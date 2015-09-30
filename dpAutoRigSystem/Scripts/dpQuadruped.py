@@ -42,10 +42,13 @@ def Quadruped(self):
         cmds.setAttr(headInstance.moduleGrp+".rotateX", 0)
         cmds.setAttr(headInstance.moduleGrp+".rotateY", 8)
         cmds.setAttr(headInstance.moduleGrp+".rotateZ", 90)
-        cmds.setAttr(headInstance.cvHeadLoc+".translateX", 2)
-        cmds.setAttr(headInstance.cvHeadLoc+".translateZ", 3)
-        cmds.setAttr(headInstance.cvJawLoc+".translateZ", 2)
-        cmds.setAttr(headInstance.cvJawLoc+".rotateY", -15)
+        cmds.setAttr(headInstance.cvNeckLoc+".rotateY", 25)
+        cmds.setAttr(headInstance.cvHeadLoc+".translateZ", 3.5)
+        cmds.setAttr(headInstance.cvHeadLoc+".rotateY", -33)
+        cmds.setAttr(headInstance.cvJawLoc+".translateZ", 1.6)
+        cmds.setAttr(headInstance.cvJawLoc+".rotateY", -5.5)
+        cmds.setAttr(headInstance.cvLLipLoc+".translateY", -0.5)
+        cmds.setAttr(headInstance.cvLLipLoc+".translateZ", 0.6)
         cmds.setAttr(headInstance.annotation+".translateX", 4)
         cmds.setAttr(headInstance.annotation+".translateY", 0)
         
@@ -78,7 +81,7 @@ def Quadruped(self):
         # set for not use bend ribbons as default:
         self.guide.Limb.setBendFalse(backLegLimbInstance)
         # change name to back leg:
-        self.guide.Limb.editUserName(backLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg']+'B')
+        self.guide.Limb.editUserName(backLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize()+'B')
         cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
         
         # editing back leg base guide informations:
@@ -95,14 +98,16 @@ def Quadruped(self):
         cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateZ", -1)
         cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateY", 65)
         cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateZ", -136)
-        cmds.setAttr(backLegLimbInstance.cvMainLoc+".rotateY", 12)
-        cmds.setAttr(backLegLimbInstance.cvCornerALoc+".translateX", 0.7)
-        cmds.setAttr(backLegLimbInstance.cvCornerALoc+".translateZ", -0.7)
-        cmds.setAttr(backLegLimbInstance.cvCornerBLoc+".translateX", -0.5)
-        cmds.setAttr(backLegLimbInstance.cvCornerBLoc+".translateZ", 2)
+        cmds.setAttr(backLegLimbInstance.cvMainLoc+".rotateY", 25)
+        cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateX", 0.7)
+        cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateZ", -0.7)
         
         # edit location of back leg ankle guide:
         cmds.setAttr(backLegLimbInstance.cvExtremLoc+".translateZ", 8)
+
+        # edit location of double back leg joint:
+        cmds.setAttr(backLegLimbInstance.cvCornerBLoc+".translateX", -2)
+
         # parent back leg guide to spine base guide:
         cmds.parent(backLegBaseGuide, spineInstance.moduleGrp, absolute=True)
         # setting X mirror:
@@ -133,7 +138,7 @@ def Quadruped(self):
         # set for not use bend ribbons as default:
         self.guide.Limb.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
-        self.guide.Limb.editUserName(frontLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg']+'A')
+        self.guide.Limb.editUserName(frontLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize()+'A')
         cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
         
         # editing front leg base guide informations:
@@ -150,14 +155,16 @@ def Quadruped(self):
         cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateZ", -2.5)
         cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateY", 40)
         cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateZ", -50)
-        cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", -15)
-        cmds.setAttr(frontLegLimbInstance.cvCornerALoc+".translateX", -0.5)
-        cmds.setAttr(frontLegLimbInstance.cvCornerALoc+".translateZ", -1.3)
-        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateX", 0.2)
-        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateZ", 1.2)
+        cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", 18)
+        cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateX", -0.5)
+        cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateZ", -1.3)
         
         # edit location of front leg ankle guide:
         cmds.setAttr(frontLegLimbInstance.cvExtremLoc+".translateZ", 6.5)
+
+        # edit location of double front leg joint:
+        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateX", 0.5)
+
         # parent front leg guide to spine chest guide:
         cmds.parent(frontLegBaseGuide, spineInstance.cvLocator, absolute=True)
         # setting X mirror:

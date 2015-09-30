@@ -75,6 +75,11 @@ class StartClass:
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.dpUIinst.guide, type='string')
         
+        baseFloatAttrList = ['shapeSize']
+        for baseFloatAttr in baseFloatAttrList:
+            cmds.addAttr(self.moduleGrp, longName=baseFloatAttr, attributeType='float')
+        cmds.setAttr(self.moduleGrp+".shapeSize", 1)
+
         # create annotation to this module:
         self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
         self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]
@@ -84,6 +89,21 @@ class StartClass:
         cmds.setAttr(self.annotation+'.template', 1)
     
     
+    def connectShapeSize(self, clusterHandle, *args):
+        """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
+        """
+        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleX", force=True)
+        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
+        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
+        # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
+        self.tempGrpName = 'dpAR_Temp_Grp'
+        if not cmds.objExists(self.tempGrpName):
+            cmds.group(name=self.tempGrpName, empty=True)
+            cmds.setAttr(self.tempGrpName+".visibility", 0)
+            cmds.setAttr(self.tempGrpName+".template", 1)
+        cmds.parent(clusterHandle, self.tempGrpName)
+
+
     def updateModuleInstanceInfo(self, *args):
         """ Just update modeuleInstanceInfo attribute in the guideNode transform.
         """

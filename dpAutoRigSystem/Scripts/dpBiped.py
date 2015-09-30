@@ -64,7 +64,7 @@ def Biped(self):
         # change limb style to biped:
         self.guide.Limb.changeStyle(legLimbInstance, self.langDic[self.langName]['m026_biped'])
         # change name to leg:
-        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'])
+        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize())
         cmds.setAttr(legLimbInstance.annotation+".translateY", -4)
         
         # editing leg base guide informations:
@@ -99,7 +99,7 @@ def Biped(self):
         # change limb style to biped:
         self.guide.Limb.changeStyle(armLimbInstance, self.langDic[self.langName]['m026_biped'])
         # change name to arm:
-        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['c_arm'])
+        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['c_arm'].capitalize())
         cmds.setAttr(armLimbInstance.annotation+".translateX", 3)
         cmds.setAttr(armLimbInstance.annotation+".translateY", 0)
         cmds.setAttr(armLimbInstance.annotation+".translateZ", 2)
@@ -146,6 +146,22 @@ def Biped(self):
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
         
+        # woking with EAR system:
+        # create FkLine module instance:
+        earInstance = self.initGuide('dpFkLine', guideDir)
+        # editing ear base guide informations:
+        self.guide.FkLine.editUserName(earInstance, checkText=self.langDic[self.langName]['m040_ear'])
+        cmds.setAttr(earInstance.moduleGrp+".translateX", 1)
+        cmds.setAttr(earInstance.moduleGrp+".translateY", 21)
+        cmds.setAttr(earInstance.moduleGrp+".rotateY", 110)
+        cmds.setAttr(earInstance.radiusCtrl+".translateX", 0.5)
+        
+        # parent ear guide to spine guide:
+        cmds.parent(earInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+        # setting X mirror:
+        self.guide.FkLine.changeMirror(earInstance, "X")
+        cmds.setAttr(earInstance.moduleGrp+".flip", 1)
+
         # select spineGuide_Base:
         cmds.select(spineInstance.moduleGrp)
     else:

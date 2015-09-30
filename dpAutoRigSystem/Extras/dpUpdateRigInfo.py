@@ -29,22 +29,30 @@ class UpdateRigInfo():
     def updateRigInfoLists(self, *args):
         """
         """
-        ctrlList = cmds.ls("*_Ctrl")
-        ctrlString = ""
-        if ctrlList:
-            for i, item in enumerate(ctrlList):
-                ctrlString = ctrlString + str(item)
-                if i < len(ctrlList):
-                    ctrlString = ctrlString + ";"
-            cmds.setAttr("Master_Ctrl.controlList", ctrlString, type="string")
-        
-        meshList = cmds.ls("*_Mesh")
-        meshString = ""
-        if meshList:
-            for i, item in enumerate(meshList):
-                meshString = meshString + str(item)
-                if i < len(meshList):
-                    meshString = meshString + ";"
-            cmds.setAttr("Master_Ctrl.geometryList", meshString, type="string")
-        print "Control List = ", ctrlString
-        print "Mesh List    = ", meshString
+        masterCtrl = None
+        masterCtrlAttr = "masterCtrl"
+        allList = cmds.ls(selection=False)
+        for nodeItem in allList:
+            if cmds.objExists(nodeItem+"."+masterCtrlAttr) and cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "bool" and cmds.getAttr(nodeItem+"."+masterCtrlAttr) == 1:
+                masterCtrl = nodeItem
+        if masterCtrl:
+            ctrlList = cmds.ls("*_Ctrl")
+            ctrlString = ""
+            if ctrlList:
+                for i, item in enumerate(ctrlList):
+                    ctrlString = ctrlString + str(item)
+                    if i < len(ctrlList):
+                        ctrlString = ctrlString + ";"
+                cmds.setAttr(masterCtrl+".controlList", ctrlString, type="string")
+            
+            meshList = cmds.ls("*_Mesh")
+            meshString = ""
+            if meshList:
+                for i, item in enumerate(meshList):
+                    meshString = meshString + str(item)
+                    if i < len(meshList):
+                        meshString = meshString + ";"
+                cmds.setAttr(masterCtrl+".geometryList", meshString, type="string")
+            print "Control List = ", ctrlString
+            print "Mesh List    = ", meshString
+            print "Updated Rig Info: "+masterCtrl,

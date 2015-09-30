@@ -21,7 +21,7 @@ def Arm(self):
         # creating module instances:
         armLimbInstance = self.initGuide('dpLimb', guideDir)
         # change name to arm:
-        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'])
+        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'].capitalize())
         # create finger instances:
         indexFingerInstance  = self.initGuide('dpFinger', guideDir)
         self.guide.Finger.editUserName(indexFingerInstance, checkText=self.langDic[self.langName]['m032_index'])
@@ -56,8 +56,9 @@ def Arm(self):
             if n == len(fingerInstanceList)-1:
                 # correct not commun values for thumb guide:
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".translateX", 10.1)
-                cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".rotateX", 60)
+                self.guide.Finger.changeJointNumber(thumbFingerInstance, 2)
+                cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
             
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)

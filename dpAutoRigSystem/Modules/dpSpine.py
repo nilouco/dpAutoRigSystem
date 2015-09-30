@@ -38,8 +38,10 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        self.cvJointLoc = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5)
-        self.cvEndJoint = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5)
+        self.connectShapeSize(shapeSizeCH)
+        self.cvEndJoint, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.connectShapeSize(shapeSizeCH)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -77,7 +79,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # add the new cvLocators:
                 for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                     # create another N cvLocator:
-                    self.cvLocator = ctrls.cvLocator( ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3 )
+                    self.cvLocator, shapeSizeCH = ctrls.cvLocator( ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3 )
+                    self.connectShapeSize(shapeSizeCH)
                     # set its nJoint value as n:
                     cmds.setAttr(self.cvLocator+".nJoint", n)
                     # parent its group to the first cvJointLocator:

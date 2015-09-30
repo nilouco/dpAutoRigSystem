@@ -247,7 +247,7 @@ def createSimpleRibbon(name='noodle', totalJoints=6):
 
 
 def cvLocator(ctrlName, r=0.3):
-    """Create and return a cvLocator curve to be usually used in the guideSystem.
+    """Create and return a cvLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
     """
     # create curve:
     curve = cmds.curve(n=ctrlName, d=1, p=[(0, 0, r), (0, 0, -r), (0, 0, 0), (r, 0, 0), (-r, 0, 0), (0, 0, 0), (0, r, 0), (0, -r, 0)] )
@@ -258,11 +258,14 @@ def cvLocator(ctrlName, r=0.3):
     renameShape([curve])
     # colorize curveShape:
     colorShape([curve], 'blue')
-    return curve
+    # shapeSize setup:
+    shapeSizeCluster = shapeSizeSetup(curve)
+#    return curve
+    return [curve, shapeSizeCluster]
 
 
 def cvJointLoc(ctrlName, r=0.3, extraLocs=False):
-    """Create and return a cvJointLocator curve to be usually used in the guideSystem.
+    """Create and return a cvJointLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
     """
     # create locator curve:
     cvLoc = cmds.curve(n=ctrlName+"_CvLoc", d=1, p=[(0, 0, r), (0, 0, -r), (0, 0, 0), (r, 0, 0), (-r, 0, 0), (0, 0, 0), (0, r, 0), (0, -r, 0)] )
@@ -302,12 +305,14 @@ def cvJointLoc(ctrlName, r=0.3, extraLocs=False):
     cmds.setAttr(locCtrl+".nJoint", 1)
     # colorize curveShapes:
     colorShape([locCtrl], 'blue')
+    # shapeSize setup:
+    shapeSizeCluster = shapeSizeSetup(locCtrl)
     cmds.select(clear=True)
-    return locCtrl
+    return [locCtrl, shapeSizeCluster]
 
 
 def cvBall(ctrlName, r=1):
-    """Create and return a cvBall curve to be usually used in the ribbonSystem.
+    """Create and return a cvBall curve to be usually used in the ribbonSystem and the clusterHandle to shapeSize..
     """
     # create circles to get the shapes:
     ballX = cmds.circle(n=ctrlName+"_x", ch=False, o=True, nr=(1, 0, 0), d=3, s=8, radius=r)
@@ -325,7 +330,7 @@ def cvBall(ctrlName, r=1):
 
 
 def cvBox(ctrlName, r=1, h=-1):
-    """Create and return a simple curve as a box control.
+    """Create and return a simple curve as a box control and the clusterHandle to shapeSize..
     """
     # verify height:
     if (h == -1):
@@ -476,8 +481,20 @@ def cvSmile(ctrlName, r=1):
 def cvCharacter(ctrlName, r=1):
     """Create a control like a mini character (minimim) to be used as an option_Ctrl.
     """
+    # get radius by checking linear unit
+    r = dpCheckLinearUnit(r)
     # create a minime curve:
     curve = cmds.curve(n=ctrlName, d=1, p=[(0, 9*r, 0), (1*r, 9*r, 0), (1.9*r, 8.2*r, 0), (1*r, 7*r, 0), (0.4*r, 6.6*r, 0), (0.4*r, 5.7*r, 0), (2.4*r, 5.45*r, 0), (3.8*r, 5.5*r, 0), (4.6*r, 6*r, 0), (5.8*r, 5.5*r, 0), (5.25*r, 4.6*r, 0), (4*r, 5*r, 0), (2.4*r, 4.9*r, 0), (1.6*r, 4.5*r, 0), (1.1*r, 3*r, 0), (1.5*r, 1.7*r, 0), (1.7*r, 0.5*r, 0), (3*r, 0.37*r, 0), (3.15*r, 0, 0), (1*r, 0, 0), (0.73*r, 1.5*r, 0), (0, 2.25*r, 0), (-0.73*r, 1.5*r, 0), (-1*r, 0, 0), (-3.15*r, 0, 0), (-3*r, 0.37*r, 0), (-1.7*r, 0.5*r, 0), (-1.5*r, 1.7*r, 0), (-1.1*r, 3*r, 0), (-1.6*r, 4.5*r, 0), (-2.4*r, 4.9*r, 0), (-4*r, 5*r, 0), (-5.25*r, 4.6*r, 0), (-5.8*r, 5.5*r, 0), (-4.6*r, 6*r, 0), (-3.8*r, 5.5*r, 0), (-2.4*r, 5.45*r, 0), (-0.4*r, 5.7*r, 0), (-0.4*r, 6.6*r, 0), (-1*r, 7*r, 0), (-1.9*r, 8.2*r, 0), (-1*r, 9*r, 0), (0, 9*r, 0)] )
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+
+
+def cvSquare(ctrlName, r=1):
+    """Create and return a simple curve as a square control.
+    """
+    # create curve:
+    curve = cmds.curve(n=ctrlName, d=1, p=[(-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, r)] )
     # rename curveShape:
     renameShape([curve])
     return curve
@@ -502,6 +519,8 @@ def cvBaseGuide(ctrlName, r=1):
     """Create a control to be used as a Base Guide control.
         Returns the main control (circle) and the radius control in a list.
     """
+    # get radius by checking linear unit
+    r = dpCheckLinearUnit(r)
     # create a simple circle curve:
     circle = cmds.circle(n=ctrlName, ch=True, o=True, nr=(0, 0, 1), d=3, s=8, radius=r)[0]
     radiusCtrl = cmds.circle(n=ctrlName+"_RadiusCtrl", ch=True, o=True, nr=(0, 1, 0), d=3, s=8, radius=(r/4.0))[0]
@@ -559,3 +578,48 @@ def setAndFreeze(nodeName="", tx=None, ty=None, tz=None, rx=None, ry=None, rz=No
                 cmds.makeIdentity(nodeName, apply=freeze, translate=freezeT, rotate=freezeR, scale=freezeS)
             except:
                 pass
+
+
+def dpCheckLinearUnit(origRadius, defaultUnit="centimeter"):
+    """ Verify if the Maya linear unit is in Centimeter.
+        Return the radius to the new unit size.
+
+        WIP!
+        Changing to shapeSize cluster setup
+    """
+    newRadius = origRadius
+#    newRadius = 1
+#    linearUnit = cmds.currentUnit(query=True, linear=True, fullName=True)
+#    # centimeter
+#    if linearUnit == defaultUnit:
+#        newRadius = origRadius
+#    elif linearUnit == "meter":
+#        newRadius = origRadius*0.01
+#    elif linearUnit == "millimeter":
+#        newRadius = origRadius*10
+#    elif linearUnit == "inch":
+#        newRadius = origRadius*0.393701
+#    elif linearUnit == "foot":
+#        newRadius = origRadius*0.032808
+#    elif linearUnit == "yard":
+#        newRadius = origRadius*0.010936
+    return newRadius
+
+
+def shapeSizeSetup(transformNode):
+    """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
+        Returns the created cluster.
+    """
+    clusterHandle = None
+    childShapeList = cmds.listRelatives(transformNode, shapes=True, children=True)
+    if childShapeList:
+        thisNamespace = childShapeList[0].split(":")[0]
+        cmds.namespace(set=thisNamespace, force=True)
+        clusterName = transformNode.split(":")[1]+"_ShapeSizeCH"
+        clusterHandle = cmds.cluster(childShapeList, name=clusterName)[1]
+        cmds.setAttr(clusterHandle+".visibility", 0)
+        cmds.xform(clusterHandle, scalePivot=(0, 0, 0), worldSpace=True)
+        cmds.namespace(set=":")
+    else:
+        print "There are not children shape to create shapeSize setup of:", transformNode
+    return clusterHandle

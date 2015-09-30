@@ -35,8 +35,8 @@ class TargetMirror():
         if cmds.window('dpTargetMirrorWindow', query=True, exists=True):
             cmds.deleteUI('dpTargetMirrorWindow', window=True)
         targetMirror_winWidth  = 305
-        targetMirror_winHeight = 250
-        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.langDic[self.langName]['m055_tgtMirror']+' '+DPTM_VERSION, iconName='dp_targetMirror', widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        targetMirror_winHeight = 450
+        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.langDic[self.langName]['m055_tgtMirror']+' '+DPTM_VERSION, iconName='dp_targetMirror', widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         
         # creating layout:
         self.targetMirrorLayout = cmds.columnLayout('targetMirrorLayout')
@@ -217,10 +217,13 @@ class TargetMirror():
                             cmds.delete(bsMirrorGrp)
                             # position:
                             if cmds.checkBox(self.mirrorPosCB, query=True, value=True):
-                                for attr in attrList:
-                                    cmds.setAttr(newTarget+"."+attr, cmds.getAttr(item+"."+attr))
-                                axisValue = cmds.getAttr(item+".translate"+axis)*(-1)
-                                cmds.setAttr(newTarget+".translate"+axis, axisValue)
+                                try:
+                                    for attr in attrList:
+                                        cmds.setAttr(newTarget+"."+attr, cmds.getAttr(item+"."+attr))
+                                    axisValue = cmds.getAttr(item+".translate"+axis)*(-1)
+                                    cmds.setAttr(newTarget+".translate"+axis, axisValue)
+                                except:
+                                    pass
                             # clear undo
                             if clearUndo:
                                 mel.eval("flushUndo;")

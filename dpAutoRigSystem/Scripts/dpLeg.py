@@ -23,7 +23,7 @@ def Leg(self):
         # change limb guide to leg type:
         self.guide.Limb.changeType(legLimbInstance, self.langDic[self.langName]['m030_leg'])
         # change name to leg:
-        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'])
+        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize())
         
         # editing leg base guide informations:
         legBaseGuide = legLimbInstance.moduleGrp

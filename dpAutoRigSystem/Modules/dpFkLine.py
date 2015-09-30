@@ -34,12 +34,14 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
-        self.cvJointLoc = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3)
+        self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
         
-        self.cvEndJoint = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.cvEndJoint, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.connectShapeSize(shapeSizeCH)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
@@ -96,7 +98,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             if self.enteredNJoints > self.currentNJoints:
                 for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                     # create another N cvJointLoc:
-                    self.cvJointLoc = ctrls.cvJointLoc( ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3 )
+                    self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc( ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3 )
+                    self.connectShapeSize(shapeSizeCH)
                     # set its nJoint value as n:
                     cmds.setAttr(self.cvJointLoc+".nJoint", n)
                     # parent it to the lastGuide:
@@ -206,20 +209,27 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     else:
                         utils.originedFrom(objName=self.ctrl, attrString=self.guide)
                     # position and orientation of joint and control:
-                    tempDel = cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False)
-                    cmds.delete(tempDel)
-                    tempDel = cmds.parentConstraint(self.guide, self.ctrl, maintainOffset=False)
-                    cmds.delete(tempDel)
+                    cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
+                    cmds.delete(cmds.parentConstraint(self.guide, self.ctrl, maintainOffset=False))
                     # zeroOut controls:
-                    utils.zeroOut([self.ctrl])
+                    zeroOutCtrlGrp = utils.zeroOut([self.ctrl])[0]
                     # hide visibility attribute:
                     cmds.setAttr(self.ctrl+'.visibility', keyable=False)
-                # create end joint:
-                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
-                tempDel = cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False)
-                cmds.delete(tempDel)
-                cmds.parent(self.endJoint, side+self.userGuideName+"_"+str(self.nJoints)+"_Jnt", absolute=True)
+                    # fixing flip mirror:
+                    if s == 1:
+                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                            cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
+                            cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
+                            cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
+                    cmds.addAttr(self.ctrl, longName='scaleCompensate', attributeType="bool", keyable=True)
+                    cmds.setAttr(self.ctrl+".scaleCompensate", 1)
+                    cmds.connectAttr(self.ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                    if n == self.nJoints:
+                        # create end joint:
+                        cmds.select(self.jnt)
+                        self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
+                        cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # grouping:
                 for n in range(1, self.nJoints+1):
                     self.jnt      = side+self.userGuideName+"_"+str(n)+"_Jnt"

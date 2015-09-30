@@ -28,12 +28,18 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # create cvJointLoc and cvLocators:
-        self.cvFootLoc = ctrls.cvJointLoc(ctrlName=self.guideName+"_foot", r=0.3)
-        self.cvRFALoc  = ctrls.cvLocator(ctrlName=self.guideName+"_RfA", r=0.3)
-        self.cvRFBLoc  = ctrls.cvLocator(ctrlName=self.guideName+"_RfB", r=0.3)
-        self.cvRFCLoc  = ctrls.cvLocator(ctrlName=self.guideName+"_RfC", r=0.3)
-        self.cvRFDLoc  = ctrls.cvLocator(ctrlName=self.guideName+"_RfD", r=0.3)
-        self.cvRFELoc  = ctrls.cvLocator(ctrlName=self.guideName+"_RfE", r=0.3)
+        self.cvFootLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName+"_foot", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
+        self.cvRFALoc, shapeSizeCH  = ctrls.cvLocator(ctrlName=self.guideName+"_RfA", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
+        self.cvRFBLoc, shapeSizeCH  = ctrls.cvLocator(ctrlName=self.guideName+"_RfB", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
+        self.cvRFCLoc, shapeSizeCH  = ctrls.cvLocator(ctrlName=self.guideName+"_RfC", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
+        self.cvRFDLoc, shapeSizeCH  = ctrls.cvLocator(ctrlName=self.guideName+"_RfD", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
+        self.cvRFELoc, shapeSizeCH  = ctrls.cvLocator(ctrlName=self.guideName+"_RfE", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
         # create jointGuides:
         self.jGuideFoot = cmds.joint(name=self.guideName+"_JGuideFoot", radius=0.001)
         self.jGuideRFE  = cmds.joint(name=self.guideName+"_JGuideRfE", radius=0.001)
@@ -52,7 +58,8 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.jGuideRFE+".template", 1)
         cmds.parent(self.jGuideFoot, self.jGuideRFA, self.moduleGrp, relative=True)
         # create cvEnd:
-        self.cvEndJoint = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.cvEndJoint, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.connectShapeSize(shapeSizeCH)
         cmds.parent(self.cvEndJoint, self.cvRFELoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
@@ -97,7 +104,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
             except:
                 hideJoints = 1
             # create lists to be integrated:
-            self.footCtrlList, self.revFootCtrlZeroFinalList, self.revFootCtrlShapeList, self.toLimbIkHandleGrpList, self.parentConstList, self.footJntList, self.ballRFList = [], [], [], [], [], [], []
+            self.footCtrlList, self.revFootCtrlZeroFinalList, self.revFootCtrlShapeList, self.toLimbIkHandleGrpList, self.parentConstList, self.footJntList, self.ballRFList, self.middleFootCtrlList, self.reverseFootAttrList = [], [], [], [], [], [], [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -154,6 +161,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 sideRFAttr    = self.langDic[self.langName]['c_RevFoot_G']
                 rfRoll        = self.langDic[self.langName]['c_RevFoot_roll']
                 rfSpin        = self.langDic[self.langName]['c_RevFoot_spin']
+                rfTurn        = self.langDic[self.langName]['c_RevFoot_turn']
                 
                 # creating joints:
                 cmds.select(clear=True)
@@ -225,6 +233,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(tempToDelA, tempToDelB)
                 self.footCtrlZeroList = utils.zeroOut([self.footCtrl, self.middleFootCtrl])
                 self.revFootCtrlZeroFinalList.append(self.footCtrlZeroList[0])
+                self.middleFootCtrlList.append(self.middleFootCtrl)
                 
                 # mount hierarchy:
                 cmds.parent(self.footCtrlZeroList[1], self.RFDJxt, absolute=True)
@@ -246,18 +255,19 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 rfTypeAttrList = [rfRoll, rfSpin]
                 for j, rfAttr in enumerate(rfAttrList):
                     for t, rfType in enumerate(rfTypeAttrList):
-                        if t == 1 and j == (len(rfAttrList)-1): # do not create ball spin attribute.
-                            pass
-                        else:
-                            cmds.addAttr(self.footCtrl, longName=rfAttr+"_"+rfType, attributeType='float', keyable=True)
+                        if t == 1 and j == (len(rfAttrList)-1): # create turn attr to ball
+                            cmds.addAttr(self.footCtrl, longName=rfAttr+"_"+rfTurn, attributeType='float', keyable=True)
+                            cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfTurn, rfJointList[j]+".rotateX", force=True)
+                            self.reverseFootAttrList.append(rfAttr+"_"+rfTurn)
+                        cmds.addAttr(self.footCtrl, longName=rfAttr+"_"+rfType, attributeType='float', keyable=True)
+                        self.reverseFootAttrList.append(rfAttr+"_"+rfType)
                         if t == 0:
                             if j > 1:
                                 cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfJointList[j]+".rotateY", force=True)
                             else:
                                 cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfJointList[j]+".rotateX", force=True)
                         else:
-                            if j < (len(rfAttrList)-1):
-                                cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfJointList[j]+".rotateZ", force=True)
+                            cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfJointList[j]+".rotateZ", force=True)
                 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.cvRFALoc+";"+self.cvRFBLoc+";"+self.cvRFCLoc+";"+self.cvRFDLoc)
@@ -340,5 +350,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                                                 "parentConstList"       : self.parentConstList,
                                                 "footJntList"           : self.footJntList,
                                                 "ballRFList"            : self.ballRFList,
+                                                "middleFootCtrlList"    : self.middleFootCtrlList,
+                                                "reverseFootAttrList"   : self.reverseFootAttrList,
                                                 }
                                     }

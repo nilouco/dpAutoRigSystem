@@ -33,6 +33,13 @@
 #                                          Proxy_Grp, FX_Grp, Jaw autoTranslate, StickyLips, EyeLookAt, Finger Ik setup,
 #                                          Add Hand Follow, Target Mirror
 #                             changed: all names to PascalCase
+#       v 2.6 _ 2015-06-08 - fixed: dpTargetMirror with locked transform, arm stretchale, integrated reverseFootCtrl_Old renaming,
+#                                   R_Leg_IkFkBlendGrpToRevFoot_Grp_ParentConstraint offset without stretch, addBend and forearm,
+#                                   fkLine flip mirror, biped ear, quadruped legs, limb start stretch value
+#                            implemented: findPath to Linux OS on dpUtils, eyeScale, sideLips, ballSpin and ballTurn, limb fkIsolated,
+#                                         ikFkSnap (thanks to Renaud Lessard), head translation, finger ikStretch, limb volume variation,
+#                                         eyeLookAt activation with baseCtrl, limb extra bends, shapeSize
+#                            changed: only one limb corner joint, unlocked fk translation,
 #
 #
 ###################################################################
@@ -56,7 +63,7 @@ except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
 
-DPAR_VERSION = "2.5"
+DPAR_VERSION = "2.6"
 
 class DP_AutoRig_UI:
     
@@ -219,7 +226,7 @@ class DP_AutoRig_UI:
         
         #colMiddleRightA - scrollLayout - modulesLayout:
         self.allUIs["colMiddleRightA"] = cmds.scrollLayout("colMiddleRightA", width=150, parent=self.allUIs["riggingTabLayout"])
-        self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=150, parent=self.allUIs["colMiddleRightA"])
+        self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
         # here will be populated by created instances of modules...
         # after footerA we will call the function to populate here, because it edits the footerAText
         cmds.setParent(self.allUIs["riggingTabLayout"])
@@ -235,7 +242,7 @@ class DP_AutoRig_UI:
         self.allUIs["prefixTextField"] = cmds.textField('prefixTextField', text="", parent= self.allUIs["prefixLayout"], changeCommand=self.setPrefix)
         self.allUIs["prefixText"] = cmds.text('prefixText', align='left', label=self.langDic[self.langName]['i003_prefix'], parent=self.allUIs["prefixLayout"])
         cmds.setParent(self.allUIs["rigOptionsLayout"])
-        self.allUIs["hideJointsCB"] = cmds.checkBox('hideJointsCB', label=self.langDic[self.langName]['i009_hideJointsCB'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["hideJointsCB"] = cmds.checkBox('hideJointsCB', label=self.langDic[self.langName]['i009_hideJointsCB'], align='left', v=0, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["integrateCB"] = cmds.checkBox('integrateCB', label=self.langDic[self.langName]['i010_integrateCB'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["defaultRenderLayerCB"] = cmds.checkBox('defaultRenderLayerCB', label=self.langDic[self.langName]['i004_defaultRL'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         cmds.setParent(self.allUIs["riggingTabLayout"])
@@ -316,10 +323,6 @@ class DP_AutoRig_UI:
         self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
         self.extraModuleList = self.startGuideModules("Extras", "start", "extraLayout")
         
-        # TODO:
-        # dpControls
-        # fx nulls
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["extraTabLayout"], edit=True,
                         attachForm=[(self.allUIs["extraMainLayout"], 'top', 20), (self.allUIs["extraMainLayout"], 'left', 5), (self.allUIs["extraMainLayout"], 'right', 5), (self.allUIs["extraMainLayout"], 'bottom', 5)]
@@ -358,7 +361,7 @@ class DP_AutoRig_UI:
         # re-create module layout:
         if selectedGuideNode:
             for moduleInstance in self.moduleInstancesList:
-                cmds.button(moduleInstance.selectButton, edit=True, label=" ")
+                cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
                 for selectedGuide in selectedGuideNodeList:
                     selectedGuideInfo = cmds.getAttr(selectedGuide+".moduleInstanceInfo")
                     if selectedGuideInfo == str(moduleInstance):
@@ -369,7 +372,7 @@ class DP_AutoRig_UI:
                 cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_selectedModule'])
                 cmds.deleteUI("selectedColumn")
                 for moduleInstance in self.moduleInstancesList:
-                    cmds.button(moduleInstance.selectButton, edit=True, label=" ")
+                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
                 pass
         # re-select items:
@@ -795,7 +798,8 @@ class DP_AutoRig_UI:
                         break
                 if not foundMasterGrp:
                     # create a dpAR_masterGrp:
-                    self.masterGrp = cmds.group(name=self.prefix+'dpAR_All_Grp', empty=True)
+                    allGrpName = "dpAR_All_Grp"
+                    self.masterGrp = cmds.group(name=self.prefix+allGrpName, empty=True)
                     cmds.addAttr(self.masterGrp, longName='masterGrp', attributeType='bool')
                     cmds.setAttr(self.masterGrp+'.masterGrp', 1)
                     # add data log:
@@ -847,20 +851,23 @@ class DP_AutoRig_UI:
                     cmds.connectAttr(self.scalableGrp+".message", self.masterGrp+".scalableGrp")
                     # working with controls:
                     # create a dpAR_masterCtrl:
-                    self.masterCtrl = cmds.circle(name=self.prefix+'Master_Ctrl', normal=(0, 1, 0), degree=3, radius=10, constructionHistory=False)[0]
+                    masterCtrlRadius = ctrls.dpCheckLinearUnit(10)
+                    self.masterCtrl = cmds.circle(name=self.prefix+'Master_Ctrl', normal=(0, 1, 0), degree=3, radius=masterCtrlRadius, constructionHistory=False)[0]
                     cmds.addAttr(self.masterCtrl, longName='masterCtrl', attributeType='bool')
                     cmds.setAttr(self.masterCtrl+'.masterCtrl', 1)
                     cmds.addAttr(self.masterCtrl, longName='geometryList', dataType='string')
                     cmds.addAttr(self.masterCtrl, longName='controlList', dataType='string')
                     # create a dpAR_globalCtrl:
-                    self.globalCtrl = cmds.circle(name=self.prefix+'Global_Ctrl', normal=(0, 1, 0), degree=1, radius=16, sections=4, constructionHistory=False)[0]
+                    globalCtrlRadius = ctrls.dpCheckLinearUnit(16)
+                    self.globalCtrl = cmds.circle(name=self.prefix+'Global_Ctrl', normal=(0, 1, 0), degree=1, radius=globalCtrlRadius, sections=4, constructionHistory=False)[0]
                     cmds.setAttr(self.globalCtrl+".rotateY", 45)
                     cmds.makeIdentity(self.globalCtrl, apply=True)
                     # create a dpAR_rootCtrl:
-                    self.rootCtrl = cmds.circle(name=self.prefix+'Root_Ctrl', normal=(0, 1, 0), degree=1, radius=9.5, constructionHistory=False)[0]
+                    rootCtrlRadius = ctrls.dpCheckLinearUnit(9.5)
+                    self.rootCtrl = cmds.circle(name=self.prefix+'Root_Ctrl', normal=(0, 1, 0), degree=1, radius=rootCtrlRadius, constructionHistory=False)[0]
                     # create a dpAR_optionCtrl:
                     self.optionCtrl = ctrls.cvCharacter(self.prefix+'Option_Ctrl', r=0.2)
-                    cmds.setAttr(self.optionCtrl+".translateX", 10)
+                    cmds.setAttr(self.optionCtrl+".translateX", masterCtrlRadius)
                     cmds.makeIdentity(self.optionCtrl, apply=True)
                     self.optionCtrlGrp = utils.zeroOut([self.optionCtrl])[0]
                     # create messageAttributes to tell us the rig controls created:
@@ -893,7 +900,7 @@ class DP_AutoRig_UI:
                     cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
                     ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                     
-                    
+            
             # run RIG function for each guideModule:
             for guideModule in self.modulesToBeRiggedList:
                 # create the rig for this guideModule:
@@ -1022,12 +1029,13 @@ class DP_AutoRig_UI:
                             # make scalableHookGrp inative:
                             cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
                 
-                # integrating modules togheter:
+                # integrating modules together:
                 # working with specific cases:
                 if self.integratedTaskDic:
                     defaultAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
                     for moduleDic in self.integratedTaskDic:
                         moduleType = moduleDic[:moduleDic.find("__")]
+						
                         # footGuide parented in the extremGuide of the limbModule:
                         if moduleType == "Foot":
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
@@ -1049,6 +1057,7 @@ class DP_AutoRig_UI:
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
                                     ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
+                                    middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
@@ -1059,6 +1068,8 @@ class DP_AutoRig_UI:
                                     parentConstToRFOffset = self.integratedTaskDic[fatherGuide]['parentConstToRFOffsetList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbType              = self.integratedTaskDic[fatherGuide]['limbType']
+                                    ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
+                                    worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.delete(ikHandlePointConst, parentConst)
                                     cmds.parent(revFootCtrlZero, ikFkBlendGrpToRevFoot, absolute=True)
@@ -1068,9 +1079,10 @@ class DP_AutoRig_UI:
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                     # organize to avoid offset error in the parentConstraint with negative scale:
                                     if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
-                                        cmds.setAttr(parentConstToRFOffset+".target[1].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
-                                        cmds.setAttr(parentConstToRFOffset+".target[1].targetOffsetRotateY", cmds.getAttr(parentConstToRFOffset+".fixOffsetY"))
-                                        cmds.setAttr(parentConstToRFOffset+".target[1].targetOffsetRotateZ", cmds.getAttr(parentConstToRFOffset+".fixOffsetZ"))
+                                        for f in range(1,3):
+                                            cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
+                                            cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateY", cmds.getAttr(parentConstToRFOffset+".fixOffsetY"))
+                                            cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateZ", cmds.getAttr(parentConstToRFOffset+".fixOffsetZ"))
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add float attributes and connect from ikCtrl to revFootCtrl:
@@ -1079,30 +1091,57 @@ class DP_AutoRig_UI:
                                         if not floatAttr in defaultAttrList and not cmds.objExists(ikCtrl+'.'+floatAttr):
                                             cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
+                                    if ikFkNetworkList:
+                                        lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
+                                        cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
+                                    cmds.rename(revFootCtrl, revFootCtrl+"_Old")
                         
-                        # worldRef of extremGuide from limbModule controled by optionCtrl:
+                        # worldRef of extremGuide from limbModule controlled by optionCtrl:
                         if moduleType == "Limb":
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
+                            ikFkNetworkList   = self.integratedTaskDic[moduleDic]['ikFkNetworkList']
+                            ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
+                            lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             for w, worldRef in enumerate(worldRefList):
-                                # do actions in order to make limb be controled by optionCtrl:
+                                # do actions in order to make limb be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True)
                                 for f, floatAttr in enumerate(floatAttrList):
                                     if f < len(floatAttrList):
                                         if not floatAttr in defaultAttrList:
                                             if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
                                                 currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
-                                                cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType='float', minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                                                if floatAttr == lvvAttr:
+                                                    cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
+                                                else:
+                                                    cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
                                             cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
                                 if not floatAttrList[len(floatAttrList)-1] in defaultAttrList and not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
-                                    cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType='float', defaultValue=1, keyable=True)
+                                    cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
                                     cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+                                cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
+
+                                # update ikFkNetwork:
+                                if ikFkNetworkList:
+                                    netIndex = 1
+                                    optionCtrlAttrList = cmds.listAttr(self.optionCtrl, visible=True, scalar=True, keyable=True)
+                                    for optAttr in optionCtrlAttrList:
+                                        if "_IkFkBlend" in optAttr:
+                                            cmds.connectAttr(self.optionCtrl+'.'+optAttr, ikFkNetworkList[w]+'.attState', force=True)
+                                    limbAttrList = cmds.listAttr(ikCtrlList[w], visible=True, scalar=True, keyable=True)
+                                    for limbAttr in limbAttrList:
+                                        if not limbAttr in defaultAttrList and "_" in limbAttr:
+                                            cmds.connectAttr(ikCtrlList[w]+'.'+limbAttr, ikFkNetworkList[w]+'.footRollAtts['+str(netIndex)+']', force=True)
+                                            netIndex = netIndex + 1
+
                                 cmds.setAttr(worldRefShapeList[w]+'.visibility', 0)
+                                cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True)
                             
-                            # parenting correctely the ikCtrlZero to spineModule:
+                            # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
+                            
                             if fatherModule == "Spine":
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                                 self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
@@ -1122,20 +1161,20 @@ class DP_AutoRig_UI:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     hipsA  = self.integratedTaskDic[fatherGuide]['hipsAList'][0]
                                     chestA = self.integratedTaskDic[fatherGuide]['chestAList'][0]
-                                    # verifing what part will be used, the hips or chest:
-                                    if limbType == "leg":
+                                    # verifying what part will be used, the hips or chest:
+                                    if limbType == self.langDic[self.langName]['m030_leg']:
                                         # do task actions in order to integrate the limb of leg type to rootCtrl:
                                         cmds.parent(ikCtrlZero, self.rootCtrl, absolute=True)
                                         cmds.parent(ikPoleVectorCtrlZero, self.rootCtrl, absolute=True)
-                                    elif fatherGuideLoc == "jointLoc1":
+                                    elif fatherGuideLoc == "JointLoc1":
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, hipsA, absolute=True)
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, chestA, absolute=True)
                                     # verify if is quadruped
-                                    if limbStyle == "quadruped" or limbStyle == "quadSpring":
-                                        if fatherGuideLoc != "jointLoc1":
+                                    if limbStyle == self.langDic[self.langName]['m037_quadruped'] or limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                                        if fatherGuideLoc != "JointLoc1":
                                             # get extra info from limb module data:
                                             quadFrontLeg = self.integratedTaskDic[moduleDic]['quadFrontLegList'][s]
                                             ikCtrl       = self.integratedTaskDic[moduleDic]['ikCtrlList'][s]
@@ -1180,20 +1219,17 @@ class DP_AutoRig_UI:
                             if self.itemGuideMirrorAxis != "off":
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
-                                # connect the masterCtrl to head group B using a orientConstraint:
-                                grpHeadB = self.integratedTaskDic[moduleDic]['grpHeadBList'][s]
-                                headRevNode = self.integratedTaskDic[moduleDic]['headRevNodeList'][s]
-                                headOrientConst = cmds.orientConstraint(self.rootCtrl, grpHeadB, maintainOffset=True, name=grpHeadB+"_OrientConstraint")[0]
-                                cmds.connectAttr(headRevNode+'.outputX', headOrientConst+"."+self.rootCtrl+"W1", force=True)
+                                # connect the masterCtrl to head group using a orientConstraint:
+                                worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
+                                cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_ParentConstraint")
                         
-                        # integrate the head orient from the masterCtrl:
+                        # integrate the EyeLookAt with the Head setup:
                         if moduleType == "EyeLookAt":
-                            # connect the masterCtrl to head group B using a orientConstraint:
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
                             eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
                             upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
                             cmds.parent(eyeGrp, self.rootCtrl, relative=False)
-                            # correct follow attribute to head control:
+                            # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
                             if fatherModule == "Head":
@@ -1207,8 +1243,19 @@ class DP_AutoRig_UI:
                                 cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c_Follow'], headParentConst+"."+headCtrl+"W1", force=True)
                                 cmds.parent(upLocGrp, headCtrl, relative=False)
                                 cmds.setAttr(upLocGrp+".visibility", 0)
+                                # head drives eyeScaleGrp:
+                                self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                                self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                                # working with item guide mirror:
+                                self.itemMirrorNameList = [""]
+                                # get itemGuideName:
+                                if self.itemGuideMirrorAxis != "off":
+                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
+                                for s, sideName in enumerate(self.itemMirrorNameList):
+                                    eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
+                                    cmds.parentConstraint(headCtrl, eyeScaleGrp, maintainOffset=True)
                 
-                        # integrate the head orient from the masterCtrl:
+                        # integrate the Finger module:
                         if moduleType == "Finger":
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
@@ -1222,11 +1269,11 @@ class DP_AutoRig_UI:
                                 scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
                                 # correct ikCtrl parent to root ctrl:
                                 cmds.parent(ikCtrlZero, self.rootCtrl, relative=True)
-                                # correct follow attribute to head control:
+                                # get father guide data:
                                 fatherModule   = self.hookDic[moduleDic]['fatherModule']
                                 fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
                                 if fatherModule == "Limb" and fatherGuideLoc == 'Extrem':
-                                    # getting head data:
+                                    # getting limb type:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     limbType = self.integratedTaskDic[fatherGuide]['limbType']
                                     if limbType == "arm":

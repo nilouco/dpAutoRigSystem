@@ -12,7 +12,10 @@ def findEnv(key, path):
     envStr = os.environ[key]
     
     dpARPath = findPath("dpAutoRig.py")
-    splitEnvList = envStr.split(";")
+    if os.name == "posix":
+        splitEnvList = envStr.split(":")
+    else:
+        splitEnvList = envStr.split(";")
     envPath = ""
     if splitEnvList:
         for env in splitEnvList:
@@ -21,12 +24,20 @@ def findEnv(key, path):
                     envPath = dpARPath.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
                 except:
                     pass
-                if envPath != "" and envPath != " " and envPath != None:
+                if len(env) < 4:
+                    envPath = dpARPath.split(env)[1][0:].split(path)[0][:-1].replace('/','.')
                     return envPath+"."+path
                 break
     # if we are here, we must return a default path:
     splitEnvList = envStr.rpartition(path)
-    envPath = splitEnvList[0][splitEnvList[0].rfind(":")-1:]
+    if os.name == "posix":
+        if envPath != "":
+            envPath = envPath+".dpAutoRigSystem"
+        else:
+            envPath = "dpAutoRigSystem"
+    else:
+        if ":" in envPath:
+            envPath = splitEnvList[0][splitEnvList[0].rfind(":")-1:]
     if envPath == "" or envPath == " " or envPath == None:
         return path
     return envPath
@@ -70,7 +81,7 @@ def findAllModules(path, dir):
     moduleList = []
     # removing "__init__":
     for file in allPyFilesList:
-        if file != "__init__" and file != "dpControls" and file != "dpUtils" and file != "dpBaseClass" and file != "dpLayoutClass" and file != 'jcRibbon':
+        if file != "__init__" and file != "dpControls" and file != "dpUtils" and file != "dpBaseClass" and file != "dpLayoutClass" and file != 'jcRibbon' and file != 'sqIkFkTools':
             moduleList.append(file)
     return moduleList
 
@@ -130,7 +141,7 @@ def findLastNumber(nameList, basename):
                 # verify if this got number is greather than the last number (value) in order to return them:
                 if numberElement > lastValue:
                     lastValue = numberElement
-    # analisys which value must be returned:
+    # analysis which value must be returned:
     if lastValue > existValue:
         finalValue = lastValue
     else:

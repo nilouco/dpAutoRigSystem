@@ -7,12 +7,23 @@
 
 # install:
 # first of all, copy the dpAutoRigSystem folder to your maya/scripts directory
-# or another MAYA_PATH (ex: C:/Users/DaniloPinheiro/Documents/maya/scripts
-# or C:/Program Files/Autodesk/Maya2011/Python/Lib/site-packages/dpAutoRigSystem)
+# or another MAYA_PATH like:
+#
+# Windows:
+# C:/Users/yourUserName/Documents/maya/scripts
+# or C:/Program Files/Autodesk/Maya2011/Python/Lib/site-packages/dpAutoRigSystem
+#
+# MAC:
+# /Users/yourUserName/Library/Preferences/Autodesk/maya/2012-x64/scripts/
+#
+# Linux:
+# /home/yourUserName/maya/scripts
+#
 # just copy and past this code in the scriptEditor python tab,
 # select it, drag and drop to your shelf as a python button.
-# if you use Mac, you can copy to the directory:
-# /Users/yourUserName/Library/Preferences/Autodesk/maya/2012-x64/scripts/
+#
+#
+# Attention:
 # Your maya version and/or yourUserName must be edited.
 
 

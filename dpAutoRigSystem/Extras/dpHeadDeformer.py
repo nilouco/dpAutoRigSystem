@@ -38,15 +38,16 @@ class HeadDeformer():
             defSize = cmds.getAttr(twistDefList[0]+".highBound")
             defScale = cmds.getAttr(twistDefList[1]+".scaleY")
             defTy = -(defSize * defScale)
+            defTy = self.dpCheckLinearUnit(defTy)
             cmds.setAttr(twistDefList[0]+".lowBound", 0)
             cmds.setAttr(twistDefList[0]+".highBound", (defSize * 2))
             cmds.setAttr(twistDefList[1]+".ty", defTy)
             
             # squash deformer
             squashDefList = cmds.nonLinear(selList, name="SquashHead", type="squash")
-            cmds.setAttr(squashDefList[0]+".lowBound", 0)
-            cmds.setAttr(squashDefList[0]+".highBound", (defSize * 2))
+            cmds.setAttr(squashDefList[0]+".highBound", (defSize * 4))
             cmds.setAttr(squashDefList[1]+".ty", defTy)
+            cmds.setAttr(squashDefList[0]+".startSmoothness", 1)
             
             # side bend deformer
             sideBendDefList = cmds.nonLinear(selList, name="BendSideHead", type="bend")
@@ -73,9 +74,6 @@ class HeadDeformer():
             
             # multiply divide in order to intensify influences
             mdNode = cmds.createNode("multiplyDivide", name=self.headName+"Deformer_MD")
-            cmds.setAttr(mdNode+".input2X", 0.1)
-            cmds.setAttr(mdNode+".input2Y", 0.1)
-            cmds.setAttr(mdNode+".input2Z", 0.1)
             mdTwistNode = cmds.createNode("multiplyDivide", name=self.headName+"Deformer_Twist_MD")
             cmds.setAttr(mdTwistNode+".input2Y", -1)
             
@@ -91,7 +89,18 @@ class HeadDeformer():
             cmds.connectAttr(mdNode+".outputY", squashDefList[0]+".factor", force=True)
             cmds.connectAttr(mdNode+".outputZ", frontBendDefList[0]+".curvature", force=True)
             cmds.connectAttr(mdTwistNode+".outputY", twistDefList[0]+".endAngle", force=True)
-            
+            # change squash to be more cartoon
+            cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=mdNode+".outputY", driverValue=-1, value=-4, inTangentType="auto", outTangentType="auto")
+            cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=mdNode+".outputY", driverValue=0, value=-2, inTangentType="auto", outTangentType="auto")
+            cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=mdNode+".outputY", driverValue=2, value=-1, inTangentType="auto", outTangentType="flat")
+            # fix side values
+            axisList = ["X", "Y", "Z"]
+            for axis in axisList:
+                unitConvNode = cmds.listConnections(mdNode+".output"+axis, destination=True)[0]
+                if unitConvNode:
+                    if cmds.objectType(unitConvNode) == "unitConversion":
+                        cmds.setAttr(unitConvNode+".conversionFactor", 1)
+
             attrList = ['rx', 'rz', 'sx', 'sy', 'sz', 'v']
             for attr in attrList:
                 cmds.setAttr(arrowCtrl+"."+attr, lock=True, keyable=False)
@@ -100,7 +109,8 @@ class HeadDeformer():
             cmds.setAttr(arrowCtrl+".intensityZ", edit=True, keyable=False, channelBox=True)
             
             # create groups
-            cmds.group(arrowCtrl, name=self.headName+"Deformer_Ctrl_Grp")
+            arrowCtrlGrp = cmds.group(arrowCtrl, name=self.headName+"Deformer_Ctrl_Grp")
+            cmds.setAttr(arrowCtrlGrp+".ty", -1.75*defTy)
             cmds.group((squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1]), name=self.headName+"Deformer_Data_Grp")
             
             # finish selection the arrow control
@@ -110,7 +120,7 @@ class HeadDeformer():
             mel.eval("warning \""+self.langDic[self.langName]['i034_notSelHeadDef']+"\";")
     
     
-    def dpCvArrow(self, ctrlName="arrowCurve", *args):
+    def dpCvArrow(self, ctrlName="arrowCurve", radius=1, *args):
         """ Create an arrow control curve and returns it.
         """
         if cmds.objExists(ctrlName) == True:
@@ -119,7 +129,30 @@ class HeadDeformer():
             while cmds.objExists(ctrlName) == True:
                 ctrlName = originalCtrlName+str(i)
                 i += 1
-        arrowCurve = cmds.curve(name=ctrlName, d=1, p=[(0, 0, 0), (-2, 1, 0), (-1, 1, 0), (-1, 4, 0), (1, 4, 0), (1, 1, 0), (2, 1, 0), (0, 0, 0)])
+        r = radius*0.1
+        arrowCurve = cmds.curve(name=ctrlName, d=1, p=[(0, 0, 0), (-2*r, r, 0), (-r, r, 0), (-r, 4*r, 0), (r, 4*r, 0), (r, r, 0), (2*r, r, 0), (0, 0, 0)])
         cmds.rename(cmds.listRelatives(arrowCurve, children=True, type="nurbsCurve", shapes=True), arrowCurve+"Shape")
         return arrowCurve
 
+
+    def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):
+        """ Verify if the Maya linear unit is in Centimeter.
+            Return the radius to the new unit size using multiplying.
+            Same function from dpControls module.
+        """
+        newRadius = 1
+        linearUnit = cmds.currentUnit(query=True, linear=True, fullName=True)
+        # centimeter
+        if linearUnit == defaultUnit:
+            newRadius = origRadius
+        elif linearUnit == "meter":
+            newRadius = origRadius*0.01
+        elif linearUnit == "millimeter":
+            newRadius = origRadius*10
+        elif linearUnit == "inch":
+            newRadius = origRadius*0.393701
+        elif linearUnit == "foot":
+            newRadius = origRadius*0.032808
+        elif linearUnit == "yard":
+            newRadius = origRadius*0.010936
+        return newRadius

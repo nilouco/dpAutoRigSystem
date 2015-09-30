@@ -22,12 +22,13 @@ class LayoutClass:
         """ Create a Basic Module Layout.
         """
         # BASIC MODULE LAYOUT:
-        self.basicColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(30, 20, 80, 20), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.topColumn )
+        self.basicColumn = cmds.rowLayout(numberOfColumns=5, width=190, columnWidth5=(30, 20, 80, 20, 35), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent=self.topColumn)
         # create basic module UI:
-        self.selectButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m004_select'], command=self.reCreateEditSelectedModuleLayout, parent=self.basicColumn)
+        self.selectButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m004_select'], command=self.reCreateEditSelectedModuleLayout, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         self.annotationCheckBox = cmds.checkBox(label=" ", annotation=self.langDic[self.langName]['m014_annotation'], onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), value=0, parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.langDic[self.langName]['m006_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
         self.colorButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
+        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shapeSize'], minValue=0.001, value=1, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
         # edit values reading from guide:
         displayAnnotationValue = cmds.getAttr(self.moduleGrp+'.displayAnnotation')
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
@@ -93,7 +94,7 @@ class LayoutClass:
                 # edit label of frame layout:
                 cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_selectedModule']+" :  "+self.langDic[self.langName][self.title]+" - "+self.userGuideName)
                 # edit button with "S" letter indicating it is selected:
-                cmds.button(self.selectButton, edit=True, label="S")
+                cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 0.7, 0.4))
                 cmds.columnLayout("selectedColumn", adjustableColumn=True, parent="selectedModuleLayout")
                 # re-create segment layout:
                 self.segDelColumn = cmds.rowLayout(numberOfColumns=3, columnWidth3=(100, 132, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 10)], parent="selectedColumn" )
@@ -205,15 +206,15 @@ class LayoutClass:
             except:
                 pass
             # disable colorOverride of all shapes inside of the moduleGrp:
-            childrenModuleList = cmds.listRelatives(self.moduleGrp, allDescendents=True)
+            childrenModuleList = cmds.listRelatives(self.moduleGrp, allDescendents=True, type="nurbsCurve")
             if childrenModuleList:
                 if colorIndex != 0:
                     for child in childrenModuleList:
-                        if cmds.getAttr(child+'.overrideEnabled') == 1:
+                        if cmds.getAttr(child+'.overrideEnabled') == 1 and not "Orig" in child:
                             cmds.setAttr(child+'.overrideEnabled', 0)
                 else:
                     for child in childrenModuleList:
-                        if cmds.getAttr(child+'.overrideColor') != 0:
+                        if cmds.getAttr(child+'.overrideColor') != 0 and not "Orig" in child:
                             cmds.setAttr(child+'.overrideEnabled', 1)
     
     
@@ -256,6 +257,12 @@ class LayoutClass:
         """ Set the attribute value for flip.
         """
         cmds.setAttr(self.moduleGrp+".flip", cmds.checkBox(self.flipCB, query=True, value=True))
+    
+    
+    def changeShapeSize(self, *args):
+        """ Set the attribute value for shapeSize.
+        """
+        cmds.setAttr(self.moduleGrp+".shapeSize", cmds.floatField(self.shapeSizeFF, query=True, value=True))
     
     
     def changeMirror(self, item, *args):
