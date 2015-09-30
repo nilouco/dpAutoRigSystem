@@ -98,7 +98,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                     for item in allGuideList:
                         cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name=side+self.userGuideName+"_"+self.moduleGrp+"_grp", empty=True)
+                    self.mirrorGrp = cmds.group(name="guide_base_grp", empty=True)
                     cmds.parent(side+self.userGuideName+'_guide_base', self.mirrorGrp, absolute=True)
                     # re-rename grp:
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
@@ -111,10 +111,13 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name=self.userGuideName+'_'+self.moduleGrp+"_grp", relative=True)
+                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name="guide_base_grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-            for side in sideList:
+            # store the number of this guide by module type
+            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            # run for all sides
+            for s, side in enumerate(sideList):
                 # redeclaring variables:
                 self.base       = side+self.userGuideName+"_guide_base"
                 self.cvNeckLoc  = side+self.userGuideName+"_guide_neck"
@@ -150,6 +153,22 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 ctrls.setAndFreeze(nodeName=self.headCtrl, rx=90, rz=-90)
                 ctrls.setAndFreeze(nodeName=self.jawCtrl, rz=-90)
                 ctrls.setAndFreeze(nodeName=self.chinCtrl, rz=-90)
+                
+                # edit the mirror shape to a good direction of controls:
+                ctrlList = [ self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl ]
+                if s == 1:
+                    for ctrl in ctrlList:
+                        if self.mirrorAxis == 'X':
+                            cmds.setAttr(ctrl+'.rotateY', 180)
+                        elif self.mirrorAxis == 'Y':
+                            cmds.setAttr(ctrl+'.rotateY', 180)
+                        elif self.mirrorAxis == 'Z':
+                            cmds.setAttr(ctrl+'.rotateX', 180)
+                            cmds.setAttr(ctrl+'.rotateZ', 180)
+                        elif self.mirrorAxis == 'XYZ':
+                            cmds.setAttr(ctrl+'.rotateX', 180)
+                            cmds.setAttr(ctrl+'.rotateZ', 180)
+                    cmds.makeIdentity(ctrlList, apply=True, translate=False, rotate=True, scale=False)
                 
                 # temporary parentConstraints:
                 tempDelNeck = cmds.parentConstraint(self.cvNeckLoc, self.neckCtrl, maintainOffset=False)
@@ -196,6 +215,12 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c_follow'], revNode+".inputX", force=True)
                 cmds.connectAttr(revNode+'.outputX', parentConst+"."+self.worldRef+"W1", force=True)
                 
+                # create a locator in order to avoid delete static group
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                cmds.parent(loc, self.worldRef, absolute=True)
+                cmds.setAttr(loc+".visibility", 0)
+                ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+                
                 # hiding visibility attributes:
                 ctrls.setLockHide([self.headCtrl, self.neckCtrl, self.jawCtrl, self.chinCtrl], ['v'], l=False)
                 
@@ -204,7 +229,12 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.toScalableHookGrp = cmds.group(self.neckJnt, name=side+self.userGuideName+"_joint_grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.grpHead, self.worldRef, name=side+self.userGuideName+"_grp")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
+                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
+                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
+                # add module type counter value
+                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
+                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 utils.addHook(objName=self.grpHead, hookType='rootHook')

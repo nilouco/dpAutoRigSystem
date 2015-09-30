@@ -121,6 +121,28 @@ def findLastNumber(nameList, basename):
     return finalValue
 
 
+def findModuleLastNumber(className, typeName):
+    """ Find the last used number of this type of module.
+        Return its highest number.
+    """
+    # work with rigged modules in the scene:
+    numberList = []
+    guideTypeCount = 0
+    # list all transforms and find the existing value in them names:
+    transformList = cmds.ls(selection=False, transforms=True)
+    for transform in transformList:
+        if cmds.objExists(transform+"."+typeName):
+            if cmds.getAttr(transform+"."+typeName) == className:
+                numberList.append(className)
+        # try check if there is a masterGrp and get its counter:
+        if cmds.objExists(transform+".masterGrp") and cmds.getAttr(transform+".masterGrp") == 1:
+            guideTypeCount = cmds.getAttr(transform+'.dp'+className+'Count')
+    if(guideTypeCount > len(numberList)):
+        return guideTypeCount
+    else:
+        return len(numberList)
+    
+    
 def normalizeText(enteredText="", prefixMax=4):
     """ Analisys the enteredText to conform it in order to use in Application (Maya).
         Return the normalized text.
@@ -160,10 +182,11 @@ def zeroOut(transformList=[]):
     if transformList:
         for transform in transformList:
             zero = cmds.duplicate(transform, name=transform+'_zero')[0]
-            try:
-                cmds.deleteAttr(zero+".originedFrom")
-            except:
-                pass
+            if( cmds.objExists(zero+".originedFrom") ):
+                try:
+                    cmds.deleteAttr(zero+".originedFrom")
+                except:
+                    pass
             allChildrenList = cmds.listRelatives(zero, allDescendents=True, children=True, fullPath=True)
             for child in allChildrenList:
                 cmds.delete(child)
@@ -377,3 +400,14 @@ def getModulesToBeRigged(instanceList):
                 if not cmds.objExists(userGuideName+'_grp'):
                     modulesToBeRiggedList.append(guideModule)
     return modulesToBeRiggedList
+
+
+def getCtrlRadius(nodeName):
+    """ Calculate and return the final radius to be used as a size of controls.
+    """
+    radius = float(cmds.getAttr(nodeName+".translateX"))
+    parentList = getParentsList(nodeName)
+    if (parentList):
+        for parent in parentList:
+            radius *= cmds.getAttr(parent+'.scaleX')
+    return radius

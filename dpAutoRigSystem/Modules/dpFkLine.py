@@ -159,7 +159,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                     for item in allGuideList:
                         cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name=side+self.userGuideName+"_"+self.moduleGrp+"_grp", empty=True)
+                    self.mirrorGrp = cmds.group(name="guide_base_grp", empty=True)
                     cmds.parent(side+self.userGuideName+'_guide_base', self.mirrorGrp, absolute=True)
                     # re-rename grp:
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
@@ -172,10 +172,14 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name=self.userGuideName+'_'+self.moduleGrp+"_grp", relative=True)
+                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name="guide_base_grp", relative=True)
+                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_grp"
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-            for side in sideList:
+            # store the number of this guide by module type
+            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            # run for all sides
+            for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_guide_base'
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
@@ -227,12 +231,22 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_ctrl_zero", name=side+self.userGuideName+"_control_grp")
                 self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_jnt", name=side+self.userGuideName+"_joint_grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_grp")
+                # create a locator in order to avoid delete static group
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                cmds.parent(loc, self.toStaticHookGrp, absolute=True)
+                cmds.setAttr(loc+".visibility", 0)
+                ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
                 utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
+                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
+                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
+                # add module type counter value
+                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
+                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):

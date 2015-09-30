@@ -142,7 +142,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                     for item in allGuideList:
                         cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name=side+self.userGuideName+"_"+self.moduleGrp+"_grp", empty=True)
+                    self.mirrorGrp = cmds.group(name="guide_base_grp", empty=True)
                     cmds.parent(side+self.userGuideName+'_guide_base', self.mirrorGrp, absolute=True)
                     # re-rename grp:
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
@@ -155,17 +155,20 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name=self.userGuideName+'_'+self.moduleGrp+"_grp", relative=True)
+                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name="guide_base_grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-            for side in sideList:
+            # store the number of this guide by module type
+            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            # run for all sides
+            for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_guide_base'
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 # create controls:
-                self.hipsA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"A_ctrl", r=self.ctrlRadius, h=(self.ctrlRadius/20.0))
+                self.hipsA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"A_ctrl", r=self.ctrlRadius, h=(self.ctrlRadius*0.25))
                 self.hipsB = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"B_ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
-                self.chestA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"A_ctrl", r=self.ctrlRadius, h=(self.ctrlRadius/20.0))
+                self.chestA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"A_ctrl", r=self.ctrlRadius, h=(self.ctrlRadius*0.25))
                 self.chestB = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"B_ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
                 cmds.addAttr(self.hipsA, longName=side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 ctrls.setLockHide([self.hipsA, self.hipsB, self.chestA, self.chestB], ['v'], l=False)
@@ -241,8 +244,13 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.clustersGrp+".visibility", 0)
                 cmds.parent(downCluster, upCluster, self.clustersGrp, relative=True)
                 # make ribbon joints groups scalable:
-                for rbnJntGrp in rbnJointGrpList:
-                    cmds.scaleConstraint(self.clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_scaleConstraint")
+                for r, rbnJntGrp in enumerate(rbnJointGrpList):
+                    if ( (r > 0) and (r < (len(rbnJointGrpList)-1)) ):
+                        scaleGrp = cmds.group( rbnJntGrp, name=rbnJntGrp.replace("_grp", "_scale_grp") )
+                        ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
+                        cmds.scaleConstraint(self.clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_scaleConstraint")
+                    else:
+                        cmds.scaleConstraint(self.clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_scaleConstraint")
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_rbn_arcLenShape")
                 arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]
@@ -252,7 +260,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # connect nurbsPlaneShape to arcLength node:
                 cmds.connectAttr(rbnNurbsPlaneShape+'.worldSpace[0]', arcLenShape+'.nurbsGeometry')
                 cmds.setAttr(arcLenShape+'.vParamValue', 1)
-                cmds.setAttr(arcLenShape+'.uParamValue', 0)
+                # avoid undesired squash if rotateZ the nurbsPlane:
+                cmds.setAttr(arcLenShape+'.uParamValue', 0.5)
                 arcLenValue = cmds.getAttr(arcLenShape+'.arcLengthInV')
                 # create a multiplyDivide to output the squashStretch values:
                 rbnMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_rbn_md")
@@ -304,7 +313,12 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 utils.addHook(objName=self.clustersGrp, hookType='scalableHook')
                 utils.addHook(objName=self.rbnRigGrp, hookType='staticHook')
                 cmds.addAttr(self.rbnRigGrp, longName="dpAR_name", dataType="string")
+                cmds.addAttr(self.rbnRigGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.rbnRigGrp+".dpAR_name", self.userGuideName, type="string")
+                cmds.setAttr(self.rbnRigGrp+".dpAR_type", CLASS_NAME, type="string")
+                # add module type counter value
+                cmds.addAttr(self.rbnRigGrp, longName='dpAR_count', attributeType='long', keyable=False)
+                cmds.setAttr(self.rbnRigGrp+'.dpAR_count', dpAR_count)
                 # lockHide scale of up and down controls:
                 ctrls.setLockHide([self.hipsA, self.hipsB, self.chestA, self.chestB], ['sx', 'sy', 'sz'])
                 # delete duplicated group for side (mirror):

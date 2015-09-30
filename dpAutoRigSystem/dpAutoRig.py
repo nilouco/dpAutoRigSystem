@@ -13,8 +13,11 @@
 #    date:
 #        v 1.0 _ 2010-09-18 - start working based in dpAutoRig.mel v1.3
 #        v 2.0 _ 2011-08-03 - first version created
-#        v 2.0 _ 2011-10-09 - first version released
-#        v 2.1 _ 2012-03-27 - Mac version updated
+#        v 2.0 _ 2011-10-09 - first version released for Maya 2011, 2012
+#        v 2.1 _ 2012-03-27 - Mac version updated, thanks to Roger Santos
+#        v 2.2 _ 2012-06-01 - Maya 2013, fixed: limb stretch calcul, (des)active poleVector, leg poleVector parent,
+#                                               ikFkBlend attr for many instances, control size by guide scale,
+#                                               mirror control shape, module count, dontDelete locators
 #
 ###################################################################
 
@@ -31,10 +34,11 @@ try:
     from functools import partial
     import Modules.dpUtils as utils
     import Modules.dpControls as ctrls
-except:
+except Exception as e:
     print "Error: importing python modules!!!"
+    print e
 
-DPAR_VERSION = "2.1"
+DPAR_VERSION = "2.2"
 
 class DP_AutoRig_UI:
     
@@ -187,7 +191,7 @@ class DP_AutoRig_UI:
         self.allUIs["guidesLayoutA"] = cmds.columnLayout("guidesLayoutA", adjustableColumn=True, width=122, rowSpacing=3, parent=self.allUIs["colMiddleLeftA"])
         # here will be populated by guides of modules and scripts...
         self.allUIs["i030_standard"] = cmds.text(self.langDic[self.langName]['i030_standard'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.startGuideModules("Modules", "start")
+        self.guideModuleList = self.startGuideModules("Modules", "start")
         cmds.separator(style='doubleDash', height=10, parent=self.allUIs["guidesLayoutA"])
         self.allUIs["i031_integrated"] = cmds.text(self.langDic[self.langName]['i031_integrated'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
         self.startGuideModules("Scripts", "start")
@@ -247,7 +251,7 @@ class DP_AutoRig_UI:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.langDic[self.langName]['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
         dpARJoints  = cmds.radioButton( label=self.langDic[self.langName]['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
-        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', numberOfRows=8, width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
+        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -433,6 +437,7 @@ class DP_AutoRig_UI:
     # Start working with Guide Modules:
     def startGuideModules(self, guideDir, action, checkModuleList=None):
         """ Find and return the modules in the directory 'Modules'.
+            Returns a list with the found modules.
         """
         # find path where 'dpAutoRig.py' is been executed:
         path = utils.findPath("dpAutoRig.py")
@@ -453,6 +458,7 @@ class DP_AutoRig_UI:
                         if not checkModule in guideModuleList:
                             notFoundModuleList.append(checkModule)
                 return notFoundModuleList
+        return guideModuleList;
     
     
     def createGuideButton(self, guideModule, guideDir):
@@ -722,6 +728,10 @@ class DP_AutoRig_UI:
                     # author:
                     cmds.addAttr(self.masterGrp, longName='author', dataType='string')
                     cmds.setAttr(self.masterGrp+".author", 'Danilo Pinheiro', type='string')
+                    # module counts:
+                    for guideType in self.guideModuleList:
+                        cmds.addAttr(self.masterGrp, longName=guideType+'Count', attributeType='long', keyable=False)
+                        cmds.setAttr(self.masterGrp+'.'+guideType+'Count', 0)
                     # create groups to parent module parts:
                     self.modelsGrp   = cmds.group(name=self.prefix+'MODELS_grp', empty=True)
                     self.ctrlsGrp    = cmds.group(name=self.prefix+'CTRLS_grp', empty=True)
@@ -969,8 +979,9 @@ class DP_AutoRig_UI:
                                     self.itemMirrorNameList = self.itemGuideMirrorNameList
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     # getting limb data:
-                                    limbType    = self.integratedTaskDic[moduleDic]['limbType']
-                                    ikCtrlZero  = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
+                                    limbType             = self.integratedTaskDic[moduleDic]['limbType']
+                                    ikCtrlZero           = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
+                                    ikPoleVectorCtrlZero = self.integratedTaskDic[moduleDic]['ikPoleVectorZeroList'][s]
                                     # getting spine data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     hipsA  = self.integratedTaskDic[fatherGuide]['hipsAList'][0]
@@ -979,6 +990,7 @@ class DP_AutoRig_UI:
                                     if limbType == "leg":
                                         # do task actions in order to integrate the limb of leg type to rootCtrl:
                                         cmds.parent(ikCtrlZero, self.rootCtrl, absolute=True)
+                                        cmds.parent(ikPoleVectorCtrlZero, self.rootCtrl, absolute=True)
                                     elif fatherGuideLoc == "jointLoc1":
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, hipsA, absolute=True)
@@ -1002,6 +1014,18 @@ class DP_AutoRig_UI:
                                 cmds.addAttr(self.masterCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.masterCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
+                
+                # atualise the number of rigged guides by type
+                for guideType in self.guideModuleList:
+                    typeCounter = 0
+                    newTranformList = cmds.ls(selection=False, type="transform")
+                    for transf in newTranformList:
+                        if cmds.objExists(transf+'.dpAR_type'):
+                            dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
+                            if ( dpARType == guideType ):
+                                typeCounter = typeCounter + 1
+                    if ( typeCounter > cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
+                        cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
         # re-declaring guideMirror and previewMirror groups:
         self.guideMirrorGrp = 'dpAR_guideMirror_grp'
@@ -1019,6 +1043,7 @@ class DP_AutoRig_UI:
         
         # call log window:
         self.logWin()
+        
     
     ###################### End: Rigging Modules Instances.
     

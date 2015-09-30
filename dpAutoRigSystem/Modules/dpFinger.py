@@ -145,7 +145,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                     for item in allGuideList:
                         cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name=side+self.userGuideName+"_"+self.moduleGrp+"_grp", empty=True)
+                    self.mirrorGrp = cmds.group(name="guide_base_grp", empty=True)
                     cmds.parent(side+self.userGuideName+'_guide_base', self.mirrorGrp, absolute=True)
                     # re-rename grp:
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
@@ -158,10 +158,13 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name=self.userGuideName+'_'+self.moduleGrp+"_grp", relative=True)
+                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name="guide_base_grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-            for side in sideList:
+            # store the number of this guide by module type
+            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            # run for all sides
+            for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_guide_base'
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
@@ -176,6 +179,19 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     if n == 1:
                         self.ctrl = ctrls.cvFinger(ctrlName=side+self.userGuideName+"_"+str(n)+"_ctrl", r=self.ctrlRadius)
                         utils.originedFrom(objName=self.ctrl, attrString=self.base+";"+self.guide)
+                        # edit the mirror shape to a good direction of controls:
+                        if s == 1:
+                            if self.mirrorAxis == 'X':
+                                cmds.setAttr(self.ctrl+'.rotateZ', 180)
+                            elif self.mirrorAxis == 'Y':
+                                cmds.setAttr(self.ctrl+'.rotateY', 180)
+                            elif self.mirrorAxis == 'Z':
+                                cmds.setAttr(self.ctrl+'.rotateZ', 180)
+                            elif self.mirrorAxis == 'XY':
+                                cmds.setAttr(self.ctrl+'.rotateX', 180)
+                            elif self.mirrorAxis == 'XYZ':
+                                cmds.setAttr(self.ctrl+'.rotateZ', 180)
+                            cmds.makeIdentity(self.ctrl, apply=True, translate=False, rotate=True, scale=False)
                     else:
                         self.ctrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
                         utils.originedFrom(objName=self.ctrl, attrString=self.guide)
@@ -204,9 +220,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.endJoint, side+self.userGuideName+"_"+str(self.nJoints)+"_jnt", absolute=True)
                 # grouping:
                 for n in range(0, self.nJoints+1):
-                    self.jnt        = side+self.userGuideName+"_"+str(n)+"_jnt"
-                    self.ctrl       = side+self.userGuideName+"_"+str(n)+"_ctrl"
-                    self.zeroCtrl   = side+self.userGuideName+"_"+str(n)+"_sdkGrp_zero"
+                    self.jnt      = side+self.userGuideName+"_"+str(n)+"_jnt"
+                    self.ctrl     = side+self.userGuideName+"_"+str(n)+"_ctrl"
+                    self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_sdkGrp_zero"
                     if n > 0:
                         if n == 1:
                             if not cmds.objExists(self.ctrl+'.'+self.langDic[self.langName]['c_showControls']):
@@ -244,7 +260,17 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
                 utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
+                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
+                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
+                # add module type counter value
+                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
+                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                # create a locator in order to avoid delete static group
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                cmds.parent(loc, self.toStaticHookGrp, absolute=True)
+                cmds.setAttr(loc+".visibility", 0)
+                ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):

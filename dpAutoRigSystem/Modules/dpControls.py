@@ -322,13 +322,13 @@ def cvBall(ctrlName, r=1):
 def cvBox(ctrlName, r=1, h=-1):
     """Create and return a simple curve as a box control.
     """
+    # verify height:
+    if (h == -1):
+        h = r
     # create curve:
-    curve = cmds.curve(n=ctrlName, d=1, p=[(-r, -r, r), (-r, r, r), (r, r, r), (r, -r, r), (-r, -r, r), (-r, -r, -r), (-r, r, -r), (-r, r, r), (r, r, r), (r, r, -r), (r, -r, -r), (r, -r, r), (r, -r, -r), (-r, -r, -r), (-r, r, -r), (r, r, -r)] )
+    curve = cmds.curve(n=ctrlName, d=1, p=[(-r, -h, r), (-r, h, r), (r, h, r), (r, -h, r), (-r, -h, r), (-r, -h, -r), (-r, h, -r), (-r, h, r), (r, h, r), (r, h, -r), (r, -h, -r), (r, -h, r), (r, -h, -r), (-r, -h, -r), (-r, h, -r), (r, h, -r)] )
     # rename curveShape:
     renameShape([curve])
-    if h != -1:
-        cmds.scale(1, h, 1, curve, absolute=True)
-        cmds.makeIdentity(curve, apply=True, scale=True)
     return curve
 
 

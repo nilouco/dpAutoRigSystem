@@ -184,6 +184,7 @@ class StartClass:
                                             self.customName = self.customName + str(n)
                                             addSuffix = False
                                             break
+                                    addSuffix = False
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField(self.userName, edit=True, text=self.customName)
@@ -212,7 +213,7 @@ class StartClass:
             
             # get the radius value to controls:
             if cmds.objExists(self.radiusCtrl):
-                self.ctrlRadius = float(cmds.getAttr(self.radiusCtrl+".translateX"))
+                self.ctrlRadius = utils.getCtrlRadius(self.radiusCtrl)
             else:
                 self.ctrlRadius = 1
             
