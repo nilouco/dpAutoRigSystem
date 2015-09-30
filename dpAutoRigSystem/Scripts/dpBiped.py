@@ -119,8 +119,9 @@ def Biped(self):
             if n == len(fingerInstanceList)-1:
                 # correct not commun values for thumb guide:
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".translateX", 10.1)
-                cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".rotateX", 60)
+                self.guide.Finger.changeJointNumber(thumbFingerInstance, 2)
+                cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
             
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)

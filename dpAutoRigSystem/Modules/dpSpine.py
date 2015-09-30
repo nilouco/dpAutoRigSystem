@@ -247,7 +247,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 for r, rbnJntGrp in enumerate(rbnJointGrpList):
                     if ( (r > 0) and (r < (len(rbnJointGrpList)-1)) ):
                         scaleGrp = cmds.group( rbnJntGrp, name=rbnJntGrp.replace("_grp", "_scale_grp") )
-                        ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
+                        ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sz'])
                         cmds.scaleConstraint(self.clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_scaleConstraint")
                     else:
                         cmds.scaleConstraint(self.clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_scaleConstraint")

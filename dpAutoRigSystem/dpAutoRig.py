@@ -18,6 +18,7 @@
 #        v 2.2 _ 2012-06-01 - Maya 2013, fixed: limb stretch calcul, (des)active poleVector, leg poleVector parent,
 #                                               ikFkBlend attr for many instances, control size by guide scale,
 #                                               mirror control shape, module count, dontDelete locators
+#        v 2.3 _ 2012-08-27 - new icons by Leandro Wagner, fixed: thumb, spine scale by James do Carmo
 #
 ###################################################################
 
@@ -617,7 +618,7 @@ class DP_AutoRig_UI:
         if self.info_description:
             infoDesc = cmds.text(self.langDic[self.langName][self.info_description], align=self.info_align, parent=infoLayout)
         if self.info_text:
-             infoText = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
+            infoText = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow(dpInfoWin)
     
