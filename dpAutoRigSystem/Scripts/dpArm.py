@@ -33,7 +33,6 @@ def Arm(self):
         self.guide.Finger.editUserName(pinkFingerInstance, checkText=self.langDic[self.langName]['m035_pink'].lower())
         thumbFingerInstance  = self.initGuide('dpFinger', guideDir)
         self.guide.Finger.editUserName(thumbFingerInstance, checkText=self.langDic[self.langName]['m036_thumb'].lower())
-        self.guide.Finger.changeJointNumber(thumbFingerInstance, 2)
         
         # edit arm limb guide:
         armBaseGuide = armLimbInstance.moduleGrp

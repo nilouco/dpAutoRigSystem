@@ -14,6 +14,7 @@
 #        v 1.0 _ 2010-09-18 - start working based in dpAutoRig.mel v1.3
 #        v 2.0 _ 2011-08-03 - first version created
 #        v 2.0 _ 2011-10-09 - first version released
+#        v 2.1 _ 2012-03-27 - Mac version updated
 #
 ###################################################################
 
@@ -33,7 +34,7 @@ try:
 except:
     print "Error: importing python modules!!!"
 
-DPAR_VERSION = "2.0"
+DPAR_VERSION = "2.1"
 
 class DP_AutoRig_UI:
     

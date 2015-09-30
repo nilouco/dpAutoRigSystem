@@ -11,6 +11,10 @@
 # or C:/Program Files/Autodesk/Maya2011/Python/Lib/site-packages/dpAutoRigSystem)
 # just copy and past this code in the scriptEditor python tab,
 # select it, drag and drop to your shelf as a python button.
+# if you use Mac, you can copy to the directory:
+# /Users/yourUserName/Library/Preferences/Autodesk/maya/2012-x64/scripts/
+# Your maya version and/or yourUserName must be edited.
+
 
 try:
     import maya.cmds as cmds

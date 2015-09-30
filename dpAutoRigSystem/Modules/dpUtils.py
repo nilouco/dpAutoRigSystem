@@ -20,7 +20,10 @@ def findPath(filename):
     """
     stringPath   = str(os.path.join(os.path.dirname(sys._getframe(1).f_code.co_filename), filename))
     correctPath  = stringPath.replace("\\", "/")
-    absolutePath = correctPath[correctPath.find("/")-2:correctPath.rfind("/")]
+    if os.name == "posix":
+		absolutePath = stringPath[0:stringPath.rfind("/")]
+    else:
+		absolutePath = correctPath[correctPath.find("/")-2:correctPath.rfind("/")]
     return absolutePath
 
 
