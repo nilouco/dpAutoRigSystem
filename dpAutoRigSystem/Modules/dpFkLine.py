@@ -1,9 +1,11 @@
 # importing libraries:
 import maya.cmds as cmds
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
+
 
 # global variables to this module:    
 CLASS_NAME = "FkLine"

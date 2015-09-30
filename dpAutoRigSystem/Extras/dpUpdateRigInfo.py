@@ -10,11 +10,7 @@ ICON = "/Icons/dp_updateRigInfo.png"
 
 
 class UpdateRigInfo():
-    def __init__(self, dpUIinst, langDic, langName):
-        # redeclaring variables
-        self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
+    def __init__(self, *args, **kwargs):
         # call main function
         self.dpMain(self)
     
@@ -25,8 +21,9 @@ class UpdateRigInfo():
         """
         self.updateRigInfoLists()
     
-    
-    def updateRigInfoLists(self, *args):
+
+    @staticmethod
+    def updateRigInfoLists(*args):
         """
         """
         masterCtrl = None

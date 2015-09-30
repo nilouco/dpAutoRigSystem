@@ -68,6 +68,10 @@
     "i060_shapePlease"    : "shape, please.",
     "i061_notExists"      : "does not exists, maybe it was deleted, sorry.",
     "i062_notFound"       : "Not found",
+    "i063_skinAddBtn"     : "ADD",
+    "i064_skinRemBtn"     : "REMOVE",
+    "i065_colorizeCtrl"   : "Colorize Ctrls",
+    "i066_addAttr"        : "Add Supplementary Attributes",
     
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -146,6 +150,8 @@
     "m065_ikFkSnap"      : "Ik Fk Snap",
     "m066_ikFkSnapDesc"  : "Show a window to change from Ik to Fk or Fk to Ik snapping.",
     "m067_shapeSize"     : "Shape Size",
+    "m068_poseReader"    : "Pose Reader",
+    "m069_poseReaderDesc": "Create all the nodes needed for a Pose System.\nFirst choose the node we want to extract the rotation.\nSecond, choose the node from which we will extract the rotation so that we get the rotation of the first node from the second one",
     
     
     "c_arm_before"      : "Clavicle",

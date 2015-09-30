@@ -1,9 +1,12 @@
 # importing libraries:
 import maya.cmds as cmds
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
+
+
 
 # importing Renaud Lessard module:
 loadedIkFkSnap = False
@@ -43,7 +46,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
     def getBendJoints(self):
         return cmds.getAttr(self.moduleGrp+".numBendJoints")
     
-    
+    #@utils.profiler
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
@@ -918,7 +921,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                     #(James) add bend to limb
                     if self.getHasBend():
-                        import jcRibbon as rb
+                        import sstk.maya.rigging.dpAutoRigSystem.Modules.Library.jcRibbon as rb
                         reload(rb)
                         num = self.getBendJoints()
                         iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'

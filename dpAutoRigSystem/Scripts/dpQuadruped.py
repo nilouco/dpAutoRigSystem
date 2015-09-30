@@ -9,20 +9,20 @@ DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
 
-def Quadruped(self):
+def Quadruped(dpAutoRigInst):
     """ This function will create all guides needed to compose a quadruped.
     """
     # check modules integrity:
     guideDir = 'Modules'
     checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine']
-    checkResultList = self.startGuideModules(guideDir, "check", checkModuleList)
+    checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
         # woking with SPINE system:
         # create spine module instance:
-        spineInstance = self.initGuide('dpSpine', guideDir)
+        spineInstance = dpAutoRigInst.initGuide('dpSpine', guideDir)
         # editing spine base guide informations:
-        self.guide.Spine.editUserName(spineInstance, checkText=self.langDic[self.langName]['m011_spine'])
+        dpAutoRigInst.guide.Spine.editUserName(spineInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m011_spine'])
         cmds.setAttr(spineInstance.moduleGrp+".translateY", 10)
         cmds.setAttr(spineInstance.moduleGrp+".translateZ", -5)
         cmds.setAttr(spineInstance.moduleGrp+".rotateX", 0)
@@ -34,9 +34,9 @@ def Quadruped(self):
         
         # woking with HEAD system:
         # create head module instance:
-        headInstance = self.initGuide('dpHead', guideDir)
+        headInstance = dpAutoRigInst.initGuide('dpHead', guideDir)
         # editing head base guide informations:
-        self.guide.Head.editUserName(headInstance, checkText=self.langDic[self.langName]['c_head'])
+        dpAutoRigInst.guide.Head.editUserName(headInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_head'])
         cmds.setAttr(headInstance.moduleGrp+".translateY", 11)
         cmds.setAttr(headInstance.moduleGrp+".translateZ", 7)
         cmds.setAttr(headInstance.moduleGrp+".rotateX", 0)
@@ -57,11 +57,11 @@ def Quadruped(self):
         
         # woking with EyeLookAt system:
         # create eyeLookAt module instance:
-        eyeLookAtInstance = self.initGuide('dpEyeLookAt', guideDir)
+        eyeLookAtInstance = dpAutoRigInst.initGuide('dpEyeLookAt', guideDir)
         # setting X mirror:
-        self.guide.EyeLookAt.changeMirror(eyeLookAtInstance, "X")
+        dpAutoRigInst.guide.EyeLookAt.changeMirror(eyeLookAtInstance, "X")
         # editing eyeLookAt base guide informations:
-        self.guide.EyeLookAt.editUserName(eyeLookAtInstance, checkText=self.langDic[self.langName]['c_eye'])
+        dpAutoRigInst.guide.EyeLookAt.editUserName(eyeLookAtInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eye'])
         cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateX", 0.5)
         cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateY", 13.5)
         cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateZ", 11)
@@ -73,15 +73,15 @@ def Quadruped(self):
         
         # working with BACK LEG (B) system:
         # create back leg module instance:
-        backLegLimbInstance = self.initGuide('dpLimb', guideDir)
+        backLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
         # change limb guide to back leg type:
-        self.guide.Limb.changeType(backLegLimbInstance, self.langDic[self.langName]['m030_leg'])
+        dpAutoRigInst.guide.Limb.changeType(backLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
         # change limb guide to back leg style (quadruped):
-        self.guide.Limb.changeStyle(backLegLimbInstance, self.langDic[self.langName]['m037_quadruped'])
+        dpAutoRigInst.guide.Limb.changeStyle(backLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m037_quadruped'])
         # set for not use bend ribbons as default:
-        self.guide.Limb.setBendFalse(backLegLimbInstance)
+        dpAutoRigInst.guide.Limb.setBendFalse(backLegLimbInstance)
         # change name to back leg:
-        self.guide.Limb.editUserName(backLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize()+'B')
+        dpAutoRigInst.guide.Limb.editUserName(backLegLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize()+'B')
         cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
         
         # editing back leg base guide informations:
@@ -111,11 +111,11 @@ def Quadruped(self):
         # parent back leg guide to spine base guide:
         cmds.parent(backLegBaseGuide, spineInstance.moduleGrp, absolute=True)
         # setting X mirror:
-        self.guide.Limb.changeMirror(backLegLimbInstance, "X")
+        dpAutoRigInst.guide.Limb.changeMirror(backLegLimbInstance, "X")
         
         # create BACK FOOT (B) module instance:
-        backFootInstance = self.initGuide('dpFoot', guideDir)
-        self.guide.Foot.editUserName(backFootInstance, checkText=self.langDic[self.langName]['c_foot']+'B')
+        backFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
+        dpAutoRigInst.guide.Foot.editUserName(backFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+'B')
         cmds.setAttr(backFootInstance.annotation+".translateY", -3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateZ", -6.5)
@@ -130,15 +130,15 @@ def Quadruped(self):
         
         # working with FRONT LEG (A) system:
         # create front leg module instance:
-        frontLegLimbInstance = self.initGuide('dpLimb', guideDir)
+        frontLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
         # change limb guide to front leg type:
-        self.guide.Limb.changeType(frontLegLimbInstance, self.langDic[self.langName]['m030_leg'])
+        dpAutoRigInst.guide.Limb.changeType(frontLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
         # change limb guide to front leg style (quadruped spring):
-        self.guide.Limb.changeStyle(frontLegLimbInstance, self.langDic[self.langName]['m043_quadSpring'])
+        dpAutoRigInst.guide.Limb.changeStyle(frontLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m043_quadSpring'])
         # set for not use bend ribbons as default:
-        self.guide.Limb.setBendFalse(frontLegLimbInstance)
+        dpAutoRigInst.guide.Limb.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
-        self.guide.Limb.editUserName(frontLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize()+'A')
+        dpAutoRigInst.guide.Limb.editUserName(frontLegLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize()+'A')
         cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
         
         # editing front leg base guide informations:
@@ -168,11 +168,11 @@ def Quadruped(self):
         # parent front leg guide to spine chest guide:
         cmds.parent(frontLegBaseGuide, spineInstance.cvLocator, absolute=True)
         # setting X mirror:
-        self.guide.Limb.changeMirror(frontLegLimbInstance, "X")
+        dpAutoRigInst.guide.Limb.changeMirror(frontLegLimbInstance, "X")
         
         # create FRONT FOOT (A) module instance:
-        frontFootInstance = self.initGuide('dpFoot', guideDir)
-        self.guide.Foot.editUserName(frontFootInstance, checkText=self.langDic[self.langName]['c_foot']+'A')
+        frontFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
+        dpAutoRigInst.guide.Foot.editUserName(frontFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+'A')
         cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateZ", 5.5)
@@ -187,9 +187,9 @@ def Quadruped(self):
         
         # woking with TAIL system:
         # create FkLine module instance:
-        tailInstance = self.initGuide('dpFkLine', guideDir)
+        tailInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
         # editing tail base guide informations:
-        self.guide.FkLine.editUserName(tailInstance, checkText=self.langDic[self.langName]['m039_tail'])
+        dpAutoRigInst.guide.FkLine.editUserName(tailInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m039_tail'])
         cmds.setAttr(tailInstance.moduleGrp+".translateY", 9.8)
         cmds.setAttr(tailInstance.moduleGrp+".translateZ", -7.6)
         cmds.setAttr(tailInstance.moduleGrp+".rotateX", 180)
@@ -199,16 +199,16 @@ def Quadruped(self):
         cmds.setAttr(tailInstance.annotation+".translateY", 0)
         cmds.setAttr(tailInstance.radiusCtrl+".translateX", 1)
         # change the number of joints to the tail module:
-        self.guide.FkLine.changeJointNumber(tailInstance, 3)
+        dpAutoRigInst.guide.FkLine.changeJointNumber(tailInstance, 3)
         
         # parent tail guide to spine guide:
         cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
         
         # woking with EAR system:
         # create FkLine module instance:
-        earInstance = self.initGuide('dpFkLine', guideDir)
+        earInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
         # editing ear base guide informations:
-        self.guide.FkLine.editUserName(earInstance, checkText=self.langDic[self.langName]['m040_ear'])
+        dpAutoRigInst.guide.FkLine.editUserName(earInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m040_ear'])
         cmds.setAttr(earInstance.moduleGrp+".translateX", 0.8)
         cmds.setAttr(earInstance.moduleGrp+".translateY", 14.5)
         cmds.setAttr(earInstance.moduleGrp+".translateZ", 10)
@@ -220,7 +220,7 @@ def Quadruped(self):
         cmds.setAttr(earInstance.annotation+".translateZ", 1.4)
         cmds.setAttr(earInstance.radiusCtrl+".translateX", 1)
         # change the number of joints to the ear module:
-        self.guide.FkLine.changeJointNumber(earInstance, 2)
+        dpAutoRigInst.guide.FkLine.changeJointNumber(earInstance, 2)
         
         # parent ear guide to spine guide:
         cmds.parent(earInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
@@ -228,11 +228,11 @@ def Quadruped(self):
         cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
         cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)
         # setting X mirror:
-        self.guide.FkLine.changeMirror(earInstance, "X")
+        dpAutoRigInst.guide.FkLine.changeMirror(earInstance, "X")
         cmds.setAttr(earInstance.moduleGrp+".flip", 1)
         
         # select spineGuide_Base:
         cmds.select(spineInstance.moduleGrp)
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

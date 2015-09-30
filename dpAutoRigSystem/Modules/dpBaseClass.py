@@ -1,8 +1,9 @@
 # importing libraries:
 import maya.cmds as cmds
 import maya.mel as mel
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 
 
 class StartClass:
@@ -173,7 +174,7 @@ class StartClass:
                 except:
                     self.enteredText = ""
             # call utils to return the normalized text:
-            self.customName = utils.normalizeText(self.enteredText, prefixMax=10)
+            self.customName = utils.normalizeText(self.enteredText, prefixMax=20)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:

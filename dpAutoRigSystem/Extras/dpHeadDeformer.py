@@ -1,6 +1,7 @@
 # importing libraries:
 import maya.cmds as cmds
 import maya.mel as mel
+from ..Modules.Library import dpControls as ctrls
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -10,21 +11,9 @@ ICON = "/Icons/dp_headDeformer.png"
 
 
 class HeadDeformer():
-    def __init__(self, dpUIinst, langDic, langName):
-        # redeclaring variables
-        self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        self.headName = self.langDic[self.langName]['c_head']
+    def __init__(self, *args, **kwargs):
         # call main function
-        self.dpMain(self)
-    
-    
-    def dpMain(self, *args):
-        """ Just main to call dpHeadDeformers function.
-        """
-        self.dpHeadDeformer()
-    
+        self.dpHeadDeformer(self)
     
     def dpHeadDeformer(self, *args):
         """ Create the arrow curve and deformers (squash and bends).
@@ -38,7 +27,7 @@ class HeadDeformer():
             defSize = cmds.getAttr(twistDefList[0]+".highBound")
             defScale = cmds.getAttr(twistDefList[1]+".scaleY")
             defTy = -(defSize * defScale)
-            defTy = self.dpCheckLinearUnit(defTy)
+            defTy = ctrls.dpCheckLinearUnit(defTy)
             cmds.setAttr(twistDefList[0]+".lowBound", 0)
             cmds.setAttr(twistDefList[0]+".highBound", (defSize * 2))
             cmds.setAttr(twistDefList[1]+".ty", defTy)
@@ -63,7 +52,7 @@ class HeadDeformer():
             cmds.setAttr(frontBendDefList[1]+".ty", defTy)
             
             # arrow control curve
-            arrowCtrl = self.dpCvArrow(self.headName+"Deformer_Ctrl")
+            arrowCtrl = self.dpCvArrow("Deformer_Ctrl")
             # add control intensite attributes
             cmds.addAttr(arrowCtrl, longName="intensityX", attributeType='float', keyable=True)
             cmds.addAttr(arrowCtrl, longName="intensityY", attributeType='float', keyable=True)
@@ -73,8 +62,8 @@ class HeadDeformer():
             cmds.setAttr(arrowCtrl+".intensityZ", 0.1)
             
             # multiply divide in order to intensify influences
-            mdNode = cmds.createNode("multiplyDivide", name=self.headName+"Deformer_MD")
-            mdTwistNode = cmds.createNode("multiplyDivide", name=self.headName+"Deformer_Twist_MD")
+            mdNode = cmds.createNode("multiplyDivide", name="Deformer_MD")
+            mdTwistNode = cmds.createNode("multiplyDivide", name="Deformer_Twist_MD")
             cmds.setAttr(mdTwistNode+".input2Y", -1)
             
             # connections
@@ -109,16 +98,16 @@ class HeadDeformer():
             cmds.setAttr(arrowCtrl+".intensityZ", edit=True, keyable=False, channelBox=True)
             
             # create groups
-            arrowCtrlGrp = cmds.group(arrowCtrl, name=self.headName+"Deformer_Ctrl_Grp")
+            arrowCtrlGrp = cmds.group(arrowCtrl, name="Deformer_Ctrl_Grp")
             cmds.setAttr(arrowCtrlGrp+".ty", -1.75*defTy)
-            cmds.group((squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1]), name=self.headName+"Deformer_Data_Grp")
+            cmds.group((squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1]), name="Deformer_Data_Grp")
             
             # finish selection the arrow control
             cmds.select(arrowCtrl)
         
         else:
-            mel.eval("warning \""+self.langDic[self.langName]['i034_notSelHeadDef']+"\";")
-    
+            mel.eval("warning" + "\"" + "Select objects to create headDeformers, usually we create in the blendShape RECEPT target" + "\"" + ";")
+
     
     def dpCvArrow(self, ctrlName="arrowCurve", radius=1, *args):
         """ Create an arrow control curve and returns it.
@@ -133,26 +122,3 @@ class HeadDeformer():
         arrowCurve = cmds.curve(name=ctrlName, d=1, p=[(0, 0, 0), (-2*r, r, 0), (-r, r, 0), (-r, 4*r, 0), (r, 4*r, 0), (r, r, 0), (2*r, r, 0), (0, 0, 0)])
         cmds.rename(cmds.listRelatives(arrowCurve, children=True, type="nurbsCurve", shapes=True), arrowCurve+"Shape")
         return arrowCurve
-
-
-    def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):
-        """ Verify if the Maya linear unit is in Centimeter.
-            Return the radius to the new unit size using multiplying.
-            Same function from dpControls module.
-        """
-        newRadius = 1
-        linearUnit = cmds.currentUnit(query=True, linear=True, fullName=True)
-        # centimeter
-        if linearUnit == defaultUnit:
-            newRadius = origRadius
-        elif linearUnit == "meter":
-            newRadius = origRadius*0.01
-        elif linearUnit == "millimeter":
-            newRadius = origRadius*10
-        elif linearUnit == "inch":
-            newRadius = origRadius*0.393701
-        elif linearUnit == "foot":
-            newRadius = origRadius*0.032808
-        elif linearUnit == "yard":
-            newRadius = origRadius*0.010936
-        return newRadius

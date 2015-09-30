@@ -1,9 +1,11 @@
 # importing libraries:
 import maya.cmds as cmds
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
+
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -108,6 +110,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 hideJoints = 1
             # declare lists to store names and attributes:
             self.worldRefList, self.headCtrlList = [], []
+            self.aCtrls = []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -175,6 +178,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.lLipCtrl = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=(self.ctrlRadius * 0.25))[0]
                 self.rLipCtrl = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=(self.ctrlRadius * 0.25))[0]
                 self.headCtrlList.append(self.headCtrl)
+                self.aCtrls.append([self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.lLipCtrl, self.rLipCtrl])
                 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 utils.originedFrom(objName=self.neckCtrl, attrString=self.base+";"+self.cvNeckLoc)
@@ -265,7 +269,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 
                 # jaw follow head or root ctrl (using worldRef)
                 jawParentConst = cmds.parentConstraint(self.headCtrl, self.worldRef, self.zeroCtrlList[2], maintainOffset=True, name=self.zeroCtrlList[2]+"_ParentConstraint")[0]
-                cmds.setAttr(jawParentConst+".interpType", 0) # no flip
+                cmds.setAttr(jawParentConst+".interpType", 2) #Shortest, no flip cause problem with scrubing
                 cmds.addAttr(self.jawCtrl, longName=self.langDic[self.langName]['c_Follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c_Follow'], jawParentConst+"."+self.headCtrl+"W0", force=True)
                 jawFollowRev = cmds.createNode("reverse", name=self.jawCtrl+"_Rev")
@@ -308,7 +312,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # create lip setup:
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.headCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ParentConstraint")[0]
-                cmds.setAttr(lLipParentConst+".interpType", 0)
+                cmds.setAttr(lLipParentConst+".interpType", 2)
                 cmds.addAttr(self.lLipCtrl, longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
                 cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c_Follow'], lLipParentConst+"."+self.jawCtrl+"W0", force=True)
                 self.lLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c_lip']+"_Rev")
@@ -316,7 +320,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.lLipRevNode+'.outputX', lLipParentConst+"."+self.headCtrl+"W1", force=True)
                 # right side lip:
                 rLipParentConst = cmds.parentConstraint(self.jawCtrl, self.headCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ParentConstraint")[0]
-                cmds.setAttr(rLipParentConst+".interpType", 0)
+                cmds.setAttr(rLipParentConst+".interpType", 2)
                 cmds.addAttr(self.rLipCtrl, longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
                 cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c_Follow'], rLipParentConst+"."+self.jawCtrl+"W0", force=True)
                 self.rLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c_lip']+"_Rev")
@@ -368,5 +372,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                                     "module": {
                                                 "worldRefList" : self.worldRefList,
                                                 "headCtrlList" : self.headCtrlList,
+                                                "ctrls"        : self.aCtrls,
                                               }
                                     }

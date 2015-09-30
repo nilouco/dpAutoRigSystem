@@ -68,6 +68,10 @@
     "i060_shapePlease"    : "shape, s'il vous plât.",
     "i061_notExists"      : "n'existe pas, il a était éffacé peut-être, désolé.",
     "i062_notFound"       : "Pas trouvé",
+    "i063_skinAddBtn"     : "AJOUTER",
+    "i064_skinRemBtn"     : "RETIRER",
+    "i065_colorizeCtrl"   : "Colorer les Ctrls",
+    "i066_addAttr"        : "Ajouter les attributs supplémentaires",
     
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -117,7 +121,7 @@
     "m036_thumb"         : "Pouce",
     "m037_quadruped"     : "Quadrupède",
     "m038_quadrupedDesc" : "Description du Script Quadrupède:\n\nCe scripted module crée un guide quadrupède de base,\navec le membres de jambe déjà paré a la colonne,\n un module tête, une gueue et oreille simple en utilisant le ligne Fk.",
-    "m039_tail"          : "Gueue",
+    "m039_tail"          : "Queue",
     "m040_ear"           : "Oreille",
     "m041_style"         : "Style",
     "m042_default"       : "Default",
@@ -146,6 +150,8 @@
     "m065_ikFkSnap"      : "Ik Fk Snap",
     "m066_ikFkSnapDesc"  : "Montre une fenêtre pour changer de Ik à Fk ou Fk à Ik en snap.",
     "m067_shapeSize"     : "Taille du Shape",
+    "m068_poseReader"    : "Lecteur de Pose",
+    "m069_poseReaderDesc": "Crée tous les noeuds nécessaire au système de lecteur de pose.\n Selectionné en premier le noeuds à partir duquel vous voulez extraire la rotation\nSelectionné en deuxième le noeud par rapport auquel on va extraire la rotation de manière a ce qu'on extracte la rotation du premier à partir du deuxième",
     
     "c_arm_before"      : "Clavicule",
     "c_arm_main"        : "Epaule",

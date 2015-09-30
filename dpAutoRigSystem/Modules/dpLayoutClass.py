@@ -1,7 +1,10 @@
 # importing libraries:
-import maya.cmds as cmds
-import dpUtils as utils
 from functools import partial
+
+import maya.cmds as cmds
+
+from Library import dpUtils as utils
+reload(utils)
 
 
 class LayoutClass:
@@ -24,7 +27,7 @@ class LayoutClass:
         # BASIC MODULE LAYOUT:
         self.basicColumn = cmds.rowLayout(numberOfColumns=5, width=190, columnWidth5=(30, 20, 80, 20, 35), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent=self.topColumn)
         # create basic module UI:
-        self.selectButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m004_select'], command=self.reCreateEditSelectedModuleLayout, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
+        self.selectButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         self.annotationCheckBox = cmds.checkBox(label=" ", annotation=self.langDic[self.langName]['m014_annotation'], onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), value=0, parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.langDic[self.langName]['m006_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
         self.colorButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
@@ -34,6 +37,12 @@ class LayoutClass:
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
         
         # declaring the index color list to override and background color of buttons:
+         #Manually add the "none" color
+        colorList = [[0.627, 0.627, 0.627]]
+        #WARNING --> color index in maya start to 1
+        colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
+
+        '''
         self.colorList = [  [0.627, 0.627, 0.627],
                             [0, 0, 0],
                             [0.247, 0.247, 0.247],
@@ -66,6 +75,7 @@ class LayoutClass:
                             [0.188, 0.404, 0.627],
                             [0.435, 0.188, 0.627],
                             [0.627, 0.188, 0.412] ]
+        '''
         
         # edit current colorIndex:
         currentIndexColor = cmds.getAttr(self.moduleGrp+'.guideColor')
@@ -82,13 +92,14 @@ class LayoutClass:
             pass
     
     
-    def reCreateEditSelectedModuleLayout(self, *args):
+    def reCreateEditSelectedModuleLayout(self, bSelect=True, *args):
         """ Select the moduleGuide, clear the selectedModuleLayout and re-create the mirrorLayout.
         """
         # verify the integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             # select the module to be re-build the selectedLayout:
-            cmds.select(self.moduleGrp)
+            if (bSelect):
+                cmds.select(self.moduleGrp)
             self.clearSelectedModuleLayout(self)
             try:
                 # edit label of frame layout:
@@ -206,15 +217,15 @@ class LayoutClass:
             except:
                 pass
             # disable colorOverride of all shapes inside of the moduleGrp:
-            childrenModuleList = cmds.listRelatives(self.moduleGrp, allDescendents=True, type="nurbsCurve")
+            childrenModuleList = cmds.listRelatives(self.moduleGrp, allDescendents=True)
             if childrenModuleList:
                 if colorIndex != 0:
                     for child in childrenModuleList:
-                        if cmds.getAttr(child+'.overrideEnabled') == 1 and not "Orig" in child:
+                        if cmds.getAttr(child+'.overrideEnabled') == 1:
                             cmds.setAttr(child+'.overrideEnabled', 0)
                 else:
                     for child in childrenModuleList:
-                        if cmds.getAttr(child+'.overrideColor') != 0 and not "Orig" in child:
+                        if cmds.getAttr(child+'.overrideColor') != 0:
                             cmds.setAttr(child+'.overrideEnabled', 1)
     
     

@@ -68,6 +68,10 @@
     "i060_shapePlease"    : "shape, por favor.",
     "i061_notExists"      : "nao existe, talvez tenha sido deletado, desculpe.",
     "i062_notFound"       : "Nao encontrado",
+    "i063_skinAddBtn"     : "ADICIONAR",
+    "i064_skinRemBtn"     : "RETIRAR",
+    "i065_colorizeCtrl"   : "Colorir Ctrls",
+    "i066_addAttr"        : "Adicionar Atributos Suplementares",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com numeros, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -146,6 +150,8 @@
     "m065_ikFkSnap"      : "Ik Fk Snap",
     "m066_ikFkSnapDesc"  : "Mostra uma janela para mudar de Ik para Fk ou Fk para Ik com snap.",
     "m067_shapeSize"     : "Tamanho do Shape",
+    "m068_poseReader"    : "Deitado Leitor",
+    "m069_poseReaderDesc": "Criar todos os nós necessários para um Sistema de Pose. \nFirst escolher o nó queremos extrair a rotação. \nSecond, escolha o nó do qual vamos extrair a rotação, para que cheguemos a rotação do primeiro nó a partir do segundo",
     
     "c_arm_before"      : "Clavicula",
     "c_arm_main"        : "Ombro",
