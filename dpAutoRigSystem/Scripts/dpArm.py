@@ -21,18 +21,18 @@ def Arm(self):
         # creating module instances:
         armLimbInstance = self.initGuide('dpLimb', guideDir)
         # change name to arm:
-        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'].lower())
+        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'])
         # create finger instances:
         indexFingerInstance  = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(indexFingerInstance, checkText=self.langDic[self.langName]['m032_index'].lower())
+        self.guide.Finger.editUserName(indexFingerInstance, checkText=self.langDic[self.langName]['m032_index'])
         middleFingerInstance = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(middleFingerInstance, checkText=self.langDic[self.langName]['m033_middle'].lower())
+        self.guide.Finger.editUserName(middleFingerInstance, checkText=self.langDic[self.langName]['m033_middle'])
         ringFingerInstance   = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(ringFingerInstance, checkText=self.langDic[self.langName]['m034_ring'].lower())
+        self.guide.Finger.editUserName(ringFingerInstance, checkText=self.langDic[self.langName]['m034_ring'])
         pinkFingerInstance   = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(pinkFingerInstance, checkText=self.langDic[self.langName]['m035_pink'].lower())
+        self.guide.Finger.editUserName(pinkFingerInstance, checkText=self.langDic[self.langName]['m035_pink'])
         thumbFingerInstance  = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(thumbFingerInstance, checkText=self.langDic[self.langName]['m036_thumb'].lower())
+        self.guide.Finger.editUserName(thumbFingerInstance, checkText=self.langDic[self.langName]['m036_thumb'])
         
         # edit arm limb guide:
         armBaseGuide = armLimbInstance.moduleGrp
@@ -62,9 +62,9 @@ def Arm(self):
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
         
-        # select the armGuide_base:
+        # select the armGuide_Base:
         cmds.select(armBaseGuide)
         
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ self.langDic[self.langName]['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

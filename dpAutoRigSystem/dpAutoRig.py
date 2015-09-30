@@ -20,11 +20,19 @@
 #                                               mirror control shape, module count, dontDelete locators
 #        v 2.3 _ 2012-08-27 - new icons by Leandro Wagner, fixed: thumb, spine scale by James do Carmo
 #		 v 2.4 _ 2013-02-01 - fixed: doNotSkin ribbon nurbsSurface, find masterGrp, orient head from masterCtrl,
-#                                    print messages (, at the end), centered pivot of chestB_ctrl (spine),
+#                                    print messages (, at the end), centered pivot of chestB_Ctrl (spine),
 #                                    clavicle pivot position, correct controls mirror based in dpLimb style,
 #                                    quadruped front legs using ikSpring solver, find environment path,
 #                                    loading decomposeMatrix node in order to create mirror, headFollow
 #                             implemented: new feature for dpLimb with bend ribbons by James do Carmo
+#        v 2.5 _ 2014-06-05 - fixed: name convension for controls "_Ctrl", joint scaleCompensate as False,
+#                                    displayAnnotation option for poleVector controls, head scalable,
+#                                    redefined clavicle/hips control, render_Grp, ikStretch/reverseFoot integration
+#                             implemented: dpLimb extremLocToParent control (working for ik/Fk), global_Ctrl,
+#                                          dpFoot footRoll and sideRoll attributes, footMiddleCtrl translate and scale,
+#                                          Proxy_Grp, FX_Grp, Jaw autoTranslate, StickyLips, EyeLookAt, Finger Ik setup,
+#                                          Add Hand Follow, Target Mirror
+#                             changed: all names to PascalCase
 #
 #
 ###################################################################
@@ -42,11 +50,13 @@ try:
     from functools import partial
     import Modules.dpUtils as utils
     import Modules.dpControls as ctrls
+    reload(utils)
+    reload(ctrls)
 except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
 
-DPAR_VERSION = "2.4"
+DPAR_VERSION = "2.5"
 
 class DP_AutoRig_UI:
     
@@ -126,7 +136,7 @@ class DP_AutoRig_UI:
     
     
     def deleteExistWindow(self, *args):
-        """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_control to deleteUI.
+        """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
         """
         if cmds.window('dpAutoRigWindow', query=True, exists=True):
             cmds.deleteUI('dpAutoRigWindow', window=True)
@@ -181,6 +191,8 @@ class DP_AutoRig_UI:
         self.allUIs["languageTabLayout"] = cmds.tabLayout('languageTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
         cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["languageTabLayout"], 'top', 0), (self.allUIs["languageTabLayout"], 'left', 0), (self.allUIs["languageTabLayout"], 'bottom', 0), (self.allUIs["languageTabLayout"], 'right', 0)) )
         
+        # --
+        
         # interface of Rigging tab - formLayout:
         self.allUIs["riggingTabLayout"] = cmds.formLayout('riggingTabLayout', numberOfDivisions=100, parent=self.allUIs["languageTabLayout"])
         
@@ -199,10 +211,10 @@ class DP_AutoRig_UI:
         self.allUIs["guidesLayoutA"] = cmds.columnLayout("guidesLayoutA", adjustableColumn=True, width=122, rowSpacing=3, parent=self.allUIs["colMiddleLeftA"])
         # here will be populated by guides of modules and scripts...
         self.allUIs["i030_standard"] = cmds.text(self.langDic[self.langName]['i030_standard'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.guideModuleList = self.startGuideModules("Modules", "start")
+        self.guideModuleList = self.startGuideModules("Modules", "start", "guidesLayoutA")
         cmds.separator(style='doubleDash', height=10, parent=self.allUIs["guidesLayoutA"])
         self.allUIs["i031_integrated"] = cmds.text(self.langDic[self.langName]['i031_integrated'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.startGuideModules("Scripts", "start")
+        self.startGuideModules("Scripts", "start", "guidesLayoutA")
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
         #colMiddleRightA - scrollLayout - modulesLayout:
@@ -250,6 +262,8 @@ class DP_AutoRig_UI:
         cmds.scriptJob(event=('deleteAll', self.jobReloadUI), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         
+        # --
+        
         # interface of Skinning tab:
         self.allUIs["skinningTabLayout"] = cmds.formLayout('skinningTabLayout', numberOfDivisions=100, parent=self.allUIs["languageTabLayout"])
         
@@ -293,8 +307,28 @@ class DP_AutoRig_UI:
         self.populateJoints()
         self.populateGeoms()
         
+        # --
+        
+        # interface of Extra tab - formLayout:
+        self.allUIs["extraTabLayout"] = cmds.formLayout('extraTabLayout', numberOfDivisions=100, parent=self.allUIs["languageTabLayout"])
+        # extraMainLayout - scrollLayout:
+        self.allUIs["extraMainLayout"] = cmds.scrollLayout("extraMainLayout", parent=self.allUIs["extraTabLayout"])
+        self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
+        self.extraModuleList = self.startGuideModules("Extras", "start", "extraLayout")
+        
+        # TODO:
+        # dpControls
+        # fx nulls
+        
+        # edit formLayout in order to get a good scalable window:
+        cmds.formLayout( self.allUIs["extraTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["extraMainLayout"], 'top', 20), (self.allUIs["extraMainLayout"], 'left', 5), (self.allUIs["extraMainLayout"], 'right', 5), (self.allUIs["extraMainLayout"], 'bottom', 5)]
+                        )
+        
+        # --
+        
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["languageTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning')) )
+        cmds.tabLayout( self.allUIs["languageTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["extraTabLayout"], 'Extra')) )
         cmds.select(clear=True)
     
     
@@ -445,7 +479,7 @@ class DP_AutoRig_UI:
     
     
     # Start working with Guide Modules:
-    def startGuideModules(self, guideDir, action, checkModuleList=None):
+    def startGuideModules(self, guideDir, action, layout, checkModuleList=None):
         """ Find and return the modules in the directory 'Modules'.
             Returns a list with the found modules.
         """
@@ -454,14 +488,14 @@ class DP_AutoRig_UI:
         print "dpAutoRigPath: "+path
         # list all guide modules:
         guideModuleList = utils.findAllModules(path, guideDir)
-        print "Modules: "+str(guideModuleList)
+        print guideDir+" : "+str(guideModuleList)
         if guideModuleList:
             # change guide module list for alphabetic order:
             guideModuleList.sort()
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
-                    self.createGuideButton(guideModule, guideDir)
+                    self.createGuideButton(guideModule, guideDir, layout)
             elif action == "check":
                 notFoundModuleList = []
                 # verify the list if exists all elements in the folder:
@@ -470,10 +504,10 @@ class DP_AutoRig_UI:
                         if not checkModule in guideModuleList:
                             notFoundModuleList.append(checkModule)
                 return notFoundModuleList
-        return guideModuleList;
+        return guideModuleList
     
     
-    def createGuideButton(self, guideModule, guideDir):
+    def createGuideButton(self, guideModule, guideDir, layout):
         """ Create a guideButton for guideModule in the respective colMiddleLeftA guidesLayout.
         """
         # especific import command for guides storing theses guides modules in a variable:
@@ -489,13 +523,15 @@ class DP_AutoRig_UI:
         path = utils.findPath("dpAutoRig.py")
         iconDir = path+icon
         # creating a basic layout for guide buttons:
-        cmds.rowLayout( numberOfColumns=3, columnWidth3=(15, 30, 55), height=30, adjustableColumn=3, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs["guidesLayoutA"] )
+        cmds.rowLayout( numberOfColumns=3, columnWidth3=(15, 30, 55), height=30, adjustableColumn=3, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
         cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
         cmds.image(i=iconDir)
         if guideDir == "Modules":
             cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir) )
         elif guideDir == "Scripts":
             cmds.button(label=title, height=30, command=partial(self.execScriptedGuide, guideModule, guideDir) )
+        elif guideDir == "Extras":
+            cmds.button(label=title, height=30, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
         cmds.setParent('..')
     
     
@@ -534,6 +570,22 @@ class DP_AutoRig_UI:
         return guideInstance
     
     
+    def initExtraModule(self, guideModule, guideDir, *args):
+        """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
+            Returns the guide instance initialised.
+        """
+        # especific import command for guides storing theses guides modules in a variable:
+        basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+        reload(self.guide)
+        # get the CLASS_NAME from extraModule:
+        guideClass = getattr(self.guide, self.guide.CLASS_NAME)
+        # initialize this extraModule as an Instance:
+        dpUIinst = self
+        guideInstance = guideClass(dpUIinst, self.langDic, self.langName)
+        return guideInstance
+        
+        
     def execScriptedGuide(self, guideModule, guideDir, *args):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
@@ -575,8 +627,8 @@ class DP_AutoRig_UI:
                 if module in validModuleNames:
                     index = validModuleNames.index(module)
                     # check if there is this module guide base in the scene:
-                    temp = validModuleNames[index]+"__"+userSpecName+":guide_base"
-                    if cmds.objExists(validModuleNames[index]+"__"+userSpecName+":guide_base"):
+                    temp = validModuleNames[index]+"__"+userSpecName+":Guide_Base"
+                    if cmds.objExists(validModuleNames[index]+"__"+userSpecName+":Guide_Base"):
                         self.allGuidesList.append([validModules[index], userSpecName])
                         
         # if exists any guide module in the scene, recreate its instance as objectClass:
@@ -620,7 +672,7 @@ class DP_AutoRig_UI:
         # declaring variables:
         self.info_title       = title
         self.info_description = description
-        self.info_text          = text
+        self.info_text        = text
         self.info_winWidth    = width
         self.info_winHeight   = height
         self.info_align       = align
@@ -698,8 +750,8 @@ class DP_AutoRig_UI:
         if self.modulesToBeRiggedList:
             
             # clear all duplicated names in order to run without find same names if they exists:
-            if cmds.objExists("dpAR_guideMirror_grp"):
-                cmds.delete("dpAR_guideMirror_grp")
+            if cmds.objExists("dpAR_GuideMirror_Grp"):
+                cmds.delete("dpAR_GuideMirror_Grp")
             
             # regenerate mirror information for all guides:
             for guideModule in self.modulesToBeRiggedList:
@@ -723,25 +775,27 @@ class DP_AutoRig_UI:
                 # create master hierarchy:
                 allTransformList = cmds.ls(selection=False, type='transform')
                 foundMasterGrp  = False
-                foundMasterCtrl = False
                 for transform in allTransformList:
                     if cmds.objExists(transform+".masterGrp") and cmds.getAttr(transform+".masterGrp") == 1:
                         self.masterGrp = transform
-                        # re-declare group names:
-                        self.modelsGrp   = self.prefix+'MODELS_grp'
-                        self.ctrlsGrp    = self.prefix+'CTRLS_grp'
-                        self.dataGrp     = self.prefix+'DATA_grp'
-                        self.staticGrp   = self.prefix+'static_grp'
-                        self.scalableGrp = self.prefix+'scalable_grp'
+                        # re-declare group and control names:
+                        self.modelsGrp   = cmds.listConnections(self.masterGrp+".modelsGrp")[0]
+                        self.ctrlsGrp    = cmds.listConnections(self.masterGrp+".ctrlsGrp")[0]
+                        self.dataGrp     = cmds.listConnections(self.masterGrp+".dataGrp")[0]
+                        self.renderGrp   = cmds.listConnections(self.masterGrp+".renderGrp")[0]
+                        self.proxyGrp    = cmds.listConnections(self.masterGrp+".proxyGrp")[0]
+                        self.fxGrp       = cmds.listConnections(self.masterGrp+".fxGrp")[0]
+                        self.staticGrp   = cmds.listConnections(self.masterGrp+".staticGrp")[0]
+                        self.scalableGrp = cmds.listConnections(self.masterGrp+".scalableGrp")[0]
+                        self.masterCtrl  = cmds.listConnections(self.masterGrp+".masterCtrl")[0]
+                        self.rootCtrl    = cmds.listConnections(self.masterGrp+".rootCtrl")[0]
+                        self.globalCtrl  = cmds.listConnections(self.masterGrp+".globalCtrl")[0]
+                        self.optionCtrl  = cmds.listConnections(self.masterGrp+".optionCtrl")[0]
                         foundMasterGrp = True
-                    if cmds.objExists(transform+".masterCtrl") and cmds.getAttr(transform+".masterCtrl") == 1:
-                        self.masterCtrl = transform
-                        # re-declare controls:
-                        self.rootCtrl   = self.prefix+'root_ctrl'
-                        foundMasterCtrl = True
+                        break
                 if not foundMasterGrp:
                     # create a dpAR_masterGrp:
-                    self.masterGrp = cmds.group(name=self.prefix+'dpAR_all_grp', empty=True)
+                    self.masterGrp = cmds.group(name=self.prefix+'dpAR_All_Grp', empty=True)
                     cmds.addAttr(self.masterGrp, longName='masterGrp', attributeType='bool')
                     cmds.setAttr(self.masterGrp+'.masterGrp', 1)
                     # add data log:
@@ -760,33 +814,85 @@ class DP_AutoRig_UI:
                         cmds.addAttr(self.masterGrp, longName=guideType+'Count', attributeType='long', keyable=False)
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', 0)
                     # create groups to parent module parts:
-                    self.modelsGrp   = cmds.group(name=self.prefix+'MODELS_grp', empty=True)
-                    self.ctrlsGrp    = cmds.group(name=self.prefix+'CTRLS_grp', empty=True)
-                    self.dataGrp     = cmds.group(name=self.prefix+'DATA_grp', empty=True)
-                    self.staticGrp   = cmds.group(name=self.prefix+'static_grp', empty=True)
-                    self.scalableGrp = cmds.group(name=self.prefix+'scalable_grp', empty=True)
+                    self.modelsGrp   = cmds.group(name=self.prefix+'Model_Grp', empty=True)
+                    self.ctrlsGrp    = cmds.group(name=self.prefix+'Ctrls_Grp', empty=True)
+                    self.dataGrp     = cmds.group(name=self.prefix+'Data_Grp', empty=True)
+                    self.renderGrp   = cmds.group(name=self.prefix+'Render_Grp', empty=True)
+                    self.proxyGrp    = cmds.group(name=self.prefix+'Proxy_Grp', empty=True)
+                    self.fxGrp       = cmds.group(name=self.prefix+'FX_Grp', empty=True)
+                    self.staticGrp   = cmds.group(name=self.prefix+'Static_Grp', empty=True)
+                    self.scalableGrp = cmds.group(name=self.prefix+'Scalable_Grp', empty=True)
                     # arrange hierarchy:
-                    cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.masterGrp)
+                    cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
                     cmds.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
                     cmds.select(clear=True)
                     # set lock and hide attributes:
-                    ctrls.setLockHide([self.masterGrp, self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.staticGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])#, 'v'])
-                if not foundMasterCtrl:
+                    ctrls.setLockHide([self.masterGrp, self.modelsGrp, self.ctrlsGrp, self.renderGrp, self.dataGrp, self.proxyGrp, self.fxGrp, self.staticGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])#, 'v'])
+                    # create messageAttributes to tell us the rig groups created:
+                    cmds.addAttr(self.masterGrp, longName='modelsGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='ctrlsGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='dataGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='renderGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='proxyGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='fxGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='staticGrp', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='scalableGrp', attributeType='message')
+                    cmds.connectAttr(self.modelsGrp+".message", self.masterGrp+".modelsGrp")
+                    cmds.connectAttr(self.ctrlsGrp+".message", self.masterGrp+".ctrlsGrp")
+                    cmds.connectAttr(self.dataGrp+".message", self.masterGrp+".dataGrp")
+                    cmds.connectAttr(self.renderGrp+".message", self.masterGrp+".renderGrp")
+                    cmds.connectAttr(self.proxyGrp+".message", self.masterGrp+".proxyGrp")
+                    cmds.connectAttr(self.fxGrp+".message", self.masterGrp+".fxGrp")
+                    cmds.connectAttr(self.staticGrp+".message", self.masterGrp+".staticGrp")
+                    cmds.connectAttr(self.scalableGrp+".message", self.masterGrp+".scalableGrp")
+                    # working with controls:
                     # create a dpAR_masterCtrl:
-                    self.masterCtrl = cmds.circle(name=self.prefix+'master_ctrl', normal=(0, 1, 0), degree=3, radius=10, constructionHistory=False)[0]
+                    self.masterCtrl = cmds.circle(name=self.prefix+'Master_Ctrl', normal=(0, 1, 0), degree=3, radius=10, constructionHistory=False)[0]
                     cmds.addAttr(self.masterCtrl, longName='masterCtrl', attributeType='bool')
                     cmds.setAttr(self.masterCtrl+'.masterCtrl', 1)
+                    cmds.addAttr(self.masterCtrl, longName='geometryList', dataType='string')
+                    cmds.addAttr(self.masterCtrl, longName='controlList', dataType='string')
+                    # create a dpAR_globalCtrl:
+                    self.globalCtrl = cmds.circle(name=self.prefix+'Global_Ctrl', normal=(0, 1, 0), degree=1, radius=16, sections=4, constructionHistory=False)[0]
+                    cmds.setAttr(self.globalCtrl+".rotateY", 45)
+                    cmds.makeIdentity(self.globalCtrl, apply=True)
                     # create a dpAR_rootCtrl:
-                    self.rootCtrl = cmds.circle(name=self.prefix+'root_ctrl', normal=(0, 1, 0), degree=1, radius=9.5, constructionHistory=False)[0]
+                    self.rootCtrl = cmds.circle(name=self.prefix+'Root_Ctrl', normal=(0, 1, 0), degree=1, radius=9.5, constructionHistory=False)[0]
+                    # create a dpAR_optionCtrl:
+                    self.optionCtrl = ctrls.cvCharacter(self.prefix+'Option_Ctrl', r=0.2)
+                    cmds.setAttr(self.optionCtrl+".translateX", 10)
+                    cmds.makeIdentity(self.optionCtrl, apply=True)
+                    self.optionCtrlGrp = utils.zeroOut([self.optionCtrl])[0]
+                    # create messageAttributes to tell us the rig controls created:
+                    cmds.addAttr(self.masterGrp, longName='masterCtrl', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='rootCtrl', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='globalCtrl', attributeType='message')
+                    cmds.addAttr(self.masterGrp, longName='optionCtrl', attributeType='message')
+                    cmds.connectAttr(self.masterCtrl+".message", self.masterGrp+".masterCtrl")
+                    cmds.connectAttr(self.rootCtrl+".message", self.masterGrp+".rootCtrl")
+                    cmds.connectAttr(self.globalCtrl+".message", self.masterGrp+".globalCtrl")
+                    cmds.connectAttr(self.optionCtrl+".message", self.masterGrp+".optionCtrl")
+                    # parenting controls:
                     cmds.parent(self.rootCtrl, self.masterCtrl)
-                    cmds.parent(self.masterCtrl, self.ctrlsGrp)
+                    cmds.parent(self.masterCtrl, self.globalCtrl)
+                    cmds.parent(self.globalCtrl, self.ctrlsGrp)
+                    cmds.parent(self.optionCtrlGrp, self.rootCtrl)
                     # prepare globalScale:
-                    cmds.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp+"_scaleConstraint")
+                    cmds.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp+"_ScaleConstraint")
                     # set lock and hide attributes:
                     ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-                    ctrls.setLockHide([self.rootCtrl], ['sx', 'sy', 'sz'])
+                    ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
                     cmds.setAttr(self.masterCtrl+'.visibility', keyable=False)
-
+                    # creating the base joint for root control:
+                    cmds.select(clear=True)
+                    self.baseRootJnt = cmds.joint(name=self.prefix+"BaseRoot_Jnt")
+                    self.baseRootJntGrp = cmds.group(self.baseRootJnt, name=self.prefix+"BaseRoot_Joint_Grp")
+                    cmds.parent(self.baseRootJntGrp, self.scalableGrp)
+                    cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ParentConstraint")
+                    cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScaleConstraint")
+                    cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
+                    ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+                    
                     
             # run RIG function for each guideModule:
             for guideModule in self.modulesToBeRiggedList:
@@ -827,7 +933,7 @@ class DP_AutoRig_UI:
                             self.itemGuideName = sideName + self.prefix + self.itemGuideInstance
                         
                         # get hook groups info:
-                        self.itemRiggedGrp = self.itemGuideName + "_grp"
+                        self.itemRiggedGrp = self.itemGuideName + "_Grp"
                         self.staticHookGrp = self.itemRiggedGrp
                         self.ctrlHookGrp = ""
                         self.scalableHookGrp = ""
@@ -873,7 +979,7 @@ class DP_AutoRig_UI:
                                     self.fatherName = sideFatherName + self.prefix + self.fatherInstance
                                 
                                 # get final rigged parent node from originedFromDic:
-                                self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_guide_"+self.fatherGuideLoc]
+                                self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
                                 if len(self.fatherMirrorNameList) > 1: # tell us 'the father has mirror'
                                     if s == f:
                                         # parent them to the correct side of the father's mirror:
@@ -926,7 +1032,7 @@ class DP_AutoRig_UI:
                         if moduleType == "Foot":
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == "Limb" and fatherGuideLoc == 'extrem':
+                            if fatherModule == "Limb" and fatherGuideLoc == 'Extrem':
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                                 self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                                 # working with item guide mirror:
@@ -942,6 +1048,7 @@ class DP_AutoRig_UI:
                                     toLimbIkHandleGrp = self.integratedTaskDic[moduleDic]['toLimbIkHandleGrpList'][s]
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
+                                    ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
                                     # getting limb data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
@@ -950,11 +1057,15 @@ class DP_AutoRig_UI:
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJntList         = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     parentConstToRFOffset = self.integratedTaskDic[fatherGuide]['parentConstToRFOffsetList'][s]
+                                    ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
+                                    limbType              = self.integratedTaskDic[fatherGuide]['limbType']
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.delete(ikHandlePointConst, parentConst)
                                     cmds.parent(revFootCtrlZero, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    parentConstExtremFoot = cmds.parentConstraint(extremJntList, footJnt, maintainOffset=True, name=footJnt+"_parentConstraint")[0]
+                                    parentConstExtremFoot = cmds.parentConstraint(extremJntList, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
+                                    if limbType == "leg":
+                                        cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                     # organize to avoid offset error in the parentConstraint with negative scale:
                                     if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
                                         cmds.setAttr(parentConstToRFOffset+".target[1].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
@@ -969,24 +1080,24 @@ class DP_AutoRig_UI:
                                             cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
                         
-                        # worldRef of extremGuide from limbModule controled by masterCtrl:
+                        # worldRef of extremGuide from limbModule controled by optionCtrl:
                         if moduleType == "Limb":
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
                             for w, worldRef in enumerate(worldRefList):
-                                # do actions in order to make limb be controled by masterCtrl:
+                                # do actions in order to make limb be controled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True)
                                 for f, floatAttr in enumerate(floatAttrList):
                                     if f < len(floatAttrList):
                                         if not floatAttr in defaultAttrList:
-                                            if not cmds.objExists(self.masterCtrl+'.'+floatAttr):
+                                            if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
                                                 currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
-                                                cmds.addAttr(self.masterCtrl, longName=floatAttr, attributeType='float', minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
-                                            cmds.connectAttr(self.masterCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
-                                if not floatAttrList[len(floatAttrList)-1] in defaultAttrList and not cmds.objExists(self.masterCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
-                                    cmds.addAttr(self.masterCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType='float', defaultValue=1, keyable=True)
-                                    cmds.connectAttr(self.masterCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+                                                cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType='float', minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                                            cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+                                if not floatAttrList[len(floatAttrList)-1] in defaultAttrList and not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                                    cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType='float', defaultValue=1, keyable=True)
+                                    cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
                                 cmds.setAttr(worldRefShapeList[w]+'.visibility', 0)
                             
                             # parenting correctely the ikCtrlZero to spineModule:
@@ -1029,8 +1140,8 @@ class DP_AutoRig_UI:
                                             quadFrontLeg = self.integratedTaskDic[moduleDic]['quadFrontLegList'][s]
                                             ikCtrl       = self.integratedTaskDic[moduleDic]['ikCtrlList'][s]
                                             # if quadruped, create a parent contraint from chestA to front leg:
-                                            quadChestParentConst = cmds.parentConstraint(self.rootCtrl, chestA, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_parentConstraint")[0]
-                                            revNode = cmds.createNode('reverse', name=quadFrontLeg+"_rev")
+                                            quadChestParentConst = cmds.parentConstraint(self.rootCtrl, chestA, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_ParentConstraint")[0]
+                                            revNode = cmds.createNode('reverse', name=quadFrontLeg+"_Rev")
                                             cmds.addAttr(ikCtrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                                             cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+chestA+"W1", force=True)
                                             cmds.connectAttr(ikCtrl+".followChestA", revNode+".inputX", force=True)
@@ -1042,7 +1153,7 @@ class DP_AutoRig_UI:
                             if fixIkSpringSolverGrp:
                                 cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
                             
-                        # integrate the volumeVariation attribute from Spine module to masterCtrl:
+                        # integrate the volumeVariation attribute from Spine module to optionCtrl:
                         if moduleType == "Spine":
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
@@ -1052,13 +1163,13 @@ class DP_AutoRig_UI:
                             if self.itemGuideMirrorAxis != "off":
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
-                                # connect the masterCtrl vvAttr to hipsA vvAttr and hide it for each side of the mirror (if it exists):
+                                # connect the optionCtrl vvAttr to hipsA vvAttr and hide it for each side of the mirror (if it exists):
                                 hipsA  = self.integratedTaskDic[moduleDic]['hipsAList'][s]
                                 vvAttr = self.integratedTaskDic[moduleDic]['volumeVariationAttrList'][s]
-                                cmds.addAttr(self.masterCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
-                                cmds.connectAttr(self.masterCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
+                                cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
+                                cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
-                
+                        
                         # integrate the head orient from the masterCtrl:
                         if moduleType == "Head":
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
@@ -1072,9 +1183,58 @@ class DP_AutoRig_UI:
                                 # connect the masterCtrl to head group B using a orientConstraint:
                                 grpHeadB = self.integratedTaskDic[moduleDic]['grpHeadBList'][s]
                                 headRevNode = self.integratedTaskDic[moduleDic]['headRevNodeList'][s]
-                                headOrientConst = cmds.orientConstraint(self.rootCtrl, grpHeadB, maintainOffset=True, name=grpHeadB+"_orientConstraint")[0]
-                                cmds.connectAttr(headRevNode+'.outputX', headOrientConst+".root_ctrlW1", force=True)
-                                
+                                headOrientConst = cmds.orientConstraint(self.rootCtrl, grpHeadB, maintainOffset=True, name=grpHeadB+"_OrientConstraint")[0]
+                                cmds.connectAttr(headRevNode+'.outputX', headOrientConst+"."+self.rootCtrl+"W1", force=True)
+                        
+                        # integrate the head orient from the masterCtrl:
+                        if moduleType == "EyeLookAt":
+                            # connect the masterCtrl to head group B using a orientConstraint:
+                            eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
+                            eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
+                            upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
+                            cmds.parent(eyeGrp, self.rootCtrl, relative=False)
+                            # correct follow attribute to head control:
+                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
+                            fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
+                            if fatherModule == "Head":
+                                # getting head data:
+                                fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                headCtrl  = self.integratedTaskDic[fatherGuide]['headCtrlList'][0]
+                                headParentConst = cmds.parentConstraint(self.rootCtrl, headCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_ParentConstraint")[0]
+                                eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c_Follow'], eyeRevNode+".inputX", force=True)
+                                cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c_Follow'], headParentConst+"."+headCtrl+"W1", force=True)
+                                cmds.parent(upLocGrp, headCtrl, relative=False)
+                                cmds.setAttr(upLocGrp+".visibility", 0)
+                
+                        # integrate the head orient from the masterCtrl:
+                        if moduleType == "Finger":
+                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                            # working with item guide mirror:
+                            self.itemMirrorNameList = [""]
+                            # get itemGuideName:
+                            if self.itemGuideMirrorAxis != "off":
+                                self.itemMirrorNameList = self.itemGuideMirrorNameList
+                            for s, sideName in enumerate(self.itemMirrorNameList):
+                                ikCtrlZero = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
+                                scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
+                                # correct ikCtrl parent to root ctrl:
+                                cmds.parent(ikCtrlZero, self.rootCtrl, relative=True)
+                                # correct follow attribute to head control:
+                                fatherModule   = self.hookDic[moduleDic]['fatherModule']
+                                fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
+                                if fatherModule == "Limb" and fatherGuideLoc == 'Extrem':
+                                    # getting head data:
+                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                    limbType = self.integratedTaskDic[fatherGuide]['limbType']
+                                    if limbType == "arm":
+                                        origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
+                                        origFrom = origFromList[-1]
+                                        cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True)
+                
+                
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0
@@ -1087,15 +1247,17 @@ class DP_AutoRig_UI:
                     if ( typeCounter > cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
+                # TODO: actualise all controls (Master_Ctrl.controlList) for this rig:
+                
         # re-declaring guideMirror and previewMirror groups:
-        self.guideMirrorGrp = 'dpAR_guideMirror_grp'
+        self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
         if cmds.objExists(self.guideMirrorGrp):
             cmds.delete(self.guideMirrorGrp)
         
         # reload the jointSkinList:
         self.populateJoints()
         
-        # select the masterCtrl:
+        # select the MasterCtrl:
         try:
             cmds.select(self.masterCtrl)
         except:
@@ -1125,7 +1287,7 @@ class DP_AutoRig_UI:
         
         if jointSkinList and geomSkinList:
             for geomSkin in geomSkinList:
-                cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, removeUnusedInfluence=False)
+                cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False)
         else:
             print self.langDic[self.langName]['i029_skinNothing'],
     

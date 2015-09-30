@@ -22,7 +22,7 @@ def Biped(self):
         # create spine module instance:
         spineInstance = self.initGuide('dpSpine', guideDir)
         # editing spine base guide informations:
-        self.guide.Spine.editUserName(spineInstance, checkText=self.langDic[self.langName]['m011_spine'].lower())
+        self.guide.Spine.editUserName(spineInstance, checkText=self.langDic[self.langName]['m011_spine'])
         cmds.setAttr(spineInstance.moduleGrp+".translateY", 11)
         cmds.setAttr(spineInstance.annotation+".translateY", -6)
         cmds.setAttr(spineInstance.radiusCtrl+".translateX", 2.5)
@@ -31,12 +31,28 @@ def Biped(self):
         # create head module instance:
         headInstance = self.initGuide('dpHead', guideDir)
         # editing head base guide informations:
-        self.guide.Head.editUserName(headInstance, checkText=self.langDic[self.langName]['m017_head'].lower())
+        self.guide.Head.editUserName(headInstance, checkText=self.langDic[self.langName]['c_head'])
         cmds.setAttr(headInstance.moduleGrp+".translateY", 17)
         cmds.setAttr(headInstance.annotation+".translateY", 3.5)
         
         # parent head guide to spine guide:
         cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+        
+        # woking with EyeLookAt system:
+        # create eyeLookAt module instance:
+        eyeLookAtInstance = self.initGuide('dpEyeLookAt', guideDir)
+        # setting X mirror:
+        self.guide.EyeLookAt.changeMirror(eyeLookAtInstance, "X")
+        # editing eyeLookAt base guide informations:
+        self.guide.EyeLookAt.editUserName(eyeLookAtInstance, checkText=self.langDic[self.langName]['c_eye'])
+        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateX", 0.5)
+        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateY", 21)
+        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateZ", 1.5)
+        cmds.setAttr(eyeLookAtInstance.annotation+".translateY", 3.5)
+        cmds.setAttr(eyeLookAtInstance.radiusCtrl+".translateX", 0.5)
+        
+        # parent head guide to spine guide:
+        cmds.parent(eyeLookAtInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         
         # working with LEG system:
         # create leg module instance:
@@ -48,7 +64,7 @@ def Biped(self):
         # change limb style to biped:
         self.guide.Limb.changeStyle(legLimbInstance, self.langDic[self.langName]['m026_biped'])
         # change name to leg:
-        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].lower())
+        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'])
         cmds.setAttr(legLimbInstance.annotation+".translateY", -4)
         
         # editing leg base guide informations:
@@ -67,7 +83,7 @@ def Biped(self):
         
         # create foot module instance:
         footInstance = self.initGuide('dpFoot', guideDir)
-        self.guide.Foot.editUserName(footInstance, checkText=self.langDic[self.langName]['m024_foot'].lower())
+        self.guide.Foot.editUserName(footInstance, checkText=self.langDic[self.langName]['c_foot'])
         cmds.setAttr(footInstance.annotation+".translateY", -3)
         cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
         cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
@@ -83,7 +99,7 @@ def Biped(self):
         # change limb style to biped:
         self.guide.Limb.changeStyle(armLimbInstance, self.langDic[self.langName]['m026_biped'])
         # change name to arm:
-        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'].lower())
+        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['c_arm'])
         cmds.setAttr(armLimbInstance.annotation+".translateX", 3)
         cmds.setAttr(armLimbInstance.annotation+".translateY", 0)
         cmds.setAttr(armLimbInstance.annotation+".translateZ", 2)
@@ -99,15 +115,15 @@ def Biped(self):
         
         # create finger instances:
         indexFingerInstance  = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(indexFingerInstance, checkText=self.langDic[self.langName]['m032_index'].lower())
+        self.guide.Finger.editUserName(indexFingerInstance, checkText=self.langDic[self.langName]['m032_index'])
         middleFingerInstance = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(middleFingerInstance, checkText=self.langDic[self.langName]['m033_middle'].lower())
+        self.guide.Finger.editUserName(middleFingerInstance, checkText=self.langDic[self.langName]['m033_middle'])
         ringFingerInstance   = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(ringFingerInstance, checkText=self.langDic[self.langName]['m034_ring'].lower())
+        self.guide.Finger.editUserName(ringFingerInstance, checkText=self.langDic[self.langName]['m034_ring'])
         pinkFingerInstance   = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(pinkFingerInstance, checkText=self.langDic[self.langName]['m035_pink'].lower())
+        self.guide.Finger.editUserName(pinkFingerInstance, checkText=self.langDic[self.langName]['m035_pink'])
         thumbFingerInstance  = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(thumbFingerInstance, checkText=self.langDic[self.langName]['m036_thumb'].lower())
+        self.guide.Finger.editUserName(thumbFingerInstance, checkText=self.langDic[self.langName]['m036_thumb'])
         
         # edit finger guides:
         fingerInstanceList = [indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkFingerInstance, thumbFingerInstance]
@@ -130,8 +146,8 @@ def Biped(self):
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
         
-        # select spineGuide_base:
+        # select spineGuide_Base:
         cmds.select(spineInstance.moduleGrp)
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ self.langDic[self.langName]['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

@@ -29,27 +29,30 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
         
+        cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".flip", 0)
+        
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
-        self.cvJointLoc = ctrls.cvJointLoc(ctrlName=self.guideName+"_jointLoc1", r=0.3)
-        self.jGuide1 = cmds.joint(name=self.guideName+"_jGuide1", radius=0.001)
+        self.cvJointLoc = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3)
+        self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
         
-        self.cvEndJoint = ctrls.cvLocator(ctrlName=self.guideName+"_jointEnd", r=0.1)
+        self.cvEndJoint = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-        self.jGuideEnd = cmds.joint(name=self.guideName+"_jGuideEnd", radius=0.001)
+        self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_parentConstraint")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_parentConstraint")
-        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_scaleConstraint")
-        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_scaleConstraint")
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_ParentConstraint")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_ParentConstraint")
+        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_ScaleConstraint")
+        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_ScaleConstraint")
     
     
     def changeJointNumber(self, enteredNJoints, *args):
@@ -72,52 +75,52 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             scaledCtrl = False
             scaledCtrlDic = {}
             for j in range(1, self.currentNJoints+1):
-                if cmds.getAttr(self.guideName+"_jointLoc"+str(j)+".scaleX") != 1 or cmds.getAttr(self.guideName+"_jointLoc"+str(j)+".scaleY") != 1 or cmds.getAttr(self.guideName+"_jointLoc"+str(j)+".scaleZ") != 1:
+                if cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleX") != 1 or cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleY") != 1 or cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ") != 1:
                     scaledCtrl = True
                     # get scale values:
-                    scaledX = cmds.getAttr(self.guideName+"_jointLoc"+str(j)+".scaleX")
-                    scaledY = cmds.getAttr(self.guideName+"_jointLoc"+str(j)+".scaleY")
-                    scaledZ = cmds.getAttr(self.guideName+"_jointLoc"+str(j)+".scaleZ")
+                    scaledX = cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleX")
+                    scaledY = cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleY")
+                    scaledZ = cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ")
                     # store scale values in the dictionary:
                     scaledCtrlDic[j] = [scaledX, scaledY, scaledZ]
                     # reset scales values to 1,1,1:
-                    cmds.setAttr(self.guideName+"_jointLoc"+str(j)+".scaleX", 1)
-                    cmds.setAttr(self.guideName+"_jointLoc"+str(j)+".scaleY", 1)
-                    cmds.setAttr(self.guideName+"_jointLoc"+str(j)+".scaleZ", 1)
+                    cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleX", 1)
+                    cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleY", 1)
+                    cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ", 1)
             # unparent temporarely the Ends:
-            self.cvEndJoint = self.guideName+"_jointEnd"
+            self.cvEndJoint = self.guideName+"_JointEnd"
             cmds.parent(self.cvEndJoint, world=True)
-            self.jGuideEnd = (self.guideName+"_jGuideEnd")
+            self.jGuideEnd = (self.guideName+"_JGuideEnd")
             cmds.parent(self.jGuideEnd, world=True)
             # verify if the nJoints is greather or less than the current
             if self.enteredNJoints > self.currentNJoints:
                 for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                     # create another N cvJointLoc:
-                    self.cvJointLoc = ctrls.cvJointLoc( ctrlName=self.guideName+"_jointLoc"+str(n), r=0.3 )
+                    self.cvJointLoc = ctrls.cvJointLoc( ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3 )
                     # set its nJoint value as n:
                     cmds.setAttr(self.cvJointLoc+".nJoint", n)
                     # parent it to the lastGuide:
-                    cmds.parent(self.cvJointLoc, self.guideName+"_jointLoc"+str(n-1), relative=True)
+                    cmds.parent(self.cvJointLoc, self.guideName+"_JointLoc"+str(n-1), relative=True)
                     cmds.setAttr(self.cvJointLoc+".translateZ", 2)
                     # create a joint to use like an arrowLine:
-                    self.jGuide = cmds.joint(name=self.guideName+"_jGuide"+str(n), radius=0.001)
+                    self.jGuide = cmds.joint(name=self.guideName+"_JGuide"+str(n), radius=0.001)
                     cmds.setAttr(self.jGuide+".template", 1)
-                    cmds.parent(self.jGuide, self.guideName+"_jGuide"+str(n-1))
-                    cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=True, name=self.jGuide+"_parentConstraint")
-                    cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=True, name=self.jGuide+"_scaleConstraint")
+                    cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1))
+                    cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=True, name=self.jGuide+"_ParentConstraint")
+                    cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=True, name=self.jGuide+"_ScaleConstraint")
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvEndJoint:
-                self.cvJointLoc = self.guideName+"_jointLoc"+str(self.enteredNJoints)
-                self.cvEndJoint = self.guideName+"_jointEnd"
-                self.jGuide = self.guideName+"_jGuide"+str(self.enteredNJoints)
+                self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
+                self.cvEndJoint = self.guideName+"_JointEnd"
+                self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
                 # re-parent the children guides:
                 childrenGuideBellowList = utils.getGuideChildrenList(self.cvJointLoc)
                 if childrenGuideBellowList:
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvJointLoc)
                 # delete difference of nJoints:
-                cmds.delete(self.guideName+"_jointLoc"+str(self.enteredNJoints+1))
-                cmds.delete(self.guideName+"_jGuide"+str(self.enteredNJoints+1))
+                cmds.delete(self.guideName+"_JointLoc"+str(self.enteredNJoints+1))
+                cmds.delete(self.guideName+"_JGuide"+str(self.enteredNJoints+1))
             # re-parent cvEndJoint:
             cmds.parent(self.cvEndJoint, self.cvJointLoc)
             cmds.setAttr(self.cvEndJoint+".tz", 1.3)
@@ -128,10 +131,10 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             # reset changed scale values again:
             if scaledCtrl:
                 for j in scaledCtrlDic:
-                    if cmds.objExists(self.guideName+"_jointLoc"+str(j)):
-                        cmds.setAttr(self.guideName+"_jointLoc"+str(j)+".scaleX", scaledCtrlDic[j][0])
-                        cmds.setAttr(self.guideName+"_jointLoc"+str(j)+".scaleY", scaledCtrlDic[j][1])
-                        cmds.setAttr(self.guideName+"_jointLoc"+str(j)+".scaleZ", scaledCtrlDic[j][2])
+                    if cmds.objExists(self.guideName+"_JointLoc"+str(j)):
+                        cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleX", scaledCtrlDic[j][0])
+                        cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleY", scaledCtrlDic[j][1])
+                        cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ", scaledCtrlDic[j][2])
             # re-build the preview mirror:
             Layout.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
@@ -155,43 +158,49 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 # get first and last letters to use as side initials (prefix):
                 sideList = [ self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_' ]
                 for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_guide_base')[0]
+                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
                     allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                     for item in allGuideList:
                         cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="guide_base_grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_guide_base', self.mirrorGrp, absolute=True)
+                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
+                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
                     # re-rename grp:
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
                     # do a group mirror with negative scaling:
                     if s == 1:
-                        for axis in self.mirrorAxis:
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                            for axis in self.mirrorAxis:
+                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
+                                flipedValue = gotValue*(-2)
+                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
+                        else:
+                            for axis in self.mirrorAxis:
+                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
             else: # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_guide_base')[0]
+                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name="guide_base_grp", relative=True)
-                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_grp"
+                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
+                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
-                self.base = side+self.userGuideName+'_guide_base'
+                self.base = side+self.userGuideName+'_Guide_Base'
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 for n in range(1, self.nJoints+1):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide = side+self.userGuideName+"_guide_jointLoc"+str(n)
+                    self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n)
                     # create a joint:
-                    self.jnt = cmds.joint(name=side+self.userGuideName+"_"+str(n)+"_jnt")
+                    self.jnt = cmds.joint(name=side+self.userGuideName+"_"+str(n)+"_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # create a control:
-                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
+                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
                     if n == 1:
                         utils.originedFrom(objName=self.ctrl, attrString=self.base+";"+self.guide)
                     else:
@@ -206,31 +215,31 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     # hide visibility attribute:
                     cmds.setAttr(self.ctrl+'.visibility', keyable=False)
                 # create end joint:
-                self.cvEndJoint = side+self.userGuideName+"_guide_jointEnd"
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_jEnd")
+                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
                 tempDel = cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False)
                 cmds.delete(tempDel)
-                cmds.parent(self.endJoint, side+self.userGuideName+"_"+str(self.nJoints)+"_jnt", absolute=True)
+                cmds.parent(self.endJoint, side+self.userGuideName+"_"+str(self.nJoints)+"_Jnt", absolute=True)
                 # grouping:
                 for n in range(1, self.nJoints+1):
-                    self.jnt      = side+self.userGuideName+"_"+str(n)+"_jnt"
-                    self.ctrl     = side+self.userGuideName+"_"+str(n)+"_ctrl"
-                    self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_ctrl_zero"
+                    self.jnt      = side+self.userGuideName+"_"+str(n)+"_Jnt"
+                    self.ctrl     = side+self.userGuideName+"_"+str(n)+"_Ctrl"
+                    self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl_Zero"
                     if n > 1:
                         # parent joints as a simple chain (line)
-                        self.fatherJnt = side+self.userGuideName+"_"+str(n-1)+"_jnt"
+                        self.fatherJnt = side+self.userGuideName+"_"+str(n-1)+"_Jnt"
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
                         # parent zeroCtrl Group to the before ctrl:
-                        self.fatherCtrl = side+self.userGuideName+"_"+str(n-1)+"_ctrl"
+                        self.fatherCtrl = side+self.userGuideName+"_"+str(n-1)+"_Ctrl"
                         cmds.parent(self.zeroCtrl, self.fatherCtrl, absolute=True)
                     # create parentConstraint from ctrl to jnt:
-                    cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_parentConstraint")
+                    cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
                     # create scaleConstraint from ctrl to jnt:
-                    cmds.scaleConstraint(self.ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_scaleConstraint")
+                    cmds.scaleConstraint(self.ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_ctrl_zero", name=side+self.userGuideName+"_control_grp")
-                self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_jnt", name=side+self.userGuideName+"_joint_grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_grp")
+                self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
+                self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_Jnt", name=side+self.userGuideName+"_Joint_Grp")
+                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)

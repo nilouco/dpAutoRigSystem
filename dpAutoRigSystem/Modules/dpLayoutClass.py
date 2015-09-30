@@ -97,6 +97,7 @@ class LayoutClass:
                 cmds.columnLayout("selectedColumn", adjustableColumn=True, parent="selectedModuleLayout")
                 # re-create segment layout:
                 self.segDelColumn = cmds.rowLayout(numberOfColumns=3, columnWidth3=(100, 132, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 10)], parent="selectedColumn" )
+                self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
                 self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
@@ -114,7 +115,7 @@ class LayoutClass:
                 
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                cmds.text(self.langDic[self.langName]['m010_mirror'], parent=self.doubleRigColumn)
+                cmds.text(self.langDic[self.langName]['m010_Mirror'], parent=self.doubleRigColumn)
                 self.mirrorMenu = cmds.optionMenu("mirrorMenu", label='', changeCommand=self.changeMirror, parent=self.doubleRigColumn)
                 mirrorMenuItemList = ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ']
                 for item in mirrorMenuItemList:
@@ -124,12 +125,12 @@ class LayoutClass:
                 if currentMirrorNameList:
                     menuNameItemList = str(currentMirrorNameList).split(';')
                 else:
-                    L = self.langDic[self.langName]['p002_Left']
-                    R = self.langDic[self.langName]['p003_Right']
-                    T = self.langDic[self.langName]['p006_Top']
-                    B = self.langDic[self.langName]['p007_Bottom']
-                    F = self.langDic[self.langName]['p008_Front']
-                    Bk= self.langDic[self.langName]['p009_Back']
+                    L = self.langDic[self.langName]['p002_left']
+                    R = self.langDic[self.langName]['p003_right']
+                    T = self.langDic[self.langName]['p006_top']
+                    B = self.langDic[self.langName]['p007_bottom']
+                    F = self.langDic[self.langName]['p008_front']
+                    Bk= self.langDic[self.langName]['p009_back']
                     menuNameItemList = [L+' --> '+R, R+' --> '+L, T+' --> '+B, B+' --> '+T, F+' --> '+Bk, Bk+' --> '+F]
                 # create items for mirrorName menu:
                 self.mirrorNameMenu = cmds.optionMenu("mirrorNameMenu", label='', changeCommand=self.changeMirrorName, parent=self.doubleRigColumn)
@@ -157,6 +158,13 @@ class LayoutClass:
                     
                 # create Rig button:
                 self.rigButton = cmds.button(label="Rig", command=self.rigModule, backgroundColor=(1.0, 1.0, 0.7), parent=self.doubleRigColumn)
+                
+                # create a flip layout:
+                if self.flipAttrExists:
+                    self.doubleFlipColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.doubleFlipColumn)
+                    flipValue = cmds.getAttr(self.moduleGrp+".flip")
+                    self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.doubleFlipColumn)
             except:
                 pass
     
@@ -214,7 +222,7 @@ class LayoutClass:
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            self.annotation = self.moduleGrp+"_ant"
+            self.annotation = self.moduleGrp+"_Ant"
             cmds.setAttr(self.annotation+'.visibility', value)
             cmds.setAttr(self.moduleGrp+'.displayAnnotation', value)
     
@@ -242,6 +250,12 @@ class LayoutClass:
                     pass
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
+    
+    
+    def changeFlip(self, *args):
+        """ Set the attribute value for flip.
+        """
+        cmds.setAttr(self.moduleGrp+".flip", cmds.checkBox(self.flipCB, query=True, value=True))
     
     
     def changeMirror(self, item, *args):
@@ -280,12 +294,12 @@ class LayoutClass:
     
     def createPreviewMirror(self, *args):
         # re-declaring guideMirror and previewMirror groups:
-        self.previewMirrorGrpName = self.moduleGrp[:self.moduleGrp.find(":")]+'_mirrorGrp'
+        self.previewMirrorGrpName = self.moduleGrp[:self.moduleGrp.find(":")]+'_MirrorGrp'
         if cmds.objExists(self.previewMirrorGrpName):
             cmds.delete(self.previewMirrorGrpName)
         
         # verify if there is not any guide module in the guideMirrorGrp and then delete it:
-        self.guideMirrorGrp = 'dpAR_guideMirror_grp'
+        self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
         utils.clearNodeGrp(nodeGrpName=self.guideMirrorGrp, attrFind='guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
@@ -321,12 +335,12 @@ class LayoutClass:
                 if duplicatedList:
                     for dup in duplicatedList:
                         if cmds.objExists(dup):
-                            if "_radiusCtrl" in dup or "_ant" in dup:
+                            if "_RadiusCtrl" in dup or "_Ant" in dup:
                                 cmds.delete(dup)
                             else:
                                 if cmds.objectType(dup) == 'transform' or cmds.objectType(dup) == 'joint':
                                     # rename duplicated node:
-                                    dupRenamed = cmds.rename(dup, self.moduleGrp[:self.moduleGrp.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_mirror')
+                                    dupRenamed = cmds.rename(dup, self.moduleGrp[:self.moduleGrp.find(":")]+'_'+dup[dup.rfind("|")+1:]+'_Mirror')
                                     originalGuide = self.moduleGrp[:self.moduleGrp.find(":")+1]+dup[dup.rfind("|")+1:]
                                     # unlock and unhide all attributes and connect original guide node transformations to the mirror guide node:
                                     attrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
@@ -347,7 +361,7 @@ class LayoutClass:
                                     cmds.delete(dup)
                 
                 # renaming the previewMirrorGuide:
-                self.previewMirrorGuide = cmds.rename(duplicated, self.moduleGrp.replace(":", "_")+'_mirror')
+                self.previewMirrorGuide = cmds.rename(duplicated, self.moduleGrp.replace(":", "_")+'_Mirror')
                 cmds.delete(self.previewMirrorGuide+'Shape')
                 
                 # create a decomposeMatrix node in order to get the worldSpace transformations (like using xform):

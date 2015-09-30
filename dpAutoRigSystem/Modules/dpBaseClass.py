@@ -23,10 +23,10 @@ class StartClass:
         # defining guideNamespace:
         cmds.namespace(setNamespace=":")
         self.namespaceExists = cmds.namespace(exists=self.guideNamespace)
-        self.guideName = self.guideNamespace + ":guide"
-        self.moduleGrp = self.guideName+"_base"
-        self.radiusCtrl = self.moduleGrp+"_radiusCtrl"
-        self.annotation = self.moduleGrp+"_ant"
+        self.guideName = self.guideNamespace + ":Guide"
+        self.moduleGrp = self.guideName+"_Base"
+        self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
+        self.annotation = self.moduleGrp+"_Ant"
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
             # create GUIDE for this module:
@@ -43,7 +43,7 @@ class StartClass:
         # MODULE LAYOUT:
         self.moduleLayout = self.langDic[self.langName][self.title]+" - "+self.userGuideName
         self.moduleFrameLayout = cmds.frameLayout(self.moduleLayout , label=self.moduleLayout, collapsable=True, collapse=False, parent="modulesLayoutA")
-        self.topColumn = cmds.columnLayout(self.moduleLayout+"_topColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
+        self.topColumn = cmds.columnLayout(self.moduleLayout+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
         # here we have just the column layouts to be populated by modules.
     
     
@@ -70,15 +70,15 @@ class StartClass:
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
-        cmds.setAttr(self.moduleGrp+".mirrorName", self.langDic[self.langName]['p002_Left']+' --> '+self.langDic[self.langName]['p003_Right'], type='string')
-        cmds.setAttr(self.moduleGrp+".hookNode", "_grp", type='string')
+        cmds.setAttr(self.moduleGrp+".mirrorName", self.langDic[self.langName]['p002_left']+' --> '+self.langDic[self.langName]['p003_right'], type='string')
+        cmds.setAttr(self.moduleGrp+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.dpUIinst.guide, type='string')
         
         # create annotation to this module:
         self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
         self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]
-        self.annotation = cmds.rename(self.annotation, self.moduleGrp+"_ant")
+        self.annotation = cmds.rename(self.annotation, self.moduleGrp+"_Ant")
         cmds.parent(self.annotation, self.moduleGrp)
         cmds.setAttr(self.annotation+'.text', self.moduleGrp[self.moduleGrp.find("__")+2:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
@@ -102,7 +102,7 @@ class StartClass:
                 else:
                     try:
                         self.deleteModule()
-                        mel.eval('warning \"'+ self.langDic[self.langName]['e000_guideNotFound'] +' - '+ self.moduleGrp +'\";')
+                        mel.eval('warning \"'+ self.langDic[self.langName]['e000_GuideNotFound'] +' - '+ self.moduleGrp +'\";')
                     except:
                         pass
                     return False
@@ -113,12 +113,12 @@ class StartClass:
         """
         # delete mirror preview:
         try:
-            cmds.delete(self.moduleGrp[:self.moduleGrp.find(":")]+"_mirrorGrp")
+            cmds.delete(self.moduleGrp[:self.moduleGrp.find(":")]+"_MirrorGrp")
         except:
             pass
         # delete the guide module:
         utils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
-        # clear default 'dpAR_guideMirror_grp':
+        # clear default 'dpAR_GuideMirror_Grp':
         utils.clearNodeGrp()
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)

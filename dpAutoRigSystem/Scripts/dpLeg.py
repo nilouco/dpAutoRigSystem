@@ -23,7 +23,7 @@ def Leg(self):
         # change limb guide to leg type:
         self.guide.Limb.changeType(legLimbInstance, self.langDic[self.langName]['m030_leg'])
         # change name to leg:
-        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].lower())
+        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'])
         
         # editing leg base guide informations:
         legBaseGuide = legLimbInstance.moduleGrp
@@ -39,15 +39,15 @@ def Leg(self):
         
         # create foot module instance:
         footInstance = self.initGuide('dpFoot', guideDir)
-        self.guide.Foot.editUserName(footInstance, checkText=self.langDic[self.langName]['m024_foot'].lower())
+        self.guide.Foot.editUserName(footInstance, checkText=self.langDic[self.langName]['m024_foot'])
         cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
         cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
         
         # parent foot guide to leg ankle guide:
         cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
         
-        # select the legGuide_base:
+        # select the legGuide_Base:
         cmds.select(legBaseGuide)
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ self.langDic[self.langName]['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
