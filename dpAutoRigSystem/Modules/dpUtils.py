@@ -7,11 +7,28 @@ import re
 
 # UTILS functions:
 def findEnv(key, path):
-    """(UNUSED) Find and return the environ directory of this system.
+    """ Find and return the environ directory of this system.
     """
     envStr = os.environ[key]
+    
+    dpARPath = findPath("dpAutoRig.py")
+    splitEnvList = envStr.split(";")
+    envPath = ""
+    if splitEnvList:
+        for env in splitEnvList:
+            if env != "" and env != ' ' and env != None and env in dpARPath:
+                try:
+                    envPath = dpARPath.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
+                except:
+                    pass
+                if envPath != "" and envPath != " " and envPath != None:
+                    return envPath+"."+path
+                break
+    # if we are here, we must return a default path:
     splitEnvList = envStr.rpartition(path)
-    envPath = splitEnvList[0][splitEnvList[0].rfind(":")-1:] + path
+    envPath = splitEnvList[0][splitEnvList[0].rfind(":")-1:]
+    if envPath == "" or envPath == " " or envPath == None:
+        return path
     return envPath
 
 
@@ -53,7 +70,7 @@ def findAllModules(path, dir):
     moduleList = []
     # removing "__init__":
     for file in allPyFilesList:
-        if file != "__init__" and file != "dpControls" and file != "dpUtils" and file != "dpBaseClass" and file != "dpLayoutClass":
+        if file != "__init__" and file != "dpControls" and file != "dpUtils" and file != "dpBaseClass" and file != "dpLayoutClass" and file != 'jcRibbon':
             moduleList.append(file)
     return moduleList
 
@@ -65,7 +82,7 @@ def findAllModuleNames(path, dir):
     validModules = findAllModules(path, dir)
     validModuleNames = []
     #guideFolder = (path+"/"+dir).partition("/Modules/")[2]
-    guideFolder = "dpAutoRigSystem.Modules"
+    guideFolder = findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules"
     for m in validModules:
         mod = __import__(guideFolder+"."+m, {}, {}, [m])
         reload(mod)

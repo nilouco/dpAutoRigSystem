@@ -193,13 +193,13 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 utils.zeroOut([self.hipsA, self.chestA])
                 # modify the pivots of chest controls:
                 upPivotPos = cmds.xform(side+self.userGuideName+"_guide_jointLoc"+str(self.nJoints-1), query=True, worldSpace=True, translation=True)
-                cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestA+".scalePivot", self.chestA+".rotatePivot", self.chestB+".scalePivot", self.chestB+".rotatePivot")
+                cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestA+".scalePivot", self.chestA+".rotatePivot")#, self.chestB+".scalePivot", self.chestB+".rotatePivot")
                 # add originedFrom attributes to hipsA, hipsB and chestB:
                 utils.originedFrom(objName=self.hipsA, attrString=self.base)
                 utils.originedFrom(objName=self.hipsB, attrString=bottomLocGuide)
                 utils.originedFrom(objName=self.chestB, attrString=topLocGuide)
-                # create spine ribbon:
-                returnedRibbonList = ctrls.createRibbon(name=side+self.userGuideName+'_rbn', totalJoints=(self.nJoints-1))
+                # create a simple spine ribbon:
+                returnedRibbonList = ctrls.createSimpleRibbon(name=side+self.userGuideName+'_rbn', totalJoints=(self.nJoints-1))
                 rbnNurbsPlane      = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
                 rbnJointGrpList    = returnedRibbonList[2]

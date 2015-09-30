@@ -45,6 +45,8 @@ def Biped(self):
         self.guide.Limb.changeMirror(legLimbInstance, "X")
         # change limb guide to leg type:
         self.guide.Limb.changeType(legLimbInstance, self.langDic[self.langName]['m030_leg'])
+        # change limb style to biped:
+        self.guide.Limb.changeStyle(legLimbInstance, self.langDic[self.langName]['m026_biped'])
         # change name to leg:
         self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].lower())
         cmds.setAttr(legLimbInstance.annotation+".translateY", -4)
@@ -78,6 +80,8 @@ def Biped(self):
         armLimbInstance = self.initGuide('dpLimb', guideDir)
         # setting X mirror:
         self.guide.Limb.changeMirror(armLimbInstance, "X")
+        # change limb style to biped:
+        self.guide.Limb.changeStyle(armLimbInstance, self.langDic[self.langName]['m026_biped'])
         # change name to arm:
         self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'].lower())
         cmds.setAttr(armLimbInstance.annotation+".translateX", 3)

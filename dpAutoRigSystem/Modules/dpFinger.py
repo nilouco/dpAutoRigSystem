@@ -239,10 +239,10 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         self.fatherCtrl = side+self.userGuideName+"_"+str(n-1)+"_ctrl"
                         cmds.parent(self.zeroCtrl, self.fatherCtrl, absolute=True)
                     # create parentConstraint from ctrl to jnt:
-                    cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_parentConstraint")
+                    cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_pc")
                 # make first falange be leads from base finger control:
-                cmds.parentConstraint(side+self.userGuideName+"_0_ctrl", side+self.userGuideName+"_1_sdkGrp_zero", maintainOffset=True, name=side+self.userGuideName+"_1_sdkGrp_zero"+"_parentConstraint")
-                cmds.scaleConstraint(side+self.userGuideName+"_0_ctrl", side+self.userGuideName+"_1_sdkGrp_zero", maintainOffset=True, name=side+self.userGuideName+"_1_sdkGrp_zero"+"_scaleConstraint")
+                cmds.parentConstraint(side+self.userGuideName+"_0_ctrl", side+self.userGuideName+"_1_sdkGrp_zero", maintainOffset=True, name=side+self.userGuideName+"_1_sdkGrp_zero"+"_pc")
+                cmds.scaleConstraint(side+self.userGuideName+"_0_ctrl", side+self.userGuideName+"_1_sdkGrp_zero", maintainOffset=True, name=side+self.userGuideName+"_1_sdkGrp_zero"+"_sc")
                 # connecting the attributes from control 1 to falanges rotate:
                 for n in range(1, self.nJoints+1):
                     self.ctrl   = side+self.userGuideName+"_1_ctrl"

@@ -57,6 +57,10 @@ def Quadruped(self):
         backLegLimbInstance = self.initGuide('dpLimb', guideDir)
         # change limb guide to back leg type:
         self.guide.Limb.changeType(backLegLimbInstance, self.langDic[self.langName]['m030_leg'])
+        # change limb guide to back leg style (quadruped):
+        self.guide.Limb.changeStyle(backLegLimbInstance, self.langDic[self.langName]['m037_quadruped'])
+        # set for not use bend ribbons as default:
+        self.guide.Limb.setBendFalse(backLegLimbInstance)
         # change name to back leg:
         self.guide.Limb.editUserName(backLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].lower()+'B')
         cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
@@ -108,6 +112,10 @@ def Quadruped(self):
         frontLegLimbInstance = self.initGuide('dpLimb', guideDir)
         # change limb guide to front leg type:
         self.guide.Limb.changeType(frontLegLimbInstance, self.langDic[self.langName]['m030_leg'])
+        # change limb guide to front leg style (quadruped spring):
+        self.guide.Limb.changeStyle(frontLegLimbInstance, self.langDic[self.langName]['m043_quadSpring'])
+        # set for not use bend ribbons as default:
+        self.guide.Limb.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
         self.guide.Limb.editUserName(frontLegLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].lower()+'A')
         cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)

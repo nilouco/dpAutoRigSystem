@@ -84,6 +84,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            # declare lists to store names and attributes:
+            self.grpHeadBList, self.headRevNodeList = [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -199,6 +201,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.grpHeadB = cmds.group(self.zeroCtrlList[1], name=self.headCtrl+"_B_grp")
                 self.grpHeadA = cmds.group(self.grpHeadB, name=self.headCtrl+"_A_grp")
                 self.grpHead = cmds.group(self.grpHeadA, name=self.headCtrl+"_grp")
+                # store grpHeadB in the list to integrate:
+                self.grpHeadBList.append(self.grpHeadB)
                 # arrange pivots:
                 self.neckPivot = cmds.xform(self.neckCtrl, query=True, worldSpace=True, translation=True)
                 self.headPivot = cmds.xform(self.headCtrl, query=True, worldSpace=True, translation=True)
@@ -208,12 +212,15 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.worldRef = cmds.group(empty=True, name=side+self.userGuideName+"_worldRef")
                 cmds.pointConstraint(self.headJxt, self.grpHeadB, maintainOffset=True, name=self.grpHeadB+"_pointConstraint")
                 parentConst = cmds.parentConstraint(self.headJxt, self.worldRef, self.grpHeadA, maintainOffset=True, name=self.grpHeadA+"_parentConstraint")[0]
-                
+                orientConst = cmds.orientConstraint(self.grpHeadA, self.grpHeadB, maintainOffset=True, name=self.grpHeadB+"_orientConstraint")[0]
+                # connect reverseNode:
                 cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c_follow'], parentConst+"."+self.headJxt+"W0", force=True)
-                revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_rev")
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c_follow'], revNode+".inputX", force=True)
-                cmds.connectAttr(revNode+'.outputX', parentConst+"."+self.worldRef+"W1", force=True)
+                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c_follow'], orientConst+"."+self.grpHeadA+"W0", force=True)
+                self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_rev")
+                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c_follow'], self.headRevNode+".inputX", force=True)
+                cmds.connectAttr(self.headRevNode+'.outputX', parentConst+"."+self.worldRef+"W1", force=True)
+                self.headRevNodeList.append(self.headRevNode)
                 
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
@@ -254,3 +261,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
     
     def integratingInfo(self, *args):
         Base.StartClass.integratingInfo(self)
+        """ This method will create a dictionary with informations about integrations system between modules.
+        """
+        self.integratedActionsDic = {
+                                    "module": {
+                                                "grpHeadBList"     : self.grpHeadBList,
+                                                "headRevNodeList"  : self.headRevNodeList,
+                                              }
+                                    }

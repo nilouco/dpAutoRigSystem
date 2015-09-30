@@ -109,7 +109,8 @@ def setNotRenderable(objList):
                     try:
                         cmds.setAttr(obj+"."+attr, 0)
                     except:
-                        print "Error: Cannot set", attr, "as zero for", obj
+                        #print "Error: Cannot set not renderable ", attr, "as zero for", obj
+                        pass
             # verify if the object is a transform type:
             elif objType == "transform":
                 # find all shapes children of the transform object:
@@ -121,7 +122,8 @@ def setNotRenderable(objList):
                             try:
                                 cmds.setAttr(shape+"."+attr, 0)
                             except:
-                                print "Error: Cannot set", attr, "as zero for", shape
+                                #print "Error: Cannot set not renderable ", attr, "as zero for", shape
+                                pass
 
 
 def distanceBet(a, b, name="temp_distBet", keep=False):
@@ -192,7 +194,7 @@ def middlePoint(a, b, createLocator=False):
         return[resultPos]
 
 
-def createRibbon(name='noodle', totalJoints=6):
+def createSimpleRibbon(name='noodle', totalJoints=6):
     """ Creates a Ribbon system.
         Receives the total number of joints to create.
         Returns the ribbon nurbs plane, the joints groups and joints created.
@@ -205,6 +207,9 @@ def createRibbon(name='noodle', totalJoints=6):
     cmds.setAttr(ribbonNurbsPlane+".template", 1)
     cmds.setAttr(ribbonNurbsPlane+".visibility", 0)
     setNotRenderable([ribbonNurbsPlaneShape])
+    # make this ribbonNurbsPlane as not skinable from dpAR_UI:
+    cmds.addAttr(ribbonNurbsPlane, longName="doNotSkinIt", attributeType="bool", keyable=True)
+    cmds.setAttr(ribbonNurbsPlane+".doNotSkinIt", 1)
     # create groups to be used as a root of the ribbon system:
     ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_RibbonJoint_grp")
     # create joints:

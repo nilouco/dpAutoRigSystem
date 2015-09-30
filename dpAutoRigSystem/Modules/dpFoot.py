@@ -150,8 +150,8 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 heelRFAttr    = self.langDic[self.langName]['c_revFoot_C']
                 toeRFAttr     = self.langDic[self.langName]['c_revFoot_D']
                 ballRFAttr    = self.langDic[self.langName]['c_revFoot_E']
-                rfRoll          = self.langDic[self.langName]['c_revFoot_roll']
-                rfSpin          = self.langDic[self.langName]['c_revFoot_spin']
+                rfRoll        = self.langDic[self.langName]['c_revFoot_roll']
+                rfSpin        = self.langDic[self.langName]['c_revFoot_spin']
                 
                 # creating joints:
                 cmds.select(clear=True)
