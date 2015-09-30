@@ -28,6 +28,14 @@
 
 
 try:
+    #Use the following line if the scripts is not copied in a maya path
+    import sys
+    #Change the text of line 37 "Your Path To The Project" for the path where you got the project
+    #Ex Win --> sys.path.append("C:/Program Files/dpAutoRigSystem")
+    #Ex Mac --> sys.path.append("/Users/yourUserName/dpAutoRigSystem")
+    #Ex Linux --> sys.path.append("/home/yourUserName/dpAutoRigSystem")
+    sys.path.append("Your Path to the project")
+    
     import maya.cmds as cmds
     import dpAutoRigSystem
     import dpAutoRigSystem.dpAutoRig as dpAR
