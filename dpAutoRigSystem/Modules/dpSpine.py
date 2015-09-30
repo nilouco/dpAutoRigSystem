@@ -1,0 +1,329 @@
+# importing libraries:
+import maya.cmds as cmds
+import dpControls as ctrls
+import dpUtils as utils
+import dpBaseClass as Base
+import dpLayoutClass as Layout
+
+# global variables to this module:    
+CLASS_NAME = "Spine"
+TITLE = "m011_spine"
+DESCRIPTION = "m012_spineDesc"
+ICON = "/Icons/dp_spine.png"
+
+
+class Spine(Base.StartClass, Layout.LayoutClass):
+    def __init__(self, dpUIinst, langDic, langName, userGuideName):
+        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
+        pass
+    
+    
+    def createModuleLayout(self, *args):
+        Base.StartClass.createModuleLayout(self)
+        Layout.LayoutClass.basicModuleLayout(self)
+        # Custom MODULE LAYOUT:
+        # verify if we are creating or re-loading this module instance:
+        firstTime = cmds.getAttr(self.moduleGrp+'.nJoints')
+        if firstTime == 1:
+            try:
+                cmds.intField(self.nJointsIF, edit=True, value=3, minValue=3)
+            except:
+                pass
+            self.changeJointNumber(3)
+    
+    
+    def createGuide(self, *args):
+        Base.StartClass.createGuide(self)
+        # Custom GUIDE:
+        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
+        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
+        cmds.setAttr(self.moduleGrp+".nJoints", 1)
+        self.cvJointLoc = ctrls.cvJointLoc(ctrlName=self.guideName+"_jointLoc1", r=0.5)
+        self.cvEndJoint = ctrls.cvLocator(ctrlName=self.guideName+"_jointEnd", r=0.1)
+        cmds.parent(self.cvEndJoint, self.cvJointLoc)
+        cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+        cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
+        ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        # Edit GUIDE:
+        cmds.setAttr(self.moduleGrp+".rx", -90)
+        cmds.setAttr(self.moduleGrp+".ry", -90)
+        cmds.setAttr(self.moduleGrp+"_radiusCtrl.tx", 4)
+    
+    
+    def changeJointNumber(self, enteredNJoints, *args):
+        """ Edit the number of joints in the guide.
+        """
+        utils.useDefaultRenderLayer()
+        # get the number of joints entered by user:
+        if enteredNJoints == 0:
+            try:
+                self.enteredNJoints = cmds.intField(self.nJointsIF, query=True, value=True)
+            except:
+                return
+        else:
+            self.enteredNJoints = enteredNJoints
+        # get the number of joints existing:
+        self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+        # start analisys the difference between values:
+        if self.enteredNJoints != self.currentNJoints:
+            self.cvEndJoint = self.guideName+"_jointEnd"
+            if self.currentNJoints > 1:
+                # delete current point constraints:
+                for n in range(2, self.currentNJoints):
+                    cmds.delete(self.guideName+"_parentConstraint"+str(n))
+            # verify if the nJoints is greather or less than the current
+            if self.enteredNJoints > self.currentNJoints:
+                # add the new cvLocators:
+                for n in range(self.currentNJoints+1, self.enteredNJoints+1):
+                    # create another N cvLocator:
+                    self.cvLocator = ctrls.cvLocator( ctrlName=self.guideName+"_jointLoc"+str(n), r=0.3 )
+                    # set its nJoint value as n:
+                    cmds.setAttr(self.cvLocator+".nJoint", n)
+                    # parent its group to the first cvJointLocator:
+                    self.cvLocGrp = cmds.group(self.cvLocator, name=self.cvLocator+"_grp")
+                    cmds.parent(self.cvLocGrp, self.guideName+"_jointLoc"+str(n-1), relative=True)
+                    cmds.setAttr(self.cvLocGrp+".translateZ", 2)
+                    if n > 2:
+                        cmds.parent(self.cvLocGrp, self.guideName+"_jointLoc1", absolute=True)
+            elif self.enteredNJoints < self.currentNJoints:
+                # re-parent cvEndJoint:
+                self.cvLocator = self.guideName+"_jointLoc"+str(self.enteredNJoints)
+                cmds.parent(self.cvEndJoint, world=True)
+                # delete difference of nJoints:
+                for n in range(self.enteredNJoints, self.currentNJoints):
+                    # re-parent the children guides:
+                    childrenGuideBellowList = utils.getGuideChildrenList(self.guideName+"_jointLoc"+str(n+1)+"_grp")
+                    if childrenGuideBellowList:
+                        for childGuide in childrenGuideBellowList:
+                            cmds.parent(childGuide, self.cvLocator)
+                    cmds.delete(self.guideName+"_jointLoc"+str(n+1)+"_grp")
+            # re-parent cvEndJoint:
+            cmds.parent(self.cvEndJoint, self.cvLocator)
+            cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+            cmds.setAttr(self.cvEndJoint+".visibility", 0)
+            # re-create parentConstraints:
+            if self.enteredNJoints > 1:
+                for n in range(2, self.enteredNJoints):
+                    self.parentConst = cmds.parentConstraint(self.guideName+"_jointLoc1", self.cvEndJoint, self.guideName+"_jointLoc"+str(n)+"_grp", name=self.guideName+"_parentConstraint"+str(n), maintainOffset=True)[0]
+                    nParentValue = (n-1) / float(self.enteredNJoints - 1)
+                    cmds.setAttr(self.parentConst+".guide_jointLoc1W0", 1-nParentValue)
+                    cmds.setAttr(self.parentConst+".guide_jointEndW1", nParentValue)
+                    ctrls.setLockHide([self.guideName+"_jointLoc"+str(n)], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+            # actualise the nJoints in the moduleGrp:
+            cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+            self.currentNJoints = self.enteredNJoints
+            # re-build the preview mirror:
+            Layout.LayoutClass.createPreviewMirror(self)
+        cmds.select(self.moduleGrp)
+    
+    
+    def rigModule(self, *args):
+        Base.StartClass.rigModule(self)
+        # verify if the guide exists:
+        if cmds.objExists(self.moduleGrp):
+            try:
+                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
+            except:
+                hideJoints = 1
+            # declare lists to store names and attributes:
+            self.hipsAList, self.chestAList, self.volumeVariationAttrList = [], [], []
+            # start as no having mirror:
+            sideList = [""]
+            # analisys the mirror module:
+            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
+            if self.mirrorAxis != 'off':
+                # get rigs names:
+                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
+                # get first and last letters to use as side initials (prefix):
+                sideList = [ self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_' ]
+                for s, side in enumerate(sideList):
+                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_guide_base')[0]
+                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
+                    for item in allGuideList:
+                        cmds.rename(item, side+self.userGuideName+"_"+item)
+                    self.mirrorGrp = cmds.group(name=side+self.userGuideName+"_"+self.moduleGrp+"_grp", empty=True)
+                    cmds.parent(side+self.userGuideName+'_guide_base', self.mirrorGrp, absolute=True)
+                    # re-rename grp:
+                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
+                    # do a group mirror with negative scaling:
+                    if s == 1:
+                        for axis in self.mirrorAxis:
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+            else: # if not mirror:
+                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_guide_base')[0]
+                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
+                for item in allGuideList:
+                    cmds.rename(item, self.userGuideName+"_"+item)
+                self.mirrorGrp = cmds.group(self.userGuideName+'_guide_base', name=self.userGuideName+'_'+self.moduleGrp+"_grp", relative=True)
+                # re-rename grp:
+                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
+            for side in sideList:
+                self.base = side+self.userGuideName+'_guide_base'
+                # get the number of joints to be created:
+                self.nJoints = cmds.getAttr(self.base+".nJoints")
+                # create controls:
+                self.hipsA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"A_ctrl", r=self.ctrlRadius, h=(self.ctrlRadius/20.0))
+                self.hipsB = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"B_ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
+                self.chestA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"A_ctrl", r=self.ctrlRadius, h=(self.ctrlRadius/20.0))
+                self.chestB = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"B_ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
+                cmds.addAttr(self.hipsA, longName=side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                ctrls.setLockHide([self.hipsA, self.hipsB, self.chestA, self.chestB], ['v'], l=False)
+                self.hipsAList.append(self.hipsA)
+                self.chestAList.append(self.chestA)
+                self.volumeVariationAttrList.append(side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'])
+                # organize hierarchy:
+                cmds.parent(self.hipsB, self.hipsA)
+                cmds.parent(self.chestB, self.chestA)
+                cmds.parent(self.chestA, self.hipsA)
+                cmds.rotate(-90, 0, 0, self.hipsA)
+                cmds.makeIdentity(self.hipsA, apply=True, rotate=True)
+                # position of controls:
+                bottomLocGuide = side+self.userGuideName+"_guide_jointLoc1"
+                topLocGuide = side+self.userGuideName+"_guide_jointLoc"+str(self.nJoints)
+                # snap controls to guideLocators:
+                tempDel = cmds.parentConstraint(bottomLocGuide, self.hipsA, maintainOffset=False)
+                cmds.delete(tempDel)
+                tempDel = cmds.parentConstraint(topLocGuide, self.chestA, maintainOffset=False)
+                cmds.delete(tempDel)
+                # zeroOut transformations:
+                utils.zeroOut([self.hipsA, self.chestA])
+                # modify the pivots of chest controls:
+                upPivotPos = cmds.xform(side+self.userGuideName+"_guide_jointLoc"+str(self.nJoints-1), query=True, worldSpace=True, translation=True)
+                cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestA+".scalePivot", self.chestA+".rotatePivot", self.chestB+".scalePivot", self.chestB+".rotatePivot")
+                # add originedFrom attributes to hipsA, hipsB and chestB:
+                utils.originedFrom(objName=self.hipsA, attrString=self.base)
+                utils.originedFrom(objName=self.hipsB, attrString=bottomLocGuide)
+                utils.originedFrom(objName=self.chestB, attrString=topLocGuide)
+                # create spine ribbon:
+                returnedRibbonList = ctrls.createRibbon(name=side+self.userGuideName+'_rbn', totalJoints=(self.nJoints-1))
+                rbnNurbsPlane      = returnedRibbonList[0]
+                rbnNurbsPlaneShape = returnedRibbonList[1]
+                rbnJointGrpList    = returnedRibbonList[2]
+                rbnJointList       = returnedRibbonList[3]
+                # position of ribbon nurbs plane:
+                cmds.setAttr(rbnNurbsPlane+".tz", -4)
+                cmds.move(0, 0, 0, rbnNurbsPlane+".scalePivot", rbnNurbsPlane+".rotatePivot")
+                cmds.rotate(90, 90, 0, rbnNurbsPlane)
+                cmds.makeIdentity(rbnNurbsPlane, apply=True, translate=True, rotate=True)
+                downLocPos   = cmds.xform(side+self.userGuideName+"_guide_jointLoc1", query=True, worldSpace=True, translation=True)
+                upLocPos     = cmds.xform(side+self.userGuideName+"_guide_jointLoc"+str(self.nJoints), query=True, worldSpace=True, translation=True)
+                cmds.move(downLocPos[0], downLocPos[1], downLocPos[2], rbnNurbsPlane)
+                # create up and down clusters:
+                downCluster   = cmds.cluster(rbnNurbsPlane+".cv[0:3][0:1]", name=side+self.userGuideName+'_down_cls')[1]
+                upCluster     = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(self.nJoints)+":"+str(self.nJoints+1)+"]", name=side+self.userGuideName+'_up_cls')[1]
+                # get positions of joints from ribbon nurbs plane:
+                startRbnJointPos = cmds.xform(side+self.userGuideName+"_rbn0_jnt", query=True, worldSpace=True, translation=True)
+                endRbnJointPos = cmds.xform(side+self.userGuideName+"_rbn"+str(self.nJoints-1)+"_jnt", query=True, worldSpace=True, translation=True)
+                # move pivots of clusters to start and end positions:
+                cmds.move(startRbnJointPos[0], startRbnJointPos[1], startRbnJointPos[2], downCluster+".scalePivot", downCluster+".rotatePivot")
+                cmds.move(endRbnJointPos[0], endRbnJointPos[1], endRbnJointPos[2], upCluster+".scalePivot", upCluster+".rotatePivot")
+                # snap clusters to guideLocators:
+                tempDel = cmds.parentConstraint(bottomLocGuide, downCluster, maintainOffset=False)
+                cmds.delete(tempDel)
+                tempDel = cmds.parentConstraint(topLocGuide, upCluster, maintainOffset=False)
+                cmds.delete(tempDel)
+                # rotate clusters to compensate guide:
+                upClusterRot   = cmds.xform(upCluster, query=True, worldSpace=True, rotation=True)
+                downClusterRot = cmds.xform(downCluster, query=True, worldSpace=True, rotation=True)
+                cmds.xform(upCluster, worldSpace=True, rotation=(upClusterRot[0]+90, upClusterRot[1], upClusterRot[2]))
+                cmds.xform(downCluster, worldSpace=True, rotation=(downClusterRot[0]+90, downClusterRot[1], downClusterRot[2]))
+                # scaleY of the clusters in order to avoid great extremity deforms:
+                rbnHeight = ctrls.distanceBet(side+self.userGuideName+"_guide_jointLoc"+str(self.nJoints), side+self.userGuideName+"_guide_jointLoc1", keep=False)[0]
+                cmds.setAttr(upCluster+".sy", rbnHeight/10)
+                cmds.setAttr(downCluster+".sy", rbnHeight/10)
+                # parent clusters in controls (up and down):
+                cmds.parentConstraint(self.hipsB, downCluster, maintainOffset=True, name=downCluster+"_parentConstraint")
+                cmds.parentConstraint(self.chestB, upCluster, maintainOffset=True, name=upCluster+"_parentConstraint")
+                # organize a group of clusters:
+                self.clustersGrp = cmds.group(name=side+self.userGuideName+"_rbn_clusters_grp", empty=True)
+                if hideJoints:
+                    cmds.setAttr(self.clustersGrp+".visibility", 0)
+                cmds.parent(downCluster, upCluster, self.clustersGrp, relative=True)
+                # make ribbon joints groups scalable:
+                for rbnJntGrp in rbnJointGrpList:
+                    cmds.scaleConstraint(self.clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_scaleConstraint")
+                # calculate the distance to volumeVariation:
+                arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_rbn_arcLenShape")
+                arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]
+                arcLen = cmds.rename(arcLenFather, side+self.userGuideName+"_rbn_arcLen")
+                arcLenShape = cmds.listRelatives(arcLen, children=True, shapes=True)[0]
+                cmds.setAttr(arcLen+'.visibility', 0)
+                # connect nurbsPlaneShape to arcLength node:
+                cmds.connectAttr(rbnNurbsPlaneShape+'.worldSpace[0]', arcLenShape+'.nurbsGeometry')
+                cmds.setAttr(arcLenShape+'.vParamValue', 1)
+                cmds.setAttr(arcLenShape+'.uParamValue', 0)
+                arcLenValue = cmds.getAttr(arcLenShape+'.arcLengthInV')
+                # create a multiplyDivide to output the squashStretch values:
+                rbnMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_rbn_md")
+                cmds.connectAttr(arcLenShape+'.arcLengthInV', rbnMD+'.input2X') 
+                cmds.setAttr(rbnMD+'.input1X', arcLenValue)
+                cmds.setAttr(rbnMD+'.operation', 2)
+                # create a blendColor in order to get the correct result value of volumeVariation:
+                rbnBlendColors = cmds.createNode('blendColors', name=side+self.userGuideName+"_rbn_bc")
+                cmds.connectAttr(self.hipsA+'.'+side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'], rbnBlendColors+'.blender')
+                cmds.connectAttr(rbnMD+'.outputX', rbnBlendColors+'.color1R')
+                cmds.setAttr(rbnBlendColors+'.color2R', 1)
+                # middle ribbon setup:
+                for n in range(1, self.nJoints-1):
+                    self.middle = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_middle']+str(n)+"_ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=self.ctrlRadius)[0]
+                    ctrls.setLockHide([self.middle], ['sx', 'sy', 'sz'])
+                    cmds.setAttr(self.middle+'.visibility', keyable=False)
+                    cmds.parent(self.middle, self.hipsA)
+                    middleLocGuide = side+self.userGuideName+"_guide_jointLoc"+str(n+1)
+                    tempDel = cmds.parentConstraint(middleLocGuide, self.middle, maintainOffset=False)
+                    cmds.delete(tempDel)
+                    utils.zeroOut([self.middle])
+                    middleCluster = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(n+1)+"]", name=side+self.userGuideName+'_middle_cls')[1]
+                    middleLocPos = cmds.xform(side+self.userGuideName+"_guide_jointLoc"+str(n), query=True, worldSpace=True, translation=True)
+                    tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
+                    cmds.delete(tempDel)
+                    middleClusterRot   = cmds.xform(middleCluster, query=True, worldSpace=True, rotation=True)
+                    cmds.xform(middleCluster, worldSpace=True, rotation=(middleClusterRot[0]+90, middleClusterRot[1], middleClusterRot[2]))
+                    cmds.parentConstraint(self.middle, middleCluster, maintainOffset=True, name=middleCluster+"_parentConstraint")
+                    # parenting constraints like guide locators:
+                    self.parentConst = cmds.parentConstraint(self.hipsB, self.chestB, self.middle+"_zero", name=self.middle+"_parentConstraint", maintainOffset=True)[0]
+                    nParentValue = (n) / float(self.nJoints - 1)
+                    cmds.setAttr(self.parentConst+"."+self.hipsB+"W0", 1-nParentValue)
+                    cmds.setAttr(self.parentConst+"."+self.chestB+"W1", nParentValue)
+                    cmds.parent(middleCluster, self.clustersGrp, relative=True)
+                    # add originedFrom attribute to this middle ctrl:
+                    utils.originedFrom(objName=self.middle, attrString=middleLocGuide)
+                    # apply volumeVariation to joints in the middle ribbon setup:
+                    cmds.connectAttr(rbnBlendColors+'.outputR', rbnJointList[n]+'.scaleX')
+                    cmds.connectAttr(rbnBlendColors+'.outputR', rbnJointList[n]+'.scaleZ')
+                # organize groups:
+                self.rbnRigGrp      = cmds.group(name=side+self.userGuideName+"_grp", empty=True)
+                self.rbnControlGrp  = cmds.group(name=side+self.userGuideName+"_control_grp", empty=True)
+                cmds.parent(self.hipsA+"_zero", self.rbnControlGrp, relative=True)
+                cmds.parent(self.clustersGrp, side+self.userGuideName+"_rbn_RibbonJoint_grp", self.rbnControlGrp, arcLen, self.rbnRigGrp, relative=True)
+                if hideJoints:
+                    cmds.setAttr(side+self.userGuideName+"_rbn_RibbonJoint_grp.visibility", 0)
+                # add hook attributes to be read when rigging integrated modules:
+                utils.addHook(objName=self.rbnControlGrp, hookType='ctrlHook')
+                utils.addHook(objName=self.clustersGrp, hookType='scalableHook')
+                utils.addHook(objName=self.rbnRigGrp, hookType='staticHook')
+                cmds.addAttr(self.rbnRigGrp, longName="dpAR_name", dataType="string")
+                cmds.setAttr(self.rbnRigGrp+".dpAR_name", self.userGuideName, type="string")
+                # lockHide scale of up and down controls:
+                ctrls.setLockHide([self.hipsA, self.hipsB, self.chestA, self.chestB], ['sx', 'sy', 'sz'])
+                # delete duplicated group for side (mirror):
+                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+            # finalize this rig:
+            self.integratingInfo()
+            cmds.select(clear=True)
+        # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
+        self.deleteModule()
+    
+    
+    def integratingInfo(self, *args):
+        Base.StartClass.integratingInfo(self)
+        """ This method will create a dictionary with informations about integrations system between modules.
+        """
+        self.integratedActionsDic = {
+                                    "module": {
+                                                "hipsAList"               : self.hipsAList,
+                                                "chestAList"              : self.chestAList,
+                                                "volumeVariationAttrList" : self.volumeVariationAttrList
+                                                }
+                                    }
