@@ -40,6 +40,9 @@
 #                                         ikFkSnap (thanks to Renaud Lessard), head translation, finger ikStretch, limb volume variation,
 #                                         eyeLookAt activation with baseCtrl, limb extra bends, shapeSize
 #                            changed: only one limb corner joint, unlocked fk translation,
+#       v 3.0 _ 2015-09-30 - GitHub OpenSource by Sébastien Bourgoing and Renaud Lessard from Squeeze Studio Animation, thanks!
+#                            All updates will be publish in GitHub:
+#                            https://github.com/nilouco/dpAutoRigSystem
 #
 #
 ###################################################################
@@ -71,7 +74,7 @@ except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
 
-DPAR_VERSION = "2.6"
+DPAR_VERSION = "3.0"
 
 class DP_AutoRig_UI:
     
@@ -313,8 +316,8 @@ class DP_AutoRig_UI:
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
         self.allUIs["skinButton"] = cmds.button("skinButton", label=self.langDic[self.langName]['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
         self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", cn="vertical2", st=1.0, parent=self.allUIs["footerB"])
-        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.0, 1.0, 0.0), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
-        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(1.0, 0.0, 0.0), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.3, 0.8, 0.3), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.8, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.langDic[self.langName]['i025_joints']+" 0 "+self.langDic[self.langName]['i024_geometries'], parent=self.allUIs["footerB"])
@@ -863,6 +866,10 @@ class DP_AutoRig_UI:
         pymel.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
         pymel.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
         pymel.select(None)
+
+        #Hide Models and FX groups
+        pymel.setAttr(self.modelsGrp.visibility, 0)
+        pymel.setAttr(self.fxGrp.visibility, 0)
 
         #Function not in pymel for the moment
         aToLock = [self.masterGrp.__melobject__(),
@@ -1416,29 +1423,27 @@ class DP_AutoRig_UI:
                 pProxyGrp = pymel.PyNode(self.proxyGrp)
 
                 if not pymel.hasAttr(pOptCtrl, "display"):
-                    pymel.addAttr(pOptCtrl, ln="display", at="enum", enumName="----------")
-                    pymel.setAttr(pOptCtrl.display, 0, edit=True, keyable=True, lock=False)
+                    pymel.addAttr(pOptCtrl, ln="display", at="enum", enumName="----------", keyable=True)
 
                 if not pymel.hasAttr(pOptCtrl, "displayMesh"):
-                    pymel.addAttr(pOptCtrl, ln="displayMesh", min=0, max=1)
-                    pymel.setAttr(pOptCtrl.displayMesh, 1, edit=True, keyable=True)
+                    pymel.addAttr(pOptCtrl, ln="displayMesh", min=0, max=1, defaultValue=1, keyable=True)
                     pymel.connectAttr(pOptCtrl.displayMesh, pRenderGrp.visibility, force=True)
-                    pymel.connectAttr(pOptCtrl.displayMesh, pProxyGrp.visibility, force=True)
+
+                if not pymel.hasAttr(pOptCtrl, "displayProxy"):
+                    pymel.addAttr(pOptCtrl, ln="displayProxy", min=0, max=1, defaultValue=0, keyable=True)
+                    pymel.connectAttr(pOptCtrl.displayProxy, pProxyGrp.visibility, force=True)
 
                 if not pymel.hasAttr(pOptCtrl, "displayCtrl"):
-                    pymel.addAttr(pOptCtrl, ln="displayCtrl", min=0, max=1)
-                    pymel.setAttr(pOptCtrl.displayCtrl, 1, edit=True, keyable=True)
+                    pymel.addAttr(pOptCtrl, ln="displayCtrl", min=0, max=1, defaultValue=1, keyable=True)
                     pymel.connectAttr(pOptCtrl.displayCtrl, pCtrlVisGrp.visibility, force=True)
 
                 if not pymel.hasAttr(pOptCtrl, "General"):
-                    pymel.addAttr(pOptCtrl, ln="General", at="enum", enumName="----------")
-                    pymel.setAttr(pOptCtrl.General, 0, edit=True, keyable=True, lock=False)
+                    pymel.addAttr(pOptCtrl, ln="General", at="enum", enumName="----------", keyable=True)
 
                 #Only create if a IkFk attribute is found
                 if not pymel.hasAttr(pOptCtrl, "IKFKBlend"):
                     if (pOptCtrl.listAttr(string="*IkFk*")):
-                        pymel.addAttr(pOptCtrl, ln="IKFKBlend", at="enum", enumName="----------")
-                        pymel.setAttr(pOptCtrl.IKFKBlend, 0, edit=True, keyable=True, lock=False)
+                        pymel.addAttr(pOptCtrl, ln="IKFKBlend", at="enum", enumName="----------", keyable=True)
 
 
         # re-declaring guideMirror and previewMirror groups:

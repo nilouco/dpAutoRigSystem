@@ -31,7 +31,8 @@ class LayoutClass:
         self.annotationCheckBox = cmds.checkBox(label=" ", annotation=self.langDic[self.langName]['m014_annotation'], onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), value=0, parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.langDic[self.langName]['m006_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
         self.colorButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
-        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shapeSize'], minValue=0.001, value=1, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
+        shapeSizeValue = cmds.getAttr(self.moduleGrp+'.shapeSize')
+        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shapeSize'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
         # edit values reading from guide:
         displayAnnotationValue = cmds.getAttr(self.moduleGrp+'.displayAnnotation')
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
