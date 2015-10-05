@@ -43,6 +43,7 @@ def getMayaWindow():
     ptr = OpenMayaUI.MQtUtil.mainWindow()
     return shiboken.wrapInstance(long(ptr), QtGui.QWidget)
 
+
 class PoseReaderDialog(QtGui.QMainWindow):
     def __init__(self, parent=getMayaWindow(), *args, **kwargs):
         super(PoseReaderDialog, self).__init__(parent)
@@ -213,6 +214,16 @@ class PoseReaderDialog(QtGui.QMainWindow):
     def on_action_create(self, *args):
         sName = self.ui.edtNewName.toPlainText()
 
+        # loading Maya matrix node
+        if not (cmds.pluginInfo("decomposeMatrix", query=True, loaded=True)):
+            try: # Maya 2012
+                cmds.loadPlugin("decomposeMatrix.mll")
+            except:
+                try: # Maya 2013 or earlier
+                    cmds.loadPlugin("matrixNodes.mll")
+                except:
+                    print self.langDic[self.langName]['e002_decomposeMatrixNotFound']
+                    
         aSel = pymel.selected()
         if (len(aSel) == 2):
             #Create the container of the system data
