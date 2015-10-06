@@ -1,6 +1,7 @@
 try:
     import pymel.core as pymel
     from Ui import PoseReader as poseReaderUI
+    reload(poseReaderUI)
     import shiboken
     from maya import OpenMayaUI
     from sstk.libs.libQt import QtCore, QtGui

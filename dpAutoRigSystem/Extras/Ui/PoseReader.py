@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '/home/sbourgoing/dev/sstk/maya/rigging/dpAutoRigSystem/Extras/Ui/PoseReader.ui'
+# Form implementation generated from reading ui file '/home/sbourgoing/dev/dpAutoRigSystem/dpAutoRigSystem/Extras/Ui/PoseReader.ui'
 #
-# Created: Thu Sep 17 16:45:14 2015
-#      by: pyside-uic 0.2.14 running on PySide 1.1.1
+# Created: Tue Oct  6 17:04:36 2015
+#      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -29,16 +29,7 @@ class Ui_MainWindow(object):
         self.btnCreate.setMaximumSize(QtCore.QSize(93, 27))
         self.btnCreate.setObjectName("btnCreate")
         self.horizontalLayout.addWidget(self.btnCreate)
-        self.edtNewName = QtGui.QTextEdit(self.centralwidget)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.edtNewName.sizePolicy().hasHeightForWidth())
-        self.edtNewName.setSizePolicy(sizePolicy)
-        self.edtNewName.setMaximumSize(QtCore.QSize(20000, 30))
-        self.edtNewName.setAcceptDrops(True)
-        self.edtNewName.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.edtNewName.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.edtNewName = QtGui.QLineEdit(self.centralwidget)
         self.edtNewName.setObjectName("edtNewName")
         self.horizontalLayout.addWidget(self.edtNewName)
         self.verticalLayout.addLayout(self.horizontalLayout)
