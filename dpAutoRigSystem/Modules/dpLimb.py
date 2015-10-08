@@ -921,7 +921,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                     #(James) add bend to limb
                     if self.getHasBend():
-                        import sstk.maya.rigging.dpAutoRigSystem.Modules.Library.jcRibbon as rb
+                        from Library import jcRibbon as rb
                         reload(rb)
                         num = self.getBendJoints()
                         iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'
