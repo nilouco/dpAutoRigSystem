@@ -172,8 +172,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # creating controls:
                 self.neckCtrl = ctrls.cvNeck(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_neck']+"_Ctrl", r=self.ctrlRadius/2.0)
+                cmds.setAttr(self.neckCtrl + ".rotateOrder", 4)
                 self.headCtrl = ctrls.cvHead(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_head']+"_Ctrl", r=self.ctrlRadius/2.0)
+                cmds.setAttr(self.headCtrl + ".rotateOrder", 4)
                 self.jawCtrl  = ctrls.cvJaw( ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_jaw']+"_Ctrl",  r=self.ctrlRadius/2.0)
+                cmds.setAttr(self.jawCtrl + ".rotateOrder", 4)
                 self.chinCtrl = ctrls.cvChin(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chin']+"_Ctrl", r=self.ctrlRadius/2.0)
                 self.lLipCtrl = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=(self.ctrlRadius * 0.25))[0]
                 self.rLipCtrl = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=(self.ctrlRadius * 0.25))[0]

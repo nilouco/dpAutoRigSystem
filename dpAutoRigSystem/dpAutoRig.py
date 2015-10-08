@@ -890,13 +890,17 @@ class DP_AutoRig_UI:
             self.masterCtrl.setDynamicAttr("masterCtrl", True)
             self.masterCtrl.setDynamicAttr("geometryList", "")
             self.masterCtrl.setDynamicAttr("controlList", "")
+            self.masterCtrl.rotateOrder.set(3)
 
         self.globalCtrl = self.getBaseCtrl("globalCtrl", self.prefix+"Global_Ctrl", ctrls.dpCheckLinearUnit(16), iSection=4)
         if (self.ctrlCreated):
             self.globalCtrl.rotateY.set(45)
             pymel.makeIdentity(self.globalCtrl, a=True)
+            self.globalCtrl.rotateOrder.set(3)
 
         self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(9.5))
+        if (self.ctrlCreated):
+            self.rootCtrl.rotateOrder.set(3)
 
         self.optionCtrl = self.getBaseCtrl("optionCtrl", self.prefix+"Option_Ctrl", ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):

@@ -226,10 +226,13 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 # creating Fk controls:
                 self.footCtrl = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_leg_extrem']+"_Ctrl", ch=False, o=True, nr=(1, 0, 0), d=3, s=8, radius=self.ctrlRadius/2.0)[0]
                 self.footCtrlList.append(self.footCtrl)
+                cmds.setAttr(self.footCtrl + ".rotateOrder", 1)
+
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
                 
                 self.middleFootCtrl = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_RevFoot_middle'].capitalize()+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=1, s=8, radius=self.ctrlRadius/2.0)[0]
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
+                cmds.setAttr(self.middleFootCtrl + ".rotateOrder", 4)
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)
                 tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootCtrl, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB)

@@ -417,6 +417,26 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         fkCtrl = cmds.circle(name=side+self.userGuideName+"_"+jName+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=1, s=8, radius=self.ctrlRadius)[0]
                     else:
                         fkCtrl = cmds.circle(name=side+self.userGuideName+"_"+jName+"_Fk_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=1, s=8, radius=self.ctrlRadius)[0]
+
+                    #Setup axis order
+                    if jName == beforeName: #Clavicle and hip
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 3)
+                    elif jName == extremName and limbTypeName == "leg": #Hand
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 4)
+                    elif jName == extremName and limbTypeName == "arm": #Hand
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 1)
+                    elif jName == mainName: #Leg and Shoulder
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 1)
+                    elif limbTypeName == "leg": #Other legs ctrl
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 2)
+                    elif limbTypeName == "arm": #Other arm ctrl
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 5)
+                    else:
+                        #Let the default axis order for other ctrl (Should not happen)
+                        pass
+
+                    #Other arm ctrl can keep the default xyz
+
                     self.fkCtrlList.append(fkCtrl)
                     cmds.setAttr(fkCtrl+'.visibility', keyable=False)
                     # creating the originedFrom attributes (in order to permit integrated parents in the future):
@@ -514,13 +534,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.parentConstraint(self.fkCtrlList[0], self.skinJointList[0], maintainOffset=True, name=self.skinJointList[0]+"_ParentConstraint")
                 
                 # creating ik controls:
+                self.ikExtremCtrl  = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
                 if self.limbType == self.langDic[self.langName]['m028_arm']:
                     self.ikCornerCtrl = ctrls.cvElbow(ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2)
                 else:
                     self.ikCornerCtrl = ctrls.cvKnee(ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3)
                 cmds.addAttr(self.ikCornerCtrl, longName='active', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 cmds.setAttr(self.ikCornerCtrl+'.active', 1);
-                self.ikExtremCtrl  = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 # getting them zeroOut groups:
                 self.ikCornerCtrlZero = utils.zeroOut([self.ikCornerCtrl])[0]

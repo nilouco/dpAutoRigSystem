@@ -189,6 +189,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     # create a control:
                     if n == 1:
                         self.ctrl = ctrls.cvFinger(ctrlName=side+self.userGuideName+"_"+str(n)+"_Ctrl", r=self.ctrlRadius)
+                        cmds.setAttr(self.ctrl + ".rotateOrder", 1)
                         utils.originedFrom(objName=self.ctrl, attrString=self.base+";"+self.guide)
                         # edit the mirror shape to a good direction of controls:
                         if s == 1:
@@ -205,6 +206,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                             cmds.makeIdentity(self.ctrl, apply=True, translate=False, rotate=True, scale=False)
                     else:
                         self.ctrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
+                        cmds.setAttr(self.ctrl + ".rotateOrder", 1)
                         utils.originedFrom(objName=self.ctrl, attrString=self.guide)
                     
                     # scaleCompensate attribute:
@@ -347,6 +349,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ParentConstraint")
                         cmds.scaleConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ScaleConstraint")
                         cmds.connectAttr(fkCtrl+".scaleCompensate", fkJoint+".segmentScaleCompensate", force=True)
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 1)
 
                 # ik handle
                 if self.nJoints >= 2:
@@ -361,6 +364,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Ik_JEnd", self.ikCtrl))
+                    cmds.setAttr(self.ikCtrl + ".rotateOrder", 1)
                     self.ikCtrlZero = utils.zeroOut([self.ikCtrl])[0]
                     self.ikCtrlZeroList.append(self.ikCtrlZero)
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ikCtrlZero+".visibility", force=True)
