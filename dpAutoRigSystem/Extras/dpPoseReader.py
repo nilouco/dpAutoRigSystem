@@ -19,7 +19,6 @@ TITLE = "m068_poseReader"
 DESCRIPTION = "m069_poseReaderDesc"
 ICON = "/Icons/sq_poseReader.png"
 
-
 #Class to contain the data of the system that will be Monkey patched when needed.
 #After Monkey patching, just print the __dict__ of the data and create the variable here
 class PoseReaderData(object):

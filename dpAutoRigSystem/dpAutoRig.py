@@ -564,7 +564,12 @@ class DP_AutoRig_UI:
         cmds.image(i=iconDir)
 
         if guideDir == "Modules":
-            cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir) )
+            '''
+            We need to passe the rigType parameters because the cmds.button command will send a False parameter that
+            will be stock in the rigType if we don't pass the parameter
+            http://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
+            '''
+            cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
         elif guideDir == "Scripts":
             cmds.button(label=title, height=30, command=partial(self.execScriptedGuide, guideModule, guideDir) )
         elif guideDir == "Extras":
@@ -573,7 +578,7 @@ class DP_AutoRig_UI:
         cmds.setParent('..')
     
     #@utils.profiler
-    def initGuide(self, guideModule, guideDir, *args):
+    def initGuide(self, guideModule, guideDir, rigType=Base.RigType.biped, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
@@ -599,7 +604,7 @@ class DP_AutoRig_UI:
         # get the CLASS_NAME from guideModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
-        guideInstance = guideClass(self, self.langDic, self.langName, userSpecName)
+        guideInstance = guideClass(self, self.langDic, self.langName, userSpecName, rigType)
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
@@ -636,8 +641,6 @@ class DP_AutoRig_UI:
         startScriptFunction = getattr(guide, guide.CLASS_NAME)
         # execute this scriptedGuideModule:
         startScriptFunction(self)
-        # reload modules before scripted creation:
-        self.populateCreatedGuideModules()
     
     
     def populateCreatedGuideModules(self, *args):
@@ -666,9 +669,9 @@ class DP_AutoRig_UI:
                 if module in validModuleNames:
                     index = validModuleNames.index(module)
                     # check if there is this module guide base in the scene:
-                    temp = validModuleNames[index]+"__"+userSpecName+":Guide_Base"
-                    if cmds.objExists(validModuleNames[index]+"__"+userSpecName+":Guide_Base"):
-                        self.allGuidesList.append([validModules[index], userSpecName])
+                    curGuideName = validModuleNames[index]+"__"+userSpecName+":Guide_Base"
+                    if cmds.objExists(curGuideName):
+                        self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
                         
         # if exists any guide module in the scene, recreate its instance as objectClass:
         if self.allGuidesList:
@@ -684,7 +687,8 @@ class DP_AutoRig_UI:
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
                 dpUIinst = self
-                moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, userGuideName=module[1])
+                rigType = cmds.getAttr(module[2] + ".rigType")
+                moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], rigType)
                 self.moduleInstancesList.append(moduleInst)
         # edit the footer A text:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
@@ -890,13 +894,17 @@ class DP_AutoRig_UI:
             self.masterCtrl.setDynamicAttr("masterCtrl", True)
             self.masterCtrl.setDynamicAttr("geometryList", "")
             self.masterCtrl.setDynamicAttr("controlList", "")
+            self.masterCtrl.rotateOrder.set(3)
 
         self.globalCtrl = self.getBaseCtrl("globalCtrl", self.prefix+"Global_Ctrl", ctrls.dpCheckLinearUnit(16), iSection=4)
         if (self.ctrlCreated):
             self.globalCtrl.rotateY.set(45)
             pymel.makeIdentity(self.globalCtrl, a=True)
+            self.globalCtrl.rotateOrder.set(3)
 
         self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(9.5))
+        if (self.ctrlCreated):
+            self.rootCtrl.rotateOrder.set(3)
 
         self.optionCtrl = self.getBaseCtrl("optionCtrl", self.prefix+"Option_Ctrl", ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):

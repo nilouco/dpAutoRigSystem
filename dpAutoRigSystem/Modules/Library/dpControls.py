@@ -619,7 +619,6 @@ def shapeSizeSetup(transformNode):
     """
     clusterHandle = None
     childShapeList = cmds.listRelatives(transformNode, shapes=True, children=True)
-    print "Child length {0}".format(len(childShapeList))
     if childShapeList:
         thisNamespace = childShapeList[0].split(":")[0]
         cmds.namespace(set=thisNamespace, force=True)

@@ -1,6 +1,7 @@
 # importing libraries:
 import maya.cmds as cmds
 import maya.mel as mel
+from ..Modules.dpBaseClass import RigType
 
 # global variables to this module:    
 CLASS_NAME = "Quadruped"
@@ -20,7 +21,7 @@ def Quadruped(dpAutoRigInst):
     if len(checkResultList) == 0:
         # woking with SPINE system:
         # create spine module instance:
-        spineInstance = dpAutoRigInst.initGuide('dpSpine', guideDir)
+        spineInstance = dpAutoRigInst.initGuide('dpSpine', guideDir, RigType.quadruped)
         # editing spine base guide informations:
         dpAutoRigInst.guide.Spine.editUserName(spineInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m011_spine'])
         cmds.setAttr(spineInstance.moduleGrp+".translateY", 10)
@@ -34,7 +35,7 @@ def Quadruped(dpAutoRigInst):
         
         # woking with HEAD system:
         # create head module instance:
-        headInstance = dpAutoRigInst.initGuide('dpHead', guideDir)
+        headInstance = dpAutoRigInst.initGuide('dpHead', guideDir, RigType.quadruped)
         # editing head base guide informations:
         dpAutoRigInst.guide.Head.editUserName(headInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_head'])
         cmds.setAttr(headInstance.moduleGrp+".translateY", 11)
@@ -57,7 +58,7 @@ def Quadruped(dpAutoRigInst):
         
         # woking with EyeLookAt system:
         # create eyeLookAt module instance:
-        eyeLookAtInstance = dpAutoRigInst.initGuide('dpEyeLookAt', guideDir)
+        eyeLookAtInstance = dpAutoRigInst.initGuide('dpEyeLookAt', guideDir, RigType.quadruped)
         # setting X mirror:
         dpAutoRigInst.guide.EyeLookAt.changeMirror(eyeLookAtInstance, "X")
         # editing eyeLookAt base guide informations:
@@ -73,7 +74,7 @@ def Quadruped(dpAutoRigInst):
         
         # working with BACK LEG (B) system:
         # create back leg module instance:
-        backLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
+        backLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir, RigType.quadruped)
         # change limb guide to back leg type:
         dpAutoRigInst.guide.Limb.changeType(backLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
         # change limb guide to back leg style (quadruped):
@@ -114,7 +115,7 @@ def Quadruped(dpAutoRigInst):
         dpAutoRigInst.guide.Limb.changeMirror(backLegLimbInstance, "X")
         
         # create BACK FOOT (B) module instance:
-        backFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
+        backFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir, RigType.quadruped)
         dpAutoRigInst.guide.Foot.editUserName(backFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+'B')
         cmds.setAttr(backFootInstance.annotation+".translateY", -3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
@@ -130,7 +131,7 @@ def Quadruped(dpAutoRigInst):
         
         # working with FRONT LEG (A) system:
         # create front leg module instance:
-        frontLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
+        frontLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir, RigType.quadruped)
         # change limb guide to front leg type:
         dpAutoRigInst.guide.Limb.changeType(frontLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
         # change limb guide to front leg style (quadruped spring):
@@ -171,7 +172,7 @@ def Quadruped(dpAutoRigInst):
         dpAutoRigInst.guide.Limb.changeMirror(frontLegLimbInstance, "X")
         
         # create FRONT FOOT (A) module instance:
-        frontFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
+        frontFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir, RigType.quadruped)
         dpAutoRigInst.guide.Foot.editUserName(frontFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+'A')
         cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
@@ -187,7 +188,7 @@ def Quadruped(dpAutoRigInst):
         
         # woking with TAIL system:
         # create FkLine module instance:
-        tailInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        tailInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir, RigType.quadruped)
         # editing tail base guide informations:
         dpAutoRigInst.guide.FkLine.editUserName(tailInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m039_tail'])
         cmds.setAttr(tailInstance.moduleGrp+".translateY", 9.8)
@@ -206,7 +207,7 @@ def Quadruped(dpAutoRigInst):
         
         # woking with EAR system:
         # create FkLine module instance:
-        earInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        earInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir, RigType.quadruped)
         # editing ear base guide informations:
         dpAutoRigInst.guide.FkLine.editUserName(earInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m040_ear'])
         cmds.setAttr(earInstance.moduleGrp+".translateX", 0.8)
