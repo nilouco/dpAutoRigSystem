@@ -15,9 +15,13 @@ ICON = "/Icons/dp_spine.png"
 
 
 class Spine(Base.StartClass, Layout.LayoutClass):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName):
-        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
-        pass
+    def __init__(self,  *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        Base.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
@@ -174,18 +178,26 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 # create controls:
                 self.hipsA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"A_Ctrl", r=self.ctrlRadius, h=(self.ctrlRadius*0.25))
-                cmds.setAttr(self.hipsA + ".rotateOrder", 4)
                 self.hipsB = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_hips']+"B_Ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
-                cmds.setAttr(self.hipsB + ".rotateOrder", 4)
                 self.chestA = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"A_Ctrl", r=self.ctrlRadius, h=(self.ctrlRadius*0.25))
-                cmds.setAttr(self.chestA + ".rotateOrder", 4)
                 self.chestB = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chest']+"B_Ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
-                cmds.setAttr(self.chestB + ".rotateOrder", 4)
                 cmds.addAttr(self.hipsA, longName=side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 ctrls.setLockHide([self.hipsA, self.hipsB, self.chestA, self.chestB], ['v'], l=False)
                 self.hipsAList.append(self.hipsA)
                 self.chestAList.append(self.chestA)
                 self.volumeVariationAttrList.append(side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'])
+
+                #Setup axis order
+                if self.rigType == Base.RigType.quadruped:
+                    cmds.setAttr(self.hipsA + ".rotateOrder", 1)
+                    cmds.setAttr(self.hipsB + ".rotateOrder", 1)
+                    cmds.setAttr(self.chestA + ".rotateOrder", 1)
+                    cmds.setAttr(self.chestB + ".rotateOrder", 1)
+                else:
+                    cmds.setAttr(self.hipsA + ".rotateOrder", 4)
+                    cmds.setAttr(self.hipsB + ".rotateOrder", 4)
+                    cmds.setAttr(self.chestA + ".rotateOrder", 4)
+                    cmds.setAttr(self.chestB + ".rotateOrder", 4)
 
                 #Keep a list of ctrls we want to colorize a certain way
                 self.aFkCtrl.append([self.hipsB, self.chestB])

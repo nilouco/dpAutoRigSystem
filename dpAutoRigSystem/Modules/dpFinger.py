@@ -15,9 +15,13 @@ ICON = "/Icons/dp_finger.png"
 
 
 class Finger(Base.StartClass, Layout.LayoutClass):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName):
-        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
-        pass
+    def __init__(self,  *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        Base.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):

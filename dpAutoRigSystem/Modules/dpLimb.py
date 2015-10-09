@@ -31,9 +31,12 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
 class Limb(Base.StartClass, Layout.LayoutClass):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName):
-        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
-        pass
+    def __init__(self,  *args, **kwargs):
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        Base.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
