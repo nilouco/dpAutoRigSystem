@@ -1,9 +1,11 @@
 # importing libraries:
 import maya.cmds as cmds
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
+
 
 # global variables to this module:    
 CLASS_NAME = "FkLine"
@@ -13,9 +15,13 @@ ICON = "/Icons/dp_fkLine.png"
 
 
 class FkLine(Base.StartClass, Layout.LayoutClass):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName):
-        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
-        pass
+    def __init__(self,  *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        Base.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):

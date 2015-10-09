@@ -32,7 +32,7 @@
 #                                          dpFoot footRoll and sideRoll attributes, footMiddleCtrl translate and scale,
 #                                          Proxy_Grp, FX_Grp, Jaw autoTranslate, StickyLips, EyeLookAt, Finger Ik setup,
 #                                          Add Hand Follow, Target Mirror
-#                             changed: all names to PascalCase
+#                             changed: all names to UpperCamelCase (PascalCase)
 #       v 2.6 _ 2015-06-08 - fixed: dpTargetMirror with locked transform, arm stretchale, integrated reverseFootCtrl_Old renaming,
 #                                   R_Leg_IkFkBlendGrpToRevFoot_Grp_ParentConstraint offset without stretch, addBend and forearm,
 #                                   fkLine flip mirror, biped ear, quadruped legs, limb start stretch value
@@ -40,6 +40,9 @@
 #                                         ikFkSnap (thanks to Renaud Lessard), head translation, finger ikStretch, limb volume variation,
 #                                         eyeLookAt activation with baseCtrl, limb extra bends, shapeSize
 #                            changed: only one limb corner joint, unlocked fk translation,
+#       v 3.0 _ 2015-09-30 - GitHub OpenSource by Sébastien Bourgoing and Renaud Lessard from Squeeze Studio Animation, thanks!
+#                            All updates will be publish in GitHub:
+#                            https://github.com/nilouco/dpAutoRigSystem
 #
 #
 ###################################################################
@@ -49,21 +52,29 @@
 # importing libraries:
 try:
     import maya.cmds as cmds
+    import pymel.core as pymel
     import json
     import os
     import sys
     import re
     import time
+    import getpass
     from functools import partial
-    import Modules.dpUtils as utils
-    import Modules.dpControls as ctrls
+    import Modules.Library.dpUtils as utils
+    import Modules.Library.dpControls as ctrls
+    import Extras.dpUpdateRigInfo as rigInfo
+    import Modules.dpBaseClass as Base
+    import Modules.dpLayoutClass as Layout
     reload(utils)
     reload(ctrls)
+    reload(rigInfo)
+    reload(Base)
+    reload(Layout)
 except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
 
-DPAR_VERSION = "2.6"
+DPAR_VERSION = "3.0"
 
 class DP_AutoRig_UI:
     
@@ -72,9 +83,12 @@ class DP_AutoRig_UI:
     def __init__(self):
         """ Start the window, menus and main layout for dpAutoRig UI.
         """
+
         try:
             # store all UI elements in a dictionary:
             self.allUIs = {}
+            self.iDeleteJobId = 0
+            self.iSelChangeJobId = 0
             # creating User Interface (UI) Window:
             self.deleteExistWindow()
             dpAR_winWidth  = 305
@@ -107,7 +121,7 @@ class DP_AutoRig_UI:
                         self.lastLang = self.langList[0]
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"languageTabLayout\"); dpUI.mainUI()')
+                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"languageTabLayout\"); autoRigUI.mainUI()')
                 # load the last language from optionVar value:
                 cmds.menuItem( self.lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection' )
             else:
@@ -138,10 +152,11 @@ class DP_AutoRig_UI:
             print self.langDic[self.langName]['i008_errorUI'],
             return
         
-        # call UI window:
-        cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"])
-    
-    
+
+        # call UI window: Also ensure that when thedock controler X button it it, the window is killed and the dock control too
+        self.iUIKilledId = cmds.scriptJob(uid=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
+        self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"]) #, vcc=self.jobDockVisChange)
+
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
         """
@@ -245,6 +260,9 @@ class DP_AutoRig_UI:
         self.allUIs["hideJointsCB"] = cmds.checkBox('hideJointsCB', label=self.langDic[self.langName]['i009_hideJointsCB'], align='left', v=0, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["integrateCB"] = cmds.checkBox('integrateCB', label=self.langDic[self.langName]['i010_integrateCB'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["defaultRenderLayerCB"] = cmds.checkBox('defaultRenderLayerCB', label=self.langDic[self.langName]['i004_defaultRL'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["colorizeCtrlCB"] = cmds.checkBox('colorizeCtrlCB', label=self.langDic[self.langName]['i065_colorizeCtrl'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["addAttrCB"] = cmds.checkBox('addAttrCB', label=self.langDic[self.langName]['i066_addAttr'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
+
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
         #footerA - columnLayout:
@@ -266,8 +284,8 @@ class DP_AutoRig_UI:
                         )
         
         # create the job of selected guide module and when new scene is created:
-        cmds.scriptJob(event=('deleteAll', self.jobReloadUI), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
-        cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.jobReloadUI), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         
         # --
         
@@ -296,7 +314,10 @@ class DP_AutoRig_UI:
         #footerB - columnLayout:
         self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinningTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
-        self.allUIs["skinButton"] = cmds.button("skinButton", label=self.langDic[self.langName]['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=self.skinFromUI, parent=self.allUIs["footerB"])
+        self.allUIs["skinButton"] = cmds.button("skinButton", label=self.langDic[self.langName]['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
+        self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", cn="vertical2", st=2.0, parent=self.allUIs["footerB"])
+        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.3, 0.8, 0.3), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.8, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.langDic[self.langName]['i025_joints']+" 0 "+self.langDic[self.langName]['i024_geometries'], parent=self.allUIs["footerB"])
@@ -333,39 +354,62 @@ class DP_AutoRig_UI:
         # call tabLayouts:
         cmds.tabLayout( self.allUIs["languageTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["extraTabLayout"], 'Extra')) )
         cmds.select(clear=True)
-    
+
     
     def jobReloadUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
+        import maya.cmds as cmds
         cmds.select(clear=True)
-        import dpAutoRig as dpAR
-        reload( dpAR )
-        dpUI = dpAR.DP_AutoRig_UI()
-    
+        import dpAutoRig as autoRig
+        reload( autoRig )
+        autoRigUI = autoRig.DP_AutoRig_UI()
+
+    def jobWinClose(self, *args):
+        #This job will ensure that the dock control is killed correctly
+        if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
+            if cmds.dockControl('dpAutoRigSystem', exists=True):
+                cmds.deleteUI('dpAutoRigSystem', control=True)
+
+    def jobDockVisChange(self, *args):
+        #This job will ensure to kill the window and at the same time to job related to it
+        if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
+            if cmds.window('dpAutoRigWindow', query=True, exists=True):
+                cmds.deleteUI('dpAutoRigWindow', window=True)
     
     def jobSelectedGuide(self):
         """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
         """
         # run the UI part:
-        selectedGuideNode = False
         selectedGuideNodeList = []
         selectedList = []
+
         # get selected items:
         selectedList = cmds.ls(selection=True, long=True)
         if selectedList:
+            toUpdateSelectList = []
+            needUpdateSelect = False
             for selectedItem in selectedList:
                 if cmds.objExists(selectedItem+".guideBase") and cmds.getAttr(selectedItem+".guideBase") == 1:
-                    selectedGuideNode = True
-                    selectedGuideNodeList.append(selectedItem)
+                    if not ":" in selectedItem[selectedItem.rfind("|"):]:
+                        newGuide = self.setupDuplicatedGuide(selectedItem)
+                        toUpdateSelectList.append(newGuide)
+                        needUpdateSelect = True
+                    else:
+                        selectedGuideNodeList.append(selectedItem)
+            if needUpdateSelect:
+                selectedGuideNodeList.extend(toUpdateSelectList)
+                self.jobReloadUI(self)
+                cmds.select(selectedGuideNodeList)
+
         # re-create module layout:
-        if selectedGuideNode:
+        if selectedGuideNodeList:
             for moduleInstance in self.moduleInstancesList:
                 cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
                 for selectedGuide in selectedGuideNodeList:
                     selectedGuideInfo = cmds.getAttr(selectedGuide+".moduleInstanceInfo")
                     if selectedGuideInfo == str(moduleInstance):
-                        moduleInstance.reCreateEditSelectedModuleLayout()
+                        moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
         # delete module layout:
         else:
             try:
@@ -375,13 +419,102 @@ class DP_AutoRig_UI:
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
                 pass
+
         # re-select items:
-        if selectedList:
-            cmds.select(selectedList)
+        #if selectedList:
+        #    cmds.select(selectedList)
         # call reload the geometries in skin UI:
         self.reloadPopulatedGeoms()
     
     
+    def setupDuplicatedGuide(self, selectedItem, *args):
+        """ This method will create a new module instance for a duplicated guide found.
+            Returns a guideBase for a new module instance.
+        """
+        # Duplicating a module guide
+        print self.langDic[self.langName]['i067_duplicating']
+
+        # declaring variables
+        transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
+        guideBaseName = "Guide_Base"
+        guideBaseAttr = "guideBase"
+        moduleNamespaceAttr = "moduleNamespace"
+        moduleInstanceInfoAttr = "moduleInstanceInfo"
+        nSegmentsAttr = "nJoints"
+        customNameAttr = "customName"
+        mirroirAxisAttr = "mirrorAxis"
+
+        # unparenting
+        parentList = cmds.listRelatives(selectedItem, parent=True)
+        if parentList:
+            cmds.parent(selectedItem, world=True)
+            selectedItem = selectedItem[selectedItem.rfind("|"):]
+
+        # getting duplicated item values
+        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+moduleNamespaceAttr)
+        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+moduleInstanceInfoAttr)
+        # generating naming values
+        origGuideName = moduleNamespaceValue+":"+guideBaseName
+        thatClassName = moduleNamespaceValue.partition("__")[0]
+        thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
+        thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
+        moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
+        moduleDir = moduleDir[moduleDir.rfind(".")+1:]
+
+        # initializing a new module instance
+        newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
+        newGuideName = cmds.ls(selection=True)[0]
+        newGuideNamespace = cmds.getAttr(newGuideName+"."+moduleNamespaceAttr)
+        # getting a good attribute list
+        toSetAttrList = cmds.listAttr(selectedItem)
+        guideBaseAttrIdx = toSetAttrList.index(guideBaseAttr)
+        toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
+        toSetAttrList.remove(guideBaseAttr)
+        toSetAttrList.remove(moduleNamespaceAttr)
+        toSetAttrList.remove(customNameAttr)
+        toSetAttrList.remove(mirroirAxisAttr)
+        
+        # check for special attributes
+        if cmds.objExists(selectedItem+"."+nSegmentsAttr):
+            toSetAttrList.remove(nSegmentsAttr)
+            nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
+            if nJointsValue > 1:
+                eval('self.guide.'+thatClassName+'.changeJointNumber(newGuideInstance, '+str(nJointsValue)+')')
+        if cmds.objExists(selectedItem+"."+customNameAttr):
+            customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
+            if customNameValue != "":
+                eval('self.guide.'+thatClassName+'.editUserName(newGuideInstance, checkText="'+customNameValue+'")')
+        if cmds.objExists(selectedItem+"."+mirroirAxisAttr):
+            mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirroirAxisAttr)
+            if mirroirAxisValue != "off":
+                eval('self.guide.'+thatClassName+'.changeMirror(newGuideInstance, "'+mirroirAxisValue+'")')
+
+        # get and set transformations
+        childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, type="transform")
+        if childrenList:
+            childrenList.append(selectedItem)
+            for child in childrenList:
+                newChild = newGuideNamespace+":"+child
+                for transfAttr in transformAttrList:
+                    try:
+                        cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
+                    except:
+                        pass
+        # setting new guide attributes
+        for toSetAttr in toSetAttrList:
+            try:
+                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr))
+            except:
+                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
+
+        # parenting correctly
+        if parentList:
+            cmds.parent(newGuideName, parentList[0])
+
+        cmds.delete(selectedItem)
+        return newGuideName
+
+
     def populateJoints(self, *args):
         """ This function is responsable to list all joints or only dpAR joints in the interface in order to use in skinning.
         """
@@ -529,19 +662,27 @@ class DP_AutoRig_UI:
         cmds.rowLayout( numberOfColumns=3, columnWidth3=(15, 30, 55), height=30, adjustableColumn=3, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
         cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
         cmds.image(i=iconDir)
+
         if guideDir == "Modules":
-            cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir) )
+            '''
+            We need to passe the rigType parameters because the cmds.button command will send a False parameter that
+            will be stock in the rigType if we don't pass the parameter
+            http://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
+            '''
+            cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
         elif guideDir == "Scripts":
             cmds.button(label=title, height=30, command=partial(self.execScriptedGuide, guideModule, guideDir) )
         elif guideDir == "Extras":
             cmds.button(label=title, height=30, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
+
         cmds.setParent('..')
     
-    
-    def initGuide(self, guideModule, guideDir, *args):
+    #@utils.profiler
+    def initGuide(self, guideModule, guideDir, rigType=Base.RigType.biped, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
+
         # creating unique namespace:
         basename = "dpAR_"
         cmds.namespace(setNamespace=":")
@@ -563,13 +704,13 @@ class DP_AutoRig_UI:
         # get the CLASS_NAME from guideModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
-        dpUIinst = self
-        guideInstance = guideClass(dpUIinst, self.langDic, self.langName, userSpecName)
+        guideInstance = guideClass(self, self.langDic, self.langName, userSpecName, rigType)
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
+
         return guideInstance
     
     
@@ -600,8 +741,6 @@ class DP_AutoRig_UI:
         startScriptFunction = getattr(guide, guide.CLASS_NAME)
         # execute this scriptedGuideModule:
         startScriptFunction(self)
-        # reload modules before scripted creation:
-        self.populateCreatedGuideModules()
     
     
     def populateCreatedGuideModules(self, *args):
@@ -630,9 +769,9 @@ class DP_AutoRig_UI:
                 if module in validModuleNames:
                     index = validModuleNames.index(module)
                     # check if there is this module guide base in the scene:
-                    temp = validModuleNames[index]+"__"+userSpecName+":Guide_Base"
-                    if cmds.objExists(validModuleNames[index]+"__"+userSpecName+":Guide_Base"):
-                        self.allGuidesList.append([validModules[index], userSpecName])
+                    curGuideName = validModuleNames[index]+"__"+userSpecName+":Guide_Base"
+                    if cmds.objExists(curGuideName):
+                        self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
                         
         # if exists any guide module in the scene, recreate its instance as objectClass:
         if self.allGuidesList:
@@ -648,7 +787,8 @@ class DP_AutoRig_UI:
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
                 dpUIinst = self
-                moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, userGuideName=module[1])
+                rigType = cmds.getAttr(module[2] + ".rigType")
+                moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], rigType)
                 self.moduleInstancesList.append(moduleInst)
         # edit the footer A text:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
@@ -661,14 +801,13 @@ class DP_AutoRig_UI:
         # get the entered text:
         enteredText = cmds.textField(self.allUIs["prefixTextField"], query=True, text=True)
         # call utils to return the normalized text:
-        prefixName = utils.normalizeText(enteredText, prefixMax=4)
-        if prefixName == "":
-            print self.langDic[self.langName]['p001_prefixText'],
-            cmds.textField(self.allUIs["prefixTextField"], edit=True, text="")
-        # edit the prefixTextField with the normalText:
-        cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
-    
-    
+        prefixName = utils.normalizeText(enteredText, prefixMax=10)
+
+        # edit the prefixTextField with the prefixName:
+        if len(prefixName) != 0:
+            cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
+
+
     def info(self, title, description, text, align, width, height, *args):
         """ Create a window showing the text info with the description about any module.
         """
@@ -736,8 +875,193 @@ class DP_AutoRig_UI:
     ###################### End: UI
     
     
-    ###################### Start: Rigging Modules Instances.
-    
+    ###################### Start: Rigging Modules Instances
+
+    '''
+    Pymel
+    Generic function to create base group
+    '''
+    def getBaseGrp(self, sAttrName, sGrpName):
+        nGrpNode = None
+        try:
+            nGrpNode = self.masterGrp.getAttr(sAttrName)
+        except pymel.MayaAttributeError:
+            try:
+                nGrpNode = pymel.PyNode(sGrpName)
+            except pymel.MayaNodeError:
+                nGrpNode = pymel.createNode("transform", name=sGrpName)
+            finally:
+                #Since there is no connection between the master and the node found, create the connection
+                self.masterGrp.addAttr(sAttrName, attributeType='message')
+                nGrpNode.message.connect(self.masterGrp.attr(sAttrName))
+
+        return nGrpNode
+
+    '''
+    Pymel
+    Generic function to create base controller
+    '''
+    def getBaseCtrl(self, sAttrName, sCtrlName, fRadius, iDegree = 1, iSection = 8):
+        nCtrl = None
+        self.ctrlCreated = False
+        try:
+            nCtrl= self.masterGrp.getAttr(sAttrName)
+        except pymel.MayaAttributeError:
+            try:
+                nCtrl = pymel.PyNode(self.prefix + sCtrlName)
+            except pymel.MayaNodeError:
+                if (sCtrlName != (self.prefix + "Option_Ctrl")):
+                    nCtrl = pymel.circle(n=sCtrlName, nr=(0, 1, 0), d=iDegree, s=iSection, r=fRadius, ch=False)[0]
+                else:
+                    nCtrl = pymel.PyNode(ctrls.cvCharacter(sCtrlName, r=0.2))
+                self.ctrlCreated = True
+            finally:
+                #Since there is no connection between the master and the node found, create the connection
+                self.masterGrp.addAttr(sAttrName, attributeType='message')
+                nCtrl.message.connect(self.masterGrp.attr(sAttrName))
+
+        return nCtrl
+
+    '''
+    Pymel
+    ensure that the main group and Ctrl of the rig exist in the scene or else create them
+    '''
+    def createBaseRigNode(self):
+        sAllGrp = "All_Grp"
+        # create master hierarchy:
+        allTransformList = pymel.ls(self.prefix + "*", selection=False, type="transform")
+        #Get all the masterGrp obj and ensure it not referenced
+        self.masterGrp = [n for n in allTransformList if n.hasAttr("masterGrp") and not pymel.referenceQuery(n, isNodeReferenced=True)]
+        localTime = str( time.asctime( time.localtime(time.time()) ) )
+        if self.masterGrp:
+            # Take the first one in the list, in almost all case, it will be fine.
+            # If not, the user need to clean it's scene for the moment
+            self.masterGrp = self.masterGrp[0]
+        else:
+            #Create Master Grp
+            self.masterGrp = pymel.createNode("transform", name=self.prefix+sAllGrp)
+            self.masterGrp.addAttr("masterGrp", at="bool")
+            self.masterGrp.setDynamicAttr('masterGrp', True)
+            self.masterGrp.setDynamicAttr("date", localTime)
+
+        # add data log:
+        # system:
+        self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION)
+        # date:
+        self.masterGrp.setDynamicAttr("lastModification", localTime)
+        # author:
+        self.masterGrp.setDynamicAttr("author", getpass.getuser())
+        # module counts:
+        for guideType in self.guideModuleList:
+            self.masterGrp.setDynamicAttr(guideType+"Count", 0)
+
+        #Get or create all the needed group
+        self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
+        self.ctrlsGrp       = self.getBaseGrp("ctrlsGrp", self.prefix+"Ctrls_Grp")
+        self.ctrlsVisGrp    = self.getBaseGrp("ctrlsVisibilityGrp", self.prefix+"Ctrls_Visibility_Grp")
+        self.dataGrp        = self.getBaseGrp("dataGrp", self.prefix+"Data_Grp")
+        self.renderGrp      = self.getBaseGrp("renderGrp", self.prefix+"Render_Grp")
+        self.proxyGrp       = self.getBaseGrp("proxyGrp", self.prefix+"Proxy_Grp")
+        self.fxGrp          = self.getBaseGrp("fxGrp", self.prefix+"FX_Grp")
+        self.staticGrp      = self.getBaseGrp("staticGrp", self.prefix+"Static_Grp")
+        self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
+
+        #Arrange Hierarchy
+        pymel.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
+        pymel.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
+        pymel.select(None)
+
+        #Hide Models and FX groups
+        pymel.setAttr(self.modelsGrp.visibility, 0)
+        pymel.setAttr(self.fxGrp.visibility, 0)
+
+        #Function not in pymel for the moment
+        aToLock = [self.masterGrp.__melobject__(),
+                   self.modelsGrp.__melobject__(),
+                   self.ctrlsGrp.__melobject__(),
+                   self.renderGrp.__melobject__(),
+                   self.dataGrp.__melobject__(),
+                   self.proxyGrp.__melobject__(),
+                   self.fxGrp.__melobject__(),
+                   self.staticGrp.__melobject__(),
+                   self.ctrlsVisGrp.__melobject__()]
+        ctrls.setLockHide(aToLock, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+
+        #Control Setup
+        fMasterRadius = ctrls.dpCheckLinearUnit(10)
+        self.masterCtrl = self.getBaseCtrl("masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
+        if (self.ctrlCreated):
+            self.masterCtrl.setDynamicAttr("masterCtrl", True)
+            self.masterCtrl.setDynamicAttr("geometryList", "")
+            self.masterCtrl.setDynamicAttr("controlList", "")
+            self.masterCtrl.rotateOrder.set(3)
+
+        self.globalCtrl = self.getBaseCtrl("globalCtrl", self.prefix+"Global_Ctrl", ctrls.dpCheckLinearUnit(16), iSection=4)
+        if (self.ctrlCreated):
+            self.globalCtrl.rotateY.set(45)
+            pymel.makeIdentity(self.globalCtrl, a=True)
+            self.globalCtrl.rotateOrder.set(3)
+
+        self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(9.5))
+        if (self.ctrlCreated):
+            self.rootCtrl.rotateOrder.set(3)
+
+        self.optionCtrl = self.getBaseCtrl("optionCtrl", self.prefix+"Option_Ctrl", ctrls.dpCheckLinearUnit(16))
+        if (self.ctrlCreated):
+            pymel.makeIdentity(self.optionCtrl, apply=True)
+            self.optionCtrlGrp = pymel.PyNode(utils.zeroOut([self.optionCtrl.__melobject__()])[0])
+            self.optionCtrlGrp.translateX.set(fMasterRadius)
+        else:
+            self.optionCtrlGrp = self.optionCtrl.getParent()
+
+        pymel.parent(self.rootCtrl, self.masterCtrl)
+        pymel.parent(self.masterCtrl, self.globalCtrl)
+        pymel.parent(self.globalCtrl, self.ctrlsGrp)
+        pymel.parent(self.optionCtrlGrp, self.rootCtrl)
+        pymel.parent(self.ctrlsVisGrp, self.rootCtrl)
+
+        pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
+        # set lock and hide attributes (cmds function):
+        ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
+        ctrls.setLockHide([self.rootCtrl.__melobject__(), self.globalCtrl.__melobject__()], ['sx', 'sy', 'sz', 'v'])
+
+        self.masterCtrl.visibility.setKeyable(False)
+        pymel.select(None)
+
+        #Base joint
+        try:
+            self.baseRootJnt = pymel.PyNode(self.prefix+"BaseRoot_Jnt")
+            self.baseRootJntGrp = pymel.PyNode(self.prefix+"BaseRoot_Joint_Grp")
+        except pymel.MayaNodeError:
+            self.baseRootJnt = pymel.createNode("joint", name=self.prefix+"BaseRoot_Jnt")
+            self.baseRootJntGrp = pymel.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
+            pymel.parent(self.baseRootJnt, self.baseRootJntGrp)
+            pymel.parent(self.baseRootJntGrp, self.scalableGrp)
+            pymel.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ParentConstraint")
+            pymel.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScaleConstraint")
+            self.baseRootJntGrp.visibility.set(False)
+            ctrls.setLockHide([self.baseRootJnt.__melobject__(), self.baseRootJntGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+
+        #Ensure object returned are cmds supported
+        self.masterGrp = self.masterGrp.__melobject__()
+        self.modelsGrp = self.modelsGrp.__melobject__()
+        self.ctrlsGrp = self.ctrlsGrp.__melobject__()
+        self.ctrlsVisGrp = self.ctrlsVisGrp.__melobject__()
+        self.dataGrp = self.dataGrp.__melobject__()
+        self.renderGrp = self.renderGrp.__melobject__()
+        self.proxyGrp = self.proxyGrp.__melobject__()
+        self.fxGrp = self.fxGrp.__melobject__()
+        self.staticGrp = self.staticGrp.__melobject__()
+        self.scalableGrp = self.scalableGrp.__melobject__()
+        self.masterCtrl = self.masterCtrl.__melobject__()
+        self.rootCtrl = self.rootCtrl.__melobject__()
+        self.globalCtrl = self.globalCtrl.__melobject__()
+        self.optionCtrl = self.optionCtrl.__melobject__()
+        self.optionCtrlGrp = self.optionCtrlGrp.__melobject__()
+        self.baseRootJnt = self.baseRootJnt.__melobject__()
+        self.baseRootJntGrp = self.baseRootJntGrp.__melobject__()
+
+
     def rigAll(self, integrate=None, *args):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automatizate the proccess.
@@ -768,139 +1092,19 @@ class DP_AutoRig_UI:
             if self.prefix != "" and self.prefix != " " and self.prefix != "_" and self.prefix != None:
                 if self.prefix[len(self.prefix)-1] != "_":
                     self.prefix = self.prefix + "_"
-            
-            # verify the integrate options:
+
+            #Check if we need to colorize the ctrls
+            #Check integrate option
+            bColorize = False
             try:
+                bColorize = cmds.checkBox(self.allUIs["colorizeCtrlCB"], query=True, value=True)
                 integrate = cmds.checkBox(self.allUIs["integrateCB"], query=True, value=True)
+                bAddAttr = cmds.checkBox(self.allUIs["addAttrCB"], query=True, value=True)
             except:
                 pass
+
             if integrate == 1:
-                # create master hierarchy:
-                allTransformList = cmds.ls(selection=False, type='transform')
-                foundMasterGrp  = False
-                for transform in allTransformList:
-                    if cmds.objExists(transform+".masterGrp") and cmds.getAttr(transform+".masterGrp") == 1:
-                        self.masterGrp = transform
-                        # re-declare group and control names:
-                        self.modelsGrp   = cmds.listConnections(self.masterGrp+".modelsGrp")[0]
-                        self.ctrlsGrp    = cmds.listConnections(self.masterGrp+".ctrlsGrp")[0]
-                        self.dataGrp     = cmds.listConnections(self.masterGrp+".dataGrp")[0]
-                        self.renderGrp   = cmds.listConnections(self.masterGrp+".renderGrp")[0]
-                        self.proxyGrp    = cmds.listConnections(self.masterGrp+".proxyGrp")[0]
-                        self.fxGrp       = cmds.listConnections(self.masterGrp+".fxGrp")[0]
-                        self.staticGrp   = cmds.listConnections(self.masterGrp+".staticGrp")[0]
-                        self.scalableGrp = cmds.listConnections(self.masterGrp+".scalableGrp")[0]
-                        self.masterCtrl  = cmds.listConnections(self.masterGrp+".masterCtrl")[0]
-                        self.rootCtrl    = cmds.listConnections(self.masterGrp+".rootCtrl")[0]
-                        self.globalCtrl  = cmds.listConnections(self.masterGrp+".globalCtrl")[0]
-                        self.optionCtrl  = cmds.listConnections(self.masterGrp+".optionCtrl")[0]
-                        foundMasterGrp = True
-                        break
-                if not foundMasterGrp:
-                    # create a dpAR_masterGrp:
-                    allGrpName = "dpAR_All_Grp"
-                    self.masterGrp = cmds.group(name=self.prefix+allGrpName, empty=True)
-                    cmds.addAttr(self.masterGrp, longName='masterGrp', attributeType='bool')
-                    cmds.setAttr(self.masterGrp+'.masterGrp', 1)
-                    # add data log:
-                    # system:
-                    cmds.addAttr(self.masterGrp, longName='system', dataType='string')
-                    cmds.setAttr(self.masterGrp+".system", "dpAutoRig_"+DPAR_VERSION , type='string')
-                    # date:
-                    cmds.addAttr(self.masterGrp, longName='date', dataType='string')
-                    localTime = str( time.asctime( time.localtime(time.time()) ) )
-                    cmds.setAttr(self.masterGrp+".date", localTime, type='string')
-                    # author:
-                    cmds.addAttr(self.masterGrp, longName='author', dataType='string')
-                    cmds.setAttr(self.masterGrp+".author", 'Danilo Pinheiro', type='string')
-                    # module counts:
-                    for guideType in self.guideModuleList:
-                        cmds.addAttr(self.masterGrp, longName=guideType+'Count', attributeType='long', keyable=False)
-                        cmds.setAttr(self.masterGrp+'.'+guideType+'Count', 0)
-                    # create groups to parent module parts:
-                    self.modelsGrp   = cmds.group(name=self.prefix+'Model_Grp', empty=True)
-                    self.ctrlsGrp    = cmds.group(name=self.prefix+'Ctrls_Grp', empty=True)
-                    self.dataGrp     = cmds.group(name=self.prefix+'Data_Grp', empty=True)
-                    self.renderGrp   = cmds.group(name=self.prefix+'Render_Grp', empty=True)
-                    self.proxyGrp    = cmds.group(name=self.prefix+'Proxy_Grp', empty=True)
-                    self.fxGrp       = cmds.group(name=self.prefix+'FX_Grp', empty=True)
-                    self.staticGrp   = cmds.group(name=self.prefix+'Static_Grp', empty=True)
-                    self.scalableGrp = cmds.group(name=self.prefix+'Scalable_Grp', empty=True)
-                    # arrange hierarchy:
-                    cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-                    cmds.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
-                    cmds.select(clear=True)
-                    # set lock and hide attributes:
-                    ctrls.setLockHide([self.masterGrp, self.modelsGrp, self.ctrlsGrp, self.renderGrp, self.dataGrp, self.proxyGrp, self.fxGrp, self.staticGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])#, 'v'])
-                    # create messageAttributes to tell us the rig groups created:
-                    cmds.addAttr(self.masterGrp, longName='modelsGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='ctrlsGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='dataGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='renderGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='proxyGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='fxGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='staticGrp', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='scalableGrp', attributeType='message')
-                    cmds.connectAttr(self.modelsGrp+".message", self.masterGrp+".modelsGrp")
-                    cmds.connectAttr(self.ctrlsGrp+".message", self.masterGrp+".ctrlsGrp")
-                    cmds.connectAttr(self.dataGrp+".message", self.masterGrp+".dataGrp")
-                    cmds.connectAttr(self.renderGrp+".message", self.masterGrp+".renderGrp")
-                    cmds.connectAttr(self.proxyGrp+".message", self.masterGrp+".proxyGrp")
-                    cmds.connectAttr(self.fxGrp+".message", self.masterGrp+".fxGrp")
-                    cmds.connectAttr(self.staticGrp+".message", self.masterGrp+".staticGrp")
-                    cmds.connectAttr(self.scalableGrp+".message", self.masterGrp+".scalableGrp")
-                    # working with controls:
-                    # create a dpAR_masterCtrl:
-                    masterCtrlRadius = ctrls.dpCheckLinearUnit(10)
-                    self.masterCtrl = cmds.circle(name=self.prefix+'Master_Ctrl', normal=(0, 1, 0), degree=3, radius=masterCtrlRadius, constructionHistory=False)[0]
-                    cmds.addAttr(self.masterCtrl, longName='masterCtrl', attributeType='bool')
-                    cmds.setAttr(self.masterCtrl+'.masterCtrl', 1)
-                    cmds.addAttr(self.masterCtrl, longName='geometryList', dataType='string')
-                    cmds.addAttr(self.masterCtrl, longName='controlList', dataType='string')
-                    # create a dpAR_globalCtrl:
-                    globalCtrlRadius = ctrls.dpCheckLinearUnit(16)
-                    self.globalCtrl = cmds.circle(name=self.prefix+'Global_Ctrl', normal=(0, 1, 0), degree=1, radius=globalCtrlRadius, sections=4, constructionHistory=False)[0]
-                    cmds.setAttr(self.globalCtrl+".rotateY", 45)
-                    cmds.makeIdentity(self.globalCtrl, apply=True)
-                    # create a dpAR_rootCtrl:
-                    rootCtrlRadius = ctrls.dpCheckLinearUnit(9.5)
-                    self.rootCtrl = cmds.circle(name=self.prefix+'Root_Ctrl', normal=(0, 1, 0), degree=1, radius=rootCtrlRadius, constructionHistory=False)[0]
-                    # create a dpAR_optionCtrl:
-                    self.optionCtrl = ctrls.cvCharacter(self.prefix+'Option_Ctrl', r=0.2)
-                    cmds.setAttr(self.optionCtrl+".translateX", masterCtrlRadius)
-                    cmds.makeIdentity(self.optionCtrl, apply=True)
-                    self.optionCtrlGrp = utils.zeroOut([self.optionCtrl])[0]
-                    # create messageAttributes to tell us the rig controls created:
-                    cmds.addAttr(self.masterGrp, longName='masterCtrl', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='rootCtrl', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='globalCtrl', attributeType='message')
-                    cmds.addAttr(self.masterGrp, longName='optionCtrl', attributeType='message')
-                    cmds.connectAttr(self.masterCtrl+".message", self.masterGrp+".masterCtrl")
-                    cmds.connectAttr(self.rootCtrl+".message", self.masterGrp+".rootCtrl")
-                    cmds.connectAttr(self.globalCtrl+".message", self.masterGrp+".globalCtrl")
-                    cmds.connectAttr(self.optionCtrl+".message", self.masterGrp+".optionCtrl")
-                    # parenting controls:
-                    cmds.parent(self.rootCtrl, self.masterCtrl)
-                    cmds.parent(self.masterCtrl, self.globalCtrl)
-                    cmds.parent(self.globalCtrl, self.ctrlsGrp)
-                    cmds.parent(self.optionCtrlGrp, self.rootCtrl)
-                    # prepare globalScale:
-                    cmds.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp+"_ScaleConstraint")
-                    # set lock and hide attributes:
-                    ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-                    ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
-                    cmds.setAttr(self.masterCtrl+'.visibility', keyable=False)
-                    # creating the base joint for root control:
-                    cmds.select(clear=True)
-                    self.baseRootJnt = cmds.joint(name=self.prefix+"BaseRoot_Jnt")
-                    self.baseRootJntGrp = cmds.group(self.baseRootJnt, name=self.prefix+"BaseRoot_Joint_Grp")
-                    cmds.parent(self.baseRootJntGrp, self.scalableGrp)
-                    cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ParentConstraint")
-                    cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScaleConstraint")
-                    cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
-                    ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-                    
-            
+                self.createBaseRigNode()
             # run RIG function for each guideModule:
             for guideModule in self.modulesToBeRiggedList:
                 # create the rig for this guideModule:
@@ -1009,13 +1213,13 @@ class DP_AutoRig_UI:
                             cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
                         else:
                             # parent module control to default masterGrp:
-                            cmds.parent(self.ctrlHookGrp, self.rootCtrl)
+                            cmds.parent(self.ctrlHookGrp, self.ctrlsVisGrp)
                             # make ctrlHookGrp inactive:
                             cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
                         
                         if self.rootHookGrp:
                             # parent module rootHook to rootCtrl:
-                            cmds.parent(self.rootHookGrp, self.rootCtrl)
+                            cmds.parent(self.rootHookGrp, self.ctrlsVisGrp)
                             # make rootHookGrp inactive:
                             cmds.setAttr(self.rootHookGrp+".rootHook", 0)
                         
@@ -1164,8 +1368,8 @@ class DP_AutoRig_UI:
                                     # verifying what part will be used, the hips or chest:
                                     if limbType == self.langDic[self.langName]['m030_leg']:
                                         # do task actions in order to integrate the limb of leg type to rootCtrl:
-                                        cmds.parent(ikCtrlZero, self.rootCtrl, absolute=True)
-                                        cmds.parent(ikPoleVectorCtrlZero, self.rootCtrl, absolute=True)
+                                        cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
+                                        cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
                                     elif fatherGuideLoc == "JointLoc1":
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, hipsA, absolute=True)
@@ -1208,6 +1412,9 @@ class DP_AutoRig_UI:
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
+                                if bColorize:
+                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['FkCtrls'][s], "cyan")
+                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['IkCtrls'][s], "yellow")
                         
                         # integrate the head orient from the masterCtrl:
                         if moduleType == "Head":
@@ -1222,13 +1429,15 @@ class DP_AutoRig_UI:
                                 # connect the masterCtrl to head group using a orientConstraint:
                                 worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_ParentConstraint")
+                                if bColorize:
+                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrls'][s], "yellow")
                         
                         # integrate the EyeLookAt with the Head setup:
                         if moduleType == "EyeLookAt":
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
                             eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
                             upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
-                            cmds.parent(eyeGrp, self.rootCtrl, relative=False)
+                            cmds.parent(eyeGrp, self.ctrlsVisGrp, relative=False)
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
@@ -1268,7 +1477,7 @@ class DP_AutoRig_UI:
                                 ikCtrlZero = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
                                 scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
                                 # correct ikCtrl parent to root ctrl:
-                                cmds.parent(ikCtrlZero, self.rootCtrl, relative=True)
+                                cmds.parent(ikCtrlZero, self.ctrlsVisGrp, relative=True)
                                 # get father guide data:
                                 fatherModule   = self.hookDic[moduleDic]['fatherModule']
                                 fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
@@ -1294,8 +1503,57 @@ class DP_AutoRig_UI:
                     if ( typeCounter > cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
-                # TODO: actualise all controls (Master_Ctrl.controlList) for this rig:
-                
+            #Actualise all controls (Master_Ctrl.controlList) for this rig:
+            rigInfo.UpdateRigInfo.updateRigInfoLists()
+
+            #Colorize all controller in yellow as a base (Pymel)
+            if (bColorize):
+                aBCtrl = [pymel.PyNode(self.globalCtrl), pymel.PyNode(self.rootCtrl), pymel.PyNode(self.optionCtrl)]
+                aAllCtrls = pymel.ls("*_Ctrl")
+                lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
+                rPattern = re.compile(self.langDic[self.langName]['p003_right'] + '_.*._Ctrl')
+                for pCtrl in aAllCtrls:
+                    if not pCtrl.getShape().overrideEnabled.get():
+                        if (lPattern.match(pCtrl.name())):
+                            ctrls.colorShape([pCtrl.__melobject__()],"red")
+                        elif (rPattern.match(pCtrl.name())):
+                            ctrls.colorShape([pCtrl.__melobject__()],"blue")
+                        elif (pCtrl in aBCtrl):
+                            ctrls.colorShape([pCtrl.__melobject__()], "black")
+                        else:
+                            ctrls.colorShape([pCtrl.__melobject__()], "yellow")
+
+            #Add usefull attributes for the animators
+            if (bAddAttr):
+                pOptCtrl = pymel.PyNode(self.optionCtrl)
+                pRenderGrp = pymel.PyNode(self.renderGrp)
+                pCtrlVisGrp = pymel.PyNode(self.ctrlsVisGrp)
+                pProxyGrp = pymel.PyNode(self.proxyGrp)
+
+                if not pymel.hasAttr(pOptCtrl, "display"):
+                    pymel.addAttr(pOptCtrl, ln="display", at="enum", enumName="----------", keyable=True)
+
+                if not pymel.hasAttr(pOptCtrl, "displayMesh"):
+                    pymel.addAttr(pOptCtrl, ln="displayMesh", min=0, max=1, defaultValue=1, keyable=True)
+                    pymel.connectAttr(pOptCtrl.displayMesh, pRenderGrp.visibility, force=True)
+
+                if not pymel.hasAttr(pOptCtrl, "displayProxy"):
+                    pymel.addAttr(pOptCtrl, ln="displayProxy", min=0, max=1, defaultValue=0, keyable=True)
+                    pymel.connectAttr(pOptCtrl.displayProxy, pProxyGrp.visibility, force=True)
+
+                if not pymel.hasAttr(pOptCtrl, "displayCtrl"):
+                    pymel.addAttr(pOptCtrl, ln="displayCtrl", min=0, max=1, defaultValue=1, keyable=True)
+                    pymel.connectAttr(pOptCtrl.displayCtrl, pCtrlVisGrp.visibility, force=True)
+
+                if not pymel.hasAttr(pOptCtrl, "General"):
+                    pymel.addAttr(pOptCtrl, ln="General", at="enum", enumName="----------", keyable=True)
+
+                #Only create if a IkFk attribute is found
+                if not pymel.hasAttr(pOptCtrl, "IKFKBlend"):
+                    if (pOptCtrl.listAttr(string="*IkFk*")):
+                        pymel.addAttr(pOptCtrl, ln="IKFKBlend", at="enum", enumName="----------", keyable=True)
+
+
         # re-declaring guideMirror and previewMirror groups:
         self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
         if cmds.objExists(self.guideMirrorGrp):
@@ -1318,7 +1576,7 @@ class DP_AutoRig_UI:
     
     
     ###################### Start: Skinning.
-    
+
     def skinFromUI(self, *args):
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
@@ -1334,8 +1592,14 @@ class DP_AutoRig_UI:
         
         if jointSkinList and geomSkinList:
             for geomSkin in geomSkinList:
-                cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False)
+                if (args[0] == "Add"):
+                    cmds.skinCluster(geomSkin, edit=True, ai=jointSkinList, toSelectedBones=True, removeUnusedInfluence=False, lockWeights=True, wt=0.0)
+                elif (args[0] == "Remove"):
+                    cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
+                else:
+                    cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False)
+
         else:
             print self.langDic[self.langName]['i029_skinNothing'],
-    
+
     ###################### End: Skinning.

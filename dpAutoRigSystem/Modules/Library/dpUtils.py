@@ -3,6 +3,7 @@ import maya.cmds as cmds
 import os
 import sys
 import re
+import cProfile
 
 
 # UTILS functions:
@@ -12,14 +13,19 @@ def findEnv(key, path):
     envStr = os.environ[key]
     
     dpARPath = findPath("dpAutoRig.py")
+
+    splitEnvList = []
     if os.name == "posix":
         splitEnvList = envStr.split(":")
     else:
         splitEnvList = envStr.split(";")
     envPath = ""
+
     if splitEnvList:
+        splitEnvList = filter(lambda x: x != "" and x != ' ' and x != None, splitEnvList)
         for env in splitEnvList:
-            if env != "" and env != ' ' and env != None and env in dpARPath:
+            env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
+            if env in dpARPath:
                 try:
                     envPath = dpARPath.split(env)[1][+1:].split(path)[0][:-1].replace('/','.')
                 except:
@@ -59,17 +65,13 @@ def findAllFiles(path, dir, ext):
     """ Find all files in the directory with the extension.
         Return a list of all module names (without '.py' extension).
     """
-    #env = findEnv("MAYA_SCRIPT_PATH", "/maya/scripts")
-    #fileDir = env + "/dpAutoRigSystem/" + "Modules"
     fileDir = path + "/" + dir
     allFilesList = os.listdir(fileDir)
     # select only files with extension:
     pyFilesList = []
     for file in allFilesList:
-        splitName = str(file).rpartition(ext)
-        # get only name from file without extension and different of "__init__":
-        if splitName[1] != "" and splitName[2] == "":
-            pyFilesList.append(splitName[0])
+        if file.endswith(".py") and str(file) != "__init__.py":
+            pyFilesList.append(str(file)[:-3])
     return pyFilesList
 
 
@@ -81,7 +83,8 @@ def findAllModules(path, dir):
     moduleList = []
     # removing "__init__":
     for file in allPyFilesList:
-        if file != "__init__" and file != "dpControls" and file != "dpUtils" and file != "dpBaseClass" and file != "dpLayoutClass" and file != 'jcRibbon' and file != 'sqIkFkTools':
+        #Ensure base class are skipped
+        if file != "dpBaseClass" and file != "dpLayoutClass":
             moduleList.append(file)
     return moduleList
 
@@ -116,17 +119,18 @@ def findLastNumber(nameList, basename):
             if "_" in endNumber and not ":" in endNumber:
                 number = endNumber[:endNumber.find("_")]
                 try:
-                    # get the number of rigged modules as integer:
-                    numberList.append(int(number))
-                except:
+                    if int(number) not in numberList:
+                        numberList.append(int(number))
+                except ValueError:
                     pass
-    # remove repeted items and put in the reverse alphabetic order (Z-A = 9-0):
-    numberList = list(set(numberList))
+
     numberList.sort()
     numberList.reverse()
+
     if numberList:
         # get the greather valuer (first):
         existValue = numberList[0]
+
     # work with created guides in the scene:
     lastValue = 0
     for n in nameList:
@@ -141,6 +145,7 @@ def findLastNumber(nameList, basename):
                 # verify if this got number is greather than the last number (value) in order to return them:
                 if numberElement > lastValue:
                     lastValue = numberElement
+
     # analysis which value must be returned:
     if lastValue > existValue:
         finalValue = lastValue
@@ -180,13 +185,13 @@ def normalizeText(enteredText="", prefixMax=4):
     if re.match("[0-9]", enteredText) or re.search("\s", enteredText[:len(enteredText)-1]) or re.search("\W", enteredText):
         return normalText
     # just add a underscore at the end for one character entered:
-    elif len(enteredText) == 1 and enteredText != " " and enteredText != "_":
-        normalText = enteredText+"_"
+    #elif len(enteredText) == 1 and enteredText != " " and enteredText != "_":
+    #    normalText = enteredText+"_"
     # edit this to have only a maximum of 'prefixMax' digits:
     else:
         if len(enteredText) < prefixMax:
             prefixMax = len(enteredText)
-        for m in range(1, prefixMax):
+        for m in range(0, prefixMax):
             if enteredText[m] != " " and enteredText[m] != "_":
                 normalText = enteredText[:m+1]
     return normalText
@@ -481,4 +486,22 @@ def deleteChildren(item):
         if(childrenList):
             for child in childrenList:
                 cmds.delete(child)
+
+#Profiler decorator
+DPAR_PROFILE_MODE = True
+def profiler(func):
+    def runProfile(*args, **kwargs):
+        if DPAR_PROFILE_MODE:
+            pProf = cProfile.Profile()
+            try:
+                pProf.enable()
+                pResult = func(*args, **kwargs)
+                pProf.disable()
+                return pResult
+            finally:
+                pProf.print_stats()
+        else:
+            pResult = func(*args, **kwargs)
+            return pResult
+    return runProfile
 

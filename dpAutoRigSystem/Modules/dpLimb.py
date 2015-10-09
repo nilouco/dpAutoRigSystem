@@ -1,9 +1,12 @@
 # importing libraries:
 import maya.cmds as cmds
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
+
+
 
 # importing Renaud Lessard module:
 loadedIkFkSnap = False
@@ -28,9 +31,12 @@ DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
 class Limb(Base.StartClass, Layout.LayoutClass):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName):
-        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
-        pass
+    def __init__(self,  *args, **kwargs):
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        Base.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
@@ -43,7 +49,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
     def getBendJoints(self):
         return cmds.getAttr(self.moduleGrp+".numBendJoints")
     
-    
+    #@utils.profiler
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
@@ -143,8 +149,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         # re orient guides:
         self.reOrientGuide()
     
-    def reCreateEditSelectedModuleLayout(self, *args):
-        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self)
+    def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
+        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
         cmds.text(self.nSegmentsText, edit=True, visible=False, parent=self.segDelColumn)
         cmds.intField(self.nJointsIF, edit=True, editable=False, visible=False, parent=self.segDelColumn)
@@ -161,7 +167,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.reOrientBT = cmds.button(label=self.langDic[self.langName]['m022_reOrient'], annotation=self.langDic[self.langName]['m023_reOrientDesc'], command=self.reOrientGuide, parent=self.typeLayout)
         
         # style layout:
-        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
+        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m041_style'], visible=True, parent=self.styleLayout)
         self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
         styleMenuItemList = [self.langDic[self.langName]['m042_default'], self.langDic[self.langName]['m026_biped'], self.langDic[self.langName]['m037_quadruped'], self.langDic[self.langName]['m043_quadSpring']]
@@ -172,7 +178,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle+1))
         
         # bend layout:
-        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
+        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m044_addBend'], visible=True, parent=self.bendLayout)
         self.bendChkbox = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
         self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
@@ -414,6 +420,26 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         fkCtrl = cmds.circle(name=side+self.userGuideName+"_"+jName+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=1, s=8, radius=self.ctrlRadius)[0]
                     else:
                         fkCtrl = cmds.circle(name=side+self.userGuideName+"_"+jName+"_Fk_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=1, s=8, radius=self.ctrlRadius)[0]
+
+                    #Setup axis order
+                    if jName == beforeName: #Clavicle and hip
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 3)
+                    elif jName == extremName and limbTypeName == "leg": #Hand
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 4)
+                    elif jName == extremName and limbTypeName == "arm": #Hand
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 1)
+                    elif jName == mainName: #Leg and Shoulder
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 1)
+                    elif limbTypeName == "leg": #Other legs ctrl
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 2)
+                    elif limbTypeName == "arm": #Other arm ctrl
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 5)
+                    else:
+                        #Let the default axis order for other ctrl (Should not happen)
+                        pass
+
+                    #Other arm ctrl can keep the default xyz
+
                     self.fkCtrlList.append(fkCtrl)
                     cmds.setAttr(fkCtrl+'.visibility', keyable=False)
                     # creating the originedFrom attributes (in order to permit integrated parents in the future):
@@ -511,13 +537,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.parentConstraint(self.fkCtrlList[0], self.skinJointList[0], maintainOffset=True, name=self.skinJointList[0]+"_ParentConstraint")
                 
                 # creating ik controls:
+                self.ikExtremCtrl  = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
                 if self.limbType == self.langDic[self.langName]['m028_arm']:
                     self.ikCornerCtrl = ctrls.cvElbow(ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2)
                 else:
                     self.ikCornerCtrl = ctrls.cvKnee(ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3)
                 cmds.addAttr(self.ikCornerCtrl, longName='active', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 cmds.setAttr(self.ikCornerCtrl+'.active', 1);
-                self.ikExtremCtrl  = ctrls.cvBox(ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=self.ctrlRadius*0.5)
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 # getting them zeroOut groups:
                 self.ikCornerCtrlZero = utils.zeroOut([self.ikCornerCtrl])[0]
@@ -918,7 +946,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                     #(James) add bend to limb
                     if self.getHasBend():
-                        import jcRibbon as rb
+                        from Library import jcRibbon as rb
                         reload(rb)
                         num = self.getBendJoints()
                         iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'

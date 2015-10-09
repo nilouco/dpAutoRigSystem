@@ -9,30 +9,30 @@ DESCRIPTION = "m029_armDesc"
 ICON = "/Icons/dp_arm.png"
 
 
-def Arm(self):
+def Arm(dpAutoRigInst):
     """ This function will create all guides needed to compose an arm.
     """
     # check modules integrity:
     guideDir = 'Modules'
     checkModuleList = ['dpLimb', 'dpFinger']
-    checkResultList = self.startGuideModules(guideDir, "check", checkModuleList)
+    checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
         # creating module instances:
-        armLimbInstance = self.initGuide('dpLimb', guideDir)
+        armLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
         # change name to arm:
-        self.guide.Limb.editUserName(armLimbInstance, checkText=self.langDic[self.langName]['m028_arm'].capitalize())
+        dpAutoRigInst.guide.Limb.editUserName(armLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m028_arm'].capitalize())
         # create finger instances:
-        indexFingerInstance  = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(indexFingerInstance, checkText=self.langDic[self.langName]['m032_index'])
-        middleFingerInstance = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(middleFingerInstance, checkText=self.langDic[self.langName]['m033_middle'])
-        ringFingerInstance   = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(ringFingerInstance, checkText=self.langDic[self.langName]['m034_ring'])
-        pinkFingerInstance   = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(pinkFingerInstance, checkText=self.langDic[self.langName]['m035_pink'])
-        thumbFingerInstance  = self.initGuide('dpFinger', guideDir)
-        self.guide.Finger.editUserName(thumbFingerInstance, checkText=self.langDic[self.langName]['m036_thumb'])
+        indexFingerInstance  = dpAutoRigInst.initGuide('dpFinger', guideDir)
+        dpAutoRigInst.guide.Finger.editUserName(indexFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m032_index'])
+        middleFingerInstance = dpAutoRigInst.initGuide('dpFinger', guideDir)
+        dpAutoRigInst.guide.Finger.editUserName(middleFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m033_middle'])
+        ringFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
+        dpAutoRigInst.guide.Finger.editUserName(ringFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m034_ring'])
+        pinkFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
+        dpAutoRigInst.guide.Finger.editUserName(pinkFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m035_pink'])
+        thumbFingerInstance  = dpAutoRigInst.initGuide('dpFinger', guideDir)
+        dpAutoRigInst.guide.Finger.editUserName(thumbFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m036_thumb'])
         
         # edit arm limb guide:
         armBaseGuide = armLimbInstance.moduleGrp
@@ -57,7 +57,7 @@ def Arm(self):
                 # correct not commun values for thumb guide:
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".translateX", 10.1)
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".rotateX", 60)
-                self.guide.Finger.changeJointNumber(thumbFingerInstance, 2)
+                dpAutoRigInst.guide.Finger.changeJointNumber(thumbFingerInstance, 2)
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
             
             # parent finger guide to the arm wrist guide:
@@ -68,4 +68,4 @@ def Arm(self):
         
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

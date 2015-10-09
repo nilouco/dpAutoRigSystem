@@ -1,12 +1,17 @@
 # importing libraries:
 import maya.cmds as cmds
 import maya.mel as mel
-import dpControls as ctrls
-import dpUtils as utils
 
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
+
+
+class RigType:
+    biped = "biped"
+    quadruped = "quadruped"
 
 class StartClass:
-    def __init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, dpUIinst, langDic, langName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -18,6 +23,7 @@ class StartClass:
         self.description = DESCRIPTION
         self.icon = ICON
         self.userGuideName = userGuideName
+        self.rigType = rigType
         # defining namespace:
         self.guideNamespace = self.guideModuleName + "__" + self.userGuideName
         # defining guideNamespace:
@@ -66,7 +72,7 @@ class StartClass:
         for baseIntegerAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntegerAttr, attributeType='long')
         
-        baseStringAttrList  = ['moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo']
+        baseStringAttrList  = ['moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType']
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
@@ -74,6 +80,7 @@ class StartClass:
         cmds.setAttr(self.moduleGrp+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.dpUIinst.guide, type='string')
+        cmds.setAttr(self.moduleGrp+".rigType", self.rigType, type='string')
         
         baseFloatAttrList = ['shapeSize']
         for baseFloatAttr in baseFloatAttrList:
@@ -173,7 +180,7 @@ class StartClass:
                 except:
                     self.enteredText = ""
             # call utils to return the normalized text:
-            self.customName = utils.normalizeText(self.enteredText, prefixMax=10)
+            self.customName = utils.normalizeText(self.enteredText, prefixMax=20)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:

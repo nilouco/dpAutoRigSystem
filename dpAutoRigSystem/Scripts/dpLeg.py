@@ -9,21 +9,21 @@ DESCRIPTION = "m031_legDesc"
 ICON = "/Icons/dp_leg.png"
 
 
-def Leg(self):
+def Leg(dpAutoRigInst):
     """ This function will create all guides needed to compose a leg.
     """
     # check modules integrity:
     guideDir = 'Modules'
     checkModuleList = ['dpLimb', 'dpFoot']
-    checkResultList = self.startGuideModules(guideDir, "check", checkModuleList)
+    checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
         # create leg module instance:
-        legLimbInstance = self.initGuide('dpLimb', guideDir)
+        legLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
         # change limb guide to leg type:
-        self.guide.Limb.changeType(legLimbInstance, self.langDic[self.langName]['m030_leg'])
+        dpAutoRigInst.guide.Limb.changeType(legLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
         # change name to leg:
-        self.guide.Limb.editUserName(legLimbInstance, checkText=self.langDic[self.langName]['m030_leg'].capitalize())
+        dpAutoRigInst.guide.Limb.editUserName(legLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize())
         
         # editing leg base guide informations:
         legBaseGuide = legLimbInstance.moduleGrp
@@ -38,8 +38,8 @@ def Leg(self):
         cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
         
         # create foot module instance:
-        footInstance = self.initGuide('dpFoot', guideDir)
-        self.guide.Foot.editUserName(footInstance, checkText=self.langDic[self.langName]['m024_foot'])
+        footInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
+        dpAutoRigInst.guide.Foot.editUserName(footInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot'])
         cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
         cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
         
@@ -50,4 +50,4 @@ def Leg(self):
         cmds.select(legBaseGuide)
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

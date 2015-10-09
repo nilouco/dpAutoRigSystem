@@ -9,23 +9,12 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 ICON = "/Icons/dp_targetMirror.png"
 
-DPTM_VERSION = "2.0"
+DPTM_VERSION = "2.1"
 
 class TargetMirror():
-    def __init__(self, dpUIinst, langDic, langName):
-        # redeclaring variables
-        self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
+    def __init__(self, *args, **kwargs):
         # call main function
-        self.dpMain(self)
-    
-    
-    def dpMain(self, *args):
-        """ Main function.
-            Call UI.
-        """
-        self.dpTargetMirrorUI()
+        self.dpTargetMirrorUI(self)
     
     
     def dpTargetMirrorUI(self, *args):
@@ -35,41 +24,41 @@ class TargetMirror():
         if cmds.window('dpTargetMirrorWindow', query=True, exists=True):
             cmds.deleteUI('dpTargetMirrorWindow', window=True)
         targetMirror_winWidth  = 305
-        targetMirror_winHeight = 450
-        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title=self.langDic[self.langName]['m055_tgtMirror']+' '+DPTM_VERSION, iconName='dp_targetMirror', widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
-        
+        targetMirror_winHeight = 250
+        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title="Target Mirror 2.1", widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+
         # creating layout:
-        self.targetMirrorLayout = cmds.columnLayout('targetMirrorLayout')
-        self.doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.targetMirrorLayout)
-        cmds.button(label=self.langDic[self.langName]['i043_origModel'], annotation=self.langDic[self.langName]['i044_origDesc'], backgroundColor=(1.0, 1.0, 0.7), width=100, command=self.dpLoadOriginalModel, parent=self.doubleLayout)
-        self.originalModelTextField = cmds.textField('originalModelTextField', width=180, text="", parent=self.doubleLayout)
-        self.listMirrorLayout = cmds.columnLayout('listMirrorLayout', columnOffset=('left', 10), width=310, parent=self.targetMirrorLayout)
-        cmds.text(label=self.langDic[self.langName]['i047_targetList'], height=30, parent=self.listMirrorLayout)
-        self.targetScrollList = cmds.textScrollList('targetScrollList', width=290, height=100, allowMultiSelection=True, parent=self.listMirrorLayout)
-        cmds.separator(style='none', parent=self.listMirrorLayout)
-        self.middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=self.listMirrorLayout)
-        cmds.button(label=self.langDic[self.langName]['i045_add'], annotation=self.langDic[self.langName]['i048_addDesc'], width=140, command=self.dpAddSelect, parent=self.middleLayout)
-        cmds.button(label=self.langDic[self.langName]['i046_remove'], annotation=self.langDic[self.langName]['i051_removeDesc'], width=140, command=self.dpRemoveSelect, parent=self.middleLayout)
-        cmds.separator(style='none', height=15, parent=self.middleLayout)
-        self.renameLayout = cmds.rowColumnLayout('renameLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0)], parent=self.listMirrorLayout)
-        self.autoRenameCB = cmds.checkBox('autoRenameCB', label=self.langDic[self.langName]['i056_autoRename'], value=1, onCommand=partial(self.dpChangeRename, 1), offCommand=partial(self.dpChangeRename, 0), parent=self.renameLayout)
-        self.fromTxt = cmds.text(label=self.langDic[self.langName]['i036_from'], parent=self.renameLayout)
-        self.toTxt = cmds.text(label=self.langDic[self.langName]['i037_to'], parent=self.renameLayout)
-        cmds.separator(style='none', height=15, parent=self.renameLayout)
-        self.fromNameTF = cmds.textField('fromNameTF', width=80, text=self.langDic[self.langName]['p002_left']+"_", parent=self.renameLayout)
-        self.toNameTF = cmds.textField('toNameTF', width=80, text=self.langDic[self.langName]['p003_right']+"_", parent=self.renameLayout)
-        cmds.text(label=self.langDic[self.langName]['i052_axis'], height=20, parent=self.listMirrorLayout)
-        self.tripleLayout = cmds.rowColumnLayout('tripleLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0)], parent=self.listMirrorLayout)
-        self.mirrorAxisRC = cmds.radioCollection('mirrorAxisRC', parent=self.tripleLayout)
-        self.rbX = cmds.radioButton("rbX", label="X = YZ", annotation="X", align="left", collection="mirrorAxisRC", parent=self.tripleLayout)
-        self.rbY = cmds.radioButton("rbY", label="Y = XZ", annotation="Y", align="left", collection="mirrorAxisRC", parent=self.tripleLayout)
-        self.rbZ = cmds.radioButton("rbZ", label="Z = XY", annotation="Z", align="left", collection="mirrorAxisRC", parent=self.tripleLayout)
-        cmds.radioCollection(self.mirrorAxisRC, edit=True, select="rbX")
-        cmds.separator(style='none', height=15, parent=self.listMirrorLayout)
-        self.mirrorPosCB = cmds.checkBox('mirrorPosCB', label=self.langDic[self.langName]['i057_mirrorPosition'], value=1, parent=self.listMirrorLayout)
-        self.cleanUndoCB = cmds.checkBox('cleanUndoCB', label=self.langDic[self.langName]['i049_clearUndo'], annotation=self.langDic[self.langName]['i050_clearUndoDesc'], align="left", value=1, parent=self.listMirrorLayout)
-        cmds.button(label=self.langDic[self.langName]['i054_targetRun'], annotation=self.langDic[self.langName]['i053_targetRunDesc'], width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpRunMirror, parent=self.listMirrorLayout)
-        
+        targetMirrorLayout = cmds.columnLayout('targetMirrorLayout')
+        doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=targetMirrorLayout)
+        cmds.button(label="Original Model >", annotation="Load the Original Model here in order to be duplicated from it.", backgroundColor=(1.0, 1.0, 0.7), width=100, command=self.dpLoadOriginalModel, parent=doubleLayout)
+        self.originalModelTextField = cmds.textField('originalModelTextField', width=180, text="", parent=doubleLayout)
+        listMirrorLayout = cmds.columnLayout('listMirrorLayout', columnOffset=('left', 10), width=310, parent=targetMirrorLayout)
+        cmds.text(label="Target List:", height=30, parent=listMirrorLayout)
+        self.targetScrollList = cmds.textScrollList('targetScrollList', width=290, height=100, allowMultiSelection=True, parent=listMirrorLayout)
+        cmds.separator(style='none', parent=listMirrorLayout)
+        middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=listMirrorLayout)
+        cmds.button(label="Add", annotation="Add selected objects to target list.", width=140, command=self.dpAddSelect, parent=middleLayout)
+        cmds.button(label="Remove", annotation="Remove selected objects from target list.", width=140, command=self.dpRemoveSelect, parent=middleLayout)
+        cmds.separator(style='none', height=15, parent=middleLayout)
+        renameLayout = cmds.rowColumnLayout('renameLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0)], parent=listMirrorLayout)
+        self.autoRenameCB = cmds.checkBox('autoRenameCB', label="Auto Rename:", value=1, onCommand=partial(self.dpChangeRename, 1), offCommand=partial(self.dpChangeRename, 0), parent=renameLayout)
+        self.fromTxt = cmds.text('fromTxt', label="from", parent=renameLayout)
+        self.toTxt = cmds.text('toTxt', label="to", parent=renameLayout)
+        cmds.separator(style='none', height=15, parent=renameLayout)
+        self.fromNameTF = cmds.textField('fromNameTF', width=80, text="L_", parent=renameLayout)
+        self.toNameTF = cmds.textField('toNameTF', width=80, text="R_", parent=renameLayout)
+        cmds.text(label="Axis:", height=20, parent=listMirrorLayout)
+        tripleLayout = cmds.rowColumnLayout('tripleLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 100), (3, 100)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0)], parent=listMirrorLayout)
+        self.mirrorAxisRC = cmds.radioCollection('mirrorAxisRC', parent=tripleLayout)
+        rbX = cmds.radioButton("rbX", label="X = YZ", annotation="X", align="left", collection="mirrorAxisRC", parent=tripleLayout)
+        rbY = cmds.radioButton("rbY", label="Y = XZ", annotation="Y", align="left", collection="mirrorAxisRC", parent=tripleLayout)
+        rbZ = cmds.radioButton("rbZ", label="Z = XY", annotation="Z", align="left", collection="mirrorAxisRC", parent=tripleLayout)
+        cmds.radioCollection('mirrorAxisRC', edit=True, select="rbX")
+        cmds.separator(style='none', height=15, parent=listMirrorLayout)
+        self.mirrorPosCB = cmds.checkBox('mirrorPosCB', label="Mirror Position", value=1, parent=listMirrorLayout)
+        self.cleanUndoCB = cmds.checkBox('cleanUndoCB', label="Clear Undo (faster)", annotation="Clear Undo in order to calculate faster (recommended).", align="left", value=1, parent=listMirrorLayout)
+        cmds.button(label="Do Mirror Targets!", annotation="Create mirrored targets.", width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpRunMirror, parent=listMirrorLayout)
+
         # call targetMirrorUI Window:
         cmds.showWindow(dpTargetMirrorWin)
     
@@ -81,7 +70,7 @@ class TargetMirror():
         if selectedList:
             cmds.textField(self.originalModelTextField, edit=True, text=selectedList[0])
         else:
-            print self.langDic[self.langName]['i043_origModel'], "None"
+            print "Original Model > None"
     
     
     def dpAddSelect(self, *args):
@@ -114,9 +103,9 @@ class TargetMirror():
                     # add selected items in the empyt target scroll list
                     cmds.textScrollList(self.targetScrollList, edit=True, append=selMeshList)
             else:
-                mel.eval("warning \""+self.langDic[self.langName]['i055_tgtSelect']+"\";")
+                mel.eval("warning \"Please, select any geometry in order to add it in the mirror list.\";")
         else:
-            mel.eval("warning \""+self.langDic[self.langName]['i055_tgtSelect']+"\";")
+            mel.eval("warning \"Please, select any geometry in order to add it in the mirror list.\";")
     
     
     def dpRemoveSelect(self, *args):
@@ -147,13 +136,13 @@ class TargetMirror():
                     if itemType == "mesh" or itemType == "nurbsSurface" or itemType == "subdiv":
                         isGeometry = True
                     else:
-                        mel.eval("warning \""+item+" "+self.langDic[self.langName]['i058_notGeo']+"\";")
+                        mel.eval("warning \""+item+" is not a geometry.\";")
                 else:
-                    mel.eval("warning \""+self.langDic[self.langName]['i059_selTransform']+" "+item+" "+self.langDic[self.langName]['i060_shapePlease']+"\";")
+                    mel.eval("warning \"Select the transform node instead of "+item+" shape, please.\";")
             else:
-                mel.eval("warning \""+item+" "+self.langDic[self.langName]['i061_notExists']+"\";")
+                mel.eval("warning \""+item+" does not exists, maybe it was deleted, sorry.\";")
         else:
-            mel.eval("warning \""+self.langDic[self.langName]['i062_notFound']+" "+item+"\";")
+            mel.eval("warning \"Not found "+item+"\";")
         return isGeometry
     
     

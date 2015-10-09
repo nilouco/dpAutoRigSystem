@@ -1,24 +1,31 @@
 # importing libraries:
 import maya.cmds as cmds
+import dpUtils as utils
 
+dic_colors = {
+    "yellow" : 17,
+    "red" : 13,
+    "blue": 6,
+    "cyan": 18,
+    "green": 7,
+    "darkRed": 4,
+    "darkBlue": 15,
+    "white": 16,
+    "black": 1,
+    "gray": 3,
+    "none": 0,
+}
 
 # CONTROLS functions:
 def colorShape(objList, color):
     """Create a color override for all shapes from a objList.
     """
-    i = color
-    # find the color index by names:
-    if color   == 'yellow':   i = 17
-    elif color == 'red':      i = 13
-    elif color == 'blue':     i = 6
-    elif color == 'cian':     i = 18
-    elif color == 'green':    i = 7
-    elif color == 'darkRed':  i = 4
-    elif color == 'darkBlue': i = 15
-    elif color == 'white':    i = 16
-    elif color == 'black':    i = 1
-    elif color == 'gray':     i = 3
-    elif color == 'none':     i = 0
+
+    if (dic_colors.has_key(color)):
+        iColorIdx = dic_colors[color]
+    else:
+        iColorIdx = color
+
     # find shapes and apply the color override:
     shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
     if objList:
@@ -29,18 +36,17 @@ def colorShape(objList, color):
                 # set override as enable:
                 cmds.setAttr(objName+".overrideEnabled", 1)
                 # set color override:
-                cmds.setAttr(objName+".overrideColor", i)
+                cmds.setAttr(objName+".overrideColor", iColorIdx)
             # verify if the object is a transform type:
             elif objType == "transform":
                 # find all shapes children of the transform object:
-                shapeList = cmds.listRelatives(objName, shapes=True, children=True)
+                shapeList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
                 if shapeList:
                     for shape in shapeList:
                         # set override as enable:
                         cmds.setAttr(shape+".overrideEnabled", 1)
                         # set color override:
-                        cmds.setAttr(shape+".overrideColor", i)
-
+                        cmds.setAttr(shape+".overrideColor", iColorIdx)
 
 def renameShape(transformList):
     """Find shapes, rename they to Shapes and return the results.
@@ -264,6 +270,7 @@ def cvLocator(ctrlName, r=0.3):
     return [curve, shapeSizeCluster]
 
 
+#@utils.profiler
 def cvJointLoc(ctrlName, r=0.3, extraLocs=False):
     """Create and return a cvJointLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
     """
@@ -605,13 +612,14 @@ def dpCheckLinearUnit(origRadius, defaultUnit="centimeter"):
 #        newRadius = origRadius*0.010936
     return newRadius
 
-
+#@utils.profiler
 def shapeSizeSetup(transformNode):
     """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
         Returns the created cluster.
     """
     clusterHandle = None
     childShapeList = cmds.listRelatives(transformNode, shapes=True, children=True)
+#    print "Child length {0}".format(len(childShapeList))
     if childShapeList:
         thisNamespace = childShapeList[0].split(":")[0]
         cmds.namespace(set=thisNamespace, force=True)

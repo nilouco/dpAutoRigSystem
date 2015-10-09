@@ -1,9 +1,11 @@
 # importing libraries:
 import maya.cmds as cmds
-import dpControls as ctrls
-import dpUtils as utils
+
+from Library import dpControls as ctrls
+from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
+
 
 # global variables to this module:    
 CLASS_NAME = "Spine"
@@ -13,9 +15,13 @@ ICON = "/Icons/dp_spine.png"
 
 
 class Spine(Base.StartClass, Layout.LayoutClass):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName):
-        Base.StartClass.__init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON)
-        pass
+    def __init__(self,  *args, **kwargs):
+        #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
+        kwargs["CLASS_NAME"] = CLASS_NAME
+        kwargs["TITLE"] = TITLE
+        kwargs["DESCRIPTION"] = DESCRIPTION
+        kwargs["ICON"] = ICON
+        Base.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
@@ -131,6 +137,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 hideJoints = 1
             # declare lists to store names and attributes:
             self.hipsAList, self.chestAList, self.volumeVariationAttrList = [], [], []
+            self.aFkCtrl = []
+            self.aIkCtrl = []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -178,6 +186,23 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 self.hipsAList.append(self.hipsA)
                 self.chestAList.append(self.chestA)
                 self.volumeVariationAttrList.append(side+self.userGuideName+'_'+self.langDic[self.langName]['c_volumeVariation'])
+
+                #Setup axis order
+                if self.rigType == Base.RigType.quadruped:
+                    cmds.setAttr(self.hipsA + ".rotateOrder", 1)
+                    cmds.setAttr(self.hipsB + ".rotateOrder", 1)
+                    cmds.setAttr(self.chestA + ".rotateOrder", 1)
+                    cmds.setAttr(self.chestB + ".rotateOrder", 1)
+                else:
+                    cmds.setAttr(self.hipsA + ".rotateOrder", 4)
+                    cmds.setAttr(self.hipsB + ".rotateOrder", 4)
+                    cmds.setAttr(self.chestA + ".rotateOrder", 4)
+                    cmds.setAttr(self.chestB + ".rotateOrder", 4)
+
+                #Keep a list of ctrls we want to colorize a certain way
+                self.aFkCtrl.append([self.hipsB, self.chestB])
+                self.aIkCtrl.append([self.hipsA, self.chestA])
+
                 # organize hierarchy:
                 cmds.parent(self.hipsB, self.hipsA)
                 cmds.parent(self.chestB, self.chestA)
@@ -279,6 +304,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # middle ribbon setup:
                 for n in range(1, self.nJoints-1):
                     self.middle = cmds.circle(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_middle']+str(n)+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=self.ctrlRadius)[0]
+                    cmds.setAttr(self.middle + ".rotateOrder", 4)
+                    self.aFkCtrl[s].append(self.middle)
                     ctrls.setLockHide([self.middle], ['sx', 'sy', 'sz'])
                     cmds.setAttr(self.middle+'.visibility', keyable=False)
                     cmds.parent(self.middle, self.hipsA)
@@ -341,6 +368,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                                     "module": {
                                                 "hipsAList"               : self.hipsAList,
                                                 "chestAList"              : self.chestAList,
-                                                "volumeVariationAttrList" : self.volumeVariationAttrList
-                                                }
+                                                "volumeVariationAttrList" : self.volumeVariationAttrList,
+                                                "FkCtrls"                 : self.aFkCtrl,
+                                                "IkCtrls"                 : self.aIkCtrl
+                                              }
                                     }
