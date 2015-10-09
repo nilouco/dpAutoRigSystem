@@ -32,7 +32,7 @@
 #                                          dpFoot footRoll and sideRoll attributes, footMiddleCtrl translate and scale,
 #                                          Proxy_Grp, FX_Grp, Jaw autoTranslate, StickyLips, EyeLookAt, Finger Ik setup,
 #                                          Add Hand Follow, Target Mirror
-#                             changed: all names to PascalCase
+#                             changed: all names to UpperCamelCase (PascalCase)
 #       v 2.6 _ 2015-06-08 - fixed: dpTargetMirror with locked transform, arm stretchale, integrated reverseFootCtrl_Old renaming,
 #                                   R_Leg_IkFkBlendGrpToRevFoot_Grp_ParentConstraint offset without stretch, addBend and forearm,
 #                                   fkLine flip mirror, biped ear, quadruped legs, limb start stretch value
@@ -121,7 +121,7 @@ class DP_AutoRig_UI:
                         self.lastLang = self.langList[0]
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"languageTabLayout\"); dpUI.mainUI()')
+                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"languageTabLayout\"); autoRigUI.mainUI()')
                 # load the last language from optionVar value:
                 cmds.menuItem( self.lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection' )
             else:
@@ -315,7 +315,7 @@ class DP_AutoRig_UI:
         self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinningTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
         self.allUIs["skinButton"] = cmds.button("skinButton", label=self.langDic[self.langName]['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
-        self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", cn="vertical2", st=1.0, parent=self.allUIs["footerB"])
+        self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", cn="vertical2", st=2.0, parent=self.allUIs["footerB"])
         self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.3, 0.8, 0.3), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
         self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.8, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
@@ -359,10 +359,11 @@ class DP_AutoRig_UI:
     def jobReloadUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
+        import maya.cmds as cmds
         cmds.select(clear=True)
-        import dpAutoRig as dpAR
-        reload( dpAR )
-        dpUI = dpAR.DP_AutoRig_UI()
+        import dpAutoRig as autoRig
+        reload( autoRig )
+        autoRigUI = autoRig.DP_AutoRig_UI()
 
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
@@ -386,9 +387,20 @@ class DP_AutoRig_UI:
         # get selected items:
         selectedList = cmds.ls(selection=True, long=True)
         if selectedList:
+            toUpdateSelectList = []
+            needUpdateSelect = False
             for selectedItem in selectedList:
                 if cmds.objExists(selectedItem+".guideBase") and cmds.getAttr(selectedItem+".guideBase") == 1:
-                    selectedGuideNodeList.append(selectedItem)
+                    if not ":" in selectedItem[selectedItem.rfind("|"):]:
+                        newGuide = self.setupDuplicatedGuide(selectedItem)
+                        toUpdateSelectList.append(newGuide)
+                        needUpdateSelect = True
+                    else:
+                        selectedGuideNodeList.append(selectedItem)
+            if needUpdateSelect:
+                selectedGuideNodeList.extend(toUpdateSelectList)
+                self.jobReloadUI(self)
+                cmds.select(selectedGuideNodeList)
 
         # re-create module layout:
         if selectedGuideNodeList:
@@ -415,6 +427,94 @@ class DP_AutoRig_UI:
         self.reloadPopulatedGeoms()
     
     
+    def setupDuplicatedGuide(self, selectedItem, *args):
+        """ This method will create a new module instance for a duplicated guide found.
+            Returns a guideBase for a new module instance.
+        """
+        # Duplicating a module guide
+        print self.langDic[self.langName]['i067_duplicating']
+
+        # declaring variables
+        transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
+        guideBaseName = "Guide_Base"
+        guideBaseAttr = "guideBase"
+        moduleNamespaceAttr = "moduleNamespace"
+        moduleInstanceInfoAttr = "moduleInstanceInfo"
+        nSegmentsAttr = "nJoints"
+        customNameAttr = "customName"
+        mirroirAxisAttr = "mirrorAxis"
+
+        # unparenting
+        parentList = cmds.listRelatives(selectedItem, parent=True)
+        if parentList:
+            cmds.parent(selectedItem, world=True)
+            selectedItem = selectedItem[selectedItem.rfind("|"):]
+
+        # getting duplicated item values
+        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+moduleNamespaceAttr)
+        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+moduleInstanceInfoAttr)
+        # generating naming values
+        origGuideName = moduleNamespaceValue+":"+guideBaseName
+        thatClassName = moduleNamespaceValue.partition("__")[0]
+        thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
+        thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
+        moduleDir = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatModuleName)-1]
+        moduleDir = moduleDir[moduleDir.rfind(".")+1:]
+
+        # initializing a new module instance
+        newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
+        newGuideName = cmds.ls(selection=True)[0]
+        newGuideNamespace = cmds.getAttr(newGuideName+"."+moduleNamespaceAttr)
+        # getting a good attribute list
+        toSetAttrList = cmds.listAttr(selectedItem)
+        guideBaseAttrIdx = toSetAttrList.index(guideBaseAttr)
+        toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
+        toSetAttrList.remove(guideBaseAttr)
+        toSetAttrList.remove(moduleNamespaceAttr)
+        toSetAttrList.remove(customNameAttr)
+        toSetAttrList.remove(mirroirAxisAttr)
+        
+        # check for special attributes
+        if cmds.objExists(selectedItem+"."+nSegmentsAttr):
+            toSetAttrList.remove(nSegmentsAttr)
+            nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
+            if nJointsValue > 1:
+                eval('self.guide.'+thatClassName+'.changeJointNumber(newGuideInstance, '+str(nJointsValue)+')')
+        if cmds.objExists(selectedItem+"."+customNameAttr):
+            customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
+            if customNameValue != "":
+                eval('self.guide.'+thatClassName+'.editUserName(newGuideInstance, checkText="'+customNameValue+'")')
+        if cmds.objExists(selectedItem+"."+mirroirAxisAttr):
+            mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirroirAxisAttr)
+            if mirroirAxisValue != "off":
+                eval('self.guide.'+thatClassName+'.changeMirror(newGuideInstance, "'+mirroirAxisValue+'")')
+
+        # get and set transformations
+        childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, type="transform")
+        if childrenList:
+            childrenList.append(selectedItem)
+            for child in childrenList:
+                newChild = newGuideNamespace+":"+child
+                for transfAttr in transformAttrList:
+                    try:
+                        cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
+                    except:
+                        pass
+        # setting new guide attributes
+        for toSetAttr in toSetAttrList:
+            try:
+                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr))
+            except:
+                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
+
+        # parenting correctly
+        if parentList:
+            cmds.parent(newGuideName, parentList[0])
+
+        cmds.delete(selectedItem)
+        return newGuideName
+
+
     def populateJoints(self, *args):
         """ This function is responsable to list all joints or only dpAR joints in the interface in order to use in skinning.
         """

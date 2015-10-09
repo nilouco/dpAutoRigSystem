@@ -149,8 +149,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         # re orient guides:
         self.reOrientGuide()
     
-    def reCreateEditSelectedModuleLayout(self, *args):
-        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self)
+    def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
+        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
         cmds.text(self.nSegmentsText, edit=True, visible=False, parent=self.segDelColumn)
         cmds.intField(self.nJointsIF, edit=True, editable=False, visible=False, parent=self.segDelColumn)
@@ -167,7 +167,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.reOrientBT = cmds.button(label=self.langDic[self.langName]['m022_reOrient'], annotation=self.langDic[self.langName]['m023_reOrientDesc'], command=self.reOrientGuide, parent=self.typeLayout)
         
         # style layout:
-        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
+        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m041_style'], visible=True, parent=self.styleLayout)
         self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
         styleMenuItemList = [self.langDic[self.langName]['m042_default'], self.langDic[self.langName]['m026_biped'], self.langDic[self.langName]['m037_quadruped'], self.langDic[self.langName]['m043_quadSpring']]
@@ -178,7 +178,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle+1))
         
         # bend layout:
-        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
+        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m044_addBend'], visible=True, parent=self.bendLayout)
         self.bendChkbox = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
         self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
