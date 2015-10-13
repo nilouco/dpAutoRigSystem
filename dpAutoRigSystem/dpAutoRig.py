@@ -155,7 +155,8 @@ class DP_AutoRig_UI:
 
         # call UI window: Also ensure that when thedock controler X button it it, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uid=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
-        self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"]) #, vcc=self.jobDockVisChange)
+        self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], vcc=self.jobDockVisChange)
+        print self.pDockCtrl
 
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
@@ -364,6 +365,7 @@ class DP_AutoRig_UI:
         import dpAutoRig as autoRig
         reload( autoRig )
         autoRigUI = autoRig.DP_AutoRig_UI()
+        cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
 
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
@@ -372,10 +374,8 @@ class DP_AutoRig_UI:
                 cmds.deleteUI('dpAutoRigSystem', control=True)
 
     def jobDockVisChange(self, *args):
-        #This job will ensure to kill the window and at the same time to job related to it
-        if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
-            if cmds.window('dpAutoRigWindow', query=True, exists=True):
-                cmds.deleteUI('dpAutoRigWindow', window=True)
+        #Force focus
+        cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
     
     def jobSelectedGuide(self):
         """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
