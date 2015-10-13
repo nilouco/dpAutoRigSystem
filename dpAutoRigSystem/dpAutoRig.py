@@ -74,7 +74,27 @@ except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
 
+# declaring member variables
 DPAR_VERSION = "3.0"
+ENGLISH = "English"
+MODULES = "Modules"
+SCRIPTS = "Scripts"
+EXTRAS = "Extras"
+BASE_NAME = "dpAR_"
+EYE_LOOK_AT = "EyeLookAt"
+HEAD = "Head"
+SPINE = "Spine"
+LIMB = "Limb"
+FOOT = "Foot"
+FINGER = "Finger"
+ARM = "Arm"
+LEG = "Leg"
+GUIDE_BASE_NAME = "Guide_Base"
+GUIDE_BASE_ATTR = "guideBase"
+MODULE_NAMESPACE_ATTR = "moduleNamespace"
+MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
+
+
 
 class DP_AutoRig_UI:
     
@@ -107,16 +127,16 @@ class DP_AutoRig_UI:
                 lastLangExists = cmds.optionVar( exists='dpAutoRigLastLanguage' )
                 if not lastLangExists:
                     # if not exists a last language, set it to English if it exists, or to the first language in the list:
-                    if "English" in self.langList:
-                        cmds.optionVar( stringValue=('dpAutoRigLastLanguage', 'English') )
+                    if ENGLISH in self.langList:
+                        cmds.optionVar( stringValue=('dpAutoRigLastLanguage', ENGLISH) )
                     else:
                         cmds.optionVar( stringValue=('dpAutoRigLastLanguage', self.langList[0]) )
                 # get its value puting in a variable lastLang:
                 self.lastLang = cmds.optionVar( query='dpAutoRigLastLanguage' )
                 # if the last language in the system was different of json files, set it to English or to the first language in the list also:
                 if not self.lastLang in self.langList:
-                    if "English" in self.langList:
-                        self.lastLang = 'English'
+                    if ENGLISH in self.langList:
+                        self.lastLang = ENGLISH
                     else:
                         self.lastLang = self.langList[0]
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
@@ -233,10 +253,10 @@ class DP_AutoRig_UI:
         self.allUIs["guidesLayoutA"] = cmds.columnLayout("guidesLayoutA", adjustableColumn=True, width=122, rowSpacing=3, parent=self.allUIs["colMiddleLeftA"])
         # here will be populated by guides of modules and scripts...
         self.allUIs["i030_standard"] = cmds.text(self.langDic[self.langName]['i030_standard'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.guideModuleList = self.startGuideModules("Modules", "start", "guidesLayoutA")
+        self.guideModuleList = self.startGuideModules(MODULES, "start", "guidesLayoutA")
         cmds.separator(style='doubleDash', height=10, parent=self.allUIs["guidesLayoutA"])
         self.allUIs["i031_integrated"] = cmds.text(self.langDic[self.langName]['i031_integrated'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
-        self.startGuideModules("Scripts", "start", "guidesLayoutA")
+        self.startGuideModules(SCRIPTS, "start", "guidesLayoutA")
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
         #colMiddleRightA - scrollLayout - modulesLayout:
@@ -316,8 +336,8 @@ class DP_AutoRig_UI:
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
         self.allUIs["skinButton"] = cmds.button("skinButton", label=self.langDic[self.langName]['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
         self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", cn="vertical2", st=2.0, parent=self.allUIs["footerB"])
-        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.3, 0.8, 0.3), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
-        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.8, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.langDic[self.langName]['i025_joints']+" 0 "+self.langDic[self.langName]['i024_geometries'], parent=self.allUIs["footerB"])
@@ -342,7 +362,7 @@ class DP_AutoRig_UI:
         # extraMainLayout - scrollLayout:
         self.allUIs["extraMainLayout"] = cmds.scrollLayout("extraMainLayout", parent=self.allUIs["extraTabLayout"])
         self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
-        self.extraModuleList = self.startGuideModules("Extras", "start", "extraLayout")
+        self.extraModuleList = self.startGuideModules(EXTRAS, "start", "extraLayout")
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["extraTabLayout"], edit=True,
@@ -387,27 +407,26 @@ class DP_AutoRig_UI:
         # get selected items:
         selectedList = cmds.ls(selection=True, long=True)
         if selectedList:
-            toUpdateSelectList = []
+            updatedGuideNodeList = []
             needUpdateSelect = False
             for selectedItem in selectedList:
-                if cmds.objExists(selectedItem+".guideBase") and cmds.getAttr(selectedItem+".guideBase") == 1:
+                if cmds.objExists(selectedItem+"."+GUIDE_BASE_ATTR) and cmds.getAttr(selectedItem+"."+GUIDE_BASE_ATTR) == 1:
                     if not ":" in selectedItem[selectedItem.rfind("|"):]:
                         newGuide = self.setupDuplicatedGuide(selectedItem)
-                        toUpdateSelectList.append(newGuide)
+                        updatedGuideNodeList.append(newGuide)
                         needUpdateSelect = True
                     else:
                         selectedGuideNodeList.append(selectedItem)
             if needUpdateSelect:
-                selectedGuideNodeList.extend(toUpdateSelectList)
                 self.jobReloadUI(self)
-                cmds.select(selectedGuideNodeList)
+                cmds.select(updatedGuideNodeList)
 
         # re-create module layout:
         if selectedGuideNodeList:
             for moduleInstance in self.moduleInstancesList:
                 cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
                 for selectedGuide in selectedGuideNodeList:
-                    selectedGuideInfo = cmds.getAttr(selectedGuide+".moduleInstanceInfo")
+                    selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
                     if selectedGuideInfo == str(moduleInstance):
                         moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
         # delete module layout:
@@ -436,10 +455,6 @@ class DP_AutoRig_UI:
 
         # declaring variables
         transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
-        guideBaseName = "Guide_Base"
-        guideBaseAttr = "guideBase"
-        moduleNamespaceAttr = "moduleNamespace"
-        moduleInstanceInfoAttr = "moduleInstanceInfo"
         nSegmentsAttr = "nJoints"
         customNameAttr = "customName"
         mirroirAxisAttr = "mirrorAxis"
@@ -451,10 +466,10 @@ class DP_AutoRig_UI:
             selectedItem = selectedItem[selectedItem.rfind("|"):]
 
         # getting duplicated item values
-        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+moduleNamespaceAttr)
-        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+moduleInstanceInfoAttr)
+        moduleNamespaceValue = cmds.getAttr(selectedItem+"."+MODULE_NAMESPACE_ATTR)
+        moduleInstanceInfoValue = cmds.getAttr(selectedItem+"."+MODULE_INSTANCE_INFO_ATTR)
         # generating naming values
-        origGuideName = moduleNamespaceValue+":"+guideBaseName
+        origGuideName = moduleNamespaceValue+":"+GUIDE_BASE_NAME
         thatClassName = moduleNamespaceValue.partition("__")[0]
         thatModuleName = moduleInstanceInfoValue[:moduleInstanceInfoValue.rfind(thatClassName)-1]
         thatModuleName = thatModuleName[thatModuleName.rfind(".")+1:]
@@ -464,13 +479,13 @@ class DP_AutoRig_UI:
         # initializing a new module instance
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
-        newGuideNamespace = cmds.getAttr(newGuideName+"."+moduleNamespaceAttr)
+        newGuideNamespace = cmds.getAttr(newGuideName+"."+MODULE_NAMESPACE_ATTR)
         # getting a good attribute list
         toSetAttrList = cmds.listAttr(selectedItem)
-        guideBaseAttrIdx = toSetAttrList.index(guideBaseAttr)
+        guideBaseAttrIdx = toSetAttrList.index(GUIDE_BASE_ATTR)
         toSetAttrList = toSetAttrList[guideBaseAttrIdx:]
-        toSetAttrList.remove(guideBaseAttr)
-        toSetAttrList.remove(moduleNamespaceAttr)
+        toSetAttrList.remove(GUIDE_BASE_ATTR)
+        toSetAttrList.remove(MODULE_NAMESPACE_ATTR)
         toSetAttrList.remove(customNameAttr)
         toSetAttrList.remove(mirroirAxisAttr)
         
@@ -482,7 +497,7 @@ class DP_AutoRig_UI:
                 eval('self.guide.'+thatClassName+'.changeJointNumber(newGuideInstance, '+str(nJointsValue)+')')
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
-            if customNameValue != "":
+            if customNameValue != "" and customNameValue != None:
                 eval('self.guide.'+thatClassName+'.editUserName(newGuideInstance, checkText="'+customNameValue+'")')
         if cmds.objExists(selectedItem+"."+mirroirAxisAttr):
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirroirAxisAttr)
@@ -490,16 +505,18 @@ class DP_AutoRig_UI:
                 eval('self.guide.'+thatClassName+'.changeMirror(newGuideInstance, "'+mirroirAxisValue+'")')
 
         # get and set transformations
-        childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, type="transform")
+        childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
         if childrenList:
-            childrenList.append(selectedItem)
             for child in childrenList:
-                newChild = newGuideNamespace+":"+child
+                newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
                 for transfAttr in transformAttrList:
                     try:
                         cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
                     except:
                         pass
+        # set transformation for Guide_Base
+        for transfAttr in transformAttrList:
+            cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
         # setting new guide attributes
         for toSetAttr in toSetAttrList:
             try:
@@ -529,7 +546,7 @@ class DP_AutoRig_UI:
             jntList = allJointList
         elif chooseJnt == "dpARJoints":
             for jnt in allJointList:
-                if cmds.objExists(jnt+'.dpAR_joint'):
+                if cmds.objExists(jnt+'.'+BASE_NAME+'joint'):
                     jntList.append(jnt)
         
         # populate the list:
@@ -663,16 +680,16 @@ class DP_AutoRig_UI:
         cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
         cmds.image(i=iconDir)
 
-        if guideDir == "Modules":
+        if guideDir == MODULES:
             '''
             We need to passe the rigType parameters because the cmds.button command will send a False parameter that
             will be stock in the rigType if we don't pass the parameter
             http://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
             '''
             cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
-        elif guideDir == "Scripts":
+        elif guideDir == SCRIPTS:
             cmds.button(label=title, height=30, command=partial(self.execScriptedGuide, guideModule, guideDir) )
-        elif guideDir == "Extras":
+        elif guideDir == EXTRAS:
             cmds.button(label=title, height=30, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
 
         cmds.setParent('..')
@@ -682,9 +699,7 @@ class DP_AutoRig_UI:
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
-
         # creating unique namespace:
-        basename = "dpAR_"
         cmds.namespace(setNamespace=":")
         # list all namespaces:
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
@@ -694,9 +709,9 @@ class DP_AutoRig_UI:
                 # if yes, get the name after the "__":
                 namespaceList[i] = namespaceList[i].partition("__")[2]
         # send this result to findLastNumber in order to get the next moduleName +1:
-        newSuffix = utils.findLastNumber(namespaceList, basename) + 1
+        newSuffix = utils.findLastNumber(namespaceList, BASE_NAME) + 1
         # generate the current moduleName added the next new suffix:
-        userSpecName = basename + str(newSuffix)
+        userSpecName = BASE_NAME + str(newSuffix)
         # especific import command for guides storing theses guides modules in a variable:
         basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
@@ -754,7 +769,7 @@ class DP_AutoRig_UI:
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find path where 'dpAutoRig.py' is been executed:
         path = utils.findPath("dpAutoRig.py")
-        guideDir = "Modules"
+        guideDir = MODULES
         # find all module names:
         moduleNameInfo = utils.findAllModuleNames(path, guideDir)
         validModules = moduleNameInfo[0]
@@ -769,7 +784,7 @@ class DP_AutoRig_UI:
                 if module in validModuleNames:
                     index = validModuleNames.index(module)
                     # check if there is this module guide base in the scene:
-                    curGuideName = validModuleNames[index]+"__"+userSpecName+":Guide_Base"
+                    curGuideName = validModuleNames[index]+"__"+userSpecName+":"+GUIDE_BASE_NAME
                     if cmds.objExists(curGuideName):
                         self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
                         
@@ -779,7 +794,7 @@ class DP_AutoRig_UI:
             cmds.deleteUI(self.allUIs["modulesLayoutA"])
             self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
             # load again the modules:
-            guideFolder = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+".Modules"
+            guideFolder = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
             # this list will be used to rig all modules pressing the RIG button:
             for module in self.allGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
@@ -1241,10 +1256,10 @@ class DP_AutoRig_UI:
                         moduleType = moduleDic[:moduleDic.find("__")]
 						
                         # footGuide parented in the extremGuide of the limbModule:
-                        if moduleType == "Foot":
+                        if moduleType == FOOT:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == "Limb" and fatherGuideLoc == 'Extrem':
+                            if fatherModule == LIMB and fatherGuideLoc == 'Extrem':
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                                 self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                                 # working with item guide mirror:
@@ -1268,7 +1283,7 @@ class DP_AutoRig_UI:
                                     ikHandleGrp           = self.integratedTaskDic[fatherGuide]['ikHandleGrpList'][s]
                                     ikHandlePointConst    = self.integratedTaskDic[fatherGuide]['ikHandlePointConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
-                                    extremJntList         = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
+                                    extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     parentConstToRFOffset = self.integratedTaskDic[fatherGuide]['parentConstToRFOffsetList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbType              = self.integratedTaskDic[fatherGuide]['limbType']
@@ -1278,9 +1293,11 @@ class DP_AutoRig_UI:
                                     cmds.delete(ikHandlePointConst, parentConst)
                                     cmds.parent(revFootCtrlZero, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    parentConstExtremFoot = cmds.parentConstraint(extremJntList, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
-                                    if limbType == "leg":
+                                    parentConstExtremFoot = cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
+                                    if limbType == LEG:
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
+                                        if cmds.objExists(extremJnt+".dpAR_joint"):
+                                            cmds.deleteAttr(extremJnt+".dpAR_joint")
                                     # organize to avoid offset error in the parentConstraint with negative scale:
                                     if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
                                         for f in range(1,3):
@@ -1301,7 +1318,7 @@ class DP_AutoRig_UI:
                                     cmds.rename(revFootCtrl, revFootCtrl+"_Old")
                         
                         # worldRef of extremGuide from limbModule controlled by optionCtrl:
-                        if moduleType == "Limb":
+                        if moduleType == LIMB:
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
@@ -1346,7 +1363,7 @@ class DP_AutoRig_UI:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
                             
-                            if fatherModule == "Spine":
+                            if fatherModule == SPINE:
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                                 self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                                 # working with item guide mirror:
@@ -1397,7 +1414,7 @@ class DP_AutoRig_UI:
                                 cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
                             
                         # integrate the volumeVariation attribute from Spine module to optionCtrl:
-                        if moduleType == "Spine":
+                        if moduleType == SPINE:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -1417,7 +1434,7 @@ class DP_AutoRig_UI:
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['IkCtrls'][s], "yellow")
                         
                         # integrate the head orient from the masterCtrl:
-                        if moduleType == "Head":
+                        if moduleType == HEAD:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -1433,7 +1450,7 @@ class DP_AutoRig_UI:
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrls'][s], "yellow")
                         
                         # integrate the EyeLookAt with the Head setup:
-                        if moduleType == "EyeLookAt":
+                        if moduleType == EYE_LOOK_AT:
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
                             eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
                             upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
@@ -1441,7 +1458,7 @@ class DP_AutoRig_UI:
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            if fatherModule == "Head":
+                            if fatherModule == HEAD:
                                 # getting head data:
                                 fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                 headCtrl  = self.integratedTaskDic[fatherGuide]['headCtrlList'][0]
@@ -1465,7 +1482,7 @@ class DP_AutoRig_UI:
                                     cmds.parentConstraint(headCtrl, eyeScaleGrp, maintainOffset=True)
                 
                         # integrate the Finger module:
-                        if moduleType == "Finger":
+                        if moduleType == FINGER:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -1481,11 +1498,11 @@ class DP_AutoRig_UI:
                                 # get father guide data:
                                 fatherModule   = self.hookDic[moduleDic]['fatherModule']
                                 fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                                if fatherModule == "Limb" and fatherGuideLoc == 'Extrem':
+                                if fatherModule == LIMB and fatherGuideLoc == 'Extrem':
                                     # getting limb type:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     limbType = self.integratedTaskDic[fatherGuide]['limbType']
-                                    if limbType == "arm":
+                                    if limbType == ARM:
                                         origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
                                         origFrom = origFromList[-1]
                                         cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True)
