@@ -165,6 +165,12 @@ class StartClass:
         delIndex = self.dpUIinst.moduleInstancesList.index(self)
         self.dpUIinst.moduleInstancesList.pop(delIndex)
     
+
+    def duplicateModule(self, *args):
+        """ This module will just do a simple duplicate from Maya because we have a scriptJob to do the creating a new instance setup.
+        """
+        cmds.duplicate(self.moduleGrp)
+
     
     def editUserName(self, checkText=None, *args):
         """ Edit the userGuideName to use the userName from module UI.

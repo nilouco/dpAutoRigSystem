@@ -30,6 +30,11 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
+# declaring member variables
+ARM = "Arm"
+LEG = "Leg"
+
+
 class Limb(Base.StartClass, Layout.LayoutClass):
     def __init__(self,  *args, **kwargs):
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -351,10 +356,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 enumType = cmds.getAttr(self.moduleGrp+'.type')
                 if enumType == 0:
                     self.limbType = self.langDic[self.langName]['m028_arm']
-                    limbTypeName = "arm"
+                    limbTypeName = ARM
                 elif enumType == 1:
                     self.limbType = self.langDic[self.langName]['m030_leg']
-                    limbTypeName = "leg"
+                    limbTypeName = LEG
                 # getting style of the limb:
                 enumStyle = cmds.getAttr(self.moduleGrp+'.style')
                 if enumStyle == 0:
@@ -375,11 +380,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint   = side+self.userGuideName+"_Guide_JointEnd"
                 
                 # getting names from dic:
-                beforeName  = self.langDic[self.langName]['c_'+limbTypeName+'_before']
-                mainName    = self.langDic[self.langName]['c_'+limbTypeName+'_main']
-                cornerName  = self.langDic[self.langName]['c_'+limbTypeName+'_corner']
-                cornerBName = self.langDic[self.langName]['c_'+limbTypeName+'_cornerB']
-                extremName  = self.langDic[self.langName]['c_'+limbTypeName+'_extrem']
+                beforeName  = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_before']
+                mainName    = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_main']
+                cornerName  = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_corner']
+                cornerBName = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_cornerB']
+                extremName  = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_extrem']
 
                 # mount cvLocList and jNameList:
                 if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
@@ -424,15 +429,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     #Setup axis order
                     if jName == beforeName: #Clavicle and hip
                         cmds.setAttr(fkCtrl + ".rotateOrder", 3)
-                    elif jName == extremName and limbTypeName == "leg": #Hand
+                    elif jName == extremName and limbTypeName == LEG: #Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
-                    elif jName == extremName and limbTypeName == "arm": #Hand
+                    elif jName == extremName and limbTypeName == ARM: #Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 1)
                     elif jName == mainName: #Leg and Shoulder
                         cmds.setAttr(fkCtrl + ".rotateOrder", 1)
-                    elif limbTypeName == "leg": #Other legs ctrl
+                    elif limbTypeName == LEG: #Other legs ctrl
                         cmds.setAttr(fkCtrl + ".rotateOrder", 2)
-                    elif limbTypeName == "arm": #Other arm ctrl
+                    elif limbTypeName == ARM: #Other arm ctrl
                         cmds.setAttr(fkCtrl + ".rotateOrder", 5)
                     else:
                         #Let the default axis order for other ctrl (Should not happen)
@@ -808,7 +813,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.stretchCondOp2+'.outColorR', self.stretchCondOp1+'.colorIfFalseR', force=True)
                 cmds.connectAttr(self.stretchCondOp0+".outColorR", self.stretchCond+'.operation', force=True)
                 
-                for j in range(1, 4):
+                for j in range(1, 3):
                     cmds.connectAttr(self.stretchCond+'.outColorR', self.skinJointList[j]+'.scaleZ', force=True)
                     cmds.connectAttr(self.stretchCond+'.outColorR', self.ikJointList[j]+'.scaleZ', force=True)
                 
