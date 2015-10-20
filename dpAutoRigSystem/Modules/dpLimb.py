@@ -317,7 +317,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             except:
                 hideJoints = 1
             # declaring lists to send information for integration:
-            self.ikExtremCtrlList, self.ikExtremCtrlZeroList, self.ikPoleVectorCtrlZeroList, self.ikHandleToRFGrpList, self.ikHandlePointConstList, self.ikFkBlendGrpToRevFootList, self.worldRefList, self.worldRefShapeList, self.extremJntList, self.parentConstToRFOffsetList, self.fixIkSpringSolverGrpList, self.quadFrontLegList, self.integrateOrigFromList, self.ikStretchExtremLocList, self.ikFkNetworkList = [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
+            self.ikExtremCtrlList, self.ikExtremCtrlZeroList, self.ikPoleVectorCtrlZeroList, self.ikHandleToRFGrpList, self.ikHandlePointConstList, self.ikFkBlendGrpToRevFootList, self.worldRefList, self.worldRefShapeList, self.extremJntList, self.parentConstToRFOffsetList, self.fixIkSpringSolverGrpList, self.quadFrontLegList, self.integrateOrigFromList, self.ikStretchExtremLocList, self.ikFkNetworkList, self.afkIsolateConst = [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -520,6 +520,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.langDic[self.langName]['c_Follow'], self.fkIsolateRevNode+".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.worldRef+"W1", force=True)
+                self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
                 self.ikFkRevList = []
@@ -1101,5 +1102,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                                 "ikStretchExtremLoc"        : self.ikStretchExtremLocList,
                                                 "ikFkNetworkList"           : self.ikFkNetworkList,
                                                 "limbManualVolume"          : "limbManualVolume",
+                                                "fkIsolateConst"            : self.afkIsolateConst,
                                                 }
                                     }

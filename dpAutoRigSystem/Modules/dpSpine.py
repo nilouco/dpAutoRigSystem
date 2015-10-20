@@ -231,7 +231,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 rbnNurbsPlane      = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
                 rbnJointGrpList    = returnedRibbonList[2]
-                rbnJointList       = returnedRibbonList[3]
+                self.rbnJointList       = returnedRibbonList[3]
                 # position of ribbon nurbs plane:
                 cmds.setAttr(rbnNurbsPlane+".tz", -4)
                 cmds.move(0, 0, 0, rbnNurbsPlane+".scalePivot", rbnNurbsPlane+".rotatePivot")
@@ -329,8 +329,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     # add originedFrom attribute to this middle ctrl:
                     utils.originedFrom(objName=self.middle, attrString=middleLocGuide)
                     # apply volumeVariation to joints in the middle ribbon setup:
-                    cmds.connectAttr(rbnBlendColors+'.outputR', rbnJointList[n]+'.scaleX')
-                    cmds.connectAttr(rbnBlendColors+'.outputR', rbnJointList[n]+'.scaleZ')
+                    cmds.connectAttr(rbnBlendColors+'.outputR', self.rbnJointList[n]+'.scaleX')
+                    cmds.connectAttr(rbnBlendColors+'.outputR', self.rbnJointList[n]+'.scaleZ')
                 # organize groups:
                 self.rbnRigGrp      = cmds.group(name=side+self.userGuideName+"_Grp", empty=True)
                 self.rbnControlGrp  = cmds.group(name=side+self.userGuideName+"_Control_Grp", empty=True)
@@ -370,6 +370,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                                                 "chestAList"              : self.chestAList,
                                                 "volumeVariationAttrList" : self.volumeVariationAttrList,
                                                 "FkCtrls"                 : self.aFkCtrl,
-                                                "IkCtrls"                 : self.aIkCtrl
+                                                "IkCtrls"                 : self.aIkCtrl,
+                                                "jointList"               : self.rbnJointList,
                                               }
                                     }

@@ -1377,22 +1377,61 @@ class DP_AutoRig_UI:
                                     ikCtrlZero           = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
                                     ikPoleVectorCtrlZero = self.integratedTaskDic[moduleDic]['ikPoleVectorZeroList'][s]
                                     limbStyle            = self.integratedTaskDic[moduleDic]['limbStyle']
+                                    limbIsolateFkConst   = self.integratedTaskDic[moduleDic]['fkIsolateConst'][s]
                                     
                                     # getting spine data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     hipsA  = self.integratedTaskDic[fatherGuide]['hipsAList'][0]
                                     chestA = self.integratedTaskDic[fatherGuide]['chestAList'][0]
+
+                                    def setupFollowSpine(mainParent):
+                                        #Ensure that the arm will follow the Chest_A Ctrl instead of the world
+                                        targetList = cmds.parentConstraint(limbIsolateFkConst, q=True, tl=True)
+                                        weightList = cmds.parentConstraint(limbIsolateFkConst, q=True, wal=True)
+                                        revNode = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])[1]
+                                        fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
+                                        fkCtrl = fkZeroNode.replace("_Zero", "")
+                                        nodeToConst = utils.zeroOut([fkCtrl])[0]
+                                        nodeToConst = cmds.rename(nodeToConst, fkZeroNode + "_spaceSwitch")
+                                        mainCtrl = cmds.listConnections(revNode + ".inputX")[0]
+                                        mainNull = sideName + mainParent +"_null"  #Ensure the name is set to prevent unbound variable problem with inner function
+                                        #Replace the old constraint with a new one that will switch with the chest ctrl
+                                        cmds.delete(limbIsolateFkConst, icn=False, cn=True)
+                                        #cmds.parentConstraint(targetList[1], limbIsolateFkConst, rm=True)
+                                        if (not cmds.objExists(mainNull)):
+                                            mainNull = cmds.group(empty=True, name=mainNull)
+                                            cmds.parent(mainNull, mainParent, relative=False)
+                                            m4Fk = cmds.xform(fkCtrl, ws=True, m=True, q=True)
+                                            cmds.xform(mainNull, ws=True, m=m4Fk)
+                                        newFkConst = cmds.parentConstraint(targetList[0], mainNull, nodeToConst, skipTranslate=["x", "y", "z"], maintainOffset=True)[0]
+                                        cmds.connectAttr(mainCtrl + "." + self.langDic[self.langName]['c_Follow'], newFkConst + "." + targetList[0]+"W0", force=True)
+                                        if (cmds.objExists(revNode)):
+                                            cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
+                                        else:
+                                            revNode = cmds.createNode('reverse', name=sideName+fkCtrl+"_FkIsolate_Rev")
+                                            cmds.connectAttr(mainCtrl+'.'+self.langDic[self.langName]['c_Follow'], revNode+".inputX", force=True)
+                                            cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
+
                                     # verifying what part will be used, the hips or chest:
                                     if limbType == self.langDic[self.langName]['m030_leg']:
                                         # do task actions in order to integrate the limb of leg type to rootCtrl:
                                         cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                         cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
+                                        #Ensure that the arm will follow the Chest_A Ctrl instead of the world
+                                        #setupFollowSpine(hipsA)
+
                                     elif fatherGuideLoc == "JointLoc1":
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, hipsA, absolute=True)
+                                        #Ensure that the arm will follow the Chest_A Ctrl instead of the world
+                                        #setupFollowSpine(hipsA)
+
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, chestA, absolute=True)
+                                        #Ensure that the arm will follow the Chest_A Ctrl instead of the world
+                                        #setupFollowSpine(chestA)
+
                                     # verify if is quadruped
                                     if limbStyle == self.langDic[self.langName]['m037_quadruped'] or limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                                         if fatherGuideLoc != "JointLoc1":
