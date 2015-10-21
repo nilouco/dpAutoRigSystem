@@ -1298,12 +1298,14 @@ class DP_AutoRig_UI:
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
-                                    # organize to avoid offset error in the parentConstraint with negative scale:
-                                    if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
-                                        for f in range(1,3):
-                                            cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
-                                            cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateY", cmds.getAttr(parentConstToRFOffset+".fixOffsetY"))
-                                            cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateZ", cmds.getAttr(parentConstToRFOffset+".fixOffsetZ"))
+                                    if (int(cmds.about(version=True)) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
+                                        # organize to avoid offset error in the parentConstraint with negative scale:
+                                        if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
+                                            for f in range(1,3):
+                                                cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
+                                                cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateY", cmds.getAttr(parentConstToRFOffset+".fixOffsetY"))
+                                                cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateZ", cmds.getAttr(parentConstToRFOffset+".fixOffsetZ"))
+
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add float attributes and connect from ikCtrl to revFootCtrl:
@@ -1386,9 +1388,13 @@ class DP_AutoRig_UI:
 
                                     def setupFollowSpine(mainParent):
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
-                                        targetList = cmds.parentConstraint(limbIsolateFkConst, q=True, tl=True)
-                                        weightList = cmds.parentConstraint(limbIsolateFkConst, q=True, wal=True)
-                                        revNode = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])[1]
+                                        targetList = cmds.parentConstraint("R_Leg_Leg_Fk_Ctrl_Zero_ParentConstraint", q=True, tl=True)
+                                        weightList = cmds.parentConstraint("R_Leg_Leg_Fk_Ctrl_Zero_ParentConstraint", q=True, wal=True)
+                                        #Need to sort the list to ensure that the resulat are in the same
+                                        #order in Maya 2014 and Maya 2016...
+                                        tempList = cmds.listConnections("R_Leg_Leg_Fk_Ctrl_Zero_ParentConstraint" + "." + weightList[1])
+                                        tempList.sort()
+                                        revNode = tempList[0]
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
                                         fkCtrl = fkZeroNode.replace("_Zero", "")
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
@@ -1418,19 +1424,19 @@ class DP_AutoRig_UI:
                                         cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                         cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
-                                        #setupFollowSpine(hipsA)
+                                        setupFollowSpine(hipsA)
 
                                     elif fatherGuideLoc == "JointLoc1":
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, hipsA, absolute=True)
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
-                                        #setupFollowSpine(hipsA)
+                                        setupFollowSpine(hipsA)
 
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, chestA, absolute=True)
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
-                                        #setupFollowSpine(chestA)
+                                        setupFollowSpine(chestA)
 
                                     # verify if is quadruped
                                     if limbStyle == self.langDic[self.langName]['m037_quadruped'] or limbStyle == self.langDic[self.langName]['m043_quadSpring']:

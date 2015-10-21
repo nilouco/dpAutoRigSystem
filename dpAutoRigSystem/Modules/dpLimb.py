@@ -515,7 +515,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PointConstraint")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.worldRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_ParentConstraint")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.langDic[self.langName]['c_Follow'], fkIsolateParentConst+"."+self.shoulderNullGrp+"W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.langDic[self.langName]['c_Follow'], self.fkIsolateRevNode+".inputX", force=True)
@@ -875,19 +875,21 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetX", attributeType='long', keyable=False)
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetY", attributeType='long', keyable=False)
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetZ", attributeType='long', keyable=False)
-                
+
+
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options are valides for Biped, Quadruped and Quadruped Spring legs
-                    if self.mirrorAxis != 'off':
-                        if s == 1: # mirrored guide
-                            if self.limbType == self.langDic[self.langName]['m030_leg']:
-                                for axis in self.mirrorAxis:
-                                    if axis == "X":
-                                        # must fix offset of the parentConstrain in the future when this will be integrated
-                                        cmds.setAttr(parentConstToRFOffset+".mustCorrectOffset", 1)
-                                        cmds.setAttr(parentConstToRFOffset+".fixOffsetX", 90)
-                                        cmds.setAttr(parentConstToRFOffset+".fixOffsetY", 180)
-                                        cmds.setAttr(parentConstToRFOffset+".fixOffsetZ", -90)
+                    if (int(cmds.about(version=True)) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
+                        if self.mirrorAxis != 'off':
+                            if s == 1: # mirrored guide
+                                if self.limbType == self.langDic[self.langName]['m030_leg']:
+                                    for axis in self.mirrorAxis:
+                                        if axis == "X":
+                                            # must fix offset of the parentConstrain in the future when this will be integrated
+                                            cmds.setAttr(parentConstToRFOffset+".mustCorrectOffset", 1)
+                                            cmds.setAttr(parentConstToRFOffset+".fixOffsetX", 90)
+                                            cmds.setAttr(parentConstToRFOffset+".fixOffsetY", 180)
+                                            cmds.setAttr(parentConstToRFOffset+".fixOffsetZ", -90)
                     
                     if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                         # fix the group for the ikSpringSolver to avoid Maya bug about rotation from masterCtrl :P
