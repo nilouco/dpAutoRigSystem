@@ -30,6 +30,11 @@ TITLE = "m019_limb"
 DESCRIPTION = "m020_limbDesc"
 ICON = "/Icons/dp_limb.png"
 
+# declaring member variables
+ARM = "Arm"
+LEG = "Leg"
+
+
 class Limb(Base.StartClass, Layout.LayoutClass):
     def __init__(self,  *args, **kwargs):
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -312,7 +317,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             except:
                 hideJoints = 1
             # declaring lists to send information for integration:
-            self.ikExtremCtrlList, self.ikExtremCtrlZeroList, self.ikPoleVectorCtrlZeroList, self.ikHandleToRFGrpList, self.ikHandlePointConstList, self.ikFkBlendGrpToRevFootList, self.worldRefList, self.worldRefShapeList, self.extremJntList, self.parentConstToRFOffsetList, self.fixIkSpringSolverGrpList, self.quadFrontLegList, self.integrateOrigFromList, self.ikStretchExtremLocList, self.ikFkNetworkList = [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
+            self.ikExtremCtrlList, self.ikExtremCtrlZeroList, self.ikPoleVectorCtrlZeroList, self.ikHandleToRFGrpList, self.ikHandlePointConstList, self.ikFkBlendGrpToRevFootList, self.worldRefList, self.worldRefShapeList, self.extremJntList, self.parentConstToRFOffsetList, self.fixIkSpringSolverGrpList, self.quadFrontLegList, self.integrateOrigFromList, self.ikStretchExtremLocList, self.ikFkNetworkList, self.afkIsolateConst = [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -351,10 +356,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 enumType = cmds.getAttr(self.moduleGrp+'.type')
                 if enumType == 0:
                     self.limbType = self.langDic[self.langName]['m028_arm']
-                    limbTypeName = "arm"
+                    limbTypeName = ARM
                 elif enumType == 1:
                     self.limbType = self.langDic[self.langName]['m030_leg']
-                    limbTypeName = "leg"
+                    limbTypeName = LEG
                 # getting style of the limb:
                 enumStyle = cmds.getAttr(self.moduleGrp+'.style')
                 if enumStyle == 0:
@@ -375,11 +380,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint   = side+self.userGuideName+"_Guide_JointEnd"
                 
                 # getting names from dic:
-                beforeName  = self.langDic[self.langName]['c_'+limbTypeName+'_before']
-                mainName    = self.langDic[self.langName]['c_'+limbTypeName+'_main']
-                cornerName  = self.langDic[self.langName]['c_'+limbTypeName+'_corner']
-                cornerBName = self.langDic[self.langName]['c_'+limbTypeName+'_cornerB']
-                extremName  = self.langDic[self.langName]['c_'+limbTypeName+'_extrem']
+                beforeName  = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_before']
+                mainName    = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_main']
+                cornerName  = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_corner']
+                cornerBName = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_cornerB']
+                extremName  = self.langDic[self.langName]['c_'+limbTypeName.lower()+'_extrem']
 
                 # mount cvLocList and jNameList:
                 if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
@@ -424,15 +429,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     #Setup axis order
                     if jName == beforeName: #Clavicle and hip
                         cmds.setAttr(fkCtrl + ".rotateOrder", 3)
-                    elif jName == extremName and limbTypeName == "leg": #Hand
+                    elif jName == extremName and limbTypeName == LEG: #Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
-                    elif jName == extremName and limbTypeName == "arm": #Hand
+                    elif jName == extremName and limbTypeName == ARM: #Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 1)
                     elif jName == mainName: #Leg and Shoulder
                         cmds.setAttr(fkCtrl + ".rotateOrder", 1)
-                    elif limbTypeName == "leg": #Other legs ctrl
+                    elif limbTypeName == LEG: #Other legs ctrl
                         cmds.setAttr(fkCtrl + ".rotateOrder", 2)
-                    elif limbTypeName == "arm": #Other arm ctrl
+                    elif limbTypeName == ARM: #Other arm ctrl
                         cmds.setAttr(fkCtrl + ".rotateOrder", 5)
                     else:
                         #Let the default axis order for other ctrl (Should not happen)
@@ -510,11 +515,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PointConstraint")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.worldRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_ParentConstraint")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.langDic[self.langName]['c_Follow'], fkIsolateParentConst+"."+self.shoulderNullGrp+"W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.langDic[self.langName]['c_Follow'], self.fkIsolateRevNode+".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.worldRef+"W1", force=True)
+                self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
                 self.ikFkRevList = []
@@ -808,7 +814,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.stretchCondOp2+'.outColorR', self.stretchCondOp1+'.colorIfFalseR', force=True)
                 cmds.connectAttr(self.stretchCondOp0+".outColorR", self.stretchCond+'.operation', force=True)
                 
-                for j in range(1, 4):
+                for j in range(1, 3):
                     cmds.connectAttr(self.stretchCond+'.outColorR', self.skinJointList[j]+'.scaleZ', force=True)
                     cmds.connectAttr(self.stretchCond+'.outColorR', self.ikJointList[j]+'.scaleZ', force=True)
                 
@@ -869,19 +875,21 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetX", attributeType='long', keyable=False)
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetY", attributeType='long', keyable=False)
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetZ", attributeType='long', keyable=False)
-                
+
+
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options are valides for Biped, Quadruped and Quadruped Spring legs
-                    if self.mirrorAxis != 'off':
-                        if s == 1: # mirrored guide
-                            if self.limbType == self.langDic[self.langName]['m030_leg']:
-                                for axis in self.mirrorAxis:
-                                    if axis == "X":
-                                        # must fix offset of the parentConstrain in the future when this will be integrated
-                                        cmds.setAttr(parentConstToRFOffset+".mustCorrectOffset", 1)
-                                        cmds.setAttr(parentConstToRFOffset+".fixOffsetX", 90)
-                                        cmds.setAttr(parentConstToRFOffset+".fixOffsetY", 180)
-                                        cmds.setAttr(parentConstToRFOffset+".fixOffsetZ", -90)
+                    if (int(cmds.about(version=True)) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
+                        if self.mirrorAxis != 'off':
+                            if s == 1: # mirrored guide
+                                if self.limbType == self.langDic[self.langName]['m030_leg']:
+                                    for axis in self.mirrorAxis:
+                                        if axis == "X":
+                                            # must fix offset of the parentConstrain in the future when this will be integrated
+                                            cmds.setAttr(parentConstToRFOffset+".mustCorrectOffset", 1)
+                                            cmds.setAttr(parentConstToRFOffset+".fixOffsetX", 90)
+                                            cmds.setAttr(parentConstToRFOffset+".fixOffsetY", 180)
+                                            cmds.setAttr(parentConstToRFOffset+".fixOffsetZ", -90)
                     
                     if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                         # fix the group for the ikSpringSolver to avoid Maya bug about rotation from masterCtrl :P
@@ -1096,5 +1104,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                                 "ikStretchExtremLoc"        : self.ikStretchExtremLocList,
                                                 "ikFkNetworkList"           : self.ikFkNetworkList,
                                                 "limbManualVolume"          : "limbManualVolume",
+                                                "fkIsolateConst"            : self.afkIsolateConst,
                                                 }
                                     }

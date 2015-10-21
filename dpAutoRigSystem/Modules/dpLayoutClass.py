@@ -106,10 +106,10 @@ class LayoutClass:
                 # edit label of frame layout:
                 cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_selectedModule']+" :  "+self.langDic[self.langName][self.title]+" - "+self.userGuideName)
                 # edit button with "S" letter indicating it is selected:
-                cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 0.7, 0.4))
+                cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                 cmds.columnLayout("selectedColumn", adjustableColumn=True, parent="selectedModuleLayout")
                 # re-create segment layout:
-                self.segDelColumn = cmds.rowLayout(numberOfColumns=3, columnWidth3=(100, 132, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 10)], parent="selectedColumn" )
+                self.segDelColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
                 self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
                 self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
                 if self.nJointsAttrExists:
@@ -125,6 +125,7 @@ class LayoutClass:
                     cmds.text(" ", parent=self.segDelColumn)
                 # create Delete button:
                 self.deleteButton = cmds.button(label=self.langDic[self.langName]['m005_delete'], command=self.deleteModule, backgroundColor=(1.0, 0.7, 0.7), parent=self.segDelColumn)
+                self.duplicateButton = cmds.button(label=self.langDic[self.langName]['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.langDic[self.langName]['i068_CtrlD'], parent=self.segDelColumn)
                 
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
