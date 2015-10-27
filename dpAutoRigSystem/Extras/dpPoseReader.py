@@ -4,8 +4,12 @@ try:
     reload(poseReaderUI)
     import shiboken
     from maya import OpenMayaUI
-    from sstk.libs.libQt import QtCore, QtGui
-    from sstk.libs import libSerialization
+    try:
+        from sstk.libs.libQt import QtCore, QtGui
+        from sstk.libs import libSerialization
+    except:
+        from PySide import QtCore, QtGui
+        from ..Modules.Library import libSerialization
     from functools import partial
     import maya.cmds as cmds
 except Exception as e:
