@@ -1,15 +1,15 @@
 try:
     import pymel.core as pymel
-    from Ui import PoseReader as poseReaderUI
-    reload(poseReaderUI)
-    import shiboken
-    from maya import OpenMayaUI
     try:
         from sstk.libs.libQt import QtCore, QtGui
         from sstk.libs import libSerialization
     except:
         from PySide import QtCore, QtGui
         from ..Modules.Library import libSerialization
+    from Ui import PoseReader as poseReaderUI
+    reload(poseReaderUI)
+    import shiboken
+    from maya import OpenMayaUI
     from functools import partial
     import maya.cmds as cmds
 except Exception as e:
