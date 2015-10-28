@@ -1035,7 +1035,12 @@ class DP_AutoRig_UI:
         pymel.parent(self.optionCtrlGrp, self.rootCtrl)
         pymel.parent(self.ctrlsVisGrp, self.rootCtrl)
 
-        pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
+        '''
+        Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
+        Release node MAYA-45759 http://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
+        '''
+        if (int(cmds.about(version=True)) < 2016):
+            pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
         # set lock and hide attributes (cmds function):
         ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
         ctrls.setLockHide([self.rootCtrl.__melobject__(), self.globalCtrl.__melobject__()], ['sx', 'sy', 'sz', 'v'])
@@ -1388,11 +1393,11 @@ class DP_AutoRig_UI:
 
                                     def setupFollowSpine(mainParent):
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
-                                        targetList = cmds.parentConstraint("R_Leg_Leg_Fk_Ctrl_Zero_ParentConstraint", q=True, tl=True)
-                                        weightList = cmds.parentConstraint("R_Leg_Leg_Fk_Ctrl_Zero_ParentConstraint", q=True, wal=True)
+                                        targetList = cmds.parentConstraint(limbIsolateFkConst, q=True, tl=True)
+                                        weightList = cmds.parentConstraint(limbIsolateFkConst, q=True, wal=True)
                                         #Need to sort the list to ensure that the resulat are in the same
                                         #order in Maya 2014 and Maya 2016...
-                                        tempList = cmds.listConnections("R_Leg_Leg_Fk_Ctrl_Zero_ParentConstraint" + "." + weightList[1])
+                                        tempList = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])
                                         tempList.sort()
                                         revNode = tempList[0]
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
