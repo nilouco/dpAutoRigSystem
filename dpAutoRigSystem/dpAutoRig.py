@@ -1433,13 +1433,13 @@ class DP_AutoRig_UI:
 
                                     elif fatherGuideLoc == "JointLoc1":
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
-                                        cmds.parent(ikCtrlZero, hipsA, absolute=True)
+                                        cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
                                         setupFollowSpine(hipsA)
 
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
-                                        cmds.parent(ikCtrlZero, chestA, absolute=True)
+                                        cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
                                         setupFollowSpine(chestA)
 

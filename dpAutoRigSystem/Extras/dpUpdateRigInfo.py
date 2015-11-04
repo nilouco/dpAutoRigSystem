@@ -30,7 +30,10 @@ class UpdateRigInfo():
         masterCtrlAttr = "masterCtrl"
         allList = cmds.ls(selection=False)
         for nodeItem in allList:
-            if cmds.objExists(nodeItem+"."+masterCtrlAttr) and cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "bool" and cmds.getAttr(nodeItem+"."+masterCtrlAttr) == 1:
+            if cmds.objExists(nodeItem+"."+masterCtrlAttr) and \
+                (cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "bool" or \
+                cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "long") and \
+                cmds.getAttr(nodeItem+"."+masterCtrlAttr) == 1:
                 masterCtrl = nodeItem
         if masterCtrl:
             ctrlList = cmds.ls("*_Ctrl")
