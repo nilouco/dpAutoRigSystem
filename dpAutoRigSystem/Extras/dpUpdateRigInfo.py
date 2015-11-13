@@ -2,6 +2,17 @@
 import maya.cmds as cmds
 import maya.mel as mel
 
+try:
+    import pymel.core as pymel
+    try:
+        import sstk.maya.animation.sqBindPose as sqBindPose
+        reload(sqBindPose)
+    except:
+        pass
+except Exception as e:
+    print "Error: importing python modules!!!\n",
+    print e
+
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
 TITLE = "m057_updateRigInfo"
@@ -30,13 +41,20 @@ class UpdateRigInfo():
         masterCtrlAttr = "masterCtrl"
         allList = cmds.ls(selection=False)
         for nodeItem in allList:
-            if cmds.objExists(nodeItem+"."+masterCtrlAttr) and cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "bool" and cmds.getAttr(nodeItem+"."+masterCtrlAttr) == 1:
+            if cmds.objExists(nodeItem+"."+masterCtrlAttr) and \
+                (cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "bool" or \
+                cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "long") and \
+                cmds.getAttr(nodeItem+"."+masterCtrlAttr) == 1:
                 masterCtrl = nodeItem
         if masterCtrl:
             ctrlList = cmds.ls("*_Ctrl")
             ctrlString = ""
             if ctrlList:
                 for i, item in enumerate(ctrlList):
+                    if (sqBindPose):
+                        nCurNode = pymel.PyNode(item)
+                        if sqBindPose.is_pose_outdated(nCurNode):
+                            sqBindPose.store_pose(pymel.PyNode(item))
                     ctrlString = ctrlString + str(item)
                     if i < len(ctrlList):
                         ctrlString = ctrlString + ";"

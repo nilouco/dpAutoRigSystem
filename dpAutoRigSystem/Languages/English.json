@@ -156,6 +156,8 @@
     "m068_poseReader"    : "Pose Reader",
     "m069_poseReaderDesc": "Create all the nodes needed for a Pose System.\nFirst choose the node we want to extract the rotation.\nSecond, choose the node from which we will extract the rotation so that we get the rotation of the first node from the second one",
     "m070_duplicate"     : "Duplicate",
+    "m071_SpaceSwitcher" : "Space Switcher",
+    "m072_SpaceSwitcherDesc" : "The first selected node will be the parent of the last selection. To correctly manage switch, use the tool itself",
 
     "c_arm_before"      : "Clavicle",
     "c_arm_main"        : "Shoulder",

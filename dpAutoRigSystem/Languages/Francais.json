@@ -156,6 +156,8 @@
     "m068_poseReader"    : "Lecteur de Pose",
     "m069_poseReaderDesc": "Crée tous les noeuds nécessaire au système de lecteur de pose.\n Selectionné en premier le noeuds à partir duquel vous voulez extraire la rotation\nSelectionné en deuxième le noeud par rapport auquel on va extraire la rotation de manière a ce qu'on extracte la rotation du premier à partir du deuxième",
     "m070_duplicate"     : "Dupliquer",
+    "m071_SpaceSwitcher" : "Changeur d'espace",
+    "m072_SpaceSwitcherDesc" : "Les premiers éléments sélectionné seront utilisés comme parent au dernier objet selection. Pour faire le changement de parent, utilisez l'outil pour une meilleure efficacité",
     
     "c_arm_before"      : "Clavicule",
     "c_arm_main"        : "Epaule",

@@ -156,6 +156,8 @@
     "m068_poseReader"    : "Leitor de Pose",
     "m069_poseReaderDesc": "Criar todos os nodes necessários para um Sistema de Pose. \nPrimeiro escolha o node que queremos extrair a rotação.\nSegundo, escolha o node do qual vamos extrair a rotação, para que cheguemos a rotação do primeiro node a partir do segundo.",
     "m070_duplicate"     : "Duplicar",
+    "m071_SpaceSwitcher" : "Mudar Espaço",
+    "m072_SpaceSwitcherDesc" : "O primeiro nó selecionado será o pai da última seleção. Para gerenciar corretamente detector, utilize a ferramenta em si",
     
     "c_arm_before"      : "Clavicula",
     "c_arm_main"        : "Ombro",
