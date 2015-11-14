@@ -4,9 +4,11 @@ import maya.mel as mel
 
 try:
     import pymel.core as pymel
+    loadedSqBindPose = False
     try:
         import sstk.maya.animation.sqBindPose as sqBindPose
         reload(sqBindPose)
+        loadedSqBindPose = True
     except:
         pass
 except Exception as e:
@@ -51,7 +53,7 @@ class UpdateRigInfo():
             ctrlString = ""
             if ctrlList:
                 for i, item in enumerate(ctrlList):
-                    if (sqBindPose):
+                    if (loadedSqBindPose):
                         nCurNode = pymel.PyNode(item)
                         if sqBindPose.is_pose_outdated(nCurNode):
                             sqBindPose.store_pose(pymel.PyNode(item))

@@ -879,7 +879,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options are valides for Biped, Quadruped and Quadruped Spring legs
-                    if (int(cmds.about(version=True)) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
+                    if (int(cmds.about(version=True)[:4]) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
                         if self.mirrorAxis != 'off':
                             if s == 1: # mirrored guide
                                 if self.limbType == self.langDic[self.langName]['m030_leg']:

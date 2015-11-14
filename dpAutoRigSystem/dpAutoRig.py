@@ -1039,7 +1039,7 @@ class DP_AutoRig_UI:
         Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
         Release node MAYA-45759 http://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
         '''
-        if (int(cmds.about(version=True)) < 2016):
+        if (int(cmds.about(version=True)[:4]) < 2016):
             pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
         # set lock and hide attributes (cmds function):
         ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
@@ -1303,7 +1303,7 @@ class DP_AutoRig_UI:
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
-                                    if (int(cmds.about(version=True)) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
+                                    if (int(cmds.about(version=True)[:4]) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
                                         # organize to avoid offset error in the parentConstraint with negative scale:
                                         if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
                                             for f in range(1,3):
