@@ -36,11 +36,14 @@ class SpaceSwitcherLogic(object):
     WORLD_NODE_NAME = "dp_sp_worldNode"
 
     def __init__(self):
-        self.aDrivers = {}
+        self.aDrivers = []
+        self.aDriversSubName = []
         self.nDriven = None
         self.nSwConst = None #SpaceSwitch constraint for the system
         self.nSwConstRecept = None #Space Switch receiver
-        self.nSwOff = None #Space Switch offset
+        self.pNetwork = None
+
+        #TODO - Find a better way to constraint the world...
         tempWorld = pymel.ls(self.WORLD_NODE_NAME)
         if tempWorld:
             self.worldNode = tempWorld[0]
@@ -48,6 +51,9 @@ class SpaceSwitcherLogic(object):
             self.worldNode = None
 
     def setup_space_switch(self, nDriven=None, aDrivers=None, bCreateWolrdNode=False, bCreateParent=True):
+            """
+            Setup a new space switch system on the node
+            """
             aCurSel = pymel.selected()
             if aDrivers == None:
                 aParent = aCurSel[0:-1]
@@ -62,6 +68,7 @@ class SpaceSwitcherLogic(object):
 
             if (self.worldNode):
                 self.aDrivers.append(self.worldNode)
+                self.aDriversSubName.append("World")
 
             if (not nDriven):
                 if (len(aCurSel) == 0):
@@ -94,6 +101,7 @@ class SpaceSwitcherLogic(object):
                 else:
                     self.nSwConst = pymel.parentConstraint(aParent[0], self.nSwConstRecept, n=self.nDriven.name() + "_SpaceSwitch_Const", mo=True)
                     self.aDrivers.append(aParent[0])
+                    self.aDriversSubName.append(aParent[0].name())
                     aParent = aParent[1:]
 
                 self.nSwConst.getWeightAliasList()[0].set(0.0)
@@ -105,21 +113,29 @@ class SpaceSwitcherLogic(object):
                 pymel.setKeyframe(self.nSwConst.restTranslate, t=0, ott="step")
                 pymel.setKeyframe(self.nSwConst.restRotate, t=0, ott="step")
 
-                self.add_target(aParent)
+                self.add_target(aParent, firstSetup=True)
+
+                pymel.select(nDriven)
+
+    def isParentExist(self, aNewParentList):
+        aExistTgt = self.nSwConst.getTargetList()
+
+        for nParent in aNewParentList:
+            if nParent in aExistTgt:
+                return True
+
+        return False
 
     def add_target(self, aNewParent, firstSetup=False):
+        """
+        Add a new target to the space switch system
+        """
         iNbTgt = len(self.nSwConst.getWeightAliasList())
         aExistTgt = self.nSwConst.getTargetList()
-        bContinue = True
 
-        if aExistTgt:
-            for nTgt in aExistTgt:
-                if (nTgt in aNewParent) and bContinue:
-                    pymel.informBox("Space Switcher", "Cannot add target " + nTgt.name() + " because it is already added to the list of parent")
-                    bContinue = False
-
-        if bContinue:
-            for nParent in aNewParent:
+        for nParent in aNewParent:
+            #Ensure that the parent doesn't already exist in the drivers list
+            if not nParent in aExistTgt:
                 #First, calculate the offset between the parent and the driven node
                 vTrans = self._get_tm_offset(nParent, type="t")
                 vRot = self._get_tm_offset(nParent, type="r")
@@ -149,24 +165,29 @@ class SpaceSwitcherLogic(object):
                 self.nSwConst.target[iNbTgt].targetOffsetRotate.targetOffsetRotateY.set(vRot[1])
                 self.nSwConst.target[iNbTgt].targetOffsetRotate.targetOffsetRotateZ.set(vRot[2])
 
-                #Need to be setted with cmds, because pymel give strange error
-                """
-                cmds.setAttr("%s.target[%s].targetOffsetTranslateX"%(self.nSwConst.__melobject__(), iNbTgt), vTrans[0])
-                cmds.setAttr("%s.target[%s].targetOffsetTranslateY"%(self.nSwConst.__melobject__(), iNbTgt), vTrans[1])
-                cmds.setAttr("%s.target[%s].targetOffsetTranslateZ"%(self.nSwConst.__melobject__(), iNbTgt), vTrans[2])
-                cmds.setAttr("%s.target[%s].targetOffsetRotateX"%(self.nSwConst.__melobject__(), iNbTgt), vRot[0])
-                cmds.setAttr("%s.target[%s].targetOffsetRotateY"%(self.nSwConst.__melobject__(), iNbTgt), vRot[1])
-                cmds.setAttr("%s.target[%s].targetOffsetRotateZ"%(self.nSwConst.__melobject__(), iNbTgt), vRot[2])
-                """
-
                 pymel.setKeyframe(nConstTgtWeight, t=0, ott="step")
                 pymel.setKeyframe(self.nSwConst.target[iNbTgt].targetOffsetTranslate, t=0, ott="step")
                 pymel.setKeyframe(self.nSwConst.target[iNbTgt].targetOffsetRotate, t=0, ott="step")
                 self.aDrivers.append(nParent)
+                self.aDriversSubName.append(nParent.name())
                 iNbTgt += 1
+            else:
+                print("Warning: " + nParent.name() + " is already a driver for " + self.nDriven)
 
+    def remove_target(self, iIdx):
+        aExistTgt = self.nSwConst.getTargetList()
+        iNbTgt = len(aExistTgt)
+
+        if (iNbTgt > iIdx):
+            pTgt = aExistTgt[iIdx]
+            pymel.parentConstraint(pTgt, self.nSwConstRecept, e=True, rm=True)
+            self.aDrivers.pop(iIdx)
+            self.aDriversSubName.pop(iIdx)
 
     def _get_tm_offset(self, nParent, type="t"):
+        """
+        Get the offset between the driven and a driver node
+        """
         mStart = om.MMatrix()
         mEnd =  om.MMatrix()
 
@@ -188,6 +209,10 @@ class SpaceSwitcherLogic(object):
 
 
     def do_switch(self, iIdx):
+        """
+        Switch the driver which will constraint the driven. Ensure that the switch is done without any snap
+        of the driven object
+        """
         fCurTime = pymel.currentTime()
         #Just try to update the offset of the parent constraint before the switch
         iActiveWeight = -1
@@ -197,6 +222,7 @@ class SpaceSwitcherLogic(object):
         for i, fValue in enumerate(aWeight):
             if fValue == 1.0:
                 iActiveWeight = i
+
         if (iIdx == -1): #Special case to deactivate all constraint and let the parent work correctly
             #Update the rest pose with the current offset and key it to prevent the parent change too move
             self.nSwConst.restRotate.set(self.nSwConst.constraintRotate.get())
@@ -208,7 +234,6 @@ class SpaceSwitcherLogic(object):
             pymel.setKeyframe(aWeight, t=fCurTime, ott="step")
         elif (len(aWeight) > iIdx):
             if (iActiveWeight != iIdx):
-                iActiveWeight = iIdx
                 #Update constraint offset of the next index in the constraint
                 pymel.parentConstraint(self.aDrivers[iIdx], self.nSwConst, mo=True, e=True)
                 #Key the offset to prevent offset problem when coming back to the same parent
@@ -228,6 +253,9 @@ class SpaceSwitcherLogic(object):
 
 # src: http://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2015/ENU/Maya-SDK/files/GUID-3F96AF53-A47E-4351-A86A-396E7BFD6665-htm.html
 def getMayaWindow():
+    """
+    Return the pointer to maya window
+    """
     OpenMayaUI.MQtUtil.mainWindow()
     ptr = OpenMayaUI.MQtUtil.mainWindow()
     return shiboken.wrapInstance(long(ptr), QtGui.QWidget)
@@ -242,127 +270,251 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         #Setup the base list of parent
         self.createModel = QtGui.QStandardItemModel(self.ui.lstParent)
         self.parentItem = QtGui.QStandardItem("Original Parent")
+        self.parentItem.setCheckable(False)
+        self.parentItem.setEditable(False)
         self.createModel.appendRow(self.parentItem)
         self.ui.lstParent.setModel(self.createModel)
-        self.createModel.item(0).setEnabled(False)
 
-
-        self.ui.btnAdd.setEnabled(False)
         self.ui.btnAction.setEnabled(False)
         self.ui.btnAction.setText("Select a Node")
-        self.ui.btnRemove.setEnabled(False)
         self.ui.lstParent.setEnabled(False)
 
         #Intern variable
         self.iJobNum = 0
-        self.action = "#create" #Can be #create or #switch
-        self.nDriven = None
-        self.aDrivers = []
+        self.action = "#create" #Can be #create, #switch, #add
+        self.nSelDriven = None
+        self.aSelDrivers = []
+        self.pSelSpSys = None
+        self.toRemove = []
         self.aSceneSpaceSwitch = []
 
         self.colorTemplate = "<font color={0}>{1}</font>"
 
-        self.setupCallbacks()
+        self._setupCallbacks()
 
         #Force the tool to check the selection on it's opening
-        self._selectionChange()
         self._fetch_system_from_scene()
+        self._selectionChange()
 
-    def setupCallbacks(self):
-        self.ui.btnHelpParent.pressed.connect(self.action_show_parent_help)
-        self.ui.btnAdd.pressed.connect(self.action_add_parent)
-        self.ui.btnRemove.pressed.connect(self.action_remove_parent)
-        self.ui.btnAction.pressed.connect(self.action_execute)
+    def _setupCallbacks(self):
+        """
+        Setup the  button callback and also a callback in maya to know when a selection is changed
+        """
+        self.ui.btnHelpParent.pressed.connect(self._action_show_parent_help)
+        self.ui.btnAction.pressed.connect(self._action_execute)
+        self.ui.lstParent.clicked.connect(self._action_lstChanged)
 
         self.iJobNum = pymel.scriptJob(event=('SelectionChanged', self._selectionChange),
                                        killWithScene=True, compressUndo=False)
 
     def _fetch_system_from_scene(self):
+        """
+        Get all SpaceSwitch system in the scene
+        """
         lstNetworkNode = libSerialization.getNetworksByClass(SpaceSwitcherLogic.__name__)
         for pNet in lstNetworkNode:
             pData = libSerialization.import_network(pNet)
             self.aSceneSpaceSwitch.append(pData)
 
     def _selectionChange(self, *args):
+        """
+        Manage the selection change to know which action the user want to do. The remove action
+        need to be implemented another way
+        """
         aCurSel = pymel.selected()
 
         if (len(aCurSel) == 0):
-            self.nDriven = None
-            self.aDrivers = []
+            self.nSelDriven = None
+            self.aSelDrivers = []
         elif (len(aCurSel) == 1):
-            self.nDriven = aCurSel[0]
-            self.aDrivers = []
+            self.nSelDriven = aCurSel[0]
+            self.aSelDrivers = []
         else:
-            self.nDriven = aCurSel[-1]
-            self.aDrivers = aCurSel[0:-1]
+            self.nSelDriven = aCurSel[-1]
+            self.aSelDrivers = aCurSel[0:-1]
 
-        self.ui.lblStatus.setText("Driven Node --> " + str(self.nDriven) + "")
+        self.ui.lblStatus.setText("Driven Node --> " + str(self.nSelDriven) + "")
 
-        if (self.nDriven != None):
-            self.action = "#create"
-            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("yellow", "(First Setup)"))
-            self.ui.btnAction.setEnabled(True)
-            self.ui.btnAction.setText("Setup Space Switch System for [" + self.nDriven.name() + "]")
+        if (self.nSelDriven != None):
+            if pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
+                self.ui.chkUseParent.setEnabled(False)
+            else:
+                self.ui.chkUseParent.setEnabled(True)
+            #Look for existing space switcher system
+            self.pSelSpSys = None
+            for pSp in self.aSceneSpaceSwitch:
+                if (pSp.nDriven == self.nSelDriven):
+                    self.pSelSpSys = pSp
+                    break;
+            self._update_parentList(self.pSelSpSys)
+            if self.pSelSpSys == None:
+                self.action = "#create"
+                self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("yellow", "(First Setup)"))
+                self.ui.btnAction.setEnabled(True)
+                self.ui.btnAction.setText("Setup Space Switch System for [" + self.nSelDriven.name() + "]")
+            else:
+                if (self.aSelDrivers):
+                    self.action = "#add"
+                    self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("green", "(Add Parent)"))
+                    if not self.pSelSpSys.isParentExist(self.aSelDrivers):
+                        self.ui.btnAction.setEnabled(True)
+                        sParentList = "("
+                        for pParent in self.aSelDrivers:
+                            sParentList += "[" + pParent.name() + "]"
+                        sParentList += ")"
+                        self.ui.btnAction.setText("Add " + sParentList +" as new parent")
+                    else:
+                        self.ui.btnAction.setEnabled(False)
+                        self.ui.btnAction.setText("Remove the node that is already a Driver node of the current system")
+                else:
+                    #If a parent is selected in the list, active the button to do the switch
+                    pSel = self.ui.lstParent.selectedIndexes()
+                    self.action = "#switch"
+                    self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("green", "(Switch Parent)"))
+                    self.ui.btnAction.setEnabled(False)
+                    self.ui.btnAction.setText("Select a parent in the list to switch the parent")
+                    if (pSel):
+                        pSel = pSel[0]
+                        self.ui.btnAction.setEnabled(True)
+                        self.ui.btnAction.setText("Switch " + self.nSelDriven.name() + " to follow -->" + pSel.data())
         else:
             self.ui.btnAction.setEnabled(False)
+            self.ui.chkUseParent.setEnabled(True)
             self.ui.btnAction.setText("Choose a node")
+            self._update_parentList(None)
 
     def closeEvent(self, *args, **kwargs):
-        pymel.scriptJob(kill=self.iJobNum, force=True)
+        """
+        Try to kill the script job when the window is closed
+        """
+        try:
+            pymel.scriptJob(kill=self.iJobNum, force=True)
+        except:
+            pass
 
-    def action_show_parent_help(self):
+    def _action_show_parent_help(self):
+        """
+        Show a small help window about the use direct parent option
+        """
         sHelpMsg = "If checked, the direct parent of the driven node will be" \
                    " use as the recept of the parent constraint. Else, a new parent will be created. \n" \
                    "WARNING : New parent cannot be used on referenced node"
         pymel.informBox("Space Switcher", sHelpMsg)
 
-    def action_add_parent(self):
-        aSel = pymel.selected()
-        aToAdd = []
-        bCanAdd = True
+    def _update_parentList(self, pSpData):
+        """
+        Update the parent list after some operation
+        """
+        if (pSpData):
+            self.ui.lstParent.setEnabled(True)
+            self.createModel.clear()
+            self.createModel.appendRow(self.parentItem)
+            for iIdx, nParentInfo in enumerate(pSpData.aDrivers):
+                newParentItem = QtGui.QStandardItem(pSpData.aDriversSubName[iIdx])
+                newParentItem.setEditable(False)
+                newParentItem.setCheckable(True)
+                self.createModel.appendRow(newParentItem)
+        else:
+            self.ui.lstParent.setEnabled(False)
+            self.createModel.clear()
+            self.createModel.appendRow(self.parentItem)
 
-        for pNode in aSel:
-            sNodeName = pNode.name()
-            if sNodeName != self.ui.edtDriven.text():
-                bAlreadyExist = False
-                for i in range(0, self.createModel.rowCount()):
-                    if (self.createModel.item(i).text() == sNodeName):
-                        bAlreadyExist = True
-                        break;
-                if (not bAlreadyExist):
-                    pNewItem = QtGui.QStandardItem(sNodeName)
-                    aToAdd.append(pNewItem)
-            else:
-                pymel.informBox("Space Switcher", "You cannot add the driven node as it's own parent")
-                bCanAdd = False
-                break
-
-        if (bCanAdd):
-            for pItem in aToAdd:
-                self.createModel.appendRow(pItem)
-
-        self._can_create()
-
-    def action_remove_parent(self):
-        aSelIdx = self.ui.lstNewParent.selectionModel().selectedIndexes()
-
-        for pModelIdx in aSelIdx:
-            iIdx = pModelIdx.row()
-            self.createModel.removeRow(iIdx)
-
-        self._can_create()
-
-    def action_execute(self):
+    def _action_execute(self):
+        """
+        Manage the different action that can happen on the tool. Will change depending on the selection
+        """
         if (self.action == "#create"):
-            bCreateParent = not self.ui.chkUseParent.isChecked()
+
+            if pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
+                bCreateParent = False
+            else:
+                bCreateParent = not self.ui.chkUseParent.isChecked()
             pNewSp = SpaceSwitcherLogic()
             with pymel.UndoChunk():
-                if self.aDrivers:
-                    pNewSp.setup_space_switch(self.nDriven, self.aDrivers, bCreateWolrdNode=False, bCreateParent=bCreateParent)
+                if self.aSelDrivers:
+                    pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=False, bCreateParent=bCreateParent)
                 else: #There is no drivers, so the user want the world to be one of them
-                    pNewSp.setup_space_switch(self.nDriven, self.aDrivers, bCreateWolrdNode=True, bCreateParent=bCreateParent)
+                    pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=True, bCreateParent=bCreateParent)
+            self._update_parentList(pNewSp)
+            pNewSp.pNetwork = libSerialization.export_network(pNewSp)
+            self.aSceneSpaceSwitch.append(pNewSp)
+            pymel.select(self.nSelDriven)
 
-            #libSerialization.export_network(pNewSp)
+        elif (self.action == "#add"):
+            self.pSelSpSys.add_target(self.aSelDrivers)
+            self._update_parentList(self.pSelSpSys)
+            #Delete the old network before updating a new one
+            if (self.pSelSpSys.pNetwork):
+                pymel.delete(self.pSelSpSys.pNetwork)
+                self.pSelSpSys.pNetwork = None
+            self.pSelSpSys.pNetwork = libSerialization.export_network(self.pSelSpSys)
+            pymel.select(self.nSelDriven)
+
+        elif (self.action == "#switch"):
+            pCurParent = self.ui.lstParent.selectedIndexes()[0]
+            #Remove one to the index since the original parent doesn't really exist in the list of parent in the system
+            self.pSelSpSys.do_switch(pCurParent.row() - 1)
+
+        elif (self.action == "#remove"):
+            for iIdx in self.toRemove:
+                self.pSelSpSys.remove_target(iIdx - 1)
+
+            #Check if it worth it to keep the system, if not, delete the network and parent constraint
+            if not self.pSelSpSys.aDrivers:
+                self.aSceneSpaceSwitch.remove(self.pSelSpSys)
+                if (self.pSelSpSys.nSwConst):
+                    pymel.delete(self.pSelSpSys.nSwConst)
+                if (self.pSelSpSys.pNetwork):
+                    pymel.delete(self.pSelSpSys.pNetwork)
+
+                #Return to the create state action since the node is still selected, but everything is deleted
+                self.action = "#create"
+                self.ui.lblStatus.setText("Driven Node --> " + str(self.nSelDriven) + "")
+                self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("yellow", "(First Setup)"))
+                self.ui.btnAction.setEnabled(True)
+                self.ui.btnAction.setText("Setup Space Switch System for [" + self.nSelDriven.name() + "]")
+            else:
+                if (self.pSelSpSys.pNetwork):
+                    pymel.delete(self.pSelSpSys.pNetwork)
+                    self.pSelSpSys.pNetwork = None
+                self.pSelSpSys.pNetwork = libSerialization.export_network(self.pSelSpSys)
+                pymel.select(self.nSelDriven)
+
+            self._update_parentList(self.pSelSpSys)
+
+
+    def _action_lstChanged(self):
+        """
+        Manage the parent list selection change
+        """
+        #First look if there is any checked out item
+        self.toRemove = []
+        for iIdx in xrange(self.createModel.rowCount()):
+            pItem = self.createModel.item(iIdx)
+            if (pItem.isCheckable()):
+                if (pItem.checkState() == QtCore.Qt.Checked):
+                    self.toRemove.append(iIdx)
+
+        if (self.toRemove):
+            self.action = "#remove"
+            self.toRemove.sort(reverse=True)
+            self.ui.btnAction.setEnabled(True)
+            self.ui.btnAction.setText("Remove checked parent from the system")
+        else:
+            #Prevent a stuck status when unchecking all item
+            self.ui.btnAction.setEnabled(False)
+            self.action = "#switch"
+
+        if (self.action == "#switch"):
+            pSel = self.ui.lstParent.selectedIndexes()
+            if (pSel):
+                pSel = pSel[0]
+                self.ui.btnAction.setEnabled(True)
+                self.ui.btnAction.setText("Switch " + self.nSelDriven.name() + " to follow --> " + pSel.data())
+            else:
+                self.ui.btnAction.setText("Select a parent in the list to switch the parent")
+
+
 
 
 
