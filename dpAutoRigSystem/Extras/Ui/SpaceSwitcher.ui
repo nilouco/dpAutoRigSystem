@@ -7,21 +7,23 @@
     <x>0</x>
     <y>0</y>
     <width>380</width>
-    <height>267</height>
+    <height>274</height>
    </rect>
+  </property>
+  <property name="sizeIncrement">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::ActionsContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>Space Switcher</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QLabel" name="lblInfo">
-      <property name="text">
-       <string>Choose the Drivers and after Driven Node to constraint</string>
-      </property>
-     </widget>
-    </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -76,7 +78,6 @@
     </item>
    </layout>
    <zorder>btnAction</zorder>
-   <zorder>lblInfo</zorder>
    <zorder>lblStatus</zorder>
   </widget>
  </widget>

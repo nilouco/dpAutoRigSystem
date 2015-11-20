@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file '/home/sbourgoing/dev/dpAutoRigSystem/dpAutoRigSystem/Extras/Ui/SpaceSwitcher.ui'
 #
-# Created: Mon Nov 16 10:24:55 2015
+# Created: Tue Nov 17 09:53:43 2015
 #      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,14 +12,13 @@ from PySide import QtCore, QtGui
 class Ui_win_main(object):
     def setupUi(self, win_main):
         win_main.setObjectName("win_main")
-        win_main.resize(380, 267)
+        win_main.resize(380, 274)
+        win_main.setSizeIncrement(QtCore.QSize(0, 0))
+        win_main.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         self.centralwidget = QtGui.QWidget(win_main)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.lblInfo = QtGui.QLabel(self.centralwidget)
-        self.lblInfo.setObjectName("lblInfo")
-        self.verticalLayout.addWidget(self.lblInfo)
         self.horizontalLayout = QtGui.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.chkUseParent = QtGui.QCheckBox(self.centralwidget)
@@ -51,7 +50,6 @@ class Ui_win_main(object):
 
     def retranslateUi(self, win_main):
         win_main.setWindowTitle(QtGui.QApplication.translate("win_main", "Space Switcher", None, QtGui.QApplication.UnicodeUTF8))
-        self.lblInfo.setText(QtGui.QApplication.translate("win_main", "Choose the Drivers and after Driven Node to constraint", None, QtGui.QApplication.UnicodeUTF8))
         self.chkUseParent.setText(QtGui.QApplication.translate("win_main", "Use Direct Parent", None, QtGui.QApplication.UnicodeUTF8))
         self.btnHelpParent.setText(QtGui.QApplication.translate("win_main", "?", None, QtGui.QApplication.UnicodeUTF8))
         self.lblStatus.setText(QtGui.QApplication.translate("win_main", "Driven Node --> None", None, QtGui.QApplication.UnicodeUTF8))

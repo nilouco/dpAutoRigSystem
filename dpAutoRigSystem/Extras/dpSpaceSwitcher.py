@@ -499,7 +499,9 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             self.action = "#remove"
             self.toRemove.sort(reverse=True)
             self.ui.btnAction.setEnabled(True)
+            self.ui.lblStatus.setText("Driven Node --> " + str(self.nSelDriven) + "")
             self.ui.btnAction.setText("Remove checked parent from the system")
+            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("red", "(Remove Parent)"))
         else:
             #Prevent a stuck status when unchecking all item
             self.ui.btnAction.setEnabled(False)
