@@ -666,8 +666,16 @@ class DP_AutoRig_UI:
         # especific import command for guides storing theses guides modules in a variable:
         #guide = __import__("dpAutoRigSystem."+guideDir+"."+guideModule, {}, {}, [guideModule])
         basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
-        guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        reload(guide)
+
+        # Sandbox the module import process so a single guide cannot crash the whole Autorig.
+        # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
+        try:
+            guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+            reload(guide)
+        except Exception, e:
+            print "ERROR loading extension {0}: {1}".format(guideModule, e)
+            return
+
         # getting data from guide module:
         title = self.langDic[self.langName][guide.TITLE]
         description = self.langDic[self.langName][guide.DESCRIPTION]
