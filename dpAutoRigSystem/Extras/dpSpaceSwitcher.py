@@ -64,7 +64,9 @@ class SpaceSwitcherLogic(object):
             #Create the worldNode
             if (not self.worldNode and bCreateWolrdNode):
                 self.worldNode = pymel.createNode("transform", n="dp_sp_worldNode")
-                ctrlUtil.setLockHide([self.worldNode.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                for pAttr in self.worldNode.listAttr(keyable=True):
+                    pymel.setAttr(pAttr, keyable=False, lock=True)
+                pymel.worldNode.hiddenInOutliner = True
 
             if (self.worldNode):
                 self.aDrivers.append(self.worldNode)
@@ -102,6 +104,7 @@ class SpaceSwitcherLogic(object):
                     self.nSwConst = pymel.parentConstraint(aParent[0], self.nSwConstRecept, n=self.nDriven.name() + "_SpaceSwitch_Const", mo=True)
                     self.aDrivers.append(aParent[0])
                     self.aDriversSubName.append(aParent[0].name())
+                    #Remove the first parent setuped before
                     aParent = aParent[1:]
 
                 self.nSwConst.getWeightAliasList()[0].set(0.0)
@@ -113,11 +116,14 @@ class SpaceSwitcherLogic(object):
                 pymel.setKeyframe(self.nSwConst.restTranslate, t=0, ott="step")
                 pymel.setKeyframe(self.nSwConst.restRotate, t=0, ott="step")
 
-                self.add_target(aParent, firstSetup=True)
+                if aParent:
+                    self.add_target(aParent, firstSetup=True)
+                else: #If this is the only parent setuped, automaticly switch to it
+                    self.do_switch(0)
 
                 pymel.select(nDriven)
 
-    def isParentExist(self, aNewParentList):
+    def _is_parent_exist(self, aNewParentList):
         aExistTgt = self.nSwConst.getTargetList()
 
         for nParent in aNewParentList:
@@ -174,6 +180,10 @@ class SpaceSwitcherLogic(object):
             else:
                 print("Warning: " + nParent.name() + " is already a driver for " + self.nDriven)
 
+        #If this is the only parent, do the switch right now on the frame the user is
+        if (len(aNewParent) == 1):
+            self.do_switch(iNbTgt - 1) #Since a new target have been added, iNbTgt equal the index to switch too
+
     def remove_target(self, iIdx):
         aExistTgt = self.nSwConst.getTargetList()
         iNbTgt = len(aExistTgt)
@@ -220,7 +230,7 @@ class SpaceSwitcherLogic(object):
 
         #If none is set to 1.0, the value will be -1 which represent the current parent
         for i, fValue in enumerate(aWeight):
-            if fValue == 1.0:
+            if fValue.get() == 1.0:
                 iActiveWeight = i
 
         if (iIdx == -1): #Special case to deactivate all constraint and let the parent work correctly
@@ -239,6 +249,19 @@ class SpaceSwitcherLogic(object):
                 #Key the offset to prevent offset problem when coming back to the same parent
                 pymel.setKeyframe(self.nSwConst.target[iIdx].targetOffsetTranslate, t=fCurTime, ott="step")
                 pymel.setKeyframe(self.nSwConst.target[iIdx].targetOffsetRotate, t=fCurTime, ott="step")
+
+                if (iActiveWeight != -1):
+                    #Also update the offset of the previous parent to prevent any snap
+                    self.nSwConst.target[iActiveWeight].targetOffsetTranslate.set(self.nSwConst.constraintTranslate.get())
+                    self.nSwConst.target[iActiveWeight].targetOffsetRotate.set(self.nSwConst.constraintRotate.get())
+                    #pymel.parentConstraint(self.aDrivers[iActiveWeight], self.nSwConst, mo=True, e=True)
+                    pymel.setKeyframe(self.nSwConst.target[iActiveWeight].targetOffsetTranslate, t=fCurTime, ott="step")
+                    pymel.setKeyframe(self.nSwConst.target[iActiveWeight].targetOffsetRotate, t=fCurTime, ott="step")
+                else:
+                    self.nSwConst.restRotate.set(self.nSwConst.constraintRotate.get())
+                    self.nSwConst.restTranslate.set(self.nSwConst.constraintTranslate.get())
+                    pymel.setKeyframe(self.nSwConst.restTranslate, t=fCurTime, ott="step")
+                    pymel.setKeyframe(self.nSwConst.restRotate, t=fCurTime, ott="step")
                 for i,wAlias in enumerate(aWeight):
                     if (i == iIdx):
                         wAlias.set(1.0)
@@ -304,8 +327,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         self.ui.btnAction.pressed.connect(self._action_execute)
         self.ui.lstParent.clicked.connect(self._action_lstChanged)
 
-        self.iJobNum = pymel.scriptJob(event=('SelectionChanged', self._selectionChange),
-                                       killWithScene=True, compressUndo=False)
+        self.iJobNum = pymel.scriptJob(event=('SelectionChanged', self._selectionChange),compressUndo=False)
 
     def _fetch_system_from_scene(self):
         """
@@ -356,7 +378,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 if (self.aSelDrivers):
                     self.action = "#add"
                     self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("green", "(Add Parent)"))
-                    if not self.pSelSpSys.isParentExist(self.aSelDrivers):
+                    if not self.pSelSpSys._is_parent_exist(self.aSelDrivers):
                         self.ui.btnAction.setEnabled(True)
                         sParentList = "("
                         for pParent in self.aSelDrivers:
@@ -364,8 +386,14 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                         sParentList += ")"
                         self.ui.btnAction.setText("Add " + sParentList +" as new parent")
                     else:
-                        self.ui.btnAction.setEnabled(False)
-                        self.ui.btnAction.setText("Remove the node that is already a Driver node of the current system")
+                        if (len(self.aSelDrivers) == 1):
+                            self.action = "#switchSelect"
+                            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("green", "(Switch Parent)"))
+                            self.ui.btnAction.setEnabled(True)
+                            self.ui.btnAction.setText("Switch " + self.nSelDriven.name() + " to follow -->" + self.aSelDrivers[0].name())
+                        else:
+                            self.ui.btnAction.setEnabled(False)
+                            self.ui.btnAction.setText("Too many parent selected to switch and can't add parent because they are already in the system")
                 else:
                     #If a parent is selected in the list, active the button to do the switch
                     pSel = self.ui.lstParent.selectedIndexes()
@@ -424,7 +452,6 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         Manage the different action that can happen on the tool. Will change depending on the selection
         """
         if (self.action == "#create"):
-
             if pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
                 bCreateParent = False
             else:
@@ -454,6 +481,14 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             pCurParent = self.ui.lstParent.selectedIndexes()[0]
             #Remove one to the index since the original parent doesn't really exist in the list of parent in the system
             self.pSelSpSys.do_switch(pCurParent.row() - 1)
+
+        elif (self.action == "#switchSelect"):
+            #Find the selected parent index
+            iSwitchIdx = 0
+            for idx, nDriver in enumerate(self.pSelSpSys.aDrivers):
+                if nDriver == self.aSelDrivers[0]:
+                    iSwitchIdx = idx
+            self.pSelSpSys.do_switch(iSwitchIdx)
 
         elif (self.action == "#remove"):
             for iIdx in self.toRemove:
