@@ -158,7 +158,10 @@
     "m070_duplicate"     : "Duplicar",
     "m071_SpaceSwitcher" : "Mudar Espaço",
     "m072_SpaceSwitcherDesc" : "O primeiro nó selecionado será o pai da última seleção. Para gerenciar corretamente detector, utilize a ferramenta em si",
-    
+
+    "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
+    "extra_CopyPasteShapesDesc" : "Sauvegarde et l' restauré Apparences des controladores . ",
+
     "c_arm_before"      : "Clavicula",
     "c_arm_main"        : "Ombro",
     "c_arm_corner"      : "Cotovelo",

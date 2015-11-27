@@ -5,7 +5,7 @@
     "date"       : "2010-10-03",
     "updated"    : "2015-10-09",
     "translator" : "Danilo Pinheiro",
-    
+
     "i000_guides"         : "Create GUIDES",
     "i001_modules"        : "Edit MODULES",
     "i002_options"        : "Options",
@@ -75,7 +75,7 @@
     "i066_addAttr"        : "Add supplementary attributes",
     "i067_duplicating"    : "Duplicating a module guide.",
     "i068_CtrlD"          : "Ctrl + D",
-    
+
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
     "p003_right"      : "R",
@@ -85,7 +85,7 @@
     "p007_bottom"     : "B",
     "p008_front"      : "F",
     "p009_back"       : "B",
-    
+
     "m001_fkLine"        : "Fk Line",
     "m002_fkLineDesc"    : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
     "m003_segments"      : "Segments",
@@ -158,6 +158,9 @@
     "m070_duplicate"     : "Duplicate",
     "m071_SpaceSwitcher" : "Space Switcher",
     "m072_SpaceSwitcherDesc" : "The first selected node will be the parent of the last selection. To correctly manage switch, use the tool itself",
+
+    "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
+    "extra_CopyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",
 
     "c_arm_before"      : "Clavicle",
     "c_arm_main"        : "Shoulder",
