@@ -158,7 +158,10 @@
     "m070_duplicate"     : "Dupliquer",
     "m071_SpaceSwitcher" : "Changeur d'espace",
     "m072_SpaceSwitcherDesc" : "Les premiers éléments sélectionné seront utilisés comme parent au dernier objet selection. Pour faire le changement de parent, utilisez l'outil pour une meilleure efficacité",
-    
+
+    "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
+    "extra_CopyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",
+
     "c_arm_before"      : "Clavicule",
     "c_arm_main"        : "Epaule",
     "c_arm_corner"      : "Coude",
