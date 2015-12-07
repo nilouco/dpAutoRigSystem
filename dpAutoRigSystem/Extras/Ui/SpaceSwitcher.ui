@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>274</height>
+    <width>479</width>
+    <height>517</height>
    </rect>
   </property>
   <property name="sizeIncrement">
@@ -25,41 +25,40 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QCheckBox" name="chkUseParent">
-        <property name="text">
-         <string>Use Direct Parent</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnHelpParent">
-        <property name="maximumSize">
-         <size>
-          <width>20</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>?</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QLabel" name="lblStatus">
+     <widget class="QLabel" name="lblSetupInfo">
       <property name="text">
-       <string>Driven Node --&gt; None</string>
+       <string>&lt;b&gt;Parent Info&lt;/b&gt;</string>
       </property>
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <widget class="QLabel" name="lblStatus">
+      <property name="text">
+       <string>Current Node --&gt; None</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="btnAction">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Setup</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QListView" name="lstParent">
         <property name="modelColumn">
@@ -70,15 +69,64 @@
      </layout>
     </item>
     <item>
-     <widget class="QPushButton" name="btnAction">
+     <spacer name="spcMiddle">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Expanding</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>458</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QLabel" name="lblFrameInfo">
       <property name="text">
-       <string>Switch Driver</string>
+       <string>&lt;b&gt;Frame/Constraint Info&lt;/b&gt;</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QTableWidget" name="tblFrameInfo">
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <attribute name="horizontalHeaderVisible">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>100</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>Frame</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Parent</string>
+       </property>
+      </column>
+     </widget>
+    </item>
    </layout>
-   <zorder>btnAction</zorder>
-   <zorder>lblStatus</zorder>
   </widget>
  </widget>
  <resources/>
