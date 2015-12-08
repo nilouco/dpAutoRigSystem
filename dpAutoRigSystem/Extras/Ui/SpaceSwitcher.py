@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file '/home/sbourgoing/dev/dpAutoRigSystem/dpAutoRigSystem/Extras/Ui/SpaceSwitcher.ui'
 #
-# Created: Fri Dec  4 17:24:43 2015
-#      by: pyside-uic 0.2.14 running on PySide 1.1.1
+# Created: Tue Dec  8 16:15:58 2015
+#      by: pyside-uic 0.2.14 running on PySide 1.2.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -12,7 +12,7 @@ from PySide import QtCore, QtGui
 class Ui_win_main(object):
     def setupUi(self, win_main):
         win_main.setObjectName("win_main")
-        win_main.resize(479, 517)
+        win_main.resize(479, 568)
         win_main.setSizeIncrement(QtCore.QSize(0, 0))
         win_main.setContextMenuPolicy(QtCore.Qt.ActionsContextMenu)
         self.centralwidget = QtGui.QWidget(win_main)
@@ -61,6 +61,9 @@ class Ui_win_main(object):
         self.tblFrameInfo.horizontalHeader().setStretchLastSection(True)
         self.tblFrameInfo.verticalHeader().setVisible(False)
         self.verticalLayout.addWidget(self.tblFrameInfo)
+        self.btnUpdateAll = QtGui.QPushButton(self.centralwidget)
+        self.btnUpdateAll.setObjectName("btnUpdateAll")
+        self.verticalLayout.addWidget(self.btnUpdateAll)
         win_main.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(win_main)
@@ -75,4 +78,5 @@ class Ui_win_main(object):
         self.tblFrameInfo.setSortingEnabled(True)
         self.tblFrameInfo.horizontalHeaderItem(0).setText(QtGui.QApplication.translate("win_main", "Frame", None, QtGui.QApplication.UnicodeUTF8))
         self.tblFrameInfo.horizontalHeaderItem(1).setText(QtGui.QApplication.translate("win_main", "Parent", None, QtGui.QApplication.UnicodeUTF8))
+        self.btnUpdateAll.setText(QtGui.QApplication.translate("win_main", "Update All Constraints", None, QtGui.QApplication.UnicodeUTF8))
 
