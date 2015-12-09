@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>479</width>
-    <height>568</height>
+    <width>471</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="sizeIncrement">
@@ -25,6 +25,30 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>348</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnRefresh">
+        <property name="text">
+         <string>Refresh Tool</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QLabel" name="lblSetupInfo">
       <property name="text">
        <string>&lt;b&gt;Parent Info&lt;/b&gt;</string>
@@ -32,14 +56,48 @@
      </widget>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="lblSetupInfo_2">
+        <property name="maximumSize">
+         <size>
+          <width>115</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Selected System:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cbSysList">
+        <property name="editable">
+         <bool>false</bool>
+        </property>
+        <property name="modelColumn">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QLabel" name="lblStatus">
       <property name="text">
-       <string>Current Node --&gt; None</string>
+       <string>Current Mode --&gt; &lt;b&gt;Inactive&lt;/b&gt;</string>
       </property>
      </widget>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QListView" name="lstParent">
+        <property name="modelColumn">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QPushButton" name="btnAction">
         <property name="sizePolicy">
@@ -56,13 +114,6 @@
         </property>
         <property name="text">
          <string>Setup</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QListView" name="lstParent">
-        <property name="modelColumn">
-         <number>0</number>
         </property>
        </widget>
       </item>
@@ -96,6 +147,15 @@
     </item>
     <item>
      <widget class="QTableWidget" name="tblFrameInfo">
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="autoScroll">
+       <bool>true</bool>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideRight</enum>
+      </property>
       <property name="sortingEnabled">
        <bool>true</bool>
       </property>
@@ -105,7 +165,7 @@
       <attribute name="horizontalHeaderCascadingSectionResizes">
        <bool>true</bool>
       </attribute>
-      <attribute name="horizontalHeaderDefaultSectionSize">
+      <attribute name="horizontalHeaderMinimumSectionSize">
        <number>100</number>
       </attribute>
       <attribute name="horizontalHeaderStretchLastSection">
@@ -122,6 +182,11 @@
       <column>
        <property name="text">
         <string>Parent</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Action</string>
        </property>
       </column>
      </widget>
