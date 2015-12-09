@@ -110,7 +110,7 @@ class SpaceSwitcherLogic(object):
                     self.nSwConstRecept = pymel.createNode("transform", ss=True)
                     mDriven = self.nDriven.getMatrix(worldSpace=True)
                     self.nSwConstRecept.setMatrix(mDriven, worldSpace=True)
-                    self.nSwConstRecept.rename(self.nDriven.name() + "_SW_Const")
+                    self.nSwConstRecept.rename(self.nDriven.name() + "_Const_Grp")
                     self.nDriven.setParent(self.nSwConstRecept)
                 else:
                     self.nSwConstRecept = self.nDriven.getParent()
@@ -344,6 +344,8 @@ class SpaceSwitcherLogic(object):
                 vTrans = self._get_tm_offset(self.aDrivers[iAjustedIdx], _type="t")
                 vRot = self._get_tm_offset(self.aDrivers[iAjustedIdx], _type="r")
 
+                pymel.setCurrentTime(t)
+
                 #Set the offset information
                 self.nSwConst.target[iAjustedIdx].targetOffsetTranslate.targetOffsetTranslateX.set(vTrans[0])
                 self.nSwConst.target[iAjustedIdx].targetOffsetTranslate.targetOffsetTranslateY.set(vTrans[1])
@@ -361,6 +363,8 @@ class SpaceSwitcherLogic(object):
                 #Get the offset information from the constraint trans and rot at the time before the key
                 vTrans = self.nSwConst.constraintTranslate.get()
                 vRot = self.nSwConst.constraintRotate.get()
+
+                pymel.setCurrentTime(t)
 
                 #Set the offset information
                 self.nSwConst.restTranslate.set(vTrans)
@@ -381,7 +385,7 @@ class SpaceSwitcherLogic(object):
         of the driven object
         """
         fCurTime = pymel.currentTime()
-        iActiveWeight = -1
+        iActiveWeight = None
         aWeight = self.nSwConst.getWeightAliasList()
 
         #If none is set to 1.0, the value will be -1 which represent the current parent
@@ -391,37 +395,44 @@ class SpaceSwitcherLogic(object):
                 iActiveWeight = i
                 break;
 
-        if (iActiveWeight != iIdx): #Check is good, but we need to adjust the index after
-            #Update the constraint information for the offset of the parent on which we will switch
-            if (iIdx == -1):
-                pymel.parentConstraint(self.nSwConst, mo=True, e=True)
-                pymel.setKeyframe(self.nSwConst.restTranslate, t=fCurTime, ott="step")
-                pymel.setKeyframe(self.nSwConst.restRotate, t=fCurTime, ott="step")
-                pymel.keyTangent(self.nSwConst.restTranslate, t=fCurTime, ott="step") #Force step
-                pymel.keyTangent(self.nSwConst.restRotate, t=fCurTime, ott="step") #Force step
-            else:
-                iAdjustedIdx = self._get_adjusted_index(iIdx)
-                pymel.parentConstraint(self.aDrivers[iIdx], self.nSwConst, mo=True, e=True)
-                pymel.setKeyframe(self.nSwConst.target[iAdjustedIdx].targetOffsetTranslate, t=fCurTime, ott="step")
-                pymel.setKeyframe(self.nSwConst.target[iAdjustedIdx].targetOffsetRotate, t=fCurTime, ott="step")
-                pymel.keyTangent(self.nSwConst.target[iAdjustedIdx].targetOffsetTranslate, t=fCurTime, ott="step") #Force step
-                pymel.keyTangent(self.nSwConst.target[iAdjustedIdx].targetOffsetRotate, t=fCurTime, ott="step") #Force step
+        #Safety check to ensure that the rest data will be keyed
+        if iActiveWeight == None:
+            aRestKey = pymel.keyframe(self.nSwConst.restTranslate, q=True)
+            if (len(aRestKey) > 0):
+                iActiveWeight = -1
 
-
-        if (iIdx == -1):
-            for wAlias in aWeight:
-                wAlias.set(0.0)
-        else:
-            for i,wAlias in enumerate(aWeight):
-                if (i == iIdx):
-                    wAlias.set(1.0)
+        with pymel.UndoChunk():
+            if (iActiveWeight != iIdx): #Check is good, but we need to adjust the index after
+                #Update the constraint information for the offset of the parent on which we will switch
+                if (iIdx == -1):
+                    pymel.parentConstraint(self.nSwConst, mo=True, e=True)
+                    pymel.setKeyframe(self.nSwConst.restTranslate, t=fCurTime, ott="step")
+                    pymel.setKeyframe(self.nSwConst.restRotate, t=fCurTime, ott="step")
+                    pymel.keyTangent(self.nSwConst.restTranslate, t=fCurTime, ott="step") #Force step
+                    pymel.keyTangent(self.nSwConst.restRotate, t=fCurTime, ott="step") #Force step
                 else:
-                    wAlias.set(0.0)
-        #Set a keyframe on the weight to keep the animation
-        pymel.setKeyframe(aWeight, t=fCurTime, ott="step")
-        pymel.keyTangent(aWeight, ott="step") #Force step
+                    iAdjustedIdx = self._get_adjusted_index(iIdx)
+                    pymel.parentConstraint(self.aDrivers[iIdx], self.nSwConst, mo=True, e=True)
+                    pymel.setKeyframe(self.nSwConst.target[iAdjustedIdx].targetOffsetTranslate, t=fCurTime, ott="step")
+                    pymel.setKeyframe(self.nSwConst.target[iAdjustedIdx].targetOffsetRotate, t=fCurTime, ott="step")
+                    pymel.keyTangent(self.nSwConst.target[iAdjustedIdx].targetOffsetTranslate, t=fCurTime, ott="step") #Force step
+                    pymel.keyTangent(self.nSwConst.target[iAdjustedIdx].targetOffsetRotate, t=fCurTime, ott="step") #Force step
 
-        self.update_constraint_keys()
+
+                if (iIdx == -1):
+                    for wAlias in aWeight:
+                        wAlias.set(0.0)
+                else:
+                    for i,wAlias in enumerate(aWeight):
+                        if (i == iIdx):
+                            wAlias.set(1.0)
+                        else:
+                            wAlias.set(0.0)
+                #Set a keyframe on the weight to keep the animation
+                pymel.setKeyframe(aWeight, t=fCurTime, ott="step")
+                pymel.keyTangent(aWeight, ott="step") #Force step
+
+                self.update_constraint_keys()
 
     def _adjust_firstKey(self, iTime, vRestT, vRestRot):
         """
@@ -463,58 +474,60 @@ class SpaceSwitcherLogic(object):
             iAdjustFrame = _iNewFrame
             pymel.refresh(su=True)
 
-            fCurTime = pymel.currentTime()
+            with pymel.UndoChunk():
+                fCurTime = pymel.currentTime()
 
-            #Check to collect all constraint keys we would need to update
-            aAllKeysConst = pymel.keyframe(self.nSwConst, q=True)
-            aAllKeysConst.sort()
+                #Check to collect all constraint keys we would need to update
+                aAllKeysConst = pymel.keyframe(self.nSwConst, q=True)
+                aAllKeysConst.sort()
 
-            #Ensure to update all the keys that are after the move starting at the lowest frame change
-            if (_iNewFrame < _iOldFrame):
-                iAdjustFrame = _iNewFrame
-            else:
-                iAdjustFrame = _iOldFrame
+                #Ensure to update all the keys that are after the move starting at the lowest frame change
+                if (_iNewFrame < _iOldFrame):
+                    iAdjustFrame = _iNewFrame
+                else:
+                    iAdjustFrame = _iOldFrame
 
-            #Get the rest data before moving the key in case we need to adjust the first frame
-            pymel.setCurrentTime(iAdjustFrame)
-            vRestT = self.nSwConst.constraintTranslate.get()
-            vRestR = self.nSwConst.constraintRotate.get()
+                #Get the rest data before moving the key in case we need to adjust the first frame
+                pymel.setCurrentTime(iAdjustFrame)
+                vRestT = self.nSwConst.constraintTranslate.get()
+                vRestR = self.nSwConst.constraintRotate.get()
 
-            pymel.keyframe(self.nSwConst, time=(_iOldFrame, _iOldFrame), o="over", timeChange=_iNewFrame)
+                pymel.keyframe(self.nSwConst, time=(_iOldFrame, _iOldFrame), o="over", timeChange=_iNewFrame)
 
-            #Handle case where the move key become the first one in the animation
-            if iAdjustFrame <= aAllKeysConst[0]:
-                self._adjust_firstKey(iAdjustFrame, vRestT, vRestR)
+                #Handle case where the move key become the first one in the animation
+                if iAdjustFrame <= aAllKeysConst[0]:
+                    self._adjust_firstKey(iAdjustFrame, vRestT, vRestR)
 
-            pymel.setCurrentTime(_iNewFrame -1)
-            self.update_constraint_keys()
-            pymel.setCurrentTime(fCurTime)
+                pymel.setCurrentTime(-1)
+                self.update_constraint_keys()
+                pymel.setCurrentTime(fCurTime)
 
             pymel.refresh(su=False)
 
     def deleteKey(self, _iFrame):
         pymel.refresh(su=True)
 
-        fCurTime = pymel.currentTime()
+        with pymel.UndoChunk():
+            fCurTime = pymel.currentTime()
 
-        #Check to collect all constraint keys we would need to update
-        aAllKeysConst = pymel.keyframe(self.nSwConst, q=True)
-        aAllKeysConst.sort()
+            #Check to collect all constraint keys we would need to update
+            aAllKeysConst = pymel.keyframe(self.nSwConst, q=True)
+            aAllKeysConst.sort()
 
-        #Get the rest data before deleting the key in case we need to adjust the first frame
-        pymel.setCurrentTime(_iFrame)
-        vRestT = self.nSwConst.constraintTranslate.get()
-        vRestR = self.nSwConst.constraintRotate.get()
+            #Get the rest data before deleting the key in case we need to adjust the first frame
+            pymel.setCurrentTime(_iFrame)
+            vRestT = self.nSwConst.constraintTranslate.get()
+            vRestR = self.nSwConst.constraintRotate.get()
 
-        pymel.cutKey(self.nSwConst, time=(_iFrame, _iFrame))
+            pymel.cutKey(self.nSwConst, time=(_iFrame, _iFrame))
 
-        #Handle case where the cut key become the first one in the animation
-        if _iFrame == aAllKeysConst[0]:
-            self._adjust_firstKey(_iFrame, vRestT, vRestR)
+            #Handle case where the cut key become the first one in the animation
+            if _iFrame == aAllKeysConst[0]:
+                self._adjust_firstKey(_iFrame, vRestT, vRestR)
 
-        pymel.setCurrentTime(_iFrame)
-        self.update_constraint_keys()
-        pymel.setCurrentTime(fCurTime)
+            pymel.setCurrentTime(_iFrame)
+            self.update_constraint_keys()
+            pymel.setCurrentTime(fCurTime)
 
         pymel.refresh(su=False)
 
@@ -542,6 +555,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         super(SpaceSwitcherDialog, self).__init__(parent)
         self.ID_COL_FRAME = 0
         self.ID_COL_PARENT = 1
+        self.ID_COL_ACTION = 2
         self.sOriginalParent = "Original Parent"
 
         self.ui = spaceSwitcherUI.Ui_win_main()
@@ -557,24 +571,8 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
 
         self.ui.btnAction.setEnabled(False)
         self.ui.btnAction.setText("Select a Node")
+        self.ui.cbSysList.addItem("--- Select a system ---")
         self.ui.lstParent.setEnabled(False)
-
-        #TODO - Fix header which don't want to change it's text value...
-        '''
-        aHeader = []
-        aHeader.append(QtGui.QApplication.translate("win_main", "Frame", None, QtGui.QApplication.UnicodeUTF8))
-        aHeader.append(QtGui.QApplication.translate("win_main", "Parent", None, QtGui.QApplication.UnicodeUTF8))
-
-        #Bypass header naming problem
-        pHeaderFrame = QtGui.QTableWidgetItem()
-        pHeaderFrame.setText(aHeader[0])
-        self.ui.tblFrameInfo.setHorizontalHeaderItem(0, pHeaderFrame)
-        pHeaderParent = QtGui.QTableWidgetItem()
-        pHeaderParent.setText(aHeader[0])
-        self.ui.tblFrameInfo.setHorizontalHeaderItem(1, pHeaderParent)
-        self.ui.tblFrameInfo.setHorizontalHeaderLabels(aHeader)
-        self.ui.tblFrameInfo.setColumnCount(2)
-        '''
 
         #Intern variable
         self.iJobSelChange = 0
@@ -587,71 +585,81 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         self.toRemove = []
         self.aSceneSpaceSwitch = []
         self.aConstrainedFrame = []
+        self.bInSelChanged = False
 
         self.colorTemplate = "<font color={0}>{1}</font>"
 
         self._setup_callbacks()
 
         #Force the tool to check the selection on it's opening
+        self.refresh()
+
+    def refresh(self):
+        """
+        Refresh the tool information
+        """
+        self.nSelDriven = None
         self._fetch_system_from_scene()
-        self._selection_change()
+        self._scriptJob_selection_change()
 
     def _setup_callbacks(self):
         """
         Setup the  button callback and also a callback in maya to know when a selection is changed
         """
-        self.ui.btnAction.pressed.connect(self._action_btnAction_pressed)
-        self.ui.btnUpdateAll.pressed.connect(self._action_btnUpdateAll_pressed)
-        self.ui.lstParent.clicked.connect(self._action_lstParent_selection_changed)
+        self.ui.btnAction.pressed.connect(self._event_btnAction_pressed)
+        self.ui.btnUpdateAll.pressed.connect(self._event_btnUpdateAll_pressed)
+        self.ui.lstParent.clicked.connect(self._event_lstParent_selChanged)
+        self.ui.cbSysList.currentIndexChanged.connect(self._event_cbSys_selChanged)
+        self.ui.btnRefresh.pressed.connect(self._event_btnRefresh_pressed)
 
-        self.iJobSelChange = pymel.scriptJob(event=('SelectionChanged', self._selection_change),compressUndo=False)
-        self.iJobSceneOpen = pymel.scriptJob(event=('SceneOpened', self._scene_opened),compressUndo=False)
-        self.iJobUndo = pymel.scriptJob(event=('Undo', self._scene_undo),compressUndo=False)
+        self.iJobSelChange = pymel.scriptJob(event=('SelectionChanged', self._scriptJob_selection_change),compressUndo=True)
+        self.iJobSceneOpen = pymel.scriptJob(event=('SceneOpened', self._scriptJob_scene_opened),compressUndo=False)
+        #Do not put a job on the undo, since it cause problem with undo's themselves
+        #self.iJobUndo = pymel.scriptJob(event=('Undo', self._scriptJob_scene_undo),compressUndo=False)
 
     def _fetch_system_from_scene(self):
         """
         Get all SpaceSwitch system in the scene
         """
+        self.ui.cbSysList.clear()
+        self.ui.cbSysList.addItem("--- Select a system ---")
+        self.aSceneSpaceSwitch = []
+
         lstNetworkNode = libSerialization.getNetworksByClass(SpaceSwitcherLogic.__name__)
         for pNet in lstNetworkNode:
             pData = libSerialization.import_network(pNet)
+            self.ui.cbSysList.addItem(pData.nDriven.name())
             self.aSceneSpaceSwitch.append(pData)
 
     def _set_mode_info(self, _mode, _bButtonEnabled):
-        self.ui.lblStatus.setText("Current Node --> " + str(self.nSelDriven) + "")
+        self.ui.lblStatus.setText("Current Mode --> ")
 
         self.mode = _mode
         self.ui.btnAction.setEnabled(_bButtonEnabled)
-        if (self.pSelSpSys):
-            self.ui.btnUpdateAll.setEnabled(True)
-        else:
-            self.ui.btnUpdateAll.setEnabled(False)
 
         #Set the status label info depending of the current mode
         if _mode == Mode.Create:
-            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("yellow",
-                                                                                                 "(First Setup)"))
+            self.ui.lblStatus.setText(self.ui.lblStatus.text() + self.colorTemplate.format("yellow","First Setup"))
             self.ui.btnAction.setText("Setup")
         elif _mode == Mode.Add:
-            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("green",
-                                                                                                 "(Add Parent)"))
+            self.ui.lblStatus.setText(self.ui.lblStatus.text() + self.colorTemplate.format("green","Add Parent"))
             self.ui.btnAction.setText("Add")
         elif _mode == Mode.Switch or _mode == Mode.SwitchSelect:
-            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("green",
-                                                                                                 "(Switch Parent)"))
+            self.ui.lblStatus.setText(self.ui.lblStatus.text() + self.colorTemplate.format("green","Switch Parent"))
             self.ui.btnAction.setText("Switch")
         elif _mode == Mode.Remove:
-            self.ui.lblStatus.setText(self.ui.lblStatus.text() + " " + self.colorTemplate.format("red",
-                                                                                                 "(Remove Parent)"))
+            self.ui.lblStatus.setText(self.ui.lblStatus.text() + self.colorTemplate.format("red","Remove Parent"))
             self.ui.btnAction.setText("Remove")
         else:
+            self.ui.lblStatus.setText(self.ui.lblStatus.text() + "Inactive")
             self.ui.btnAction.setText("Select a Node")
 
-    def _selection_change(self, *args):
+    def _scriptJob_selection_change(self, *args):
         """
         Manage the selection change to know which action the user want to do. The remove action
         need to be implemented another way
         """
+        self.bInSelChanged = True
         aCurSel = pymel.selected()
 
         if (len(aCurSel) == 0):
@@ -670,7 +678,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         if (self.nSelDriven != None):
             #Look for existing space switcher system
             self.pSelSpSys = None
-            for pSp in self.aSceneSpaceSwitch:
+            for i, pSp in enumerate(self.aSceneSpaceSwitch):
                 if (pSp.nDriven == self.nSelDriven):
                     self.pSelSpSys = pSp
                     break;
@@ -700,13 +708,15 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                     else:
                         self._set_mode_info(Mode.SwitchSelect, True)
 
-    def _scene_opened(self, *args):
+        self.bInSelChanged = False
+
+    def _scriptJob_scene_opened(self, *args):
         """
         Find all SpaceSwitcher system in the scene
         """
         self._fetch_system_from_scene()
 
-    def _scene_undo(self, *args):
+    def _scriptJob_scene_undo(self, *args):
         """
         Ensure to refresh the UI on a undo in the scene
         """
@@ -734,6 +744,13 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
         Small wrapper to update all needed info in the UI
         """
+        if (pSpData):
+            iCurSys = self.aSceneSpaceSwitch.index(pSpData)
+            self.ui.cbSysList.setCurrentIndex(iCurSys + 1) # First item is empty
+            self.ui.btnUpdateAll.setEnabled(True)
+        else:
+            self.ui.cbSysList.setCurrentIndex(0) # First item is empty
+            self.ui.btnUpdateAll.setEnabled(False)
         self._update_lstParent(pSpData)
         self._update_tblFrameInfo(pSpData)
 
@@ -760,7 +777,6 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
 
         #Clear the table info and refresh it
-        self.ui.tblFrameInfo.clear()
         self.ui.tblFrameInfo.setRowCount(0)
         self.aConstrainedFrame = []
 
@@ -804,13 +820,13 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 edtFrame = QtGui.QLineEdit()
                 edtFrame.setValidator(QDoubleEmptyStringValidator())
                 edtFrame.setText(str(int(pTblInfo[0])))
-                edtFrame.returnPressed.connect(partial(self._action_edtFrame_changed, iNbRow))
-                edtFrame.editingFinished.connect(partial(self._action_edtFrame_endEdit, iNbRow))
+                edtFrame.returnPressed.connect(partial(self._event_edtFrame_changed, iNbRow))
+                edtFrame.editingFinished.connect(partial(self._event_edtFrame_endEdit, iNbRow))
                 '''
                 Monkey patch the mouse event function to create a right click menu on it.
                 I could have redefined a class that inherit the QLineEdit class, but....
                 '''
-                edtFrame.mousePressEvent = partial(self._action_mousePressEventEdt, iRow=iNbRow)
+                edtFrame.mousePressEvent = partial(self._event_edtFrame_mousePress, iRow=iNbRow)
                 self.ui.tblFrameInfo.setCellWidget(iNbRow, self.ID_COL_FRAME, edtFrame)
                 pFrameCell.setData(QtCore.Qt.UserRole, int(pTblInfo[0]))
 
@@ -818,52 +834,59 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 pCellParent = QtGui.QTableWidgetItem()
                 self.ui.tblFrameInfo.setItem(iNbRow, self.ID_COL_PARENT, pCellParent)
                 cbParent = QtGui.QComboBox()
+                cbParent.setMaximumWidth(200)
                 cbParent.addItems(aParentName)
                 cbParent.setCurrentIndex(pTblInfo[1] + 1) #Index is always +1 since original parent it -1 in the system
-                cbParent.currentIndexChanged.connect(partial(self._action_cbParent_indexChanged, iNbRow))
-                cbParent.wheelEvent =  self._action_cbWheelEvent #Override the wheel event to prevent change with it
+                cbParent.currentIndexChanged.connect(partial(self._event_cbParent_indexChanged, iNbRow))
+                cbParent.wheelEvent =  self._event_cbParent_wheel #Override the wheel event to prevent change with it
                 cbParent.setFocusPolicy(QtCore.Qt.ClickFocus)
                 self.ui.tblFrameInfo.setCellWidget(iNbRow, self.ID_COL_PARENT, cbParent)
                 pCellParent.setData(QtCore.Qt.UserRole, pTblInfo[1])
 
+                pCellAction = QtGui.QTableWidgetItem()
+                self.ui.tblFrameInfo.setItem(iNbRow, self.ID_COL_ACTION, pCellAction)
+                btnRemove = QtGui.QPushButton()
+                btnRemove.setText("Remove")
+                btnRemove.pressed.connect(partial(self._event_btnRemove_pressed, iNbRow))
+                self.ui.tblFrameInfo.setCellWidget(iNbRow, self.ID_COL_ACTION, btnRemove)
+
                 self.aConstrainedFrame.append(int(pTblInfo[0]))
 
-    def _action_mousePressEventEdt(self, event, iRow=0):
+                self.ui.tblFrameInfo.resizeColumnToContents(self.ID_COL_PARENT)
+
+    def _event_edtFrame_mousePress(self, event, iRow=0):
         """
         Generate a right click on the QLineEdit with the frame number to allow the user to delete a key
         """
         if event.button() == QtCore.Qt.RightButton:
             #Get data
-            pParentCell = self.ui.tblFrameInfo.item(iRow, self.ID_COL_PARENT)
-            iParentIdx = pParentCell.data(QtCore.Qt.UserRole)
             pFrameCell = self.ui.tblFrameInfo.item(iRow, self.ID_COL_FRAME)
             iFrame = pFrameCell.data(QtCore.Qt.UserRole)
             menu = QtGui.QMenu()
-            action_sel_parent = menu.addAction('Delete')
-            action_sel_parent.triggered.connect(partial(self._action_deleteKey, iFrame, iParentIdx))
+            action_sel_parent = menu.addAction('Remove')
+            action_sel_parent.triggered.connect(partial(self._event_rcMenu_deleteKey, iFrame))
             menu.exec_(QtGui.QCursor.pos())
 
-    def _action_cbWheelEvent(self, event):
+    def _event_cbParent_wheel(self, event):
         """
         Empty override to prevent the user to change the parent with the mouse wheel
         """
         pass
 
-    def _action_deleteKey(self, iFrame, iParentIdx):
+    def _event_rcMenu_deleteKey(self, iFrame):
         """
         Right-Click menu action to delete a constrained key
         """
         self.pSelSpSys.deleteKey(iFrame)
         self._update_tblFrameInfo(self.pSelSpSys)
-        pass
 
-    def _action_btnUpdateAll_pressed(self):
+    def _event_btnUpdateAll_pressed(self):
         """
         Update all the constraint offset, can be usefull if a parent have been moved
         """
         self.pSelSpSys.update_constraint_keys(_updateAll=True)
 
-    def _action_btnAction_pressed(self):
+    def _event_btnAction_pressed(self):
         """
         Manage the different action that can happen on the tool. Will change depending on the selection
         """
@@ -876,31 +899,28 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 else:
                     bCreateParent = True
 
-            with pymel.UndoChunk():
-                pNewSp = SpaceSwitcherLogic()
-                if self.aSelDrivers:
-                    pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=False, bCreateParent=bCreateParent)
-                else: #There is no drivers, so the user want the world to be one of them
-                    pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=True, bCreateParent=bCreateParent)
-                self._update_info(pNewSp)
-                libSerialization.export_network(pNewSp)
-                self.aSceneSpaceSwitch.append(pNewSp)
+            pNewSp = SpaceSwitcherLogic()
+            if self.aSelDrivers:
+                pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=False, bCreateParent=bCreateParent)
+            else: #There is no drivers, so the user want the world to be one of them
+                pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=True, bCreateParent=bCreateParent)
+            self._update_info(pNewSp)
+            libSerialization.export_network(pNewSp)
+            self.aSceneSpaceSwitch.append(pNewSp)
 
         elif (self.mode == Mode.Add):
-            with pymel.UndoChunk():
-                self.pSelSpSys.add_target(self.aSelDrivers)
-                self._update_info(self.pSelSpSys)
-                #Delete the old network before updating a new one
-                aNetwork = libSerialization.getConnectedNetworks(self.pSelSpSys.nDriven, recursive=False)
-                pymel.delete(aNetwork)
-                libSerialization.export_network(self.pSelSpSys)
+            self.pSelSpSys.add_target(self.aSelDrivers)
+            self._update_info(self.pSelSpSys)
+            #Delete the old network before updating a new one
+            aNetwork = libSerialization.getConnectedNetworks(self.pSelSpSys.nDriven, recursive=False)
+            pymel.delete(aNetwork)
+            libSerialization.export_network(self.pSelSpSys)
 
         elif (self.mode == Mode.Switch):
             pCurParent = self.ui.lstParent.selectedIndexes()[0]
             #Remove one to the index since the original parent doesn't really exist in the list of parent in the system
-            with pymel.UndoChunk():
-                self.pSelSpSys.do_switch(pCurParent.row() - 1)
-                self._update_tblFrameInfo(self.pSelSpSys)
+            self.pSelSpSys.do_switch(pCurParent.row() - 1)
+            self._update_tblFrameInfo(self.pSelSpSys)
 
         elif (self.mode == Mode.SwitchSelect):
             #Find the selected parent index
@@ -911,27 +931,25 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 for idx, nDriver in enumerate(self.pSelSpSys.aDrivers):
                     if nDriver == self.aSelDrivers[0]:
                         iSwitchIdx = idx
-            with pymel.UndoChunk():
-                self.pSelSpSys.do_switch(iSwitchIdx)
-                self._update_tblFrameInfo(self.pSelSpSys)
+            self.pSelSpSys.do_switch(iSwitchIdx)
+            self._update_tblFrameInfo(self.pSelSpSys)
 
         elif (self.mode == Mode.Remove):
             iNbTarget = len(self.pSelSpSys.aDrivers)
             self.toRemove.sort(reverse=True) #Ensure to remove from the bigger to the smaller index
 
             #Delete the network
-            with pymel.UndoChunk():
-                aNetwork = libSerialization.getConnectedNetworks(self.pSelSpSys.nDriven, recursive=False)
-                pymel.delete(aNetwork)
-                if (iNbTarget == len(self.toRemove)):
-                    #Totally remove the constraint
-                    self.pSelSpSys.remove_target(-1, all=True)
-                    self.aSceneSpaceSwitch.remove(self.pSelSpSys)
-                else:
-                    for iIdx in self.toRemove:
-                        self.pSelSpSys.remove_target(iIdx - 1)
-                    #Recreate the network with refreshed data
-                    libSerialization.export_network(self.pSelSpSys)
+            aNetwork = libSerialization.getConnectedNetworks(self.pSelSpSys.nDriven, recursive=False)
+            pymel.delete(aNetwork)
+            if (iNbTarget == len(self.toRemove)):
+                #Totally remove the constraint
+                self.pSelSpSys.remove_target(-1, all=True)
+                self.aSceneSpaceSwitch.remove(self.pSelSpSys)
+            else:
+                for iIdx in self.toRemove:
+                    self.pSelSpSys.remove_target(iIdx - 1)
+                #Recreate the network with refreshed data
+                libSerialization.export_network(self.pSelSpSys)
 
         pymel.select(self.nSelDriven)
 
@@ -942,7 +960,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             self._update_info(None)
         '''
 
-    def _action_lstParent_selection_changed(self):
+    def _event_lstParent_selChanged(self):
         """
         Manage the parent list selection change
         """
@@ -968,7 +986,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             else:
                 self._set_mode_info(Mode.Switch, False)
 
-    def _action_edtFrame_changed(self, iRow):
+    def _event_edtFrame_changed(self, iRow):
         """
         Manage a frame change in the frame info table
         """
@@ -982,25 +1000,24 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             iNewFrame = int(pCellQLine.text())
             #Prevent the user to move a key on a frame already constrained
             if not (iNewFrame in self.aConstrainedFrame):
-                with pymel.UndoChunk():
-                    self.pSelSpSys.moveKey(iNewFrame, iOldFrame)
+                self.pSelSpSys.moveKey(iNewFrame, iOldFrame)
                 self._update_tblFrameInfo(self.pSelSpSys)
             else:
                 pCellQLine.setText(str(iOldFrame))
 
             pymel.select(self.nSelDriven)
 
-    def _action_edtFrame_endEdit(self, iRow):
+    def _event_edtFrame_endEdit(self, iRow):
         """
         Ensure that the frame data is still shown if the user put no frame
         """
         pCell = self.ui.tblFrameInfo.item(iRow, self.ID_COL_FRAME)
         iCurFrame = pCell.data(QtCore.Qt.UserRole)
         pCellQLine = self.ui.tblFrameInfo.cellWidget(iRow, self.ID_COL_FRAME)
-        if pCellQLine.text() == "":
+        if pCellQLine and pCellQLine.text() == "":
             pCellQLine.setText(str(iCurFrame))
 
-    def _action_cbParent_indexChanged(self, _iRow, _iIndex):
+    def _event_cbParent_indexChanged(self, _iRow, _iIndex):
         """
         Manage a parent change in the frame info table
         """
@@ -1010,10 +1027,45 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
 
         pymel.refresh(su=True)
         pymel.setCurrentTime(iFrame)
-        with pymel.UndoChunk():
-            self.pSelSpSys.do_switch(_iIndex-1) #Combo Box index are bigger than the real index system
+        self.pSelSpSys.do_switch(_iIndex-1) #Combo Box index are bigger than the real index system
         pymel.setCurrentTime(iCurTime)
         pymel.refresh(su=False)
+
+    def _event_cbSys_selChanged(self, _iIdx):
+        """
+        Manage the system change with the combo box. select the node related to the system selected in the combo box
+        """
+        #Prevent a node selection when the comboBox index changed during selection changed callback
+        if not self.bInSelChanged:
+            if _iIdx > 0:
+                pCurSys = self.aSceneSpaceSwitch[_iIdx - 1]
+                pymel.select(pCurSys.nDriven)
+            else: #If the no system index is selected, but a node is selected in the scene, put back the selected system
+                for i, pSp in enumerate(self.aSceneSpaceSwitch):
+                    if (pSp.nDriven == self.nSelDriven):
+                        #Change the index, but prevent the event to select back the node
+                        self.bInSelChanged = True
+                        self.ui.cbSysList.setCurrentIndex(i + 1)
+                        self.bInSelChanged = False
+                        break;
+
+    def _event_btnRefresh_pressed(self):
+        """
+        Refresh Button pressed Event
+        """
+        self.refresh()
+
+    def _event_btnRemove_pressed(self, iRow):
+        """
+        Delete the key in the same row than the delete button
+        """
+        pFrameCell = self.ui.tblFrameInfo.item(iRow, self.ID_COL_FRAME)
+        iFrame = pFrameCell.data(QtCore.Qt.UserRole)
+
+        self.pSelSpSys.deleteKey(iFrame)
+        self._update_tblFrameInfo(self.pSelSpSys)
+
+
 
 class SpaceSwitcher(object):
     """
