@@ -19,6 +19,10 @@ except Exception as e:
     print e
 
 
+#TODO - Support constraint only on position or rotation
+#TODO - Fix warning message on scene open when the tool is already (Don't seem to cause any problem)
+#TODO - Need more testing
+
 # global variables to this module:
 CLASS_NAME = "SpaceSwitcher"
 TITLE = "m071_SpaceSwitcher"
@@ -43,19 +47,16 @@ class QDoubleEmptyStringValidator(QtGui.QIntValidator):
             return validState
 
 
-
-
 class SpaceSwitcherLogic(object):
 
     """
     This class is used to setup a spaceSwitch system on a node
     """
 
-    WORLD_NODE_NAME = "dp_sp_worldNode"
+    WORLD_NODE_NAME = "World_SpaceSwitcher"
 
     def __init__(self):
         self.aDrivers = []
-        self.aDriversSubName = []
         self.nDriven = None
         self.nSwConst = None #SpaceSwitch constraint for the system
         self.nSwConstRecept = None #Space Switch receiver
@@ -80,7 +81,7 @@ class SpaceSwitcherLogic(object):
         bContinue = False
         #Create the worldNode
         if (not self.worldNode and bCreateWolrdNode):
-            self.worldNode = pymel.createNode("transform", n="dp_sp_worldNode")
+            self.worldNode = pymel.createNode("transform", n=self.WORLD_NODE_NAME)
             self.worldNode.visibility.set(False)
             for pAttr in self.worldNode.listAttr(keyable=True):
                 pymel.setAttr(pAttr, keyable=False, lock=True)
@@ -88,7 +89,6 @@ class SpaceSwitcherLogic(object):
 
         if (self.worldNode):
             self.aDrivers.append(self.worldNode)
-            self.aDriversSubName.append("World")
 
         if (not nDriven):
             if (len(aCurSel) == 0):
@@ -105,12 +105,13 @@ class SpaceSwitcherLogic(object):
             bContinue = True
 
         if bContinue:
+            sStripName = str(self.nDriven.stripNamespace()).replace(pymel.other.NameParser.PARENT_SEP, "")
             #Setup the intermediate node to manage the spaceSwitch
             if bCreateParent:
                 self.nSwConstRecept = pymel.createNode("transform", ss=True)
                 mDriven = self.nDriven.getMatrix(worldSpace=True)
                 self.nSwConstRecept.setMatrix(mDriven, worldSpace=True)
-                self.nSwConstRecept.rename(self.nDriven.name() + "_Const_Grp")
+                self.nSwConstRecept.rename(sStripName + "_Const_Grp")
                 self.nDriven.setParent(self.nSwConstRecept)
             else:
                 self.nSwConstRecept = self.nDriven.getParent()
@@ -118,12 +119,11 @@ class SpaceSwitcherLogic(object):
             #Create the parent constraint for the first node, but add the other target manually
             if (bCreateWolrdNode):
                 self.nSwConst = pymel.parentConstraint(self.worldNode, self.nSwConstRecept,
-                                                       n=self.nDriven.name() + "_SpaceSwitch_Const", mo=True)
+                                                       n=sStripName + "_SpaceSwitch_Const", mo=True)
             else:
                 self.nSwConst = pymel.parentConstraint(aParent[0], self.nSwConstRecept,
-                                                       n=self.nDriven.name() + "_SpaceSwitch_Const", mo=True)
+                                                       n=sStripName + "_SpaceSwitch_Const", mo=True)
                 self.aDrivers.append(aParent[0])
-                self.aDriversSubName.append(aParent[0].name())
                 #Remove the first parent setuped before
                 aParent = aParent[1:]
 
@@ -174,9 +174,12 @@ class SpaceSwitcherLogic(object):
         """
         Add a new target to the space switch system
         """
+
         aExistTgt = self.nSwConst.getTargetList()
 
         for nParent in aNewParent:
+            sStripParentName = str(nParent.stripNamespace()).replace(pymel.other.NameParser.PARENT_SEP, "")
+
             #Check if we need to use an free index that could exist after some target removing
             if len(self.aFreeIndex) != 0:
                 iNewIdx = self.aFreeIndex[0]
@@ -192,11 +195,11 @@ class SpaceSwitcherLogic(object):
 
                 #Connect the new target manually in the parent constraint
                 if (iNewIdx == 0):
-                    self.nSwConst.addAttr(nParent.name().replace("|", "_") + "W" +
-                                          str(iNewIdx), at="double", min=0, max=1, dv=1, k=True, h=False)
+                    self.nSwConst.addAttr(sStripParentName + "W" + str(iNewIdx), at="double",
+                                          min=0, max=1, dv=1, k=True, h=False)
                 else:
-                    self.nSwConst.addAttr(nParent.name().replace("|", "_") + "W" +
-                                          str(iNewIdx), at="double", min=0, max=1, dv=0, k=True, h=False)
+                    self.nSwConst.addAttr(sStripParentName + "W" + str(iNewIdx), at="double",
+                                          min=0, max=1, dv=0, k=True, h=False)
 
                 pymel.connectAttr(nParent.parentMatrix, self.nSwConst.target[iNewIdx].targetParentMatrix)
                 pymel.connectAttr(nParent.scale, self.nSwConst.target[iNewIdx].targetScale)
@@ -206,8 +209,7 @@ class SpaceSwitcherLogic(object):
                 pymel.connectAttr(nParent.rotatePivot, self.nSwConst.target[iNewIdx].targetRotatePivot)
                 pymel.connectAttr(nParent.translate, self.nSwConst.target[iNewIdx].targetTranslate)
                 #Link the created attributes to the weight value of the target
-                nConstTgtWeight = pymel.Attribute(self.nSwConst.name() + "." + nParent.name().replace("|", "_") + "W"
-                                                  + str(iNewIdx))
+                nConstTgtWeight = pymel.Attribute(self.nSwConst.name() + "." + sStripParentName + "W" + str(iNewIdx))
                 pymel.connectAttr(nConstTgtWeight, self.nSwConst.target[iNewIdx].targetWeight)
 
                 #Set the offset information
@@ -219,12 +221,11 @@ class SpaceSwitcherLogic(object):
                 self.nSwConst.target[iNewIdx].targetOffsetRotate.targetOffsetRotateZ.set(vRot[2])
 
                 #Do not key an non-referenced object to prevent problem when referencing the scene
-                if pymel.referenceQuery(self.nDriven, isNodeReferenced=True):
+                if pymel.referenceQuery(self.nSwConst, isNodeReferenced=True):
                     pymel.setKeyframe(nConstTgtWeight, t=0, ott="step")
                     pymel.setKeyframe(self.nSwConst.target[iNewIdx].targetOffsetTranslate, t=0, ott="step")
                     pymel.setKeyframe(self.nSwConst.target[iNewIdx].targetOffsetRotate, t=0, ott="step")
                 self.aDrivers.insert(iNewIdx, nParent)
-                self.aDriversSubName.insert(iNewIdx, nParent.name())
             else:
                 print("Warning: " + nParent.name() + " is already a driver for " + self.nDriven)
 
@@ -238,7 +239,6 @@ class SpaceSwitcherLogic(object):
             #Remove the constraint and reset some variable
             pymel.delete(self.nSwConst)
             self.aDrivers = []
-            self.aDriversSubName = []
             self.nDriven = None
             self.nSwConst = None #SpaceSwitch constraint for the system
             self.nSwConstRecept = None #Space Switch receiver
@@ -272,7 +272,6 @@ class SpaceSwitcherLogic(object):
                 self.aFreeIndex.append(iIdx)
                 self.aFreeIndex.sort()
                 self.aDrivers.pop(iIdx)
-                self.aDriversSubName.pop(iIdx)
 
                 #Update all constraint when removing one
                 self.update_constraint_keys()
@@ -341,8 +340,8 @@ class SpaceSwitcherLogic(object):
             if (i >= 0):
                 iAjustedIdx = self._get_adjusted_index(i)
                 #Compute the offset between the parent and the driver
-                vTrans = self._get_tm_offset(self.aDrivers[iAjustedIdx], _type="t")
-                vRot = self._get_tm_offset(self.aDrivers[iAjustedIdx], _type="r")
+                vTrans = self._get_tm_offset(self.aDrivers[i], _type="t")
+                vRot = self._get_tm_offset(self.aDrivers[i], _type="r")
 
                 pymel.setCurrentTime(t)
 
@@ -578,6 +577,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         self.iJobSelChange = 0
         self.iJobSceneOpen = 0
         self.iJobUndo = 0
+        self.pTimeJobCallback = None
         self.mode = Mode.Inactive
         self.nSelDriven = None
         self.aSelDrivers = []
@@ -607,6 +607,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
         Setup the  button callback and also a callback in maya to know when a selection is changed
         """
+        #TODO - Change each callback for a Open Maya one
         self.ui.btnAction.pressed.connect(self._event_btnAction_pressed)
         self.ui.btnUpdateAll.pressed.connect(self._event_btnUpdateAll_pressed)
         self.ui.lstParent.clicked.connect(self._event_lstParent_selChanged)
@@ -617,14 +618,16 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         self.iJobSceneOpen = pymel.scriptJob(event=('SceneOpened', self._scriptJob_scene_opened),compressUndo=False)
         #Do not put a job on the undo, since it cause problem with undo's themselves
         self.iJobUndo = pymel.scriptJob(event=('Undo', self._scriptJob_scene_undo),compressUndo=False)
+        self.ui.tblFrameInfo.paintEvent = self.tblFrame_paintEvent
+        self.pTimeJobCallback = om.MDGMessage.addTimeChangeCallback(self._scriptJob_timeChanged, "onTimeChange")
 
     def _fetch_system_from_scene(self):
         """
         Get all SpaceSwitch system in the scene
         """
+        self.aSceneSpaceSwitch = []
         self.ui.cbSysList.clear()
         self.ui.cbSysList.addItem("--- Select a system ---")
-        self.aSceneSpaceSwitch = []
 
         lstNetworkNode = libSerialization.getNetworksByClass(SpaceSwitcherLogic.__name__)
         for pNet in lstNetworkNode:
@@ -676,65 +679,65 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         Manage the selection change to know which action the user want to do. The remove action
         need to be implemented another way
         """
-        if not self.bBlockSelJob:
-            self.bInSelChanged = True
-            aCurSel = pymel.selected()
+        self.bInSelChanged = True
+        aCurSel = pymel.selected()
 
-            if (len(aCurSel) == 0):
-                self.nSelDriven = None
-                self.aSelDrivers = []
-            elif (len(aCurSel) == 1):
-                self.nSelDriven = aCurSel[0]
-                self.aSelDrivers = []
-            else:
-                self.nSelDriven = aCurSel[-1]
-                self.aSelDrivers = aCurSel[0:-1]
+        if (len(aCurSel) == 0):
+            self.nSelDriven = None
+            self.aSelDrivers = []
+        elif (len(aCurSel) == 1):
+            self.nSelDriven = aCurSel[0]
+            self.aSelDrivers = []
+        else:
+            self.nSelDriven = aCurSel[-1]
+            self.aSelDrivers = aCurSel[0:-1]
 
-            self._set_mode_info(Mode.Inactive, False)
-            self._update_info(None)
+        self._set_mode_info(Mode.Inactive, False)
+        self._update_info(None)
 
-            if (self.nSelDriven != None):
-                #Look for existing space switcher system
-                self.pSelSpSys = None
-                for i, pSp in enumerate(self.aSceneSpaceSwitch):
-                    if (pSp.nDriven == self.nSelDriven):
-                        self.pSelSpSys = pSp
-                        break;
-                self._update_info(self.pSelSpSys)
+        if (self.nSelDriven != None):
+            #Look for existing space switcher system
+            self.pSelSpSys = None
+            for i, pSp in enumerate(self.aSceneSpaceSwitch):
+                if (pSp.nDriven == self.nSelDriven):
+                    self.pSelSpSys = pSp
+                    break;
+            self._update_info(self.pSelSpSys)
 
-                if self.pSelSpSys == None:
-                    nDrivenParent = self.nSelDriven.getParent()
-                    if nDrivenParent == None and pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
-                        self._set_mode_info(Mode.Create, False)
-                    else:
-                        #TODO - Check if the parent can possibly receive a constraint on it
-                        self._set_mode_info(Mode.Create, True)
+            if self.pSelSpSys == None:
+                nDrivenParent = self.nSelDriven.getParent()
+                if nDrivenParent == None and pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
+                    self._set_mode_info(Mode.Create, False)
                 else:
-                    if (self.aSelDrivers):
-                        if not self.pSelSpSys._is_parent_exist(self.aSelDrivers): #If no selected parent already exist
-                            self._set_mode_info(Mode.Add, True)
-                        else:
-                            if (len(self.aSelDrivers) == 1):
-                                self._set_mode_info(Mode.SwitchSelect, True)
-                            else:
-                                self._set_mode_info(Mode.Add, True)
+                    #TODO - Check if the parent can possibly receive a constraint on it
+                    self._set_mode_info(Mode.Create, True)
+            else:
+                if (self.aSelDrivers):
+                    if not self.pSelSpSys._is_parent_exist(self.aSelDrivers): #If no selected parent already exist
+                        self._set_mode_info(Mode.Add, True)
                     else:
-                        #If a parent is selected in the list, active the button to do the switch
-                        pSel = self.ui.lstParent.selectedIndexes()
-                        if (pSel):
-                            self._set_mode_info(Mode.Switch, True)
-                        else:
+                        if (len(self.aSelDrivers) == 1):
                             self._set_mode_info(Mode.SwitchSelect, True)
+                            iParentIdx = self.pSelSpSys.aDrivers.index(self.aSelDrivers[0])
 
-            self.bInSelChanged = False
+                            self.ui.lstParent.setCurrentIndex(iParentIdx)
+                        else:
+                            self._set_mode_info(Mode.Add, True)
+                else:
+                    #If a parent is selected in the list, active the button to do the switch
+                    pSel = self.ui.lstParent.selectedIndexes()
+                    if (pSel):
+                        self._set_mode_info(Mode.Switch, True)
+                    else:
+                        self._set_mode_info(Mode.SwitchSelect, True)
+
+        self.bInSelChanged = False
 
     def _scriptJob_scene_opened(self, *args):
         """
         Find all SpaceSwitcher system in the scene
         """
-        self.bBlockSelJob = True
-        self._fetch_system_from_scene()
-        self.bBlockSelJob = False
+        self.refresh()
 
     def _scriptJob_scene_undo(self, *args):
         """
@@ -744,6 +747,37 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             self._update_info(self.pSelSpSys)
         else:
             self._update_info(None)
+
+    def _scriptJob_timeChanged(self, *args):
+        """
+        Callbacks that trigger when the time change
+        """
+        self.ui.tblFrameInfo.viewport().update()
+        
+    def tblFrame_paintEvent(self, event):
+        """
+        Override the table paint event to redraw it when we need too
+        """
+        super(QtGui.QTableWidget, self.ui.tblFrameInfo).paintEvent(event)
+        iRowCount = self.ui.tblFrameInfo.rowCount()
+        iCurTime = int(pymel.currentTime())
+        for i in range(0, iRowCount):
+            iFrameAfter = 9999999999
+            pRow = self.ui.tblFrameInfo.item(i, self.ID_COL_FRAME)
+            if (i < iRowCount-1):
+                pRowAfter = self.ui.tblFrameInfo.item(i+1, self.ID_COL_FRAME)
+                iFrameAfter = pRowAfter.data(QtCore.Qt.UserRole)
+            iFrame = pRow.data(QtCore.Qt.UserRole)
+            pWidget = self.ui.tblFrameInfo.cellWidget(i, self.ID_COL_FRAME)
+            pPal = pWidget.palette()
+            if (iCurTime >= iFrame and iCurTime < iFrameAfter):
+                pPal.setColor(pWidget.backgroundRole(), QtCore.Qt.darkRed)
+            elif (iCurTime < iFrame and i == 0):
+                pPal.setColor(pWidget.backgroundRole(), QtCore.Qt.darkRed)
+            else:
+                pPal.setColor(pWidget.backgroundRole(), QtCore.Qt.black)
+            pWidget.setPalette(pPal)
+
 
     def closeEvent(self, *args, **kwargs):
         """
@@ -756,6 +790,8 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 pymel.scriptJob(kill=self.iJobSceneOpen, force=True)
             if pymel.scriptJob(ex=self.iJobUndo):
                 pymel.scriptJob(kill=self.iJobUndo, force=True)
+
+            om.MDGMessage.removeCallback(self.pTimeJobCallback)
         except:
             pass
 
@@ -765,7 +801,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
         if (pSpData):
             iCurSys = self.aSceneSpaceSwitch.index(pSpData)
-            if iCurSys:
+            if iCurSys != None:
                 self.ui.cbSysList.setCurrentIndex(iCurSys + 1) # First item is empty
                 self.ui.btnUpdateAll.setEnabled(True)
             else:
@@ -786,10 +822,10 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             self.ui.lstParent.setEnabled(True)
             self.createModel.appendRow(self.parentItem)
             for iIdx, nParentInfo in enumerate(pSpData.aDrivers):
-                newParentItem = QtGui.QStandardItem(pSpData.aDriversSubName[iIdx])
+                newParentItem = QtGui.QStandardItem(nParentInfo.name())
                 newParentItem.setEditable(False)
                 #Prevent any delete action when the sysem is referenced
-                if pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
+                if pymel.referenceQuery(self.pSelSpSys.nSwConst, isNodeReferenced=True):
                     newParentItem.setCheckable(False)
                 else:
                     newParentItem.setCheckable(True)
@@ -845,6 +881,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 pFrameCell = QtGui.QTableWidgetItem()
                 self.ui.tblFrameInfo.setItem(iNbRow, self.ID_COL_FRAME, pFrameCell)
                 edtFrame = QtGui.QLineEdit()
+                edtFrame.setAutoFillBackground(True)
                 edtFrame.setValidator(QDoubleEmptyStringValidator())
                 edtFrame.setText(str(int(pTblInfo[0])))
                 edtFrame.returnPressed.connect(partial(self._event_edtFrame_changed, iNbRow))
@@ -985,25 +1022,26 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
 
         #First look if there is any checked out item
-        self.toRemove = []
-        for iIdx in xrange(self.createModel.rowCount()):
-            pItem = self.createModel.item(iIdx)
-            if (pItem.isCheckable()):
-                if (pItem.checkState() == QtCore.Qt.Checked):
-                    self.toRemove.append(iIdx)
+        if (not self.bInSelChanged):
+            self.toRemove = []
+            for iIdx in xrange(self.createModel.rowCount()):
+                pItem = self.createModel.item(iIdx)
+                if (pItem.isCheckable()):
+                    if (pItem.checkState() == QtCore.Qt.Checked):
+                        self.toRemove.append(iIdx)
 
-        if (self.toRemove):
-            self._set_mode_info(Mode.Remove, True)
-        else:
-            #Prevent a stuck status when unchecking all item
-            self._set_mode_info(Mode.Switch, False)
-
-        if (self.mode == Mode.Switch):
-            pSel = self.ui.lstParent.selectedIndexes()
-            if (pSel):
-                self._set_mode_info(Mode.Switch, True)
+            if (self.toRemove):
+                self._set_mode_info(Mode.Remove, True)
             else:
+                #Prevent a stuck status when unchecking all item
                 self._set_mode_info(Mode.Switch, False)
+
+            if (self.mode == Mode.Switch):
+                pSel = self.ui.lstParent.selectedIndexes()
+                if (pSel):
+                    self._set_mode_info(Mode.Switch, True)
+                else:
+                    self._set_mode_info(Mode.Switch, False)
 
     def _event_edtFrame_changed(self, iRow):
         """
