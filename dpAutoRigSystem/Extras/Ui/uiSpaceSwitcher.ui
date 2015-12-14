@@ -65,20 +65,21 @@
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>200</height>
+        <height>250</height>
        </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="sizeConstraint">
-        <enum>QLayout::SetDefaultConstraint</enum>
-       </property>
-       <property name="margin">
-        <number>0</number>
-       </property>
        <item>
         <widget class="QLabel" name="lblSetupInfo">
          <property name="text">
           <string>&lt;b&gt;Parent Info&lt;/b&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblStatus">
+         <property name="text">
+          <string>Current Mode --&gt; &lt;b&gt;Inactive&lt;/b&gt;</string>
          </property>
         </widget>
        </item>
@@ -110,13 +111,6 @@
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="lblStatus">
-         <property name="text">
-          <string>Current Mode --&gt; &lt;b&gt;Inactive&lt;/b&gt;</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QListView" name="lstParent">
@@ -143,6 +137,49 @@
             <string>Setup</string>
            </property>
           </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblConstraintAxis">
+         <property name="text">
+          <string>Constrained Axis</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="lblPosAxis">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Position:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cbPosition"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="maximumSize">
+            <size>
+             <width>60</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Rotation:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="cbRotation"/>
          </item>
         </layout>
        </item>
