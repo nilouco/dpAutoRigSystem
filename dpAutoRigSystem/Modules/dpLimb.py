@@ -432,7 +432,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     elif jName == extremName and limbTypeName == LEG: #Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
                     elif jName == extremName and limbTypeName == ARM: #Hand
-                        cmds.setAttr(fkCtrl + ".rotateOrder", 1)
+                        cmds.setAttr(fkCtrl + ".rotateOrder", 4)
                     elif jName == mainName: #Leg and Shoulder
                         cmds.setAttr(fkCtrl + ".rotateOrder", 1)
                     elif limbTypeName == LEG: #Other legs ctrl
