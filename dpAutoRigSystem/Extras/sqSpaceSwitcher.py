@@ -601,10 +601,9 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         self.ui.cbRotation.setEnabled(False)
 
         # Intern variable
-        self.iJobSelChange = 0
-        self.iJobSceneOpen = 0
-        self.iJobUndo = 0
+        self.aEventCallbacksID = []
         self.pTimeJobCallback = None
+        self.pSceneUpdateID = None
         self.mode = Mode.Inactive
         self.nSelDriven = None
         self.aSelDrivers = []
@@ -628,13 +627,12 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
         self.nSelDriven = None
         self._fetch_system_from_scene()
-        self._scriptJob_selection_change()
+        self._callback_selection_change()
 
     def _setup_callbacks(self):
         """
         Setup the  button callback and also a callback in maya to know when a selection is changed
         """
-        # TODO - Change each callback for a Open Maya one
         self.ui.btnAction.pressed.connect(self._event_btnAction_pressed)
         self.ui.btnUpdateAll.pressed.connect(self._event_btnUpdateAll_pressed)
         self.ui.lstParent.clicked.connect(self._event_lstParent_selChanged)
@@ -643,13 +641,22 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         self.ui.cbRotation.currentIndexChanged.connect(self._event_cbRotation_selChanged)
         self.ui.btnRefresh.pressed.connect(self._event_btnRefresh_pressed)
 
+        '''
         self.iJobSelChange = pymel.scriptJob(event=('SelectionChanged', self._scriptJob_selection_change),
                                              compressUndo=True)
         self.iJobSceneOpen = pymel.scriptJob(event=('SceneOpened', self._scriptJob_scene_opened), compressUndo=False)
         # Do not put a job on the undo, since it cause problem with undo's themselves
         self.iJobUndo = pymel.scriptJob(event=('Undo', self._scriptJob_scene_undo), compressUndo=False)
-        self.ui.tblFrameInfo.paintEvent = self.tblFrame_paintEvent
+        '''
+
+        pUndoID = om.MEventMessage.addEventCallback("Undo", self._callback_scene_undoRedo)
+        pRedoID = om.MEventMessage.addEventCallback("Redo", self._callback_scene_undoRedo)
+        pSelectionChangeID = om.MEventMessage.addEventCallback("SelectionChanged", self._callback_selection_change)
+        self.pSceneUpdateID = om.MSceneMessage.addCallback(om.MSceneMessage.kSceneUpdate, self._callback_scene_updated)
         self.pTimeJobCallback = om.MDGMessage.addTimeChangeCallback(self._scriptJob_timeChanged, "onTimeChange")
+        self.aEventCallbacksID = [pUndoID, pRedoID, pSelectionChangeID]
+
+        self.ui.tblFrameInfo.paintEvent = self._tblFrame_paintEvent
 
     def _fetch_system_from_scene(self):
         """
@@ -712,7 +719,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             self.ui.lblStatus.setText(self.ui.lblStatus.text() + "Inactive")
             self.ui.btnAction.setText("Select a Node")
 
-    def _scriptJob_selection_change(self, *args):
+    def _callback_selection_change(self, *args):
         """
         Manage the selection change to know which action the user want to do. The remove action
         need to be implemented another way
@@ -776,13 +783,13 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
 
         self.bInSelChanged = False
 
-    def _scriptJob_scene_opened(self, *args):
+    def _callback_scene_updated(self, *args):
         """
         Find all SpaceSwitcher system in the scene
         """
         self._fetch_system_from_scene()
 
-    def _scriptJob_scene_undo(self, *args):
+    def _callback_scene_undoRedo(self, *args):
         """
         Ensure to refresh the UI on a undo in the scene
         """
@@ -797,7 +804,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         """
         self.ui.tblFrameInfo.viewport().update()
 
-    def tblFrame_paintEvent(self, event):
+    def _tblFrame_paintEvent(self, event):
         """
         Override the table paint event to redraw it when we need too
         :param event:
@@ -828,17 +835,10 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         :param args:
         :param kwargs:
         """
-        try:
-            if pymel.scriptJob(ex=self.iJobSelChange):
-                pymel.scriptJob(kill=self.iJobSelChange, force=True)
-            if pymel.scriptJob(ex=self.iJobSceneOpen):
-                pymel.scriptJob(kill=self.iJobSceneOpen, force=True)
-            if pymel.scriptJob(ex=self.iJobUndo):
-                pymel.scriptJob(kill=self.iJobUndo, force=True)
-
-            om.MDGMessage.removeCallback(self.pTimeJobCallback)
-        except:
-            pass
+        om.MDGMessage.removeCallback(self.pTimeJobCallback)
+        for pId in self.aEventCallbacksID:
+            om.MEventMessage.removeCallback(pId)
+        om.MSceneMessage.removeCallback(self.pSceneUpdateID)
 
     def _update_info(self, pSpData):
         """
