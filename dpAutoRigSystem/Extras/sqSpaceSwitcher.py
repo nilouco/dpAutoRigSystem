@@ -724,64 +724,67 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         Manage the selection change to know which action the user want to do. The remove action
         need to be implemented another way
         """
-        self.bInSelChanged = True
-        aCurSel = pymel.selected()
+        if not self.bBlockSelJob:
+            self.bInSelChanged = True
+            aCurSel = pymel.selected()
 
-        if len(aCurSel) == 0:
-            self.nSelDriven = None
-            self.aSelDrivers = []
-        elif len(aCurSel) == 1:
-            self.nSelDriven = aCurSel[0]
-            self.aSelDrivers = []
-        else:
-            self.nSelDriven = aCurSel[-1]
-            self.aSelDrivers = aCurSel[0:-1]
-
-        self._set_mode_info(Mode.Inactive, False)
-
-        self.pSelSpSys = None
-        if self.nSelDriven is not None:
-            # Look for existing space switcher system
-            for i, pSp in enumerate(self.aSceneSpaceSwitch):
-                if pSp.nDriven == self.nSelDriven:
-                    self.pSelSpSys = pSp
-                    break
-            self._update_info(self.pSelSpSys)
-
-            if self.pSelSpSys is None:
-                nDrivenParent = self.nSelDriven.getParent()
-                if nDrivenParent is None and pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
-                    self._set_mode_info(Mode.Create, False)
-                else:
-                    # TODO - Check if the parent can possibly receive a constraint on it
-                    self._set_mode_info(Mode.Create, True)
+            if len(aCurSel) == 0:
+                self.nSelDriven = None
+                self.aSelDrivers = []
+            elif len(aCurSel) == 1:
+                self.nSelDriven = aCurSel[0]
+                self.aSelDrivers = []
             else:
-                if self.aSelDrivers:
-                    if not self.pSelSpSys.is_parent_exist(self.aSelDrivers):  # If no selected parent already exist
-                        self._set_mode_info(Mode.Add, True)
-                    else:
-                        if len(self.aSelDrivers) == 1:
-                            self._set_mode_info(Mode.SwitchSelect, True)
-                            iParentIdx = self.pSelSpSys.aDrivers.index(self.aSelDrivers[0])
+                self.nSelDriven = aCurSel[-1]
+                self.aSelDrivers = aCurSel[0:-1]
 
-                            pIdx = self.ui.lstParent.model().createIndex(iParentIdx + 1, 0)
-                            self.ui.lstParent.selectionModel().select(pIdx, QtGui.QItemSelectionModel.Select)
+            self._set_mode_info(Mode.Inactive, False)
+
+            self.pSelSpSys = None
+            if self.nSelDriven is not None:
+                # Look for existing space switcher system
+                for i, pSp in enumerate(self.aSceneSpaceSwitch):
+                    if pSp.nDriven == self.nSelDriven:
+                        self.pSelSpSys = pSp
+                        break
+                self._update_info(self.pSelSpSys)
+
+                if self.pSelSpSys is None:
+                    #Check to ensure that the callback will not catch a network node when we create a new system
+                    if pymel.nodeType(self.nSelDriven) != "network":
+                        nDrivenParent = self.nSelDriven.getParent()
+                        if nDrivenParent is None and pymel.referenceQuery(self.nSelDriven, isNodeReferenced=True):
+                            self._set_mode_info(Mode.Create, False)
                         else:
-                            self._set_mode_info(Mode.Add, True)
+                            # TODO - Check if the parent can possibly receive a constraint on it
+                            self._set_mode_info(Mode.Create, True)
                 else:
-                    # If a parent is selected in the list, active the button to do the switch
-                    pSel = self.ui.lstParent.selectedIndexes()
-                    if pSel:
-                        self._set_mode_info(Mode.Switch, True)
+                    if self.aSelDrivers:
+                        if not self.pSelSpSys.is_parent_exist(self.aSelDrivers):  # If no selected parent already exist
+                            self._set_mode_info(Mode.Add, True)
+                        else:
+                            if len(self.aSelDrivers) == 1:
+                                self._set_mode_info(Mode.SwitchSelect, True)
+                                iParentIdx = self.pSelSpSys.aDrivers.index(self.aSelDrivers[0])
+
+                                pIdx = self.ui.lstParent.model().createIndex(iParentIdx + 1, 0)
+                                self.ui.lstParent.selectionModel().select(pIdx, QtGui.QItemSelectionModel.Select)
+                            else:
+                                self._set_mode_info(Mode.Add, True)
                     else:
-                        self._set_mode_info(Mode.SwitchSelect, True)
-                        pIdx = self.ui.lstParent.model().createIndex(0, 0)
-                        self.ui.lstParent.selectionModel().select(pIdx, QtGui.QItemSelectionModel.Select)
+                        # If a parent is selected in the list, active the button to do the switch
+                        pSel = self.ui.lstParent.selectedIndexes()
+                        if pSel:
+                            self._set_mode_info(Mode.Switch, True)
+                        else:
+                            self._set_mode_info(Mode.SwitchSelect, True)
+                            pIdx = self.ui.lstParent.model().createIndex(0, 0)
+                            self.ui.lstParent.selectionModel().select(pIdx, QtGui.QItemSelectionModel.Select)
 
-        else:
-            self._update_info(None)
+            else:
+                self._update_info(None)
 
-        self.bInSelChanged = False
+            self.bInSelChanged = False
 
     def _callback_scene_updated(self, *args):
         """
@@ -835,10 +838,13 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         :param args:
         :param kwargs:
         """
-        om.MDGMessage.removeCallback(self.pTimeJobCallback)
-        for pId in self.aEventCallbacksID:
-            om.MEventMessage.removeCallback(pId)
-        om.MSceneMessage.removeCallback(self.pSceneUpdateID)
+        try:
+            om.MDGMessage.removeCallback(self.pTimeJobCallback)
+            for pId in self.aEventCallbacksID:
+                om.MEventMessage.removeCallback(pId)
+            om.MSceneMessage.removeCallback(self.pSceneUpdateID)
+        except:
+            pass
 
     def _update_info(self, pSpData):
         """
@@ -1057,6 +1063,9 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 else:
                     bCreateParent = True
 
+            #Block undo and selection changed callback for the moment we need export the network
+            pymel.undoInfo(stateWithoutFlush=False)
+            self.bBlockSelJob = True
             pNewSp = SpaceSwitcherLogic()
             if self.aSelDrivers:
                 pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=False,
@@ -1065,15 +1074,22 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 pNewSp.setup_space_switch(self.nSelDriven, self.aSelDrivers, bCreateWolrdNode=True,
                                           bCreateParent=bCreateParent)
             libSerialization.export_network(pNewSp)
+            self.bBlockSelJob = False
+            pymel.undoInfo(stateWithoutFlush=True)
             self.ui.cbSysList.addItem(pNewSp.nDriven.name())
             self.aSceneSpaceSwitch.append(pNewSp)
 
         elif self.mode == Mode.Add:
+            #Block undo and selection changed callback for the moment we need export the network
+            pymel.undoInfo(stateWithoutFlush=False)
+            self.bBlockSelJob = True
             self.pSelSpSys.add_target(self.aSelDrivers)
             # Delete the old network before updating a new one
             aNetwork = libSerialization.getConnectedNetworks(self.pSelSpSys.nDriven, recursive=False)
             pymel.delete(aNetwork)
             libSerialization.export_network(self.pSelSpSys)
+            self.bBlockSelJob = False
+            pymel.undoInfo(stateWithoutFlush=True)
 
         elif self.mode == Mode.Switch:
             pCurParent = self.ui.lstParent.selectedIndexes()[0]
@@ -1106,10 +1122,15 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 self.aSceneSpaceSwitch.remove(self.pSelSpSys)
                 self.pSelSpSys = None
             else:
+                #Block undo and selection changed callback for the moment we need export the network
+                pymel.undoInfo(stateWithoutFlush=False)
+                self.bBlockSelJob = True
                 for iIdx in self.toRemove:
                     self.pSelSpSys.remove_target(iIdx - 1)
                 # Recreate the network with refreshed data
                 libSerialization.export_network(self.pSelSpSys)
+                self.bBlockSelJob = True
+                pymel.undoInfo(stateWithoutFlush=True)
 
         pymel.select(self.nSelDriven)
 
