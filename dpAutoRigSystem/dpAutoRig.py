@@ -810,9 +810,19 @@ class DP_AutoRig_UI:
                 # identify the guide modules and add to the moduleInstancesList:
                 moduleClass = getattr(mod, mod.CLASS_NAME)
                 dpUIinst = self
-                rigType = cmds.getAttr(module[2] + ".rigType")
-                moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], rigType)
-                self.moduleInstancesList.append(moduleInst)
+                if cmds.attributeQuery("rigType", node=module[2], ex=True):
+                    curRigType = cmds.getAttr(module[2] + ".rigType")
+                    moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], curRigType)
+                    self.moduleInstancesList.append(moduleInst)
+                else:
+                    if cmds.attributeQuery("Style", node=module[2], ex=True):
+                        iStyle = cmds.getAttr(module[2] + ".Style")
+                        if (iStyle == 0 or iStyle == 1):
+                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.biped)
+                        else:
+                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.quadruped)
+                    else:
+                        moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.default)
         # edit the footer A text:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
