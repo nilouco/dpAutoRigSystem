@@ -374,6 +374,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 utils.addHook(objName=self.grpHead, hookType='rootHook')
                 utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
                 utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+
+                #Ensure head Jxt matrix
+                mHead = cmds.getAttr(self.headCtrl + ".worldMatrix")
+                cmds.xform(self.headJxt, m=mHead, ws=True)
+
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 
