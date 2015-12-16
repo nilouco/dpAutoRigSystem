@@ -96,6 +96,13 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
     limbJoints.extend(downLimb['skinJointsList'])
     
     jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
+    '''
+    Deactivate the segment scale compensate on the bone to prevent scaling problem in maya 2016
+    It will prevent a double scale problem that will come from the upper parent in the rig
+    '''
+    if (int(cmds.about(version=True)[:4]) >= 2016):
+        for nBone in limbJoints:
+            cmds.setAttr(nBone+".segmentScaleCompensate", 0)
     
     for i in range(len(limbJoints)):
         limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_'+`i+1`+'_Jnt')

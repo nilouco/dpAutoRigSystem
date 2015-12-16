@@ -813,7 +813,6 @@ class DP_AutoRig_UI:
                 if cmds.attributeQuery("rigType", node=module[2], ex=True):
                     curRigType = cmds.getAttr(module[2] + ".rigType")
                     moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], curRigType)
-                    self.moduleInstancesList.append(moduleInst)
                 else:
                     if cmds.attributeQuery("Style", node=module[2], ex=True):
                         iStyle = cmds.getAttr(module[2] + ".Style")
@@ -823,6 +822,7 @@ class DP_AutoRig_UI:
                             moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.quadruped)
                     else:
                         moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.default)
+                self.moduleInstancesList.append(moduleInst)
         # edit the footer A text:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
@@ -1297,6 +1297,7 @@ class DP_AutoRig_UI:
                                     revFootCtrlShape  = self.integratedTaskDic[moduleDic]['revFootCtrlShapeList'][s]
                                     toLimbIkHandleGrp = self.integratedTaskDic[moduleDic]['toLimbIkHandleGrpList'][s]
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
+                                    scaleConst        = self.integratedTaskDic[moduleDic]['scaleConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
                                     ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
                                     middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
@@ -1313,10 +1314,12 @@ class DP_AutoRig_UI:
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     # do task actions in order to integrate the limb and foot:
-                                    cmds.delete(ikHandlePointConst, parentConst)
+                                    cmds.delete(ikHandlePointConst, parentConst, scaleConst)
                                     cmds.parent(revFootCtrlZero, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    parentConstExtremFoot = cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
+                                    #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
+                                    cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
+                                    cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScaleConstraint")[0]
                                     if limbType == LEG:
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
@@ -1328,6 +1331,12 @@ class DP_AutoRig_UI:
                                                 cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
                                                 cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateY", cmds.getAttr(parentConstToRFOffset+".fixOffsetY"))
                                                 cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateZ", cmds.getAttr(parentConstToRFOffset+".fixOffsetZ"))
+                                    #Maya 2016 --> Scale constraint behavior
+                                    # is fixed and a single master scale constraint doesn't work anymore
+                                    if (int(cmds.about(version=True)[:4]) >= 2016):
+                                        scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                        pymel.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
+
 
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
@@ -1387,16 +1396,23 @@ class DP_AutoRig_UI:
                             # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
-                            
-                            if fatherModule == SPINE:
-                                self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                                self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                                # working with item guide mirror:
-                                self.itemMirrorNameList = [""]
-                                # get itemGuideName:
-                                if self.itemGuideMirrorAxis != "off":
-                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
-                                for s, sideName in enumerate(self.itemMirrorNameList):
+
+                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                            # working with item guide mirror:
+                            self.itemMirrorNameList = [""]
+                            # get itemGuideName:
+                            if self.itemGuideMirrorAxis != "off":
+                                self.itemMirrorNameList = self.itemGuideMirrorNameList
+
+                            for s, sideName in enumerate(self.itemMirrorNameList):
+                                #Maya 2016 --> Scale constraint behavior
+                                # is fixed and a single master scale constraint doesn't work anymore
+                                if (int(cmds.about(version=True)[:4]) >= 2016):
+                                    scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                    pymel.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
+
+                                if fatherModule == SPINE:
                                     # getting limb data:
                                     limbType             = self.integratedTaskDic[moduleDic]['limbType']
                                     ikCtrlZero           = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
@@ -1480,6 +1496,9 @@ class DP_AutoRig_UI:
                             fixIkSpringSolverGrp = self.integratedTaskDic[moduleDic]['fixIkSpringSolverGrpList']
                             if fixIkSpringSolverGrp:
                                 cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
+                                if (int(cmds.about(version=True)[:4]) >= 2016):
+                                    for nFix in fixIkSpringSolverGrp:
+                                        pymel.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScaleConstraint")
                             
                         # integrate the volumeVariation attribute from Spine module to optionCtrl:
                         if moduleType == SPINE:
@@ -1494,6 +1513,11 @@ class DP_AutoRig_UI:
                                 # connect the optionCtrl vvAttr to hipsA vvAttr and hide it for each side of the mirror (if it exists):
                                 hipsA  = self.integratedTaskDic[moduleDic]['hipsAList'][s]
                                 vvAttr = self.integratedTaskDic[moduleDic]['volumeVariationAttrList'][s]
+                                #Maya 2016 --> Scale constraint behavior
+                                # is fixed and a single master scale constraint doesn't work anymore
+                                if (int(cmds.about(version=True)[:4]) >= 2016):
+                                    clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                    pymel.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScaleConstraint")
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
