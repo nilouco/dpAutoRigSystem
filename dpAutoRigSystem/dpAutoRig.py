@@ -1335,7 +1335,7 @@ class DP_AutoRig_UI:
                                     # is fixed and a single master scale constraint doesn't work anymore
                                     if (int(cmds.about(version=True)[:4]) >= 2016):
                                         scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                        pymel.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
+                                        cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
 
 
                                     # hide this control shape
@@ -1410,7 +1410,7 @@ class DP_AutoRig_UI:
                                 # is fixed and a single master scale constraint doesn't work anymore
                                 if (int(cmds.about(version=True)[:4]) >= 2016):
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                    pymel.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
+                                    cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
 
                                 if fatherModule == SPINE:
                                     # getting limb data:
@@ -1498,7 +1498,7 @@ class DP_AutoRig_UI:
                                 cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
                                 if (int(cmds.about(version=True)[:4]) >= 2016):
                                     for nFix in fixIkSpringSolverGrp:
-                                        pymel.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScaleConstraint")
+                                        cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScaleConstraint")
                             
                         # integrate the volumeVariation attribute from Spine module to optionCtrl:
                         if moduleType == SPINE:
@@ -1517,7 +1517,7 @@ class DP_AutoRig_UI:
                                 # is fixed and a single master scale constraint doesn't work anymore
                                 if (int(cmds.about(version=True)[:4]) >= 2016):
                                     clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                    pymel.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScaleConstraint")
+                                    cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScaleConstraint")
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
@@ -1585,6 +1585,14 @@ class DP_AutoRig_UI:
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ikCtrlZero = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
                                 scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
+
+                                '''
+                                Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
+                                Release node MAYA-45759 http://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
+                                '''
+                                if (int(cmds.about(version=True)[:4]) >= 2016):
+                                    cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
+
                                 # correct ikCtrl parent to root ctrl:
                                 cmds.parent(ikCtrlZero, self.ctrlsVisGrp, relative=True)
                                 # get father guide data:
