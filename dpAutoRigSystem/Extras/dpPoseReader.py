@@ -209,14 +209,14 @@ class PoseReaderDialog(QtGui.QMainWindow):
         pData.nChildLoc.angleMaxValue.set(args[0])
 
     def on_action_textChange(self, *args):
-        sName = self.ui.edtNewName.toPlainText()
+        sName = self.ui.edtNewName.text()
         if sName:
             self.ui.btnCreate.setEnabled(True)
         else:
             self.ui.btnCreate.setEnabled(False)
 
     def on_action_create(self, *args):
-        sName = self.ui.edtNewName.toPlainText()
+        sName = self.ui.edtNewName.text()
 
         # loading Maya matrix node
         if not (cmds.pluginInfo("decomposeMatrix", query=True, loaded=True)):
@@ -256,8 +256,8 @@ class PoseReaderDialog(QtGui.QMainWindow):
 
                 #Setup the rotation extaction
                 pData.nMultM = pymel.createNode("multMatrix", name=sName+"_ExtactAngle_MM")
-                pymel.connectAttr(pData.nParentLoc.worldMatrix[0], pData.nMultM.matrixIn[0])
-                pymel.connectAttr(pData.nChildLoc.worldInverseMatrix[0], pData.nMultM.matrixIn[1])
+                pymel.connectAttr(pData.nChildLoc.worldMatrix[0], pData.nMultM.matrixIn[0])
+                pymel.connectAttr(pData.nParentLoc.worldInverseMatrix[0], pData.nMultM.matrixIn[1])
                 pData.nDecM = pymel.createNode("decomposeMatrix", name=sName+"_ExtractAngle_DM")
                 pymel.connectAttr(pData.nMultM.matrixSum, pData.nDecM.inputMatrix)
 
