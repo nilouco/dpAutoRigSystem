@@ -1,5 +1,6 @@
 # importing libraries:
 import maya.cmds as cmds
+import maya.OpenMaya as om
 
 from Library import dpControls as ctrls
 from Library import dpUtils as utils
@@ -57,12 +58,11 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_ParentConstraint")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_ParentConstraint")
-        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_ScaleConstraint")
-    
-    
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ParentConstraint")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
+        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScaleConstraint")
+        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScaleConstraint")
+
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
@@ -79,22 +79,6 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
         # start analisys the difference between values:
         if self.enteredNJoints != self.currentNJoints:
-            # check if the controls have scale changed values in order to avoid the transform groups created from maya without namespace:
-            scaledCtrl = False
-            scaledCtrlDic = {}
-            for j in range(1, self.currentNJoints+1):
-                if cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleX") != 1 or cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleY") != 1 or cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ") != 1:
-                    scaledCtrl = True
-                    # get scale values:
-                    scaledX = cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleX")
-                    scaledY = cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleY")
-                    scaledZ = cmds.getAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ")
-                    # store scale values in the dictionary:
-                    scaledCtrlDic[j] = [scaledX, scaledY, scaledZ]
-                    # reset scales values to 1,1,1:
-                    cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleX", 1)
-                    cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleY", 1)
-                    cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ", 1)
             # unparent temporarely the Ends:
             self.cvEndJoint = self.guideName+"_JointEnd"
             cmds.parent(self.cvEndJoint, world=True)
@@ -114,9 +98,11 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     # create a joint to use like an arrowLine:
                     self.jGuide = cmds.joint(name=self.guideName+"_JGuide"+str(n), radius=0.001)
                     cmds.setAttr(self.jGuide+".template", 1)
-                    cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1))
-                    cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=True, name=self.jGuide+"_ParentConstraint")
-                    cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=True, name=self.jGuide+"_ScaleConstraint")
+                    #Prevent a intermidiate node to be added
+                    cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1), relative=True)
+                    #Do not maintain offset and ensure cv will be at the same place than the joint
+                    cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ParentConstraint")
+                    cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScaleConstraint")
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvEndJoint:
                 self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
@@ -131,19 +117,20 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(self.guideName+"_JointLoc"+str(self.enteredNJoints+1))
                 cmds.delete(self.guideName+"_JGuide"+str(self.enteredNJoints+1))
             # re-parent cvEndJoint:
+            pTempParent = cmds.listRelatives(self.cvEndJoint, p=True)
             cmds.parent(self.cvEndJoint, self.cvJointLoc)
+
+            #Ensure to remove temp parent from the unparenting done on the end joint
+            if pTempParent:
+                cmds.delete(pTempParent)
             cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-            cmds.parent(self.jGuideEnd, self.jGuide)
-            # actualise the nJoints in the moduleGrp:
+            pTempParent = cmds.listRelatives(self.jGuideEnd, p=True)
+            cmds.parent(self.jGuideEnd, self.jGuide, relative=True)
+            if pTempParent:
+                cmds.delete(pTempParent)
+
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
-            # reset changed scale values again:
-            if scaledCtrl:
-                for j in scaledCtrlDic:
-                    if cmds.objExists(self.guideName+"_JointLoc"+str(j)):
-                        cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleX", scaledCtrlDic[j][0])
-                        cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleY", scaledCtrlDic[j][1])
-                        cmds.setAttr(self.guideName+"_JointLoc"+str(j)+".scaleZ", scaledCtrlDic[j][2])
             # re-build the preview mirror:
             Layout.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)

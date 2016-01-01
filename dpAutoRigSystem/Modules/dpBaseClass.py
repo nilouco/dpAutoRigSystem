@@ -9,6 +9,7 @@ from Library import dpUtils as utils
 class RigType:
     biped = "biped"
     quadruped = "quadruped"
+    default = "unknown" #Support old guide system
 
 class StartClass:
     def __init__(self, dpUIinst, langDic, langName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON):
