@@ -204,39 +204,36 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.middleFootJxt+".segmentScaleCompensate", 0)
                     cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
-                # reverse foot joints:
-                self.RFAJxt = cmds.joint(name=side + self.userGuideName + "_" + outsideRFAttr.capitalize() + "_Jxt")
-                self.RFBJxt = cmds.joint(name=side + self.userGuideName + "_" + insideRFAttr.capitalize() + "_Jxt")
-                self.RFCJxt = cmds.joint(name=side + self.userGuideName + "_" + heelRFAttr.capitalize() + "_Jxt")
-                self.RFDJxt = cmds.joint(name=side + self.userGuideName + "_" + toeRFAttr.capitalize() + "_Jxt")
-                self.RFEJxt = cmds.joint(name=side + self.userGuideName + "_" + ballRFAttr.capitalize() + "_Jxt")
-                self.RFEndJxt = cmds.joint(name=side + self.userGuideName + "_RFEnd_Jxt")
+                # reverse foot groups:
+                self.RFAJxt = cmds.group(name=side + self.userGuideName + "_" + outsideRFAttr.capitalize() + "_Grp", empty=True)
+                self.RFBJxt = cmds.group(name=side + self.userGuideName + "_" + insideRFAttr.capitalize() + "_Grp", empty=True)
+                self.RFCJxt = cmds.group(name=side + self.userGuideName + "_" + heelRFAttr.capitalize() + "_Grp", empty=True)
+                self.RFDJxt = cmds.group(name=side + self.userGuideName + "_" + toeRFAttr.capitalize() + "_Grp", empty=True)
+                self.RFEJxt = cmds.group(name=side + self.userGuideName + "_" + ballRFAttr.capitalize() + "_Grp", empty=True)
+                self.RFEndJxt = cmds.group(name=side + self.userGuideName + "_RFEnd_Grp", empty=True)
                 rfJointList = [self.RFAJxt, self.RFBJxt, self.RFCJxt, self.RFDJxt, self.RFEJxt]
                 self.ballRFList.append(self.RFEJxt)
-                # set as template using overrides in order to permit no template children:
-                for rfJoint in rfJointList:
-                    cmds.setAttr(rfJoint+'.visibility', 0)
-                '''
-                for rfJoint in rfJointList:
-                    cmds.setAttr(rfJoint+'.overrideEnabled', 1)
-                    cmds.setAttr(rfJoint+'.overrideDisplayType', 1)
-                cmds.setAttr(self.footJnt+'.overrideEnabled', 1)
-                cmds.setAttr(self.middleFootJnt+'.overrideEnabled', 1)
-                '''
-                # reverse foot zero out joints:
-                self.RFEJzt = utils.zeroOutJoints([self.RFEJxt])[0]
-                self.RFDJzt = utils.zeroOutJoints([self.RFDJxt])[0]
-                self.RFCJzt = utils.zeroOutJoints([self.RFCJxt])[0]
-                self.RFBJzt = utils.zeroOutJoints([self.RFBJxt])[0]
-                self.RFAJzt = utils.zeroOutJoints([self.RFAJxt])[0]
+                cmds.parent(self.RFBJxt, self.RFAJxt)
+                cmds.parent(self.RFCJxt, self.RFBJxt)
+                cmds.parent(self.RFDJxt, self.RFCJxt)
+                cmds.parent(self.RFEJxt, self.RFDJxt)
+                cmds.parent(self.RFEndJxt, self.RFEJxt)
+                
+                # reverse foot zero out groups:
+                self.RFEJzt = utils.zeroOut([self.RFEJxt])[0]
+                self.RFDJzt = utils.zeroOut([self.RFDJxt])[0]
+                self.RFCJzt = utils.zeroOut([self.RFCJxt])[0]
+                self.RFBJzt = utils.zeroOut([self.RFBJxt])[0]
+                self.RFAJzt = utils.zeroOut([self.RFAJxt])[0]
+                self.RFAJztExtra = utils.zeroOut([self.RFAJzt])[0]
                 rfJointZeroList = [self.RFAJzt, self.RFBJzt, self.RFCJzt, self.RFDJzt, self.RFEJzt]
 
-                # putting joints in the correct place:
+                # putting groups in the correct place:
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footJnt, maintainOffset=False)
                 tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootJxt, maintainOffset=False)
                 tempToDelC = cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False)
                 tempToDelD = cmds.parentConstraint(self.cvEndJoint, self.endBJnt, maintainOffset=False)
-                tempToDelE = cmds.parentConstraint(self.cvRFALoc, self.RFAJzt, maintainOffset=False)
+                tempToDelE = cmds.parentConstraint(self.cvRFALoc, self.RFAJztExtra, maintainOffset=False)
                 tempToDelF = cmds.parentConstraint(self.cvRFBLoc, self.RFBJzt, maintainOffset=False)
                 tempToDelG = cmds.parentConstraint(self.cvRFCLoc, self.RFCJzt, maintainOffset=False)
                 tempToDelH = cmds.parentConstraint(self.cvRFDLoc, self.RFDJzt, maintainOffset=False)
@@ -244,7 +241,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 tempToDelJ = cmds.parentConstraint(self.cvEndJoint, self.RFEndJxt, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG,
                             tempToDelH, tempToDelI, tempToDelJ)
-                cmds.makeIdentity(rfJointZeroList, apply=True, translate=True, rotate=True, scale=True)
+                cmds.makeIdentity(rfJointZeroList, apply=True, translate=False, rotate=True, scale=True)
 
                 # creating ikHandles:
                 ikHandleAnkleList = cmds.ikHandle(
@@ -292,7 +289,8 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                                                     name=self.footJnt + "_ParentConstraint")[0]
                 self.parentConstList.append(parentConst)
                 self.footJntList.append(self.footJnt)
-                cmds.parent(self.RFAJzt, self.footCtrl, absolute=True)
+                cmds.parent(self.RFAJztExtra, self.footCtrl, absolute=True)
+                
                 scaleConst = cmds.scaleConstraint(self.footCtrl, self.footJnt, maintainOffset=True,
                                                   name=self.footJnt + "_ScaleConstraint")
                 self.scaleConstList.append(scaleConst)
@@ -301,7 +299,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.scaleConstraint(self.middleFootCtrl, self.middleFootJnt, maintainOffset=True,
                                      name=self.middleFootJnt + "_ScaleConstraint")
 
-                # add attributes to footCtrl and connect them to joint rotation:
+                # add attributes to footCtrl and connect them to reverseFoot groups rotation:
                 rfAttrList = [outsideRFAttr, insideRFAttr, heelRFAttr, toeRFAttr, ballRFAttr]
                 rfTypeAttrList = [rfRoll, rfSpin]
                 for j, rfAttr in enumerate(rfAttrList):
@@ -345,12 +343,14 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.footCtrl + "." + sideRFAttr + "_" + rfRoll, sideClamp + ".inputG", force=True)
                 cmds.connectAttr(sideClamp + ".outputR", self.RFAJzt + ".rotateX", force=True)
                 cmds.connectAttr(sideClamp + ".outputG", self.RFBJzt + ".rotateX", force=True)
+
                 # for footRoll:
                 footClamp = cmds.createNode("clamp", name=side + self.userGuideName + "_Foot_Clp")
                 # heel values in R
                 cmds.setAttr(footClamp + ".maxR", 360)
                 cmds.connectAttr(self.footCtrl + "." + footRFAttr + "_" + rfRoll, footClamp + ".inputR", force=True)
                 cmds.connectAttr(footClamp + ".outputR", self.RFCJzt + ".rotateY", force=True)
+                
                 # set driven keys
                 cmds.setDrivenKeyframe(self.RFEJzt + ".rotateY",
                                        currentDriver=self.footCtrl + "." + footRFAttr + "_" + rfRoll, driverValue=0,
