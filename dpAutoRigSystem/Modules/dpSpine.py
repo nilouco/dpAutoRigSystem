@@ -30,6 +30,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         self.aHipsAList = []
         self.aChestAList = []
         self.aVolVariationAttrList = []
+        self.aActVolVariationAttrList = []
+        self.aMScaleVolVariationAttrList = []
         self.aFkCtrl = []
         self.aIkCtrl = []
         self.aRbnJointList = []
@@ -198,14 +200,15 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 self.chestB = \
                 cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "B_Ctrl",
                             ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
-                cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_' + self.langDic[self.langName][
-                    'c_volumeVariation'],
-                             attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 ctrls.setLockHide([self.hipsA, self.hipsB, self.chestA, self.chestB], ['v'], l=False)
                 self.aHipsAList.append(self.hipsA)
                 self.aChestAList.append(self.chestA)
-                self.aVolVariationAttrList.append(
-                    side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'])
+                self.aVolVariationAttrList.append(side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'])
+                self.aActVolVariationAttrList.append(side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'])
+                self.aMScaleVolVariationAttrList.append(side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'])
 
                 # Setup axis order
                 if self.rigType == Base.RigType.quadruped:
@@ -334,13 +337,20 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(arcLenShape + '.arcLengthInV', rbnMD + '.input2X')
                 cmds.setAttr(rbnMD + '.input1X', arcLenValue)
                 cmds.setAttr(rbnMD + '.operation', 2)
-                # create a blendColor in order to get the correct result value of volumeVariation:
+                # create a blendColor, a condition and a multiplyDivide in order to get the correct result value of volumeVariation:
                 rbnBlendColors = cmds.createNode('blendColors', name=side + self.userGuideName + "_Rbn_BlendColor")
-                cmds.connectAttr(self.hipsA + '.' + side + self.userGuideName + '_' + self.langDic[self.langName][
-                    'c_volumeVariation'],
-                                 rbnBlendColors + '.blender')
+                cmds.connectAttr(self.hipsA + '.' + side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'], rbnBlendColors + '.blender')
+                rbnCond = cmds.createNode('condition', name=side+self.userGuideName+'_Rbn_Cond')
+                cmds.connectAttr(self.hipsA + '.' + side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'], rbnCond + '.firstTerm')
+                cmds.connectAttr(rbnBlendColors+'.outputR', rbnCond + '.colorIfTrueR')
                 cmds.connectAttr(rbnMD + '.outputX', rbnBlendColors + '.color1R')
+                rbnVVMD = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_Rbn_VV_MD")
+                cmds.connectAttr(self.hipsA + '.' + side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'], rbnVVMD + '.input2X')
+                cmds.connectAttr(rbnVVMD + '.outputX', rbnCond + '.colorIfFalseR')
+                cmds.setAttr(rbnVVMD + '.operation', 2)
+                cmds.setAttr(rbnVVMD + '.input1X', 1)
                 cmds.setAttr(rbnBlendColors + '.color2R', 1)
+                cmds.setAttr(rbnCond+".secondTerm", 1)
                 # middle ribbon setup:
                 for n in range(1, self.nJoints - 1):
                     self.middle = cmds.circle(
@@ -378,8 +388,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     # add originedFrom attribute to this middle ctrl:
                     utils.originedFrom(objName=self.middle, attrString=middleLocGuide)
                     # apply volumeVariation to joints in the middle ribbon setup:
-                    cmds.connectAttr(rbnBlendColors + '.outputR', self.aRbnJointList[n] + '.scaleX')
-                    cmds.connectAttr(rbnBlendColors + '.outputR', self.aRbnJointList[n] + '.scaleZ')
+                    cmds.connectAttr(rbnCond + '.outColorR', self.aRbnJointList[n] + '.scaleX')
+                    cmds.connectAttr(rbnCond + '.outColorR', self.aRbnJointList[n] + '.scaleZ')
                 # organize groups:
                 self.rbnRigGrp = cmds.group(name=side + self.userGuideName + "_Grp", empty=True)
                 self.rbnControlGrp = cmds.group(name=side + self.userGuideName + "_Control_Grp", empty=True)
@@ -418,6 +428,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 "hipsAList": self.aHipsAList,
                 "chestAList": self.aChestAList,
                 "volumeVariationAttrList": self.aVolVariationAttrList,
+                "ActiveVolumeVariationAttrList": self.aActVolVariationAttrList,
+                "MasterScaleVolumeVariationAttrList": self.aMScaleVolVariationAttrList,
                 "FkCtrls": self.aFkCtrl,
                 "IkCtrls": self.aIkCtrl,
                 "jointList": self.aRbnJointList,

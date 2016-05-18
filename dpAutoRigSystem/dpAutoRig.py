@@ -1513,6 +1513,8 @@ class DP_AutoRig_UI:
                                 # connect the optionCtrl vvAttr to hipsA vvAttr and hide it for each side of the mirror (if it exists):
                                 hipsA  = self.integratedTaskDic[moduleDic]['hipsAList'][s]
                                 vvAttr = self.integratedTaskDic[moduleDic]['volumeVariationAttrList'][s]
+                                actVVAttr = self.integratedTaskDic[moduleDic]['ActiveVolumeVariationAttrList'][s]
+                                mScaleVVAttr = self.integratedTaskDic[moduleDic]['MasterScaleVolumeVariationAttrList'][s]
                                 #Maya 2016 --> Scale constraint behavior
                                 # is fixed and a single master scale constraint doesn't work anymore
                                 if (int(cmds.about(version=True)[:4]) >= 2016):
@@ -1521,6 +1523,11 @@ class DP_AutoRig_UI:
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
+                                cmds.addAttr(self.optionCtrl, longName=actVVAttr, attributeType="bool", defaultValue=True, keyable=True)
+                                cmds.connectAttr(self.optionCtrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
+                                cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
+                                cmds.connectAttr(self.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
+                                cmds.setAttr(hipsA+'.'+mScaleVVAttr, keyable=False)
                                 if bColorize:
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['FkCtrls'][s], "cyan")
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['IkCtrls'][s], "yellow")

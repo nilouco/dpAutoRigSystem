@@ -254,6 +254,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.scaleConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_ScaleConstraint")
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False))
                 cmds.setAttr(self.jawJnt+".segmentScaleCompensate", 0)
+                cmds.setAttr(self.chinJnt+".segmentScaleCompensate", 0)
 
                 # create interations between neck and head:
                 self.grpNeck = cmds.group(self.zeroCtrlList[0], name=self.neckCtrl+"_Grp")

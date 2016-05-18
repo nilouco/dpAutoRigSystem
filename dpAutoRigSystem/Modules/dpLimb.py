@@ -333,6 +333,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".rotateY", -90)
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateX", 10)
+            cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
             cmds.delete(self.cornerGrp + "_AimConstraint")
             cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0),
                                worldUpType="object", worldUpObject=self.cvUpVectorLoc,
