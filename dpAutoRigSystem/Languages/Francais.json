@@ -158,7 +158,14 @@
     "m070_duplicate"     : "Dupliquer",
     "m071_SpaceSwitcher" : "Changeur d'espace",
     "m072_SpaceSwitcherDesc" : "Les premiers éléments sélectionné seront utilisés comme parent au dernier objet selection. Pour faire le changement de parent, utilisez l'outil pour une meilleure efficacité",
-
+    "m073_single"        : "Unique",
+    "m074_singleDesc"    : "Description du module Unique:\n\nCe module crée un joint unique\nqu'on peut l'utiliser pour créer des rigs très simples\nou pour rigs faciales avec l'option Indirect Skinning\nsi on veut le passer par une target de blendShape.",
+    "m075_upperTeeth"    : "DentsAHaut",
+    "m076_lowerTeeth"    : "DentsEnBas",
+    "m077_tongue"        : "Langue",
+    "m078_nose"          : "Nez",
+    "m079_nostril"       : "Narine",
+    
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",
 

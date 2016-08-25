@@ -157,8 +157,15 @@
     "m069_poseReaderDesc": "Criar todos os nodes necessários para um Sistema de Pose. \nPrimeiro escolha o node que queremos extrair a rotação.\nSegundo, escolha o node do qual vamos extrair a rotação, para que cheguemos a rotação do primeiro node a partir do segundo.",
     "m070_duplicate"     : "Duplicar",
     "m071_SpaceSwitcher" : "Mudar Espaço",
-    "m072_SpaceSwitcherDesc" : "O primeiro nó selecionado será o pai da última seleção. Para gerenciar corretamente detector, utilize a ferramenta em si",
-
+    "m072_SpaceSwitcherDesc" : "O primeiro objeto selecionado será o pai da última seleção. Para gerenciar corretamente, utilize a ferramenta em si.",
+    "m073_single"        : "Singular",
+    "m074_singleDesc"    : "Descrição do modulo Singular:\n\nEsse modulo cria um joint unico\nque pode ser usado para rigs muito simples\nou para rigs faciais com a opção Indirect Skinning estiver ligada\nse quisermos passa-la por uma target de blendShape.",
+    "m075_upperTeeth"    : "DenteSuperior",
+    "m076_lowerTeeth"    : "DenteInferior",
+    "m077_tongue"        : "Lingua",
+    "m078_nose"          : "Nariz",
+    "m079_nostril"       : "Narina",
+    
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et l' restauré Apparences des controladores . ",
 

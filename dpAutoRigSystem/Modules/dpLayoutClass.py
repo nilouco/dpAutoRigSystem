@@ -39,9 +39,9 @@ class LayoutClass:
         
         # declaring the index color list to override and background color of buttons:
          #Manually add the "none" color
-        colorList = [[0.627, 0.627, 0.627]]
+        self.colorList = [[0.627, 0.627, 0.627]]
         #WARNING --> color index in maya start to 1
-        colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
+        self.colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
 
         '''
         self.colorList = [  [0.627, 0.627, 0.627],
@@ -112,6 +112,7 @@ class LayoutClass:
                 self.segDelColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
                 self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
                 self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
+                self.IndirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if nJointsAttr > 0:
@@ -179,6 +180,13 @@ class LayoutClass:
                     cmds.text(" ", parent=self.doubleFlipColumn)
                     flipValue = cmds.getAttr(self.moduleGrp+".flip")
                     self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.doubleFlipColumn)
+                    
+                # create an indirectSkin layout:
+                if self.IndirectSkinAttrExists:
+                    self.doubleIndirectSkinColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.doubleIndirectSkinColumn)
+                    indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
+                    self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.doubleIndirectSkinColumn)
             except:
                 pass
     
@@ -191,8 +199,8 @@ class LayoutClass:
             # creating colorIndex Window:
             if cmds.window('dpColorIndexWindow', query=True, exists=True):
                 cmds.deleteUI('dpColorIndexWindow', window=True)
-            colorIndex_winWidth  = 305
-            colorIndex_winHeight = 250
+            colorIndex_winWidth  = 160
+            colorIndex_winHeight = 80
             self.dpColorIndexWin = cmds.window('dpColorIndexWindow', title='Color Index', iconName='dpColorIndex', widthHeight=(colorIndex_winWidth, colorIndex_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
             # creating layout:
             colorIndexLayout = cmds.gridLayout('colorIndexLayout', numberOfColumns=8, cellWidthHeight=(20,20))
@@ -270,6 +278,18 @@ class LayoutClass:
         """ Set the attribute value for flip.
         """
         cmds.setAttr(self.moduleGrp+".flip", cmds.checkBox(self.flipCB, query=True, value=True))
+    
+    
+    def changeIndirectSkin(self, *args):
+        """ Set the attribute value for indirectSkin.
+        """
+        indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
+        if indSkinValue == 1:
+            cmds.setAttr(self.moduleGrp+".flip", 0)
+            cmds.checkBox(self.flipCB, edit=True, value=False, enable=False)
+        else:
+            cmds.checkBox(self.flipCB, edit=True, enable=True)
     
     
     def changeShapeSize(self, *args):

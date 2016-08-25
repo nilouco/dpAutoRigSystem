@@ -1319,7 +1319,7 @@ class DP_AutoRig_UI:
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
                                     #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
                                     cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
-                                    cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScaleConstraint")[0]
+                                    #cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScaleConstraint")[0]
                                     if limbType == LEG:
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
@@ -1658,24 +1658,24 @@ class DP_AutoRig_UI:
                     pymel.addAttr(pOptCtrl, ln="display", at="enum", enumName="----------", keyable=True)
 
                 if not pymel.hasAttr(pOptCtrl, "displayMesh"):
-                    pymel.addAttr(pOptCtrl, ln="displayMesh", min=0, max=1, defaultValue=1, keyable=True)
+                    pymel.addAttr(pOptCtrl, ln="displayMesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
                     pymel.connectAttr(pOptCtrl.displayMesh, pRenderGrp.visibility, force=True)
 
                 if not pymel.hasAttr(pOptCtrl, "displayProxy"):
-                    pymel.addAttr(pOptCtrl, ln="displayProxy", min=0, max=1, defaultValue=0, keyable=True)
+                    pymel.addAttr(pOptCtrl, ln="displayProxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=True)
                     pymel.connectAttr(pOptCtrl.displayProxy, pProxyGrp.visibility, force=True)
 
                 if not pymel.hasAttr(pOptCtrl, "displayCtrl"):
-                    pymel.addAttr(pOptCtrl, ln="displayCtrl", min=0, max=1, defaultValue=1, keyable=True)
+                    pymel.addAttr(pOptCtrl, ln="displayCtrl", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
                     pymel.connectAttr(pOptCtrl.displayCtrl, pCtrlVisGrp.visibility, force=True)
 
                 if not pymel.hasAttr(pOptCtrl, "General"):
                     pymel.addAttr(pOptCtrl, ln="General", at="enum", enumName="----------", keyable=True)
 
                 #Only create if a IkFk attribute is found
-                if not pymel.hasAttr(pOptCtrl, "IKFKBlend"):
+                if not pymel.hasAttr(pOptCtrl, "ikFkBlend"):
                     if (pOptCtrl.listAttr(string="*IkFk*")):
-                        pymel.addAttr(pOptCtrl, ln="IKFKBlend", at="enum", enumName="----------", keyable=True)
+                        pymel.addAttr(pOptCtrl, ln="ikFkBlend", at="enum", enumName="----------", keyable=True)
 
 
         # re-declaring guideMirror and previewMirror groups:

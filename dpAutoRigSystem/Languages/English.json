@@ -158,7 +158,14 @@
     "m070_duplicate"     : "Duplicate",
     "m071_SpaceSwitcher" : "Space Switcher",
     "m072_SpaceSwitcherDesc" : "The first selected node will be the parent of the last selection. To correctly manage switch, use the tool itself",
-
+    "m073_single"        : "Single",
+    "m074_singleDesc"    : "Description to Single module:\n\nThis module will create just an alone joint\nthat we can use it with very simple rigs\nour to facial rigs with the Indirect Skinning option\nif we want pass it throu a blendShape target.",
+    "m075_upperTeeth"    : "UpperTeeth",
+    "m076_lowerTeeth"    : "LowerTeeth",
+    "m077_tongue"        : "Tongue",
+    "m078_nose"          : "Nose",
+    "m079_nostril"       : "Nostril",
+    
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",
 
