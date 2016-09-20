@@ -348,7 +348,6 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.hipsA + '.' + side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'], rbnVVMD + '.input2X')
                 cmds.connectAttr(rbnVVMD + '.outputX', rbnCond + '.colorIfFalseR')
                 cmds.setAttr(rbnVVMD + '.operation', 2)
-                cmds.setAttr(rbnVVMD + '.input1X', 1)
                 cmds.setAttr(rbnBlendColors + '.color2R', 1)
                 cmds.setAttr(rbnCond+".secondTerm", 1)
                 # middle ribbon setup:
@@ -390,6 +389,9 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     # apply volumeVariation to joints in the middle ribbon setup:
                     cmds.connectAttr(rbnCond + '.outColorR', self.aRbnJointList[n] + '.scaleX')
                     cmds.connectAttr(rbnCond + '.outColorR', self.aRbnJointList[n] + '.scaleZ')
+                # update spine volume variation setup
+                currentVV = cmds.getAttr(rbnMD + '.outputX')
+                cmds.setAttr(rbnVVMD + '.input1X', currentVV)
                 # organize groups:
                 self.rbnRigGrp = cmds.group(name=side + self.userGuideName + "_Grp", empty=True)
                 self.rbnControlGrp = cmds.group(name=side + self.userGuideName + "_Control_Grp", empty=True)
