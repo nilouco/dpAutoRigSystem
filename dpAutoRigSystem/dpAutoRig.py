@@ -1035,7 +1035,7 @@ class DP_AutoRig_UI:
             pymel.makeIdentity(self.globalCtrl, a=True)
             self.globalCtrl.rotateOrder.set(3)
 
-        self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(9.5))
+        self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(9))
         if (self.ctrlCreated):
             self.rootCtrl.rotateOrder.set(3)
 
@@ -1419,6 +1419,7 @@ class DP_AutoRig_UI:
                                     ikPoleVectorCtrlZero = self.integratedTaskDic[moduleDic]['ikPoleVectorZeroList'][s]
                                     limbStyle            = self.integratedTaskDic[moduleDic]['limbStyle']
                                     limbIsolateFkConst   = self.integratedTaskDic[moduleDic]['fkIsolateConst'][s]
+                                    ikHandleGrp          = self.integratedTaskDic[moduleDic]['ikHandleGrpList'][s]
                                     
                                     # getting spine data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
@@ -1434,6 +1435,10 @@ class DP_AutoRig_UI:
                                         tempList = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])
                                         tempList.sort()
                                         revNode = tempList[0]
+                                        if not cmds.objectType(revNode) == 'reverse':
+                                            for tmp in tempList:
+                                                if cmds.objectType(tmp) == 'reverse':
+                                                    revNode = tmp
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
                                         fkCtrl = fkZeroNode.replace("_Zero", "")
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
@@ -1474,6 +1479,7 @@ class DP_AutoRig_UI:
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
+                                        cmds.parentConstraint(chestA, ikHandleGrp, mo=1)
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
                                         setupFollowSpine(chestA)
 
@@ -1708,6 +1714,8 @@ class DP_AutoRig_UI:
         jointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
         if not jointSkinList:
             jointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
+        
+        # TODO: test if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
         
         # get geometries to be skinned:
         geomSkinList = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
