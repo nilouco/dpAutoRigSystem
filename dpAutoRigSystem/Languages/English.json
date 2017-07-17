@@ -75,6 +75,10 @@
     "i066_addAttr"        : "Add supplementary attributes",
     "i067_duplicating"    : "Duplicating a module guide.",
     "i068_CtrlD"          : "Ctrl + D",
+    "i069_notSkinJoint"   : "The listed joints bellow doesn't exists anymore:",
+    "i070_continueSkin"   : "Do you want to continue the Skinning without those joints?",
+    "i071_yes"            : "Yes",
+    "i072_no"             : "No",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

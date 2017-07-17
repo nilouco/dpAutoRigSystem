@@ -75,6 +75,10 @@
     "i066_addAttr"        : "Ajouter les attributs supplémentaires",
     "i067_duplicating"    : "Dupliquer un guide de module.",
     "i068_CtrlD"          : "Ctrl + D",
+    "i069_notSkinJoint"   : "Ces joints listés en bas n'existent plus:",
+    "i070_continueSkin"   : "Esc-que vous voulez continuer le Skinning quand même?",
+    "i071_yes"            : "Oui",
+    "i072_no"             : "Non",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

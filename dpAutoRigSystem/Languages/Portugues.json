@@ -75,6 +75,10 @@
     "i066_addAttr"        : "Adicionar atributos suplementares",
     "i067_duplicating"    : "Duplicando a guia do modulo.",
     "i068_CtrlD"          : "Ctrl + D",
+    "i069_notSkinJoint"   : "Os joints listados abaixo não existem mais:",
+    "i070_continueSkin"   : "Voce gostaria de continuar o Skinning sem esses joints?",
+    "i071_yes"            : "Sim",
+    "i072_no"             : "Não",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com numeros, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

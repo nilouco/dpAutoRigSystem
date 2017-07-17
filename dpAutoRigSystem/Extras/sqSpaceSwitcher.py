@@ -4,16 +4,13 @@ try:
     import pymel.core as pymel
     import maya.OpenMaya as om
     from Ui import uiSpaceSwitcher as uiSpaceSwitcher
-
     reload(uiSpaceSwitcher)
-    import shiboken
     from maya import OpenMayaUI
-
     try:
-        from sstk.libs.libQt import QtCore, QtGui
+        from sstk.libs.libQt import QtCore, QtWidgets
         from sstk.libs import libSerialization
     except ImportError:
-        from PySide import QtCore, QtGui
+        from ..Vendor.Qt import QtCore, QtGui, QtWidgets, QtCompat
         from ..Modules.Library import libSerialization
     from functools import partial
 except Exception as e:
@@ -555,7 +552,7 @@ def getMayaWindow():
     """
     OpenMayaUI.MQtUtil.mainWindow()
     ptr = OpenMayaUI.MQtUtil.mainWindow()
-    return shiboken.wrapInstance(long(ptr), QtGui.QWidget)
+    return QtCompat.wrapInstance(long(ptr), QtWidgets.QWidget)
 
 
 class Mode:
@@ -570,7 +567,7 @@ class Mode:
     Remove = 5
 
 
-class SpaceSwitcherDialog(QtGui.QMainWindow):
+class SpaceSwitcherDialog(QtWidgets.QMainWindow):
     def __init__(self, parent=getMayaWindow(), *args, **kwargs):
         super(SpaceSwitcherDialog, self).__init__(parent)
         self.ID_COL_FRAME = 0
@@ -768,7 +765,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                                 iParentIdx = self.pSelSpSys.aDrivers.index(self.aSelDrivers[0])
 
                                 pIdx = self.ui.lstParent.model().createIndex(iParentIdx + 1, 0)
-                                self.ui.lstParent.selectionModel().select(pIdx, QtGui.QItemSelectionModel.Select)
+                                self.ui.lstParent.selectionModel().select(pIdx, QtWidgets.QItemSelectionModel.Select)
                             else:
                                 self._set_mode_info(Mode.Add, True)
                     else:
@@ -779,7 +776,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                         else:
                             self._set_mode_info(Mode.SwitchSelect, True)
                             pIdx = self.ui.lstParent.model().createIndex(0, 0)
-                            self.ui.lstParent.selectionModel().select(pIdx, QtGui.QItemSelectionModel.Select)
+                            self.ui.lstParent.selectionModel().select(pIdx, QtWidgets.QItemSelectionModel.Select)
 
             else:
                 self._update_info(None)
@@ -812,7 +809,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
         Override the table paint event to redraw it when we need too
         :param event:
         """
-        super(QtGui.QTableWidget, self.ui.tblFrameInfo).paintEvent(event)
+        super(QtWidgets.QTableWidget, self.ui.tblFrameInfo).paintEvent(event)
         iRowCount = self.ui.tblFrameInfo.rowCount()
         iCurTime = int(pymel.currentTime())
         for i in range(0, iRowCount):
@@ -921,7 +918,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             self.ui.lstParent.setEnabled(True)
             self.createModel.appendRow(self.parentItem)
             for iIdx, nParentInfo in enumerate(pSpData.aDrivers):
-                newParentItem = QtGui.QStandardItem(nParentInfo.name())
+                newParentItem = QtWidgets.QStandardItem(nParentInfo.name())
                 newParentItem.setEditable(False)
                 # Prevent any delete action when the sysem is referenced
                 if pymel.referenceQuery(self.pSelSpSys.nSwConst, isNodeReferenced=True):
@@ -977,9 +974,9 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 self.ui.tblFrameInfo.insertRow(iNbRow)
 
                 # Frame Field
-                pFrameCell = QtGui.QTableWidgetItem()
+                pFrameCell = QtWidgets.QTableWidgetItem()
                 self.ui.tblFrameInfo.setItem(iNbRow, self.ID_COL_FRAME, pFrameCell)
-                edtFrame = QtGui.QLineEdit()
+                edtFrame = QtWidgets.QLineEdit()
                 edtFrame.setAutoFillBackground(True)
                 edtFrame.setValidator(QDoubleEmptyStringValidator())
                 edtFrame.setText(str(int(pTblInfo[0])))
@@ -994,9 +991,9 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 pFrameCell.setData(QtCore.Qt.UserRole, int(pTblInfo[0]))
 
                 # Parent Field
-                pCellParent = QtGui.QTableWidgetItem()
+                pCellParent = QtWidgets.QTableWidgetItem()
                 self.ui.tblFrameInfo.setItem(iNbRow, self.ID_COL_PARENT, pCellParent)
-                cbParent = QtGui.QComboBox()
+                cbParent = QtWidgets.QComboBox()
                 cbParent.setMaximumWidth(200)
                 cbParent.addItems(aParentName)
                 cbParent.setCurrentIndex(
@@ -1007,9 +1004,9 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
                 self.ui.tblFrameInfo.setCellWidget(iNbRow, self.ID_COL_PARENT, cbParent)
                 pCellParent.setData(QtCore.Qt.UserRole, pTblInfo[1])
 
-                pCellAction = QtGui.QTableWidgetItem()
+                pCellAction = QtWidgets.QTableWidgetItem()
                 self.ui.tblFrameInfo.setItem(iNbRow, self.ID_COL_ACTION, pCellAction)
-                btnRemove = QtGui.QPushButton()
+                btnRemove = QtWidgets.QPushButton()
                 btnRemove.setText("Remove")
                 btnRemove.pressed.connect(partial(self._event_btnRemove_pressed, iNbRow))
                 self.ui.tblFrameInfo.setCellWidget(iNbRow, self.ID_COL_ACTION, btnRemove)
@@ -1026,7 +1023,7 @@ class SpaceSwitcherDialog(QtGui.QMainWindow):
             # Get data
             pFrameCell = self.ui.tblFrameInfo.item(iRow, self.ID_COL_FRAME)
             iFrame = pFrameCell.data(QtCore.Qt.UserRole)
-            menu = QtGui.QMenu()
+            menu = QtWidgets.QMenu()
             action_sel_parent = menu.addAction('Remove')
             action_sel_parent.triggered.connect(partial(self._event_rcMenu_deleteKey, iFrame))
             menu.exec_(QtGui.QCursor.pos())
@@ -1340,7 +1337,7 @@ class SpaceSwitcher(object):
     def centerDialog(self):
         # Create a frame geo to easilly move it from the center
         pFrame = self.pDialog.frameGeometry()
-        pScreen = QtGui.QApplication.desktop().screenNumber(QtGui.QApplication.desktop().cursor().pos())
-        ptCenter = QtGui.QApplication.desktop().screenGeometry(pScreen).center()
+        pScreen = QtWidgets.QApplication.desktop().screenNumber(QtWidgets.QApplication.desktop().cursor().pos())
+        ptCenter = QtWidgets.QApplication.desktop().screenGeometry(pScreen).center()
         pFrame.moveCenter(ptCenter)
         self.pDialog.move(pFrame.topLeft())
