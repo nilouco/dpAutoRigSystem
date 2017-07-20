@@ -213,6 +213,7 @@
     "c_arm"             : "Braco",
     "c_foot"            : "Pe",
     "c_lip"             : "Labio",
+    "c_uniformScale"    : "escalaUniforme",
     
     "e000_GuideNotFound"           : "Erro: (000) - Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Erro: (001) - Guia(s) não encontrada(s) no diretorio respectivo...",

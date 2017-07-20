@@ -213,6 +213,7 @@
     "c_arm"             : "Arm",
     "c_foot"            : "Foot",
     "c_lip"             : "Lip",
+    "c_uniformScale"    : "uniformScale",
     
     "e000_GuideNotFound"           : "Error: (000) - Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Error: (001) - Guide(s) not found in the respective folder...",

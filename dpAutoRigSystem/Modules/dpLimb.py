@@ -530,7 +530,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.zeroFkCtrlList = utils.zeroOut(self.fkCtrlList)
                 self.zeroFkCtrlGrp = cmds.group(self.zeroFkCtrlList[0], self.zeroFkCtrlList[1],
                                                 name=side + self.userGuideName + "_FkCtrl_Grp")
-
+                
                 # invert scale for right side before:
                 if s == 1:
                     cmds.setAttr(self.fkCtrlList[0] + ".scaleX", -1)
@@ -1075,6 +1075,25 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetY", attributeType='long', keyable=False)
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetZ", attributeType='long', keyable=False)
 
+                # work with scalable extrem hand or foot:
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.setAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c_uniformScale'], edit=True, keyable=True)
+                cmds.setAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c_uniformScale'], edit=True, keyable=True)
+                uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.langDic[self.langName]['c_uniformScale']+"_BC")
+                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c_uniformScale'], uniBlend+".color2R", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c_uniformScale'], uniBlend+".color1R", force=True)
+                cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleX", force=True)
+                cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleY", force=True)
+                cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleZ", force=True)
+                cmds.connectAttr(uniBlend+".outputR", self.skinJointList[-2]+".scaleX", force=True)
+                cmds.connectAttr(uniBlend+".outputR", self.skinJointList[-2]+".scaleY", force=True)
+                cmds.connectAttr(uniBlend+".outputR", self.skinJointList[-2]+".scaleZ", force=True)
+                cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleX", force=True)
+                cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleY", force=True)
+                cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleZ", force=True)
+                cmds.connectAttr(self.worldRef + "." + side + self.limbType + str(dpAR_count) + '_IkFkBlend', uniBlend+".blender", force=True)
+                
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options are valides for Biped, Quadruped and Quadruped Spring legs
                     if (int(cmds.about(version=True)[

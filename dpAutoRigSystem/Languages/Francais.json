@@ -213,6 +213,7 @@
     "c_arm"             : "Bras",
     "c_foot"            : "Pied",
     "c_lip"             : "Levre",
+    "c_uniformScale"    : "taileUniforme",
     
     "e000_GuideNotFound"           : "Erreur: (000) - Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Erreur: (001) - Guide(s) pas trouvée(s) dans le dossier respectif...",

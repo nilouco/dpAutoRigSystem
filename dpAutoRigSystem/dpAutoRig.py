@@ -1321,6 +1321,9 @@ class DP_AutoRig_UI:
                                     cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
                                     #cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScaleConstraint")[0]
                                     if limbType == LEG:
+                                        cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
+                                        cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
+                                        cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
@@ -1711,11 +1714,24 @@ class DP_AutoRig_UI:
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
         # get joints to be skinned:
-        jointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
-        if not jointSkinList:
-            jointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
+        uiJointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
+        if not uiJointSkinList:
+            uiJointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
         
-        # TODO: test if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
+        # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
+        jointSkinList, jointNotExistingList = [], []
+        for item in uiJointSkinList:
+            if cmds.objExists(item):
+                jointSkinList.append(item)
+            else:
+                jointNotExistingList.append(item)
+        if jointNotExistingList:
+            notExistingJointMessage = self.langDic[self.langName]['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.langDic[self.langName]['i070_continueSkin']
+            btYes = self.langDic[self.langName]['i071_yes']
+            btNo = self.langDic[self.langName]['i072_no']
+            confirmSkinning = cmds.confirmDialog(title='Confirm Skinning', message=notExistingJointMessage, button=[btYes,btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+            if confirmSkinning == btNo:
+                jointSkinList = None
         
         # get geometries to be skinned:
         geomSkinList = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
