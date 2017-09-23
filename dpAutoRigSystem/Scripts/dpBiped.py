@@ -23,6 +23,7 @@ def Biped(dpAutoRigInst):
         spineInstance = dpAutoRigInst.initGuide('dpSpine', guideDir)
         # editing spine base guide informations:
         dpAutoRigInst.guide.Spine.editUserName(spineInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m011_spine'])
+        dpAutoRigInst.guide.Spine.changeStyle(spineInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m026_biped'])
         cmds.setAttr(spineInstance.moduleGrp+".translateY", 11)
         cmds.setAttr(spineInstance.annotation+".translateY", -6)
         cmds.setAttr(spineInstance.radiusCtrl+".translateX", 2.5)
@@ -211,7 +212,7 @@ def Biped(dpAutoRigInst):
         dpAutoRigInst.guide.FkLine.changeMirror(nostrilInstance, "X")
         cmds.setAttr(nostrilInstance.moduleGrp+".flip", 1)
         # parent nostril guide to nose guide:
-        cmds.parent(nostrilInstance.moduleGrp, noseInstance.cvJointLoc, absolute=True)
+        cmds.parent(nostrilInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
         
         # woking with Tongue system:
         # create FkLine module instance:

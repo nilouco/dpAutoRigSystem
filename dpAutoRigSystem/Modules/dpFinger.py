@@ -317,7 +317,11 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 else:
                     dupIk = cmds.duplicate(self.skinJointList[1])[0]
                     dupFk = cmds.duplicate(self.skinJointList[1])[0]
-
+                
+                # hide ik and fk joints in order to be rigger friendly whe skinning
+                cmds.setAttr(dupIk+".visibility", 0)
+                cmds.setAttr(dupFk+".visibility", 0)
+                
                 # ik setup
                 childrenIkList = cmds.listRelatives(dupIk, children=True, allDescendents=True, fullPath=True)
                 if childrenIkList:
@@ -431,6 +435,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                                           maintainOffset=True)
                     ikHandleGrp = cmds.group(ikHandleList[0], endIkHandleList[0],
                                              name=side + self.userGuideName + "_IkHandle_Grp")
+                    cmds.setAttr(ikHandleGrp+".visibility", 0)
                     ctrls.setLockHide([self.ikCtrl], ['sx', 'sy', 'sz', 'v'])
 
                     if self.nJoints == 2:

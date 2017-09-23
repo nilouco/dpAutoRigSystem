@@ -51,9 +51,10 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
     downctrlList = createBendCtrl(prefix+'Down_'+myName+'_Off_Ctrl', r=ctrlRadius)
     downctrl = downctrlList[0]
     downctrlCtrl = downctrlList[1]
-    elbowctrlList = createElbowCtrl(prefix+myName+'_Off_Ctrl', r=ctrlRadius)
+    elbowctrlList = createElbowCtrl(prefix+myName+'_Off_Ctrl', r=ctrlRadius, armStyle=arm)
     elbowctrl = elbowctrlList[0]
     elbowctrlCtrl = elbowctrlList[1]
+    elbowctrlZero = elbowctrlList[2]
     
     cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
     
@@ -75,10 +76,10 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
     cmds.setAttr(orientConst+".interpType", 2)
     
     cmds.delete(upLimb['constraints'][1])
-    cmds.parentConstraint(cmds.listRelatives(elbowctrl, c=True)[0], upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_ParentConstraint")
+    cmds.parentConstraint(elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_ParentConstraint")
     
     cmds.delete(downLimb['constraints'][0])
-    cmds.parentConstraint(cmds.listRelatives(elbowctrl, c=True)[0], downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_ParentConstraint")
+    cmds.parentConstraint(elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_ParentConstraint")
     
     cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_ParentConstraint")
     cmds.parentConstraint(cmds.listRelatives(upctrl, c=True)[0], upLimb['middleCtrl'], mo=True, w=1, name=upLimb['middleCtrl']+"_ParentConstraint")
@@ -174,19 +175,25 @@ def createBendCtrl(myName='Bend_Ctrl', r=1, zero=True):
         grp = cmds.group(curve, n=myName+'_Grp')
     return [grp, curve]
     
-def createElbowCtrl(myName='Limb_Ctrl', r=1, zero=True):
+def createElbowCtrl(myName='Limb_Ctrl', r=1, zero=True, armStyle=True):
     curve = cmds.curve(n=myName, d=1, p=[(-2*r, 0, -1*r), (-1*r, 0, -1*r), (-1*r, 0, -2*r), (1*r, 0, -2*r), (1*r, 0, -1*r), (2*r, 0, -1*r), (2*r, 0, 1*r), (1*r, 0, 1*r), (1*r, 0, 2*r), (-1*r, 0, 2*r), (-1*r, 0, 1*r), (-2*r, 0, 1*r), (-2*r, 0, -1*r), (-1*r, 0, -1*r)])
     ctrls.renameShape([curve])
-    cmds.setAttr(curve+'.rx', 90)
-    cmds.setAttr(curve+'.rz', 90)
+    if armStyle:
+        cmds.setAttr(curve+'.rx', 90)
+        cmds.setAttr(curve+'.ry', 90)
     cmds.makeIdentity(curve, a=1)
     grp = None
     if zero:
-        grp = cmds.group(curve, n=myName+'_Grp')
-    return [grp, curve]
+        zero = cmds.group(curve, n=myName+'_Grp')
+        grp = cmds.group(zero, n=myName+'_Grp')
+        if armStyle:
+            cmds.rotate(0, -90, -90, zero)
+        else:
+            cmds.rotate(-90, 0, -90, zero)
+    return [grp, curve, zero]
     
 #function to create the ribbon
-def createRibbon(axis=(0, 0, 1), name='xxxx', horizontal=False, numJoints=3, guias=None, v=True, s=0, firstLimb=True, upCtrl=None, ctrlRadius=1, worldRef="worldRef"):
+def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guias=None, v=True, s=0, firstLimb=True, upCtrl=None, ctrlRadius=1, worldRef="worldRef"):
         retDict = {}
         
         #define variables
@@ -284,20 +291,12 @@ def createRibbon(axis=(0, 0, 1), name='xxxx', horizontal=False, numJoints=3, gui
         elif horizontal and axis==(0, 0, -1):
             if firstLimb:
                 cmds.setAttr(bttm_Loc[2]+'.translateY', 2)
-                cmds.setAttr(top_Loc[2]+'.translateX', -2)
-                cmds.setAttr(mid_Loc[3]+'.translateX', -2)
+                cmds.setAttr(top_Loc[2]+'.translateY', 2)
                 cmds.setAttr(mid_Loc[3]+'.translateY', 2)
             else:
-                if s == 0:
-                    cmds.setAttr(bttm_Loc[2]+'.translateX', -2)
-                    cmds.setAttr(top_Loc[2]+'.translateY', -2)
-                    cmds.setAttr(mid_Loc[3]+'.translateX', -2)
-                    cmds.setAttr(mid_Loc[3]+'.translateY', 2)
-                else:
-                    cmds.setAttr(bttm_Loc[2]+'.translateX', -2)
-                    cmds.setAttr(top_Loc[2]+'.translateY', -2)
-                    cmds.setAttr(mid_Loc[3]+'.translateX', -2)
-                    cmds.setAttr(mid_Loc[3]+'.translateY', 2)
+                cmds.setAttr(bttm_Loc[2]+'.translateY', 2)
+                cmds.setAttr(top_Loc[2]+'.translateY', -2)
+                cmds.setAttr(mid_Loc[3]+'.translateY', 2)
                 
         
         #create auxiliary joints that will be used to control the ribbon
@@ -403,7 +402,7 @@ def createRibbon(axis=(0, 0, 1), name='xxxx', horizontal=False, numJoints=3, gui
         cmds.delete(cmds.parentConstraint(midCtrl, mid_Ctrl, mo=0))
         cmds.parent(midCtrl, mid_Ctrl)
         
-        #adjust the realtionship between the locators
+        #adjust the relationship between the locators
         cmds.parent(mid_Ctrl, mid_Loc[2], r=True)
         cmds.parent(drv_Jnt[1], midCtrl)
         cmds.parent([top_Loc[2], mid_Loc[3], bttm_Loc[2]], w=True)
@@ -424,7 +423,7 @@ def createRibbon(axis=(0, 0, 1), name='xxxx', horizontal=False, numJoints=3, gui
             cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AimConstraint")
             cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AimConstraint")
         
-        #create a point and orient constraint for the middel control
+        #create a point and orient constraint for the middle control
         cmds.pointConstraint(top_Loc[0], bttm_Loc[0], mid_Loc[0], offset=(0, 0, 0), weight=1, name=mid_Loc[0]+"_PointConstraint")
         ori = cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrientConstraint")
         

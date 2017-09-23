@@ -105,6 +105,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvFootLoc + ".rotateY", -90)
         cmds.setAttr(self.cvRFELoc + ".translateX", -1)
         cmds.setAttr(self.cvRFELoc + ".translateZ", 2.5)
+        cmds.setAttr(self.cvRFELoc + ".rotateZ", -90)
         cmds.setAttr(self.cvRFCLoc + ".translateX", 1)
         cmds.setAttr(self.cvRFALoc + ".translateX", -0.6)
         cmds.setAttr(self.cvRFALoc + ".translateY", -1)

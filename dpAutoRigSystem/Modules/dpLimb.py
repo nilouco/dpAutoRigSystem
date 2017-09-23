@@ -73,6 +73,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
     def getBendJoints(self):
         return cmds.getAttr(self.moduleGrp + ".numBendJoints")
 
+    def getAlignWorld(self):
+        return cmds.getAttr(self.moduleGrp + ".alignWorld")
+        
     # @utils.profiler
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
@@ -90,6 +93,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                      enumName=self.langDic[self.langName]['m042_default'] + ':' + self.langDic[self.langName][
                          'm026_biped'] + ':' + self.langDic[self.langName]['m037_quadruped'] + ':' +
                               self.langDic[self.langName]['m043_quadSpring'])
+        cmds.addAttr(self.moduleGrp, longName="alignWorld", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".alignWorld", 1)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3)
@@ -245,6 +250,25 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             if currentNumberBendJoints == item:
                 cmds.optionMenu(self.bendNumJointsMenu, edit=True, select=i + 1)
                 break
+                
+        # align world layout:
+        self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20),
+                                         columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')],
+                                         adjustableColumn=4,
+                                         columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)],
+                                         parent="selectedColumn")
+        cmds.text(label=self.langDic[self.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
+
+        self.bendChkbox = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=self.setAlignWorldFalse, onc=self.setAlignWorldTrue,
+                                        parent=self.alignWorldLayout)
+                                        
+    def setAlignWorldTrue(self, *args):
+        self.hasAlignWorld = True
+        cmds.setAttr(self.moduleGrp + ".alignWorld", 1)
+    
+    def setAlignWorldFalse(self, *args):
+        self.hasAlignWorld = False
+        cmds.setAttr(self.moduleGrp + ".alignWorld", 0)
 
     def setBendTrue(self, *args):
         self.hasBend = True
@@ -654,11 +678,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.ikExtremCtrlZero = utils.zeroOut([self.ikExtremCtrl])[0]
                 self.ikExtremCtrlZeroList.append(self.ikExtremCtrlZero)
                 # putting ikCtrls in the correct position and orientation:
-                tempToDelH = cmds.parentConstraint(self.cvExtremLoc, self.ikExtremCtrlZero, maintainOffset=False)
-                cmds.delete(tempToDelH)
+                cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikExtremCtrlZero, maintainOffset=False))
+
                 # fix stretch calcule to work with reverseFoot
-                self.ikStretchExtremLoc = cmds.group(empty=True,
-                                                     name=side + self.userGuideName + "_" + extremName + "_Ik_Loc_Grp")
+                self.ikStretchExtremLoc = cmds.group(empty=True, name=side + self.userGuideName + "_" + extremName + "_Ik_Loc_Grp")
                 self.ikStretchExtremLocList.append(self.ikStretchExtremLoc)
                 cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
                 cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
@@ -668,10 +691,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.ikCornerCtrlZero + ".scaleX", -1)
 
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
-                self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl,
-                                                  name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
-                self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp,
-                                                        name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
+                self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
+                self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
 
                 # verify if user wants to apply the good mirror orientation:
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
@@ -700,6 +721,34 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", 90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleX", -1)
+
+                # working with world axis orientation for limb extrem ik controls
+                if self.getAlignWorld() == True:
+                    tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
+                    cmds.parent(tempDup, world=True)
+                    self.origRotList = cmds.xform(tempDup, query=True, ro=True, ws=True)
+                    cmds.delete(tempDup)
+                    nRX = self.origRotList[0]
+                    nRY = self.origRotList[1]
+                    if s == 1:
+                        nRX = -self.origRotList[0]
+                        nRY = (self.origRotList[1] - 180) * (-1)
+                    cmds.setAttr(self.ikExtremCtrl+".rotateX", nRX)
+                    cmds.setAttr(self.ikExtremCtrl+".rotateY", nRY)
+                    cmds.setAttr(self.ikExtremCtrl+".rotateZ", self.origRotList[2])
+                    cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateX", 0)
+                    cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateY", 0)
+                    cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateZ", 0)
+                    cmds.setAttr(self.ikExtremCtrlZero+".rotateX", 0)
+                    cmds.setAttr(self.ikExtremCtrlZero+".rotateY", 0)
+                    cmds.setAttr(self.ikExtremCtrlZero+".rotateZ", 0)
+                    # store original rotation values for initial default pose
+                    cmds.addAttr(self.ikExtremCtrl, longName='originalRotateX', attributeType='float', keyable=True)
+                    cmds.addAttr(self.ikExtremCtrl, longName='originalRotateY', attributeType='float', keyable=True)
+                    cmds.addAttr(self.ikExtremCtrl, longName='originalRotateZ', attributeType='float', keyable=True)
+                    cmds.setAttr(self.ikExtremCtrl+".originalRotateX", nRX, lock=True)
+                    cmds.setAttr(self.ikExtremCtrl+".originalRotateY", nRY, lock=True)
+                    cmds.setAttr(self.ikExtremCtrl+".originalRotateZ", self.origRotList[2], lock=True)
 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + side + self.limbType + str(dpAR_count) + '_IkFkBlend',

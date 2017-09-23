@@ -169,6 +169,7 @@
     "m077_tongue"        : "Tongue",
     "m078_nose"          : "Nose",
     "m079_nostril"       : "Nostril",
+    "m080_alignWorld"    : "Align World",
     
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",

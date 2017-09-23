@@ -53,13 +53,15 @@ class HeadDeformer():
             
             # arrow control curve
             arrowCtrl = self.dpCvArrow("Deformer_Ctrl")
+            cmds.setAttr(arrowCtrl+"Shape.overrideEnabled", 1)
+            cmds.setAttr(arrowCtrl+"Shape.overrideColor", 18)
             # add control intensite attributes
             cmds.addAttr(arrowCtrl, longName="intensityX", attributeType='float', keyable=True)
             cmds.addAttr(arrowCtrl, longName="intensityY", attributeType='float', keyable=True)
             cmds.addAttr(arrowCtrl, longName="intensityZ", attributeType='float', keyable=True)
-            cmds.setAttr(arrowCtrl+".intensityX", 0.1)
-            cmds.setAttr(arrowCtrl+".intensityY", 0.1)
-            cmds.setAttr(arrowCtrl+".intensityZ", 0.1)
+            cmds.setAttr(arrowCtrl+".intensityX", 0.3)
+            cmds.setAttr(arrowCtrl+".intensityY", 0.3)
+            cmds.setAttr(arrowCtrl+".intensityZ", 0.3)
             
             # multiply divide in order to intensify influences
             mdNode = cmds.createNode("multiplyDivide", name="Deformer_MD")

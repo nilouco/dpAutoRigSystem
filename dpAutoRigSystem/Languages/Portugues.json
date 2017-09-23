@@ -169,6 +169,7 @@
     "m077_tongue"        : "Lingua",
     "m078_nose"          : "Nariz",
     "m079_nostril"       : "Narina",
+    "m080_alignWorld"    : "Alinhar Mundo",
     
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et l' restauré Apparences des controladores . ",

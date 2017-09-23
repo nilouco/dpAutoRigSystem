@@ -75,7 +75,7 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.0"
+DPAR_VERSION = "3.02"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
@@ -1028,6 +1028,8 @@ class DP_AutoRig_UI:
             self.masterCtrl.setDynamicAttr("geometryList", "")
             self.masterCtrl.setDynamicAttr("controlList", "")
             self.masterCtrl.rotateOrder.set(3)
+            pymel.connectAttr(self.masterCtrl.scaleY, self.masterCtrl.scaleX, lock=True, force=True)
+            pymel.connectAttr(self.masterCtrl.scaleY, self.masterCtrl.scaleZ, lock=True, force=True)
 
         self.globalCtrl = self.getBaseCtrl("globalCtrl", self.prefix+"Global_Ctrl", ctrls.dpCheckLinearUnit(16), iSection=4)
         if (self.ctrlCreated):
@@ -1035,7 +1037,7 @@ class DP_AutoRig_UI:
             pymel.makeIdentity(self.globalCtrl, a=True)
             self.globalCtrl.rotateOrder.set(3)
 
-        self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(9))
+        self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(8))
         if (self.ctrlCreated):
             self.rootCtrl.rotateOrder.set(3)
 
@@ -1556,6 +1558,8 @@ class DP_AutoRig_UI:
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_ParentConstraint")
                                 if bColorize:
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrls'][s], "yellow")
+                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
+                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                         
                         # integrate the EyeLookAt with the Head setup:
                         if moduleType == EYE_LOOK_AT:
@@ -1648,9 +1652,9 @@ class DP_AutoRig_UI:
                 for pCtrl in aAllCtrls:
                     if not pCtrl.getShape().overrideEnabled.get():
                         if (lPattern.match(pCtrl.name())):
-                            ctrls.colorShape([pCtrl.__melobject__()],"red")
+                            ctrls.colorShape([pCtrl.__melobject__()], "red")
                         elif (rPattern.match(pCtrl.name())):
-                            ctrls.colorShape([pCtrl.__melobject__()],"blue")
+                            ctrls.colorShape([pCtrl.__melobject__()], "blue")
                         elif (pCtrl in aBCtrl):
                             ctrls.colorShape([pCtrl.__melobject__()], "black")
                         else:

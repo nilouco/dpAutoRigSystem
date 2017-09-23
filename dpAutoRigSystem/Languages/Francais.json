@@ -169,6 +169,7 @@
     "m077_tongue"        : "Langue",
     "m078_nose"          : "Nez",
     "m079_nostril"       : "Narine",
+    "m080_alignWorld"    : "Aligné au Monde",
     
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",

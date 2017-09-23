@@ -49,12 +49,43 @@ class Spine(Base.StartClass, Layout.LayoutClass):
             except:
                 pass
             self.changeJointNumber(3)
+    
+    
+    def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
+        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
+        # style layout:
+        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70),
+                                          columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4,
+                                          columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2),
+                                                        (3, 'both', 10)], parent="selectedColumn")
+        cmds.text(label=self.langDic[self.langName]['m041_style'], visible=True, parent=self.styleLayout)
+        self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
+        styleMenuItemList = [self.langDic[self.langName]['m042_default'], self.langDic[self.langName]['m026_biped']]
+        for item in styleMenuItemList:
+            cmds.menuItem(label=item, parent=self.styleMenu)
+        # read from guide attribute the current value to style:
+        currentStyle = cmds.getAttr(self.moduleGrp + ".style")
+        cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle + 1))
+        
+        
+    def changeStyle(self, style, *args):
+        """ Change the style to be applyed custom actions to be more animator friendly.
+            We will optimise: control world orientation
+        """
+        # for Default style:
+        if style == self.langDic[self.langName]['m042_default']:
+            cmds.setAttr(self.moduleGrp + ".style", 0)
+        # for Biped style:
+        if style == self.langDic[self.langName]['m026_biped']:
+            cmds.setAttr(self.moduleGrp + ".style", 1)
+
 
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp + ".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
+        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.langDic[self.langName]['m042_default'] + ':' + self.langDic[self.langName]['m026_biped'])
         cmds.setAttr(self.moduleGrp + ".nJoints", 1)
         self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName + "_JointLoc1", r=0.5)
         self.connectShapeSize(shapeSizeCH)
@@ -150,6 +181,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            self.currentStyle = cmds.getAttr(self.moduleGrp + ".style")
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -217,10 +249,10 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.chestA + ".rotateOrder", 1)
                     cmds.setAttr(self.chestB + ".rotateOrder", 1)
                 else:
-                    cmds.setAttr(self.hipsA + ".rotateOrder", 4)
-                    cmds.setAttr(self.hipsB + ".rotateOrder", 4)
-                    cmds.setAttr(self.chestA + ".rotateOrder", 4)
-                    cmds.setAttr(self.chestB + ".rotateOrder", 4)
+                    cmds.setAttr(self.hipsA + ".rotateOrder", 3)
+                    cmds.setAttr(self.hipsB + ".rotateOrder", 3)
+                    cmds.setAttr(self.chestA + ".rotateOrder", 3)
+                    cmds.setAttr(self.chestB + ".rotateOrder", 3)
 
                 # Keep a list of ctrls we want to colorize a certain way
                 self.aFkCtrl.append([self.hipsB, self.chestB])
@@ -229,17 +261,22 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # organize hierarchy:
                 cmds.parent(self.hipsB, self.hipsA)
                 cmds.parent(self.chestB, self.chestA)
-                cmds.parent(self.chestA, self.hipsA)
-                cmds.rotate(-90, 0, 0, self.hipsA)
-                cmds.makeIdentity(self.hipsA, apply=True, rotate=True)
+                if self.currentStyle == 0: #default
+                    cmds.rotate(-90, 0, 0, self.hipsA, self.chestA)
+                    cmds.makeIdentity(self.hipsA, self.chestA, apply=True, rotate=True)
                 # position of controls:
                 bottomLocGuide = side + self.userGuideName + "_Guide_JointLoc1"
                 topLocGuide = side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints)
                 # snap controls to guideLocators:
-                tempDel = cmds.parentConstraint(bottomLocGuide, self.hipsA, maintainOffset=False)
-                cmds.delete(tempDel)
-                tempDel = cmds.parentConstraint(topLocGuide, self.chestA, maintainOffset=False)
-                cmds.delete(tempDel)
+                cmds.delete(cmds.parentConstraint(bottomLocGuide, self.hipsA, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(topLocGuide, self.chestA, maintainOffset=False))
+                
+                # change axis orientation for biped stype
+                if self.currentStyle == 1: #biped
+                    cmds.rotate(0, 0, 0, self.hipsA, self.chestA)
+                    cmds.makeIdentity(self.hipsA, self.chestA, apply=True, rotate=True)
+                cmds.parent(self.chestA, self.hipsA)
+                
                 # zeroOut transformations:
                 utils.zeroOut([self.hipsA, self.chestA])
                 # modify the pivots of chest controls:
@@ -352,18 +389,20 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(rbnCond+".secondTerm", 1)
                 # middle ribbon setup:
                 for n in range(1, self.nJoints - 1):
-                    self.middle = cmds.circle(
-                        name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_middle'] + str(
-                            n) + "_Ctrl",
-                        ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=self.ctrlRadius)[0]
-                    cmds.setAttr(self.middle + ".rotateOrder", 4)
+                    if self.currentStyle == 0: #default
+                        self.middle = cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_middle'] + str(n) + "_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=self.ctrlRadius)[0]
+                        cmds.setAttr(self.middle + ".rotateOrder", 4)
+                    else: #biped
+                        self.middle = cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_middle'] + str(n) + "_Ctrl", ch=False, o=True, nr=(0, 1, 0), d=3, s=8, radius=self.ctrlRadius)[0]
+                        cmds.setAttr(self.middle + ".rotateOrder", 3)
                     self.aFkCtrl[s].append(self.middle)
                     ctrls.setLockHide([self.middle], ['sx', 'sy', 'sz'])
                     cmds.setAttr(self.middle + '.visibility', keyable=False)
                     cmds.parent(self.middle, self.hipsA)
                     middleLocGuide = side + self.userGuideName + "_Guide_JointLoc" + str(n + 1)
-                    tempDel = cmds.parentConstraint(middleLocGuide, self.middle, maintainOffset=False)
-                    cmds.delete(tempDel)
+                    cmds.delete(cmds.parentConstraint(middleLocGuide, self.middle, maintainOffset=False))
+                    if self.currentStyle == 1: #biped
+                        cmds.rotate(0, 0, 0, self.middle)
                     utils.zeroOut([self.middle])
                     middleCluster = cmds.cluster(rbnNurbsPlane + ".cv[0:3][" + str(n + 1) + "]",
                                                  name=side + self.userGuideName + '_Middle_Cls')[1]
