@@ -75,7 +75,7 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.02"
+DPAR_VERSION = "3.03"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
