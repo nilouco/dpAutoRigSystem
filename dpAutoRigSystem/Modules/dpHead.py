@@ -326,8 +326,9 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.jawIntensityCnd+".outColorG", self.jawSdkGrp+".translateY", force=True)
                 cmds.connectAttr(self.jawIntensityCnd+".outColorG", self.jawIntensityZMD+".input1Z", force=True)
                 cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c_moveIntensity']+"Z", self.jawIntensityFixUnitMD+".input1Z", force=True)
-                cmds.setAttr(self.jawIntensityFixUnitMD+".input2Z", -0.01)
-                cmds.connectAttr(self.jawIntensityFixUnitMD+".outputZ", self.jawSdkGrp+".translateZ", force=True)
+                cmds.setAttr(self.jawIntensityFixUnitMD+".input2Z", -0.1)
+                cmds.connectAttr(self.jawIntensityFixUnitMD+".outputZ", self.jawIntensityZMD+".input2Z", force=True)
+                cmds.connectAttr(self.jawIntensityZMD+".outputZ", self.jawSdkGrp+".translateZ", force=True)
 
                 # create lip setup:
                 # left side lip:
