@@ -121,13 +121,13 @@ def Biped(dpAutoRigInst):
         dpAutoRigInst.guide.Finger.editUserName(middleFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m033_middle'])
         ringFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
         dpAutoRigInst.guide.Finger.editUserName(ringFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m034_ring'])
-        pinkFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
-        dpAutoRigInst.guide.Finger.editUserName(pinkFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m035_pink'])
+        pinkyFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
+        dpAutoRigInst.guide.Finger.editUserName(pinkyFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m035_pinky'])
         thumbFingerInstance  = dpAutoRigInst.initGuide('dpFinger', guideDir)
         dpAutoRigInst.guide.Finger.editUserName(thumbFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m036_thumb'])
         
         # edit finger guides:
-        fingerInstanceList = [indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkFingerInstance, thumbFingerInstance]
+        fingerInstanceList = [indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance, thumbFingerInstance]
         fingerTZList       = [0.6, 0.2, -0.2, -0.6, 0.72]
         for n, fingerInstance in enumerate(fingerInstanceList):
             cmds.setAttr(fingerInstance.moduleGrp+".translateX", 11)

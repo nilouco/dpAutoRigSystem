@@ -124,7 +124,7 @@
     "m032_index"         : "Index",
     "m033_middle"        : "Majeur",
     "m034_ring"          : "Annulaire",
-    "m035_pink"          : "Auriculaire",
+    "m035_pinky"         : "Auriculaire",
     "m036_thumb"         : "Pouce",
     "m037_quadruped"     : "Quadrupède",
     "m038_quadrupedDesc" : "Description du Script Quadrupède:\n\nCe scripted module crée un guide quadrupède de base,\navec le membres de jambe déjà parentés à la colonne,\n un module tête, une gueue et oreille simple en utilisant le ligne Fk.",

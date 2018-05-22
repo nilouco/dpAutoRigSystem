@@ -124,7 +124,7 @@
     "m032_index"         : "Index",
     "m033_middle"        : "Middle",
     "m034_ring"          : "Ring",
-    "m035_pink"          : "Pink",
+    "m035_pinky"         : "Pinky",
     "m036_thumb"         : "Thumb",
     "m037_quadruped"     : "Quadruped",
     "m038_quadrupedDesc" : "Quadruped Script Description:\n\nThis scripted module creates a basic quadruped guide,\nwith leg type limb modules parented to spine,\n a head module, a simple tail and ear using Fk Line.",

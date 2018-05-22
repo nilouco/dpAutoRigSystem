@@ -124,7 +124,7 @@
     "m032_index"         : "Indicador",
     "m033_middle"        : "Medio",
     "m034_ring"          : "Anelar",
-    "m035_pink"          : "Mindinho",
+    "m035_pinky"         : "Mindinho",
     "m036_thumb"         : "Polegar",
     "m037_quadruped"     : "Quadrúpede",
     "m038_quadrupedDesc" : "Descrição do Script Quadrúpede:\n\nEsse modulo cria uma guia basica de quadrúpede,\ncom modulos membro tipo perna parenteado a coluna,\num modulo cabeça, um modulo rabo e orelha simples de linha Fk.",
