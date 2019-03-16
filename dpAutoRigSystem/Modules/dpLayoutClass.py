@@ -283,15 +283,9 @@ class LayoutClass:
     def changeIndirectSkin(self, *args):
         """ Set the attribute value for indirectSkin.
         """
-        indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
-        if indSkinValue == 1:
-            cmds.setAttr(self.moduleGrp+".flip", 0)
-            cmds.checkBox(self.flipCB, edit=True, value=False, enable=False)
-        else:
-            cmds.checkBox(self.flipCB, edit=True, enable=True)
-    
-    
+        cmds.setAttr(self.moduleGrp+".indirectSkin", cmds.checkBox(self.indirectSkinCB, query=True, value=True))
+
+       
     def changeShapeSize(self, *args):
         """ Set the attribute value for shapeSize.
         """

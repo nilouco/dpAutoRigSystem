@@ -153,9 +153,16 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     self.jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
                     cmds.deleteAttr(self.jxt, attribute="dpAR_joint")
                     cmds.parent(self.jnt, self.jxt)
+                    cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
                     for attr in attrList:
                         cmds.connectAttr(self.ctrl+'.'+attr, self.jnt+'.'+attr)
+                    if s == 1:
+                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                            cmds.setAttr(self.jxt+".scaleX", -1)
+                            cmds.setAttr(self.jxt+".scaleY", -1)
+                            cmds.setAttr(self.jxt+".scaleZ", -1)
+                    self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
                 else:
                     # create parentConstraint from ctrl to jnt:
                     cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
@@ -170,6 +177,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
                 if self.getHasIndirectSkin():
                     locScale = cmds.spaceLocator(name=side+self.userGuideName+"_Scalable_DO_NOT_DELETE")[0]
+                    cmds.setAttr(locScale+".visibility", 0)
                     self.toScalableHookGrp = cmds.group(locScale, name=side+self.userGuideName+"_IndirectSkin_Grp")
                     jxtGrp = cmds.group(side+self.userGuideName+"_Jxt", name=side+self.userGuideName+"_Joint_Grp")
                     self.toStaticHookGrp   = cmds.group(jxtGrp, self.toScalableHookGrp, self.toCtrlHookGrp, name=side+self.userGuideName+"_Grp")
