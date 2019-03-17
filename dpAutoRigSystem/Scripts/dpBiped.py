@@ -51,6 +51,7 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateZ", 1.5)
         cmds.setAttr(eyeLookAtInstance.annotation+".translateY", 3.5)
         cmds.setAttr(eyeLookAtInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(eyeLookAtInstance.cvEndJoint+".translateZ", 7)
         
         # parent eyeLookAt guide to spine guide:
         cmds.parent(eyeLookAtInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
@@ -136,6 +137,7 @@ def Biped(dpAutoRigInst):
             cmds.setAttr(fingerInstance.moduleGrp+".displayAnnotation", 0)
             cmds.setAttr(fingerInstance.radiusCtrl+".translateX", 0.3)
             cmds.setAttr(fingerInstance.annotation+".visibility", 0)
+            cmds.setAttr(fingerInstance.moduleGrp+".shapeSize", 0.3)
             
             if n == len(fingerInstanceList)-1:
                 # correct not commun values for thumb guide:
@@ -156,6 +158,7 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(earInstance.moduleGrp+".translateY", 21)
         cmds.setAttr(earInstance.moduleGrp+".rotateY", 110)
         cmds.setAttr(earInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(earInstance.cvEndJoint+".translateZ", 0.4)
         # parent ear guide to head guide:
         cmds.parent(earInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         # setting X mirror:
@@ -171,6 +174,7 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(upperTeethInstance.moduleGrp+".translateZ", 2.2)
         cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
         cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
         # parent upperTeeth guide to head guide:
         cmds.parent(upperTeethInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         # create FkLine module instance:
@@ -181,6 +185,7 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(lowerTeethInstance.moduleGrp+".translateZ", 2.2)
         cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
         cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
         # parent upperTeeth guide to head guide:
         cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
         
@@ -197,6 +202,7 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(noseInstance.cvJointLoc+".translateY", -0.15)
         cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.3)
         cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(noseInstance.moduleGrp+".shapeSize", 0.5)
         # parent nose guide to head guide:
         cmds.parent(noseInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         # create FkLine module instance:
@@ -208,6 +214,7 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(nostrilInstance.moduleGrp+".translateZ", 2.15)
         cmds.setAttr(nostrilInstance.radiusCtrl+".translateX", 0.2)
         cmds.setAttr(nostrilInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(nostrilInstance.moduleGrp+".shapeSize", 0.3)
         # setting X mirror:
         dpAutoRigInst.guide.FkLine.changeMirror(nostrilInstance, "X")
         cmds.setAttr(nostrilInstance.moduleGrp+".flip", 1)
@@ -229,7 +236,8 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(tongueInstance.moduleGrp+".nJoints", 3)
         cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
         cmds.setAttr(tongueInstance.cvEndJoint+".translateZ", 0.2)
-        # parent nose guide to head guide:
+        cmds.setAttr(tongueInstance.moduleGrp+".shapeSize", 0.4)
+        # parent tongue guide to head guide:
         cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
         
         # select spineGuide_Base:

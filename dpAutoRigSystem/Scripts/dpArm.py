@@ -52,6 +52,7 @@ def Arm(dpAutoRigInst):
             cmds.setAttr(fingerInstance.moduleGrp+".displayAnnotation", 0)
             cmds.setAttr(fingerInstance.radiusCtrl+".translateX", 0.3)
             cmds.setAttr(fingerInstance.annotation+".visibility", 0)
+            cmds.setAttr(fingerInstance.moduleGrp+".shapeSize", 0.3)
             
             if n == len(fingerInstanceList)-1:
                 # correct not commun values for thumb guide:

@@ -23,6 +23,10 @@ class Single(Base.StartClass, Layout.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         Base.StartClass.__init__(self, *args, **kwargs)
+        #Returned data from the dictionnary
+        self.mainJisList = []
+        self.aStaticGrpList = []
+        self.aCtrlGrpList = []
     
     
     def createModuleLayout(self, *args):
@@ -34,6 +38,10 @@ class Single(Base.StartClass, Layout.LayoutClass):
         return cmds.getAttr(self.moduleGrp + ".indirectSkin")
     
     
+    def getHasHolder(self):
+        return cmds.getAttr(self.moduleGrp + "." + self.langDic[self.langName]['c_holder'])
+        
+        
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
@@ -42,6 +50,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
         
         cmds.addAttr(self.moduleGrp, longName="indirectSkin", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".indirectSkin", 0)
+        cmds.addAttr(self.moduleGrp, longName=self.langDic[self.langName]['c_holder'], attributeType='bool')
+        cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], 0)
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
@@ -147,7 +157,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.ctrl+".scaleCompensate", 1)
                 cmds.connectAttr(self.ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
-                    # create a fatherJoint:
+                    # create a fatherJoint in order to zeroOut the skinning joint:
                     cmds.select(clear=True)
                     jxtName = self.jnt.replace("_Jnt", "_Jxt")
                     self.jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
@@ -162,8 +172,15 @@ class Single(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(self.jxt+".scaleX", -1)
                             cmds.setAttr(self.jxt+".scaleY", -1)
                             cmds.setAttr(self.jxt+".scaleZ", -1)
-                    self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
-                else:
+                    if self.getHasHolder():
+                        cmds.delete(self.ctrl+"Shape", shape=True)
+                        self.ctrl = cmds.rename(self.ctrl, self.ctrl+"_"+self.langDic[self.langName]['c_holder']+"_Grp")
+                        ctrls.setLockHide([self.ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'scaleCompensate'])
+                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c_holder']+"_Jis"))
+                        ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
+                    else:
+                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
+                else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
                     cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
                     # create scaleConstraint from ctrl to jnt:
@@ -173,6 +190,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
                 if self.getHasIndirectSkin():
@@ -197,6 +215,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
+                self.aStaticGrpList.append(self.toStaticHookGrp)
+                self.aCtrlGrpList.append(self.toCtrlHookGrp)
                 # add module type counter value
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
@@ -213,3 +233,12 @@ class Single(Base.StartClass, Layout.LayoutClass):
     
     def integratingInfo(self, *args):
         Base.StartClass.integratingInfo(self)
+        """ This method will create a dictionary with informations about integrations system between modules.
+        """
+        self.integratedActionsDic = {
+                                    "module": {
+                                                "mainJisList"   : self.mainJisList,
+                                                "staticGrpList" : self.aStaticGrpList,
+                                                "ctrlGrpList"   : self.aCtrlGrpList,
+                                              }
+                                    }

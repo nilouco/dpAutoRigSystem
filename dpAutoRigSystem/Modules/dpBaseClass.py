@@ -187,7 +187,7 @@ class StartClass:
                 except:
                     self.enteredText = ""
             # call utils to return the normalized text:
-            self.customName = utils.normalizeText(self.enteredText, prefixMax=20)
+            self.customName = utils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:

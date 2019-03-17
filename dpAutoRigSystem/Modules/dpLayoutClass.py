@@ -187,6 +187,10 @@ class LayoutClass:
                     cmds.text(" ", parent=self.doubleIndirectSkinColumn)
                     indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
                     self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.doubleIndirectSkinColumn)
+                    cmds.text(" ", parent=self.doubleIndirectSkinColumn)
+                    holderValue = cmds.getAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'])
+                    self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.doubleIndirectSkinColumn)
+                    
             except:
                 pass
     
@@ -283,9 +287,21 @@ class LayoutClass:
     def changeIndirectSkin(self, *args):
         """ Set the attribute value for indirectSkin.
         """
-        cmds.setAttr(self.moduleGrp+".indirectSkin", cmds.checkBox(self.indirectSkinCB, query=True, value=True))
+        indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
+        if indSkinValue == 0:
+            cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], 0)
+            cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
+        else:
+            cmds.checkBox(self.holderCB, edit=True, enable=True)
+            
 
-       
+    def changeHolder(self, *args):
+        """ Set the attribute value for holder.
+        """
+        cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], cmds.checkBox(self.holderCB, query=True, value=True))
+        
+        
     def changeShapeSize(self, *args):
         """ Set the attribute value for shapeSize.
         """
@@ -387,10 +403,15 @@ class LayoutClass:
                                         childrenShapeList = cmds.listRelatives(dupRenamed, shapes=True, children=True)
                                         if childrenShapeList:
                                             cmds.delete(childrenShapeList)
-                                            newSphere = cmds.sphere(name=dupRenamed+"Sphere", radius=0.1, constructionHistory=False)
+                                            newSphere = cmds.sphere(name=dupRenamed+"Sphere", radius=0.1, constructionHistory=True)
                                             newSphereShape = cmds.listRelatives(newSphere, shapes=True, children=True)[0]
                                             cmds.parent(newSphereShape, dupRenamed, shape=True, relative=True)
-                                            cmds.delete(newSphere)
+                                            cmds.delete(newSphere[0]) #transform
+                                            szMD = cmds.createNode("multiplyDivide", name=dupRenamed+"_MD")
+                                            cmds.connectAttr(self.moduleGrp+".shapeSize", szMD+".input1X", force=True)
+                                            cmds.connectAttr(szMD+".outputX", newSphere[1]+".radius", force=True)
+                                            cmds.setAttr(szMD+".input2X", 0.1)
+                                            cmds.rename(newSphere[1], dupRenamed+"_MNS")
                                 elif cmds.objectType(dup) != 'nurbsCurve':
                                     cmds.delete(dup)
                 

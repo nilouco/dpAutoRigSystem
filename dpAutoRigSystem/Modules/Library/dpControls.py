@@ -18,7 +18,7 @@ dic_colors = {
 
 # CONTROLS functions:
 def colorShape(objList, color):
-    """Create a color override for all shapes from a objList.
+    """Create a color override for all shapes from the objList.
     """
 
     if (dic_colors.has_key(color)):
@@ -49,7 +49,7 @@ def colorShape(objList, color):
                         cmds.setAttr(shape+".overrideColor", iColorIdx)
 
 def renameShape(transformList):
-    """Find shapes, rename they to Shapes and return the results.
+    """Find shapes, rename them to Shapes and return the results.
     """
     resultList = []
     for transform in transformList:
@@ -553,6 +553,8 @@ def cvBaseGuide(ctrlName, r=1):
     cmds.connectAttr(radiusCtrlMD+".outputX", radiusCtrlHistory+".radius", force=True)
     # colorize curveShapes:
     colorShape([circle, radiusCtrl], 'yellow')
+    colorShape([radiusCtrl], 'cyan')
+    cmds.setAttr(circle+"Shape.lineWidth", 2)
     cmds.select(clear=True)
     return [circle, radiusCtrl]
 

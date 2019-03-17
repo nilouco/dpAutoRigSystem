@@ -75,7 +75,7 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.03"
+DPAR_VERSION = "3.04"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
@@ -89,6 +89,7 @@ FOOT = "Foot"
 FINGER = "Finger"
 ARM = "Arm"
 LEG = "Leg"
+SINGLE = "Single"
 GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
@@ -1626,6 +1627,37 @@ class DP_AutoRig_UI:
                                         origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
                                         origFrom = origFromList[-1]
                                         cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True)
+                
+                        # integrate the Single module with another Single as a father:
+                        if moduleType == SINGLE:
+                            # connect Option_Ctrl display attribute to the visibility:
+                            if not cmds.objExists(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks']):
+                                cmds.addAttr(self.optionCtrl, longName="display"+self.langDic[self.langName]['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
+                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                            # working with item guide mirror:
+                            self.itemMirrorNameList = [""]
+                            # get itemGuideName:
+                            if self.itemGuideMirrorAxis != "off":
+                                self.itemMirrorNameList = self.itemGuideMirrorNameList
+                            for s, sideName in enumerate(self.itemMirrorNameList):
+                                ctrlGrp = self.integratedTaskDic[moduleDic]["ctrlGrpList"][s]
+                                cmds.connectAttr(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks'], ctrlGrp+".visibility", force=True)
+                            # get father module:
+                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
+                            if fatherModule == SINGLE:
+                                for s, sideName in enumerate(self.itemMirrorNameList):
+                                    # getting child Single Static_Grp:
+                                    staticGrp = self.integratedTaskDic[moduleDic]["staticGrpList"][s]
+                                    # getting father Single mainJis (indirect skinning joint) data:
+                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                    try:
+                                        mainJis = self.integratedTaskDic[fatherGuide]['mainJisList'][s]
+                                    except:
+                                        mainJis = self.integratedTaskDic[fatherGuide]['mainJisList'][0]
+                                    # father's mainJis drives child's staticGrp:
+                                    cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True)
+                                    cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True)
                 
                 
                 # atualise the number of rigged guides by type
