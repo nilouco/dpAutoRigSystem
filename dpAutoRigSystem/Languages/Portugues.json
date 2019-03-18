@@ -79,6 +79,11 @@
     "i070_continueSkin"   : "Voce gostaria de continuar o Skinning sem esses joints?",
     "i071_yes"            : "Sim",
     "i072_no"             : "Não",
+    "i073_displayLongName": "Mostrar Nome Longo",
+    "i074_attention"      : "Atenção!",
+    "i075_moreOne"        : "Mais de um objeto",
+    "i076_sameName"       : "com o mesmo nome:",
+    "i077_skinned"        : "Skinning bem feito para: ",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com numeros, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -226,5 +231,6 @@
     
     "e000_GuideNotFound"           : "Erro: (000) - Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Erro: (001) - Guia(s) não encontrada(s) no diretorio respectivo...",
-    "e002_decomposeMatrixNotFound" : "Erro: (002) - O plugin decomposeMatrix não foi encontrado, não foi possivel continuar o espelhamento."
+    "e002_decomposeMatrixNotFound" : "Erro: (002) - O plugin decomposeMatrix não foi encontrado, não foi possivel continuar o espelhamento.",
+    "e003_moreThanOneGeo"          : "Erro: (003) - Não é possível realizar o Skinning!\nDesculpe.\n\nMais de um objeto\ncom o mesmo nome\nna lista de Geometrias.\n\nPor favor, tente usar a opção:\nMostrar Nome Longo.\n\nAqui o problema:\n"
 }

@@ -320,6 +320,9 @@ class DP_AutoRig_UI:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.langDic[self.langName]['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
         dpARJoints  = cmds.radioButton( label=self.langDic[self.langName]['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
+        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=2, columnWidth=[(1, 40), (2, 100)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
+        self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="_Jnt", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="_Jis", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
         cmds.setParent(self.allUIs["skinningTabLayout"])
@@ -330,6 +333,7 @@ class DP_AutoRig_UI:
         allGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
         selGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
+        self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.langDic[self.langName]['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=allGeoms )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -541,18 +545,29 @@ class DP_AutoRig_UI:
         chooseJnt = cmds.radioButton(jntSelectedRadioButton, query=True, annotation=True)
         
         # list joints to be populated:
-        jntList = []
+        jointList = []
         allJointList = cmds.ls(selection=False, type="joint")
         if chooseJnt == "allJoints":
-            jntList = allJointList
+            jointList = allJointList
+            cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=False)
+            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=False)
         elif chooseJnt == "dpARJoints":
-            for jnt in allJointList:
-                if cmds.objExists(jnt+'.'+BASE_NAME+'joint'):
-                    jntList.append(jnt)
+            cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=True)
+            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=True)
+            displayJnt = cmds.checkBox(self.allUIs["_JntCB"], query=True, value=True)
+            displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
+            for jointNode in allJointList:
+                if cmds.objExists(jointNode+'.'+BASE_NAME+'joint'):
+                    if displayJnt:
+                        if "_Jnt" in jointNode:
+                            jointList.append(jointNode)
+                    if displayJis:
+                        if "_Jis" in jointNode:
+                            jointList.append(jointNode)
         
         # populate the list:
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, removeAll=True)
-        cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=jntList)
+        cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=jointList)
         # atualize of footerB text:
         self.atualizeSkinFooter()
     
@@ -564,28 +579,58 @@ class DP_AutoRig_UI:
         geomSelectedRadioButton = cmds.radioCollection(self.allUIs["geomCollection"], query=True, select=True)
         chooseGeom = cmds.radioButton(geomSelectedRadioButton, query=True, annotation=True)
         
+        # get user preference as long or short name:
+        displayGeoLongName = cmds.checkBox(self.allUIs["geoLongName"], query=True, value=True)
+        
         # list geometries to be populated:
-        geomList = []
+        geomList, shortNameList, sameNameList = [], [], []
+        
         currentSelectedList = cmds.ls(selection=True, long=True)
         geomTypeList = ["mesh", "nurbsSurface", "subdiv"]
         for geomType in geomTypeList:
             allGeomList = cmds.ls(selection=False, type=geomType, long=True)
             if allGeomList:
                 for meshName in allGeomList:
-                    transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
-                    if transformNameList:
-                        # do not add ribbon nurbs plane to the list:
-                        if not cmds.objExists(transformNameList[0]+".doNotSkinIt"):
-                            if not transformNameList[0] in geomList:
-                                if chooseGeom == "allGeoms":
-                                    geomList.append(transformNameList[0])
-                                elif chooseGeom == "selGeoms":
-                                    if transformNameList[0] in currentSelectedList or meshName in currentSelectedList:
+                    if cmds.getAttr(meshName+".intermediateObject") == 0:
+                        transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
+                        if transformNameList:
+                            # do not add ribbon nurbs plane to the list:
+                            if not cmds.objExists(transformNameList[0]+".doNotSkinIt"):
+                                if not transformNameList[0] in geomList:
+                                    if chooseGeom == "allGeoms":
                                         geomList.append(transformNameList[0])
+                                        cmds.checkBox(self.allUIs["geoLongName"], edit=True, value=True, enable=False)
+                                    elif chooseGeom == "selGeoms":
+                                        cmds.checkBox(self.allUIs["geoLongName"], edit=True, enable=True)
+                                        if transformNameList[0] in currentSelectedList or meshName in currentSelectedList:
+                                            if displayGeoLongName:
+                                                geomList.append(transformNameList[0])
+                                            else:
+                                                shortName = transformNameList[0][transformNameList[0].rfind("|")+1:]
+                                                geomList.append(shortName)
+
+        # check if we have same short name:
+        if geomList:
+            for g, geo in enumerate(geomList):
+                if geo in geomList[:g]:
+                    sameNameList.append(geo)
+        if sameNameList:
+            geomList.insert(0, "*")
+            geomList.append(" ")
+            geomList.append("-------")
+            geomList.append(self.langDic[self.langName]['i074_attention'])
+            geomList.append(self.langDic[self.langName]['i075_moreOne'])
+            geomList.append(self.langDic[self.langName]['i076_sameName'])
+            for sameName in sameNameList:
+                geomList.append(sameName)
+        
         
         # populate the list:
         cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, removeAll=True)
-        cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=geomList)
+        if sameNameList:
+            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, lineFont=[(len(geomList)-len(sameNameList)-2, 'boldLabelFont'), (len(geomList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(geomList)-len(sameNameList), 'obliqueLabelFont')], append=geomList)
+        else:
+            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=geomList)
         # atualize of footerB text:
         self.atualizeSkinFooter()
     
@@ -1745,7 +1790,17 @@ class DP_AutoRig_UI:
     
     
     ###################### Start: Skinning.
-
+    
+    def validateGeoList(self, geoList, *args):
+        """ Check if the geometry list from UI is good to be skinned, because we can get issue if the display long name is not used.
+        """
+        if geoList:
+            for i, item in enumerate(geoList):
+                if item in geoList[:i]:
+                    self.info('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
+                    return False
+        return True
+    
     def skinFromUI(self, *args):
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
@@ -1774,15 +1829,17 @@ class DP_AutoRig_UI:
         if not geomSkinList:
             geomSkinList = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, allItems=True)
         
-        if jointSkinList and geomSkinList:
-            for geomSkin in geomSkinList:
-                if (args[0] == "Add"):
-                    cmds.skinCluster(geomSkin, edit=True, ai=jointSkinList, toSelectedBones=True, removeUnusedInfluence=False, lockWeights=True, wt=0.0)
-                elif (args[0] == "Remove"):
-                    cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
-                else:
-                    cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False)
-
+        # check if we have repeated listed geometries in case of the user choose to not display long names:
+        if self.validateGeoList(geomSkinList):
+            if jointSkinList and geomSkinList:
+                for geomSkin in geomSkinList:
+                    if (args[0] == "Add"):
+                        cmds.skinCluster(geomSkin, edit=True, ai=jointSkinList, toSelectedBones=True, removeUnusedInfluence=False, lockWeights=True, wt=0.0)
+                    elif (args[0] == "Remove"):
+                        cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
+                    else:
+                        cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False)
+                print self.langDic[self.langName]['i077_skinned'] + ', '.join(geomSkinList),
         else:
             print self.langDic[self.langName]['i029_skinNothing'],
 

@@ -31,7 +31,7 @@
     "i022_listAllJnts"    : "List All joints",
     "i023_listdpARJnts"   : "List dpAR joints",
     "i024_geometries"     : "geometries",
-    "i025_joints"         : "joints will be skined to",
+    "i025_joints"         : "joints will be skinned to",
     "i026_listAllJnts"    : "List All geometries",
     "i027_listSelJnts"    : "List Selected geometries",
     "i028_skinButton"     : "SKIN",
@@ -79,6 +79,11 @@
     "i070_continueSkin"   : "Do you want to continue the Skinning without those joints?",
     "i071_yes"            : "Yes",
     "i072_no"             : "No",
+    "i073_displayLongName": "Display Long Name",
+    "i074_attention"      : "Attention!",
+    "i075_moreOne"        : "More than one object",
+    "i076_sameName"       : "with the same name:",
+    "i077_skinned"        : "Skinning worked well for: ",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -226,5 +231,6 @@
     
     "e000_GuideNotFound"           : "Error: (000) - Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Error: (001) - Guide(s) not found in the respective folder...",
-    "e002_decomposeMatrixNotFound" : "Error: (002) - The decomposeMatrix plugin not found, could not continue to create the mirror."
+    "e002_decomposeMatrixNotFound" : "Error: (002) - The decomposeMatrix plugin not found, could not continue to create the mirror.",
+    "e003_moreThanOneGeo"          : "Error: (003) - It is not possible create the Skinning!\nSorry.\n\nThere are more than one object\nwith the same name\nin the list of Geometries.\n\nTry to use the option:\nDisplay Long Name,\nplease.\n\nHere's the problem:\n"
 }

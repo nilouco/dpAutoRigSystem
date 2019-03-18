@@ -31,7 +31,7 @@
     "i022_listAllJnts"    : "Liste TOUS les joints",
     "i023_listdpARJnts"   : "Liste les dpAR joints",
     "i024_geometries"     : "géométries",
-    "i025_joints"         : "joints seront skined aux",
+    "i025_joints"         : "joints seront skinned aux",
     "i026_listAllJnts"    : "Liste TOUTES les géométries",
     "i027_listSelJnts"    : "Liste les géométries sélectionnés",
     "i028_skinButton"     : "SKIN",
@@ -79,6 +79,11 @@
     "i070_continueSkin"   : "Esc-que vous voulez continuer le Skinning quand même?",
     "i071_yes"            : "Oui",
     "i072_no"             : "Non",
+    "i073_displayLongName": "Montrer le Nom Complet",
+    "i074_attention"      : "Attention!",
+    "i075_moreOne"        : "Plus d'un objet",
+    "i076_sameName"       : "avec le même nom:",
+    "i077_skinned"        : "Skinning bien faite pour: ",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -226,5 +231,6 @@
     
     "e000_GuideNotFound"           : "Erreur: (000) - Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Erreur: (001) - Guide(s) pas trouvée(s) dans le dossier respectif...",
-    "e002_decomposeMatrixNotFound" : "Erreur: (002) - C'était impossible de trouver le plugin decomposeMatrix, ce n'est pas possible de faire le miroir."
+    "e002_decomposeMatrixNotFound" : "Erreur: (002) - C'était impossible de trouver le plugin decomposeMatrix, ce n'est pas possible de faire le miroir.",
+    "e003_moreThanOneGeo"          : "Erreur: (003) - Ce n'est pas possible faire le SSkinning!\nDésolé.\n\nIl y a plus d'un objet\navec le même nom\ndans la liste de Geometries.\n\nEssayer utliser l'option:\nMontrer le Nom Complet,\ns'il vous plaît.\n\nVoici le problème:\n"
 }
