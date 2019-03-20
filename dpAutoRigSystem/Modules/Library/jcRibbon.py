@@ -112,7 +112,7 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
             cmds.setAttr(nBone+".segmentScaleCompensate", 0)
     
     for i in range(len(limbJoints)):
-        limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_'+`i+1`+'_Jnt')
+        limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+1))
         cmds.addAttr(limbJoints[i], longName="dpAR_joint", attributeType='float', keyable=False)
     
     scaleGrp = cmds.group(upLimb['scaleGrp'], downLimb['scaleGrp'], jntGrp, n=prefix+myName+'_Ribbon_Scale_Grp')
@@ -139,7 +139,15 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
                 pass
             # rename joint
             cmds.rename(item, item.replace('_Jnt', '_Jxt'))
-            
+    
+    # implementing pin setup to ribbon corner offset control:
+    if elbowctrlList[2]:
+        worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, elbowctrlZero, mo=True)[0]
+        pinRev = cmds.createNode('reverse', name=elbowctrlCtrl+"_Pin_Rev")
+        cmds.connectAttr(elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
+        cmds.connectAttr(elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
+        cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
+    
     
     # WIP: not used this mirror by dpAR system because each module guide will create each own mirror
     if mirror:
@@ -190,13 +198,14 @@ def createElbowCtrl(myName='Limb_Ctrl', r=1, zero=True, armStyle=True):
     cmds.makeIdentity(curve, a=1)
     grp = None
     if zero:
-        zero = cmds.group(curve, n=myName+'_Grp')
+        zero = cmds.group(curve, n=myName+'_Zero')
         grp = cmds.group(zero, n=myName+'_Grp')
         if armStyle:
             cmds.rotate(0, -90, -90, zero)
         else:
             cmds.rotate(-90, 0, -90, zero)
     cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+    cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
     return [grp, curve, zero]
     
 #function to create the ribbon
@@ -221,10 +230,10 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
 
         #create a nurbsPlane based in the choose orientation option
         if horizontal:
-            ribbon =cmds.nurbsPlane(ax=axis, w=numJoints, lr=(1/float(numJoints)), d=3, u=numJoints, v=1, ch=0, name=name+'_Plane')[0]
+            ribbon = cmds.nurbsPlane(ax=axis, w=numJoints, lr=(1/float(numJoints)), d=3, u=numJoints, v=1, ch=0, name=name+'_Plane')[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, sv=1, du=3, dv=1, tol=0.01, fr=0, dir=1) 
         else:
-            ribbon =cmds.nurbsPlane(ax=axis, w=1, lr=numJoints, d=3, u=1, v=numJoints, ch=0, name=name+'_Plane')[0]
+            ribbon = cmds.nurbsPlane(ax=axis, w=1, lr=numJoints, d=3, u=1, v=numJoints, ch=0, name=name+'_Plane')[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, su=1, du=1, dv=3, tol=0.01, fr=0, dir=0) 
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
         cmds.addAttr(ribbon, longName="doNotSkinIt", attributeType="bool", keyable=True)
@@ -642,8 +651,8 @@ def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False):
         passo = (1/float(num))/2.0;
         for i in range(num):
             #create the follicle and do correct connections to link it to the 
-            folShape = cmds.createNode('follicle', name=name+'_%d_FolShape'%i)
-            folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%d_Fol'%i)         
+            folShape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
+            folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%02d_Fol'%i)         
             fols.append(folTrans)
             cmds.connectAttr(rib+'.worldMatrix[0]', folShape+'.inputWorldMatrix')
             cmds.connectAttr(rib+'.local', folShape+'.inputSurface')
@@ -653,7 +662,7 @@ def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False):
             cmds.setAttr(folShape+'.parameterV', 0.5) 
             #create the joint in the follicle
             cmds.select(cl=True)
-            jnts.append(cmds.joint(n=name+'_%d_Jnt'%i))
+            jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
             cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
             cmds.select(cl=True)
             #calculate the position of the first follicle
@@ -665,8 +674,8 @@ def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False):
         passo = (1/float(num))/2.0;
         for i in range(num):
             #create the follicle and do correct connections in order to link it to the ribbon
-            folShape = cmds.createNode('follicle', name=name+'_%d_FolShape'%i)
-            folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%d_Fol'%i)
+            folShape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
+            folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%02d_Fol'%i)
             fols.append(folTrans)
             cmds.connectAttr(rib+'.worldMatrix[0]', folShape+'.inputWorldMatrix')
             cmds.connectAttr(rib+'.local', folShape+'.inputSurface')
@@ -676,7 +685,7 @@ def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False):
             cmds.setAttr(folShape+'.parameterV', passo) 
             #create the joint in the follicle
             cmds.select(cl=True)
-            jnts.append(cmds.joint(n=name+'_%d_Jnt'%i))
+            jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
             cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
             cmds.select(cl=True)
             #calculate the first follicle position

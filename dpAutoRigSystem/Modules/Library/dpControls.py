@@ -200,7 +200,7 @@ def middlePoint(a, b, createLocator=False):
         return[resultPos]
 
 
-def createSimpleRibbon(name='noodle', totalJoints=6):
+def createSimpleRibbon(name='ribbon', totalJoints=6):
     """ Creates a Ribbon system.
         Receives the total number of joints to create.
         Returns the ribbon nurbs plane, the joints groups and joints created.
@@ -217,7 +217,7 @@ def createSimpleRibbon(name='noodle', totalJoints=6):
     cmds.addAttr(ribbonNurbsPlane, longName="doNotSkinIt", attributeType="bool", keyable=True)
     cmds.setAttr(ribbonNurbsPlane+".doNotSkinIt", 1)
     # create groups to be used as a root of the ribbon system:
-    ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_RibbonJoint_Grp")
+    ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_Rbn_RibbonJoint_Grp")
     # create joints:
     jointList, jointGrpList = [], []
     for j in range(totalJoints+1):
@@ -238,7 +238,7 @@ def createSimpleRibbon(name='noodle', totalJoints=6):
         cmds.connectAttr(infoNode + ".tangentV", aimGrp + ".translate", force=True)
         # create joint:
         cmds.select(clear=True)
-        joint = cmds.joint(name=name+str(j)+"_Jnt")
+        joint = cmds.joint(name=name+"_%02d_Jnt"%j)
         jointList.append(joint)
         cmds.addAttr(joint, longName='dpAR_joint', attributeType='float', keyable=False)
         # parent the joint to the groups:

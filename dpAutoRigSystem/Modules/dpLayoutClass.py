@@ -400,6 +400,9 @@ class LayoutClass:
                                     
                                     # rebuild the shape as a nurbsSphere:
                                     if cmds.objectType(dupRenamed) == 'transform':
+                                        # make this previewMirrorGuide as not skinable from dpAR_UI:
+                                        cmds.addAttr(dupRenamed, longName="doNotSkinIt", attributeType="bool", keyable=True)
+                                        cmds.setAttr(dupRenamed+".doNotSkinIt", 1)
                                         childrenShapeList = cmds.listRelatives(dupRenamed, shapes=True, children=True)
                                         if childrenShapeList:
                                             cmds.delete(childrenShapeList)
@@ -417,6 +420,7 @@ class LayoutClass:
                 
                 # renaming the previewMirrorGuide:
                 self.previewMirrorGuide = cmds.rename(duplicated, self.moduleGrp.replace(":", "_")+'_Mirror')
+                cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
                 cmds.delete(self.previewMirrorGuide+'Shape')
                 
                 # create a decomposeMatrix node in order to get the worldSpace transformations (like using xform):

@@ -24,15 +24,15 @@ def Arm(dpAutoRigInst):
         dpAutoRigInst.guide.Limb.editUserName(armLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m028_arm'].capitalize())
         # create finger instances:
         indexFingerInstance  = dpAutoRigInst.initGuide('dpFinger', guideDir)
-        dpAutoRigInst.guide.Finger.editUserName(indexFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m032_index'])
+        dpAutoRigInst.guide.Finger.editUserName(indexFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']+"_"+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m032_index'])
         middleFingerInstance = dpAutoRigInst.initGuide('dpFinger', guideDir)
-        dpAutoRigInst.guide.Finger.editUserName(middleFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m033_middle'])
+        dpAutoRigInst.guide.Finger.editUserName(middleFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']+"_"+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m033_middle'])
         ringFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
-        dpAutoRigInst.guide.Finger.editUserName(ringFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m034_ring'])
+        dpAutoRigInst.guide.Finger.editUserName(ringFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']+"_"+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m034_ring'])
         pinkyFingerInstance   = dpAutoRigInst.initGuide('dpFinger', guideDir)
-        dpAutoRigInst.guide.Finger.editUserName(pinkyFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m035_pinky'])
+        dpAutoRigInst.guide.Finger.editUserName(pinkyFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']+"_"+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m035_pinky'])
         thumbFingerInstance  = dpAutoRigInst.initGuide('dpFinger', guideDir)
-        dpAutoRigInst.guide.Finger.editUserName(thumbFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m036_thumb'])
+        dpAutoRigInst.guide.Finger.editUserName(thumbFingerInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']+"_"+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m036_thumb'])
         
         # edit arm limb guide:
         armBaseGuide = armLimbInstance.moduleGrp

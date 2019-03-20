@@ -289,7 +289,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 utils.originedFrom(objName=self.hipsB, attrString=bottomLocGuide)
                 utils.originedFrom(objName=self.chestB, attrString=topLocGuide)
                 # create a simple spine ribbon:
-                returnedRibbonList = ctrls.createSimpleRibbon(name=side + self.userGuideName + '_Rbn',
+                returnedRibbonList = ctrls.createSimpleRibbon(name=side + self.userGuideName,
                                                               totalJoints=(self.nJoints - 1))
                 rbnNurbsPlane = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
@@ -312,9 +312,9 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.cluster(rbnNurbsPlane + ".cv[0:3][" + str(self.nJoints) + ":" + str(self.nJoints + 1) + "]",
                              name=side + self.userGuideName + '_Up_Cls')[1]
                 # get positions of joints from ribbon nurbs plane:
-                startRbnJointPos = cmds.xform(side + self.userGuideName + "_Rbn0_Jnt",
+                startRbnJointPos = cmds.xform(side + self.userGuideName + "_00_Jnt",
                                               query=True, worldSpace=True, translation=True)
-                endRbnJointPos = cmds.xform(side + self.userGuideName + "_Rbn" + str(self.nJoints - 1) + "_Jnt",
+                endRbnJointPos = cmds.xform(side + self.userGuideName + "_%02d_Jnt"%(self.nJoints - 1),
                                             query=True, worldSpace=True, translation=True)
                 # move pivots of clusters to start and end positions:
                 cmds.move(startRbnJointPos[0], startRbnJointPos[1], startRbnJointPos[2],
