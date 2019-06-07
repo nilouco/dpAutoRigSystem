@@ -228,6 +228,8 @@
     "c_upper"           : "Upper",
     "c_lower"           : "Lower",
     "c_holder"          : "Holder",
+    "c_autoRotate"      : "autoRotate",
+    "c_chew"            : "Chew",
     
     "e000_GuideNotFound"           : "Error: (000) - Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Error: (001) - Guide(s) not found in the respective folder...",

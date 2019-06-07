@@ -62,9 +62,9 @@ try:
     from functools import partial
     import Modules.Library.dpUtils as utils
     import Modules.Library.dpControls as ctrls
-    import Extras.dpUpdateRigInfo as rigInfo
     import Modules.dpBaseClass as Base
     import Modules.dpLayoutClass as Layout
+    import Extras.dpUpdateRigInfo as rigInfo
     reload(utils)
     reload(ctrls)
     reload(rigInfo)
@@ -1074,8 +1074,6 @@ class DP_AutoRig_UI:
             self.masterCtrl.setDynamicAttr("geometryList", "")
             self.masterCtrl.setDynamicAttr("controlList", "")
             self.masterCtrl.rotateOrder.set(3)
-            pymel.connectAttr(self.masterCtrl.scaleY, self.masterCtrl.scaleX, lock=True, force=True)
-            pymel.connectAttr(self.masterCtrl.scaleY, self.masterCtrl.scaleZ, lock=True, force=True)
 
         self.globalCtrl = self.getBaseCtrl("globalCtrl", self.prefix+"Global_Ctrl", ctrls.dpCheckLinearUnit(16), iSection=4)
         if (self.ctrlCreated):
@@ -1092,6 +1090,14 @@ class DP_AutoRig_UI:
             pymel.makeIdentity(self.optionCtrl, apply=True)
             self.optionCtrlGrp = pymel.PyNode(utils.zeroOut([self.optionCtrl.__melobject__()])[0])
             self.optionCtrlGrp.translateX.set(fMasterRadius)
+            # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
+            self.rigScaleMD = pymel.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
+            pymel.connectAttr(self.optionCtrl.rigScale, self.rigScaleMD.input1X, force=True)
+            pymel.connectAttr(self.optionCtrl.rigScaleMultiplier, self.rigScaleMD.input2X, force=True)
+            pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleX, force=True)
+            pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleY, force=True)
+            pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleZ, force=True)
+            ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
         else:
             self.optionCtrlGrp = self.optionCtrl.getParent()
 
@@ -1677,7 +1683,8 @@ class DP_AutoRig_UI:
                         if moduleType == SINGLE:
                             # connect Option_Ctrl display attribute to the visibility:
                             if not cmds.objExists(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks']):
-                                cmds.addAttr(self.optionCtrl, longName="display"+self.langDic[self.langName]['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
+                                cmds.addAttr(self.optionCtrl, longName="display"+self.langDic[self.langName]['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                cmds.setAttr(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks'], channelBox=True)
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -1766,7 +1773,10 @@ class DP_AutoRig_UI:
                 if not pymel.hasAttr(pOptCtrl, "ikFkBlend"):
                     if (pOptCtrl.listAttr(string="*IkFk*")):
                         pymel.addAttr(pOptCtrl, ln="ikFkBlend", at="enum", enumName="----------", keyable=True)
-
+                        
+            #Try add hand follow (space switch attribute) on bipeds:
+            self.initExtraModule("dpAddHandFollow", EXTRAS)
+            
 
         # re-declaring guideMirror and previewMirror groups:
         self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'

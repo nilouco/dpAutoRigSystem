@@ -228,6 +228,8 @@
     "c_upper"           : "Superior",
     "c_lower"           : "Inferior",
     "c_holder"          : "Suporte",
+    "c_autoRotate"      : "autoRotacionar",
+    "c_chew"            : "Mastigar",
     
     "e000_GuideNotFound"           : "Erro: (000) - Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Erro: (001) - Guia(s) não encontrada(s) no diretorio respectivo...",

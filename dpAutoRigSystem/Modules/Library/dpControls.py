@@ -409,6 +409,16 @@ def cvChin(ctrlName, r=1):
     return curve
 
 
+def cvChew(ctrlName, r=1):
+    """Create a control to be used as a Chew control.
+    """
+    # create a simple circle curve:
+    curve = cmds.curve(n=ctrlName, d=3, p=[(0, -0.4*r, 0), (0.75*r, -0.75*r, 0), (r, 0, 0), (r, 0.75*r, 0), (0, 0.15*r, 0), (-r, 0.75*r, 0), (-r, 0, 0), (-0.75*r, -0.75*r, 0), (0, -0.4*r, 0)] )
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
+
 def cvEyes(ctrlName, r=1, Le="L", Ri="R", eye="eye", pupil="pupil"):
     """Create a control to be used as a Chin control.
     """
@@ -486,14 +496,39 @@ def cvSmile(ctrlName, r=1):
 
 
 def cvCharacter(ctrlName, r=1):
-    """Create a control like a mini character (minimim) to be used as an option_Ctrl.
+    """Create a control like a mini character (minimim) to be used as an Option_Ctrl.
     """
     # get radius by checking linear unit
     r = dpCheckLinearUnit(r)
     # create a minime curve:
     curve = cmds.curve(n=ctrlName, d=1, p=[(0, 9*r, 0), (1*r, 9*r, 0), (1.9*r, 8.2*r, 0), (1*r, 7*r, 0), (0.4*r, 6.6*r, 0), (0.4*r, 5.7*r, 0), (2.4*r, 5.45*r, 0), (3.8*r, 5.5*r, 0), (4.6*r, 6*r, 0), (5.8*r, 5.5*r, 0), (5.25*r, 4.6*r, 0), (4*r, 5*r, 0), (2.4*r, 4.9*r, 0), (1.6*r, 4.5*r, 0), (1.1*r, 3*r, 0), (1.5*r, 1.7*r, 0), (1.7*r, 0.5*r, 0), (3*r, 0.37*r, 0), (3.15*r, 0, 0), (1*r, 0, 0), (0.73*r, 1.5*r, 0), (0, 2.25*r, 0), (-0.73*r, 1.5*r, 0), (-1*r, 0, 0), (-3.15*r, 0, 0), (-3*r, 0.37*r, 0), (-1.7*r, 0.5*r, 0), (-1.5*r, 1.7*r, 0), (-1.1*r, 3*r, 0), (-1.6*r, 4.5*r, 0), (-2.4*r, 4.9*r, 0), (-4*r, 5*r, 0), (-5.25*r, 4.6*r, 0), (-5.8*r, 5.5*r, 0), (-4.6*r, 6*r, 0), (-3.8*r, 5.5*r, 0), (-2.4*r, 5.45*r, 0), (-0.4*r, 5.7*r, 0), (-0.4*r, 6.6*r, 0), (-1*r, 7*r, 0), (-1.9*r, 8.2*r, 0), (-1*r, 9*r, 0), (0, 9*r, 0)] )
+    cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True)
+    cmds.addAttr(curve, longName="rigScaleMultiplier", attributeType='float', defaultValue=1, keyable=False)
     # rename curveShape:
     renameShape([curve])
+    # create Option_Ctrl Text:
+    optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
+    cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Source Sans Pro", text="Option Ctrl", constructionHistory=False)[0]
+    txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
+    if txtShapeList:
+        for s, shape in enumerate(txtShapeList):
+            # store CV world position
+            curveCVList = cmds.getAttr(shape+'.cp', multiIndices=True)
+            vtxWorldPosition = []
+            for i in curveCVList :
+                cvPointPosition = cmds.xform(shape+'.cp['+str(i)+']', query=True, translation=True, worldSpace=True) 
+                vtxWorldPosition.append(cvPointPosition)
+            # parent the shapeNode :
+            cmds.parent(shape, optCtrlTxt, r=True, s=True)
+            # restore the shape world position
+            for i in curveCVList:
+                cmds.xform(shape+'.cp['+str(i)+']', a=True, worldSpace=True, t=vtxWorldPosition[i])
+            cmds.rename(shape, optCtrlTxt+"Shape"+str(s))
+    cmds.delete(cvText)
+    cmds.parent(optCtrlTxt, curve)
+    cmds.setAttr(optCtrlTxt+".template", 1)
+    cmds.setAttr(optCtrlTxt+".tx", -10.4*r)
+    cmds.setAttr(optCtrlTxt+".ty", 10*r)
     return curve
 
 
@@ -501,11 +536,30 @@ def cvSquare(ctrlName, r=1):
     """Create and return a simple curve as a square control.
     """
     # create curve:
-    curve = cmds.curve(n=ctrlName, d=1, p=[(-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, r)] )
+    curve = cmds.curve(n=ctrlName, d=1, p=[(-r, 0, r), (r, 0, r), (r, 0, -r), (-r, 0, -r), (-r, 0, r)])
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
+    
+def cvRoundSquare(ctrlName, r=1):
+    """Create and return a simple curve as a round square control usually for lip corner to skinning.
+    """
+    # create curve:
+    curve = cmds.curve(n=ctrlName, d=3, p=[(0.5*r, 0, 0), (0.5*r, 0, 0), (0.5*r, 0.5*r, 0), (0, 0.5*r, 0), (-0.5*r, 0.5*r, 0), (-0.5*r, 0, 0), (-0.5*r, -0.5*r, 0), (0, -0.5*r, 0), (0.5*r, -0.5*r, 0), (0.5*r, 0, 0), (0.5*r, 0, 0), (0.5*r, 0, 0)])
     # rename curveShape:
     renameShape([curve])
     return curve
 
+def cvFootball(ctrlName, r=1):
+    """Create and return a simple curve as a football control usually for eyes corner.
+    """
+    # create curve:
+    curve = cmds.curve(n=ctrlName, d=3, p=[(0.5*r, 0, 0), (0, 0.5*r, 0), (-0.5*r, 0, 0), (-0.5*r, 0, 0), (-0.5*r, 0, 0), (0, -0.5*r, 0), (0.5*r, 0, 0), (0.5*r, 0, 0)])
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
 
 def findHistory(objList, historyName):
     """Search and return the especific history of the listed objects.

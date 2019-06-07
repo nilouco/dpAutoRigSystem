@@ -136,9 +136,23 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 # create a control:
                 if self.getHasIndirectSkin():
-                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=3, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
+                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=3, normal=(0, 0, 1), r=self.ctrlRadius, s=8, ch=False)[0]
                 else:
-                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
+                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=8, ch=False)[0]
+                # edit circle shape to Upper or Lower controls:
+                if "Upper" in self.userGuideName:
+                    cmds.setAttr(self.ctrl+"Shape.controlPoints[4].yValue", 0)
+                    cmds.setAttr(self.ctrl+"Shape.controlPoints[5].yValue", 0)
+                    cmds.setAttr(self.ctrl+"Shape.controlPoints[6].yValue", 0)
+                    if not self.getHasIndirectSkin():
+                        cmds.setAttr(self.ctrl+"Shape.controlPoints[3].yValue", 0)
+                elif "Lower" in self.userGuideName:
+                    cmds.setAttr(self.ctrl+"Shape.controlPoints[0].yValue", 0)
+                    cmds.setAttr(self.ctrl+"Shape.controlPoints[1].yValue", 0)
+                    cmds.setAttr(self.ctrl+"Shape.controlPoints[2].yValue", 0)
+                    if not self.getHasIndirectSkin():
+                        cmds.setAttr(self.ctrl+"Shape.controlPoints[7].yValue", 0)
+                        cmds.setAttr(self.ctrl+"Shape.controlPoints[8].yValue", 0)
                 utils.originedFrom(objName=self.ctrl, attrString=self.base+";"+self.guide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
@@ -192,7 +206,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
                 if self.getHasIndirectSkin():
                     locScale = cmds.spaceLocator(name=side+self.userGuideName+"_Scalable_DO_NOT_DELETE")[0]
                     cmds.setAttr(locScale+".visibility", 0)

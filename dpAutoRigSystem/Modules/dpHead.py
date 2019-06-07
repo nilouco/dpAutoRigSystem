@@ -42,6 +42,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
         self.connectShapeSize(shapeSizeCH)
         self.cvChinLoc, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_chin", r=0.3)
         self.connectShapeSize(shapeSizeCH)
+        self.cvChewLoc, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_chew", r=0.3)
+        self.connectShapeSize(shapeSizeCH)
         self.cvLLipLoc, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_lLip", r=0.1)
         self.connectShapeSize(shapeSizeCH)
         self.cvRLipLoc, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_rLip", r=0.1)
@@ -51,25 +53,28 @@ class Head(Base.StartClass, Layout.LayoutClass):
         self.jGuideHead = cmds.joint(name=self.guideName+"_JGuideHead", radius=0.001)
         self.jGuideJaw  = cmds.joint(name=self.guideName+"_JGuideJaw", radius=0.001)
         self.jGuideChin = cmds.joint(name=self.guideName+"_JGuideChin", radius=0.001)
+        self.jGuideChew = cmds.joint(name=self.guideName+"_JGuideChew", radius=0.001)
         # set jointGuides as templates:
         cmds.setAttr(self.jGuideNeck+".template", 1)
         cmds.setAttr(self.jGuideHead+".template", 1)
         cmds.setAttr(self.jGuideJaw+".template", 1)
         cmds.setAttr(self.jGuideChin+".template", 1)
+        cmds.setAttr(self.jGuideChew+".template", 1)
         cmds.parent(self.jGuideNeck, self.moduleGrp, relative=True)
         # create cvEnd:
         self.cvEndJoint, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
         self.connectShapeSize(shapeSizeCH)
-        cmds.parent(self.cvEndJoint, self.cvChinLoc)
+        cmds.parent(self.cvEndJoint, self.cvChewLoc)
         cmds.setAttr(self.cvEndJoint+".tz", ctrls.dpCheckLinearUnit(1.3))
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.parent(self.jGuideEnd, self.jGuideChin)
+        cmds.parent(self.jGuideEnd, self.jGuideChew)
         # connect cvLocs in jointGuides:
         ctrls.directConnect(self.cvNeckLoc, self.jGuideNeck, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         ctrls.directConnect(self.cvHeadLoc, self.jGuideHead, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         ctrls.directConnect(self.cvJawLoc, self.jGuideJaw, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         ctrls.directConnect(self.cvChinLoc, self.jGuideChin, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        ctrls.directConnect(self.cvChewLoc, self.jGuideChew, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -84,6 +89,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvJawLoc+".translateZ", 0.7)
         cmds.setAttr(self.cvChinLoc+".translateY", 2.7)
         cmds.setAttr(self.cvChinLoc+".translateZ", 1.7)
+        cmds.setAttr(self.cvChewLoc+".translateY", 2.5)
+        cmds.setAttr(self.cvChewLoc+".translateZ", 2.0)
 
         # lip cvLocs:
         cmds.setAttr(self.cvLLipLoc+".translateX", 0.6)
@@ -97,12 +104,14 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(self.lipMD+".outputY", self.cvRLipLoc+".translateY", force=True)
         cmds.connectAttr(self.lipMD+".outputZ", self.cvRLipLoc+".translateZ", force=True)
         cmds.setAttr(self.lipMD+".input2X", -1)
+        cmds.setAttr(self.cvRLipLoc+".template", 1)
 
       # make parents between cvLocs:
         cmds.parent(self.cvNeckLoc, self.moduleGrp)
         cmds.parent(self.cvHeadLoc, self.cvNeckLoc)
         cmds.parent(self.cvJawLoc, self.cvHeadLoc)
         cmds.parent(self.cvChinLoc, self.cvJawLoc)
+        cmds.parent(self.cvChewLoc, self.cvChinLoc)
         cmds.parent(self.cvLLipLoc, self.cvJawLoc)
         cmds.parent(self.cvRLipLoc, self.cvJawLoc)
 
@@ -157,6 +166,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.cvHeadLoc  = side+self.userGuideName+"_Guide_head"
                 self.cvJawLoc   = side+self.userGuideName+"_Guide_jaw"
                 self.cvChinLoc  = side+self.userGuideName+"_Guide_chin"
+                self.cvChewLoc  = side+self.userGuideName+"_Guide_chew"
                 self.cvLLipLoc  = side+self.userGuideName+"_Guide_lLip"
                 self.cvRLipLoc  = side+self.userGuideName+"_Guide_rLip"
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
@@ -168,12 +178,13 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.headJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_head']+"_Jnt", scaleCompensate=False)
                 self.jawJnt  = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_jaw']+"_Jnt", scaleCompensate=False)
                 self.chinJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chin']+"_Jnt", scaleCompensate=False)
+                self.chewJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chew']+"_Jnt", scaleCompensate=False)
                 self.endJnt  = cmds.joint(name=side+self.userGuideName+"_JEnd", scaleCompensate=False)
                 cmds.select(clear=True)
                 self.lLipJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c_lip']+"_Jnt", scaleCompensate=False)
                 cmds.select(clear=True)
                 self.rLipJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c_lip']+"_Jnt", scaleCompensate=False)
-                dpARJointList = [self.neckJnt, self.headJnt, self.jawJnt, self.chinJnt, self.lLipJnt, self.rLipJnt]
+                dpARJointList = [self.neckJnt, self.headJnt, self.jawJnt, self.chinJnt, self.chewJnt, self.lLipJnt, self.rLipJnt]
                 for dpARJoint in dpARJointList:
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # creating controls:
@@ -181,10 +192,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.headCtrl = ctrls.cvHead(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_head']+"_Ctrl", r=self.ctrlRadius/2.0)
                 self.jawCtrl  = ctrls.cvJaw( ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_jaw']+"_Ctrl",  r=self.ctrlRadius/2.0)
                 self.chinCtrl = ctrls.cvChin(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chin']+"_Ctrl", r=self.ctrlRadius/2.0)
-                self.lLipCtrl = cmds.circle(name=self.langDic[self.langName]['p002_left']+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=(self.ctrlRadius * 0.25))[0]
-                self.rLipCtrl = cmds.circle(name=self.langDic[self.langName]['p003_right']+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", ch=False, o=True, nr=(0, 0, 1), d=3, s=8, radius=(self.ctrlRadius * 0.25))[0]
+                self.chewCtrl = ctrls.cvChew(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_chew']+"_Ctrl", r=self.ctrlRadius/3.0)
+                self.lLipCtrl = ctrls.cvRoundSquare(ctrlName=self.langDic[self.langName]['p002_left']+"_"+self.userGuideName+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", r=(self.ctrlRadius * 0.25))
+                self.rLipCtrl = ctrls.cvRoundSquare(ctrlName=self.langDic[self.langName]['p003_right']+"_"+self.userGuideName+"_"+self.langDic[self.langName]['c_lip']+"_Ctrl", r=(self.ctrlRadius * 0.25))
                 self.headCtrlList.append(self.headCtrl)
-                self.aCtrls.append([self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl])
+                self.aCtrls.append([self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl])
                 self.aLCtrls.append([self.lLipCtrl])
                 self.aRCtrls.append([self.rLipCtrl])
                 
@@ -202,10 +214,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 utils.originedFrom(objName=self.neckCtrl, attrString=self.base+";"+self.cvNeckLoc)
                 utils.originedFrom(objName=self.headCtrl, attrString=self.cvHeadLoc)
                 utils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
-                utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc+";"+self.cvEndJoint)
+                utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
+                utils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
                 
                 # edit the mirror shape to a good direction of controls:
-                ctrlList = [ self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl ]
+                ctrlList = [ self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl ]
                 if s == 1:
                     for ctrl in ctrlList:
                         if self.mirrorAxis == 'X':
@@ -225,34 +238,39 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 tempDelHead = cmds.parentConstraint(self.cvHeadLoc, self.headCtrl, maintainOffset=False)
                 tempDelJaw  = cmds.parentConstraint(self.cvJawLoc, self.jawCtrl, maintainOffset=False)
                 tempDelChin = cmds.parentConstraint(self.cvChinLoc, self.chinCtrl, maintainOffset=False)
+                tempDelChew = cmds.parentConstraint(self.cvChewLoc, self.chewCtrl, maintainOffset=False)
                 tempDelLLip = cmds.parentConstraint(self.cvLLipLoc, self.lLipCtrl, maintainOffset=False)
                 tempDelRLip = cmds.parentConstraint(self.cvRLipLoc, self.rLipCtrl, maintainOffset=False)
-                cmds.delete(tempDelNeck, tempDelHead, tempDelJaw, tempDelChin, tempDelLLip, tempDelRLip)
+                cmds.delete(tempDelNeck, tempDelHead, tempDelJaw, tempDelChin, tempDelChew, tempDelLLip, tempDelRLip)
                 
                 # zeroOut controls:
                 self.zeroLipCtrlList = utils.zeroOut([self.lLipCtrl, self.rLipCtrl])
                 self.lLipGrp = cmds.group(self.lLipCtrl, name=self.lLipCtrl+"_Grp")
                 self.rLipGrp = cmds.group(self.rLipCtrl, name=self.rLipCtrl+"_Grp")
-                self.zeroCtrlList = utils.zeroOut([self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.zeroLipCtrlList[0], self.zeroLipCtrlList[1]])
+                cmds.setAttr(self.rLipGrp+".scaleX", -1)
+                self.zeroCtrlList = utils.zeroOut([self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.zeroLipCtrlList[0], self.zeroLipCtrlList[1]])
 
                 # make joints be ride by controls:
-                cmds.makeIdentity(self.neckJnt, self.headJxt, self.headJnt, self.jawJnt, self.chinJnt, self.endJnt, rotate=True, apply=True)
+                cmds.makeIdentity(self.neckJnt, self.headJxt, self.headJnt, self.jawJnt, self.chinJnt, self.chewJnt, self.endJnt, rotate=True, apply=True)
                 cmds.parentConstraint(self.neckCtrl, self.neckJnt, maintainOffset=False, name=self.neckJnt+"_ParentConstraint")
                 cmds.scaleConstraint(self.neckCtrl, self.neckJnt, maintainOffset=False, name=self.neckJnt+"_ScaleConstraint")
                 cmds.delete(cmds.parentConstraint(self.headCtrl, self.headJxt, maintainOffset=False))
                 cmds.parentConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_ParentConstraint")
                 cmds.parentConstraint(self.jawCtrl, self.jawJnt, maintainOffset=False, name=self.jawJnt+"_ParentConstraint")
                 cmds.parentConstraint(self.chinCtrl, self.chinJnt, maintainOffset=False, name=self.chinJnt+"_ParentConstraint")
+                cmds.parentConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_ParentConstraint")
                 cmds.parentConstraint(self.lLipCtrl, self.lLipJnt, maintainOffset=False, name=self.lLipJnt+"_ParentConstraint")
                 cmds.parentConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_ParentConstraint")
                 cmds.scaleConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_ScaleConstraint")
                 cmds.scaleConstraint(self.jawCtrl, self.jawJnt, maintainOffset=False, name=self.jawJnt+"_ScaleConstraint")
                 cmds.scaleConstraint(self.chinCtrl, self.chinJnt, maintainOffset=False, name=self.chinJnt+"_ScaleConstraint")
+                cmds.scaleConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_ScaleConstraint")
                 cmds.scaleConstraint(self.lLipCtrl, self.lLipJnt, maintainOffset=False, name=self.lLipJnt+"_ScaleConstraint")
                 cmds.scaleConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_ScaleConstraint")
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False))
                 cmds.setAttr(self.jawJnt+".segmentScaleCompensate", 0)
                 cmds.setAttr(self.chinJnt+".segmentScaleCompensate", 0)
+                cmds.setAttr(self.chewJnt+".segmentScaleCompensate", 0)
 
                 # create interations between neck and head:
                 self.grpNeck = cmds.group(self.zeroCtrlList[0], name=self.neckCtrl+"_Grp")
@@ -279,8 +297,24 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c_Follow'], self.headRevNode+".inputX", force=True)
                 cmds.connectAttr(self.headRevNode+'.outputX', orientConst+"."+self.worldRef+"W1", force=True)
                 
+                # setup neck autoRotate:
+                self.neckOrientGrp = cmds.group(self.neckCtrl, name=self.neckCtrl+"_Orient_Grp")
+                cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
+                cmds.addAttr(self.neckCtrl, longName=self.langDic[self.langName]['c_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
+                neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrl+"_"+self.langDic[self.langName]['c_autoRotate']+"_MD")
+                cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
+                cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
+                cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)
+                cmds.connectAttr(self.neckCtrl+"."+self.langDic[self.langName]['c_autoRotate'], neckARMD+".input2X", force=True)
+                cmds.connectAttr(self.neckCtrl+"."+self.langDic[self.langName]['c_autoRotate'], neckARMD+".input2Y", force=True)
+                cmds.connectAttr(self.neckCtrl+"."+self.langDic[self.langName]['c_autoRotate'], neckARMD+".input2Z", force=True)
+                cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
+                cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateY", force=True)
+                cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateZ", force=True)
+                
                 # mount controls hierarchy:
                 cmds.parent(self.zeroCtrlList[3], self.jawCtrl, absolute=True)
+                cmds.parent(self.zeroCtrlList[4], self.chinCtrl, absolute=True)
                 
                 # jaw follow head or root ctrl (using worldRef)
                 jawParentConst = cmds.parentConstraint(self.headCtrl, self.worldRef, self.zeroCtrlList[2], maintainOffset=True, name=self.zeroCtrlList[2]+"_ParentConstraint")[0]
@@ -357,10 +391,10 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 
                 # hiding visibility attributes:
-                ctrls.setLockHide([self.headCtrl, self.neckCtrl, self.jawCtrl, self.chinCtrl], ['v'], l=False)
+                ctrls.setLockHide([self.headCtrl, self.neckCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl], ['v'], l=False)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(self.grpNeck, self.grpHead, self.zeroCtrlList[2], self.zeroCtrlList[4], self.zeroCtrlList[5], name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp     = cmds.group(self.grpNeck, self.grpHead, self.zeroCtrlList[2], self.zeroCtrlList[5], self.zeroCtrlList[6], name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.neckJnt, self.headJnt, self.lLipJnt, self.rLipJnt, name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.grpHead, self.worldRef, name=side+self.userGuideName+"_Grp")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
