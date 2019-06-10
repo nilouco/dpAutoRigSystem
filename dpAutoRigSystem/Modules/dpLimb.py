@@ -62,6 +62,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
+        self.origRotList = []
 
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
@@ -724,17 +725,13 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # working with world axis orientation for limb extrem ik controls
                 if self.getAlignWorld() == True:
-                    tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
-                    cmds.parent(tempDup, world=True)
-                    self.origRotList = cmds.xform(tempDup, query=True, ro=True, ws=True)
-                    cmds.delete(tempDup)
-                    nRX = self.origRotList[0]
-                    nRY = self.origRotList[1]
-                    if s == 1:
-                        nRX = -self.origRotList[0]
-                        nRY = (self.origRotList[1] - 180) * (-1)
-                    cmds.setAttr(self.ikExtremCtrl+".rotateX", nRX)
-                    cmds.setAttr(self.ikExtremCtrl+".rotateY", nRY)
+                    if s == 0:
+                        tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
+                        cmds.parent(tempDup, world=True)
+                        self.origRotList = cmds.xform(tempDup, query=True, ro=True, ws=True)
+                        cmds.delete(tempDup)
+                    cmds.setAttr(self.ikExtremCtrl+".rotateX", self.origRotList[0])
+                    cmds.setAttr(self.ikExtremCtrl+".rotateY", self.origRotList[1])
                     cmds.setAttr(self.ikExtremCtrl+".rotateZ", self.origRotList[2])
                     cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateX", 0)
                     cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateY", 0)
@@ -746,8 +743,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(self.ikExtremCtrl, longName='originalRotateX', attributeType='float', keyable=True)
                     cmds.addAttr(self.ikExtremCtrl, longName='originalRotateY', attributeType='float', keyable=True)
                     cmds.addAttr(self.ikExtremCtrl, longName='originalRotateZ', attributeType='float', keyable=True)
-                    cmds.setAttr(self.ikExtremCtrl+".originalRotateX", nRX, lock=True)
-                    cmds.setAttr(self.ikExtremCtrl+".originalRotateY", nRY, lock=True)
+                    cmds.setAttr(self.ikExtremCtrl+".originalRotateX", self.origRotList[0], lock=True)
+                    cmds.setAttr(self.ikExtremCtrl+".originalRotateY", self.origRotList[1], lock=True)
                     cmds.setAttr(self.ikExtremCtrl+".originalRotateZ", self.origRotList[2], lock=True)
 
                 # connecting visibilities:

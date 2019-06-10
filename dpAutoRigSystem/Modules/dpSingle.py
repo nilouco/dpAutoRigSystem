@@ -27,6 +27,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
         self.mainJisList = []
         self.aStaticGrpList = []
         self.aCtrlGrpList = []
+        self.detectedBug = False
     
     
     def createModuleLayout(self, *args):
@@ -238,6 +239,11 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+            # check mirror indirectSkin bug in Maya2018:
+            if (int(cmds.about(version=True)[:4]) == 2018):
+                if self.mirrorAxis != 'off':
+                    if self.getHasIndirectSkin():
+                        self.detectedBug = True
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)
@@ -254,5 +260,6 @@ class Single(Base.StartClass, Layout.LayoutClass):
                                                 "mainJisList"   : self.mainJisList,
                                                 "staticGrpList" : self.aStaticGrpList,
                                                 "ctrlGrpList"   : self.aCtrlGrpList,
+                                                "detectedBug"   : self.detectedBug,
                                               }
                                     }

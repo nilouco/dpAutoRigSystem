@@ -84,6 +84,7 @@
     "i075_moreOne"        : "More than one object",
     "i076_sameName"       : "with the same name:",
     "i077_skinned"        : "Skinning worked well for: ",
+    "i078_detectedBug"    : "Detected Bug",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -234,5 +235,8 @@
     "e000_GuideNotFound"           : "Error: (000) - Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Error: (001) - Guide(s) not found in the respective folder...",
     "e002_decomposeMatrixNotFound" : "Error: (002) - The decomposeMatrix plugin not found, could not continue to create the mirror.",
-    "e003_moreThanOneGeo"          : "Error: (003) - It is not possible create the Skinning!\nSorry.\n\nThere are more than one object\nwith the same name\nin the list of Geometries.\n\nTry to use the option:\nDisplay Long Name,\nplease.\n\nHere's the problem:\n"
+    "e003_moreThanOneGeo"          : "Error: (003) - It is not possible create the Skinning!\nSorry.\n\nThere are more than one object\nwith the same name\nin the list of Geometries.\n\nTry to use the option:\nDisplay Long Name,\nplease.\n\nHere's the problem:\n",
+    
+    "b000_BugGeneral" : "Bug: (000) - Found a bug, sorry.\n\nReview your guides or script version, please.",
+    "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - Found mirror on Single module\nusing indirectSkin on Maya 2018!\n\nThere is a problem:\nMaya 2018 is not able to calculate\ncorrectely the mirror of indirect skinning.\n\nWe need to use a workaroud, sorry:\n\nSave your scene and open it again\nbefore start the skinning, please."
 }

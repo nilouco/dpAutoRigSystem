@@ -1325,6 +1325,10 @@ class DP_AutoRig_UI:
                             # make scalableHookGrp inative:
                             cmds.setAttr(self.scalableHookGrp+".scalableHook", 0)
                 
+                # prepare to show a dialog box if find a bug:
+                self.detectedBug = False
+                self.bugMessage = self.langDic[self.langName]['b000_BugGeneral']
+                
                 # integrating modules together:
                 # working with specific cases:
                 if self.integratedTaskDic:
@@ -1710,6 +1714,10 @@ class DP_AutoRig_UI:
                                     # father's mainJis drives child's staticGrp:
                                     cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True)
                                     cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True)
+                            # check Single mirror indirectSkin bug in Maya2018:
+                            if not self.detectedBug:
+                                self.detectedBug = self.integratedTaskDic[moduleDic]["detectedBug"]
+                                self.bugMessage = self.langDic[self.langName]['b001_BugSingleIndirectSkinMaya2018']
                 
                 
                 # atualise the number of rigged guides by type
@@ -1777,6 +1785,11 @@ class DP_AutoRig_UI:
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpAddHandFollow", EXTRAS)
             
+            # show dialogBox if detected a bug:
+            if self.detectedBug:
+                print "\n\n"
+                print self.bugMessage
+                cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=['OK'])
 
         # re-declaring guideMirror and previewMirror groups:
         self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
