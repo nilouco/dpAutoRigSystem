@@ -75,13 +75,13 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.04"
+DPAR_VERSION = "3.05"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
 EXTRAS = "Extras"
 BASE_NAME = "dpAR_"
-EYE_LOOK_AT = "EyeLookAt"
+EYE = "Eye"
 HEAD = "Head"
 SPINE = "Spine"
 LIMB = "Limb"
@@ -1617,8 +1617,8 @@ class DP_AutoRig_UI:
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
                                     ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                         
-                        # integrate the EyeLookAt with the Head setup:
-                        if moduleType == EYE_LOOK_AT:
+                        # integrate the Eye with the Head setup:
+                        if moduleType == EYE:
                             eyeCtrl = self.integratedTaskDic[moduleDic]['eyeCtrl']
                             eyeGrp = self.integratedTaskDic[moduleDic]['eyeGrp']
                             upLocGrp = self.integratedTaskDic[moduleDic]['upLocGrp']
@@ -1648,7 +1648,18 @@ class DP_AutoRig_UI:
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
                                     cmds.parentConstraint(headCtrl, eyeScaleGrp, maintainOffset=True)
-                
+                            # changing iris and pupil color override:
+                            # get itemGuideName:
+                            if self.itemGuideMirrorAxis != "off":
+                                self.itemMirrorNameList = self.itemGuideMirrorNameList
+                            for s, sideName in enumerate(self.itemMirrorNameList):
+                                if self.integratedTaskDic[moduleDic]['hasIris']:
+                                    irisCtrl = self.integratedTaskDic[moduleDic]['irisCtrl'][s]
+                                    ctrls.colorShape([irisCtrl], "cyan")
+                                if self.integratedTaskDic[moduleDic]['hasPupil']:
+                                    pupilCtrl = self.integratedTaskDic[moduleDic]['pupilCtrl'][s]
+                                    ctrls.colorShape([pupilCtrl], "black")
+                        
                         # integrate the Finger module:
                         if moduleType == FINGER:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']

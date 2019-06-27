@@ -79,6 +79,24 @@ class Single(Base.StartClass, Layout.LayoutClass):
         cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScaleConstraint")
     
     
+    def changeIndirectSkin(self, *args):
+        """ Set the attribute value for indirectSkin.
+        """
+        indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
+        if indSkinValue == 0:
+            cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], 0)
+            cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
+        else:
+            cmds.checkBox(self.holderCB, edit=True, enable=True)
+            
+
+    def changeHolder(self, *args):
+        """ Set the attribute value for holder.
+        """
+        cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], cmds.checkBox(self.holderCB, query=True, value=True))
+    
+    
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
         # verify if the guide exists:

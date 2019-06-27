@@ -14,7 +14,7 @@ def Biped(dpAutoRigInst):
     """
     # check modules integrity:
     guideDir = 'Modules'
-    checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead']
+    checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye']
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
@@ -39,22 +39,23 @@ def Biped(dpAutoRigInst):
         # parent head guide to spine guide:
         cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
         
-        # woking with EyeLookAt system:
-        # create eyeLookAt module instance:
-        eyeLookAtInstance = dpAutoRigInst.initGuide('dpEyeLookAt', guideDir)
+        # woking with Eye system:
+        # create eye module instance:
+        eyeInstance = dpAutoRigInst.initGuide('dpEye', guideDir)
         # setting X mirror:
-        dpAutoRigInst.guide.EyeLookAt.changeMirror(eyeLookAtInstance, "X")
+        dpAutoRigInst.guide.Eye.changeMirror(eyeInstance, "X")
         # editing eyeLookAt base guide informations:
-        dpAutoRigInst.guide.EyeLookAt.editUserName(eyeLookAtInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eye'])
-        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateX", 0.5)
-        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateY", 21)
-        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateZ", 1.5)
-        cmds.setAttr(eyeLookAtInstance.annotation+".translateY", 3.5)
-        cmds.setAttr(eyeLookAtInstance.radiusCtrl+".translateX", 0.5)
-        cmds.setAttr(eyeLookAtInstance.cvEndJoint+".translateZ", 7)
+        dpAutoRigInst.guide.Eye.editUserName(eyeInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eye'])
+        cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
+        cmds.setAttr(eyeInstance.moduleGrp+".translateY", 21)
+        cmds.setAttr(eyeInstance.moduleGrp+".translateZ", 1.5)
+        cmds.setAttr(eyeInstance.annotation+".translateY", 3.5)
+        cmds.setAttr(eyeInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(eyeInstance.cvEndJoint+".translateZ", 7)
+        cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
         
-        # parent eyeLookAt guide to spine guide:
-        cmds.parent(eyeLookAtInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+        # parent eye guide to spine guide:
+        cmds.parent(eyeInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         
         # working with LEG system:
         # create leg module instance:

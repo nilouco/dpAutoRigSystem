@@ -15,7 +15,7 @@ def Quadruped(dpAutoRigInst):
     """
     # check modules integrity:
     guideDir = 'Modules'
-    checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine']
+    checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye']
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
@@ -60,21 +60,22 @@ def Quadruped(dpAutoRigInst):
         # parent head guide to spine guide:
         cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
         
-        # woking with EyeLookAt system:
+        # woking with Eye system:
         # create eyeLookAt module instance:
-        eyeLookAtInstance = dpAutoRigInst.initGuide('dpEyeLookAt', guideDir, RigType.quadruped)
+        eyeInstance = dpAutoRigInst.initGuide('dpEye', guideDir, RigType.quadruped)
         # setting X mirror:
-        dpAutoRigInst.guide.EyeLookAt.changeMirror(eyeLookAtInstance, "X")
+        dpAutoRigInst.guide.Eye.changeMirror(eyeInstance, "X")
         # editing eyeLookAt base guide informations:
-        dpAutoRigInst.guide.EyeLookAt.editUserName(eyeLookAtInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eye'])
-        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateX", 0.5)
-        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateY", 13.5)
-        cmds.setAttr(eyeLookAtInstance.moduleGrp+".translateZ", 11)
-        cmds.setAttr(eyeLookAtInstance.annotation+".translateY", 3.5)
-        cmds.setAttr(eyeLookAtInstance.radiusCtrl+".translateX", 0.5)
+        dpAutoRigInst.guide.Eye.editUserName(eyeInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eye'])
+        cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
+        cmds.setAttr(eyeInstance.moduleGrp+".translateY", 13.5)
+        cmds.setAttr(eyeInstance.moduleGrp+".translateZ", 11)
+        cmds.setAttr(eyeInstance.annotation+".translateY", 3.5)
+        cmds.setAttr(eyeInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
         
         # parent head guide to spine guide:
-        cmds.parent(eyeLookAtInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+        cmds.parent(eyeInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         
         # working with BACK LEG (B) system:
         # create back leg module instance:

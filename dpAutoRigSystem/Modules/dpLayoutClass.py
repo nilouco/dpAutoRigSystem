@@ -110,9 +110,11 @@ class LayoutClass:
                 cmds.columnLayout("selectedColumn", adjustableColumn=True, parent="selectedModuleLayout")
                 # re-create segment layout:
                 self.segDelColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                self.aimDirectionAttrExists = cmds.objExists(self.moduleGrp+".aimDirection")
                 self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
                 self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
-                self.IndirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
+                self.indirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
+                self.eyelidExists = cmds.objExists(self.moduleGrp+".eyelid")
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if nJointsAttr > 0:
@@ -174,6 +176,18 @@ class LayoutClass:
                 # create Rig button:
                 self.rigButton = cmds.button(label="Rig", command=self.rigModule, backgroundColor=(1.0, 1.0, 0.7), parent=self.doubleRigColumn)
                 
+                # aim direction for eye look at:
+                self.doubleAimDirectionColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                if self.aimDirectionAttrExists:
+                    cmds.text(self.langDic[self.langName]['i082_aimDirection'], parent=self.doubleAimDirectionColumn)
+                    self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.doubleAimDirectionColumn)
+                    self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
+                    for item in self.aimMenuItemList:
+                        cmds.menuItem(label=item, parent=self.aimMenu)
+                    currentAimDirection = cmds.getAttr(self.moduleGrp+".aimDirection")
+                    # set layout with the current value:
+                    cmds.optionMenu(self.aimMenu, edit=True, value=self.aimMenuItemList[currentAimDirection])
+                
                 # create a flip layout:
                 if self.flipAttrExists:
                     self.doubleFlipColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
@@ -182,7 +196,7 @@ class LayoutClass:
                     self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.doubleFlipColumn)
                     
                 # create an indirectSkin layout:
-                if self.IndirectSkinAttrExists:
+                if self.indirectSkinAttrExists:
                     self.doubleIndirectSkinColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
                     cmds.text(" ", parent=self.doubleIndirectSkinColumn)
                     indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
@@ -190,6 +204,17 @@ class LayoutClass:
                     cmds.text(" ", parent=self.doubleIndirectSkinColumn)
                     holderValue = cmds.getAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'])
                     self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.doubleIndirectSkinColumn)
+                    
+                # create eyelid layout:
+                if self.eyelidExists:
+                    self.doubleEyelidColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 150, 50, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.doubleEyelidColumn)
+                    eyelidValue = cmds.getAttr(self.moduleGrp+".eyelid")
+                    self.eyelidCB = cmds.checkBox(label=self.langDic[self.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.doubleEyelidColumn)
+                    irisValue = cmds.getAttr(self.moduleGrp+".iris")
+                    self.irisCB = cmds.checkBox(label=self.langDic[self.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.doubleEyelidColumn)
+                    pupilValue = cmds.getAttr(self.moduleGrp+".pupil")
+                    self.pupilCB = cmds.checkBox(label=self.langDic[self.langName]['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.doubleEyelidColumn)
                     
             except:
                 pass
@@ -284,24 +309,6 @@ class LayoutClass:
         cmds.setAttr(self.moduleGrp+".flip", cmds.checkBox(self.flipCB, query=True, value=True))
     
     
-    def changeIndirectSkin(self, *args):
-        """ Set the attribute value for indirectSkin.
-        """
-        indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
-        cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
-        if indSkinValue == 0:
-            cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], 0)
-            cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
-        else:
-            cmds.checkBox(self.holderCB, edit=True, enable=True)
-            
-
-    def changeHolder(self, *args):
-        """ Set the attribute value for holder.
-        """
-        cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], cmds.checkBox(self.holderCB, query=True, value=True))
-        
-        
     def changeShapeSize(self, *args):
         """ Set the attribute value for shapeSize.
         """
