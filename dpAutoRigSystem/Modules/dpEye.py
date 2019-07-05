@@ -218,7 +218,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         # declating a concatenated name used for base to compose:
         baseName = side+self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c_eyelid']
         # creating eyelid control:
-        eyelidCtrl = cmds.circle(name=baseName+"_Ctrl", radius=self.ctrlRadius*0.4, normal=(0, 0, normalZ), degree=1, sections=3, constructionHistory=False)[0]
+        eyelidCtrl = ctrls.cvTriangle(baseName+"_Ctrl", self.ctrlRadius*0.4, normalZ, 0)
         utils.originedFrom(objName=eyelidCtrl, attrString=self.base+";"+self.guide)
         eyelidCtrlZero = utils.zeroOut([eyelidCtrl])[0]
         ctrls.setLockHide([eyelidCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

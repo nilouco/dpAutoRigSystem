@@ -385,7 +385,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.rename(ikHandleList[1], side + self.userGuideName + "_Effector")
                     endIkHandleList = cmds.ikHandle(startJoint=side + self.userGuideName + "_" + str(self.nJoints) + "_Ik_Jxt", endEffector=side + self.userGuideName + "_Ik_JEnd", solver="ikSCsolver", name=side + self.userGuideName + "_EndIkHandle")
                     cmds.rename(endIkHandleList[1], side + self.userGuideName + "_EndEffector")
-                    self.ikCtrl = ctrls.cvBox(ctrlName=side + self.userGuideName + "_Ik_Ctrl", r=self.ctrlRadius)
+                    self.ikCtrl = ctrls.cvBox(ctrlName=side + self.userGuideName + "_Ik_Ctrl", r=self.ctrlRadius*0.3)
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl + ".twist", ikHandleList[0] + ".twist", force=True)
                     cmds.delete(cmds.parentConstraint(side + self.userGuideName + "_Ik_JEnd", self.ikCtrl))

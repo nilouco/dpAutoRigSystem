@@ -1872,7 +1872,15 @@ class DP_AutoRig_UI:
                     elif (args[0] == "Remove"):
                         cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
                     else:
-                        cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False)
+                        baseName = geomSkin
+                        meshSuffixList = ["_Mesh", "_mesh", "_Geo", "_geo", "_Tgt", "_tgt"]
+                        for meshSuffix in meshSuffixList:
+                            if meshSuffix in geomSkin:
+                                baseName = geomSkin[:geomSkin.rfind(meshSuffix)]
+                        skinClusterName = baseName+"_SC"
+                        if "|" in skinClusterName:
+                            skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
+                        cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
                 print self.langDic[self.langName]['i077_skinned'] + ', '.join(geomSkinList),
         else:
             print self.langDic[self.langName]['i029_skinNothing'],

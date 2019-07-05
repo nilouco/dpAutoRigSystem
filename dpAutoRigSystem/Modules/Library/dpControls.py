@@ -493,6 +493,13 @@ def cvSmile(ctrlName, r=1):
     cmds.delete(face, lEye, rEye, mouth)
     cmds.select(clear=True)
     return smileCtrl
+    
+ 
+def cvFace(ctrlName, r=1):
+    """ Just call cvSmile
+    """
+    curve = cvSmile(ctrlName, r)
+    return curve   
 
 
 def cvCharacter(ctrlName, r=1):
@@ -551,15 +558,118 @@ def cvRoundSquare(ctrlName, r=1):
     renameShape([curve])
     return curve
 
-def cvFootball(ctrlName, r=1):
-    """Create and return a simple curve as a football control usually for eyes corner.
+
+def cvEyelid(ctrlName, r=1):
+    """Create and return a simple curve as a football control usually for eyes corner or facial blink.
     """
     # create curve:
-    curve = cmds.curve(n=ctrlName, d=3, p=[(0.5*r, 0, 0), (0, 0.5*r, 0), (-0.5*r, 0, 0), (-0.5*r, 0, 0), (-0.5*r, 0, 0), (0, -0.5*r, 0), (0.5*r, 0, 0), (0.5*r, 0, 0)])
+    curve = cmds.curve(n=ctrlName, d=3, p=[(0.5*r, 0, 0), (0.25*r, 0.25*r, 0), (-0.125*r, 0.374*r, 0), (-0.5*r, 0, 0), (-0.5*r, 0, 0), (-0.5*r, 0, 0), (0, -0.5*r, 0), (0.5*r, 0, 0), (0.5*r, 0, 0)])
     # rename curveShape:
     renameShape([curve])
     return curve
     
+    
+def cvBrow(ctrlName, r=1):
+    """Create and return a simple curve as a brow control usually for facial blendShape control.
+    """
+    # create curve:
+    curve = cmds.curve(n=ctrlName, d=3, p=[(-0.22*r, -0.17*r, 0), (0.79*r, -0.52*r, 0), (1.1*r, 0, 0), (0.79*r, 0.17*r, 0), (0, 0.5*r, 0), (-0.79*r, 0.52*r, 0), (-1.1*r, 0, 0), (-0.79*r, -0.52*r, 0), (-0.22*r, -0.17*r, 0)])
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
+    
+def cvDrop(ctrlName, r=1):
+    """Create and return a simple curve as a drop control.
+    """
+    # create curve:
+    curve = cmds.curve(n=ctrlName, d=3, p=[(0, -0.19*r, 0), (0.19*r, -0.19*r, 0), (0.36*r, 0, 0), (0.19*r, 0.19*r, 0), (0, 0.43*r, 0), (-0.19*r, 0.19*r, 0), (-0.36*r, 0, 0), (-0.19*r, -0.19*r, 0), (0, -0.19*r, 0)])
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
+    
+def cvDimond(ctrlName, r=1):
+    """Create and return a simple curve as a dimond control.
+    """
+    # create curve:
+    curve = cmds.curve(n=ctrlName, d=1, p=[(0, -1*r, 0), (-1*r, 0, 0), (0, r, 0), (r, 0, 0), (0, -1*r, 0)])
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
+    
+def cvLips(ctrlName, r=1):
+    """ Just call cvDimond
+    """
+    curve = cvDimond(ctrlName, r)
+    return curve
+    
+    
+def cvTriangle(ctrlName, r=1, normalZ=1, rotateShape=0):
+    """Create and return a simple curve as a triangle control. We can chose its direction.
+    """
+    # create curve:
+    curve = cmds.circle(name=ctrlName, radius=r, normal=(0, 0, normalZ), degree=1, sections=3, constructionHistory=False)[0]
+    cmds.xform(curve, centerPivots=True)
+    if not rotateShape == 0:
+        if rotateShape == -1:
+            cmds.setAttr(curve+".rotateZ", -90)
+        elif rotateShape == 1:
+            cmds.setAttr(curve+".rotateZ", 90)
+        cmds.makeIdentity(curve, apply=True)
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+    
+    
+def cvMouth(ctrlName, r=1, rotateShape=0):
+    """ Just call cvTriangle
+    """
+    curve = cvTriangle(ctrlName, r, 1, rotateShape)
+    return curve
+    
+    
+def cvSneer(ctrlName, r=1, normalZ=1):
+    """Create and return a simple curve as a sneer control.
+    """
+    # create curve:
+    curve = cmds.circle(name=ctrlName, radius=r, normal=(0, 0, normalZ), degree=3, sections=8, constructionHistory=False)[0]
+    if normalZ == 1:
+        cmds.setAttr(curve+".controlPoints[1].yValue", 0.1)
+        cmds.setAttr(curve+".controlPoints[4].yValue", -0.28)
+        cmds.setAttr(curve+".controlPoints[5].yValue", -0.28)
+        cmds.setAttr(curve+".controlPoints[6].yValue", -0.28)
+    else:
+        cmds.setAttr(curve+".controlPoints[1].yValue", -0.1)
+        cmds.setAttr(curve+".controlPoints[4].yValue", 0.28)
+        cmds.setAttr(curve+".controlPoints[5].yValue", 0.28)
+        cmds.setAttr(curve+".controlPoints[6].yValue", 0.28)
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+
+    
+def cvGrimace(ctrlName, r=1):
+    """ Just call cvSneer
+    """
+    curve = cvSneer(ctrlName, r, -1)
+    return curve
+    
+    
+def cvRoundUp(ctrlName, r=1, normalZ=1):
+    """Create and return a simple curve as a sneer control.
+    """
+    # create curve:
+    curve = cmds.circle(name=ctrlName, radius=r, normal=(0, 0, normalZ), degree=3, sections=8, constructionHistory=False)[0]
+    cmds.setAttr(curve+".controlPoints[1].yValue", 0.89)
+    cmds.setAttr(curve+".controlPoints[4].yValue", -0.28)
+    cmds.setAttr(curve+".controlPoints[5].yValue", -0.28)
+    cmds.setAttr(curve+".controlPoints[6].yValue", -0.28)
+    # rename curveShape:
+    renameShape([curve])
+    return curve
+
 
 def findHistory(objList, historyName):
     """Search and return the especific history of the listed objects.

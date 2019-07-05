@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttp://nilouco.blogspot.com",
     "date"       : "2010-10-03",
-    "updated"    : "2019-06-16",
+    "updated"    : "2019-06-30",
     "translator" : "Danilo Pinheiro",
 
     "i000_guides"         : "Create GUIDES",
@@ -182,6 +182,10 @@
     "m080_alignWorld"    : "Align World",
     "m081_tweaks"        : "Tweaks",
     "m082_tweaksDesc"    : "Create Single modules and parent them\nin order to get a good Facial Tweaks setup\nto use as indirect skinning.",
+    "m083_rivet"         : "Rivet",
+    "m084_rivetDesc"     : "Create a Rivet setup to make controls follow a geometry mesh. We can use it for Tweaks\non a character face, for example.\n\nThere are some options like:\nBack = to avoid double transformations,\nAttach transform,\nAnd it can be easly integrated to scalable Rigs.",
+    "m085_facialCtrl"    : "Facial Control",
+    "m086_facialCtrlDesc": "Create usually facial controls with attributes\nready to be directly connected to blendShapes.",
     
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",
@@ -240,6 +244,8 @@
     "c_preset"          : "preset",
     "c_fix"             : "fix",
     "c_invert"          : "invert",
+    "c_squint"          : "Squint",
+    "c_cheek"           : "Cheek",
     
     "e000_GuideNotFound"           : "Error: (000) - Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Error: (001) - Guide(s) not found in the respective folder...",

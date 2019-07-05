@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttp://nilouco.blogspot.com",
     "date"       : "2011-08-04",
-    "updated"    : "2019-06-16",
+    "updated"    : "2019-06-30",
     "translator" : "Marina Rüegger",
     
     "i000_guides"         : "Créer des GUIDES",
@@ -182,6 +182,10 @@
     "m080_alignWorld"    : "Aligné au Monde",
     "m081_tweaks"        : "Ajustements",
     "m082_tweaksDesc"    : "Crée des modules Single et les arrange\npour avoir une bonne configuration de Tweaks Facial\npour utiliser comment indirect skinning.",
+    "m083_rivet"         : "Rivet",
+    "m084_rivetDesc"     : "Il va créer de setup pour le Rivet\npour faire le controleur suivir une geometrie mesh.\nOn peut l'utiliser pour les Tweaks\nsur le visage du personnage, par exemple.\n\nIl y a quelques options, comme:\nBack = pour eviter les double transformations,\nAttach transform,\nIl peut être facilement integré dans le scala de Rigs.",
+    "m085_facialCtrl"    : "Facial Controleur",
+    "m086_facialCtrlDesc": "Il va créer de controleur du visage avec des attributes\nprêt pour connecter directement dans le blendShapes",
     
     "extra_CopyPasteShapes" : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",
@@ -240,6 +244,8 @@
     "c_preset"          : "predefinit",
     "c_fix"             : "corriger",
     "c_invert"          : "inverser",
+    "c_squint"          : "Plisser",
+    "c_cheek"           : "Joue",
     
     "e000_GuideNotFound"           : "Erreur: (000) - Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Erreur: (001) - Guide(s) pas trouvée(s) dans le dossier respectif...",

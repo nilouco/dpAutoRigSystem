@@ -29,6 +29,8 @@ def Tweaks(dpAutoRigInst):
         lowerName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_lower']
         lipName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_lip']
         holderName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_holder']
+        squintName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_squint']
+        cheekName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_cheek']
         
         holderMainName = tweaksName+"_"+holderName
         # eybrows names:
@@ -47,6 +49,13 @@ def Tweaks(dpAutoRigInst):
         lowerEyelidName2 = tweaksName+"_"+lowerName+"_"+eyelidName+"_02"
         eyelidCornerName0 = tweaksName+"_"+cornerName+"_"+eyelidName+"_00"
         eyelidCornerName1 = tweaksName+"_"+cornerName+"_"+eyelidName+"_01"
+        # squints names:
+        squintMainName = tweaksName+"_"+squintName
+        squintName1 = tweaksName+"_"+squintName+"_01"
+        squintName2 = tweaksName+"_"+squintName+"_02"
+        squintName3 = tweaksName+"_"+squintName+"_03"
+        # cheeks names:
+        cheekName1 = tweaksName+"_"+cheekName+"_01"
         # lip names:
         lipMainName = tweaksName+"_"+lipName
         upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
@@ -118,6 +127,28 @@ def Tweaks(dpAutoRigInst):
         dpAutoRigInst.guide.Single.editUserName(eyelidCornerInstance1, checkText=eyelidCornerName1)
         dpAutoRigInst.guide.Single.changeMirror(eyelidCornerInstance1, "X")
         
+        
+        squintMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
+        dpAutoRigInst.guide.Single.editUserName(squintMainInstance, checkText=squintMainName)
+        dpAutoRigInst.guide.Single.changeMirror(squintMainInstance, "X")
+        
+        squintInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
+        dpAutoRigInst.guide.Single.editUserName(squintInstance1, checkText=squintName1)
+        dpAutoRigInst.guide.Single.changeMirror(squintInstance1, "X")
+        
+        squintInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
+        dpAutoRigInst.guide.Single.editUserName(squintInstance2, checkText=squintName2)
+        dpAutoRigInst.guide.Single.changeMirror(squintInstance2, "X")
+        
+        squintInstance3 = dpAutoRigInst.initGuide('dpSingle', guideDir)
+        dpAutoRigInst.guide.Single.editUserName(squintInstance3, checkText=squintName3)
+        dpAutoRigInst.guide.Single.changeMirror(squintInstance3, "X")
+
+
+        cheekInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
+        dpAutoRigInst.guide.Single.editUserName(cheekInstance1, checkText=cheekName1)
+        dpAutoRigInst.guide.Single.changeMirror(cheekInstance1, "X")
+
 
         lipMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
         dpAutoRigInst.guide.Single.editUserName(lipMainInstance, checkText=lipMainName)
@@ -151,11 +182,11 @@ def Tweaks(dpAutoRigInst):
         
         # woking with Single indirect skinning setup:
         # declaring a instanceList in order to clear the code a little:
-        instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, eyelidCornerInstance0, eyelidCornerInstance1, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
+        instanceList = [holderMainInstance, eyebrowMiddleInstance, eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, lipMainInstance, upperLipMiddleInstance, upperLipInstance1, upperLipInstance2, lowerLipMiddleInstance, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
         
-        sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, eyelidCornerInstance0, eyelidCornerInstance1, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
+        sideInstanceList = [eyebrowMainInstance, eyebrowInstance1, eyebrowInstance2, eyebrowInstance3, eyelidMainInstance, upperEyelidInstance0, upperEyelidInstance1, upperEyelidInstance2, lowerEyelidInstance0, lowerEyelidInstance1, lowerEyelidInstance2, eyelidCornerInstance0, eyelidCornerInstance1, squintMainInstance, squintInstance1, squintInstance2, squintInstance3, cheekInstance1, upperLipInstance1, upperLipInstance2, lowerLipInstance1, lowerLipInstance2, lipCornerInstance]
         
-        mainInstanceList = [eyebrowMainInstance, eyelidMainInstance, lipMainInstance]
+        mainInstanceList = [eyebrowMainInstance, eyelidMainInstance, squintMainInstance, lipMainInstance]
         
         
         # turn on indirectSkinning:
@@ -180,9 +211,10 @@ def Tweaks(dpAutoRigInst):
         
         
         # working on hierarchy
-        cmds.parent([eyebrowMiddleInstance.moduleGrp, eyebrowMainInstance.moduleGrp, eyelidMainInstance.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
+        cmds.parent([eyebrowMiddleInstance.moduleGrp, eyebrowMainInstance.moduleGrp, eyelidMainInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
         cmds.parent([eyebrowInstance1.moduleGrp, eyebrowInstance2.moduleGrp, eyebrowInstance3.moduleGrp, ], eyebrowMainInstance.moduleGrp, absolute=True)
         cmds.parent([upperEyelidInstance0.moduleGrp, upperEyelidInstance1.moduleGrp, upperEyelidInstance2.moduleGrp, lowerEyelidInstance0.moduleGrp, lowerEyelidInstance1.moduleGrp, lowerEyelidInstance2.moduleGrp, eyelidCornerInstance0.moduleGrp, eyelidCornerInstance1.moduleGrp], eyelidMainInstance.moduleGrp, absolute=True)
+        cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
         cmds.parent([upperLipMiddleInstance.moduleGrp, upperLipInstance1.moduleGrp, upperLipInstance2.moduleGrp, lowerLipMiddleInstance.moduleGrp, lowerLipInstance1.moduleGrp, lowerLipInstance2.moduleGrp, lipCornerInstance.moduleGrp], lipMainInstance.moduleGrp, absolute=True)
         
         # try to parent to HEAD guide or control
@@ -237,6 +269,26 @@ def Tweaks(dpAutoRigInst):
         cmds.setAttr(lowerEyelidInstance2.moduleGrp+".translateX", 0.17)
         cmds.setAttr(lowerEyelidInstance2.moduleGrp+".translateY", -0.1)
         cmds.setAttr(lowerEyelidInstance2.moduleGrp+".translateZ", 0.5)
+        
+        cmds.setAttr(squintMainInstance.moduleGrp+".translateX", 0.5)
+        cmds.setAttr(squintMainInstance.moduleGrp+".translateY", 1.4)
+        cmds.setAttr(squintMainInstance.moduleGrp+".translateZ", 1.6)
+        
+        cmds.setAttr(squintInstance1.moduleGrp+".translateX", -0.18)
+        cmds.setAttr(squintInstance1.moduleGrp+".translateY", 0.07)
+        cmds.setAttr(squintInstance1.moduleGrp+".translateZ", 0.42)
+        
+        cmds.setAttr(squintInstance2.moduleGrp+".translateX", 0.07)
+        cmds.setAttr(squintInstance2.moduleGrp+".translateY", -0.04)
+        cmds.setAttr(squintInstance2.moduleGrp+".translateZ", 0.35)
+        
+        cmds.setAttr(squintInstance3.moduleGrp+".translateX", 0.36)
+        cmds.setAttr(squintInstance3.moduleGrp+".translateY", -0.01)
+        cmds.setAttr(squintInstance3.moduleGrp+".translateZ", 0.2)
+        
+        cmds.setAttr(cheekInstance1.moduleGrp+".translateX", 1.1)
+        cmds.setAttr(cheekInstance1.moduleGrp+".translateY", 0.9)
+        cmds.setAttr(cheekInstance1.moduleGrp+".translateZ", 2.1)
         
         cmds.setAttr(eyelidCornerInstance0.moduleGrp+".translateX", -0.3)
         cmds.setAttr(eyelidCornerInstance0.moduleGrp+".translateZ", 0.5)
