@@ -261,7 +261,9 @@ class Single(Base.StartClass, Layout.LayoutClass):
             if (int(cmds.about(version=True)[:4]) == 2018):
                 if self.mirrorAxis != 'off':
                     if self.getHasIndirectSkin():
-                        self.detectedBug = True
+                        meshList = cmds.ls(selection=False, type="mesh")
+                        if meshList:
+                            self.detectedBug = True
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)
