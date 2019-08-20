@@ -261,7 +261,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                                 self.ikFkRevNode = cmds.createNode("reverse", name=side + self.userGuideName + "_ikFk_Rev")
                                 cmds.connectAttr(self.ctrl + ".ikFkBlend", self.ikFkRevNode + ".inputX", force=True)
                             if not cmds.objExists(self.ctrl + '.' + self.langDic[self.langName]['c_showControls']):
-                                cmds.addAttr(self.ctrl, longName=self.langDic[self.langName]['c_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=0.0)
+                                cmds.addAttr(self.ctrl, longName=self.langDic[self.langName]['c_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                                 self.ctrlShape0 = cmds.listRelatives(side + self.userGuideName + "_0_Ctrl", children=True, type='nurbsCurve')[0]
                                 cmds.connectAttr(self.ctrl + "." + self.langDic[self.langName]['c_showControls'], self.ctrlShape0 + ".visibility", force=True)
                                 cmds.setAttr(self.ctrl + '.' + self.langDic[self.langName]['c_showControls'], keyable=False, channelBox=True)

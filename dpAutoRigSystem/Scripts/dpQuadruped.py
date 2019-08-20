@@ -23,7 +23,7 @@ def Quadruped(dpAutoRigInst):
         # Starting progress window
         progressAmount = 0
         cmds.progressWindow(title='Quadruped Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
-        maxProcess = 9 # number of modules to create
+        maxProcess = 13 # number of modules to create
 
         # Update progress window
         progressAmount += 1
@@ -42,6 +42,24 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(spineInstance.cvLocator+".translateZ", 6)
         cmds.setAttr(spineInstance.annotation+".translateX", 6)
         cmds.setAttr(spineInstance.annotation+".translateY", 0)
+        dpAutoRigInst.guide.Spine.changeStyle(spineInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m026_biped'])
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_neck']))
+        
+        # woking with NeckBase system:
+        # create fkLine module instance:
+        neckBaseInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+        # editing fkLine base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(neckBaseInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_neck']+"Base")
+        cmds.setAttr(neckBaseInstance.moduleGrp+".translateY", 9.5)
+        cmds.setAttr(neckBaseInstance.moduleGrp+".translateZ", 5.5)
+        cmds.setAttr(neckBaseInstance.moduleGrp+".rotateX", -45)
+        cmds.setAttr(neckBaseInstance.radiusCtrl+".translateX", 2.8)
+        
+        # parent neckBase guide to spine guide:
+        cmds.parent(neckBaseInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
         
         # Update progress window
         progressAmount += 1
@@ -71,8 +89,8 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(headInstance.annotation+".translateX", 4)
         cmds.setAttr(headInstance.annotation+".translateY", 0)
         
-        # parent head guide to spine guide:
-        cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+        # parent head guide to neckBase guide:
+        cmds.parent(headInstance.moduleGrp, neckBaseInstance.cvJointLoc, absolute=True)
         
         # Update progress window
         progressAmount += 1
@@ -90,6 +108,7 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(eyeInstance.moduleGrp+".translateZ", 11)
         cmds.setAttr(eyeInstance.annotation+".translateY", 3.5)
         cmds.setAttr(eyeInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(eyeInstance.cvEndJoint+".translateZ", 7)
         cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
         
         # parent head guide to spine guide:
@@ -121,11 +140,12 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(backLegBaseGuide+".rotateX", 0)
         
         # edit before, main and corners:
-        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateX", 2)
-        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateY", 2)
-        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateZ", -1)
-        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateY", 65)
-        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateZ", -136)
+        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateX", 1)
+        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateY", 0,5)
+        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".translateZ", -2.5)
+        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateX", 20)
+        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateY", 10)
+        cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateZ", -105)
         cmds.setAttr(backLegLimbInstance.cvMainLoc+".rotateY", 25)
         cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateX", 0.7)
         cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateZ", -0.7)
@@ -169,8 +189,8 @@ def Quadruped(dpAutoRigInst):
         frontLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir, RigType.quadruped)
         # change limb guide to front leg type:
         dpAutoRigInst.guide.Limb.changeType(frontLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
-        # change limb guide to front leg style (quadruped spring):
-        dpAutoRigInst.guide.Limb.changeStyle(frontLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m043_quadSpring'])
+        # change limb guide to front leg style (biped):
+        dpAutoRigInst.guide.Limb.changeStyle(frontLegLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m026_biped'])
         # set for not use bend ribbons as default:
         dpAutoRigInst.guide.Limb.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
@@ -186,14 +206,15 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(frontLegBaseGuide+".rotateX", 0)
         
         # edit before, main and corners:
-        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateX", -1.4)
-        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateY", 1.7)
+        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateX", -0.75)
+        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateY", 0.5)
         cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".translateZ", -2.5)
-        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateY", 40)
-        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateZ", -50)
-        cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", 18)
-        cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateX", -0.5)
-        cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateZ", -1.3)
+        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateX", -15)
+        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateY", 15)
+        cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateZ", -90)
+        cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", -27)
+        cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateX", -2.0)
+        cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateZ", -0.6)
         
         # edit location of front leg ankle guide:
         cmds.setAttr(frontLegLimbInstance.cvExtremLoc+".translateZ", 6.5)
@@ -278,6 +299,150 @@ def Quadruped(dpAutoRigInst):
         # setting X mirror:
         dpAutoRigInst.guide.FkLine.changeMirror(earInstance, "X")
         cmds.setAttr(earInstance.moduleGrp+".flip", 1)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth']))
+        
+        # woking with Teeth system:
+        # create FkLine module instance:
+        upperTeethInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing upperTeeth base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(upperTeethInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth'])
+        cmds.setAttr(upperTeethInstance.moduleGrp+".translateY", 12.5)
+        cmds.setAttr(upperTeethInstance.moduleGrp+".translateZ", 12.7)
+        cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
+        # create FkLine module instance:
+        upperTeethMiddleInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing upperTeethMiddle base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(upperTeethMiddleInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_middle'])
+        cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 12.3)
+        cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateZ", 12.7)
+        cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+        # parent upperTeethMiddle guide to upperTeeth guide:
+        cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
+        # create FkLine module instance:
+        upperTeethSideInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing upperTeethSide base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(upperTeethSideInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_RevFoot_G'].capitalize())
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 12.3)
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 12.3)
+        cmds.setAttr(upperTeethSideInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(upperTeethSideInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".shapeSize", 0.3)
+        dpAutoRigInst.guide.FkLine.changeMirror(upperTeethSideInstance, "X")
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
+        # parent upperTeethSide guide to upperTeeth guide:
+        cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
+        # create FkLine module instance:
+        lowerTeethInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing lowerTeeth base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(lowerTeethInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m076_lowerTeeth'])
+        cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 11.7)
+        cmds.setAttr(lowerTeethInstance.moduleGrp+".translateZ", 12.7)
+        cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
+        cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
+        # parent lowerTeeth guide to head guide:
+        cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
+        # create FkLine module instance:
+        lowerTeethMiddleInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing lowerTeethMiddle base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(lowerTeethMiddleInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m076_lowerTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_middle'])
+        cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 11.9)
+        cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateZ", 12.7)
+        cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+        # parent lowerTeeth guide to lowerTeeth guide:
+        cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
+        # create FkLine module instance:
+        lowerTeethSideInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing lowerTeethSide base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(lowerTeethSideInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m076_lowerTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_RevFoot_G'].capitalize())
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 11.9)
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 12.3)
+        cmds.setAttr(lowerTeethSideInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(lowerTeethSideInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".shapeSize", 0.3)
+        dpAutoRigInst.guide.FkLine.changeMirror(lowerTeethSideInstance, "X")
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
+        # parent lowerTeethSide guide to lowerTeeth guide:
+        cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m077_tongue']))
+        
+        # woking with Tongue system:
+        # create FkLine module instance:
+        tongueInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing tongue base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(tongueInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m077_tongue'])
+        cmds.setAttr(tongueInstance.moduleGrp+".translateY", 12)
+        cmds.setAttr(tongueInstance.moduleGrp+".translateZ", 12)
+        cmds.setAttr(tongueInstance.radiusCtrl+".translateX", 0.35)
+        dpAutoRigInst.guide.FkLine.changeJointNumber(tongueInstance, 2)
+        cmds.setAttr(tongueInstance.moduleGrp+".nJoints", 2)
+        cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
+        dpAutoRigInst.guide.FkLine.changeJointNumber(tongueInstance, 3)
+        cmds.setAttr(tongueInstance.moduleGrp+".nJoints", 3)
+        cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
+        cmds.setAttr(tongueInstance.cvEndJoint+".translateZ", 0.2)
+        cmds.setAttr(tongueInstance.moduleGrp+".shapeSize", 0.4)
+        # parent tongue guide to head guide:
+        cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m078_nose']))
+        
+        # woking with Nose and Nostril systems:
+        # create FkLine module instance:
+        noseInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing upperTeeth base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(noseInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m078_nose'])
+        cmds.setAttr(noseInstance.moduleGrp+".translateY", 13)
+        cmds.setAttr(noseInstance.moduleGrp+".translateZ", 11.5)
+        cmds.setAttr(noseInstance.radiusCtrl+".translateX", 0.3)
+        dpAutoRigInst.guide.FkLine.changeJointNumber(noseInstance, 2)
+        cmds.setAttr(noseInstance.moduleGrp+".nJoints", 2)
+        cmds.setAttr(noseInstance.cvJointLoc+".translateY", -0.2)
+        cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.7)
+        cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(noseInstance.moduleGrp+".shapeSize", 0.5)
+        storedNose2Guide = noseInstance.cvJointLoc
+        # adding a new nose point segment to quadrupeds:
+        dpAutoRigInst.guide.FkLine.changeJointNumber(noseInstance, 3)
+        cmds.setAttr(noseInstance.moduleGrp+".nJoints", 3)
+        cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.7)
+        cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
+        # parent nose guide to head guide:
+        cmds.parent(noseInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+        # parent upperTeeth guide to Nose1 guide:
+        cmds.parent(upperTeethInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
+        # create FkLine module instance:
+        nostrilInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing nostril base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(nostrilInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m079_nostril'])
+        cmds.setAttr(nostrilInstance.moduleGrp+".translateX", 0.33)
+        cmds.setAttr(nostrilInstance.moduleGrp+".translateY", 12.7)
+        cmds.setAttr(nostrilInstance.moduleGrp+".translateZ", 12.8)
+        cmds.setAttr(nostrilInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(nostrilInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(nostrilInstance.moduleGrp+".shapeSize", 0.3)
+        # setting X mirror:
+        dpAutoRigInst.guide.FkLine.changeMirror(nostrilInstance, "X")
+        cmds.setAttr(nostrilInstance.moduleGrp+".flip", 1)
+        # parent nostril guide to nose guide:
+        cmds.parent(nostrilInstance.moduleGrp, storedNose2Guide, absolute=True)
+        
         
         # Close progress window
         cmds.progressWindow(endProgress=True)

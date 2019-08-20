@@ -165,7 +165,7 @@ def load_all_ctrls_shapes(path=None):
 CLASS_NAME = "CopyPasteShapes"
 TITLE = "extra_CopyPasteShapes"
 DESCRIPTION = "extra_CopyPasteShapesDesc"
-ICON = "dp_copyPasteShapes.png"
+ICON = "/Icons/dp_copyPasteShapes.png"
 
 class CopyPasteShapes():
     def __init__(self, *args, **kwargs):

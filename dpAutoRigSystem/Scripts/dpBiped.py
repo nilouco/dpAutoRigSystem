@@ -220,16 +220,66 @@ def Biped(dpAutoRigInst):
         # parent upperTeeth guide to head guide:
         cmds.parent(upperTeethInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         # create FkLine module instance:
+        upperTeethMiddleInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing upperTeethMiddle base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(upperTeethMiddleInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_middle'])
+        cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateY", 20.1)
+        cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".translateZ", 2.2)
+        cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+        # parent upperTeethMiddle guide to upperTeeth guide:
+        cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
+        # create FkLine module instance:
+        upperTeethSideInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing upperTeethSide base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(upperTeethSideInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_RevFoot_G'].capitalize())
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 20.1)
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 2)
+        cmds.setAttr(upperTeethSideInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(upperTeethSideInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".shapeSize", 0.3)
+        dpAutoRigInst.guide.FkLine.changeMirror(upperTeethSideInstance, "X")
+        cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
+        # parent upperTeethSide guide to upperTeeth guide:
+        cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
+        # create FkLine module instance:
         lowerTeethInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
-        # editing upperTeeth base guide informations:
+        # editing lowerTeeth base guide informations:
         dpAutoRigInst.guide.FkLine.editUserName(lowerTeethInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m076_lowerTeeth'])
         cmds.setAttr(lowerTeethInstance.moduleGrp+".translateY", 19.5)
         cmds.setAttr(lowerTeethInstance.moduleGrp+".translateZ", 2.2)
         cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
         cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
         cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
-        # parent upperTeeth guide to head guide:
+        # parent lowerTeeth guide to head guide:
         cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
+        # create FkLine module instance:
+        lowerTeethMiddleInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing lowerTeethMiddle base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(lowerTeethMiddleInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m076_lowerTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_middle'])
+        cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateY", 19.7)
+        cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".translateZ", 2.2)
+        cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+        # parent lowerTeeth guide to lowerTeeth guide:
+        cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
+        # create FkLine module instance:
+        lowerTeethSideInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
+        # editing lowerTeethSide base guide informations:
+        dpAutoRigInst.guide.FkLine.editUserName(lowerTeethSideInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m076_lowerTeeth']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_RevFoot_G'].capitalize())
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 19.7)
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 2)
+        cmds.setAttr(lowerTeethSideInstance.radiusCtrl+".translateX", 0.2)
+        cmds.setAttr(lowerTeethSideInstance.cvEndJoint+".translateZ", 0.1)
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".shapeSize", 0.3)
+        dpAutoRigInst.guide.FkLine.changeMirror(lowerTeethSideInstance, "X")
+        cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
+        # parent lowerTeethSide guide to lowerTeeth guide:
+        cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
         
         # Update progress window
         progressAmount += 1

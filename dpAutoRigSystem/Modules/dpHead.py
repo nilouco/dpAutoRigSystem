@@ -205,6 +205,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.neckCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.headCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.jawCtrl + ".rotateOrder", 1)
+                    cmds.rotate(90, 0, 0, self.neckCtrl)
+                    cmds.makeIdentity(self.neckCtrl, apply=True, rotate=True)
                 else:
                     cmds.setAttr(self.neckCtrl + ".rotateOrder", 3)
                     cmds.setAttr(self.headCtrl + ".rotateOrder", 3)

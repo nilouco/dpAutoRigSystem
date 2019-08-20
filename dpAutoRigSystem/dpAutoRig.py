@@ -76,7 +76,7 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.05.5"
+DPAR_VERSION = "3.05.6"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
@@ -749,10 +749,10 @@ class DP_AutoRig_UI:
         iconDir = path+icon
         iconInfo = path+"/Icons/"+INFO_ICON
         # creating a basic layout for guide buttons:
-        cmds.rowLayout( numberOfColumns=3, columnWidth3=(30, 55, 15), height=30, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
+        cmds.rowLayout( numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
         #OLD-#cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
         
-        cmds.image(i=iconDir, width=30)
+        cmds.image(i=iconDir, width=32)
 
         if guideDir == MODULES:
             '''
@@ -760,13 +760,13 @@ class DP_AutoRig_UI:
             will be stock in the rigType if we don't pass the parameter
             http://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
             '''
-            cmds.button(label=title, height=30, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
+            cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
         elif guideDir == SCRIPTS:
-            cmds.button(label=title, height=30, command=partial(self.execScriptedGuide, guideModule, guideDir) )
+            cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir) )
         elif guideDir == EXTRAS:
-            cmds.button(label=title, height=30, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
+            cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
         
-        cmds.iconTextButton(i=iconInfo, height=30, width=15, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
+        cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
         cmds.setParent('..')
     
     #@utils.profiler
@@ -1119,6 +1119,7 @@ class DP_AutoRig_UI:
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleY, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleZ, force=True)
             ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
+            ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         else:
             self.optionCtrlGrp = self.optionCtrl.getParent()
 
@@ -1872,7 +1873,7 @@ class DP_AutoRig_UI:
                 if not pymel.hasAttr(pOptCtrl, "proxy"):
                     pymel.addAttr(pOptCtrl, ln="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
                     pymel.connectAttr(pOptCtrl.proxy, pProxyGrp.visibility, force=True)
-                    pymel.setAttr(pOptCtrl.proxy, channelBox=True)
+                    #pymel.setAttr(pOptCtrl.proxy, channelBox=True)
                 
                 if not pymel.hasAttr(pOptCtrl, "control"):
                     pymel.addAttr(pOptCtrl, ln="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)

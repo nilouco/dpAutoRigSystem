@@ -96,6 +96,20 @@ def setLockHide(objList, attrList, l=True, k=False):
                     cmds.setAttr(obj+"."+attr, lock=l, keyable=k)
                 except:
                     print "Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k
+                    
+                    
+def setNonKeyable(objList, attrList):
+    """Set nonKeyable to attributes for objects in lists.
+    """
+    if objList and attrList:
+        for obj in objList:
+            for attr in attrList:
+                if cmds.objExists(obj+"."+attr):
+                    try:
+                        # set lock and hide of given attributes:
+                        cmds.setAttr(obj+"."+attr, keyable=False, channelBox=True)
+                    except:
+                        print "Error: Cannot set", obj, ".", attr, "as nonKeayble, sorry."
 
 
 def setNotRenderable(objList):
@@ -516,7 +530,10 @@ def cvCharacter(ctrlName, r=1):
     # create Option_Ctrl Text:
     try:
         optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-        cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Source Sans Pro", text="Option Ctrl", constructionHistory=False)[0]
+        try:
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Source Sans Pro", text="Option Ctrl", constructionHistory=False)[0]
+        except:
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Arial", text="Option Ctrl", constructionHistory=False)[0]
         txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
         if txtShapeList:
             for s, shape in enumerate(txtShapeList):

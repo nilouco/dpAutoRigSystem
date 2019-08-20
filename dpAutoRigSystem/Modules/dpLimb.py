@@ -454,7 +454,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
                         cmds.addAttr(skinJoint, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.extremJntList.append(self.skinJointList[-2])
 
                 # creating Fk controls and a hierarchy group to originedFrom data:
                 self.fkCtrlList, self.origFromList = [], []
@@ -1098,6 +1097,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         twistBoneMD = self.bendGrps['twistBoneMD']
                         twistBoneMM = cmds.createNode("multMatrix", name=self.skinJointList[1]+"_ExtactAngle_MM")
                         twistBoneDM = cmds.createNode("decomposeMatrix", name=self.skinJointList[1]+"_ExtactAngle_DM")
+                        twistBoneQtE = cmds.createNode("quatToEuler", name=self.skinJointList[1]+"_ExtactAngle_QtE")
                         shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
                         shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
                         cmds.setAttr(shoulderChildLoc+".visibility", 0)
@@ -1108,8 +1108,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(shoulderChildLoc+".worldMatrix[0]", twistBoneMM+".matrixIn[0]", force=True)
                         cmds.connectAttr(shoulderParentLoc+".worldInverseMatrix[0]", twistBoneMM+".matrixIn[1]", force=True)
                         cmds.connectAttr(twistBoneMM+".matrixSum", twistBoneDM+".inputMatrix", force=True)
-                        cmds.connectAttr(twistBoneDM+".outputRotate.outputRotateZ", twistBoneMD+".input2X", force=True)
-
+                        cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatZ", twistBoneQtE+".inputQuat.inputQuatZ", force=True);
+                        cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatW", twistBoneQtE+".inputQuat.inputQuatW", force=True);
+                        cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotateZ", twistBoneMD+".input2X", force=True)
+                
                 if loadedIkFkSnap:
                     # do otherCtrlList get extraCtrlList from bendy
                     otherCtrlList = []
@@ -1153,7 +1155,21 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)
                         elif self.limbType == self.langDic[self.langName]['m028_arm']:
                             cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
-
+                
+                # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
+                if self.getHasBend():
+                    beforeNumber = "00"
+                    extremNumber = "11" #default value for 5 bends
+                    numBendJnt = self.getBendJoints()
+                    if numBendJnt == 3:
+                        extremNumber = "07"
+                    elif numBendJnt == 7:
+                        extremNumber = "15"
+                    self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
+                    self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
+                    
+                self.extremJntList.append(self.skinJointList[-2])
+                
                 self.integrateOrigFromList.append(self.origFromList)
 
                 # add hook attributes to be read when rigging integrated modules:

@@ -54,10 +54,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # style layout:
-        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70),
-                                          columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4,
-                                          columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2),
-                                                        (3, 'both', 10)], parent="selectedColumn")
+        self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m041_style'], visible=True, parent=self.styleLayout)
         self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
         styleMenuItemList = [self.langDic[self.langName]['m042_default'], self.langDic[self.langName]['m026_biped']]
@@ -157,11 +154,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
             # re-create parentConstraints:
             if self.enteredNJoints > 1:
                 for n in range(2, self.enteredNJoints):
-                    self.parentConst = cmds.parentConstraint(self.guideName + "_JointLoc1",
-                                                             self.cvEndJoint,
-                                                             self.guideName + "_JointLoc" + str(n) + "_Grp",
-                                                             name=self.guideName + "_ParentConstraint" + str(n),
-                                                             maintainOffset=True)[0]
+                    self.parentConst = cmds.parentConstraint(self.guideName + "_JointLoc1", self.cvEndJoint, self.guideName + "_JointLoc" + str(n) + "_Grp", name=self.guideName + "_ParentConstraint" + str(n), maintainOffset=True)[0]
                     nParentValue = (n - 1) / float(self.enteredNJoints - 1)
                     cmds.setAttr(self.parentConst + ".Guide_JointLoc1W0", 1 - nParentValue)
                     cmds.setAttr(self.parentConst + ".Guide_JointEndW1", nParentValue)
@@ -220,18 +213,10 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base + ".nJoints")
                 # create controls:
-                self.hipsA = ctrls.cvBox(
-                    ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c_hips'] + "A_Ctrl",
-                    r=self.ctrlRadius, h=(self.ctrlRadius * 0.25))
-                self.hipsB = \
-                cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_hips'] + "B_Ctrl",
-                            ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
-                self.chestA = ctrls.cvBox(
-                    ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "A_Ctrl",
-                    r=self.ctrlRadius, h=(self.ctrlRadius * 0.25))
-                self.chestB = \
-                cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "B_Ctrl",
-                            ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
+                self.hipsA = ctrls.cvBox(ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c_hips'] + "A_Ctrl", r=self.ctrlRadius, h=(self.ctrlRadius * 0.25))
+                self.hipsB = cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_hips'] + "B_Ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
+                self.chestA = ctrls.cvBox(ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "A_Ctrl", r=self.ctrlRadius, h=(self.ctrlRadius * 0.25))
+                self.chestB = cmds.circle(name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "B_Ctrl", ch=False, o=True, nr=(0, 1, 0), d=1, s=8, radius=self.ctrlRadius)[0]
                 cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsA, longName=side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
@@ -248,12 +233,14 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.hipsB + ".rotateOrder", 1)
                     cmds.setAttr(self.chestA + ".rotateOrder", 1)
                     cmds.setAttr(self.chestB + ".rotateOrder", 1)
+                    cmds.rotate(90, 0, 0, self.hipsA, self.hipsB, self.chestA, self.chestB)
+                    cmds.makeIdentity(self.hipsA, self.hipsB, self.chestA, self.chestB, apply=True, rotate=True)
                 else:
                     cmds.setAttr(self.hipsA + ".rotateOrder", 3)
                     cmds.setAttr(self.hipsB + ".rotateOrder", 3)
                     cmds.setAttr(self.chestA + ".rotateOrder", 3)
                     cmds.setAttr(self.chestB + ".rotateOrder", 3)
-
+                
                 # Keep a list of ctrls we want to colorize a certain way
                 self.aFkCtrl.append([self.hipsB, self.chestB])
                 self.aIkCtrl.append([self.hipsA, self.chestA])
@@ -280,17 +267,14 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # zeroOut transformations:
                 utils.zeroOut([self.hipsA, self.chestA])
                 # modify the pivots of chest controls:
-                upPivotPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints - 1),
-                                        query=True, worldSpace=True, translation=True)
-                cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestA + ".scalePivot",
-                          self.chestA + ".rotatePivot")  # , self.chestB+".scalePivot", self.chestB+".rotatePivot")
+                upPivotPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints - 1), query=True, worldSpace=True, translation=True)
+                cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestA + ".scalePivot", self.chestA + ".rotatePivot")  # , self.chestB+".scalePivot", self.chestB+".rotatePivot")
                 # add originedFrom attributes to hipsA, hipsB and chestB:
                 utils.originedFrom(objName=self.hipsA, attrString=self.base)
                 utils.originedFrom(objName=self.hipsB, attrString=bottomLocGuide)
                 utils.originedFrom(objName=self.chestB, attrString=topLocGuide)
                 # create a simple spine ribbon:
-                returnedRibbonList = ctrls.createSimpleRibbon(name=side + self.userGuideName,
-                                                              totalJoints=(self.nJoints - 1))
+                returnedRibbonList = ctrls.createSimpleRibbon(name=side + self.userGuideName,totalJoints=(self.nJoints - 1))
                 rbnNurbsPlane = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
                 rbnJointGrpList = returnedRibbonList[2]
@@ -300,27 +284,18 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.move(0, 0, 0, rbnNurbsPlane + ".scalePivot", rbnNurbsPlane + ".rotatePivot")
                 cmds.rotate(90, 90, 0, rbnNurbsPlane)
                 cmds.makeIdentity(rbnNurbsPlane, apply=True, translate=True, rotate=True)
-                downLocPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc1",
-                                        query=True, worldSpace=True, translation=True)
-                upLocPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints),
-                                      query=True, worldSpace=True, translation=True)
+                downLocPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc1", query=True, worldSpace=True, translation=True)
+                upLocPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints), query=True, worldSpace=True, translation=True)
                 cmds.move(downLocPos[0], downLocPos[1], downLocPos[2], rbnNurbsPlane)
                 # create up and down clusters:
-                downCluster = \
-                cmds.cluster(rbnNurbsPlane + ".cv[0:3][0:1]", name=side + self.userGuideName + '_Down_Cls')[1]
-                upCluster = \
-                cmds.cluster(rbnNurbsPlane + ".cv[0:3][" + str(self.nJoints) + ":" + str(self.nJoints + 1) + "]",
-                             name=side + self.userGuideName + '_Up_Cls')[1]
+                downCluster = cmds.cluster(rbnNurbsPlane + ".cv[0:3][0:1]", name=side + self.userGuideName + '_Down_Cls')[1]
+                upCluster = cmds.cluster(rbnNurbsPlane + ".cv[0:3][" + str(self.nJoints) + ":" + str(self.nJoints + 1) + "]", name=side + self.userGuideName + '_Up_Cls')[1]
                 # get positions of joints from ribbon nurbs plane:
-                startRbnJointPos = cmds.xform(side + self.userGuideName + "_00_Jnt",
-                                              query=True, worldSpace=True, translation=True)
-                endRbnJointPos = cmds.xform(side + self.userGuideName + "_%02d_Jnt"%(self.nJoints - 1),
-                                            query=True, worldSpace=True, translation=True)
+                startRbnJointPos = cmds.xform(side + self.userGuideName + "_00_Jnt", query=True, worldSpace=True, translation=True)
+                endRbnJointPos = cmds.xform(side + self.userGuideName + "_%02d_Jnt"%(self.nJoints - 1), query=True, worldSpace=True, translation=True)
                 # move pivots of clusters to start and end positions:
-                cmds.move(startRbnJointPos[0], startRbnJointPos[1], startRbnJointPos[2],
-                          downCluster + ".scalePivot", downCluster + ".rotatePivot")
-                cmds.move(endRbnJointPos[0], endRbnJointPos[1], endRbnJointPos[2],
-                          upCluster + ".scalePivot", upCluster + ".rotatePivot")
+                cmds.move(startRbnJointPos[0], startRbnJointPos[1], startRbnJointPos[2], downCluster + ".scalePivot", downCluster + ".rotatePivot")
+                cmds.move(endRbnJointPos[0], endRbnJointPos[1], endRbnJointPos[2], upCluster + ".scalePivot", upCluster + ".rotatePivot")
                 # snap clusters to guideLocators:
                 tempDel = cmds.parentConstraint(bottomLocGuide, downCluster, maintainOffset=False)
                 cmds.delete(tempDel)
@@ -329,18 +304,14 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # rotate clusters to compensate guide:
                 upClusterRot = cmds.xform(upCluster, query=True, worldSpace=True, rotation=True)
                 downClusterRot = cmds.xform(downCluster, query=True, worldSpace=True, rotation=True)
-                cmds.xform(upCluster, worldSpace=True,
-                           rotation=(upClusterRot[0] + 90, upClusterRot[1], upClusterRot[2]))
-                cmds.xform(downCluster, worldSpace=True,
-                           rotation=(downClusterRot[0] + 90, downClusterRot[1], downClusterRot[2]))
+                cmds.xform(upCluster, worldSpace=True, rotation=(upClusterRot[0] + 90, upClusterRot[1], upClusterRot[2]))
+                cmds.xform(downCluster, worldSpace=True, rotation=(downClusterRot[0] + 90, downClusterRot[1], downClusterRot[2]))
                 # scaleY of the clusters in order to avoid great extremity deforms:
-                rbnHeight = ctrls.distanceBet(side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints),
-                                              side + self.userGuideName + "_Guide_JointLoc1", keep=False)[0]
+                rbnHeight = ctrls.distanceBet(side + self.userGuideName + "_Guide_JointLoc" + str(self.nJoints), side + self.userGuideName + "_Guide_JointLoc1", keep=False)[0]
                 cmds.setAttr(upCluster + ".sy", rbnHeight / 10)
                 cmds.setAttr(downCluster + ".sy", rbnHeight / 10)
                 # parent clusters in controls (up and down):
-                cmds.parentConstraint(self.hipsB, downCluster, maintainOffset=True,
-                                      name=downCluster + "_ParentConstraint")
+                cmds.parentConstraint(self.hipsB, downCluster, maintainOffset=True, name=downCluster + "_ParentConstraint")
                 cmds.parentConstraint(self.chestB, upCluster, maintainOffset=True, name=upCluster + "_ParentConstraint")
                 # organize a group of clusters:
                 clustersGrp = cmds.group(name=side + self.userGuideName + "_Rbn_Clusters_Grp", empty=True)
@@ -355,8 +326,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                         ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sz'])
                         cmds.scaleConstraint(clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp + "_Scale")
                     else:
-                        cmds.scaleConstraint(clustersGrp, rbnJntGrp, maintainOffset=True,
-                                             name=rbnJntGrp + "_Scale")
+                        cmds.scaleConstraint(clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp + "_Scale")
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side + self.userGuideName + "_Rbn_ArcLenShape")
                 arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]
@@ -403,22 +373,20 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(cmds.parentConstraint(middleLocGuide, self.middle, maintainOffset=False))
                     if self.currentStyle == 1: #biped
                         cmds.rotate(0, 0, 0, self.middle)
+                    if self.rigType == Base.RigType.quadruped:
+                        cmds.rotate(90, 0, 0, self.middle)
+                        cmds.makeIdentity(self.middle, apply=True, rotate=True)
                     utils.zeroOut([self.middle])
-                    middleCluster = cmds.cluster(rbnNurbsPlane + ".cv[0:3][" + str(n + 1) + "]",
-                                                 name=side + self.userGuideName + '_Middle_Cls')[1]
-                    middleLocPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc" + str(n), query=True,
-                                              worldSpace=True, translation=True)
+                    middleCluster = cmds.cluster(rbnNurbsPlane + ".cv[0:3][" + str(n + 1) + "]", name=side + self.userGuideName + '_Middle_Cls')[1]
+                    middleLocPos = cmds.xform(side + self.userGuideName + "_Guide_JointLoc" + str(n), query=True, worldSpace=True, translation=True)
                     tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
                     cmds.delete(tempDel)
                     middleClusterRot = cmds.xform(middleCluster, query=True, worldSpace=True, rotation=True)
                     cmds.xform(middleCluster, worldSpace=True,
                                rotation=(middleClusterRot[0] + 90, middleClusterRot[1], middleClusterRot[2]))
-                    cmds.parentConstraint(self.middle, middleCluster, maintainOffset=True,
-                                          name=middleCluster + "_ParentConstraint")
+                    cmds.parentConstraint(self.middle, middleCluster, maintainOffset=True, name=middleCluster + "_ParentConstraint")
                     # parenting constraints like guide locators:
-                    self.parentConst = cmds.parentConstraint(self.hipsB, self.chestB, self.middle + "_Zero",
-                                                             name=self.middle + "_ParentConstraint",
-                                                             maintainOffset=True)[0]
+                    self.parentConst = cmds.parentConstraint(self.hipsB, self.chestB, self.middle + "_Zero", name=self.middle + "_ParentConstraint", maintainOffset=True)[0]
                     nParentValue = (n) / float(self.nJoints - 1)
                     cmds.setAttr(self.parentConst + "." + self.hipsB + "W0", 1 - nParentValue)
                     cmds.setAttr(self.parentConst + "." + self.chestB + "W1", nParentValue)
@@ -435,8 +403,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 self.rbnRigGrp = cmds.group(name=side + self.userGuideName + "_Grp", empty=True)
                 self.rbnControlGrp = cmds.group(name=side + self.userGuideName + "_Control_Grp", empty=True)
                 cmds.parent(self.hipsA + "_Zero", self.rbnControlGrp, relative=True)
-                cmds.parent(clustersGrp, side + self.userGuideName + "_Rbn_RibbonJoint_Grp", self.rbnControlGrp,
-                            arcLen, self.rbnRigGrp, relative=True)
+                cmds.parent(clustersGrp, side + self.userGuideName + "_Rbn_RibbonJoint_Grp", self.rbnControlGrp, arcLen, self.rbnRigGrp, relative=True)
                 if hideJoints:
                     cmds.setAttr(side + self.userGuideName + "_Rbn_RibbonJoint_Grp.visibility", 0)
                 # add hook attributes to be read when rigging integrated modules:

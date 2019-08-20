@@ -56,7 +56,7 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
     elbowctrlCtrl = elbowctrlList[1]
     elbowctrlZero = elbowctrlList[2]
     
-    cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0, max=1, keyable=True)
+    cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
     cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
     
     if arm:
