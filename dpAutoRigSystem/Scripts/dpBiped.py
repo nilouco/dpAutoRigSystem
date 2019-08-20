@@ -18,6 +18,15 @@ def Biped(dpAutoRigInst):
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        # Starting progress window
+        progressAmount = 0
+        cmds.progressWindow(title='Biped Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        maxProcess = 12 # number of modules to create
+
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m011_spine']))
+        
         # woking with SPINE system:
         # create spine module instance:
         spineInstance = dpAutoRigInst.initGuide('dpSpine', guideDir)
@@ -27,6 +36,10 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(spineInstance.moduleGrp+".translateY", 11)
         cmds.setAttr(spineInstance.annotation+".translateY", -6)
         cmds.setAttr(spineInstance.radiusCtrl+".translateX", 2.5)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m017_head']))
         
         # woking with HEAD system:
         # create head module instance:
@@ -38,6 +51,10 @@ def Biped(dpAutoRigInst):
         
         # parent head guide to spine guide:
         cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m063_eye']))
         
         # woking with Eye system:
         # create eye module instance:
@@ -56,6 +73,10 @@ def Biped(dpAutoRigInst):
         
         # parent eye guide to spine guide:
         cmds.parent(eyeInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg']))
         
         # working with LEG system:
         # create leg module instance:
@@ -84,6 +105,10 @@ def Biped(dpAutoRigInst):
         # parent leg guide to spine base guide:
         cmds.parent(legBaseGuide, spineInstance.moduleGrp, absolute=True)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot']))
+        
         # create foot module instance:
         footInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
         dpAutoRigInst.guide.Foot.editUserName(footInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot'])
@@ -93,6 +118,10 @@ def Biped(dpAutoRigInst):
         
         # parent foot guide to leg ankle guide:
         cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m028_arm']))
         
         # working with ARM system:
         # creating module instances:
@@ -115,6 +144,10 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
         # parent arm guide to spine chest guide:
         cmds.parent(armLimbInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']))
         
         # create finger instances:
         indexFingerInstance  = dpAutoRigInst.initGuide('dpFinger', guideDir)
@@ -150,6 +183,10 @@ def Biped(dpAutoRigInst):
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m040_ear']))
+        
         # woking with EAR system:
         # create FkLine module instance:
         earInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
@@ -166,6 +203,10 @@ def Biped(dpAutoRigInst):
         dpAutoRigInst.guide.FkLine.changeMirror(earInstance, "X")
         cmds.setAttr(earInstance.moduleGrp+".flip", 1)
 
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m075_upperTeeth']))
+        
         # woking with Teeth system:
         # create FkLine module instance:
         upperTeethInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
@@ -189,6 +230,10 @@ def Biped(dpAutoRigInst):
         cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
         # parent upperTeeth guide to head guide:
         cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m078_nose']))
         
         # woking with Nose and Nostril systems:
         # create FkLine module instance:
@@ -222,6 +267,10 @@ def Biped(dpAutoRigInst):
         # parent nostril guide to nose guide:
         cmds.parent(nostrilInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m077_tongue']))
+        
         # woking with Tongue system:
         # create FkLine module instance:
         tongueInstance = dpAutoRigInst.initGuide('dpFkLine', guideDir)
@@ -241,8 +290,12 @@ def Biped(dpAutoRigInst):
         # parent tongue guide to head guide:
         cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
         
+        # Close progress window
+        cmds.progressWindow(endProgress=True)
+        
         # select spineGuide_Base:
         cmds.select(spineInstance.moduleGrp)
+        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m089_createdBiped']
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

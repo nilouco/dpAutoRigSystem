@@ -225,9 +225,9 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         extraCtrlList = []
 
         #define attributes
-        limbManualVVAttr = "limbManualVolume"
-        limbVVAttr       = "limbVolumeVariation"
-        limbMinVVAttr    = "limbMinVolume"
+        limbManualVVAttr = "limbManual_volumeVariation"
+        limbVVAttr       = "limb_volumeVariation"
+        limbMinVVAttr    = "limbMin_volumeVariation"
 
         #create a nurbsPlane based in the choose orientation option
         if horizontal:

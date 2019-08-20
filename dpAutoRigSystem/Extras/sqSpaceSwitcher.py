@@ -24,7 +24,7 @@ except Exception as e:
 CLASS_NAME = "SpaceSwitcher"
 TITLE = "m071_SpaceSwitcher"
 DESCRIPTION = "m072_SpaceSwitcherDesc"
-ICON = ""
+ICON = "dp_spaceSwither.png"
 
 
 class QDoubleEmptyStringValidator(QtGui.QIntValidator):

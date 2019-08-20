@@ -10,6 +10,7 @@ DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
 
+
 def Quadruped(dpAutoRigInst):
     """ This function will create all guides needed to compose a quadruped.
     """
@@ -19,6 +20,15 @@ def Quadruped(dpAutoRigInst):
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        # Starting progress window
+        progressAmount = 0
+        cmds.progressWindow(title='Quadruped Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        maxProcess = 9 # number of modules to create
+
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m011_spine']))
+        
         # woking with SPINE system:
         # create spine module instance:
         spineInstance = dpAutoRigInst.initGuide('dpSpine', guideDir, RigType.quadruped)
@@ -32,6 +42,10 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(spineInstance.cvLocator+".translateZ", 6)
         cmds.setAttr(spineInstance.annotation+".translateX", 6)
         cmds.setAttr(spineInstance.annotation+".translateY", 0)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m017_head']))
         
         # woking with HEAD system:
         # create head module instance:
@@ -60,6 +74,10 @@ def Quadruped(dpAutoRigInst):
         # parent head guide to spine guide:
         cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m063_eye']))
+        
         # woking with Eye system:
         # create eyeLookAt module instance:
         eyeInstance = dpAutoRigInst.initGuide('dpEye', guideDir, RigType.quadruped)
@@ -77,6 +95,10 @@ def Quadruped(dpAutoRigInst):
         # parent head guide to spine guide:
         cmds.parent(eyeInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg']))
+        
         # working with BACK LEG (B) system:
         # create back leg module instance:
         backLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir, RigType.quadruped)
@@ -87,7 +109,7 @@ def Quadruped(dpAutoRigInst):
         # set for not use bend ribbons as default:
         dpAutoRigInst.guide.Limb.setBendFalse(backLegLimbInstance)
         # change name to back leg:
-        dpAutoRigInst.guide.Limb.editUserName(backLegLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize()+'B')
+        dpAutoRigInst.guide.Limb.editUserName(backLegLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize()+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_back'])
         cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
         
         # editing back leg base guide informations:
@@ -119,9 +141,13 @@ def Quadruped(dpAutoRigInst):
         # setting X mirror:
         dpAutoRigInst.guide.Limb.changeMirror(backLegLimbInstance, "X")
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot']))
+        
         # create BACK FOOT (B) module instance:
         backFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir, RigType.quadruped)
-        dpAutoRigInst.guide.Foot.editUserName(backFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+'B')
+        dpAutoRigInst.guide.Foot.editUserName(backFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_back'])
         cmds.setAttr(backFootInstance.annotation+".translateY", -3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateZ", -6.5)
@@ -134,6 +160,10 @@ def Quadruped(dpAutoRigInst):
         # parent back foot guide to back leg ankle guide:
         cmds.parent(backFootInstance.moduleGrp, backLegLimbInstance.cvExtremLoc, absolute=True)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg']))
+        
         # working with FRONT LEG (A) system:
         # create front leg module instance:
         frontLegLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir, RigType.quadruped)
@@ -144,7 +174,7 @@ def Quadruped(dpAutoRigInst):
         # set for not use bend ribbons as default:
         dpAutoRigInst.guide.Limb.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
-        dpAutoRigInst.guide.Limb.editUserName(frontLegLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize()+'A')
+        dpAutoRigInst.guide.Limb.editUserName(frontLegLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize()+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_front'])
         cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
         
         # editing front leg base guide informations:
@@ -176,9 +206,13 @@ def Quadruped(dpAutoRigInst):
         # setting X mirror:
         dpAutoRigInst.guide.Limb.changeMirror(frontLegLimbInstance, "X")
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot']))
+        
         # create FRONT FOOT (A) module instance:
         frontFootInstance = dpAutoRigInst.initGuide('dpFoot', guideDir, RigType.quadruped)
-        dpAutoRigInst.guide.Foot.editUserName(frontFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+'A')
+        dpAutoRigInst.guide.Foot.editUserName(frontFootInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_foot']+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_front'])
         cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateZ", 5.5)
@@ -190,6 +224,10 @@ def Quadruped(dpAutoRigInst):
         
         # parent fron foot guide to front leg ankle guide:
         cmds.parent(frontFootInstance.moduleGrp, frontLegLimbInstance.cvExtremLoc, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m039_tail']))
         
         # woking with TAIL system:
         # create FkLine module instance:
@@ -209,6 +247,10 @@ def Quadruped(dpAutoRigInst):
         
         # parent tail guide to spine guide:
         cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m040_ear']))
         
         # woking with EAR system:
         # create FkLine module instance:
@@ -237,8 +279,12 @@ def Quadruped(dpAutoRigInst):
         dpAutoRigInst.guide.FkLine.changeMirror(earInstance, "X")
         cmds.setAttr(earInstance.moduleGrp+".flip", 1)
         
+        # Close progress window
+        cmds.progressWindow(endProgress=True)
+        
         # select spineGuide_Base:
         cmds.select(spineInstance.moduleGrp)
+        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m090_createdQuadruped']
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

@@ -18,6 +18,15 @@ def Arm(dpAutoRigInst):
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        # Starting progress window
+        progressAmount = 0
+        cmds.progressWindow(title='Arm Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        maxProcess = 2 # number of modules to create
+
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m028_arm']))
+        
         # creating module instances:
         armLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
         # change name to arm:
@@ -42,6 +51,10 @@ def Arm(dpAutoRigInst):
         cmds.setAttr(armLimbInstance.cvExtremLoc+".translateZ", 7)
         cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m007_finger']))
+        
         # edit finger guides:
         fingerInstanceList = [indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance, thumbFingerInstance]
         fingerTZList       = [0.6, 0.2, -0.2, -0.6, 0.72]
@@ -64,9 +77,12 @@ def Arm(dpAutoRigInst):
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
         
+        # Close progress window
+        cmds.progressWindow(endProgress=True)
+
         # select the armGuide_Base:
         cmds.select(armBaseGuide)
-        
+        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m091_createdArm']
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

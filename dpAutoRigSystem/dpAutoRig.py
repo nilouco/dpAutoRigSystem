@@ -65,6 +65,7 @@ try:
     import Modules.dpBaseClass as Base
     import Modules.dpLayoutClass as Layout
     import Extras.dpUpdateRigInfo as rigInfo
+    import Extras.dpReorderAttr as dpReorderAttr
     reload(utils)
     reload(ctrls)
     reload(rigInfo)
@@ -75,7 +76,7 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.05.3"
+DPAR_VERSION = "3.05.4"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
@@ -94,6 +95,7 @@ GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
 MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
+INFO_ICON = "dp_info.png"
 
 
 
@@ -104,6 +106,11 @@ class DP_AutoRig_UI:
     def __init__(self):
         """ Start the window, menus and main layout for dpAutoRig UI.
         """
+        self.loadedPath = False
+        self.loadedModules = False
+        self.loadedScripts = False
+        self.loadedExtras = False
+        
 
         try:
             # store all UI elements in a dictionary:
@@ -177,7 +184,7 @@ class DP_AutoRig_UI:
         # call UI window: Also ensure that when thedock controler X button it it, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uid=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], vcc=self.jobDockVisChange)
-        print self.pDockCtrl
+        #print self.pDockCtrl
 
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
@@ -684,10 +691,11 @@ class DP_AutoRig_UI:
         """
         # find path where 'dpAutoRig.py' is been executed:
         path = utils.findPath("dpAutoRig.py")
-        print "dpAutoRigPath: "+path
+        if not self.loadedPath:
+            print "dpAutoRigPath: "+path
+            self.loadedPath = True
         # list all guide modules:
         guideModuleList = utils.findAllModules(path, guideDir)
-        print guideDir+" : "+str(guideModuleList)
         if guideModuleList:
             # change guide module list for alphabetic order:
             guideModuleList.sort()
@@ -703,6 +711,16 @@ class DP_AutoRig_UI:
                         if not checkModule in guideModuleList:
                             notFoundModuleList.append(checkModule)
                 return notFoundModuleList
+            # avoid print again the same message:
+            if guideDir == MODULES and not self.loadedModules:
+                print guideDir+" : "+str(guideModuleList)
+                self.loadedModules = True
+            if guideDir == SCRIPTS and not self.loadedScripts:
+                print guideDir+" : "+str(guideModuleList)
+                self.loadedScripts = True
+            if guideDir == EXTRAS and not self.loadedExtras:
+                print guideDir+" : "+str(guideModuleList)
+                self.loadedExtras = True
         return guideModuleList
     
     
@@ -729,10 +747,12 @@ class DP_AutoRig_UI:
         # find path where 'dpAutoRig.py' is been executed to get the icon:
         path = utils.findPath("dpAutoRig.py")
         iconDir = path+icon
+        iconInfo = path+"/Icons/"+INFO_ICON
         # creating a basic layout for guide buttons:
-        cmds.rowLayout( numberOfColumns=3, columnWidth3=(15, 30, 55), height=30, adjustableColumn=3, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
-        cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
-        cmds.image(i=iconDir)
+        cmds.rowLayout( numberOfColumns=3, columnWidth3=(30, 55, 15), height=30, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
+        #OLD-#cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
+        
+        cmds.image(i=iconDir, width=30)
 
         if guideDir == MODULES:
             '''
@@ -745,7 +765,8 @@ class DP_AutoRig_UI:
             cmds.button(label=title, height=30, command=partial(self.execScriptedGuide, guideModule, guideDir) )
         elif guideDir == EXTRAS:
             cmds.button(label=title, height=30, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
-
+        
+        cmds.iconTextButton(i=iconInfo, height=30, width=15, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
         cmds.setParent('..')
     
     #@utils.profiler
@@ -1152,6 +1173,36 @@ class DP_AutoRig_UI:
         self.optionCtrlGrp = self.optionCtrlGrp.__melobject__()
         self.baseRootJnt = self.baseRootJnt.__melobject__()
         self.baseRootJntGrp = self.baseRootJntGrp.__melobject__()
+        
+        
+    def reorderAttributes(self, objList, attrList, *args):
+        """ Reorder Attributes of a given objectList following the desiredAttribute list.
+            Useful for organize the Option_Ctrl attributes, for example.
+        """
+        if objList and attrList:
+            for obj in objList:
+                # load dpReorderAttribute:
+                dpRAttr = dpReorderAttr.ReorderAttr()
+                # Reordering Option_Ctrl attributos progress window
+                progressAmount = 0
+                cmds.progressWindow(title='Reordering Attributes', progress=progressAmount, status='Reordering: 0%', isInterruptable=False)
+                nbDesAttr = len(attrList)
+                delta = 0
+                for i, desAttr in enumerate(attrList):
+                    # update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + `progressAmount` + ' '+ obj + ' attributes'))
+                    # get current user defined attributes:
+                    currentAttrList = cmds.listAttr(obj, userDefined=True)
+                    if desAttr in currentAttrList:
+                        cAttrIndex = currentAttrList.index(desAttr)
+                        maxRange = cAttrIndex+1-i+delta
+                        for n in range(1, maxRange):
+                            dpRAttr.dpMoveAttr(1, [obj], [desAttr])
+                    else:
+                        delta = delta+1
+                cmds.progressWindow(endProgress=True)
+                dpRAttr.dpCloseReorderAttrUI()
 
 
     def rigAll(self, integrate=None, *args):
@@ -1167,6 +1218,11 @@ class DP_AutoRig_UI:
         
         # verify if there are instances of modules (guides) to rig in the scene:
         if self.modulesToBeRiggedList:
+            
+            # Starting progress window
+            rigProgressAmount = 0
+            cmds.progressWindow(title='dpAutoRigSystem', progress=rigProgressAmount, status='Rigging : 0%', isInterruptable=False)
+            maxProcess = len(self.modulesToBeRiggedList)
             
             # clear all duplicated names in order to run without find same names if they exists:
             if cmds.objExists("dpAR_GuideMirror_Grp"):
@@ -1201,6 +1257,12 @@ class DP_AutoRig_UI:
             for guideModule in self.modulesToBeRiggedList:
                 # create the rig for this guideModule:
                 guideModuleCustomName = cmds.getAttr(guideModule.moduleGrp+'.customName')
+                
+                # Update progress window
+                rigProgressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + `rigProgressAmount` + ' '+str(guideModuleCustomName)))
+                
+                # Rig it :)
                 guideModule.rigModule()
                 # get rigged module name:
                 self.riggedModuleDic[guideModule.moduleGrp.split(":")[0]] = guideModuleCustomName
@@ -1209,11 +1271,15 @@ class DP_AutoRig_UI:
                     self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
             
             if integrate == 1:
+                # Update progress window
+                rigProgressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + `rigProgressAmount` + ' '+self.langDic[self.langName]['i010_integrateCB']))
+                
                 # get all parent info from rigged modules:
                 self.originedFromDic = utils.getOriginedFromDic()
                 
                 # verify if is necessary organize the hierarchies for each module:
-                for guideModule in self.modulesToBeRiggedList:                
+                for guideModule in self.modulesToBeRiggedList:
                     # get guideModule info:
                     self.itemGuideModule         = self.hookDic[guideModule.moduleGrp]['guideModuleName']
                     self.itemGuideInstance       = self.hookDic[guideModule.moduleGrp]['guideInstance']
@@ -1437,7 +1503,11 @@ class DP_AutoRig_UI:
                                     cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
                                     cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
                                 cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
-
+                                bendAttrList = ["bends", "extraBends"]
+                                for bendAttr in bendAttrList:
+                                    if cmds.objExists(self.optionCtrl+"."+bendAttr):
+                                        cmds.setAttr(self.optionCtrl+"."+bendAttr, keyable=False, channelBox=True)
+                                
                                 # update ikFkNetwork:
                                 if ikFkNetworkList:
                                     netIndex = 1
@@ -1649,7 +1719,9 @@ class DP_AutoRig_UI:
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
                                     cmds.parentConstraint(headCtrl, eyeScaleGrp, maintainOffset=True)
                             # changing iris and pupil color override:
+                            self.itemMirrorNameList = [""]
                             # get itemGuideName:
+                            self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
                             if self.itemGuideMirrorAxis != "off":
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
@@ -1697,9 +1769,9 @@ class DP_AutoRig_UI:
                         # integrate the Single module with another Single as a father:
                         if moduleType == SINGLE:
                             # connect Option_Ctrl display attribute to the visibility:
-                            if not cmds.objExists(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks']):
-                                cmds.addAttr(self.optionCtrl, longName="display"+self.langDic[self.langName]['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                cmds.setAttr(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks'], channelBox=True)
+                            if not cmds.objExists(self.optionCtrl+"."+self.langDic[self.langName]['m081_tweaks']):
+                                cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                cmds.setAttr(self.optionCtrl+"."+self.langDic[self.langName]['m081_tweaks'], channelBox=True)
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -1709,7 +1781,7 @@ class DP_AutoRig_UI:
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ctrlGrp = self.integratedTaskDic[moduleDic]["ctrlGrpList"][s]
-                                cmds.connectAttr(self.optionCtrl+".display"+self.langDic[self.langName]['m081_tweaks'], ctrlGrp+".visibility", force=True)
+                                cmds.connectAttr(self.optionCtrl+"."+self.langDic[self.langName]['m081_tweaks'], ctrlGrp+".visibility", force=True)
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             if fatherModule == SINGLE:
@@ -1743,6 +1815,9 @@ class DP_AutoRig_UI:
                     if ( typeCounter > cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
+            # Close progress window
+            cmds.progressWindow(endProgress=True)
+        
             #Actualise all controls (Master_Ctrl.controlList) for this rig:
             rigInfo.UpdateRigInfo.updateRigInfoLists()
 
@@ -1763,36 +1838,69 @@ class DP_AutoRig_UI:
                         else:
                             ctrls.colorShape([pCtrl.__melobject__()], "yellow")
 
-            #Add usefull attributes for the animators
+            # Add usefull attributes for the animators
             if (bAddAttr):
                 pOptCtrl = pymel.PyNode(self.optionCtrl)
                 pRenderGrp = pymel.PyNode(self.renderGrp)
                 pCtrlVisGrp = pymel.PyNode(self.ctrlsVisGrp)
                 pProxyGrp = pymel.PyNode(self.proxyGrp)
-
+                
+                if not pymel.hasAttr(pOptCtrl, "general"):
+                    pymel.addAttr(pOptCtrl, ln="general", at="enum", enumName="----------", keyable=True)
+                    pymel.setAttr(pOptCtrl.general, lock=True)
+                
+                # Only create if a VolumeVariation attribute is found
+                if not pymel.hasAttr(pOptCtrl, "volumeVariation"):
+                    if (pOptCtrl.listAttr(string="*volumeVariation*")):
+                        pymel.addAttr(pOptCtrl, ln="volumeVariation", at="enum", enumName="----------", keyable=True)
+                        pymel.setAttr(pOptCtrl.volumeVariation, lock=True)
+                
+                # Only create if a IkFk attribute is found
+                if not pymel.hasAttr(pOptCtrl, "ikFkBlend"):
+                    if (pOptCtrl.listAttr(string="*ikFk*")):
+                        pymel.addAttr(pOptCtrl, ln="ikFkBlend", at="enum", enumName="----------", keyable=True)
+                        pymel.setAttr(pOptCtrl.ikFkBlend, lock=True)
+                
                 if not pymel.hasAttr(pOptCtrl, "display"):
                     pymel.addAttr(pOptCtrl, ln="display", at="enum", enumName="----------", keyable=True)
-
-                if not pymel.hasAttr(pOptCtrl, "displayMesh"):
-                    pymel.addAttr(pOptCtrl, ln="displayMesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
-                    pymel.connectAttr(pOptCtrl.displayMesh, pRenderGrp.visibility, force=True)
-
-                if not pymel.hasAttr(pOptCtrl, "displayProxy"):
-                    pymel.addAttr(pOptCtrl, ln="displayProxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=True)
-                    pymel.connectAttr(pOptCtrl.displayProxy, pProxyGrp.visibility, force=True)
-
-                if not pymel.hasAttr(pOptCtrl, "displayCtrl"):
-                    pymel.addAttr(pOptCtrl, ln="displayCtrl", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
-                    pymel.connectAttr(pOptCtrl.displayCtrl, pCtrlVisGrp.visibility, force=True)
-
-                if not pymel.hasAttr(pOptCtrl, "General"):
-                    pymel.addAttr(pOptCtrl, ln="General", at="enum", enumName="----------", keyable=True)
-
-                #Only create if a IkFk attribute is found
-                if not pymel.hasAttr(pOptCtrl, "ikFkBlend"):
-                    if (pOptCtrl.listAttr(string="*IkFk*")):
-                        pymel.addAttr(pOptCtrl, ln="ikFkBlend", at="enum", enumName="----------", keyable=True)
-                        
+                    pymel.setAttr(pOptCtrl.display, lock=True)
+                
+                if not pymel.hasAttr(pOptCtrl, "mesh"):
+                    pymel.addAttr(pOptCtrl, ln="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
+                    pymel.connectAttr(pOptCtrl.mesh, pRenderGrp.visibility, force=True)
+                
+                if not pymel.hasAttr(pOptCtrl, "proxy"):
+                    pymel.addAttr(pOptCtrl, ln="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                    pymel.connectAttr(pOptCtrl.proxy, pProxyGrp.visibility, force=True)
+                    pymel.setAttr(pOptCtrl.proxy, channelBox=True)
+                
+                if not pymel.hasAttr(pOptCtrl, "control"):
+                    pymel.addAttr(pOptCtrl, ln="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                    pymel.connectAttr(pOptCtrl.control, pCtrlVisGrp.visibility, force=True)
+                    pymel.setAttr(pOptCtrl.control, channelBox=True)
+                
+                # try to organize Option_Ctrl attributes:
+                # get current user defined attributes:
+                currentAttrList = cmds.listAttr(self.optionCtrl, userDefined=True)
+                # clean up "_ikFkBlend" atributes:
+                if currentAttrList:
+                    for cAttr in currentAttrList:
+                        if cAttr.endswith("_ikFkBlend"):
+                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
+                # clean up "VolumeVariation" attributes:
+                if currentAttrList:
+                    for cAttr in currentAttrList:
+                        if cAttr.endswith("_volumeVariation"):
+                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_volumeVariation")])
+                            
+                # list desirable Option_Ctrl attributes order:
+                desiredAttrList = ['general', 'rigScale', 'rigScaleMultiplier', 'globalStretch', 'volumeVariation', 'Spine_active', 'Spine', 'Spine1_active', 'Spine1', 
+                'limb', 'limbMin', 'limbManual', 'ikFkBlend', 'Arm', 'Leg', 'lArm', 'rArm', 'lLeg', 'rLeg', 'lLegFront', 'rLegFront', 'lLegBack', 'rLegBack',
+                'Arm1', 'Leg1', 'lArm1', 'rArm1', 'lLeg1', 'rLeg1', 'lLegFront1', 'rLegFront1', 'lLegBack1', 'rLegBack1',
+                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', 'tweaks']
+                # call method to reorder Option_Ctrl attributes:
+                self.reorderAttributes([self.optionCtrl], desiredAttrList)
+                
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpAddHandFollow", EXTRAS)
             

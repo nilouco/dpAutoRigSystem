@@ -18,6 +18,15 @@ def Tweaks(dpAutoRigInst):
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        # Starting progress window
+        progressAmount = 0
+        cmds.progressWindow(title='Tweaks Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        maxProcess = 6 # number of modules to create
+
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m081_tweaks']))
+        
         # defining naming
         # part names:
         tweaksName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['m081_tweaks']
@@ -66,6 +75,9 @@ def Tweaks(dpAutoRigInst):
         lowerLipName2 = tweaksName+"_"+lowerName+"_"+lipName+"_02"
         lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eyebrow']))
         
         # creating Single instances:
         holderMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
@@ -90,6 +102,9 @@ def Tweaks(dpAutoRigInst):
         dpAutoRigInst.guide.Single.editUserName(eyebrowInstance3, checkText=eyebrowName3)
         dpAutoRigInst.guide.Single.changeMirror(eyebrowInstance3, "X")
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eyelid']))
 
         eyelidMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
         dpAutoRigInst.guide.Single.editUserName(eyelidMainInstance, checkText=eyelidMainName)
@@ -127,6 +142,9 @@ def Tweaks(dpAutoRigInst):
         dpAutoRigInst.guide.Single.editUserName(eyelidCornerInstance1, checkText=eyelidCornerName1)
         dpAutoRigInst.guide.Single.changeMirror(eyelidCornerInstance1, "X")
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_squint']))
         
         squintMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
         dpAutoRigInst.guide.Single.editUserName(squintMainInstance, checkText=squintMainName)
@@ -149,6 +167,9 @@ def Tweaks(dpAutoRigInst):
         dpAutoRigInst.guide.Single.editUserName(cheekInstance1, checkText=cheekName1)
         dpAutoRigInst.guide.Single.changeMirror(cheekInstance1, "X")
 
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_lip']))
 
         lipMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
         dpAutoRigInst.guide.Single.editUserName(lipMainInstance, checkText=lipMainName)
@@ -209,6 +230,9 @@ def Tweaks(dpAutoRigInst):
         cmds.setAttr(holderMainInstance.radiusCtrl+".translateX", 2)
         cmds.setAttr(holderMainInstance.moduleGrp+"."+holderName, 0.7)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' hierarchy'))
         
         # working on hierarchy
         cmds.parent([eyebrowMiddleInstance.moduleGrp, eyebrowMainInstance.moduleGrp, eyelidMainInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
@@ -321,8 +345,11 @@ def Tweaks(dpAutoRigInst):
         cmds.setAttr(lipCornerInstance.moduleGrp+".translateX", 0.55)
         cmds.setAttr(lipCornerInstance.moduleGrp+".translateZ", 1.5)
         
+        # Close progress window
+        cmds.progressWindow(endProgress=True)
 
         cmds.select(holderMainInstance.moduleGrp)
+        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m093_createdTweaks']
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

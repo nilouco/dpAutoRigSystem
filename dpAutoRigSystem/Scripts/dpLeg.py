@@ -18,6 +18,15 @@ def Leg(dpAutoRigInst):
     checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        # Starting progress window
+        progressAmount = 0
+        cmds.progressWindow(title='Leg Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        maxProcess = 12 # number of modules to create
+
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg']))
+        
         # create leg module instance:
         legLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
         # change limb guide to leg type:
@@ -37,6 +46,10 @@ def Leg(dpAutoRigInst):
         # edit location of leg ankle guide:
         cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
         
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot']))
+        
         # create foot module instance:
         footInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
         dpAutoRigInst.guide.Foot.editUserName(footInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot'])
@@ -46,8 +59,12 @@ def Leg(dpAutoRigInst):
         # parent foot guide to leg ankle guide:
         cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
         
+        # Close progress window
+        cmds.progressWindow(endProgress=True)
+
         # select the legGuide_Base:
         cmds.select(legBaseGuide)
+        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m092_createdLeg']
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
