@@ -76,7 +76,7 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.05.4"
+DPAR_VERSION = "3.05.5"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
@@ -1905,10 +1905,11 @@ class DP_AutoRig_UI:
             self.initExtraModule("dpAddHandFollow", EXTRAS)
             
             # show dialogBox if detected a bug:
-            if self.detectedBug:
-                print "\n\n"
-                print self.bugMessage
-                cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=['OK'])
+            if integrate == 1:
+                if self.detectedBug:
+                    print "\n\n"
+                    print self.bugMessage
+                    cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=['OK'])
 
         # re-declaring guideMirror and previewMirror groups:
         self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'

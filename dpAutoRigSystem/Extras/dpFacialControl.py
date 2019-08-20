@@ -20,7 +20,7 @@ LIPS_TGTLIST = ["Pucker", "LipsOpen", "LipsDown", "LipsUp"]
 SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None]
 GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
-
+HEAD_CTRL = "Head_Head_Ctrl"
 
 DPFC_VERSION = "1.0"
 
@@ -81,7 +81,7 @@ class FacialControl():
         cmds.text(label='', parent=tgtListFoundLayout)
         
         cmds.button(label="Create selected", annotation="Create selected facial controls.", width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpSelectedCtrls, parent=tgtListFoundLayout)
-        cmds.button(label="Create default package", annotation="Create default facial controls package.", width=290, backgroundColor=(1.0, 1.0, 0.6), command=self.dpSelectedCtrls, parent=tgtListFoundLayout)
+        cmds.button(label="Create default package", annotation="Create default facial controls package.", width=290, backgroundColor=(1.0, 1.0, 0.6), command=self.dpCreateDefaultPackage, parent=tgtListFoundLayout)
         
         # call facialControlUI Window:
         cmds.showWindow(dpFacialControlWin)
@@ -102,21 +102,56 @@ class FacialControl():
     def dpCreateDefaultPackage(self, *args):
         """ Function to create a package of facial controls we use as default.
         """
-        self.bsNode = BSNAME
+        if cmds.objExists(BSNAME):
+            self.bsNode = BSNAME
+        # creating controls:
         lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", "Brow", "cvBrow", BROW_TGTLIST, False, False, True, True, False, True, "red")
         rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", "Brow", "cvBrow", BROW_TGTLIST, False, False, True, True, False, True, "blue")
-        if rBrowCtrlGrp:
-            cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
         lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", "Eyelid", "cvEyelid", EYELID_TGTLIST, True, False, False, True, False, True, "red")
         rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", "Eyelid", "cvEyelid", EYELID_TGTLIST, True, False, False, True, False, True, "blue")
         lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", "Mouth", "cvMouth", MOUTH_TGTLIST, False, False, False, False, False, True, "red")
         rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", "Mouth", "cvMouth", MOUTH_TGTLIST, False, False, False, False, False, True, "blue")
-        if rMouthCtrlGrp:
-            cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
         lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, "Lips", "cvLips", LIPS_TGTLIST, False, False, True, True, False, True, "yellow")
         sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, "Sneer", "cvSneer", SNEER_TGTLIST, False, True, True, True, False, True, "cyan")
         grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, "Grimace", "cvGrimace", GRIMACE_TGTLIST, False, True, True, True, False, True, "cyan")
         faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, "Face", "cvFace", FACE_TGTLIST, True, True, True, True, True, True, "cyan")
+        
+        # positioning control groups:
+        cmds.setAttr(lBrowCtrlGrp+".translateX", 4)
+        cmds.setAttr(rBrowCtrlGrp+".translateX", -4)
+        cmds.setAttr(lEyelidCtrlGrp+".translateX", 2)
+        cmds.setAttr(rEyelidCtrlGrp+".translateX", -2)
+        cmds.setAttr(lMouthCtrlGrp+".translateX", 3)
+        cmds.setAttr(rMouthCtrlGrp+".translateX", -3)
+        cmds.setAttr(faceCtrlGrp+".translateX", 10)
+        
+        cmds.setAttr(lBrowCtrlGrp+".translateY", 12)
+        cmds.setAttr(rBrowCtrlGrp+".translateY", 12)
+        cmds.setAttr(lEyelidCtrlGrp+".translateY", 10)
+        cmds.setAttr(rEyelidCtrlGrp+".translateY", 10)
+        cmds.setAttr(lMouthCtrlGrp+".translateY", 1.5)
+        cmds.setAttr(rMouthCtrlGrp+".translateY", 1.5)
+        cmds.setAttr(lipsCtrlGrp+".translateY", 1.5)
+        cmds.setAttr(sneerCtrlGrp+".translateY", 2.5)
+        cmds.setAttr(grimaceCtrlGrp+".translateY", 0.5)
+        cmds.setAttr(faceCtrlGrp+".translateY", 2)
+        
+        cmds.setAttr(lBrowCtrlGrp+".translateZ", 13)
+        cmds.setAttr(rBrowCtrlGrp+".translateZ", 13)
+        cmds.setAttr(lEyelidCtrlGrp+".translateZ", 13)
+        cmds.setAttr(rEyelidCtrlGrp+".translateZ", 13)
+        cmds.setAttr(lMouthCtrlGrp+".translateZ", 13)
+        cmds.setAttr(rMouthCtrlGrp+".translateZ", 13)
+        cmds.setAttr(lipsCtrlGrp+".translateZ", 13)
+        cmds.setAttr(sneerCtrlGrp+".translateZ", 13)
+        cmds.setAttr(grimaceCtrlGrp+".translateZ", 13)
+        
+        cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
+        cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
+        
+        # integrating to dpAutoRigSystem:
+        if cmds.objExists(HEAD_CTRL):
+            cmds.parent(FACIAL_CTRLS_GRP, HEAD_CTRL, absolute=True)
     
     
     def dpSelectedCtrls(self, *args):
