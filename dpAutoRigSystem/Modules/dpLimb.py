@@ -1094,23 +1094,34 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                         
                         # implementing auto rotate twist bones:
-                        twistBoneMD = self.bendGrps['twistBoneMD']
-                        twistBoneMM = cmds.createNode("multMatrix", name=self.skinJointList[1]+"_ExtactAngle_MM")
-                        twistBoneDM = cmds.createNode("decomposeMatrix", name=self.skinJointList[1]+"_ExtactAngle_DM")
-                        twistBoneQtE = cmds.createNode("quatToEuler", name=self.skinJointList[1]+"_ExtactAngle_QtE")
-                        shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
-                        shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
-                        cmds.setAttr(shoulderChildLoc+".visibility", 0)
-                        cmds.setAttr(shoulderParentLoc+".visibility", 0)
-                        cmds.delete(cmds.parentConstraint(self.skinJointList[1], shoulderParentLoc, mo=False))
-                        cmds.parent(shoulderParentLoc, self.skinJointList[0])
-                        cmds.parent(shoulderChildLoc, self.skinJointList[1], relative=True)
-                        cmds.connectAttr(shoulderChildLoc+".worldMatrix[0]", twistBoneMM+".matrixIn[0]", force=True)
-                        cmds.connectAttr(shoulderParentLoc+".worldInverseMatrix[0]", twistBoneMM+".matrixIn[1]", force=True)
-                        cmds.connectAttr(twistBoneMM+".matrixSum", twistBoneDM+".inputMatrix", force=True)
-                        cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatZ", twistBoneQtE+".inputQuat.inputQuatZ", force=True);
-                        cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatW", twistBoneQtE+".inputQuat.inputQuatW", force=True);
-                        cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotateZ", twistBoneMD+".input2X", force=True)
+                        # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node:
+                        quatLoaded = False
+                        if not cmds.pluginInfo('quatNodes.mll', query=True, loaded=True):
+                            try:
+                                cmds.loadPlugin('quatNodes.mll')
+                                quatLoaded = True
+                            except:
+                                print "Error: Can not load the quatNodes plugin!"
+                                print "Applied default limbs instead."
+                                pass
+                        if quatLoaded:
+                            twistBoneMD = self.bendGrps['twistBoneMD']
+                            twistBoneMM = cmds.createNode("multMatrix", name=self.skinJointList[1]+"_ExtactAngle_MM")
+                            twistBoneDM = cmds.createNode("decomposeMatrix", name=self.skinJointList[1]+"_ExtactAngle_DM")
+                            twistBoneQtE = cmds.createNode("quatToEuler", name=self.skinJointList[1]+"_ExtactAngle_QtE")
+                            shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
+                            shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
+                            cmds.setAttr(shoulderChildLoc+".visibility", 0)
+                            cmds.setAttr(shoulderParentLoc+".visibility", 0)
+                            cmds.delete(cmds.parentConstraint(self.skinJointList[1], shoulderParentLoc, mo=False))
+                            cmds.parent(shoulderParentLoc, self.skinJointList[0])
+                            cmds.parent(shoulderChildLoc, self.skinJointList[1], relative=True)
+                            cmds.connectAttr(shoulderChildLoc+".worldMatrix[0]", twistBoneMM+".matrixIn[0]", force=True)
+                            cmds.connectAttr(shoulderParentLoc+".worldInverseMatrix[0]", twistBoneMM+".matrixIn[1]", force=True)
+                            cmds.connectAttr(twistBoneMM+".matrixSum", twistBoneDM+".inputMatrix", force=True)
+                            cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatZ", twistBoneQtE+".inputQuat.inputQuatZ", force=True);
+                            cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatW", twistBoneQtE+".inputQuat.inputQuatW", force=True);
+                            cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotateZ", twistBoneMD+".input2X", force=True)
                 
                 if loadedIkFkSnap:
                     # do otherCtrlList get extraCtrlList from bendy
