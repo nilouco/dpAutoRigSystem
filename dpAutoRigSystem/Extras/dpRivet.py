@@ -242,9 +242,10 @@ class Rivet():
         """
         axisList = ['X', 'Y', 'Z']
         if cmds.objExists(nodeName):
+            nodePivot = cmds.xform(nodeName, query=True, worldSpace=True, rotatePivot=True)
             if invR:
                 invRGrp = cmds.group(nodeName, name=nodeName+"_InvR_Grp")
-                cmds.xform(invRGrp, rotateOrder="zyx")
+                cmds.xform(invRGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]), rotateOrder="zyx")
                 rMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvR_MD", skipSelect=True)
                 cmds.setAttr(rMD+'.input2X', -1)
                 cmds.setAttr(rMD+'.input2Y', -1)
@@ -254,6 +255,7 @@ class Rivet():
                     cmds.connectAttr(rMD+'.output'+axis, invRGrp+'.rotate'+axis, force=True)
             if invT:
                 invTGrp = cmds.group(nodeName, name=nodeName+"_InvT_Grp")
+                cmds.xform(invTGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]))
                 tMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvT_MD", skipSelect=True)
                 cmds.setAttr(tMD+'.input2X', -1)
                 cmds.setAttr(tMD+'.input2Y', -1)
@@ -419,6 +421,7 @@ class Rivet():
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_Rivet_Grp")
+                    cmds.xform(rivet, worldSpace=True, rotatePivot=(rivetPos[0], rivetPos[1], rivetPos[2]))
                 
                 # move temp tranform to rivet location:
                 cmds.xform(self.tempNode, worldSpace=True, translation=(rivetPos[0], rivetPos[1], rivetPos[2]))
