@@ -488,6 +488,22 @@ def deleteChildren(item):
             for child in childrenList:
                 cmds.delete(child)
 
+
+def setJointLabel(jointName, sideNumber, typeNumber, labelString):
+    """ Set joint labelling in order to help Maya calculate the skinning mirror correctly.
+        side:
+            0 = Center
+            1 = Left
+            2 = Right
+        type:
+            18 = Other
+    """
+    cmds.setAttr(jointName+".side", sideNumber)
+    cmds.setAttr(jointName+".type", typeNumber)
+    if typeNumber == 18: #other
+        cmds.setAttr(jointName+".otherType", labelString, type="string")
+
+
 #Profiler decorator
 DPAR_PROFILE_MODE = False
 def profiler(func):

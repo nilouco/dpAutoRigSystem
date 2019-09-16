@@ -19,7 +19,7 @@ import dpUtils as utils
 import dpControls as ctrls
 
 
-def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, ctrlRadius=1, side=0, arm=True, worldRef="worldRef"):
+def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, ctrlRadius=1, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0):
     if not oriLoc:
         oriLoc = cmds.ls(sl=True, l=True)[0]
     if not iniJnt:
@@ -60,11 +60,11 @@ def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='
     cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
     
     if arm:
-        upLimb = createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guias=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, ctrlRadius=ctrlRadius, worldRef=worldRef)
-        downLimb = createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guias=[lista[1], lista[2]], s=side, firstLimb=False, ctrlRadius=ctrlRadius, worldRef=worldRef)
+        upLimb = createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guias=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
+        downLimb = createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guias=[lista[1], lista[2]], s=side, firstLimb=False, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
     else:
-        upLimb = createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guias=[lista[0], lista[1]], upCtrl=upctrlCtrl, ctrlRadius=ctrlRadius, worldRef=worldRef)
-        downLimb = createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guias=[lista[1], lista[2]], ctrlRadius=ctrlRadius, worldRef=worldRef)
+        upLimb = createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guias=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
+        downLimb = createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guias=[lista[1], lista[2]], s=side, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
     
     cmds.delete(cmds.parentConstraint(oriLoc, upctrl, mo=False, w=1))
     cmds.delete(cmds.pointConstraint(upLimb['middleCtrl'], upctrl, mo=False, w=1))
@@ -210,7 +210,7 @@ def createElbowCtrl(myName='Limb_Ctrl', r=1, zero=True, armStyle=True):
     return [grp, curve, zero]
     
 #function to create the ribbon
-def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guias=None, v=True, s=0, firstLimb=True, upCtrl=None, ctrlRadius=1, worldRef="worldRef"):
+def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guias=None, v=True, s=0, firstLimb=True, upCtrl=None, ctrlRadius=1, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName"):
         retDict = {}
         
         #define variables
@@ -240,7 +240,7 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         cmds.addAttr(ribbon, longName="doNotSkinIt", attributeType="bool", keyable=True)
         cmds.setAttr(ribbon+".doNotSkinIt", 1)
         #call the function to create follicles and joint in the nurbsPlane
-        results = createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal)
+        results = createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
         rb_Jnt = results[0]
         fols = results[1]
         #create locator controls for the middle of the ribbon
@@ -655,7 +655,7 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         return retDict
             
 #function to create follicles and joints
-def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False): 
+def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, jointLabelAdd=0, jointLabelName="RibbonName"): 
     #define variables
     jnts = []
     fols = []
@@ -678,6 +678,7 @@ def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False):
             cmds.select(cl=True)
             jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
             cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
+            utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
             cmds.select(cl=True)
             #calculate the position of the first follicle
             passo+=(1/float(num))
@@ -701,6 +702,7 @@ def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False):
             cmds.select(cl=True)
             jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
             cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
+            utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
             cmds.select(cl=True)
             #calculate the first follicle position
             passo+=(1/float(num))

@@ -87,10 +87,10 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvHeadLoc+".translateY", 2)
         cmds.setAttr(self.cvJawLoc+".translateY", 2.7)
         cmds.setAttr(self.cvJawLoc+".translateZ", 0.7)
-        cmds.setAttr(self.cvChinLoc+".translateY", 2.7)
-        cmds.setAttr(self.cvChinLoc+".translateZ", 1.7)
-        cmds.setAttr(self.cvChewLoc+".translateY", 2.5)
-        cmds.setAttr(self.cvChewLoc+".translateZ", 2.0)
+        cmds.setAttr(self.cvChinLoc+".translateY", 2.5)
+        cmds.setAttr(self.cvChinLoc+".translateZ", 1.0)
+        cmds.setAttr(self.cvChewLoc+".translateY", 2.3)
+        cmds.setAttr(self.cvChewLoc+".translateZ", 1.3)
 
         # lip cvLocs:
         cmds.setAttr(self.cvLLipLoc+".translateX", 0.6)
@@ -148,6 +148,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     if s == 1:
                         for axis in self.mirrorAxis:
                             cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+                # joint labelling:
+                jointLabelAdd = 1
             else: # if not mirror:
                 duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
@@ -156,6 +158,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
+                # joint labelling:
+                jointLabelAdd = 0
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
@@ -187,6 +191,14 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 dpARJointList = [self.neckJnt, self.headJnt, self.jawJnt, self.chinJnt, self.chewJnt, self.lLipJnt, self.rLipJnt]
                 for dpARJoint in dpARJointList:
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
+                # joint labelling:
+                utils.setJointLabel(self.neckJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_neck'])
+                utils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_head'])
+                utils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_jaw'])
+                utils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_chin'])
+                utils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_chew'])
+                utils.setJointLabel(self.lLipJnt, 1, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_lip'])
+                utils.setJointLabel(self.rLipJnt, 2, 18, self.userGuideName+"_"+self.langDic[self.langName]['c_lip'])
                 # creating controls:
                 self.neckCtrl = ctrls.cvNeck(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_neck']+"_Ctrl", r=self.ctrlRadius/2.0)
                 self.headCtrl = ctrls.cvHead(ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c_head']+"_Ctrl", r=self.ctrlRadius/2.0)
@@ -303,7 +315,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.neckOrientGrp = cmds.group(self.neckCtrl, name=self.neckCtrl+"_Orient_Grp")
                 cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
                 cmds.addAttr(self.neckCtrl, longName=self.langDic[self.langName]['c_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
-                neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrl+"_"+self.langDic[self.langName]['c_autoRotate']+"_MD")
+                neckARMDName = self.langDic[self.langName]['c_autoRotate'][0].capitalize()+self.langDic[self.langName]['c_autoRotate'][1:]
+                neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrl+"_"+neckARMDName+"_MD")
                 cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
                 cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
                 cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)

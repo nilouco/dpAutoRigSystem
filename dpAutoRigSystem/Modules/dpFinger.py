@@ -160,6 +160,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     if s == 1:
                         for axis in self.mirrorAxis:
                             cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp + '.scale' + axis, -1)
+                # joint labelling:
+                jointLabelAdd = 1
             else:  # if not mirror:
                 duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName + '_Guide_Base')[0]
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
@@ -168,6 +170,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 self.mirrorGrp = cmds.group(self.userGuideName + '_Guide_Base', name="Guide_Base_Grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName + '_' + self.mirrorGrp)
+                # joint labelling:
+                jointLabelAdd = 0
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
@@ -184,6 +188,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     self.jnt = cmds.joint(name=side + self.userGuideName + "_" + str(n) + "_Jnt", scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                    utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+str(n))
                     # create a control:
                     if n == 1:
                         self.ctrl = ctrls.cvFinger(ctrlName=side + self.userGuideName + "_" + str(n) + "_Ctrl", r=self.ctrlRadius)

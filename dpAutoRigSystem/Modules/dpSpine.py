@@ -197,6 +197,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     if s == 1:
                         for axis in self.mirrorAxis:
                             cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp + '.scale' + axis, -1)
+                # joint labelling:
+                jointLabelAdd = 1
             else:  # if not mirror:
                 duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName + '_Guide_Base')[0]
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
@@ -205,6 +207,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 self.mirrorGrp = cmds.group(self.userGuideName + '_Guide_Base', name="Guide_Base_Grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName + '_' + self.mirrorGrp)
+                # joint labelling:
+                jointLabelAdd = 0
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
@@ -274,7 +278,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 utils.originedFrom(objName=self.hipsB, attrString=bottomLocGuide)
                 utils.originedFrom(objName=self.chestB, attrString=topLocGuide)
                 # create a simple spine ribbon:
-                returnedRibbonList = ctrls.createSimpleRibbon(name=side + self.userGuideName,totalJoints=(self.nJoints - 1))
+                returnedRibbonList = ctrls.createSimpleRibbon(name=side+self.userGuideName, totalJoints=(self.nJoints - 1), jointLabelNumber=(s+jointLabelAdd), jointLabelName=self.userGuideName)
                 rbnNurbsPlane = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
                 rbnJointGrpList = returnedRibbonList[2]

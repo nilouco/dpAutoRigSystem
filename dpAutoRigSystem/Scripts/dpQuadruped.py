@@ -323,6 +323,7 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
         cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
         cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+        dpAutoRigInst.guide.FkLine.displayAnnotation(upperTeethMiddleInstance, 0)
         # parent upperTeethMiddle guide to upperTeeth guide:
         cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
         # create FkLine module instance:
@@ -337,6 +338,7 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".shapeSize", 0.3)
         dpAutoRigInst.guide.FkLine.changeMirror(upperTeethSideInstance, "X")
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
+        dpAutoRigInst.guide.FkLine.displayAnnotation(upperTeethSideInstance, 0)
         # parent upperTeethSide guide to upperTeeth guide:
         cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
         # create FkLine module instance:
@@ -359,6 +361,7 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
         cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
         cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+        dpAutoRigInst.guide.FkLine.displayAnnotation(lowerTeethMiddleInstance, 0)
         # parent lowerTeeth guide to lowerTeeth guide:
         cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
         # create FkLine module instance:
@@ -373,6 +376,7 @@ def Quadruped(dpAutoRigInst):
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".shapeSize", 0.3)
         dpAutoRigInst.guide.FkLine.changeMirror(lowerTeethSideInstance, "X")
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
+        dpAutoRigInst.guide.FkLine.displayAnnotation(lowerTeethSideInstance, 0)
         # parent lowerTeethSide guide to lowerTeeth guide:
         cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
         

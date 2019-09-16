@@ -375,6 +375,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     if s == 1:
                         for axis in self.mirrorAxis:
                             cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp + '.scale' + axis, -1)
+                # joint labelling:
+                jointLabelAdd = 1
             else:  # if not mirror:
                 duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName + '_Guide_Base')[0]
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
@@ -383,6 +385,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.mirrorGrp = cmds.group(self.userGuideName + '_Guide_Base', name="Guide_Base_Grp", relative=True)
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName + '_' + self.mirrorGrp)
+                # joint labelling:
+                jointLabelAdd = 0
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
@@ -454,6 +458,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
                         cmds.addAttr(skinJoint, longName='dpAR_joint', attributeType='float', keyable=False)
+                        utils.setJointLabel(skinJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.jNameList[o])
 
                 # creating Fk controls and a hierarchy group to originedFrom data:
                 self.fkCtrlList, self.origFromList = [], []
@@ -889,7 +894,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
                 if self.limbType == self.langDic[self.langName]['m028_arm'] and self.getHasBend() == False:
                     # create forearm joint:
-                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c_forearm'] + self.jSufixList[0])[0]
+                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.langDic[self.langName][ 'c_forearm']+self.jSufixList[0])[0]
+                    utils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName][ 'c_forearm'])
                     # delete its children:
                     childList = cmds.listRelatives(forearmJnt, children=True, fullPath=True)
                     cmds.delete(childList)
@@ -1062,15 +1068,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                         if self.limbType == self.langDic[self.langName]['m028_arm']:
-                            if s == 0:
-                                self.bendGrps = rb.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, ctrlRadius=(self.ctrlRadius * 0.5), arm=True, worldRef=self.worldRef)
-                            else:
-                                self.bendGrps = rb.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, ctrlRadius=(self.ctrlRadius * 0.5), side=1, arm=True, worldRef=self.worldRef)
+                            self.bendGrps = rb.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, ctrlRadius=(self.ctrlRadius * 0.5), side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd)
                         else:
-                            if s == 0:
-                                self.bendGrps = rb.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, ctrlRadius=(self.ctrlRadius * 0.5), arm=False, worldRef=self.worldRef)
-                            else:
-                                self.bendGrps = rb.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, ctrlRadius=(self.ctrlRadius * 0.5), side=1, arm=False, worldRef=self.worldRef)
+                            self.bendGrps = rb.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, ctrlRadius=(self.ctrlRadius * 0.5), side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd)
                         cmds.delete(loc)
                         
                         cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)

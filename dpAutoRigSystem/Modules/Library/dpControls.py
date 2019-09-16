@@ -214,7 +214,7 @@ def middlePoint(a, b, createLocator=False):
         return[resultPos]
 
 
-def createSimpleRibbon(name='ribbon', totalJoints=6):
+def createSimpleRibbon(name='ribbon', totalJoints=6, jointLabelNumber=0, jointLabelName="SimpleRibbon"):
     """ Creates a Ribbon system.
         Receives the total number of joints to create.
         Returns the ribbon nurbs plane, the joints groups and joints created.
@@ -263,6 +263,8 @@ def createSimpleRibbon(name='ribbon', totalJoints=6):
         cmds.aimConstraint(aimGrp, jointGrp, offset=(0, 0, 0), weight=1, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=upGrp, n=name+"Ribbon"+str(j)+"_AimConstraint" )
         # parent this ribbonPos to the ribbonGrp:
         cmds.parent(posGrp, ribbonGrp, absolute=True)
+        # joint labelling:
+        utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
     return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
 
 

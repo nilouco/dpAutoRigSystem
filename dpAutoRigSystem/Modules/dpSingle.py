@@ -133,6 +133,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         else:
                             for axis in self.mirrorAxis:
                                 cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+                # joint labelling:
+                jointLabelAdd = 1
             else: # if not mirror:
                 duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
                 allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
@@ -142,6 +144,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
+                # joint labelling:
+                jointLabelAdd = 0
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
@@ -153,6 +157,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if self.getHasIndirectSkin():
                     self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=3, normal=(0, 0, 1), r=self.ctrlRadius, s=8, ch=False)[0]
