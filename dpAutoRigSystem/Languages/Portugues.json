@@ -194,6 +194,8 @@
     "m092_createdLeg"        : "Criado Guias para Perna.",
     "m093_createdTweaks"     : "Criado Guias para Tweaks.",
     "m094_doing"             : "Fazendo",
+    "m095_isolate"           : "Isolar",
+    "m096_isolateDesc"       : "Esse script vai criar um setup de Isolação.\nPrecisa ter 3 nodes seleccionados.",
     
     "extra_CopyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Salva, guarda e restaura a aparência de controles. Pratico quando o rig deve ser reconstruido.",
@@ -261,6 +263,7 @@
     "e001_GuideNotChecked"         : "Erro: (001) - Guia(s) não encontrada(s) no diretorio respectivo...",
     "e002_decomposeMatrixNotFound" : "Erro: (002) - O plugin decomposeMatrix não foi encontrado, não foi possivel continuar o espelhamento.",
     "e003_moreThanOneGeo"          : "Erro: (003) - Não é possível realizar o Skinning!\nDesculpe.\n\nMais de um objeto\ncom o mesmo nome\nna lista de Geometrias.\n\nPor favor, tente usar a opção:\nMostrar Nome Longo.\n\nAqui o problema:\n",
+    "e004_objNotExist"             : "Erro: (004) - O item especificado não existe.\n\nAqui o problema:\n",
     
     "b000_BugGeneral"                    : "Bug: (000) - Encontrado um bug, desculpe.\n\nRevise as guias ou a versão do script, por favor.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - Encontrado mirror no módulo Single\nusando indirectSkin no Maya 2018!\n\nExiste um problema:\nMaya 2018 não é capaz de calcular\ncorretamente o mirror de indirect skinning.\n\nPrecisamos usar um workaroud, desculpe:\n\nSalve sua cena e abra novamente\nantes de começar o skinning, por favor."

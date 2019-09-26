@@ -194,6 +194,8 @@
     "m092_createdLeg"        : "Créé de Guides pour la Jambre.",
     "m093_createdTweaks"     : "Créé de Guides pour les Tweaks.",
     "m094_doing"             : "En faire",
+    "m095_isolate"           : "Isolé",
+    "m096_isolateDesc"       : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés.",
     
     "extra_CopyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",
@@ -261,6 +263,7 @@
     "e001_GuideNotChecked"         : "Erreur: (001) - Guide(s) pas trouvée(s) dans le dossier respectif...",
     "e002_decomposeMatrixNotFound" : "Erreur: (002) - C'était impossible de trouver le plugin decomposeMatrix, ce n'est pas possible de faire le miroir.",
     "e003_moreThanOneGeo"          : "Erreur: (003) - Ce n'est pas possible faire le SSkinning!\nDésolé.\n\nIl y a plus d'un objet\navec le même nom\ndans la liste de Geometries.\n\nEssayer utliser l'option:\nMontrer le Nom Complet,\ns'il vous plaît.\n\nVoici le problème:\n",
+    "e004_objNotExist"             : "Erreur: (004) - Il n'existe pas l'item listé.\n\nVoici le problème:\n",
     
     "b000_BugGeneral"                    : "Bug: (000) - Un bug est trouvé, desolé.\n\nReviser les guides ou la version du script, s'il vous plaît.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - On a trouvé le mirroir du module Single\nen utilisant l'indirectSkin dans Maya 2018!\n\nIl y a un problème:\nMaya 2018 n'est pas capable de calculer\ncorrectement le mirroir de l'indirect skinning.\n\nOn a besoin d'utiliser un workaroud, desolé:\n\nSauvegarder votre scene et l'ouvre encore\navant de commencer le skinning, s'il vous plaît."
