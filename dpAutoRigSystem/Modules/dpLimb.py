@@ -881,10 +881,18 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.stretchCondOp1 + '.outColorR', self.stretchCondOp0 + '.colorIfFalseR', force=True)
                 cmds.connectAttr(self.stretchCondOp2 + '.outColorR', self.stretchCondOp1 + '.colorIfFalseR', force=True)
                 cmds.connectAttr(self.stretchCondOp0 + ".outColorR", self.stretchCond + '.operation', force=True)
-
-                for j in range(1, 3):
+                
+                # connecting stretch output node to skinned and ik joints:
+                maxJntValue = 3 #default for biped
+                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                    maxJntValue = 4 #because we have 1 more articulation to stretch out
+                for j in range(1, maxJntValue):
                     cmds.connectAttr(self.stretchCond + '.outColorR', self.skinJointList[j] + '.scaleZ', force=True)
                     cmds.connectAttr(self.stretchCond + '.outColorR', self.ikJointList[j] + '.scaleZ', force=True)
+                    # check if we have quadruped spring solver and apply the stretch to all ik spring joint scale axis in order to avoid the Maya issue:
+                    if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                        cmds.connectAttr(self.stretchCond + '.outColorR', self.ikJointList[j] + '.scaleX', force=True)
+                        cmds.connectAttr(self.stretchCond + '.outColorR', self.ikJointList[j] + '.scaleY', force=True)
 
                 # do ikHandle off when before is fk in order to turn off the stretch:
                 cmds.parentConstraint(self.skinJointList[0], self.distBetweenList[4], maintainOffset=True, name=self.distBetweenList[4] + "_ParentConstraint")
