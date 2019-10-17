@@ -9,7 +9,7 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 ICON = "/Icons/dp_targetMirror.png"
 
-DPTM_VERSION = "2.1"
+DPTM_VERSION = "2.2"
 
 class TargetMirror():
     def __init__(self, *args, **kwargs):
@@ -25,7 +25,7 @@ class TargetMirror():
             cmds.deleteUI('dpTargetMirrorWindow', window=True)
         targetMirror_winWidth  = 305
         targetMirror_winHeight = 250
-        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title="Target Mirror 2.1", widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpTargetMirrorWin = cmds.window('dpTargetMirrorWindow', title="Target Mirror "+DPTM_VERSION, widthHeight=(targetMirror_winWidth, targetMirror_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         targetMirrorLayout = cmds.columnLayout('targetMirrorLayout')
@@ -68,7 +68,8 @@ class TargetMirror():
         """
         selectedList = cmds.ls(selection=True)
         if selectedList:
-            cmds.textField(self.originalModelTextField, edit=True, text=selectedList[0])
+            if self.dpCheckGeometry(selectedList[0]):
+                cmds.textField(self.originalModelTextField, edit=True, text=selectedList[0])
         else:
             print "Original Model > None"
     
@@ -134,7 +135,13 @@ class TargetMirror():
                 if childList:
                     itemType = cmds.objectType(childList[0])
                     if itemType == "mesh" or itemType == "nurbsSurface" or itemType == "subdiv":
-                        isGeometry = True
+                        historyList = cmds.listHistory(childList[0])
+                        if len(historyList) > 1:
+                            dialogReturn = cmds.confirmDialog(title="History found", message="There's history in your geometry:\n\n"+item+"\n\nMaybe, your model could have some\nundesirable deformation.\n\nThis will propagate in the copied targets.\n\nYou need to delete history of your model before.\n\nAre you sure to continue?", button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+                            if dialogReturn == "Yes":
+                                isGeometry = True
+                        else:
+                            isGeometry = True
                     else:
                         mel.eval("warning \""+item+" is not a geometry.\";")
                 else:

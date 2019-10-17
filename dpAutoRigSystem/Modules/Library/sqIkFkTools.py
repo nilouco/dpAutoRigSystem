@@ -40,7 +40,7 @@ class IkFkNetwork(object):
         self.iEndIndex    = iEndIndex
         self.attState     = _cast_string_to_attribute(attState)
         self.footRollAtts = _cast_string_to_attribute(footRollAtts)
-        self.otherCtrls   =_cast_string_to_pynode(otherCtrls) # The only goal of this attribute is to use additional control to detect a limb
+        self.otherCtrls   = _cast_string_to_pynode(otherCtrls) # The only goal of this attribute is to use additional control to detect a limb
 
         # Compute transform offset between ikCtrl and corresponding fkCtrl
         fkHandCtrl = self.fkCtrls[self.iEndIndex]
@@ -84,12 +84,23 @@ class IkFkNetwork(object):
     def switchToIk(self):
         if self.attState.get() != self._state_ik:
             self.snapIkToFk()
-            self.attState.set(self._state_ik)
+            self.setAttState(self._state_ik)
 
     def switchToFk(self):
         if self.attState.get() != self._state_fk:
             self.snapFkToIk()
-            self.attState.set(self._state_fk)
+            self.setAttState(self._state_fk)
+            
+            
+    def setAttState(self, state):
+        """ Brute force in order to change connected attribute.
+        """
+        try:
+            self.attState.set(state)
+        except:
+            self.attState = _cast_string_to_attribute(cmds.listConnections(str(self.attState), source=True, destination=False, plugs=True)[0])
+            self.attState.set(state)
+
 
 # taken from omtk.animation.ikfkTools
 def CallFnOnNetworkByClass(_sFn, _sCls):

@@ -228,6 +228,19 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp]
                 self.ballRFList.append(self.RFEGrp)
                 
+                # putting groups in the correct place:
+                tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footJnt, maintainOffset=False)
+                tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootJxt, maintainOffset=False)
+                tempToDelC = cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False)
+                tempToDelD = cmds.parentConstraint(self.cvEndJoint, self.endBJnt, maintainOffset=False)
+                tempToDelE = cmds.parentConstraint(self.cvRFALoc, self.RFAGrp, maintainOffset=False)
+                tempToDelF = cmds.parentConstraint(self.cvRFBLoc, self.RFBGrp, maintainOffset=False)
+                tempToDelG = cmds.parentConstraint(self.cvRFCLoc, self.RFCGrp, maintainOffset=False)
+                tempToDelH = cmds.parentConstraint(self.cvRFDLoc, self.RFDGrp, maintainOffset=False)
+                tempToDelI = cmds.parentConstraint(self.cvRFELoc, self.RFEGrp, maintainOffset=False)
+                tempToDelJ = cmds.parentConstraint(self.cvEndJoint, self.RFEndGrp, maintainOffset=False)
+                cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG, tempToDelH, tempToDelI, tempToDelJ)
+                
                 # mounting hierarchy:
                 cmds.parent(self.RFBGrp, self.RFACtrl)
                 cmds.parent(self.RFCGrp, self.RFBCtrl)
@@ -243,21 +256,10 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 self.RFAZero = utils.zeroOut([self.RFAGrp])[0]
                 self.RFAZeroExtra = utils.zeroOut([self.RFAZero])[0]
                 rfJointZeroList = [self.RFAZero, self.RFBZero, self.RFCZero, self.RFDZero, self.RFEZero]
-
-                # putting groups in the correct place:
-                tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footJnt, maintainOffset=False)
-                tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootJxt, maintainOffset=False)
-                tempToDelC = cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False)
-                tempToDelD = cmds.parentConstraint(self.cvEndJoint, self.endBJnt, maintainOffset=False)
-                tempToDelE = cmds.parentConstraint(self.cvRFALoc, self.RFAZeroExtra, maintainOffset=False)
-                tempToDelF = cmds.parentConstraint(self.cvRFBLoc, self.RFBZero, maintainOffset=False)
-                tempToDelG = cmds.parentConstraint(self.cvRFCLoc, self.RFCZero, maintainOffset=False)
-                tempToDelH = cmds.parentConstraint(self.cvRFDLoc, self.RFDZero, maintainOffset=False)
-                tempToDelI = cmds.parentConstraint(self.cvRFELoc, self.RFEZero, maintainOffset=False)
-                tempToDelJ = cmds.parentConstraint(self.cvEndJoint, self.RFEndGrp, maintainOffset=False)
-                cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG, tempToDelH, tempToDelI, tempToDelJ)
-                cmds.makeIdentity(rfJointZeroList, apply=True, translate=False, rotate=True, scale=True)
-
+                
+                # fixing side rool rotation order:
+                cmds.setAttr(self.RFBZero+".rotateOrder", 5)
+                
                 # creating ikHandles:
                 ikHandleAnkleList = cmds.ikHandle(name=side + self.userGuideName + "_" + ankleRFAttr.capitalize() + "_IkHandle", startJoint=self.footJnt, endEffector=self.middleFootJxt, solver='ikSCsolver')
                 ikHandleMiddleList = cmds.ikHandle(name=side + self.userGuideName + "_" + middleRFAttr.capitalize() + "_IkHandle", startJoint=self.middleFootJxt, endEffector=self.endJnt, solver='ikSCsolver')
