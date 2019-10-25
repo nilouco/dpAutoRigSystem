@@ -22,7 +22,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         Base.StartClass.__init__(self, *args, **kwargs)
 
         self.footCtrlList = []
-        self.revFootCtrlZeroFinalList = []
+        self.revFootCtrlGrpFinalList = []
         self.revFootCtrlShapeList = []
         self.toLimbIkHandleGrpList = []
         self.parentConstList = []
@@ -224,7 +224,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 self.RFCGrp = cmds.group(self.RFCCtrl, name=self.RFCCtrl+"_Grp")
                 self.RFDGrp = cmds.group(self.RFDCtrl, name=self.RFDCtrl+"_Grp")
                 self.RFEGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Grp")
-                self.RFEndGrp = cmds.group(name=side+self.userGuideName+"_RFEnd_Grp")
+#                self.RFEndGrp = cmds.group(name=side+self.userGuideName+"_RFEnd_Grp")
                 rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp]
                 self.ballRFList.append(self.RFEGrp)
                 
@@ -238,15 +238,15 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 tempToDelG = cmds.parentConstraint(self.cvRFCLoc, self.RFCGrp, maintainOffset=False)
                 tempToDelH = cmds.parentConstraint(self.cvRFDLoc, self.RFDGrp, maintainOffset=False)
                 tempToDelI = cmds.parentConstraint(self.cvRFELoc, self.RFEGrp, maintainOffset=False)
-                tempToDelJ = cmds.parentConstraint(self.cvEndJoint, self.RFEndGrp, maintainOffset=False)
-                cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG, tempToDelH, tempToDelI, tempToDelJ)
+#                tempToDelJ = cmds.parentConstraint(self.cvEndJoint, self.RFEndGrp, maintainOffset=False)
+                cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG, tempToDelH, tempToDelI)
                 
                 # mounting hierarchy:
                 cmds.parent(self.RFBGrp, self.RFACtrl)
                 cmds.parent(self.RFCGrp, self.RFBCtrl)
                 cmds.parent(self.RFDGrp, self.RFCCtrl)
                 cmds.parent(self.RFEGrp, self.RFDCtrl)
-                cmds.parent(self.RFEndGrp, self.RFEGrp)
+#                cmds.parent(self.RFEndGrp, self.RFEGrp)
                 
                 # reverse foot zero out groups:
                 self.RFEZero = utils.zeroOut([self.RFEGrp])[0]
@@ -282,7 +282,6 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootCtrl, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB)
                 self.footCtrlZeroList = utils.zeroOut([self.footCtrl, self.middleFootCtrl])
-                self.revFootCtrlZeroFinalList.append(self.footCtrlZeroList[0])
                 self.middleFootCtrlList.append(self.middleFootCtrl)
 
                 # mount hierarchy:
@@ -365,6 +364,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp = cmds.group(self.footCtrlZeroList[0], name=side + self.userGuideName + "_Control_Grp")
+                self.revFootCtrlGrpFinalList.append(self.toCtrlHookGrp)
 
                 self.toScalableHookGrp = cmds.createNode("transform", name=side + self.userGuideName + "_Joint_Grp")
                 mWorldFoot = cmds.getAttr(self.footJnt + ".worldMatrix")
@@ -412,7 +412,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         self.integratedActionsDic = {
             "module": {
                 "revFootCtrlList": self.footCtrlList,
-                "revFootCtrlZeroList": self.revFootCtrlZeroFinalList,
+                "revFootCtrlGrpList": self.revFootCtrlGrpFinalList,
                 "revFootCtrlShapeList": self.revFootCtrlShapeList,
                 "toLimbIkHandleGrpList": self.toLimbIkHandleGrpList,
                 "parentConstList": self.parentConstList,

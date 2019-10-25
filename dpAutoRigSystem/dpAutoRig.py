@@ -48,6 +48,9 @@
 ###################################################################
 
 
+# print loading script:
+DPAR_VERSION = "3.06.00"
+print "\nLoading dpAutoRigSystem v", DPAR_VERSION
 
 # importing libraries:
 try:
@@ -76,7 +79,6 @@ except Exception as e:
     print e
 
 # declaring member variables
-DPAR_VERSION = "3.05.12"
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
@@ -1418,7 +1420,7 @@ class DP_AutoRig_UI:
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     # getting foot data:
                                     revFootCtrl       = self.integratedTaskDic[moduleDic]['revFootCtrlList'][s]
-                                    revFootCtrlZero   = self.integratedTaskDic[moduleDic]['revFootCtrlZeroList'][s]
+                                    revFootCtrlGrp   = self.integratedTaskDic[moduleDic]['revFootCtrlGrpList'][s]
                                     revFootCtrlShape  = self.integratedTaskDic[moduleDic]['revFootCtrlShapeList'][s]
                                     toLimbIkHandleGrp = self.integratedTaskDic[moduleDic]['toLimbIkHandleGrpList'][s]
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
@@ -1440,7 +1442,7 @@ class DP_AutoRig_UI:
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.delete(ikHandlePointConst, parentConst, scaleConst)
-                                    cmds.parent(revFootCtrlZero, ikFkBlendGrpToRevFoot, absolute=True)
+                                    cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
                                     #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
                                     cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]

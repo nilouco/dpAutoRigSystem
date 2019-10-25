@@ -216,11 +216,10 @@ def zeroOut(transformList=[]):
     if transformList:
         for transform in transformList:
             zero = cmds.duplicate(transform, name=transform+'_Zero')[0]
-            if( cmds.objExists(zero+".originedFrom") ):
-                try:
-                    cmds.deleteAttr(zero+".originedFrom")
-                except:
-                    pass
+            zeroUserAttrList = cmds.listAttr(zero, userDefined=True)
+            if zeroUserAttrList:
+                for zUserAttr in zeroUserAttrList:
+                    cmds.deleteAttr(zero+"."+zUserAttr)
             allChildrenList = cmds.listRelatives(zero, allDescendents=True, children=True, fullPath=True)
             for child in allChildrenList:
                 cmds.delete(child)

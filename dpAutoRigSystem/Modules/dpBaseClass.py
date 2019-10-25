@@ -209,16 +209,26 @@ class StartClass:
                             if not currentName in dpAR_nameList:
                                 dpAR_nameList.append(currentName)
                     if dpAR_nameList:
+                        dpAR_nameList.sort()
                         for currentName in dpAR_nameList:
                             if currentName == self.customName:
-                                addSuffix = True
-                                while addSuffix:
-                                    for n in range(1,len(dpAR_nameList)+1):
-                                        if not self.customName+str(n) in dpAR_nameList:
-                                            self.customName = self.customName + str(n)
-                                            addSuffix = False
-                                            break
-                                    addSuffix = False
+                                # getting the index of the last digit in the name:
+                                n = len(currentName)+1
+                                hasDigit = False
+                                for i in reversed(xrange(len(currentName))):
+                                    if currentName[i].isdigit():
+                                        n = i
+                                        hasDigit = True
+                                    else:
+                                        break
+                                # adding a sequential number:
+                                if hasDigit:
+                                    moduleDigit = int(currentName[n:])
+                                    self.customName = self.customName[:n] + str(moduleDigit+1)
+                                # adding 1 at the name end:
+                                else:
+                                    self.customName = self.customName + str(1)
+                                
                 # edit the prefixTextField with the normalText:
                 try:
                     cmds.textField(self.userName, edit=True, text=self.customName)

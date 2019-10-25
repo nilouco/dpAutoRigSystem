@@ -714,7 +714,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 ikHandleGrp = cmds.group(empty=True, name=side + self.userGuideName + "_IkHandle_Grp")
                 cmds.setAttr(ikHandleGrp + '.visibility', 0)
                 self.ikHandleToRFGrp = cmds.group(empty=True, name=side + self.userGuideName + "_IkHandleToRF_Grp")
-                self.ikHandleToRFGrpList.append(self.ikHandleToRFGrp)
+                self.ikHandleToRFGrpList.append(ikHandleGrp)
                 cmds.setAttr(self.ikHandleToRFGrp + '.visibility', 0)
                 cmds.parent(ikHandleMainList[0], self.ikHandleToRFGrp)
                 cmds.parent(self.ikHandleToRFGrp, ikHandleGrp)

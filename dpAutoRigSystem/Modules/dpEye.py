@@ -238,8 +238,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_preset']+"X", attributeType="float", defaultValue=preset, keyable=False)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_preset']+"Y", attributeType="float", defaultValue=preset, keyable=False)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], attributeType="float", minValue=0, defaultValue=0.5, maxValue=1, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_fix']+"ScaleX", attributeType="float", defaultValue=0.01, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_fix']+"TranslateZ", attributeType="float", defaultValue=0.15, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_fix']+"ScaleX", attributeType="float", defaultValue=0.01, minValue=0, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_fix']+"TranslateZ", attributeType="float", defaultValue=0.15, minValue=0, keyable=False)
         # creating utility nodes to eyelid setup:
         eyelidIntensityMD = cmds.createNode('multiplyDivide', name=baseName+"_Intensity_MD")
         eyelidInvertMD = cmds.createNode('multiplyDivide', name=baseName+"_Invert_MD")
@@ -253,6 +253,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         eyelidFixModulusYCnd = cmds.createNode('condition', name=baseName+"_Fix_ModulusY_Cnd")
         eyelidFixNegativeMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Negative_MD")
         eyelidFixMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Middle_MD")
+        eyelidFixMiddleScaleClp = cmds.createNode('clamp', name=baseName+"_Fix_Middle_Clp")
         # seting up the node attributes:
         cmds.setAttr(eyelidInvertXCnd+".colorIfTrueR", 1)
         cmds.setAttr(eyelidInvertXCnd+".colorIfFalseR", -1)
@@ -263,6 +264,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(eyelidFixPMA+".input3D[0].input3Dx", 1)
         cmds.setAttr(eyelidFixNegativeMD+".input2Y", -1)
         cmds.setAttr(eyelidFixModulusYCnd+".operation", 3)
+        cmds.setAttr(eyelidFixMiddleScaleClp+".minR", 1)
+        cmds.setAttr(eyelidFixMiddleScaleClp+".maxR", 1000)
         # connecting eyelid control to nodes and joints:
         cmds.connectAttr(eyelidCtrl+".translateX", eyelidInvertMD+".input1X", force=True)
         cmds.connectAttr(eyelidCtrl+".translateY", eyelidInvertMD+".input1Y", force=True)
@@ -313,7 +316,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(eyelidFixModulusYCnd+".outColorR", eyelidFixMiddleMD+".input1Y", force=True)
         cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], eyelidFixMiddleMD+".input2X", force=True)
         cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], eyelidFixMiddleMD+".input2Y", force=True)
-        cmds.connectAttr(eyelidFixMiddleMD+".outputX", eyelidMiddleJnt+".scaleX", force=True)
+        cmds.connectAttr(eyelidFixMiddleMD+".outputX", eyelidFixMiddleScaleClp+".inputR", force=True)
+        cmds.connectAttr(eyelidFixMiddleScaleClp+".outputR", eyelidMiddleJnt+".scaleX", force=True)
         cmds.connectAttr(eyelidFixMiddleMD+".outputY", eyelidMiddleJnt+".translateZ", force=True)
         return eyelidCtrl, eyelidCtrlZero
         
