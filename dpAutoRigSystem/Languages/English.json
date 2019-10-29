@@ -89,6 +89,7 @@
     "i080_iris"            : "Iris",
     "i081_pupil"           : "Pupil",
     "i082_aimDirection"    : "Aim Direction",
+    "i083_copiedSkin"      : "Copied skinning from/to",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -196,6 +197,8 @@
     "m094_doing"             : "Doing",
     "m095_isolate"           : "Isolate",
     "m096_isolateDesc"       : "This script will create an Isolate setup.\nNeed 3 nodes selected.",
+    "m097_copySkin"          : "Copy Skin",
+    "m098_copySkinDesc"      : "This script will copy the skinning from\nthe first selected and skinned geometry\nto the others selected.",
     
     "extra_CopyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",
@@ -264,6 +267,9 @@
     "e002_decomposeMatrixNotFound" : "Error: (002) - The decomposeMatrix plugin not found, could not continue to create the mirror.",
     "e003_moreThanOneGeo"          : "Error: (003) - It is not possible create the Skinning!\nSorry.\n\nThere are more than one object\nwith the same name\nin the list of Geometries.\n\nTry to use the option:\nDisplay Long Name,\nplease.\n\nHere's the problem:\n",
     "e004_objNotExist"             : "Error: (004) - The item specified doesn't exists.\n\nHere's the problem:\n",
+    "e005_selectOneObj"            : "Error: (005) - Select more then one object, please",
+    "e006_firstSkinnedGeo"         : "Error: (006) - Select first a skinned geometry, please.",
+    "e007_notSkinFound"            : "Error: (007) - There isn't a skinCluster in the first selected geometry.",
     
     "b000_BugGeneral"                    : "Bug: (000) - Found a bug, sorry.\n\nReview your guides or script version, please.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - Found mirror on Single module\nusing indirectSkin on Maya 2018!\n\nThere is a problem:\nMaya 2018 is not able to calculate\ncorrectely the mirror of indirect skinning.\n\nWe need to use a workaroud, sorry:\n\nSave your scene and open it again\nbefore start the skinning, please."

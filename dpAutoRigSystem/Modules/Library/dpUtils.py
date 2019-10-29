@@ -503,6 +503,17 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
         cmds.setAttr(jointName+".otherType", labelString, type="string")
 
 
+def extractSuffix(nodeName):
+    """ Remove suffix from a node name and return the base name.
+    """
+    meshSuffixList = ["_Mesh", "_mesh", "_Geo", "_geo", "_Tgt", "_tgt"]
+    for meshSuffix in meshSuffixList:
+        if nodeName.endswith(meshSuffix):
+            baseName = nodeName[:nodeName.rfind(meshSuffix)]
+            return baseName
+    return nodeName
+
+
 #Profiler decorator
 DPAR_PROFILE_MODE = False
 def profiler(func):

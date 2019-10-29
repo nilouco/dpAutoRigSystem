@@ -49,7 +49,7 @@
 
 
 # print loading script:
-DPAR_VERSION = "3.06.00"
+DPAR_VERSION = "3.06.01"
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
 
 # importing libraries:
@@ -1984,11 +1984,7 @@ class DP_AutoRig_UI:
                     elif (args[0] == "Remove"):
                         cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
                     else:
-                        baseName = geomSkin
-                        meshSuffixList = ["_Mesh", "_mesh", "_Geo", "_geo", "_Tgt", "_tgt"]
-                        for meshSuffix in meshSuffixList:
-                            if meshSuffix in geomSkin:
-                                baseName = geomSkin[:geomSkin.rfind(meshSuffix)]
+                        baseName = utils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
