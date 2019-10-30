@@ -10,7 +10,7 @@ TITLE = "m097_copySkin"
 DESCRIPTION = "m098_copySkinDesc"
 ICON = "/Icons/dp_copySkin.png"
 
-dpCopySkinVersion = 1.0
+dpCopySkinVersion = 1.1
 
 class CopySkin():
     def __init__(self, dpUIinst, langDic, langName):
@@ -22,8 +22,8 @@ class CopySkin():
         self.dpMain(self)
     
     def dpMain(self, *args):
-    """ Main function to analise and call copy skin process. 
-    """
+        """ Main function to analise and call copy skin process. 
+        """
         selList = cmds.ls(selection=True)
         if selList and len(selList) > 1:
             # get first selected item
@@ -32,26 +32,40 @@ class CopySkin():
             destinationList = selList[1:]
             shapeList = cmds.listRelatives(sourceItem, shapes=True)
             if shapeList:
-                for shapeNode in shapeList:
-                    if not shapeNode.endswith("Orig"):
-                        # check if there's a skinCluster node connected to the first selected item
-                        skinClusterNode = cmds.listConnections(shapeNode, type="skinCluster")[0]
-                        # get joints influence from skinCluster
-                        skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
-                        if skinInfList:
-                            # call copySkin function
-                            self.dpCopySkin(sourceItem, destinationList, skinInfList)
-                        else:
-                            print self.langDic[self.langName]['e007_notSkinFound']
+                # check if there's a skinCluster node connected to the first selected item
+                checkSkin = self.dpCheckSkinCluster(shapeList)
+                if checkSkin:
+                    # get joints influence from skinCluster
+                    skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
+                    if skinInfList:
+                        # call copySkin function
+                        self.dpCopySkin(sourceItem, destinationList, skinInfList)
+                else:
+                    print self.langDic[self.langName]['e007_notSkinFound']
             else:
                 print self.langDic[self.langName]['e006_firstSkinnedGeo']
         else:
             print self.langDic[self.langName]['e005_selectOneObj']
 
 
+    def dpCheckSkinCluster(self, shapeList, *args):
+        """ Verify if there's a skinCluster node in the list of history of the shape.
+            Return True if yes.
+            Return False if no.
+        """
+        for shapeNode in shapeList:
+            if not shapeNode.endswith("Orig"):
+                histList = cmds.listHistory(shapeNode)
+                if histList:
+                    for histItem in histList:
+                        if cmds.objectType(histItem) == "skinCluster":
+                            return True
+        return False
+    
+    
     def dpCopySkin(self, sourceItem, destinationList, skinInfList, *args):
-    """ Do the copy skin from sourceItem to destinationList using the skinInfList.
-    """
+        """ Do the copy skin from sourceItem to destinationList using the skinInfList.
+        """
         for item in destinationList:
             # get correct naming
             skinClusterName = utils.extractSuffix(item)

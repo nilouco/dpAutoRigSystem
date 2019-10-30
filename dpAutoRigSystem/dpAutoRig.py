@@ -49,7 +49,7 @@
 
 
 # print loading script:
-DPAR_VERSION = "3.06.01"
+DPAR_VERSION = "3.06.02"
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
 
 # importing libraries:
