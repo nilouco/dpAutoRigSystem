@@ -48,8 +48,10 @@
 ###################################################################
 
 
+# current version:
+DPAR_VERSION = "3.06.03"
+
 # print loading script:
-DPAR_VERSION = "3.06.02"
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
 
 # importing libraries:
@@ -62,6 +64,7 @@ try:
     import re
     import time
     import getpass
+    import urllib
     from functools import partial
     import Modules.Library.dpUtils as utils
     import Modules.Library.dpControls as ctrls
@@ -167,6 +170,7 @@ class DP_AutoRig_UI:
             cmds.menuItem( 'about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250) )
+            cmds.menuItem( 'update_MI', label='Update', command=self.checkForUpdate)
             cmds.menuItem( 'help_MI', label='Help...', command=self.help )
             
             # create the main layout:
@@ -332,6 +336,7 @@ class DP_AutoRig_UI:
         self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=2, columnWidth=[(1, 40), (2, 100)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="_Jnt", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="_Jis", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
         cmds.setParent(self.allUIs["skinningTabLayout"])
@@ -341,8 +346,9 @@ class DP_AutoRig_UI:
         self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
         allGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
         selGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
-        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.langDic[self.langName]['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
+        self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
+        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=allGeoms )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -545,7 +551,7 @@ class DP_AutoRig_UI:
         cmds.delete(selectedItem)
         return newGuideName
 
-
+        
     def populateJoints(self, *args):
         """ This function is responsable to list all joints or only dpAR joints in the interface in order to use in skinning.
         """
@@ -554,7 +560,7 @@ class DP_AutoRig_UI:
         chooseJnt = cmds.radioButton(jntSelectedRadioButton, query=True, annotation=True)
         
         # list joints to be populated:
-        jointList = []
+        jointList, sortedJointList = [], []
         allJointList = cmds.ls(selection=False, type="joint")
         if chooseJnt == "allJoints":
             jointList = allJointList
@@ -574,13 +580,22 @@ class DP_AutoRig_UI:
                         if "_Jis" in jointNode:
                             jointList.append(jointNode)
         
+        # sort joints by name filter:
+        jointName = cmds.textField(self.allUIs["jointNameTF"], query=True, text=True)
+        if jointList and jointName:
+            for jointNode in jointList:
+                if str(jointName) in jointNode:
+                    sortedJointList.append(jointNode)
+        else:
+            sortedJointList = jointList
+            
         # populate the list:
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, removeAll=True)
-        cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=jointList)
+        cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=sortedJointList)
         # atualize of footerB text:
         self.atualizeSkinFooter()
-    
-    
+        
+        
     def populateGeoms(self, *args):
         """ This function is responsable to list all geometries or only selected geometries in the interface in order to use in skinning.
         """
@@ -592,7 +607,7 @@ class DP_AutoRig_UI:
         displayGeoLongName = cmds.checkBox(self.allUIs["geoLongName"], query=True, value=True)
         
         # list geometries to be populated:
-        geomList, shortNameList, sameNameList = [], [], []
+        geomList, shortNameList, sameNameList, sortedGeoList = [], [], [], []
         
         currentSelectedList = cmds.ls(selection=True, long=True)
         geomTypeList = ["mesh", "nurbsSurface", "subdiv"]
@@ -633,13 +648,21 @@ class DP_AutoRig_UI:
             for sameName in sameNameList:
                 geomList.append(sameName)
         
+        # sort geometries by name filter:
+        geoName = cmds.textField(self.allUIs["geoNameTF"], query=True, text=True)
+        if geomList and geoName:
+            for geoNode in geomList:
+                if str(geoName) in geoNode:
+                    sortedGeoList.append(geoNode)
+        else:
+            sortedGeoList = geomList
         
         # populate the list:
         cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, removeAll=True)
         if sameNameList:
-            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, lineFont=[(len(geomList)-len(sameNameList)-2, 'boldLabelFont'), (len(geomList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(geomList)-len(sameNameList), 'obliqueLabelFont')], append=geomList)
+            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, lineFont=[(len(sortedGeoList)-len(sameNameList)-2, 'boldLabelFont'), (len(sortedGeoList)-len(sameNameList)-1, 'obliqueLabelFont'), (len(sortedGeoList)-len(sameNameList), 'obliqueLabelFont')], append=sortedGeoList)
         else:
-            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=geomList)
+            cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=sortedGeoList)
         # atualize of footerB text:
         self.atualizeSkinFooter()
     
@@ -933,6 +956,28 @@ class DP_AutoRig_UI:
         # call Info Window:
         cmds.showWindow(dpInfoWin)
     
+    
+    def checkForUpdate(self, *args):
+        """ Check if there's an update for this current script version.
+            Output the result in a window.
+        """
+        try:
+            # getting dpAutoRig.py file from GitHub:
+            remoteSource = urllib.urlopen("https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py")
+            remoteContents = remoteSource.readlines()
+            # find the line with the version and compare them:
+            for line in remoteContents:
+                if "DPAR_VERSION = " in line:
+                    remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
+                    if remoteVersion == DPAR_VERSION:
+                        print "Yes, updated"
+                    else:
+                        print "not egual", remoteVersion, DPAR_VERSION
+        
+        except:
+            print "sorry, not connected to internet in order to check"
+        
+        
     
     def help(self, *args):
         """ Start browser with the help instructions and tutorials about dpAutoRig v2.

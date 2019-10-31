@@ -22,7 +22,7 @@ GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
 HEAD_CTRL = "Head_Head_Ctrl"
 
-DPFC_VERSION = "1.0"
+DPFC_VERSION = "1.1"
 
 class FacialControl():
     def __init__(self, *args, **kwargs):
@@ -40,7 +40,7 @@ class FacialControl():
             cmds.deleteUI('dpFacialControlWindow', window=True)
         facialCtrl_winWidth  = 380
         facialCtrl_winHeight = 450
-        dpFacialControlWin = cmds.window('dpFacialControlWindow', title="Facial Control 1.0", widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpFacialControlWin = cmds.window('dpFacialControlWindow', title="Facial Control "+DPFC_VERSION, widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("left", 10))
@@ -269,14 +269,20 @@ class FacialControl():
                         
                         # try to connect attributes into blendShape node:
                         if connectBS and self.bsNode:
+                            addedSide = False
+                            storedAttr = attr
                             for i, alias in enumerate(aliasList):
-                                if not side == None:
+                                if not side == None and not addedSide:
                                     attr = side+"_"+attr
+                                    addedSide = True
                                 if attr in alias:
                                     try:
                                         cmds.connectAttr(fCtrl+"."+attr, self.bsNode+"."+alias, force=True)
                                     except:
-                                        pass
+                                        try:
+                                            cmds.connectAttr(fCtrl+"."+storedAttr, self.bsNode+"."+alias, force=True)
+                                        except:
+                                            pass
                                     
             # parenting the hierarchy:
             if not cmds.objExists(facialCtrlsGrp):
