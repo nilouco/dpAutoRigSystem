@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.03"
+DPAR_VERSION = "3.06.04"
 
 # print loading script:
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
@@ -101,7 +101,10 @@ GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
 MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
 INFO_ICON = "dp_info.png"
-
+DPAR_SITE = "https://nilouco.blogspot.com"
+DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
+DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
+DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 
 
 class DP_AutoRig_UI:
@@ -171,7 +174,7 @@ class DP_AutoRig_UI:
             cmds.menuItem( 'author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'update_MI', label='Update', command=self.checkForUpdate)
-            cmds.menuItem( 'help_MI', label='Help...', command=self.help )
+            cmds.menuItem( 'help_MI', label='Help...', command=partial(utils.visiteWebSite, DPAR_SITE) )
             
             # create the main layout:
             self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
@@ -582,13 +585,12 @@ class DP_AutoRig_UI:
         
         # sort joints by name filter:
         jointName = cmds.textField(self.allUIs["jointNameTF"], query=True, text=True)
-        if jointList and jointName:
-            for jointNode in jointList:
-                if str(jointName) in jointNode:
-                    sortedJointList.append(jointNode)
-        else:
-            sortedJointList = jointList
-            
+        if jointList:
+            if jointName:
+                sortedJointList = utils.filterName(jointName, jointList, " ")
+            else:
+                sortedJointList = jointList
+        
         # populate the list:
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, removeAll=True)
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=sortedJointList)
@@ -650,12 +652,11 @@ class DP_AutoRig_UI:
         
         # sort geometries by name filter:
         geoName = cmds.textField(self.allUIs["geoNameTF"], query=True, text=True)
-        if geomList and geoName:
-            for geoNode in geomList:
-                if str(geoName) in geoNode:
-                    sortedGeoList.append(geoNode)
-        else:
-            sortedGeoList = geomList
+        if geomList:
+            if geoName:
+                sortedGeoList = utils.filterName(geoName, geomList, " ")
+            else:
+                sortedGeoList = geomList
         
         # populate the list:
         cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, removeAll=True)
@@ -707,6 +708,28 @@ class DP_AutoRig_UI:
                 cmds.text(self.allUIs["footerBText"], edit=True, label=self.langDic[self.langName]['i029_skinNothing'])
         except:
             pass
+    
+    
+    def checkForUpdate(self, *args):
+        """ Check if there's an update for this current script version.
+            Output the result in a window.
+        """
+        print "\n", self.langDic[self.langName]['i084_checkUpdate']
+        
+        # compare current version with GitHub master
+        rawResult = utils.checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL)
+        
+        # call Update Window about rawRsult:
+        if rawResult[0] == 0:
+            self.updateWin(rawResult, 'i085_updated')
+        elif rawResult[0] == 1:
+            self.updateWin(rawResult, 'i086_newVersion')
+        elif rawResult[0] == 2:
+            self.updateWin(rawResult, 'i087_rawURLFail')
+        elif rawResult[0] == 3:
+            self.updateWin(rawResult, 'i088_internetFail')
+        elif rawResult[0] == 4:
+            self.updateWin(rawResult, 'e008_failCheckUpdate')
     
     
     # Start working with Guide Modules:
@@ -783,7 +806,7 @@ class DP_AutoRig_UI:
             '''
             We need to passe the rigType parameters because the cmds.button command will send a False parameter that
             will be stock in the rigType if we don't pass the parameter
-            http://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
+            https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
             '''
             cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
         elif guideDir == SCRIPTS:
@@ -948,41 +971,14 @@ class DP_AutoRig_UI:
             cmds.deleteUI('dpInfoWindow', window=True)
         dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+DPAR_VERSION+' - '+self.langDic[self.langName]['i013_info']+' - '+self.langDic[self.langName][self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        infoLayout = cmds.scrollLayout('dpInfoWindow')
+        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpInfoWin)
+        infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
         if self.info_description:
             infoDesc = cmds.text(self.langDic[self.langName][self.info_description], align=self.info_align, parent=infoLayout)
         if self.info_text:
             infoText = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
         # call Info Window:
         cmds.showWindow(dpInfoWin)
-    
-    
-    def checkForUpdate(self, *args):
-        """ Check if there's an update for this current script version.
-            Output the result in a window.
-        """
-        try:
-            # getting dpAutoRig.py file from GitHub:
-            remoteSource = urllib.urlopen("https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py")
-            remoteContents = remoteSource.readlines()
-            # find the line with the version and compare them:
-            for line in remoteContents:
-                if "DPAR_VERSION = " in line:
-                    remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
-                    if remoteVersion == DPAR_VERSION:
-                        print "Yes, updated"
-                    else:
-                        print "not egual", remoteVersion, DPAR_VERSION
-        
-        except:
-            print "sorry, not connected to internet in order to check"
-        
-        
-    
-    def help(self, *args):
-        """ Start browser with the help instructions and tutorials about dpAutoRig v2.
-        """
-        os.popen('start http://nilouco.blogspot.com')
     
     
     def logWin(self, *args):
@@ -1018,6 +1014,53 @@ class DP_AutoRig_UI:
         # creating a info window to show the log:
         self.info( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
         
+    
+    def updateWin(self, rawResult, text, *args):
+        """ Create a window showing the text info with the description about any module.
+        """
+        # declaring variables:
+        self.update_checkedNumber = rawResult[0]
+        self.update_remoteVersion = rawResult[1]
+        self.update_text          = text
+        self.update_winWidth      = 305
+        self.update_winHeight     = 250
+        # creating Update Window:
+        if cmds.window('dpUpdateWindow', query=True, exists=True):
+            cmds.deleteUI('dpUpdateWindow', window=True)
+        dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.langDic[self.langName]['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpUpdateWin)
+        if self.update_text:
+            updateDesc = cmds.text("\n"+self.langDic[self.langName][self.update_text], align="center", parent=updateLayout)
+            cmds.text("\n"+DPAR_VERSION+self.langDic[self.langName]['i090_currentVersion'], align="left", parent=updateLayout)
+        if self.update_remoteVersion:
+            cmds.text(self.update_remoteVersion+self.langDic[self.langName]['i091_onlineVersion'], align="left", parent=updateLayout)
+            cmds.text("\n", parent=updateLayout)
+            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visiteWebSite, DPAR_GITHUB), parent=updateLayout)
+            downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
+#            installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", parent=updateLayout)
+        # automatically check for updates:
+        cmds.separator(height=30)
+#        autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.langDic[self.langName]['i092_autoCheckUpdate'], align="left", parent=updateLayout)
+        # call Update Window:
+        cmds.showWindow(dpUpdateWin)
+        print self.langDic[self.langName][self.update_text]
+    
+    
+    def downloadUpdate(self, url, ext, *args):
+        """ Download file from given url adrees and ask user to choose folder and file name to save
+        """
+        extFilter = "*."+ext
+        downloadFolder = cmds.fileDialog2(fileFilter=extFilter, dialogStyle=2)
+        if downloadFolder:
+            cmds.progressWindow(title='Download Update', progress=50, status='Downloading...', isInterruptable=False)
+            try:
+                urllib.urlretrieve(url, downloadFolder[0])
+                self.info('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+            except:
+                self.info('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
+            cmds.progressWindow(endProgress=True)
+    
     
     ###################### End: UI
     
@@ -1178,7 +1221,7 @@ class DP_AutoRig_UI:
 
         '''
         Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
-        Release node MAYA-45759 http://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
+        Release node MAYA-45759 https://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
         '''
         if (int(cmds.about(version=True)[:4]) < 2016):
             pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
@@ -1795,7 +1838,7 @@ class DP_AutoRig_UI:
 
                                 '''
                                 Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
-                                Release node MAYA-45759 http://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
+                                Release node MAYA-45759 https://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
                                 '''
                                 if (int(cmds.about(version=True)[:4]) >= 2016):
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")

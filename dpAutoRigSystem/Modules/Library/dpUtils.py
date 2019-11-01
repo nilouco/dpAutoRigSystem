@@ -5,6 +5,10 @@ import os
 import sys
 import re
 import cProfile
+import shutil
+import urllib
+import zipfile
+import StringIO
 
 
 # UTILS functions:
@@ -446,7 +450,6 @@ def getCtrlRadius(nodeName):
     return radius
 
 
-
 def zeroOutJoints(jntList=None):
     """ Duplicate the joints, parent as zeroOut.
         Returns the father joints (zeroOuted).
@@ -506,12 +509,85 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
 def extractSuffix(nodeName):
     """ Remove suffix from a node name and return the base name.
     """
-    meshSuffixList = ["_Mesh", "_mesh", "_Geo", "_geo", "_Tgt", "_tgt"]
+    meshSuffixList = ["_Mesh", "_mesh", "_Geo", "_geo", "_Tgt", "_tgt", "_Ctrl", "_ctrl", "_Grp", "_grp"]
     for meshSuffix in meshSuffixList:
         if nodeName.endswith(meshSuffix):
             baseName = nodeName[:nodeName.rfind(meshSuffix)]
             return baseName
     return nodeName
+
+
+def filterName(name, itemList, separator):
+    """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
+        Returns the filtered list.
+    """
+    filteredList = []
+    multiFilterList = [name]
+    if separator in name:
+        multiFilterList = list(name.split(separator))
+    for filterName in multiFilterList:
+        if filterName:
+            for item in itemList:
+                if str(filterName) in item:
+                    if not item in filteredList:
+                        filteredList.append(item)
+    return filteredList
+    
+    
+def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
+    """ Check for update using raw url.
+        Compares the remote version from GitHub to the current version.
+        
+        Returns a list with CheckedNumber and RemoteVersion or None.
+        
+        CheckedNumber:
+                0 - the current version is up to date
+                1 - there's a new version
+                2 - remote file not found using given raw url
+                3 - internet connection fail (probably)
+                4 - error
+                
+        if we have an update to do:
+            return [CheckedNumber, RemoteVersion]
+        if not or ok:
+            return [CheckedNumber, None]
+    """
+    try:
+        gotRemoteFile = False
+        
+        # getting dpAutoRig.py file from GitHub website using the Raw URL:
+        remoteSource = urllib.urlopen(DPAR_RAWURL)
+        remoteContents = remoteSource.readlines()
+        
+        # find the line with the version and compare them:
+        for line in remoteContents:
+            if "DPAR_VERSION = " in line:
+                gotRemoteFile = True
+                remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
+                if remoteVersion == DPAR_VERSION:
+                    # 0 - the current version is up to date
+                    return [0, None]
+                else:
+                    # 1 - there's a new version
+                    return [1, remoteVersion]
+        if not gotRemoteFile:
+            # 2 - remote file not found using given raw url
+            return [2, None]
+    except:
+        # 3 - internet connection fail (probably)
+        return [3, None]
+    # 4 - error
+    return [4, None]
+
+
+def visiteWebSite(website, *args):
+    """ Start browser with the given website address.
+    """
+    webSiteString = "start "+website
+    os.popen(webSiteString)
+    
+    
+    
 
 
 #Profiler decorator

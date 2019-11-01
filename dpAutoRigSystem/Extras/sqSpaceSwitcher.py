@@ -544,7 +544,7 @@ class SpaceSwitcherLogic(object):
         pymel.refresh(su=False)
 
 
-# src: http://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2015/ENU/Maya-SDK/files/
+# src: https://knowledge.autodesk.com/search-result/caas/CloudHelp/cloudhelp/2015/ENU/Maya-SDK/files/
 # GUID-3F96AF53-A47E-4351-A86A-396E7BFD6665-htm.html
 def getMayaWindow():
     """

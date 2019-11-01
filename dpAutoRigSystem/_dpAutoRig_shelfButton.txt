@@ -3,7 +3,7 @@
 # dpAutoRig python script is FREE !!!
 # author: Danilo Pinheiro (nilouco)
 # contact: nilouco@gmail.com
-# http://nilouco.blogspot.com
+# https://nilouco.blogspot.com
 
 # download the last version at Github, please:
 # https://github.com/nilouco/dpAutoRigSystem

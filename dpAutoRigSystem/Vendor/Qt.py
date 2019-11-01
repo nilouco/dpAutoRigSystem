@@ -697,7 +697,7 @@ def _wrapinstance(func, ptr, base=None):
 
     This behaviour is available in sip per default.
 
-    Based on http://nathanhorne.com/pyqtpyside-wrap-instance
+    Based on https://nathanhorne.com/pyqtpyside-wrap-instance
 
     Usage:
         This mechanism kicks in under these circumstances.
@@ -994,7 +994,7 @@ def _loadUi(uifile, baseinstance=None):
     else it implements a comparable binding for PySide.
 
     Documentation:
-        http://pyqt.sourceforge.net/Docs/PyQt5/designer.html#PyQt5.uic.loadUi
+        https://pyqt.sourceforge.net/Docs/PyQt5/designer.html#PyQt5.uic.loadUi
 
     Arguments:
         uifile (str): Absolute path to Qt Designer file.
