@@ -104,6 +104,8 @@
     "i095_installUpdate"   : "Instalar a última versão",
     "i096_downloaded"      : "\nArquivo baixado:\n",
     "i097_sorry"           : "Desculpe.",
+    "i098_installing"      : "Instalando a atualização do dpAutoRigSystem...",
+    "i099_installed"       : "\nInstalado a atualização do dpAutoRigSystem:\n",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com numeros, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -286,6 +288,7 @@
     "e007_notSkinFound"            : "Erro: (007) - Não tem skinCluster na primeira geometria skinada.",
     "e008_failCheckUpdate"         : "Erro: (008) - Não foi possível verificar por atualização, desculpe.",
     "e009_failDownloadUpdate"      : "Erro: (009) - Não foi possível baixar o arquivo de update, desculpe.\n\nVerifique sua conexão com a internet\nou a permissão de salvar no diretório\n\n",
+    "e010_failInstallUpdate"       : "Erro: (010) - Não foi possível instalar a atualização, desculpe.\n\nVerifique sua conexão com a internet\nou tente fazer manualmente\nbaixando a nova versão do site GitHub\n\n",
     
     "b000_BugGeneral"                    : "Bug: (000) - Encontrado um bug, desculpe.\n\nRevise as guias ou a versão do script, por favor.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - Encontrado mirror no módulo Single\nusando indirectSkin no Maya 2018!\n\nExiste um problema:\nMaya 2018 não é capaz de calcular\ncorretamente o mirror de indirect skinning.\n\nPrecisamos usar um workaroud, desculpe:\n\nSalve sua cena e abra novamente\nantes de começar o skinning, por favor."

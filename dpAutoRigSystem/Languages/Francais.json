@@ -104,6 +104,8 @@
     "i095_installUpdate"   : "Omstaççer la dernière version",
     "i096_downloaded"      : "\nFichier téléchargé:\n",
     "i097_sorry"           : "Désolé.",
+    "i098_installing"      : "En instalent le mis à jour de dpAutoRigSystem...",
+    "i099_installed"       : "\nInstallé le mis à jour pour le dpAutoRigSystem:\n",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -286,6 +288,7 @@
     "e007_notSkinFound"            : "Erreur: (007) - Il n'y a pas de skinCluster dans la premiere geometrie selectionnée.",
     "e008_failCheckUpdate"         : "Erreur: (008) - Ce n'est pas possible verifier des mis à jour, désolé.",
     "e009_failDownloadUpdate"      : "Erreur: (009) - Ce n'est pas possible télécharger le\nfichier de mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou la permission pour salvegarder dans le dossier\n\n",
+    "e010_failInstallUpdate"       : "Erreur: (010) - Ce n'est pas possible installer\nle mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou essayer de le faire à la main\npar le téléchargement de la nouvelle version\ndu site web GitHub\n\n",
     
     "b000_BugGeneral"                    : "Bug: (000) - Un bug est trouvé, desolé.\n\nReviser les guides ou la version du script, s'il vous plaît.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - On a trouvé le mirroir du module Single\nen utilisant l'indirectSkin dans Maya 2018!\n\nIl y a un problème:\nMaya 2018 n'est pas capable de calculer\ncorrectement le mirroir de l'indirect skinning.\n\nOn a besoin d'utiliser un workaroud, desolé:\n\nSauvegarder votre scene et l'ouvre encore\navant de commencer le skinning, s'il vous plaît."

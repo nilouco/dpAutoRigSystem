@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.04"
+DPAR_VERSION = "3.06.05"
 
 # print loading script:
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
@@ -65,6 +65,9 @@ try:
     import time
     import getpass
     import urllib
+    import shutil
+    import zipfile
+    import StringIO
     from functools import partial
     import Modules.Library.dpUtils as utils
     import Modules.Library.dpControls as ctrls
@@ -1038,10 +1041,10 @@ class DP_AutoRig_UI:
             cmds.text("\n", parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visiteWebSite, DPAR_GITHUB), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
-#            installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", parent=updateLayout)
+            installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
         cmds.separator(height=30)
-#        autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.langDic[self.langName]['i092_autoCheckUpdate'], align="left", parent=updateLayout)
+#        autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.langDic[self.langName]['i092_autoCheckUpdate'], align="left", changeCommand=self.autoCheckUpdate, parent=updateLayout)
         # call Update Window:
         cmds.showWindow(dpUpdateWin)
         print self.langDic[self.langName][self.update_text]
@@ -1057,9 +1060,105 @@ class DP_AutoRig_UI:
             try:
                 urllib.urlretrieve(url, downloadFolder[0])
                 self.info('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+                # closes dpUpdateWindow:
+                if cmds.window('dpUpdateWindow', query=True, exists=True):
+                    cmds.deleteUI('dpUpdateWindow', window=True)
             except:
                 self.info('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
+    
+    
+    def installUpdate(self, url, newVersion, *args):
+        """ Install the last version from the given url address to download file
+        """
+        print self.langDic[self.langName]['i098_installing']
+        # declaring variables:
+        dpAR_Folder = "dpAutoRigSystem"
+        dpAR_DestFolder = utils.findPath("dpAutoRig.py")
+        
+        # progress window:
+        installAmount = 0
+        cmds.progressWindow(title=self.langDic[self.langName]['i098_installing'], progress=installAmount, status='Installing: 0%', isInterruptable=False)
+        maxInstall = 100
+        
+        try:
+            # get remote file from url:
+            remoteSource = urllib.urlopen(url)
+            
+            installAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+            
+            # read the downloaded Zip file stored in the RAM memory:
+            dpAR_Zip = zipfile.ZipFile(StringIO.StringIO(remoteSource.read()))
+            
+            installAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+            
+            # list Zip file contents in order to extract them in a temporarlly folder:
+            zipNameList = dpAR_Zip.namelist()
+            for fileName in zipNameList:
+                if dpAR_Folder in fileName:
+                    dpAR_Zip.extract(fileName, dpAR_DestFolder)
+            dpAR_Zip.close()
+            
+            installAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+            
+            # declare temporary folder:
+            dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
+            
+            # pass in all files to copy them (doing the simple installation):
+            for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
+                # declare destination directory:
+                destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
+                
+                installAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                
+                # make sure we have all folders needed, otherwise, create them in the destination directory:
+                if not os.path.exists(destDir):
+                    os.makedirs(destDir)
+                
+                for dpAR_File in fileList:
+                    sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
+                    destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
+                    # if the file exists (we expect that yes) then delete it:
+                    if os.path.exists(destFile):
+                        try:
+                            os.remove(destFile)
+                        except PermissionError as exc:
+                            # use a brute force to delete without permission:
+                            os.chmod(destFile, stat.S_IWUSR)
+                            os.remove(destFile)
+                    # copy the dpAR_File:
+                    shutil.copy(sourceFile, destDir)
+                    
+                    installAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+            
+            # delete the temporary folder used to download and install the update:
+            folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
+            shutil.rmtree(folderToDelete)
+            
+            # report finished update installation:
+            self.info('i095_installUpdate', 'i099_installed', newVersion+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+            # closes dpUpdateWindow:
+            if cmds.window('dpUpdateWindow', query=True, exists=True):
+                cmds.deleteUI('dpUpdateWindow', window=True)
+            # reload UI in order to refresh dpAutoRigSystem:
+            self.jobReloadUI(self)
+        except:
+            # report fail update installation:
+            self.info('i095_installUpdate', 'e010_failInstallUpdate', newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
+        cmds.progressWindow(endProgress=True)        
+        
+    
+    
+    def autoCheckUpdate(self, *args):
+        """ Store user choose about automatically check for update in an optionVar.
+            If active, try to check for update once a day.
+        """
+        print "wip :)"
     
     
     ###################### End: UI
