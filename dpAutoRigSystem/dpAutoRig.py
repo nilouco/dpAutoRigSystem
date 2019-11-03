@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.05"
+DPAR_VERSION = "3.06.06"
 
 # print loading script:
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
@@ -68,6 +68,7 @@ try:
     import shutil
     import zipfile
     import StringIO
+    import datetime
     from functools import partial
     import Modules.Library.dpUtils as utils
     import Modules.Library.dpControls as ctrls
@@ -176,7 +177,7 @@ class DP_AutoRig_UI:
             cmds.menuItem( 'about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250) )
-            cmds.menuItem( 'update_MI', label='Update', command=self.checkForUpdate)
+            cmds.menuItem( 'update_MI', label='Update', command=partial(self.checkForUpdate, True))
             cmds.menuItem( 'help_MI', label='Help...', command=partial(utils.visiteWebSite, DPAR_SITE) )
             
             # create the main layout:
@@ -185,6 +186,9 @@ class DP_AutoRig_UI:
             
             # call mainUI in order to populate the main layout:
             self.mainUI()
+            
+            # check if we need to automatically check for update:
+            self.autoCheckUpdate()
         
         except Exception as e:
             print "Error: dpAutoRig UI window !!!\n"
@@ -713,7 +717,7 @@ class DP_AutoRig_UI:
             pass
     
     
-    def checkForUpdate(self, *args):
+    def checkForUpdate(self, verbose=True, *args):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
@@ -724,15 +728,19 @@ class DP_AutoRig_UI:
         
         # call Update Window about rawRsult:
         if rawResult[0] == 0:
-            self.updateWin(rawResult, 'i085_updated')
+            if verbose:
+                self.updateWin(rawResult, 'i085_updated')
         elif rawResult[0] == 1:
             self.updateWin(rawResult, 'i086_newVersion')
         elif rawResult[0] == 2:
-            self.updateWin(rawResult, 'i087_rawURLFail')
+            if verbose:
+                self.updateWin(rawResult, 'i087_rawURLFail')
         elif rawResult[0] == 3:
-            self.updateWin(rawResult, 'i088_internetFail')
+            if verbose:
+                self.updateWin(rawResult, 'i088_internetFail')
         elif rawResult[0] == 4:
-            self.updateWin(rawResult, 'e008_failCheckUpdate')
+            if verbose:
+                self.updateWin(rawResult, 'e008_failCheckUpdate')
     
     
     # Start working with Guide Modules:
@@ -1044,7 +1052,7 @@ class DP_AutoRig_UI:
             installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
         cmds.separator(height=30)
-#        autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.langDic[self.langName]['i092_autoCheckUpdate'], align="left", changeCommand=self.autoCheckUpdate, parent=updateLayout)
+        self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.langDic[self.langName]['i092_autoCheckUpdate'], align="left", value=self.userDefAutoCheckUpdate, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
         # call Update Window:
         cmds.showWindow(dpUpdateWin)
         print self.langDic[self.langName][self.update_text]
@@ -1151,14 +1159,45 @@ class DP_AutoRig_UI:
             # report fail update installation:
             self.info('i095_installUpdate', 'e010_failInstallUpdate', newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
         cmds.progressWindow(endProgress=True)        
-        
+    
+    
+    def setAutoCheckUpdatePref(self, currentValue, *args):
+        """ Set the optionVar for auto check update preference as stored userDefAutoCheckUpdate read variable.
+        """
+        cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', int(currentValue)))
     
     
     def autoCheckUpdate(self, *args):
         """ Store user choose about automatically check for update in an optionVar.
             If active, try to check for update once a day.
         """
-        print "wip :)"
+        firstTimeOpenDPAR = False
+        # verify if there is an optionVar of last autoCheckUpdate checkBox choose value by user in the maya system:
+        autoCheckUpdateExists = cmds.optionVar(exists='dpAutoRigAutoCheckUpdate')
+        if not autoCheckUpdateExists:
+            cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', 1))
+            firstTimeOpenDPAR = True
+        
+        # get its value puting in a variable userDefAutoCheckUpdate:
+        self.userDefAutoCheckUpdate = cmds.optionVar(query='dpAutoRigAutoCheckUpdate')
+        if self.userDefAutoCheckUpdate == 1:
+            # verify if there is an optionVar for store the date of the lastest autoCheckUpdate ran in order to avoid many hits in the GitHub server:
+            todayDate = str(datetime.datetime.now().date())
+            lastAutoCheckUpdateExists = cmds.optionVar(exists='dpAutoRigLastDateAutoCheckUpdate')
+            if not lastAutoCheckUpdateExists:
+                cmds.optionVar(stringValue=('dpAutoRigLastDateAutoCheckUpdate', todayDate))
+            # get its value puting in a variable userDefAutoCheckUpdate:
+            lastDateAutoCheckUpdate = cmds.optionVar(query='dpAutoRigLastDateAutoCheckUpdate')
+            if not lastDateAutoCheckUpdate == todayDate:
+                # then check for update:
+                self.checkForUpdate(verbose=False)
+                cmds.optionVar(stringValue=('dpAutoRigLastDateAutoCheckUpdate', todayDate))
+        
+        # force checkForUpdate if it's the first time openning the dpAutoRigSystem in this computer:
+        if firstTimeOpenDPAR:
+            self.checkForUpdate(verbose=True)
+        
+        
     
     
     ###################### End: UI
