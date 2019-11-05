@@ -191,9 +191,10 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
-                cmds.addAttr(self.ctrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                cmds.setAttr(self.ctrl+".scaleCompensate", 1)
-                cmds.connectAttr(self.ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                if not self.getHasIndirectSkin():
+                    cmds.addAttr(self.ctrl, longName='scaleCompensate', attributeType="bool", keyable=True)
+                    cmds.setAttr(self.ctrl+".scaleCompensate", 1)
+                    cmds.connectAttr(self.ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
                     # create a fatherJoint in order to zeroOut the skinning joint:
                     cmds.select(clear=True)
@@ -213,7 +214,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     if self.getHasHolder():
                         cmds.delete(self.ctrl+"Shape", shape=True)
                         self.ctrl = cmds.rename(self.ctrl, self.ctrl+"_"+self.langDic[self.langName]['c_holder']+"_Grp")
-                        ctrls.setLockHide([self.ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'scaleCompensate'])
+                        ctrls.setLockHide([self.ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c_holder']+"_Jis"))
                         ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
                     else:

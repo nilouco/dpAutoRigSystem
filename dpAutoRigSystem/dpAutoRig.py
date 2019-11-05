@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.06"
+DPAR_VERSION = "3.06.07"
 
 # print loading script:
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
@@ -2026,10 +2026,11 @@ class DP_AutoRig_UI:
                                     # father's mainJis drives child's staticGrp:
                                     cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True)
                                     cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True)
+                            # Fixed for v3.06.07
                             # check Single mirror indirectSkin bug in Maya2018:
-                            if not self.detectedBug:
-                                self.detectedBug = self.integratedTaskDic[moduleDic]["detectedBug"]
-                                self.bugMessage = self.langDic[self.langName]['b001_BugSingleIndirectSkinMaya2018']
+                            #if not self.detectedBug:
+                            #    self.detectedBug = self.integratedTaskDic[moduleDic]["detectedBug"]
+                            #    self.bugMessage = self.langDic[self.langName]['b001_BugSingleIndirectSkinMaya2018']
                 
                 
                 # atualise the number of rigged guides by type
