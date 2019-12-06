@@ -2,7 +2,7 @@
 import maya.cmds as cmds
 import maya.mel as mel
 
-from Library import dpControls as ctrls
+from Library import dpControls
 from Library import dpUtils as utils
 
 
@@ -12,7 +12,7 @@ class RigType:
     default = "unknown" #Support old guide system
 
 class StartClass:
-    def __init__(self, dpUIinst, langDic, langName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -25,6 +25,9 @@ class StartClass:
         self.icon = ICON
         self.userGuideName = userGuideName
         self.rigType = rigType
+        self.presetDic = presetDic
+        self.presetName = presetName
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         # defining namespace:
         self.guideNamespace = self.guideModuleName + "__" + self.userGuideName
         # defining guideNamespace:
@@ -60,7 +63,7 @@ class StartClass:
         # GUIDE:
         utils.useDefaultRenderLayer()
         # create guide base (moduleGrp):
-        guideBaseList = ctrls.cvBaseGuide(self.moduleGrp, r=2)
+        guideBaseList = self.ctrls.cvBaseGuide(self.moduleGrp, r=2)
         self.moduleGrp = guideBaseList[0]
         self.radiusCtrl = guideBaseList[1]
         # add attributes to be read when rigging module:
@@ -73,7 +76,7 @@ class StartClass:
         for baseIntegerAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntegerAttr, attributeType='long')
         
-        baseStringAttrList  = ['moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType']
+        baseStringAttrList  = ['moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
@@ -82,11 +85,17 @@ class StartClass:
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.dpUIinst.guide, type='string')
         cmds.setAttr(self.moduleGrp+".rigType", self.rigType, type='string')
+        cmds.setAttr(self.moduleGrp+".dpARVersion", self.dpUIinst.dpARVersion, type='string')
         
         baseFloatAttrList = ['shapeSize']
         for baseFloatAttr in baseFloatAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseFloatAttr, attributeType='float')
         cmds.setAttr(self.moduleGrp+".shapeSize", 1)
+        
+        baseIntegerAttrList = ['degree']
+        for baseIntAttr in baseIntegerAttrList:
+            cmds.addAttr(self.moduleGrp, longName=baseIntAttr, attributeType='short')
+        cmds.setAttr(self.moduleGrp+".degree", 1)
 
         # create annotation to this module:
         self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
@@ -260,6 +269,9 @@ class StartClass:
                 self.ctrlRadius = utils.getCtrlRadius(self.radiusCtrl)
             else:
                 self.ctrlRadius = 1
+                
+            # get curve degree:
+            self.curveDegree = cmds.getAttr(self.moduleGrp+".degree")
             
             # unparent all guide modules child:
             childrenList = cmds.listRelatives(self.moduleGrp, allDescendents=True, type='transform')

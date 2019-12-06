@@ -9,37 +9,38 @@ DESCRIPTION = "m082_tweaksDesc"
 ICON = "/Icons/dp_tweaks.png"
 
 
-def Tweaks(dpAutoRigInst):
+def Tweaks(dpUIinst):
     """ This function will create all guides needed to compose a good facial tweaks controls with integrated Single modules using indirect skinning.
     """
     # check modules integrity:
     guideDir = 'Modules'
     checkModuleList = ['dpSingle']
-    checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = dpUIinst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
         # Starting progress window
         progressAmount = 0
-        cmds.progressWindow(title='Tweaks Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        cmds.progressWindow(title='Tweaks Guides', progress=progressAmount, status=dpUIinst.langDic[dpUIinst.langName]['m094_doing']+': 0%', isInterruptable=False)
         maxProcess = 6 # number of modules to create
 
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m081_tweaks']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpUIinst.langDic[dpUIinst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpUIinst.langDic[dpUIinst.langName]['m081_tweaks']))
         
-        # defining naming
+        # defining naming:
+        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
         # part names:
-        tweaksName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['m081_tweaks']
-        middleName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_middle']
-        eyebrowName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eyebrow']
-        eyelidName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eyelid']
-        cornerName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_corner']
-        upperName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_upper']
-        lowerName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_lower']
-        lipName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_lip']
-        holderName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_holder']
-        squintName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_squint']
-        cheekName = dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_cheek']
+        tweaksName = dpUIinst.langDic[dpUIinst.langName]['m081_tweaks']
+        middleName = dpUIinst.langDic[dpUIinst.langName]['c_middle']
+        eyebrowName = dpUIinst.langDic[dpUIinst.langName]['c_eyebrow']
+        eyelidName = dpUIinst.langDic[dpUIinst.langName]['c_eyelid']
+        cornerName = dpUIinst.langDic[dpUIinst.langName]['c_corner']
+        upperName = dpUIinst.langDic[dpUIinst.langName]['c_upper']
+        lowerName = dpUIinst.langDic[dpUIinst.langName]['c_lower']
+        lipName = dpUIinst.langDic[dpUIinst.langName]['c_lip']
+        holderName = dpUIinst.langDic[dpUIinst.langName]['c_holder']
+        squintName = dpUIinst.langDic[dpUIinst.langName]['c_squint']
+        cheekName = dpUIinst.langDic[dpUIinst.langName]['c_cheek']
         
         holderMainName = tweaksName+"_"+holderName
         # eybrows names:
@@ -77,128 +78,128 @@ def Tweaks(dpAutoRigInst):
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eyebrow']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+eyebrowMainName))
         
         # creating Single instances:
-        holderMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(holderMainInstance, checkText=holderMainName)
+        holderMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        holderMainInstance.editUserName(holderMainName)
         
-        eyebrowMiddleInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyebrowMiddleInstance, checkText=eyebrowMiddleName)
+        eyebrowMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        eyebrowMiddleInstance.editUserName(eyebrowMiddleName)
         
-        eyebrowMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyebrowMainInstance, checkText=eyebrowMainName)
-        dpAutoRigInst.guide.Single.changeMirror(eyebrowMainInstance, "X")
+        eyebrowMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        eyebrowMainInstance.editUserName(eyebrowMainName)
+        eyebrowMainInstance.changeMirror("X")
         
-        eyebrowInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyebrowInstance1, checkText=eyebrowName1)
-        dpAutoRigInst.guide.Single.changeMirror(eyebrowInstance1, "X")
+        eyebrowInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        eyebrowInstance1.editUserName(eyebrowName1)
+        eyebrowInstance1.changeMirror("X")
         
-        eyebrowInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyebrowInstance2, checkText=eyebrowName2)
-        dpAutoRigInst.guide.Single.changeMirror(eyebrowInstance2, "X")
+        eyebrowInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+        eyebrowInstance2.editUserName(eyebrowName2)
+        eyebrowInstance2.changeMirror("X")
         
-        eyebrowInstance3 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyebrowInstance3, checkText=eyebrowName3)
-        dpAutoRigInst.guide.Single.changeMirror(eyebrowInstance3, "X")
-        
-        # Update progress window
-        progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_eyelid']))
-
-        eyelidMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyelidMainInstance, checkText=eyelidMainName)
-        dpAutoRigInst.guide.Single.changeMirror(eyelidMainInstance, "X")
-        
-        upperEyelidInstance0 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(upperEyelidInstance0, checkText=upperEyelidName0)
-        dpAutoRigInst.guide.Single.changeMirror(upperEyelidInstance0, "X")
-        
-        upperEyelidInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(upperEyelidInstance1, checkText=upperEyelidName1)
-        dpAutoRigInst.guide.Single.changeMirror(upperEyelidInstance1, "X")
-        
-        upperEyelidInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(upperEyelidInstance2, checkText=upperEyelidName2)
-        dpAutoRigInst.guide.Single.changeMirror(upperEyelidInstance2, "X")
-        
-        lowerEyelidInstance0 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lowerEyelidInstance0, checkText=lowerEyelidName0)
-        dpAutoRigInst.guide.Single.changeMirror(lowerEyelidInstance0, "X")
-        
-        lowerEyelidInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lowerEyelidInstance1, checkText=lowerEyelidName1)
-        dpAutoRigInst.guide.Single.changeMirror(lowerEyelidInstance1, "X")
-        
-        lowerEyelidInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lowerEyelidInstance2, checkText=lowerEyelidName2)
-        dpAutoRigInst.guide.Single.changeMirror(lowerEyelidInstance2, "X")
-        
-        eyelidCornerInstance0 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyelidCornerInstance0, checkText=eyelidCornerName0)
-        dpAutoRigInst.guide.Single.changeMirror(eyelidCornerInstance0, "X")
-        
-        eyelidCornerInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(eyelidCornerInstance1, checkText=eyelidCornerName1)
-        dpAutoRigInst.guide.Single.changeMirror(eyelidCornerInstance1, "X")
+        eyebrowInstance3 = dpUIinst.initGuide('dpSingle', guideDir)
+        eyebrowInstance3.editUserName(eyebrowName3)
+        eyebrowInstance3.changeMirror("X")
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_squint']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+eyelidMainName))
+
+        eyelidMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        eyelidMainInstance.editUserName(eyelidMainName)
+        eyelidMainInstance.changeMirror("X")
         
-        squintMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(squintMainInstance, checkText=squintMainName)
-        dpAutoRigInst.guide.Single.changeMirror(squintMainInstance, "X")
+        upperEyelidInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+        upperEyelidInstance0.editUserName(upperEyelidName0)
+        upperEyelidInstance0.changeMirror("X")
         
-        squintInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(squintInstance1, checkText=squintName1)
-        dpAutoRigInst.guide.Single.changeMirror(squintInstance1, "X")
+        upperEyelidInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        upperEyelidInstance1.editUserName(upperEyelidName1)
+        upperEyelidInstance1.changeMirror("X")
         
-        squintInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(squintInstance2, checkText=squintName2)
-        dpAutoRigInst.guide.Single.changeMirror(squintInstance2, "X")
+        upperEyelidInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+        upperEyelidInstance2.editUserName(upperEyelidName2)
+        upperEyelidInstance2.changeMirror("X")
         
-        squintInstance3 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(squintInstance3, checkText=squintName3)
-        dpAutoRigInst.guide.Single.changeMirror(squintInstance3, "X")
+        lowerEyelidInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+        lowerEyelidInstance0.editUserName(lowerEyelidName0)
+        lowerEyelidInstance0.changeMirror("X")
+        
+        lowerEyelidInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        lowerEyelidInstance1.editUserName(lowerEyelidName1)
+        lowerEyelidInstance1.changeMirror("X")
+        
+        lowerEyelidInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+        lowerEyelidInstance2.editUserName(lowerEyelidName2)
+        lowerEyelidInstance2.changeMirror("X")
+        
+        eyelidCornerInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
+        eyelidCornerInstance0.editUserName(eyelidCornerName0)
+        eyelidCornerInstance0.changeMirror("X")
+        
+        eyelidCornerInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        eyelidCornerInstance1.editUserName(eyelidCornerName1)
+        eyelidCornerInstance1.changeMirror("X")
+        
+        # Update progress window
+        progressAmount += 1
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+squintMainName))
+        
+        squintMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        squintMainInstance.editUserName(squintMainName)
+        squintMainInstance.changeMirror("X")
+        
+        squintInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        squintInstance1.editUserName(checkText=squintName1)
+        squintInstance1.changeMirror("X")
+        
+        squintInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+        squintInstance2.editUserName(squintName2)
+        squintInstance2.changeMirror("X")
+        
+        squintInstance3 = dpUIinst.initGuide('dpSingle', guideDir)
+        squintInstance3.editUserName(squintName3)
+        squintInstance3.changeMirror("X")
 
 
-        cheekInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(cheekInstance1, checkText=cheekName1)
-        dpAutoRigInst.guide.Single.changeMirror(cheekInstance1, "X")
+        cheekInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        cheekInstance1.editUserName(cheekName1)
+        cheekInstance1.changeMirror("X")
 
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['c_lip']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+lipMainName))
 
-        lipMainInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lipMainInstance, checkText=lipMainName)
+        lipMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        lipMainInstance.editUserName(lipMainName)
         
-        upperLipMiddleInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(upperLipMiddleInstance, checkText=upperLipMiddleName)
+        upperLipMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        upperLipMiddleInstance.editUserName(upperLipMiddleName)
         
-        upperLipInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(upperLipInstance1, checkText=upperLipName1)
-        dpAutoRigInst.guide.Single.changeMirror(upperLipInstance1, "X")
+        upperLipInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        upperLipInstance1.editUserName(checkText=upperLipName1)
+        upperLipInstance1.changeMirror("X")
         
-        upperLipInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(upperLipInstance2, checkText=upperLipName2)
-        dpAutoRigInst.guide.Single.changeMirror(upperLipInstance2, "X")
+        upperLipInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+        upperLipInstance2.editUserName(upperLipName2)
+        upperLipInstance2.changeMirror("X")
         
-        lowerLipMiddleInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lowerLipMiddleInstance, checkText=lowerLipMiddleName)
+        lowerLipMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        lowerLipMiddleInstance.editUserName(lowerLipMiddleName)
         
-        lowerLipInstance1 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lowerLipInstance1, checkText=lowerLipName1)
-        dpAutoRigInst.guide.Single.changeMirror(lowerLipInstance1, "X")
+        lowerLipInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
+        lowerLipInstance1.editUserName(lowerLipName1)
+        lowerLipInstance1.changeMirror("X")
         
-        lowerLipInstance2 = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lowerLipInstance2, checkText=lowerLipName2)
-        dpAutoRigInst.guide.Single.changeMirror(lowerLipInstance2, "X")
+        lowerLipInstance2 = dpUIinst.initGuide('dpSingle', guideDir)
+        lowerLipInstance2.editUserName(lowerLipName2)
+        lowerLipInstance2.changeMirror("X")
         
-        lipCornerInstance = dpAutoRigInst.initGuide('dpSingle', guideDir)
-        dpAutoRigInst.guide.Single.editUserName(lipCornerInstance, checkText=lipCornerName)
-        dpAutoRigInst.guide.Single.changeMirror(lipCornerInstance, "X")
+        lipCornerInstance = dpUIinst.initGuide('dpSingle', guideDir)
+        lipCornerInstance.editUserName(lipCornerName)
+        lipCornerInstance.changeMirror("X")
         
         
         # woking with Single indirect skinning setup:
@@ -228,11 +229,11 @@ def Tweaks(dpAutoRigInst):
             cmds.setAttr(mainInst.radiusCtrl+".translateX", 0.3)
         
         cmds.setAttr(holderMainInstance.radiusCtrl+".translateX", 2)
-        cmds.setAttr(holderMainInstance.moduleGrp+"."+holderName, 0.7)
+        cmds.setAttr(holderMainInstance.moduleGrp+".holder", 0.7)
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' hierarchy'))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' hierarchy'))
         
         # working on hierarchy
         cmds.parent([eyebrowMiddleInstance.moduleGrp, eyebrowMainInstance.moduleGrp, eyelidMainInstance.moduleGrp, squintMainInstance.moduleGrp, cheekInstance1.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)
@@ -349,7 +350,7 @@ def Tweaks(dpAutoRigInst):
         cmds.progressWindow(endProgress=True)
 
         cmds.select(holderMainInstance.moduleGrp)
-        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m093_createdTweaks']
+        print dpUIinst.langDic[dpUIinst.langName]['m093_createdTweaks']
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

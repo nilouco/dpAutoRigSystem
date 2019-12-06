@@ -2,7 +2,6 @@
 import maya.cmds as cmds
 import maya.OpenMaya as om
 
-from Library import dpControls as ctrls
 from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
@@ -41,20 +40,20 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
-        self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3)
+        self.cvJointLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
         
-        self.cvEndJoint, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.cvEndJoint, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
@@ -88,7 +87,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             if self.enteredNJoints > self.currentNJoints:
                 for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                     # create another N cvJointLoc:
-                    self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc( ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3 )
+                    self.cvJointLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
                     self.connectShapeSize(shapeSizeCH)
                     # set its nJoint value as n:
                     cmds.setAttr(self.cvJointLoc+".nJoint", n)
@@ -202,27 +201,28 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     # joint labelling:
                     utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+str(n))
                     # create a control:
-                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
+#                    self.mainCtrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
+                    self.mainCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_"+str(n)+"_Ctrl", r=self.ctrlRadius, d=1)
                     if n == 1:
-                        utils.originedFrom(objName=self.ctrl, attrString=self.base+";"+self.guide)
+                        utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide)
                     else:
-                        utils.originedFrom(objName=self.ctrl, attrString=self.guide)
+                        utils.originedFrom(objName=self.mainCtrl, attrString=self.guide)
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.guide, self.ctrl, maintainOffset=False))
+                    cmds.delete(cmds.parentConstraint(self.guide, self.mainCtrl, maintainOffset=False))
                     # zeroOut controls:
-                    zeroOutCtrlGrp = utils.zeroOut([self.ctrl])[0]
+                    zeroOutCtrlGrp = utils.zeroOut([self.mainCtrl])[0]
                     # hide visibility attribute:
-                    cmds.setAttr(self.ctrl+'.visibility', keyable=False)
+                    cmds.setAttr(self.mainCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
                     if s == 1:
                         if cmds.getAttr(self.moduleGrp+".flip") == 1:
                             cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
                             cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
-                    cmds.addAttr(self.ctrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                    cmds.setAttr(self.ctrl+".scaleCompensate", 1)
-                    cmds.connectAttr(self.ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                    cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="bool", keyable=True)
+                    cmds.setAttr(self.mainCtrl+".scaleCompensate", 1)
+                    cmds.connectAttr(self.mainCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == self.nJoints:
                         # create end joint:
                         cmds.select(self.jnt)
@@ -232,19 +232,19 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 # grouping:
                 for n in range(1, self.nJoints+1):
                     self.jnt      = side+self.userGuideName+"_"+str(n)+"_Jnt"
-                    self.ctrl     = side+self.userGuideName+"_"+str(n)+"_Ctrl"
+                    self.mainCtrl     = side+self.userGuideName+"_"+str(n)+"_Ctrl"
                     self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl_Zero"
                     if n > 1:
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side+self.userGuideName+"_"+str(n-1)+"_Jnt"
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
-                        # parent zeroCtrl Group to the before ctrl:
+                        # parent zeroCtrl Group to the before mainCtrl:
                         self.fatherCtrl = side+self.userGuideName+"_"+str(n-1)+"_Ctrl"
                         cmds.parent(self.zeroCtrl, self.fatherCtrl, absolute=True)
-                    # create parentConstraint from ctrl to jnt:
-                    cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
-                    # create scaleConstraint from ctrl to jnt:
-                    cmds.scaleConstraint(self.ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                    # create parentConstraint from mainCtrl to jnt:
+                    cmds.parentConstraint(self.mainCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
+                    # create scaleConstraint from mainCtrl to jnt:
+                    cmds.scaleConstraint(self.mainCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_Jnt", name=side+self.userGuideName+"_Joint_Grp")
@@ -253,7 +253,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
-                ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+                self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')

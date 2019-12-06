@@ -2,7 +2,6 @@
 import maya.cmds as cmds
 import maya.OpenMaya as om
 
-from Library import dpControls as ctrls
 from Library import dpUtils as utils
 import dpBaseClass as Base
 import dpLayoutClass as Layout
@@ -40,7 +39,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
     
     
     def getHasHolder(self):
-        return cmds.getAttr(self.moduleGrp + "." + self.langDic[self.langName]['c_holder'])
+        return cmds.getAttr(self.moduleGrp + ".holder")
         
         
     def createGuide(self, *args):
@@ -51,25 +50,25 @@ class Single(Base.StartClass, Layout.LayoutClass):
         
         cmds.addAttr(self.moduleGrp, longName="indirectSkin", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".indirectSkin", 0)
-        cmds.addAttr(self.moduleGrp, longName=self.langDic[self.langName]['c_holder'], attributeType='bool')
-        cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], 0)
+        cmds.addAttr(self.moduleGrp, longName='holder', attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".holder", 0)
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
-        self.cvJointLoc, shapeSizeCH = ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3)
+        self.cvJointLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
         
-        self.cvEndJoint, shapeSizeCH = ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1)
+        self.cvEndJoint, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
@@ -94,7 +93,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
     def changeHolder(self, *args):
         """ Set the attribute value for holder.
         """
-        cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], cmds.checkBox(self.holderCB, query=True, value=True))
+        cmds.setAttr(self.moduleGrp+".holder", cmds.checkBox(self.holderCB, query=True, value=True))
     
     
     def rigModule(self, *args):
@@ -160,31 +159,31 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if self.getHasIndirectSkin():
-                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=3, normal=(0, 0, 1), r=self.ctrlRadius, s=8, ch=False)[0]
+                    self.singleCtrl = self.ctrls.cvControl("id_029_SingleIndSkin", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 else:
-                    self.ctrl = cmds.circle(name=side+self.userGuideName+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=8, ch=False)[0]
+                    self.singleCtrl = self.ctrls.cvControl("id_028_Single", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 # edit circle shape to Upper or Lower controls:
                 if "Upper" in self.userGuideName:
-                    cmds.setAttr(self.ctrl+"Shape.controlPoints[4].yValue", 0)
-                    cmds.setAttr(self.ctrl+"Shape.controlPoints[5].yValue", 0)
-                    cmds.setAttr(self.ctrl+"Shape.controlPoints[6].yValue", 0)
+                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[4].yValue", 0)
+                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[5].yValue", 0)
+                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[6].yValue", 0)
                     if not self.getHasIndirectSkin():
-                        cmds.setAttr(self.ctrl+"Shape.controlPoints[3].yValue", 0)
+                        cmds.setAttr(self.singleCtrl+"Shape.controlPoints[3].yValue", 0)
                 elif "Lower" in self.userGuideName:
-                    cmds.setAttr(self.ctrl+"Shape.controlPoints[0].yValue", 0)
-                    cmds.setAttr(self.ctrl+"Shape.controlPoints[1].yValue", 0)
-                    cmds.setAttr(self.ctrl+"Shape.controlPoints[2].yValue", 0)
+                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[0].yValue", 0)
+                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[1].yValue", 0)
+                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[2].yValue", 0)
                     if not self.getHasIndirectSkin():
-                        cmds.setAttr(self.ctrl+"Shape.controlPoints[7].yValue", 0)
-                        cmds.setAttr(self.ctrl+"Shape.controlPoints[8].yValue", 0)
-                utils.originedFrom(objName=self.ctrl, attrString=self.base+";"+self.guide)
+                        cmds.setAttr(self.singleCtrl+"Shape.controlPoints[7].yValue", 0)
+                        cmds.setAttr(self.singleCtrl+"Shape.controlPoints[8].yValue", 0)
+                utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                cmds.delete(cmds.parentConstraint(self.guide, self.ctrl, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
                 # zeroOut controls:
-                zeroOutCtrlGrp = utils.zeroOut([self.ctrl])[0]
+                zeroOutCtrlGrp = utils.zeroOut([self.singleCtrl])[0]
                 # hide visibility attribute:
-                cmds.setAttr(self.ctrl+'.visibility', keyable=False)
+                cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
@@ -192,9 +191,9 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
                 if not self.getHasIndirectSkin():
-                    cmds.addAttr(self.ctrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                    cmds.setAttr(self.ctrl+".scaleCompensate", 1)
-                    cmds.connectAttr(self.ctrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="bool", keyable=True)
+                    cmds.setAttr(self.singleCtrl+".scaleCompensate", 1)
+                    cmds.connectAttr(self.singleCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
                     # create a fatherJoint in order to zeroOut the skinning joint:
                     cmds.select(clear=True)
@@ -205,25 +204,25 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
                     for attr in attrList:
-                        cmds.connectAttr(self.ctrl+'.'+attr, self.jnt+'.'+attr)
+                        cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr)
                     if s == 1:
                         if cmds.getAttr(self.moduleGrp+".flip") == 1:
                             cmds.setAttr(self.jxt+".scaleX", -1)
                             cmds.setAttr(self.jxt+".scaleY", -1)
                             cmds.setAttr(self.jxt+".scaleZ", -1)
                     if self.getHasHolder():
-                        cmds.delete(self.ctrl+"Shape", shape=True)
-                        self.ctrl = cmds.rename(self.ctrl, self.ctrl+"_"+self.langDic[self.langName]['c_holder']+"_Grp")
-                        ctrls.setLockHide([self.ctrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                        cmds.delete(self.singleCtrl+"Shape", shape=True)
+                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.langDic[self.langName]['c_holder']+"_Grp")
+                        self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c_holder']+"_Jis"))
-                        ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
+                        self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
                     else:
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
-                    cmds.parentConstraint(self.ctrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
+                    cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
                     # create scaleConstraint from ctrl to jnt:
-                    cmds.scaleConstraint(self.ctrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                    cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
                 # create end joint:
                 cmds.select(self.jnt)
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
@@ -245,7 +244,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
-                ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+                self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')

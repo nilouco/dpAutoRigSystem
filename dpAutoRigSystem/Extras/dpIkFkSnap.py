@@ -10,7 +10,7 @@ ICON = "/Icons/dp_ikFkSnap.png"
 DPIKFK_VERSION = "1.2"
 
 class IkFkSnap():
-    def __init__(self, dpUIinst, langDic, langName):
+    def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.langDic = langDic

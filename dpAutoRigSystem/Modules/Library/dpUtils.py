@@ -89,7 +89,7 @@ def findAllModules(path, dir):
     # removing "__init__":
     for file in allPyFilesList:
         #Ensure base class are skipped
-        if file != "dpBaseClass" and file != "dpLayoutClass":
+        if file != "dpBaseClass" and file != "dpLayoutClass" and file != "dpBaseControlClass":
             moduleList.append(file)
     return moduleList
 
@@ -214,9 +214,12 @@ def useDefaultRenderLayer():
 
 def zeroOut(transformList=[]):
     """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
+        If don't have a transformList given, try to get the current selection.
         Return a list of names of the zeroOut groups.
     """
     zeroList = []
+    if not transformList:
+        transformList = cmds.ls(selection=True)
     if transformList:
         for transform in transformList:
             zero = cmds.duplicate(transform, name=transform+'_Zero')[0]

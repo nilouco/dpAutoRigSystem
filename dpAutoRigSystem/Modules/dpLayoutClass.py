@@ -109,12 +109,13 @@ class LayoutClass:
                 cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                 cmds.columnLayout("selectedColumn", adjustableColumn=True, parent="selectedModuleLayout")
                 # re-create segment layout:
-                self.segDelColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                self.segDelColumn = cmds.rowLayout('segDelColumn', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
                 self.aimDirectionAttrExists = cmds.objExists(self.moduleGrp+".aimDirection")
                 self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
                 self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
                 self.indirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
                 self.eyelidExists = cmds.objExists(self.moduleGrp+".eyelid")
+                self.degreeExists = cmds.objExists(self.moduleGrp+".degree")
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if nJointsAttr > 0:
@@ -131,7 +132,7 @@ class LayoutClass:
                 self.duplicateButton = cmds.button(label=self.langDic[self.langName]['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.langDic[self.langName]['i068_CtrlD'], parent=self.segDelColumn)
                 
                 # reCreate mirror layout:
-                self.doubleRigColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
                 cmds.text(self.langDic[self.langName]['m010_Mirror'], parent=self.doubleRigColumn)
                 self.mirrorMenu = cmds.optionMenu("mirrorMenu", label='', changeCommand=self.changeMirror, parent=self.doubleRigColumn)
                 mirrorMenuItemList = ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ']
@@ -177,10 +178,10 @@ class LayoutClass:
                 self.rigButton = cmds.button(label="Rig", command=self.rigModule, backgroundColor=(1.0, 1.0, 0.7), parent=self.doubleRigColumn)
                 
                 # aim direction for eye look at:
-                self.doubleAimDirectionColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
                 if self.aimDirectionAttrExists:
-                    cmds.text(self.langDic[self.langName]['i082_aimDirection'], parent=self.doubleAimDirectionColumn)
-                    self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.doubleAimDirectionColumn)
+                    self.aimDirectionLayout = cmds.rowLayout('aimDirectionLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(self.langDic[self.langName]['i082_aimDirection'], parent=self.aimDirectionLayout)
+                    self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.aimDirectionLayout)
                     self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
                     for item in self.aimMenuItemList:
                         cmds.menuItem(label=item, parent=self.aimMenu)
@@ -190,32 +191,47 @@ class LayoutClass:
                 
                 # create a flip layout:
                 if self.flipAttrExists:
-                    self.doubleFlipColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                    cmds.text(" ", parent=self.doubleFlipColumn)
+                    self.flipLayout = cmds.rowLayout('flipLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.flipLayout)
                     flipValue = cmds.getAttr(self.moduleGrp+".flip")
-                    self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.doubleFlipColumn)
+                    self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.flipLayout)
                     
                 # create an indirectSkin layout:
                 if self.indirectSkinAttrExists:
-                    self.doubleIndirectSkinColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                    cmds.text(" ", parent=self.doubleIndirectSkinColumn)
+                    self.indirectSkinLayout = cmds.rowLayout('indirectSkinLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.indirectSkinLayout)
                     indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
-                    self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.doubleIndirectSkinColumn)
-                    cmds.text(" ", parent=self.doubleIndirectSkinColumn)
+                    self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.indirectSkinLayout)
+                    cmds.text(" ", parent=self.indirectSkinLayout)
                     holderValue = cmds.getAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'])
-                    self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.doubleIndirectSkinColumn)
+                    self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
                     
                 # create eyelid layout:
                 if self.eyelidExists:
-                    self.doubleEyelidColumn = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 150, 50, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                    cmds.text(" ", parent=self.doubleEyelidColumn)
+                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=4, columnWidth4=(100, 150, 50, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.eyelidLayout)
                     eyelidValue = cmds.getAttr(self.moduleGrp+".eyelid")
-                    self.eyelidCB = cmds.checkBox(label=self.langDic[self.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.doubleEyelidColumn)
+                    self.eyelidCB = cmds.checkBox(label=self.langDic[self.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.eyelidLayout)
                     irisValue = cmds.getAttr(self.moduleGrp+".iris")
-                    self.irisCB = cmds.checkBox(label=self.langDic[self.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.doubleEyelidColumn)
+                    self.irisCB = cmds.checkBox(label=self.langDic[self.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.eyelidLayout)
                     pupilValue = cmds.getAttr(self.moduleGrp+".pupil")
-                    self.pupilCB = cmds.checkBox(label=self.langDic[self.langName]['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.doubleEyelidColumn)
+                    self.pupilCB = cmds.checkBox(label=self.langDic[self.langName]['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.eyelidLayout)
                     
+                # create degree layout:
+                if self.degreeExists:
+                    self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )
+                    cmds.text(self.langDic[self.langName]['i119_curveDegree'], parent=self.degreeColumn)
+                    self.degreeMenu = cmds.optionMenu("degreeMenu", label='', changeCommand=self.changeDegree, parent=self.degreeColumn)
+                    self.degreeMenuItemList = ['1 - Linear', '3 - Cubic']
+                    for item in self.degreeMenuItemList:
+                        cmds.menuItem(label=item, parent=self.degreeMenu)
+                    currentDegree = cmds.getAttr(self.moduleGrp+".degree")
+                    # set layout with the current value:
+                    if currentDegree == 3:
+                        cmds.optionMenu(self.degreeMenu, edit=True, value='3 - Cubic')
+                    else:
+                        cmds.optionMenu(self.degreeMenu, edit=True, value='1 - Linear')
+                        
             except:
                 pass
     
@@ -347,6 +363,17 @@ class LayoutClass:
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             cmds.setAttr(self.moduleGrp+".mirrorName", item, type='string')
+            
+            
+    def changeDegree(self, item, *args):
+        """ This function receives the degree menu name item and set it as a string in the guide base (moduleGrp).
+        """
+        # verify integrity of the guideModule:
+        if self.verifyGuideModuleIntegrity():
+            if item == '3 - Cubic':
+                cmds.setAttr(self.moduleGrp+".degree", 3)
+            else:
+                cmds.setAttr(self.moduleGrp+".degree", 1)
     
     
     def createPreviewMirror(self, *args):

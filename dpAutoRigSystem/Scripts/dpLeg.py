@@ -9,30 +9,36 @@ DESCRIPTION = "m031_legDesc"
 ICON = "/Icons/dp_leg.png"
 
 
-def Leg(dpAutoRigInst):
+def Leg(dpUIinst):
     """ This function will create all guides needed to compose a leg.
     """
     # check modules integrity:
     guideDir = 'Modules'
     checkModuleList = ['dpLimb', 'dpFoot']
-    checkResultList = dpAutoRigInst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
+    checkResultList = dpUIinst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
+        # defining naming:
+        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
+        # part names:
+        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg']
+        footName = dpUIinst.langDic[dpUIinst.langName]['c_foot']
+        
         # Starting progress window
         progressAmount = 0
-        cmds.progressWindow(title='Leg Guides', progress=progressAmount, status=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': 0%', isInterruptable=False)
+        cmds.progressWindow(title='Leg Guides', progress=progressAmount, status=doingName+': 0%', isInterruptable=False)
         maxProcess = 12 # number of modules to create
 
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+legName))
         
         # create leg module instance:
-        legLimbInstance = dpAutoRigInst.initGuide('dpLimb', guideDir)
+        legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
         # change limb guide to leg type:
-        dpAutoRigInst.guide.Limb.changeType(legLimbInstance, dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'])
+        legLimbInstance.changeType(legName)
         # change name to leg:
-        dpAutoRigInst.guide.Limb.editUserName(legLimbInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m030_leg'].capitalize())
+        legLimbInstance.editUserName(legName.capitalize())
         
         # editing leg base guide informations:
         legBaseGuide = legLimbInstance.moduleGrp
@@ -48,11 +54,11 @@ def Leg(dpAutoRigInst):
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(dpAutoRigInst.langDic[dpAutoRigInst.langName]['m094_doing']+': ' + `progressAmount` + ' '+dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+footName))
         
         # create foot module instance:
-        footInstance = dpAutoRigInst.initGuide('dpFoot', guideDir)
-        dpAutoRigInst.guide.Foot.editUserName(footInstance, checkText=dpAutoRigInst.langDic[dpAutoRigInst.langName]['m024_foot'])
+        footInstance = dpUIinst.initGuide('dpFoot', guideDir)
+        footInstance.editUserName(footName)
         cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
         cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
         
@@ -64,7 +70,7 @@ def Leg(dpAutoRigInst):
 
         # select the legGuide_Base:
         cmds.select(legBaseGuide)
-        print dpAutoRigInst.langDic[dpAutoRigInst.langName]['m092_createdLeg']
+        print dpUIinst.langDic[dpUIinst.langName]['m092_createdLeg']
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpAutoRigInst.langDic[dpAutoRigInst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

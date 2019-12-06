@@ -11,7 +11,7 @@ ICON = "/Icons/dp_matchMesh.png"
 
 
 class MatchMesh():
-    def __init__(self, dpUIinst, langDic, langName):
+    def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.langDic = langDic

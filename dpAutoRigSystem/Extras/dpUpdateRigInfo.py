@@ -39,16 +39,16 @@ class UpdateRigInfo():
     def updateRigInfoLists(*args):
         """
         """
-        masterCtrl = None
-        masterCtrlAttr = "masterCtrl"
+        masterGrp = None
+        masterGrpAttr = "masterGrp"
         allList = cmds.ls(selection=False)
         for nodeItem in allList:
-            if cmds.objExists(nodeItem+"."+masterCtrlAttr) and \
-                (cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "bool" or \
-                cmds.getAttr(nodeItem+"."+masterCtrlAttr, type=True) == "long") and \
-                cmds.getAttr(nodeItem+"."+masterCtrlAttr) == 1:
-                masterCtrl = nodeItem
-        if masterCtrl:
+            if cmds.objExists(nodeItem+"."+masterGrpAttr) and \
+                (cmds.getAttr(nodeItem+"."+masterGrpAttr, type=True) == "bool" or \
+                cmds.getAttr(nodeItem+"."+masterGrpAttr, type=True) == "long") and \
+                cmds.getAttr(nodeItem+"."+masterGrpAttr) == 1:
+                masterGrp = nodeItem
+        if masterGrp:
             ctrlList = cmds.ls("*_Ctrl")
             ctrlString = ""
             if ctrlList:
@@ -60,7 +60,7 @@ class UpdateRigInfo():
                     ctrlString = ctrlString + str(item)
                     if i < len(ctrlList):
                         ctrlString = ctrlString + ";"
-                cmds.setAttr(masterCtrl+".controlList", ctrlString, type="string")
+                cmds.setAttr(masterGrp+".controlList", ctrlString, type="string")
             
             meshList = cmds.ls("*_Mesh")
             meshString = ""
@@ -69,7 +69,7 @@ class UpdateRigInfo():
                     meshString = meshString + str(item)
                     if i < len(meshList):
                         meshString = meshString + ";"
-                cmds.setAttr(masterCtrl+".geometryList", meshString, type="string")
+                cmds.setAttr(masterGrp+".geometryList", meshString, type="string")
             print "Control List = ", ctrlString
             print "Mesh List    = ", meshString
-            print "Updated Rig Info: "+masterCtrl,
+            print "Updated Rig Info: "+masterGrp,

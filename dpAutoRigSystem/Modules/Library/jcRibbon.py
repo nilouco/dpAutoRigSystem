@@ -16,201 +16,224 @@
 # importing libraries:
 import maya.cmds as cmds
 import dpUtils as utils
-import dpControls as ctrls
+import dpControls
 
 
-def addRibbonToLimb(prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, ctrlRadius=1, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0):
-    if not oriLoc:
-        oriLoc = cmds.ls(sl=True, l=True)[0]
-    if not iniJnt:
-        iniJnt = cmds.ls(sl=True)[1]
-    
-    if not prefix == '':
-        if not prefix.endswith('_'):
-            prefix+='_'
-    skipa = ['x', 'y', 'z']
-    skipa.remove(skipAxis)
-    lista = []
-    lista.append(iniJnt)
-    lista.append(cmds.listRelatives(lista[0], c=True)[0])
-    lista.append(cmds.listRelatives(lista[1], c=True)[0])
-    auxLoc = cmds.duplicate(oriLoc, rr=True)
-    midLoc = cmds.duplicate(oriLoc, rr=True)
-    
-    cmds.delete(cmds.parentConstraint(lista[1], auxLoc, mo=False, w=1))
-    cmds.delete(cmds.aimConstraint(lista[2], auxLoc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
-    cmds.delete(cmds.orientConstraint(oriLoc, auxLoc, mo=False, skip=skipa, weight=1))
+class RibbonClass:
 
-    cmds.delete(cmds.parentConstraint(lista[1], midLoc, mo=False, w=1))
+    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, ctrlRadius, curveDegree, *args):
+        # defining variables:
+        self.dpUIinst = dpUIinst
+        self.langDic = langDic
+        self.langName = langName
+        self.presetDic = presetDic
+        self.presetName = presetName
+        self.ctrlRadius = ctrlRadius
+        self.curveDegree = curveDegree
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        
+        
+    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, *args):
+        """ Create the Ribbon system to be added in the Limb module.
+            Returns a dictionary with all nodes needed to be integrated.
+        """
+        if not oriLoc:
+            oriLoc = cmds.ls(sl=True, l=True)[0]
+        if not iniJnt:
+            iniJnt = cmds.ls(sl=True)[1]
+        
+        if not prefix == '':
+            if not prefix.endswith('_'):
+                prefix+='_'
+        skipa = ['x', 'y', 'z']
+        skipa.remove(skipAxis)
+        lista = []
+        lista.append(iniJnt)
+        lista.append(cmds.listRelatives(lista[0], c=True)[0])
+        lista.append(cmds.listRelatives(lista[1], c=True)[0])
+        auxLoc = cmds.duplicate(oriLoc, rr=True)
+        midLoc = cmds.duplicate(oriLoc, rr=True)
+        
+        cmds.delete(cmds.parentConstraint(lista[1], auxLoc, mo=False, w=1))
+        cmds.delete(cmds.aimConstraint(lista[2], auxLoc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
+        cmds.delete(cmds.orientConstraint(oriLoc, auxLoc, mo=False, skip=skipa, weight=1))
 
-    cmds.delete(cmds.orientConstraint(oriLoc, midLoc, mo=False, skip=skipa, weight=1))
-    
-    upctrlList = createBendCtrl(prefix+'Up_'+myName+'_Off_Ctrl', r=ctrlRadius)
-    upctrl = upctrlList[0]
-    upctrlCtrl = upctrlList[1]
-    downctrlList = createBendCtrl(prefix+'Down_'+myName+'_Off_Ctrl', r=ctrlRadius)
-    downctrl = downctrlList[0]
-    downctrlCtrl = downctrlList[1]
-    elbowctrlList = createElbowCtrl(prefix+myName+'_Off_Ctrl', r=ctrlRadius, armStyle=arm)
-    elbowctrl = elbowctrlList[0]
-    elbowctrlCtrl = elbowctrlList[1]
-    elbowctrlZero = elbowctrlList[2]
-    
-    cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
-    cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
-    
-    if arm:
-        upLimb = createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guias=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
-        downLimb = createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guias=[lista[1], lista[2]], s=side, firstLimb=False, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
-    else:
-        upLimb = createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guias=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
-        downLimb = createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guias=[lista[1], lista[2]], s=side, ctrlRadius=ctrlRadius, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
-    
-    cmds.delete(cmds.parentConstraint(oriLoc, upctrl, mo=False, w=1))
-    cmds.delete(cmds.pointConstraint(upLimb['middleCtrl'], upctrl, mo=False, w=1))
-    
-    cmds.delete(cmds.parentConstraint(auxLoc, downctrl, mo=False, w=1))
-    cmds.delete(cmds.pointConstraint(downLimb['middleCtrl'], downctrl, mo=False, w=1))
-    
-    cmds.delete(cmds.parentConstraint(midLoc, elbowctrl, mo=False, w=1))
-    orientConst = cmds.orientConstraint(lista[0], lista[1], elbowctrl, mo=False, w=1)[0]
-    cmds.setAttr(orientConst+".interpType", 2)
-    
-    cmds.delete(upLimb['constraints'][1])
-    cmds.parentConstraint(elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_ParentConstraint")
-    
-    cmds.delete(downLimb['constraints'][0])
-    cmds.parentConstraint(elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_ParentConstraint")
-    
-    upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_ParentConstraint")[0]
-    cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrientConstraint")
-    cmds.setAttr(upPC+'.interpType', 2)
-    cmds.connectAttr(elbowctrlCtrl+'.autoBend', upPC+'.'+elbowctrlCtrl+'W1', force=True)
-    cmds.parentConstraint(cmds.listRelatives(upctrl, c=True)[0], upLimb['middleCtrl'], mo=True, w=1, name=upLimb['middleCtrl']+"_ParentConstraint")
-    
-    downPC = cmds.parentConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], elbowctrlCtrl, downctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=downctrl+"_ParentConstraint")[0]
-    cmds.orientConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], downctrl, mo=True, w=1, name=downctrl+"_OrientConstraint")
-    cmds.setAttr(downPC+'.interpType', 2)
-    cmds.connectAttr(elbowctrlCtrl+'.autoBend', downPC+'.'+elbowctrlCtrl+'W1', force=True)
-    cmds.parentConstraint(cmds.listRelatives(downctrl, c=True)[0], downLimb['middleCtrl'], mo=True, w=1, name=downLimb['middleCtrl']+"_ParentConstraint")
-    
-    cmds.pointConstraint(lista[1], elbowctrl, mo=True, w=1, name=elbowctrl+"_PointConstraint")
+        cmds.delete(cmds.parentConstraint(lista[1], midLoc, mo=False, w=1))
 
-    
-    upJntGrp = cmds.listRelatives(upLimb['skinJointsList'][0], p=True, f=True)
-    downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
-    
-    limbJoints = list(upLimb['skinJointsList'])
-    limbJoints.extend(downLimb['skinJointsList'])
-    
-    jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
-    '''
-    Deactivate the segment scale compensate on the bone to prevent scaling problem in maya 2016
-    It will prevent a double scale problem that will come from the upper parent in the rig
-    '''
-    if (int(cmds.about(version=True)[:4]) >= 2016):
-        for nBone in limbJoints:
-            cmds.setAttr(nBone+".segmentScaleCompensate", 0)
-    
-    for i in range(len(limbJoints)):
-        limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+1))
-        cmds.addAttr(limbJoints[i], longName="dpAR_joint", attributeType='float', keyable=False)
-    
-    scaleGrp = cmds.group(upLimb['scaleGrp'], downLimb['scaleGrp'], jntGrp, n=prefix+myName+'_Ribbon_Scale_Grp')
-    cmds.setAttr(upLimb['scaleGrp']+'.v', cmds.getAttr(upLimb['finalGrp']+'.v'))
-    cmds.setAttr(downLimb['scaleGrp']+'.v', cmds.getAttr(downLimb['finalGrp']+'.v'))
-    
-    cmds.delete(upJntGrp, downJntGrp)
-    
-    staticGrp = cmds.group(upLimb['finalGrp'], downLimb['finalGrp'], n=prefix+myName+'_Ribbon_Static_Grp')
-    
-    ctrlsGrp = cmds.group(upctrl, downctrl, elbowctrl, upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp'], n=prefix+myName+'_Ctrls_Grp')
-    
-    cmds.delete(midLoc, auxLoc)
-    
-    # organizing joint nomenclature ('_Jnt', '_Jxt') and skin attributes (".dpAR_joint")
-    # in order to quickly skin using dpAR_UI
-    for item in lista[:-1]:
-        #fix joint name suffix
-        if '_Jnt' in item:
-            # remove dpAR skin attribute
-            try:
-                cmds.deleteAttr(item+".dpAR_joint")
-            except:
-                pass
-            # rename joint
-            cmds.rename(item, item.replace('_Jnt', '_Jxt'))
-    
-    # implementing pin setup to ribbon corner offset control:
-    if elbowctrlList[2]:
-        worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, elbowctrlZero, mo=True)[0]
-        pinRev = cmds.createNode('reverse', name=elbowctrlCtrl+"_Pin_Rev")
-        cmds.connectAttr(elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
-        cmds.connectAttr(elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
-        cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
-    
-    
-    # WIP: not used this mirror by dpAR system because each module guide will create each own mirror
-    if mirror:
-        jnt = None
-        if cmds.objExists(iniJnt.replace('Jxt', 'Jnt').replace('L_', 'R_')):
-            jnt = iniJnt.replace('Jxt', 'Jnt').replace('L_', 'R_')
+        cmds.delete(cmds.orientConstraint(oriLoc, midLoc, mo=False, skip=skipa, weight=1))
+        
+        upctrlList = self.createBendCtrl(prefix+'Up_'+myName+'_Off_Ctrl', r=self.ctrlRadius)
+        upctrl = upctrlList[0]
+        upctrlCtrl = upctrlList[1]
+        downctrlList = self.createBendCtrl(prefix+'Down_'+myName+'_Off_Ctrl', r=self.ctrlRadius)
+        downctrl = downctrlList[0]
+        downctrlCtrl = downctrlList[1]
+        elbowctrlList = self.createElbowCtrl(prefix+myName+'_Off_Ctrl', armStyle=arm)
+        elbowctrl = elbowctrlList[0]
+        elbowctrlCtrl = elbowctrlList[1]
+        elbowctrlZero = elbowctrlList[2]
+        
+        cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
+        cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
+        
+        if arm:
+            upLimb = self.createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
+            downLimb = self.createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, firstLimb=False, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
         else:
-            jnt = iniJnt.replace('L_', 'R_')
-        newOri = cmds.duplicate(oriLoc, rr=True)
-        auxgrp = cmds.group(em=True, name='MirrorAux_Grp')
+            upLimb = self.createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
+            downLimb = self.createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
         
-        cmds.parent(newOri, auxgrp)
+        cmds.delete(cmds.parentConstraint(oriLoc, upctrl, mo=False, w=1))
+        cmds.delete(cmds.pointConstraint(upLimb['middleCtrl'], upctrl, mo=False, w=1))
         
-        cmds.setAttr(auxgrp+'.sx', -1)
-        cmds.parent(newOri, w=True)
-        cmds.delete(auxgrp)
-        grp = cmds.group(em=True, n='MirrorAuxGrp')
-        cmds.delete(cmds.parentConstraint(newOri, grp, mo=False, w=1))
-        cmds.parent(newOri, grp)
-        cmds.makeIdentity(newOri, a=1, s=1)
+        cmds.delete(cmds.parentConstraint(auxLoc, downctrl, mo=False, w=1))
+        cmds.delete(cmds.pointConstraint(downLimb['middleCtrl'], downctrl, mo=False, w=1))
         
-        #addRibbonToLimb(prefix=prefix.replace('L_', 'R_'), myName=myName, oriLoc=newOri, iniJnt=jnt, num=num, mirror=False)
+        cmds.delete(cmds.parentConstraint(midLoc, elbowctrl, mo=False, w=1))
+        orientConst = cmds.orientConstraint(lista[0], lista[1], elbowctrl, mo=False, w=1)[0]
+        cmds.setAttr(orientConst+".interpType", 2)
         
-        cmds.delete(grp)
+        cmds.delete(upLimb['constraints'][1])
+        cmds.parentConstraint(elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_ParentConstraint")
+        
+        cmds.delete(downLimb['constraints'][0])
+        cmds.parentConstraint(elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_ParentConstraint")
+        
+        upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_ParentConstraint")[0]
+        cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrientConstraint")
+        cmds.setAttr(upPC+'.interpType', 2)
+        cmds.connectAttr(elbowctrlCtrl+'.autoBend', upPC+'.'+elbowctrlCtrl+'W1', force=True)
+        cmds.parentConstraint(cmds.listRelatives(upctrl, c=True)[0], upLimb['middleCtrl'], mo=True, w=1, name=upLimb['middleCtrl']+"_ParentConstraint")
+        
+        downPC = cmds.parentConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], elbowctrlCtrl, downctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=downctrl+"_ParentConstraint")[0]
+        cmds.orientConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], downctrl, mo=True, w=1, name=downctrl+"_OrientConstraint")
+        cmds.setAttr(downPC+'.interpType', 2)
+        cmds.connectAttr(elbowctrlCtrl+'.autoBend', downPC+'.'+elbowctrlCtrl+'W1', force=True)
+        cmds.parentConstraint(cmds.listRelatives(downctrl, c=True)[0], downLimb['middleCtrl'], mo=True, w=1, name=downLimb['middleCtrl']+"_ParentConstraint")
+        
+        cmds.pointConstraint(lista[1], elbowctrl, mo=True, w=1, name=elbowctrl+"_PointConstraint")
 
-    # extraCtrlList:
-    extraCtrlList = upLimb['extraCtrlList']
-    extraCtrlList.extend(downLimb['extraCtrlList'])
+        
+        upJntGrp = cmds.listRelatives(upLimb['skinJointsList'][0], p=True, f=True)
+        downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
+        
+        limbJoints = list(upLimb['skinJointsList'])
+        limbJoints.extend(downLimb['skinJointsList'])
+        
+        jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
+        '''
+        Deactivate the segment scale compensate on the bone to prevent scaling problem in maya 2016
+        It will prevent a double scale problem that will come from the upper parent in the rig
+        '''
+        if (int(cmds.about(version=True)[:4]) >= 2016):
+            for nBone in limbJoints:
+                cmds.setAttr(nBone+".segmentScaleCompensate", 0)
+        
+        for i in range(len(limbJoints)):
+            limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+1))
+            cmds.addAttr(limbJoints[i], longName="dpAR_joint", attributeType='float', keyable=False)
+        
+        scaleGrp = cmds.group(upLimb['scaleGrp'], downLimb['scaleGrp'], jntGrp, n=prefix+myName+'_Ribbon_Scale_Grp')
+        cmds.setAttr(upLimb['scaleGrp']+'.v', cmds.getAttr(upLimb['finalGrp']+'.v'))
+        cmds.setAttr(downLimb['scaleGrp']+'.v', cmds.getAttr(downLimb['finalGrp']+'.v'))
+        
+        cmds.delete(upJntGrp, downJntGrp)
+        
+        staticGrp = cmds.group(upLimb['finalGrp'], downLimb['finalGrp'], n=prefix+myName+'_Ribbon_Static_Grp')
+        
+        ctrlsGrp = cmds.group(upctrl, downctrl, elbowctrl, upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp'], n=prefix+myName+'_Ctrls_Grp')
+        
+        cmds.delete(midLoc, auxLoc)
+        
+        # organizing joint nomenclature ('_Jnt', '_Jxt') and skin attributes (".dpAR_joint")
+        # in order to quickly skin using dpAR_UI
+        for item in lista[:-1]:
+            #fix joint name suffix
+            if '_Jnt' in item:
+                # remove dpAR skin attribute
+                try:
+                    cmds.deleteAttr(item+".dpAR_joint")
+                except:
+                    pass
+                # rename joint
+                cmds.rename(item, item.replace('_Jnt', '_Jxt'))
+        
+        # implementing pin setup to ribbon corner offset control:
+        if elbowctrlList[2]:
+            worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, elbowctrlZero, mo=True)[0]
+            pinRev = cmds.createNode('reverse', name=elbowctrlCtrl+"_Pin_Rev")
+            cmds.connectAttr(elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
+            cmds.connectAttr(elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
+            cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
+        
+        
+        # WIP: not used this mirror by dpAR system because each module guide will create each own mirror
+        if mirror:
+            jnt = None
+            if cmds.objExists(iniJnt.replace('Jxt', 'Jnt').replace('L_', 'R_')):
+                jnt = iniJnt.replace('Jxt', 'Jnt').replace('L_', 'R_')
+            else:
+                jnt = iniJnt.replace('L_', 'R_')
+            newOri = cmds.duplicate(oriLoc, rr=True)
+            auxgrp = cmds.group(em=True, name='MirrorAux_Grp')
+            
+            cmds.parent(newOri, auxgrp)
+            
+            cmds.setAttr(auxgrp+'.sx', -1)
+            cmds.parent(newOri, w=True)
+            cmds.delete(auxgrp)
+            grp = cmds.group(em=True, n='MirrorAuxGrp')
+            cmds.delete(cmds.parentConstraint(newOri, grp, mo=False, w=1))
+            cmds.parent(newOri, grp)
+            cmds.makeIdentity(newOri, a=1, s=1)
+            
+            #addRibbonToLimb(prefix=prefix.replace('L_', 'R_'), myName=myName, oriLoc=newOri, iniJnt=jnt, num=num, mirror=False)
+            
+            cmds.delete(grp)
+
+        # extraCtrlList:
+        extraCtrlList = upLimb['extraCtrlList']
+        extraCtrlList.extend(downLimb['extraCtrlList'])
+        
+        return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD']}
     
-    return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD']}
     
-def createBendCtrl(myName='Bend_Ctrl', r=1, zero=True):
-    grp = None
-    curve = cmds.curve(n=myName, d=1, p=[(-1.5*r, 0, 0), (-1.06066*r, 0, -1.06066*r), (0, 0, -1.5*r), (1.06066*r, 0, -1.06066*r), (1.5*r, 0, 0), (1.06066*r, 0, 1.06066*r), (0, 0, 1.5*r), (-1.06066*r, 0, 1.06066*r), (-1.5*r, 0, 0), (-1.06066*r, 0, -1.06066*r)])
-    ctrls.renameShape([curve])
-    cmds.setAttr(curve+'.rz', 90)
-    cmds.makeIdentity(curve, a=1)
-    if zero:
-        grp = cmds.group(curve, n=myName+'_Grp')
-    return [grp, curve]
+    def createBendCtrl(self, myName='Bend_Ctrl', r=1, zero=True, *args):
+        """ Create the Ribbon Bend control.
+            Returns the group zeroOut and the control curve.
+        """
+        grp = None
+        curve = self.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
+        if zero:
+            grp = cmds.group(curve, n=myName+'_Grp')
+        return [grp, curve]
     
-def createElbowCtrl(myName='Limb_Ctrl', r=1, zero=True, armStyle=True):
-    curve = cmds.curve(n=myName, d=1, p=[(-2*r, 0, -1*r), (-1*r, 0, -1*r), (-1*r, 0, -2*r), (1*r, 0, -2*r), (1*r, 0, -1*r), (2*r, 0, -1*r), (2*r, 0, 1*r), (1*r, 0, 1*r), (1*r, 0, 2*r), (-1*r, 0, 2*r), (-1*r, 0, 1*r), (-2*r, 0, 1*r), (-2*r, 0, -1*r), (-1*r, 0, -1*r)])
-    ctrls.renameShape([curve])
-    if armStyle:
-        cmds.setAttr(curve+'.rx', 90)
-        cmds.setAttr(curve+'.ry', 90)
-    cmds.makeIdentity(curve, a=1)
-    grp = None
-    if zero:
-        zero = cmds.group(curve, n=myName+'_Zero')
-        grp = cmds.group(zero, n=myName+'_Grp')
+    
+    def createElbowCtrl(self, myName='Limb_Ctrl', zero=True, armStyle=True, *args):
+        """ Create the Ribbon Corner (Elbow) control.
+            Returns the group, the control curve and it's zeroOut group.
+        """
         if armStyle:
-            cmds.rotate(0, -90, -90, zero)
+            curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
         else:
-            cmds.rotate(-90, 0, -90, zero)
-    cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-    cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-    return [grp, curve, zero]
+            curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0))
+        grp = None
+        if zero:
+            zero = cmds.group(curve, n=myName+'_Zero')
+            grp = cmds.group(zero, n=myName+'_Grp')
+            if armStyle:
+                cmds.rotate(0, -90, -90, zero)
+            else:
+                cmds.rotate(-90, 0, -90, zero)
+        cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+        cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+        return [grp, curve, zero]
     
-#function to create the ribbon
-def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guias=None, v=True, s=0, firstLimb=True, upCtrl=None, ctrlRadius=1, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName"):
+    
+    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, v=True, s=0, firstLimb=True, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", *args):
+        """ Main method to create the Ribbon system.
+            Returns results in a dictionary.
+        """
         retDict = {}
         
         #define variables
@@ -240,7 +263,7 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         cmds.addAttr(ribbon, longName="doNotSkinIt", attributeType="bool", keyable=True)
         cmds.setAttr(ribbon+".doNotSkinIt", 1)
         #call the function to create follicles and joint in the nurbsPlane
-        results = createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
+        results = self.createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
         rb_Jnt = results[0]
         fols = results[1]
         #create locator controls for the middle of the ribbon
@@ -412,8 +435,7 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
-        mid_Ctrl = cmds.circle (c=(0, 0, 0), nr=(1, 0, 0), ch=0, name=name+'_MidCtrl')[0]
-        ctrls.renameShape([mid_Ctrl])
+        mid_Ctrl = self.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
         cmds.delete(cmds.parentConstraint(midCtrl, mid_Ctrl, mo=0))
@@ -476,9 +498,9 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
             cmds.makeIdentity(jnt, a=True)
             # create extra control
             extraCtrlName = jnt.replace("_Jnt", "_Ctrl")
-            extraCtrl = ctrls.cvSquare(ctrlName=extraCtrlName, r=ctrlRadius)
+            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraCtrlName, r=self.ctrlRadius, d=self.curveDegree)
             extraCtrlList.append(extraCtrl)
-            cmds.rotate(0, 0, 90, extraCtrl)
+            cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
             extraCtrlZero = utils.zeroOut([extraCtrl])[0]
             cmds.parent(extraCtrlZero, extraCtrlGrp)
@@ -578,9 +600,9 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
                 cmds.skinPercent(skinClusterNode, ribbon + '.cv[1][0:1]', tv=[(drv_Jnt[0], 0.85), (drv_Jnt[1], 0.15)])
                 cmds.skinPercent(skinClusterNode, ribbon + '.cv[0][0:1]', tv=(drv_Jnt[0], 1))
         constr = []
-        if guias:
-            top = guias[0]
-            bottom = guias[1]
+        if guides:
+            top = guides[0]
+            bottom = guides[1]
             constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_ParentConstraint"))
             constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_ParentConstraint"))
         
@@ -589,7 +611,7 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrientConstraint")
         
         #fix loc_Grp scale
-        if guias:
+        if guides:
             from math import sqrt, pow
             auxLoc1 = cmds.spaceLocator(name='auxLoc1')[0]
             auxLoc2 = cmds.spaceLocator(name='auxLoc2')[0]
@@ -653,60 +675,63 @@ def createRibbon(axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints
         retDict['rbNormalizeMD'] = rbNormalizeMD
         cmds.setAttr(finalSystemGrp+'.v', v)
         return retDict
-            
-#function to create follicles and joints
-def createFollicles(rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, jointLabelAdd=0, jointLabelName="RibbonName"): 
-    #define variables
-    jnts = []
-    fols = []
-    #create joints and follicles based in the choose options from user
-    if horizontal:
-        #calcule the position of the first follicle
-        passo = (1/float(num))/2.0;
-        for i in range(num):
-            #create the follicle and do correct connections to link it to the 
-            folShape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
-            folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%02d_Fol'%i)         
-            fols.append(folTrans)
-            cmds.connectAttr(rib+'.worldMatrix[0]', folShape+'.inputWorldMatrix')
-            cmds.connectAttr(rib+'.local', folShape+'.inputSurface')
-            cmds.connectAttr(folShape+'.outTranslate', folTrans+'.translate')
-            cmds.connectAttr(folShape+'.outRotate', folTrans+'.rotate')
-            cmds.setAttr(folShape+'.parameterU', passo)
-            cmds.setAttr(folShape+'.parameterV', 0.5) 
-            #create the joint in the follicle
-            cmds.select(cl=True)
-            jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
-            cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-            utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
-            cmds.select(cl=True)
+    
+    
+    def createFollicles(self, rib, num, pad=0.5, name='xxxx', horizontal=False, side=0, jointLabelAdd=0, jointLabelName="RibbonName", *args): 
+        """ Create follicles to be used by the Ribbon system.
+            Returns a list with joints and follicles created.
+        """
+        #define variables
+        jnts = []
+        fols = []
+        #create joints and follicles based in the choose options from user
+        if horizontal:
+            #calcule the position of the first follicle
+            passo = (1/float(num))/2.0;
+            for i in range(num):
+                #create the follicle and do correct connections to link it to the 
+                folShape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
+                folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%02d_Fol'%i)         
+                fols.append(folTrans)
+                cmds.connectAttr(rib+'.worldMatrix[0]', folShape+'.inputWorldMatrix')
+                cmds.connectAttr(rib+'.local', folShape+'.inputSurface')
+                cmds.connectAttr(folShape+'.outTranslate', folTrans+'.translate')
+                cmds.connectAttr(folShape+'.outRotate', folTrans+'.rotate')
+                cmds.setAttr(folShape+'.parameterU', passo)
+                cmds.setAttr(folShape+'.parameterV', 0.5) 
+                #create the joint in the follicle
+                cmds.select(cl=True)
+                jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
+                cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
+                utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
+                cmds.select(cl=True)
+                #calculate the position of the first follicle
+                passo+=(1/float(num))
+            results = [jnts, fols]
+            #return the joints and follicles created
+        else:
             #calculate the position of the first follicle
-            passo+=(1/float(num))
-        results = [jnts, fols]
-        #return the joints and follicles created
-    else:
-        #calculate the position of the first follicle
-        passo = (1/float(num))/2.0;
-        for i in range(num):
-            #create the follicle and do correct connections in order to link it to the ribbon
-            folShape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
-            folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%02d_Fol'%i)
-            fols.append(folTrans)
-            cmds.connectAttr(rib+'.worldMatrix[0]', folShape+'.inputWorldMatrix')
-            cmds.connectAttr(rib+'.local', folShape+'.inputSurface')
-            cmds.connectAttr(folShape+'.outTranslate', folTrans+'.translate')
-            cmds.connectAttr(folShape+'.outRotate', folTrans+'.rotate')
-            cmds.setAttr(folShape+'.parameterU', 0.5)   
-            cmds.setAttr(folShape+'.parameterV', passo) 
-            #create the joint in the follicle
-            cmds.select(cl=True)
-            jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
-            cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-            utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
-            cmds.select(cl=True)
-            #calculate the first follicle position
-            passo+=(1/float(num))
-        results = [jnts, fols]
-    #return the created joints and follicles
-    cmds.parent(fols, rib)
-    return results
+            passo = (1/float(num))/2.0;
+            for i in range(num):
+                #create the follicle and do correct connections in order to link it to the ribbon
+                folShape = cmds.createNode('follicle', name=name+'_%02d_FolShape'%i)
+                folTrans = cmds.rename(cmds.listRelatives(folShape, p=1)[0], name+'_%02d_Fol'%i)
+                fols.append(folTrans)
+                cmds.connectAttr(rib+'.worldMatrix[0]', folShape+'.inputWorldMatrix')
+                cmds.connectAttr(rib+'.local', folShape+'.inputSurface')
+                cmds.connectAttr(folShape+'.outTranslate', folTrans+'.translate')
+                cmds.connectAttr(folShape+'.outRotate', folTrans+'.rotate')
+                cmds.setAttr(folShape+'.parameterU', 0.5)   
+                cmds.setAttr(folShape+'.parameterV', passo) 
+                #create the joint in the follicle
+                cmds.select(cl=True)
+                jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
+                cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
+                utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
+                cmds.select(cl=True)
+                #calculate the first follicle position
+                passo+=(1/float(num))
+            results = [jnts, fols]
+        #return the created joints and follicles
+        cmds.parent(fols, rib)
+        return results

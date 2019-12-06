@@ -1,7 +1,7 @@
 # importing libraries:
 import maya.cmds as cmds
 import maya.mel as mel
-from ..Modules.Library import dpControls as ctrls
+from ..Modules.Library import dpControls as dpControls
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -11,7 +11,14 @@ ICON = "/Icons/dp_headDeformer.png"
 
 
 class HeadDeformer():
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
+        # defining variables:
+        self.dpUIinst = dpUIinst
+        self.langDic = langDic
+        self.langName = langName
+        self.presetDic = presetDic
+        self.presetName = presetName
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         # call main function
         self.dpHeadDeformer(self)
     
@@ -27,7 +34,7 @@ class HeadDeformer():
             defSize = cmds.getAttr(twistDefList[0]+".highBound")
             defScale = cmds.getAttr(twistDefList[1]+".scaleY")
             defTy = -(defSize * defScale)
-            defTy = ctrls.dpCheckLinearUnit(defTy)
+            defTy = self.ctrls.dpCheckLinearUnit(defTy)
             cmds.setAttr(twistDefList[0]+".lowBound", 0)
             cmds.setAttr(twistDefList[0]+".highBound", (defSize * 2))
             cmds.setAttr(twistDefList[1]+".ty", defTy)
@@ -52,7 +59,7 @@ class HeadDeformer():
             cmds.setAttr(frontBendDefList[1]+".ty", defTy)
             
             # arrow control curve
-            arrowCtrl = self.dpCvArrow("Deformer_Ctrl")
+            arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", "Deformer_Ctrl")
             cmds.setAttr(arrowCtrl+"Shape.overrideEnabled", 1)
             cmds.setAttr(arrowCtrl+"Shape.overrideColor", 18)
             # add control intensite attributes
@@ -109,18 +116,3 @@ class HeadDeformer():
         
         else:
             mel.eval("warning" + "\"" + "Select objects to create headDeformers, usually we create in the blendShape RECEPT target" + "\"" + ";")
-
-    
-    def dpCvArrow(self, ctrlName="arrowCurve", radius=1, *args):
-        """ Create an arrow control curve and returns it.
-        """
-        if cmds.objExists(ctrlName) == True:
-            originalCtrlName = ctrlName
-            i = 1
-            while cmds.objExists(ctrlName) == True:
-                ctrlName = originalCtrlName+str(i)
-                i += 1
-        r = radius*0.1
-        arrowCurve = cmds.curve(name=ctrlName, d=1, p=[(0, 0, 0), (-2*r, r, 0), (-r, r, 0), (-r, 4*r, 0), (r, 4*r, 0), (r, r, 0), (2*r, r, 0), (0, 0, 0)])
-        cmds.rename(cmds.listRelatives(arrowCurve, children=True, type="nurbsCurve", shapes=True), arrowCurve+"Shape")
-        return arrowCurve

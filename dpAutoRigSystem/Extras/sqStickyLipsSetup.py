@@ -34,7 +34,7 @@ SQSL_VERSION = "1.0"
 
 
 class StickyLips():
-    def __init__(self, dpUIinst, langDic, langName):
+    def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.langDic = langDic

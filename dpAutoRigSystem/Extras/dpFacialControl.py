@@ -2,7 +2,7 @@
 import maya.cmds as cmds
 import maya.mel as mel
 from functools import partial
-import dpAutoRigSystem.Modules.Library.dpControls as ctrls
+import dpAutoRigSystem.Modules.Library.dpControls as dpControls
 
 # global variables to this module:
 CLASS_NAME = "FacialControl"
@@ -25,7 +25,14 @@ HEAD_CTRL = "Head_Head_Ctrl"
 DPFC_VERSION = "1.1"
 
 class FacialControl():
-    def __init__(self, *args, **kwargs):
+    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
+        # defining variables:
+        self.dpUIinst = dpUIinst
+        self.langDic = langDic
+        self.langName = langName
+        self.presetDic = presetDic
+        self.presetName = presetName
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         # call main function
         self.dpFacialControlUI(self)
         self.bsNode = None
@@ -105,16 +112,16 @@ class FacialControl():
         if cmds.objExists(BSNAME):
             self.bsNode = BSNAME
         # creating controls:
-        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", "Brow", "cvBrow", BROW_TGTLIST, False, False, True, True, False, True, "red")
-        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", "Brow", "cvBrow", BROW_TGTLIST, False, False, True, True, False, True, "blue")
-        lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", "Eyelid", "cvEyelid", EYELID_TGTLIST, True, False, False, True, False, True, "red")
-        rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", "Eyelid", "cvEyelid", EYELID_TGTLIST, True, False, False, True, False, True, "blue")
-        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", "Mouth", "cvMouth", MOUTH_TGTLIST, False, False, False, False, False, True, "red")
-        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", "Mouth", "cvMouth", MOUTH_TGTLIST, False, False, False, False, False, True, "blue")
-        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, "Lips", "cvLips", LIPS_TGTLIST, False, False, True, True, False, True, "yellow")
-        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, "Sneer", "cvSneer", SNEER_TGTLIST, False, True, True, True, False, True, "cyan")
-        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, "Grimace", "cvGrimace", GRIMACE_TGTLIST, False, True, True, True, False, True, "cyan")
-        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, "Face", "cvFace", FACE_TGTLIST, True, True, True, True, True, True, "cyan")
+        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", "Brow", "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, True, "red")
+        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", "Brow", "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, True, "blue")
+        lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", "Eyelid", "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, True, "red")
+        rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", "Eyelid", "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, True, "blue")
+        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", "Mouth", "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, True, "red")
+        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", "Mouth", "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, True, "blue")
+        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, "Lips", "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, True, True, False, True, "yellow")
+        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, "Sneer", "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, True, True, True, False, True, "cyan")
+        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, "Grimace", "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 180), False, True, True, True, False, True, "cyan")
+        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, "Face", "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, "cyan")
         
         # positioning control groups:
         cmds.setAttr(lBrowCtrlGrp+".translateX", 4)
@@ -159,29 +166,29 @@ class FacialControl():
         """
         connectBS = cmds.checkBox(self.connectCB, query=True, value=True)
         if cmds.checkBox(self.browCB, query=True, value=True):
-            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", "Brow", "cvBrow", BROW_TGTLIST, False, False, True, True, False, connectBS, "red")
-            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", "Brow", "cvBrow", BROW_TGTLIST, False, False, True, True, False, connectBS, "blue")
+            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", "Brow", "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, "red")
+            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", "Brow", "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, "blue")
             if rBrowCtrlGrp:
                 cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.eyelidCB, query=True, value=True):
-            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", "Eyelid", "cvEyelid", EYELID_TGTLIST, True, False, False, True, False, connectBS, "red")
-            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", "Eyelid", "cvEyelid", EYELID_TGTLIST, True, False, False, True, False, connectBS, "blue")
+            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", "Eyelid", "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, connectBS, "red")
+            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", "Eyelid", "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, connectBS, "blue")
         if cmds.checkBox(self.mouthCB, query=True, value=True):
-            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", "Mouth", "cvMouth", MOUTH_TGTLIST, False, False, False, False, False, connectBS, "red")
-            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", "Mouth", "cvMouth", MOUTH_TGTLIST, False, False, False, False, False, connectBS, "blue")
+            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", "Mouth", "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, connectBS, "red")
+            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", "Mouth", "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, connectBS, "blue")
             if rMouthCtrlGrp:
                 cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.lipsCB, query=True, value=True):
-            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, "Lips", "cvLips", LIPS_TGTLIST, False, False, True, True, False, connectBS, "yellow")
+            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, "Lips", "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, "yellow")
         if cmds.checkBox(self.sneerCB, query=True, value=True):
-            sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, "Sneer", "cvSneer", SNEER_TGTLIST, False, True, True, True, False, connectBS, "cyan")
+            sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, "Sneer", "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, True, True, True, False, connectBS, "cyan")
         if cmds.checkBox(self.grimaceCB, query=True, value=True):
-            grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, "Grimace", "cvGrimace", GRIMACE_TGTLIST, False, True, True, True, False, connectBS, "cyan")
+            grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, "Grimace", "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 180), False, True, True, True, False, connectBS, "cyan")
         if cmds.checkBox(self.faceCB, query=True, value=True):
-            faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, "Face", "cvFace", FACE_TGTLIST, True, True, True, True, True, connectBS, "cyan")
+            faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, "Face", "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, connectBS, "cyan")
         
     
-    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, lockX=False, lockY=False, limitX=True, limitY=True, directConnection=False, connectBS=True, color='yellow', *args):
+    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, limitX=True, limitY=True, directConnection=False, connectBS=True, color='yellow', *args):
         """ Important function to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty"]
@@ -206,25 +213,11 @@ class FacialControl():
                 if cmds.objectType(self.bsNode) == "blendShape":
                     aliasList = cmds.aliasAttr(self.bsNode, query=True)
             # create control calling dpControls function:
-            if cvCtrl == "cvBrow":
-                fCtrl = ctrls.cvBrow(fCtrlName)
-            elif cvCtrl == "cvEyelid":
-                fCtrl = ctrls.cvEyelid(fCtrlName)
-            elif cvCtrl == "cvMouth":
-                fCtrl = ctrls.cvMouth(fCtrlName, rotateShape=-1)
-            elif cvCtrl == "cvLips":
-                fCtrl = ctrls.cvLips(fCtrlName)
-            elif cvCtrl == "cvSneer":
-                fCtrl = ctrls.cvSneer(fCtrlName)
-            elif cvCtrl == "cvGrimace":
-                fCtrl = ctrls.cvGrimace(fCtrlName)
-            elif cvCtrl == "cvFace":
-                fCtrl = ctrls.cvFace(fCtrlName)
-            else:
-                fCtrl = cmds.circle(name=fCtrlName, constructionHistory=False, object=True, normal=(0, 0, 1), degree=3, sections=8, radius=1)[0]
+            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=3, rot=rotVector)
+            
             # ctrl zeroOut grp and color:
             fCtrlGrp = cmds.group(fCtrl, name=fCtrlName+"_Grp")
-            ctrls.colorShape([fCtrl], color)
+            self.ctrls.colorShape([fCtrl], color)
             # lock or limit XY axis:
             if lockX:
                 cmds.setAttr(fCtrl+".tx", lock=True, keyable=False)
@@ -234,7 +227,7 @@ class FacialControl():
                 cmds.setAttr(fCtrl+".ty", lock=True, keyable=False)
             elif limitY:
                 cmds.transformLimits(fCtrl, translationY=(-1, 1), enableTranslationY=(1, 1))
-            ctrls.setLockHide([fCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setLockHide([fCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
             # add calibrate attributes:
             if not lockX:
                 cmds.addAttr(fCtrl, longName="calibrateTX", attributeType="float", defaultValue=1)

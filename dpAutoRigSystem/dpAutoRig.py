@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.07"
+DPAR_VERSION = "3.06.08"
 
 # print loading script:
 print "\nLoading dpAutoRigSystem v", DPAR_VERSION
@@ -71,24 +71,28 @@ try:
     import datetime
     from functools import partial
     import Modules.Library.dpUtils as utils
-    import Modules.Library.dpControls as ctrls
+    import Modules.Library.dpControls as dpControls
     import Modules.dpBaseClass as Base
     import Modules.dpLayoutClass as Layout
     import Extras.dpUpdateRigInfo as rigInfo
     import Extras.dpReorderAttr as dpReorderAttr
     reload(utils)
-    reload(ctrls)
+    reload(dpControls)
     reload(rigInfo)
     reload(Base)
     reload(Layout)
 except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
+    self.jobWinClose()
 
 # declaring member variables
 ENGLISH = "English"
 MODULES = "Modules"
 SCRIPTS = "Scripts"
+CONTROLS = "Controls"
+COMBINED = "Controls/Combined"
+PRESET = "Controls/Presets"
 EXTRAS = "Extras"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
@@ -109,6 +113,7 @@ DPAR_SITE = "https://nilouco.blogspot.com"
 DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
 DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
+DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 
 
 class DP_AutoRig_UI:
@@ -118,11 +123,15 @@ class DP_AutoRig_UI:
     def __init__(self):
         """ Start the window, menus and main layout for dpAutoRig UI.
         """
+        self.dpARVersion = DPAR_VERSION
         self.loadedPath = False
         self.loadedModules = False
         self.loadedScripts = False
+        self.loadedControls = False
+        self.loadedCombined = False
         self.loadedExtras = False
-        
+        self.controlInstanceList = []
+
 
         try:
             # store all UI elements in a dictionary:
@@ -136,44 +145,49 @@ class DP_AutoRig_UI:
             self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRig System - v'+str(DPAR_VERSION)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
             
             # creating menus:
+            self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
             # language menu:
-            cmds.menu('languageMenu', label='Language')
+            self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('languageRadioMenuCollection')
             # create a language list:
-            self.langList = self.language()
+            self.langList, self.langDic = self.getJsonFileInfo("Languages")
             # create menuItems from language list:
             if self.langList:
-                # verify if there is a optionVar of last language choose by user in the maya system:
-                lastLangExists = cmds.optionVar( exists='dpAutoRigLastLanguage' )
-                if not lastLangExists:
-                    # if not exists a last language, set it to English if it exists, or to the first language in the list:
-                    if ENGLISH in self.langList:
-                        cmds.optionVar( stringValue=('dpAutoRigLastLanguage', ENGLISH) )
-                    else:
-                        cmds.optionVar( stringValue=('dpAutoRigLastLanguage', self.langList[0]) )
-                # get its value puting in a variable lastLang:
-                self.lastLang = cmds.optionVar( query='dpAutoRigLastLanguage' )
-                # if the last language in the system was different of json files, set it to English or to the first language in the list also:
-                if not self.lastLang in self.langList:
-                    if ENGLISH in self.langList:
-                        self.lastLang = ENGLISH
-                    else:
-                        self.lastLang = self.langList[0]
+                # verify if there is a optionVar of last choosen by user in Maya system:
+                lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"languageTabLayout\"); autoRigUI.mainUI()')
+                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"mainTabLayout\"); autoRigUI.mainUI()')
                 # load the last language from optionVar value:
-                cmds.menuItem( self.lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection' )
+                cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
                 print "Error: Cannot load the json language files!\n",
                 return
             
+            # preset menu:
+            self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
+            cmds.radioMenuItemCollection('presetRadioMenuCollection')
+            # create a preset list:
+            self.presetList, self.presetDic = self.getJsonFileInfo(PRESET)
+            # create menuItems from preset list:
+            if self.presetList:
+                # verify if there is a optionVar of last choosen by user in Maya system:
+                lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
+                # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
+                for preset in self.presetList:
+                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.deleteUI(\"mainTabLayout\"); autoRigUI.mainUI()')
+                # load the last preset from optionVar value:
+                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
+            else:
+                print "Error: Cannot load the json preset files!\n",
+                return
+            
             # option menu:
-            cmds.menu( 'optionMenu', label='Window' )
+            self.allUIs["optionMenu"] = cmds.menu( 'optionMenu', label='Window' )
             cmds.menuItem( 'reloadUI_MI', label='Reload UI', command=self.jobReloadUI )
             cmds.menuItem( 'quit_MI', label='Quit', command=self.deleteExistWindow )
             # help menu:
-            cmds.menu( 'helpMenu', label='Help', helpMenu=True )
+            self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True )
             cmds.menuItem( 'about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250) )
@@ -207,61 +221,93 @@ class DP_AutoRig_UI:
         """
         if cmds.window('dpAutoRigWindow', query=True, exists=True):
             cmds.deleteUI('dpAutoRigWindow', window=True)
-        if cmds.dockControl('dpAutoRigSystem', exists=True):
+        if cmds.dockControl('dpAutoRigSystem', query=True, exists=True):
             cmds.deleteUI('dpAutoRigSystem', control=True)
     
     
-    def language(self):
-        """ Find all json language file in the languagePath and get idiom used for each "language module".
-            Create a dictionary with dictionaries of all languages found.
-            Return a list with the name of the languages found.
+    def getJsonFileInfo(self, dir):
+        """ Find all json files in the given path and get coctemt used for each file.
+            Create a dictionary with dictionaries of all file found.
+            Return a list with the name of the found files.
         """
         # declare the resulted list:
-        self.langList = []
-        self.langDic = {}
+        resultList = []
+        resultDic = {}
         # find path where 'dpAutoRig.py' is been executed:
-        path = utils.findPath("dpAutoRig.py")
-        langDir = "Languages/"
-        langPath = path + "/" + langDir
-        # list all files in the language directory:
-        allFileList = os.listdir(langPath)
+        path = os.path.dirname(__file__)
+        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+        jsonPath = os.path.join(path, dir, "").replace("\\", "/")
+        # list all files in this directory:
+        allFileList = os.listdir(jsonPath)
         for file in allFileList:
             # verify if there is the extension ".json"
-            if ".json" in file:
-                # get the name of the languafe from the file name:
-                langName = file.partition(".json")[0]
+            if file.endswith(".json"):
+                # get the name of the type from the file name:
+                typeName = file.partition(".json")[0]
                 # clear the old variable content and open the json file as read:
                 content = None
-                fileDictionary = open(langPath + file, "r")
+                fileDictionary = open(jsonPath + file, "r")
                 try:
                     # read the json file content and store it in a dictionary:
                     content = json.loads(fileDictionary.read())
-                    self.langDic[langName] = content
-                    self.langList.append(langName)
+                    resultDic[typeName] = content
+                    resultList.append(typeName)
                 except:
-                    print "Error: json Language file corrupted:", file,
+                    print "Error: json file corrupted:", file,
                 # close the json file:
                 fileDictionary.close()
-        return self.langList
+        return resultList, resultDic
+    
+    
+    def checkLastOptionVar(self, optionVarName, preferableName, typeList):
+        """ Verify if there's a optionVar with this name or create it with the preferable given value.
+            Returns the lastValue found.
+        """
+        lastValueExists = cmds.optionVar(exists=optionVarName)
+        if not lastValueExists:
+            # if not exists a last optionVar, set it to preferableName if it exists, or to the first value in the list:
+            if preferableName in typeList:
+                cmds.optionVar( stringValue=(optionVarName, preferableName) )
+            else:
+                cmds.optionVar( stringValue=(optionVarName, typeList[0]) )
+        # get its value puting in a variable to return it:
+        resultValue = cmds.optionVar( query=optionVarName )
+        # if the last value in the system was different of json files, set it to preferableName or to the first value in the list also:
+        if not resultValue in typeList:
+            if preferableName in typeList:
+                resultValue = preferableName
+            else:
+                resultValue = resultValue[0]
+        return resultValue
+    
+    
+    def getCurrentMenuValue(self, itemList, *args):
+        for item in itemList:
+            if cmds.menuItem( item+"_MI", query=True, radioButton=True ):
+                return item
     
     
     def mainUI(self):
         """ Create the layouts inside of the mainLayout. Here will be the entire User Interface.
         """
         # get current language choose UI from menu:
-        for idiom in self.langList:
-            if cmds.menuItem( idiom+"_MI", query=True, radioButton=True ):
-                self.langName = idiom
-                break
+        self.langName = self.getCurrentMenuValue(self.langList)
+        # get current preset choose UI from menu:
+        self.presetName = self.getCurrentMenuValue(self.presetList)            
         
-        # creating tabs - languageTabLayout:
-        self.allUIs["languageTabLayout"] = cmds.tabLayout('languageTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
-        cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["languageTabLayout"], 'top', 0), (self.allUIs["languageTabLayout"], 'left', 0), (self.allUIs["languageTabLayout"], 'bottom', 0), (self.allUIs["languageTabLayout"], 'right', 0)) )
+        # initialize dpControls:
+        self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
+        
+        # --
+        
+        # creating tabs - mainTabLayout:
+        self.allUIs["mainTabLayout"] = cmds.tabLayout('mainTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
+        cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["mainTabLayout"], 'top', 0), (self.allUIs["mainTabLayout"], 'left', 0), (self.allUIs["mainTabLayout"], 'bottom', 0), (self.allUIs["mainTabLayout"], 'right', 0)) )
         
         # --
         
         # interface of Rigging tab - formLayout:
-        self.allUIs["riggingTabLayout"] = cmds.formLayout('riggingTabLayout', numberOfDivisions=100, parent=self.allUIs["languageTabLayout"])
+        self.allUIs["riggingTabLayout"] = cmds.formLayout('riggingTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
         
         #colTopLefA - columnLayout:
         self.allUIs["colTopLeftA"] = cmds.columnLayout('colTopLeftA', adjustableColumn=True, parent=self.allUIs["riggingTabLayout"])
@@ -316,7 +362,7 @@ class DP_AutoRig_UI:
         cmds.separator(style='none', height=5, parent=self.allUIs["footerA"])
         # this text will be actualized by the number of module instances created in the scene...
         self.allUIs["footerAText"] = cmds.text('footerAText', align='center', label="# "+self.langDic[self.langName]['i005_footerA'], parent=self.allUIs["footerA"])
-        cmds.setParent( self.allUIs["languageTabLayout"] )
+        cmds.setParent( self.allUIs["mainTabLayout"] )
         
         # call the function in order to populate the colMiddleRightA (modulesLayout)
         self.populateCreatedGuideModules()
@@ -335,7 +381,7 @@ class DP_AutoRig_UI:
         # --
         
         # interface of Skinning tab:
-        self.allUIs["skinningTabLayout"] = cmds.formLayout('skinningTabLayout', numberOfDivisions=100, parent=self.allUIs["languageTabLayout"])
+        self.allUIs["skinningTabLayout"] = cmds.formLayout('skinningTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
         
         #colSkinLeftA - columnLayout:
         self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=190, parent=self.allUIs["skinningTabLayout"])
@@ -366,13 +412,13 @@ class DP_AutoRig_UI:
         self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinningTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
         self.allUIs["skinButton"] = cmds.button("skinButton", label=self.langDic[self.langName]['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
-        self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", cn="vertical2", st=2.0, parent=self.allUIs["footerB"])
+        self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["footerB"])
         self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
         self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.langDic[self.langName]['i025_joints']+" 0 "+self.langDic[self.langName]['i024_geometries'], parent=self.allUIs["footerB"])
-        cmds.setParent( self.allUIs["languageTabLayout"] )
+        cmds.setParent( self.allUIs["mainTabLayout"] )
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["skinningTabLayout"], edit=True,
@@ -388,8 +434,59 @@ class DP_AutoRig_UI:
         
         # --
         
+        # interface of Control tab - formLayout:
+        self.allUIs["controlTabLayout"] = cmds.formLayout('controlTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # controlMainLayout - scrollLayout:
+        self.allUIs["controlMainLayout"] = cmds.scrollLayout('controlMainLayout', parent=self.allUIs["controlTabLayout"])
+        self.allUIs["controlLayout"] = cmds.columnLayout('controlLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['controlMainLayout'])
+        
+        # createControl - frameLayout:
+        self.allUIs["createControlLayout"] = cmds.frameLayout('createControlLayout', label=self.langDic[self.langName]['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["optionsB"] = cmds.frameLayout('optionsB', label=self.langDic[self.langName]['i002_options'], collapsable=True, collapse=False, marginWidth=10, parent=self.allUIs["createControlLayout"])
+        self.allUIs["controlOptionsLayout"] = cmds.columnLayout('controlOptionsLayout', adjustableColumn=True, width=50, rowSpacing=5, parent=self.allUIs["optionsB"])
+        self.allUIs["controlNameTFG"] = cmds.textFieldGrp('controlNameTFG', text="", label=self.langDic[self.langName]['i101_customName'], columnAlign2=("right", "left"), adjustableColumn2=2, columnAttach=((1, "right", 5), (2, "left", 5)), parent=self.allUIs["controlOptionsLayout"])
+        self.allUIs["controlActionRBG"] = cmds.radioButtonGrp("controlActionRBG", label=self.langDic[self.langName]['i109_action'], labelArray3=[self.langDic[self.langName]['i108_newControl'], self.langDic[self.langName]['i107_addShape'], self.langDic[self.langName]['i102_replaceShape']], vertical=True, numberOfRadioButtons=3, parent=self.allUIs["controlOptionsLayout"])
+        cmds.radioButtonGrp(self.allUIs["controlActionRBG"], edit=True, select=1) #new control
+        self.allUIs["degreeRBG"] = cmds.radioButtonGrp("degreeRBG", label=self.langDic[self.langName]['i103_degree'], labelArray2=[self.langDic[self.langName]['i104_linear'], self.langDic[self.langName]['i105_cubic']], vertical=True, numberOfRadioButtons=2, parent=self.allUIs["controlOptionsLayout"])
+        cmds.radioButtonGrp(self.allUIs["degreeRBG"], edit=True, select=1) #linear
+        self.allUIs["controlSizeFSG"] = cmds.floatSliderGrp("controlSizeFSG", label=self.langDic[self.langName]['i115_size'], field=True, minValue=0.01, maxValue=10.0, fieldMinValue=0, fieldMaxValue=1000.0, precision=2, value=1.0, parent=self.allUIs["controlOptionsLayout"])
+        self.allUIs["directionOMG"] = cmds.optionMenuGrp("directionOMG", label=self.langDic[self.langName]['i106_direction'], parent=self.allUIs["controlOptionsLayout"])
+        cmds.menuItem(label='-X')
+        cmds.menuItem(label='+X')
+        cmds.menuItem(label='-Y')
+        cmds.menuItem(label='+Y')
+        cmds.menuItem(label='-Z')
+        cmds.menuItem(label='+Z')
+        cmds.optionMenuGrp(self.allUIs["directionOMG"], edit=True, value='+Y')
+        
+        # curveShapes - frameLayout:
+        self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.langDic[self.langName]['i100_curveShapes'], collapsable=True, collapse=False, parent=self.allUIs["createControlLayout"])
+        self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(50, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
+        # here we populate the control module layout with the items from Controls folder:
+        self.controlModuleList = self.startGuideModules(CONTROLS, "start", "controlModuleLayout")
+        
+        self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.langDic[self.langName]['i118_combinedShapes'], collapsable=True, collapse=False, parent=self.allUIs["createControlLayout"])
+        self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(50, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
+        # here we populate the control module layout with the items from Controls folder:
+        self.combinedControlModuleList = self.startGuideModules(COMBINED, "start", "combinedControlModuleLayout")
+        
+        # editSeletedControls - frameLayout:
+        self.allUIs["editSelectionFL"] = cmds.frameLayout('editSelectionFL', label=self.langDic[self.langName]['i111_editSelection'], collapsable=True, collapse=False, marginHeight=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["editSelectionLayout"] = cmds.paneLayout("editSelectionLayout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
+        self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.langDic[self.langName]['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelectionLayout"])
+        self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.langDic[self.langName]['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelectionLayout"])
+        self.allUIs["replaceShapeButton"] = cmds.button("replaceShapeButton", label=self.langDic[self.langName]['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ctrls.transferShape, True, True), parent=self.allUIs["editSelectionLayout"])
+        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=utils.zeroOut, parent=self.allUIs["editSelectionFL"])
+        
+        # edit formLayout in order to get a good scalable window:
+        cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["controlMainLayout"], 'top', 20), (self.allUIs["controlMainLayout"], 'left', 5), (self.allUIs["controlMainLayout"], 'right', 5), (self.allUIs["controlMainLayout"], 'bottom', 5)]
+                        )
+        
+        # --
+        
         # interface of Extra tab - formLayout:
-        self.allUIs["extraTabLayout"] = cmds.formLayout('extraTabLayout', numberOfDivisions=100, parent=self.allUIs["languageTabLayout"])
+        self.allUIs["extraTabLayout"] = cmds.formLayout('extraTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
         # extraMainLayout - scrollLayout:
         self.allUIs["extraMainLayout"] = cmds.scrollLayout("extraMainLayout", parent=self.allUIs["extraTabLayout"])
         self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
@@ -403,7 +500,7 @@ class DP_AutoRig_UI:
         # --
         
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["languageTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["extraTabLayout"], 'Extra')) )
+        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra')) )
         cmds.select(clear=True)
 
     
@@ -419,9 +516,10 @@ class DP_AutoRig_UI:
 
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
-        if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
-            if cmds.dockControl('dpAutoRigSystem', exists=True):
-                cmds.deleteUI('dpAutoRigSystem', control=True)
+        if self.pDockCtrl:
+            if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
+                if cmds.dockControl('dpAutoRigSystem', exists=True):
+                    cmds.deleteUI('dpAutoRigSystem', control=True)
 
     def jobDockVisChange(self, *args):
         #Force focus
@@ -777,6 +875,12 @@ class DP_AutoRig_UI:
             if guideDir == SCRIPTS and not self.loadedScripts:
                 print guideDir+" : "+str(guideModuleList)
                 self.loadedScripts = True
+            if guideDir == CONTROLS and not self.loadedControls:
+                print guideDir+" : "+str(guideModuleList)
+                self.loadedControls = True
+            if guideDir == COMBINED and not self.loadedCombined:
+                print guideDir+" : "+str(guideModuleList)
+                self.loadedCombined = True
             if guideDir == EXTRAS and not self.loadedExtras:
                 print guideDir+" : "+str(guideModuleList)
                 self.loadedExtras = True
@@ -793,9 +897,11 @@ class DP_AutoRig_UI:
         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
         try:
+            guideDir = guideDir.replace("/", ".")
             guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
             reload(guide)
-        except Exception, e:
+        except Exception as e:
+            print e
             print "ERROR loading extension {0}: {1}".format(guideModule, e)
             return
 
@@ -807,25 +913,30 @@ class DP_AutoRig_UI:
         path = utils.findPath("dpAutoRig.py")
         iconDir = path+icon
         iconInfo = path+"/Icons/"+INFO_ICON
+        guideName = guide.CLASS_NAME
+        
         # creating a basic layout for guide buttons:
-        cmds.rowLayout( numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout] )
-        #OLD-#cmds.button(label='?', height=30, backgroundColor=(0.8, 0.8, 0.8), command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
-        
-        cmds.image(i=iconDir, width=32)
+        if guideDir == CONTROLS or guideDir == COMBINED.replace("/", "."):
+            controlInstance = self.initControlModule(guideModule, guideDir)
+            cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
+            self.controlInstanceList.append(controlInstance)
+        else:
+            moduleLayout = cmds.rowLayout(numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
+            cmds.image(i=iconDir, width=32, parent=moduleLayout)
 
-        if guideDir == MODULES:
-            '''
-            We need to passe the rigType parameters because the cmds.button command will send a False parameter that
-            will be stock in the rigType if we don't pass the parameter
-            https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
-            '''
-            cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped) )
-        elif guideDir == SCRIPTS:
-            cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir) )
-        elif guideDir == EXTRAS:
-            cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir) )
-        
-        cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250))
+            if guideDir == MODULES:
+                '''
+                We need to passe the rigType parameters because the cmds.button command will send a False parameter that
+                will be stock in the rigType if we don't pass the parameter
+                https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
+                '''
+                cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped), parent=moduleLayout)
+            elif guideDir == SCRIPTS:
+                cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
+            elif guideDir == EXTRAS:
+                cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
+            
+            cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     #@utils.profiler
@@ -853,13 +964,12 @@ class DP_AutoRig_UI:
         # get the CLASS_NAME from guideModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
-        guideInstance = guideClass(self, self.langDic, self.langName, userSpecName, rigType)
+        guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName, userSpecName, rigType)
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
-
         return guideInstance
     
     
@@ -874,11 +984,23 @@ class DP_AutoRig_UI:
         # get the CLASS_NAME from extraModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this extraModule as an Instance:
-        dpUIinst = self
-        guideInstance = guideClass(dpUIinst, self.langDic, self.langName)
+        guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName)
         return guideInstance
         
         
+    def initControlModule(self, guideModule, guideDir, *args):
+        """ Call initExtraModule because it's the same code.
+        """
+        guideInstance = self.initExtraModule(guideModule, guideDir)
+        return guideInstance
+    
+    
+    def installControlModule(self, controlInstance, useUI, *args):
+        """  Start the creation of this Control module using the UI info.
+        """
+        controlInstance.cvMain(useUI)
+    
+    
     def execScriptedGuide(self, guideModule, guideDir, *args):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
@@ -938,16 +1060,16 @@ class DP_AutoRig_UI:
                 dpUIinst = self
                 if cmds.attributeQuery("rigType", node=module[2], ex=True):
                     curRigType = cmds.getAttr(module[2] + ".rigType")
-                    moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], curRigType)
+                    moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], curRigType)
                 else:
                     if cmds.attributeQuery("Style", node=module[2], ex=True):
                         iStyle = cmds.getAttr(module[2] + ".Style")
                         if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.biped)
+                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.biped)
                         else:
-                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.quadruped)
+                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.quadruped)
                     else:
-                        moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, module[1], Base.RigType.default)
+                        moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.default)
                 self.moduleInstancesList.append(moduleInst)
         # edit the footer A text:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
@@ -1034,19 +1156,20 @@ class DP_AutoRig_UI:
         self.update_remoteVersion = rawResult[1]
         self.update_text          = text
         self.update_winWidth      = 305
-        self.update_winHeight     = 250
+        self.update_winHeight     = 300
         # creating Update Window:
         if cmds.window('dpUpdateWindow', query=True, exists=True):
             cmds.deleteUI('dpUpdateWindow', window=True)
         dpUpdateWin = cmds.window('dpUpdateWindow', title='dpAutoRigSystem - '+self.langDic[self.langName]['i089_update'], iconName='dpInfo', widthHeight=(self.update_winWidth, self.update_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
-        updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpUpdateWin)
+        updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
         if self.update_text:
             updateDesc = cmds.text("\n"+self.langDic[self.langName][self.update_text], align="center", parent=updateLayout)
             cmds.text("\n"+DPAR_VERSION+self.langDic[self.langName]['i090_currentVersion'], align="left", parent=updateLayout)
         if self.update_remoteVersion:
             cmds.text(self.update_remoteVersion+self.langDic[self.langName]['i091_onlineVersion'], align="left", parent=updateLayout)
             cmds.text("\n", parent=updateLayout)
+            whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(utils.visiteWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visiteWebSite, DPAR_GITHUB), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
             installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
@@ -1229,7 +1352,7 @@ class DP_AutoRig_UI:
     Pymel
     Generic function to create base controller
     '''
-    def getBaseCtrl(self, sAttrName, sCtrlName, fRadius, iDegree = 1, iSection = 8):
+    def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree = 1, iSection = 8):
         nCtrl = None
         self.ctrlCreated = False
         try:
@@ -1239,9 +1362,9 @@ class DP_AutoRig_UI:
                 nCtrl = pymel.PyNode(self.prefix + sCtrlName)
             except pymel.MayaNodeError:
                 if (sCtrlName != (self.prefix + "Option_Ctrl")):
-                    nCtrl = pymel.circle(n=sCtrlName, nr=(0, 1, 0), d=iDegree, s=iSection, r=fRadius, ch=False)[0]
+                    nCtrl = pymel.PyNode(self.ctrls.cvControl(sCtrlType, sCtrlName, r=fRadius, d=iDegree, dir="+X"))
                 else:
-                    nCtrl = pymel.PyNode(ctrls.cvCharacter(sCtrlName, r=0.2))
+                    nCtrl = pymel.PyNode(self.ctrls.cvCharacter(sCtrlType, sCtrlName, r=(fRadius*0.2)))
                 self.ctrlCreated = True
             finally:
                 #Since there is no connection between the master and the node found, create the connection
@@ -1271,17 +1394,21 @@ class DP_AutoRig_UI:
             self.masterGrp.addAttr("masterGrp", at="bool")
             self.masterGrp.setDynamicAttr('masterGrp', True)
             self.masterGrp.setDynamicAttr("date", localTime)
+            # system:
+            self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION)
+            # author:
+            self.masterGrp.setDynamicAttr("author", getpass.getuser())
+            # rig info to be updated:
+            self.masterGrp.setDynamicAttr("geometryList", "")
+            self.masterGrp.setDynamicAttr("controlList", "")
 
-        # add data log:
-        # system:
-        self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION)
-        # date:
+        # add date data log:
         self.masterGrp.setDynamicAttr("lastModification", localTime)
-        # author:
-        self.masterGrp.setDynamicAttr("author", getpass.getuser())
+        
         # module counts:
         for guideType in self.guideModuleList:
             self.masterGrp.setDynamicAttr(guideType+"Count", 0)
+        
 
         #Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
@@ -1313,28 +1440,24 @@ class DP_AutoRig_UI:
                    self.fxGrp.__melobject__(),
                    self.staticGrp.__melobject__(),
                    self.ctrlsVisGrp.__melobject__()]
-        ctrls.setLockHide(aToLock, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide(aToLock, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
 
         #Control Setup
-        fMasterRadius = ctrls.dpCheckLinearUnit(10)
-        self.masterCtrl = self.getBaseCtrl("masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
+        fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
+        self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         if (self.ctrlCreated):
-            self.masterCtrl.setDynamicAttr("masterCtrl", True)
-            self.masterCtrl.setDynamicAttr("geometryList", "")
-            self.masterCtrl.setDynamicAttr("controlList", "")
+#            self.masterCtrl.setDynamicAttr("masterCtrl", True)
             self.masterCtrl.rotateOrder.set(3)
 
-        self.globalCtrl = self.getBaseCtrl("globalCtrl", self.prefix+"Global_Ctrl", ctrls.dpCheckLinearUnit(16), iSection=4)
+        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13), iSection=4)
         if (self.ctrlCreated):
-            self.globalCtrl.rotateY.set(45)
-            pymel.makeIdentity(self.globalCtrl, a=True)
             self.globalCtrl.rotateOrder.set(3)
 
-        self.rootCtrl   = self.getBaseCtrl("rootCtrl", self.prefix+"Root_Ctrl", ctrls.dpCheckLinearUnit(8))
+        self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         if (self.ctrlCreated):
             self.rootCtrl.rotateOrder.set(3)
 
-        self.optionCtrl = self.getBaseCtrl("optionCtrl", self.prefix+"Option_Ctrl", ctrls.dpCheckLinearUnit(16))
+        self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             pymel.makeIdentity(self.optionCtrl, apply=True)
             self.optionCtrlGrp = pymel.PyNode(utils.zeroOut([self.optionCtrl.__melobject__()])[0])
@@ -1346,8 +1469,8 @@ class DP_AutoRig_UI:
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleX, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleY, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleZ, force=True)
-            ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
-            ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
+            self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         else:
             self.optionCtrlGrp = self.optionCtrl.getParent()
 
@@ -1364,8 +1487,8 @@ class DP_AutoRig_UI:
         if (int(cmds.about(version=True)[:4]) < 2016):
             pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
         # set lock and hide attributes (cmds function):
-        ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-        ctrls.setLockHide([self.rootCtrl.__melobject__(), self.globalCtrl.__melobject__()], ['sx', 'sy', 'sz', 'v'])
+        self.ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
+        self.ctrls.setLockHide([self.rootCtrl.__melobject__(), self.globalCtrl.__melobject__()], ['sx', 'sy', 'sz', 'v'])
 
         self.masterCtrl.visibility.setKeyable(False)
         pymel.select(None)
@@ -1382,7 +1505,7 @@ class DP_AutoRig_UI:
             pymel.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ParentConstraint")
             pymel.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScaleConstraint")
             self.baseRootJntGrp.visibility.set(False)
-            ctrls.setLockHide([self.baseRootJnt.__melobject__(), self.baseRootJntGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setLockHide([self.baseRootJnt.__melobject__(), self.baseRootJntGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
 
         #Ensure object returned are cmds supported
         self.masterGrp = self.masterGrp.__melobject__()
@@ -1470,7 +1593,7 @@ class DP_AutoRig_UI:
                 if self.prefix[len(self.prefix)-1] != "_":
                     self.prefix = self.prefix + "_"
 
-            #Check if we need to colorize the ctrls
+            #Check if we need to colorize the self.ctrls
             #Check integrate option
             bColorize = False
             try:
@@ -1895,8 +2018,8 @@ class DP_AutoRig_UI:
                                 cmds.connectAttr(self.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
                                 cmds.setAttr(hipsA+'.'+mScaleVVAttr, keyable=False)
                                 if bColorize:
-                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['FkCtrls'][s], "cyan")
-                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['IkCtrls'][s], "yellow")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['FkCtrls'][s], "cyan")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['IkCtrls'][s], "yellow")
                         
                         # integrate the head orient from the masterCtrl:
                         if moduleType == HEAD:
@@ -1912,9 +2035,9 @@ class DP_AutoRig_UI:
                                 worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_ParentConstraint")
                                 if bColorize:
-                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrls'][s], "yellow")
-                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
-                                    ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                         
                         # integrate the Eye with the Head setup:
                         if moduleType == EYE:
@@ -1956,10 +2079,10 @@ class DP_AutoRig_UI:
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 if self.integratedTaskDic[moduleDic]['hasIris']:
                                     irisCtrl = self.integratedTaskDic[moduleDic]['irisCtrl'][s]
-                                    ctrls.colorShape([irisCtrl], "cyan")
+                                    self.ctrls.colorShape([irisCtrl], "cyan")
                                 if self.integratedTaskDic[moduleDic]['hasPupil']:
                                     pupilCtrl = self.integratedTaskDic[moduleDic]['pupilCtrl'][s]
-                                    ctrls.colorShape([pupilCtrl], "black")
+                                    self.ctrls.colorShape([pupilCtrl], "black")
                         
                         # integrate the Finger module:
                         if moduleType == FINGER:
@@ -2060,13 +2183,13 @@ class DP_AutoRig_UI:
                 for pCtrl in aAllCtrls:
                     if not pCtrl.getShape().overrideEnabled.get():
                         if (lPattern.match(pCtrl.name())):
-                            ctrls.colorShape([pCtrl.__melobject__()], "red")
+                            self.ctrls.colorShape([pCtrl.__melobject__()], "red")
                         elif (rPattern.match(pCtrl.name())):
-                            ctrls.colorShape([pCtrl.__melobject__()], "blue")
+                            self.ctrls.colorShape([pCtrl.__melobject__()], "blue")
                         elif (pCtrl in aBCtrl):
-                            ctrls.colorShape([pCtrl.__melobject__()], "black")
+                            self.ctrls.colorShape([pCtrl.__melobject__()], "black")
                         else:
-                            ctrls.colorShape([pCtrl.__melobject__()], "yellow")
+                            self.ctrls.colorShape([pCtrl.__melobject__()], "yellow")
 
             # Add usefull attributes for the animators
             if (bAddAttr):
@@ -2121,7 +2244,11 @@ class DP_AutoRig_UI:
                 if currentAttrList:
                     for cAttr in currentAttrList:
                         if cAttr.endswith("_volumeVariation"):
-                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_volumeVariation")])
+                            try:
+                                cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_volumeVariation")])
+                            except:
+                                # probably exists another attribute with the same name
+                                pass
                             
                 # list desirable Option_Ctrl attributes order:
                 desiredAttrList = ['general', 'rigScale', 'rigScaleMultiplier', 'globalStretch', 'volumeVariation', 'Spine_active', 'Spine', 'Spine1_active', 'Spine1', 
