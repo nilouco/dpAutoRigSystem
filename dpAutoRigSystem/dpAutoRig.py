@@ -49,18 +49,46 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.08"
+DPAR_VERSION = "3.06.09"
 
-# print loading script:
-print "\nLoading dpAutoRigSystem v", DPAR_VERSION
+
+
+###################### Start: Loading.
+
+import maya.cmds as cmds
+import sys
+import os
+import random
+
+def clearDPARLoadingWindow():
+    if cmds.window('dpARLoadWin', query=True, exists=True):
+        cmds.deleteUI('dpARLoadWin', window=True)
+
+def dpARLoadingWindow():
+    """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
+    """
+    loadingString = "Loading dpAutoRigSystem v%s ... " %DPAR_VERSION
+    print loadingString,
+    path = os.path.dirname(__file__)
+    randImage = random.randint(0,7)
+    clearDPARLoadingWindow()
+    cmds.window('dpARLoadWin', title='dpAutoRigSystem', iconName='dpAutoRig', widthHeight=(285, 203), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+    cmds.columnLayout('dpARLoadLayout')
+    cmds.image('loadingImage', image=(path+"/Icons/dp_loading_0%i.png" %randImage), backgroundColor=(0.8, 0.8, 0.8), parent='dpARLoadLayout')
+    cmds.text('versionText', label=loadingString, parent='dpARLoadLayout')
+    cmds.showWindow('dpARLoadWin')
+
+if not "pymel" in sys.modules:
+    dpARLoadingWindow()
+
+###################### End: Loading.
+
+
 
 # importing libraries:
 try:
-    import maya.cmds as cmds
     import pymel.core as pymel
     import json
-    import os
-    import sys
     import re
     import time
     import getpass
@@ -84,7 +112,12 @@ try:
 except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
-    self.jobWinClose()
+    try:
+        if cmds.window('dpARLoadWin', query=True, exists=True):
+            cmds.deleteUI('dpARLoadWin', window=True)
+        self.jobWinClose()
+    except:
+        pass
 
 # declaring member variables
 ENGLISH = "English"
@@ -142,7 +175,7 @@ class DP_AutoRig_UI:
             self.deleteExistWindow()
             dpAR_winWidth  = 305
             dpAR_winHeight = 605
-            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRig System - v'+str(DPAR_VERSION)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
+            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
             
             # creating menus:
             self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
@@ -215,6 +248,8 @@ class DP_AutoRig_UI:
         self.iUIKilledId = cmds.scriptJob(uid=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], vcc=self.jobDockVisChange)
         #print self.pDockCtrl
+        clearDPARLoadingWindow()
+        
 
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
