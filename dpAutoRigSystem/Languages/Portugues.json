@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "date"       : "2011-08-03",
-    "updated"    : "2019-12-03",
+    "updated"    : "2019-12-08",
     "translator" : "Danilo Pinheiro",
 
     "i000_guides"          : "Criar GUIAS",
@@ -126,6 +126,15 @@
     "i117_whatsChanged"    : "O que mudou?",
     "i118_combinedShapes"  : "Formas Combinadas",
     "i119_curveDegree"     : "Grau da Curva",
+    "i120_changeDegree"    : "Trocar o Grau da Curva",
+    "i121_resetCurve"      : "Redefinir a Curva",
+    "i122_copyAttr"        : "Copiar Atributos",
+    "i123_pasteAttr"       : "Colar Atributos",
+    "i124_copyPasteAttr"   : "Copiar e Colar Atributos",
+    "i125_copiedAttr"      : "Atributos copiados com sucesso.",
+    "i126_pastedAttr"      : "Atributos colados com sucesso.",
+    "i127_guideVersionDif" : "Encontrado versão de guia diferente\ndesta versão atual do dpAutoRigSystem.\n\nTalvez isso cause problemas inexperados\nna construção do módulo.\n\nVocê quer continuar?",
+    "i128_optionDegree"    : "Crir as guias usando este grau de curva.",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com numeros, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -271,6 +280,8 @@
     "m132_jawHandle"         : "Pegador do Maxilar",
     "m133_locatorFlat"       : "Locator Plano",
     "m134_piramid"           : "Piramide",
+    "m135_copyPasteAttr"     : "Copiar e Colar Atributos",
+    "m136_copyPasteAttrDesc" : "Copiar e Colar os atributos selecionados\n do primeiro objeto selecionado\npara os outros objetos selecionados.",
     
     "extra_CopyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Salva, guarda e restaura a aparência de controles. Pratico quando o rig deve ser reconstruido.",
@@ -349,6 +360,8 @@
     "e012_cantLoadRibbon"          : "Erro: (012) - Não foi possível carregar a extensão jcRibbon para criar bend no módulo Limb, desculpe.",
     "e013_cantLoadIkSpringSolver"  : "Erro: (013) - Não foi possível carregar o plugin ikSpringSolver, desculpe.\nAplicado o ikRPSolver como padrão.",
     "e014_cantLoadQuatNode"        : "Erro: (014) - Não foi possível carregar o plugin QuatNode.\nUsaremos o módulo Limb comum.",
+    "e015_selectToCopyAttr"        : "Erro: (015) - Selecione um objeto para copiar os atributos, por favor.",
+    "e016_notPastedAttr"           : "Erro: (016) - Não foi possível colar o attributo.",
     
     "b000_BugGeneral"                    : "Bug: (000) - Encontrado um bug, desculpe.\n\nRevise as guias ou a versão do script, por favor.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - Encontrado mirror no módulo Single\nusando indirectSkin no Maya 2018!\n\nExiste um problema:\nMaya 2018 não é capaz de calcular\ncorretamente o mirror de indirect skinning.\n\nPrecisamos usar um workaroud, desculpe:\n\nSalve sua cena e abra novamente\nantes de começar o skinning, por favor."

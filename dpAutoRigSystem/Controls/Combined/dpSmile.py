@@ -9,7 +9,7 @@ TITLE = "m101_smile"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_smile.png"
 
-dpSmileVersion = 1.0
+dpSmileVersion = 1.1
 
 class Smile(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -23,7 +23,7 @@ class Smile(BaseControl.ControlStartClass):
         self.checkModuleList = ['dpCircle', 'dpCurvedCircleUp']
     
     
-    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvAction=1, dpGuide=False, *args):
+    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
@@ -31,7 +31,7 @@ class Smile(BaseControl.ControlStartClass):
         checkResultList = self.dpUIinst.startGuideModules(self.controlsGuideDir, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
-            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvAction, dpGuide, True)
+            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
             return result
         else:
             # error checking modules in the folder:
@@ -45,10 +45,10 @@ class Smile(BaseControl.ControlStartClass):
         circleInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
         mouthInstance = self.dpUIinst.initControlModule('dpCurvedCircleUp', self.controlsGuideDir)
         # creating curve shapes:
-        curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree, "+Y", 1)
-        curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree, "+Y", 1)
-        curve3 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree, "+Y", 1)
-        curve4 = mouthInstance.cvMain(False, cvID, cvName, cvSize, cvDegree, "+Y", 1)
+        curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)
+        curve3 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)
+        curve4 = mouthInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve2+".translateX", 0.4)
         cmds.setAttr(curve2+".translateY", 0.3)
         cmds.setAttr(curve3+".translateX", -0.4)

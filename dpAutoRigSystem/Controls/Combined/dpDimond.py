@@ -9,7 +9,7 @@ TITLE = "m105_dimond"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_dimond.png"
 
-dpDimondVersion = 1.0
+dpDimondVersion = 1.1
 
 class Dimond(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -23,7 +23,7 @@ class Dimond(BaseControl.ControlStartClass):
         self.checkModuleList = ['dpSquare']
     
     
-    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvAction=1, dpGuide=False, *args):
+    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
@@ -31,7 +31,7 @@ class Dimond(BaseControl.ControlStartClass):
         checkResultList = self.dpUIinst.startGuideModules(self.controlsGuideDir, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
-            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvAction, dpGuide, True)
+            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
             return result
         else:
             # error checking modules in the folder:
@@ -44,7 +44,7 @@ class Dimond(BaseControl.ControlStartClass):
         # load module instance
         squareInstance = self.dpUIinst.initControlModule('dpSquare', self.controlsGuideDir)
         # creating curve shapes:
-        curve1 = squareInstance.cvMain(useUI, cvID, cvName, cvSize, cvDegree)
+        curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         if cvDirection[1] == "Y":
             cmds.setAttr(curve1+".rotateZ", 45)
         else:

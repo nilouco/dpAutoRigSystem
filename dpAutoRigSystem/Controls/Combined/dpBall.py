@@ -9,7 +9,7 @@ TITLE = "m116_ball"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ball.png"
 
-dpBallVersion = 1.0
+dpBallVersion = 1.1
 
 class Ball(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -23,7 +23,7 @@ class Ball(BaseControl.ControlStartClass):
         self.checkModuleList = ['dpCircle']
     
     
-    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvAction=1, dpGuide=False, *args):
+    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
@@ -31,7 +31,7 @@ class Ball(BaseControl.ControlStartClass):
         checkResultList = self.dpUIinst.startGuideModules(self.controlsGuideDir, "check", None, checkModuleList=self.checkModuleList)
         if len(checkResultList) == 0:
             # call combine function:
-            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvAction, dpGuide, True)
+            result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide, True)
             return result
         else:
             # error checking modules in the folder:
@@ -44,9 +44,9 @@ class Ball(BaseControl.ControlStartClass):
         # load module instance
         circleInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
-        curve1 = circleInstance.cvMain(useUI, cvID, cvName, cvSize, cvDegree)
-        curve2 = circleInstance.cvMain(useUI, cvID, cvName, cvSize, cvDegree)
-        curve3 = circleInstance.cvMain(useUI, cvID, cvName, cvSize, cvDegree)
+        curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
+        curve3 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve2+".rotateY", -90)
         cmds.setAttr(curve3+".rotateX", 90)
         mainCurve = self.combineCurves([curve1, curve2, curve3])

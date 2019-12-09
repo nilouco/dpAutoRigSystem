@@ -25,6 +25,7 @@ class ControlClass:
         self.dpUIinst = dpUIinst
         self.presetDic = presetDic
         self.presetName = presetName
+        self.attrValueDic = {}
 
 
     # CONTROLS functions:
@@ -298,7 +299,15 @@ class ControlClass:
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.presetDic[self.presetName][ctrlType]
+        ctrlModule = self.presetDic[self.presetName][ctrlType]['type']
+        return ctrlModule
+        
+        
+    def getControlDegreeById(self, ctrlType, *args):
+        """ Check the control type reading the loaded dictionary from preset json file.
+            Return the respective control module name by id.
+        """
+        ctrlModule = self.presetDic[self.presetName][ctrlType]['degree']
         return ctrlModule
 
 
@@ -320,16 +329,18 @@ class ControlClass:
         # get control module:
         if ctrlType.startswith("id_"):
             ctrlModule = self.getControlModuleById(ctrlType)
+            # get degree:
+            if d == 0:
+                d = self.getControlDegreeById(ctrlType)
         else:
             ctrlModule = ctrlType
+            if d == 0:
+                d = 1
         # get control instance:
         controlInstance = self.getControlInstance(ctrlModule)
         if controlInstance:
             # create curve
-            curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, 1)
-            # rotate and freezeTransformation
-            cmds.rotate(rot[0], rot[1], rot[2], curve)
-            cmds.makeIdentity(curve, rotate=True, apply=True)
+            curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
             return curve
 
 
@@ -337,7 +348,7 @@ class ControlClass:
         """Create and return a cvLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
         """
         curveInstance = self.getControlInstance("Locator")
-        curve = curveInstance.cvMain(False, "Locator", ctrlName, r, d, '+Y', 1, guide)
+        curve = curveInstance.cvMain(False, "Locator", ctrlName, r, d, '+Y', (0, 0, 0), 1, guide)
         if guide:
             # create an attribute to be used as guide by module:
             cmds.addAttr(curve, longName="nJoint", attributeType='long')
@@ -396,12 +407,12 @@ class ControlClass:
         return [locCtrl, shapeSizeCluster]
     
     
-    def cvCharacter(self, ctrlType, ctrlName, r=1, d=1, dir="+Y", *args):
+    def cvCharacter(self, ctrlType, ctrlName, r=1, d=1, dir="+Y", rot=(0, 0, 0), *args):
         """ Create and return a curve to be used as a control.
         """
         # get radius by checking linear unit
         r = self.dpCheckLinearUnit(r)
-        curve = self.cvControl(ctrlType, ctrlName, r, d, dir)
+        curve = self.cvControl(ctrlType, ctrlName, r, d, dir, rot)
         # edit a minime curve:
         cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True)
         cmds.addAttr(curve, longName="rigScaleMultiplier", attributeType='float', defaultValue=1, keyable=False)
@@ -521,6 +532,82 @@ class ControlClass:
                     pass
     
     
+    def copyAttr(self, sourceItem=False, attrList=False, verbose=False, *args):
+        """ Get and store in a dictionary the attributes from sourceItem.
+            Returns the dictionary with attribute values.
+        """
+        # getting sourceItem:
+        if not sourceItem:
+            selList = cmds.ls(selection=True, long=True)
+            if selList:
+                sourceItem = selList[0]
+            else:
+                print self.dpUIinst.langDic[self.dpUIinst.langName]["e015_selectToCopyAttr"]
+        if cmds.objExists(sourceItem):
+            if not attrList:
+                # getting channelBox selected attributes:
+                currentAttrList = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
+                if not currentAttrList:
+                    # list all attributes if nothing is selected:
+                    currentAttrList = cmds.listAttr(sourceItem, visible=True, keyable=True)
+                attrList = currentAttrList
+            if attrList:
+                # store attribute values in a dic:
+                self.attrValueDic = {}
+                for attr in attrList:
+                    if cmds.objExists(sourceItem+'.'+attr):
+                        value = cmds.getAttr(sourceItem+'.'+attr)
+                        self.attrValueDic[attr] = value
+                if verbose:
+                    print self.dpUIinst.langDic[self.dpUIinst.langName]["i125_copiedAttr"]
+        return self.attrValueDic
+    
+    
+    def pasteAttr(self, destinationList=False, verbose=False, *args):
+        """ Get to destination list and set the dictionary values on them.
+        """
+        # getting destinationList:
+        if not destinationList:
+            destinationList = cmds.ls(selection=True, long=True)
+        if destinationList and self.attrValueDic:
+            # set dic values to destinationList:
+            for destItem in destinationList:
+                for attr in self.attrValueDic:
+                    try:
+                        cmds.setAttr(destItem+'.'+attr, self.attrValueDic[attr])
+                    except:
+                        try:
+                            cmds.setAttr(destItem+'.'+attr, self.attrValueDic[attr], type='string')
+                        except:
+                            pass
+                            if verbose:
+                                print self.dpUIinst.langDic[self.dpUIinst.langName]["e016_notPastedAttr"], attr
+            if verbose:
+                print self.dpUIinst.langDic[self.dpUIinst.langName]["i126_pastedAttr"]
+    
+    
+    def copyAndPasteAttr(self, verbose=False, *args):
+        """ Call copy and past functions.
+        """
+        # copy attributes and store them in the dictionary:
+        self.copyAttr()
+        # get destinationList:
+        currentSelectedList = cmds.ls(selection=True, long=True)
+        if currentSelectedList:
+            if len(currentSelectedList) > 1:
+                destinationList = currentSelectedList[1:]
+                # calling function to paste attributes to destinationList:
+                self.pasteAttr(destinationList, verbose)
+    
+    
+    def transferAttr(self, sourceItem, destinationList, attrList, *args):
+        """ Transfer attributes from sourceItem to destinationList.
+        """
+        if sourceItem and destinationList and attrList:
+            self.copyAttr(sourceItem, attrList)
+            self.pasteAttr(destinationList)
+    
+    
     def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, applyColor=True, *args):
         """ Transfer control shape from sourceItem to destination list
         """
@@ -536,23 +623,21 @@ class ControlClass:
             if sourceShapeList:
                 if destinationList:
                     for destTransform in destinationList:
+                        dupSourceItem = cmds.duplicate(sourceItem)[0]
+                        if applyColor:
+                            self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
                         if destShapeList:
                             if clearDestinationShapes:
                                 cmds.delete(destShapeList)
-                        dupSourceItem = cmds.duplicate(sourceItem)[0]
-                        if applyColor:
-                            self.setSourceColorOverride(dupSourceItem, [destTransform])
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
                             cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
                     if deleteSource:
-                        # update cvClassName:
-                        if cmds.objExists(sourceItem+".className"):
-                            if cmds.objExists(destTransform+".className"):
-                                cmds.setAttr(destTransform+".className", cmds.getAttr(sourceItem+".className"), type="string")
+                        # update cvControls attributes:
+                        self.transferAttr(sourceItem, [destTransform], ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
     
     
@@ -562,7 +647,7 @@ class ControlClass:
         """
         colorList = []
         for item in destinationList:
-            childShapeList = cmds.listRelatives(item, children=True, shapes=True, noIntermediate=True, type="nurbsCurve")
+            childShapeList = cmds.listRelatives(item, shapes=True, type="nurbsCurve", fullPath=True)
             if childShapeList:
                 for childShape in childShapeList:
                     if cmds.getAttr(childShape+".overrideEnabled") == 1:
@@ -575,6 +660,37 @@ class ControlClass:
                             colorList.append(cmds.getAttr(childShape+".overrideColor"))
                             self.colorShape([sourceItem], colorList[0])
                         break
+                        
+    
+    def resetCurve(self, changeDegree=False, transformList=False, *args):
+        """ Read the current curve degree of selected curve controls and change it to another one.
+            1 to 3
+            or
+            3 to 1.
+        """
+        if not transformList:
+            transformList = cmds.ls(selection=True, type="transform")
+        if transformList:
+            for item in transformList:
+                if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl") == 1:
+                    # getting current control values from stored attributes:
+                    curType = cmds.getAttr(item+".className")
+                    curSize = cmds.getAttr(item+".size")
+                    curDegree = cmds.getAttr(item+".degree")
+                    curDir = cmds.getAttr(item+".direction")
+                    curRotX = cmds.getAttr(item+".cvRotX")
+                    curRotY = cmds.getAttr(item+".cvRotY")
+                    curRotZ = cmds.getAttr(item+".cvRotZ")
+                    if changeDegree:
+                        # changing current curve degree:
+                        if curDegree == 1: #linear
+                            curDegree = 3 #cubic
+                        else: #cubic
+                            curDegree = 1 #linear
+                        cmds.setAttr(item+".degree", curDegree)
+                    curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
+                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], applyColor=True)
+            cmds.select(transformList)
     
     
     def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):

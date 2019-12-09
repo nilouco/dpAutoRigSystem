@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.09"
+DPAR_VERSION = "3.06.10"
 
 
 
@@ -113,8 +113,7 @@ except Exception as e:
     print "Error: importing python modules!!!\n",
     print e
     try:
-        if cmds.window('dpARLoadWin', query=True, exists=True):
-            cmds.deleteUI('dpARLoadWin', window=True)
+        clearDPARLoadingWindow()
         self.jobWinClose()
     except:
         pass
@@ -164,6 +163,7 @@ class DP_AutoRig_UI:
         self.loadedCombined = False
         self.loadedExtras = False
         self.controlInstanceList = []
+        self.degreeOption = 0
 
 
         try:
@@ -241,6 +241,7 @@ class DP_AutoRig_UI:
             print "Error: dpAutoRig UI window !!!\n"
             print "Exception:", e
             print self.langDic[self.langName]['i008_errorUI'],
+            clearDPARLoadingWindow()
             return
         
 
@@ -322,6 +323,13 @@ class DP_AutoRig_UI:
                 return item
     
     
+    def changeOptionDegree(self, degreeOption, *args):
+        """ Set optionVar to choosen menu item.
+        """
+        cmds.optionVar(stringValue=('dpAutoRigLastDegreeOption', degreeOption))
+        self.degreeOption = int(degreeOption[0])
+    
+    
     def mainUI(self):
         """ Create the layouts inside of the mainLayout. Here will be the entire User Interface.
         """
@@ -388,6 +396,17 @@ class DP_AutoRig_UI:
         self.allUIs["defaultRenderLayerCB"] = cmds.checkBox('defaultRenderLayerCB', label=self.langDic[self.langName]['i004_defaultRL'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["colorizeCtrlCB"] = cmds.checkBox('colorizeCtrlCB', label=self.langDic[self.langName]['i065_colorizeCtrl'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["addAttrCB"] = cmds.checkBox('addAttrCB', label=self.langDic[self.langName]['i066_addAttr'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["degreeLayout"] = cmds.rowColumnLayout('degreeLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 250)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
+        # option Degree:
+        self.degreeOptionMenu = cmds.optionMenu("degreeOptionMenu", label='', changeCommand=self.changeOptionDegree, parent=self.allUIs["degreeLayout"])
+        self.degreeOptionMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
+        # verify if there is a optionVar of last choosen by user in Maya system:
+        lastDegreeOption = self.checkLastOptionVar("dpAutoRigLastDegreeOption", "0 - Preset", self.degreeOptionMenuItemList)
+        for degreeOption in self.degreeOptionMenuItemList:
+            cmds.menuItem(label=degreeOption, parent=self.degreeOptionMenu)
+        cmds.optionMenu(self.degreeOptionMenu, edit=True, value=lastDegreeOption)
+        cmds.text(self.langDic[self.langName]['i128_optionDegree'], parent=self.allUIs["degreeLayout"])
+        self.degreeOption = int(lastDegreeOption[0])
 
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
@@ -507,10 +526,13 @@ class DP_AutoRig_UI:
         
         # editSeletedControls - frameLayout:
         self.allUIs["editSelectionFL"] = cmds.frameLayout('editSelectionFL', label=self.langDic[self.langName]['i111_editSelection'], collapsable=True, collapse=False, marginHeight=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["editSelectionLayout"] = cmds.paneLayout("editSelectionLayout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
-        self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.langDic[self.langName]['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelectionLayout"])
-        self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.langDic[self.langName]['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelectionLayout"])
-        self.allUIs["replaceShapeButton"] = cmds.button("replaceShapeButton", label=self.langDic[self.langName]['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ctrls.transferShape, True, True), parent=self.allUIs["editSelectionLayout"])
+        self.allUIs["editSelection3Layout"] = cmds.paneLayout("editSelection3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
+        self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.langDic[self.langName]['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelection3Layout"])
+        self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.langDic[self.langName]['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelection3Layout"])
+        self.allUIs["replaceShapeButton"] = cmds.button("replaceShapeButton", label=self.langDic[self.langName]['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ctrls.transferShape, True, True), parent=self.allUIs["editSelection3Layout"])
+        self.allUIs["editSelection2Layout"] = cmds.paneLayout("editSelection2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
+        self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.langDic[self.langName]['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
+        self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.langDic[self.langName]['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=utils.zeroOut, parent=self.allUIs["editSelectionFL"])
         
         # edit formLayout in order to get a good scalable window:
@@ -549,6 +571,7 @@ class DP_AutoRig_UI:
         autoRigUI = autoRig.DP_AutoRig_UI()
         cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
 
+
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
         if self.pDockCtrl:
@@ -556,9 +579,11 @@ class DP_AutoRig_UI:
                 if cmds.dockControl('dpAutoRigSystem', exists=True):
                     cmds.deleteUI('dpAutoRigSystem', control=True)
 
+
     def jobDockVisChange(self, *args):
         #Force focus
         cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
+    
     
     def jobSelectedGuide(self):
         """ This scriptJob read if the selected item in the scene is a guideModule and reload the UI.
@@ -1605,6 +1630,16 @@ class DP_AutoRig_UI:
         
         # verify if there are instances of modules (guides) to rig in the scene:
         if self.modulesToBeRiggedList:
+            
+            # check guide versions to be sure we are building with the same dpAutoRigSystem version:
+            for guideModule in self.modulesToBeRiggedList:
+                guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
+                if not guideVersion == DPAR_VERSION:
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION, message=self.langDic[self.langName]['i127_guideVersionDif'], button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+                    if userChoose == 'No':
+                        return
+                    else:
+                        break
             
             # Starting progress window
             rigProgressAmount = 0

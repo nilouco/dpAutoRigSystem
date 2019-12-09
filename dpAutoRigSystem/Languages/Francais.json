@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "date"       : "2011-08-04",
-    "updated"    : "2019-12-03",
+    "updated"    : "2019-12-08",
     "translator" : "Marina Rüegger",
     
     "i000_guides"          : "Créer des GUIDES",
@@ -126,6 +126,15 @@
     "i117_whatsChanged"    : "Qu'est-ce que a changé?",
     "i118_combinedShapes"  : "Formes Combinées",
     "i119_curveDegree"     : "Degré de Courbe",
+    "i120_changeDegree"    : "Changer Courbe Degré",
+    "i121_resetCurve"      : "Réinitialiser la Courbe",
+    "i122_copyAttr"        : "Copier des Attributes",
+    "i123_pasteAttr"       : "Coller des Attributes",
+    "i124_copyPasteAttr"   : "Copier et Coller des Attributes",
+    "i125_copiedAttr"      : "Les attributes ont été bien copiés.",
+    "i126_pastedAttr"      : "Les attributes ont été bien collés.",
+    "i127_guideVersionDif" : "Il y a de version de guide differentes\nde cette version du dpAutoRigSystem.\n\nPeut-être ça cause de problèmes\nquand ont construire le Rig.\n\nEst-ce que vous voulez continuer?",
+    "i128_optionDegree"    : "Creer des guides avec ce degré de courbe.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -271,6 +280,8 @@
     "m132_jawHandle"         : "Poigné de la Mânchoire",
     "m133_locatorFlat"       : "Locator Plat",
     "m134_piramid"           : "Piramid",
+    "m135_copyPasteAttr"     : "Copier et Coller des Attributes",
+    "m136_copyPasteAttrDesc" : "Copier et Coller les attributes selectinées\ndu premier objet selectionné\npour les autres objects selectinés.",
     
     "extra_CopyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",
@@ -349,6 +360,8 @@
     "e012_cantLoadRibbon"          : "Erreur: (012) - Ce n'est pas possible charger l'extention jcRibbon pour creer des controlleurs bend dans le Limb module, désolé.",
     "e013_cantLoadIkSpringSolver"  : "Erreur: (013) - Ce n'est pas possible charger le plugin ikSpringSolver, sorry.\nOn utilise le ikRPSolver par default.",
     "e014_cantLoadQuatNode"        : "Erreur: (014) - Ce n'est pas possible charger le plugin QuatNode.\nOn utilise le Limb par default.",
+    "e015_selectToCopyAttr"        : "Erreur: (015) - Selectionner un objet pour copier les attributes, s'il vous plaît.",
+    "e016_notPastedAttr"           : "Erreur: (016) - Ce n'est pas possible coller l'attribute.",
     
     "b000_BugGeneral"                    : "Bug: (000) - Un bug est trouvé, desolé.\n\nReviser les guides ou la version du script, s'il vous plaît.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - On a trouvé le mirroir du module Single\nen utilisant l'indirectSkin dans Maya 2018!\n\nIl y a un problème:\nMaya 2018 n'est pas capable de calculer\ncorrectement le mirroir de l'indirect skinning.\n\nOn a besoin d'utiliser un workaroud, desolé:\n\nSauvegarder votre scene et l'ouvre encore\navant de commencer le skinning, s'il vous plaît."

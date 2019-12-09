@@ -226,7 +226,10 @@ def zeroOut(transformList=[]):
             zeroUserAttrList = cmds.listAttr(zero, userDefined=True)
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:
-                    cmds.deleteAttr(zero+"."+zUserAttr)
+                    try:
+                        cmds.deleteAttr(zero+"."+zUserAttr)
+                    except:
+                        pass
             allChildrenList = cmds.listRelatives(zero, allDescendents=True, children=True, fullPath=True)
             for child in allChildrenList:
                 cmds.delete(child)

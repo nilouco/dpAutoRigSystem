@@ -95,8 +95,8 @@ class StartClass:
         baseIntegerAttrList = ['degree']
         for baseIntAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntAttr, attributeType='short')
-        cmds.setAttr(self.moduleGrp+".degree", 1)
-
+        cmds.setAttr(self.moduleGrp+".degree", self.dpUIinst.degreeOption)
+        
         # create annotation to this module:
         self.annotation = cmds.annotate( self.moduleGrp, tx=self.moduleGrp, point=(0,2,0) )
         self.annotation = cmds.listRelatives(self.annotation, parent=True)[0]

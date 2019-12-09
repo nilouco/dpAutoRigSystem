@@ -21,6 +21,7 @@ class ControlStartClass:
         self.cvDegree = None
         self.cvSize = None
         self.cvDirection = None
+        self.cvRot = None
         self.cvPointList = None
         self.cvKnotList = None
         self.cvPeriodic = None
@@ -78,7 +79,7 @@ class ControlStartClass:
         return [self.cvName, self.cvSize, self.cvDegree, self.cvDirection, self.cvAction]
     
     
-    def addControlInfo(self, cvNode, className=True, size=True, degree=True, direction=True, dpGuide=False, *args):
+    def addControlInfo(self, cvNode, className=True, size=True, degree=True, direction=True, rot=True, dpGuide=False, *args):
         """ Add some information in the curve transform node of the control.
         """
         cmds.addAttr(cvNode, longName="dpControl", attributeType='bool')
@@ -103,6 +104,13 @@ class ControlStartClass:
         if direction:
             cmds.addAttr(cvNode, longName="direction", dataType='string')
             cmds.setAttr(cvNode+".direction", self.cvDirection, type="string")
+        if rot:
+            cmds.addAttr(cvNode, longName="cvRotX", attributeType='double')
+            cmds.addAttr(cvNode, longName="cvRotY", attributeType='double')
+            cmds.addAttr(cvNode, longName="cvRotZ", attributeType='double')
+            cmds.setAttr(cvNode+".cvRotX", self.cvRot[0])
+            cmds.setAttr(cvNode+".cvRotY", self.cvRot[1])
+            cmds.setAttr(cvNode+".cvRotZ", self.cvRot[2])
     
     
     def createCurve(self, cvName, cvDegree, cvPointList, cvKnot, cvPeriodic, dpGuide, *args):
@@ -144,6 +152,9 @@ class ControlStartClass:
         else:
             pass #default +Y, just pass
         cmds.makeIdentity(cvNode, rotate=True, apply=True)
+        # rotate and freezeTransformation from given cvRot vector:
+        cmds.rotate(self.cvRot[0], self.cvRot[1], self.cvRot[2], self.cvCurve)
+        cmds.makeIdentity(self.cvCurve, rotate=True, apply=True)
     
     
     def doControlAction(self, destinationList, *args):
@@ -166,7 +177,7 @@ class ControlStartClass:
                 mel.eval("warning \""+self.langDic[self.langName]['e011_notSelShape']+"\";")
     
     
-    def cvCreate(self, useUI, cvID, cvName='Control_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvAction=1, dpGuide=False, combine=False, *args):
+    def cvCreate(self, useUI, cvID, cvName='Control_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, combine=False, *args):
         """ Check if we need to get parameters from UI.
             Create a respective curve shape.
             Return the transform curve or a list of selected destination items.
@@ -179,6 +190,7 @@ class ControlStartClass:
         self.cvSize = cvSize
         self.cvDegree = cvDegree
         self.cvDirection = cvDirection
+        self.cvRot = cvRot
         self.cvAction = cvAction
         # getting UI info:
         if useUI:
@@ -186,7 +198,7 @@ class ControlStartClass:
         
         # combine or create curve using the parameters:
         if combine:
-            self.cvCurve = self.generateCombineCurves(useUI, self.cvID, self.cvName, self.cvSize, self.cvDegree, self.cvDirection, dpGuide)
+            self.cvCurve = self.generateCombineCurves(useUI, self.cvID, self.cvName, self.cvSize, self.cvDegree, self.cvDirection)
         else:
             # getting curve info to be created based on choose degree:
             if self.cvDegree == 1: #linear

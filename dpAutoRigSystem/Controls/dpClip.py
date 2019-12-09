@@ -9,7 +9,7 @@ TITLE = "m106_clip"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clip.png"
 
-dpClipVersion = 1.0
+dpClipVersion = 1.1
 
 class Clip(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -21,11 +21,11 @@ class Clip(BaseControl.ControlStartClass):
         BaseControl.ControlStartClass.__init__(self, *args, **kwargs)
     
     
-    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvAction=1, dpGuide=False, *args):
+    def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):
         """ The principal method to call all other methods in order to build the cvControl curve.
             Return the result: new control curve or the destination list depending of action.
         """
-        result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvAction, dpGuide)
+        result = self.cvCreate(useUI, cvID, cvName, cvSize, cvDegree, cvDirection, cvRot, cvAction, dpGuide)
         return result
     
     

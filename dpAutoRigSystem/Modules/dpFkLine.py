@@ -202,7 +202,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+str(n))
                     # create a control:
 #                    self.mainCtrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
-                    self.mainCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_"+str(n)+"_Ctrl", r=self.ctrlRadius, d=1)
+                    self.mainCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_"+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     if n == 1:
                         utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide)
                     else:

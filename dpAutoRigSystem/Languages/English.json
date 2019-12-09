@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "date"       : "2010-10-03",
-    "updated"    : "2019-12-03",
+    "updated"    : "2019-12-08",
     "translator" : "Danilo Pinheiro",
 
     "i000_guides"          : "Create GUIDES",
@@ -126,6 +126,15 @@
     "i117_whatsChanged"    : "What's changed?",
     "i118_combinedShapes"  : "Combined Shapes",
     "i119_curveDegree"     : "Curve Degree",
+    "i120_changeDegree"    : "Change Curve Degree",
+    "i121_resetCurve"      : "Reset Curve",
+    "i122_copyAttr"        : "Copy Attributes",
+    "i123_pasteAttr"       : "Paste Attributes",
+    "i124_copyPasteAttr"   : "Copy and Paste Attributes",
+    "i125_copiedAttr"      : "Copied attributes with success.",
+    "i126_pastedAttr"      : "Pasted attributes with success.",
+    "i127_guideVersionDif" : "Found guide version different\nof this current dpAutoRigSystem.\n\nMaybe it could build module with\nunexpected results.\n\nDo you want to continue?",
+    "i128_optionDegree"    : "Create guides using this curve degree.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -271,6 +280,8 @@
     "m132_jawHandle"         : "Jaw Handle",
     "m133_locatorFlat"       : "Locator Flat",
     "m134_piramid"           : "Piramid",
+    "m135_copyPasteAttr"     : "Copy Paste Attribute",
+    "m136_copyPasteAttrDesc" : "Copy and Paste selected attributes\nfrom the firt selected oject\nto other selected objects.",
     
     "extra_CopyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "extra_CopyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",
@@ -349,6 +360,8 @@
     "e012_cantLoadRibbon"          : "Error: (012) - Can't load jcRibbon extension in order to create bend in Limb module, sorry.",
     "e013_cantLoadIkSpringSolver"  : "Error: (013) - Can't load ikSpringSolver plugin, sorry.\nApplied default ikRPSolver instead.",
     "e014_cantLoadQuatNode"        : "Error: (014) - Can't load QuatNode plugin, sorry.\nApplied default Limb instead.",
+    "e015_selectToCopyAttr"        : "Error: (015) - Select one object to copy attributes, please.",
+    "e016_notPastedAttr"           : "Error: (016) - Can't paste attribute.",
     
     "b000_BugGeneral"                    : "Bug: (000) - Found a bug, sorry.\n\nReview your guides or script version, please.",
     "b001_BugSingleIndirectSkinMaya2018" : "Bug: (001) - Found mirror on Single module\nusing indirectSkin on Maya 2018!\n\nThere is a problem:\nMaya 2018 is not able to calculate\ncorrectely the mirror of indirect skinning.\n\nWe need to use a workaroud, sorry:\n\nSave your scene and open it again\nbefore start the skinning, please."

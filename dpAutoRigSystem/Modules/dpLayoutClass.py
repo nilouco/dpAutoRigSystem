@@ -222,15 +222,18 @@ class LayoutClass:
                     self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )
                     cmds.text(self.langDic[self.langName]['i119_curveDegree'], parent=self.degreeColumn)
                     self.degreeMenu = cmds.optionMenu("degreeMenu", label='', changeCommand=self.changeDegree, parent=self.degreeColumn)
-                    self.degreeMenuItemList = ['1 - Linear', '3 - Cubic']
+                    self.degreeMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
                     for item in self.degreeMenuItemList:
                         cmds.menuItem(label=item, parent=self.degreeMenu)
                     currentDegree = cmds.getAttr(self.moduleGrp+".degree")
                     # set layout with the current value:
-                    if currentDegree == 3:
-                        cmds.optionMenu(self.degreeMenu, edit=True, value='3 - Cubic')
-                    else:
+                    if currentDegree == 0:
+                        cmds.optionMenu(self.degreeMenu, edit=True, value='0 - Preset')
+                    elif currentDegree == 1:
                         cmds.optionMenu(self.degreeMenu, edit=True, value='1 - Linear')
+                    else:
+                        cmds.optionMenu(self.degreeMenu, edit=True, value='3 - Cubic')
+                        
                         
             except:
                 pass

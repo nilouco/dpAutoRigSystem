@@ -213,7 +213,7 @@ class FacialControl():
                 if cmds.objectType(self.bsNode) == "blendShape":
                     aliasList = cmds.aliasAttr(self.bsNode, query=True)
             # create control calling dpControls function:
-            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=3, rot=rotVector)
+            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=0, rot=rotVector)
             
             # ctrl zeroOut grp and color:
             fCtrlGrp = cmds.group(fCtrl, name=fCtrlName+"_Grp")

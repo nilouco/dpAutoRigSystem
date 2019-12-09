@@ -48,7 +48,7 @@ def Arm(dpUIinst):
         middleFingerInstance.editUserName(fingerMiddleName)
         ringFingerInstance   = dpUIinst.initGuide('dpFinger', guideDir)
         ringFingerInstance.editUserName(fingerRingName)
-        pinkyFingerInstance   = dpUIinst.initGuide('dpFinger', guideDir)
+        pinkyFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
         pinkyFingerInstance.editUserName(fingerPinkyName)
         thumbFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
         thumbFingerInstance.editUserName(fingerThumbName)
