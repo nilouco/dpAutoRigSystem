@@ -203,7 +203,7 @@ class LayoutClass:
                     indirectSkinValue = cmds.getAttr(self.moduleGrp+".indirectSkin")
                     self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.indirectSkinLayout)
                     cmds.text(" ", parent=self.indirectSkinLayout)
-                    holderValue = cmds.getAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'])
+                    holderValue = cmds.getAttr(self.moduleGrp+".holder")
                     self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
                     
                 # create eyelid layout:

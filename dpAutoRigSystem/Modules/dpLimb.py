@@ -1050,13 +1050,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         loadedRibbon = False
                         try:
                             from Library import jcRibbon
-#                            reload(jsRibbon)
                             RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
                             loadedRibbon = True
                         except Exception as e:
                             print e
                             print self.langDic[self.langName]['e012_cantLoadRibbon']
-                            
+                        
                         if loadedRibbon:
                             num = self.getBendJoints()
                             iniJoint = side + self.userGuideName + "_" + mainName + '_Jnt'
@@ -1118,6 +1117,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                     print e
                                     print self.langDic[self.langName]['e014_cantLoadQuatNode']
                                     pass
+                            else:
+                                loadedQuatNode = True
                             if loadedQuatNode:
                                 twistBoneMD = self.bendGrps['twistBoneMD']
                                 twistBoneMM = cmds.createNode("multMatrix", name=self.skinJointList[1]+"_ExtactAngle_MM")

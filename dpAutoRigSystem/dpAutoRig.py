@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.06.10"
+DPAR_VERSION = "3.06.11"
 
 
 
@@ -668,6 +668,7 @@ class DP_AutoRig_UI:
         newGuideInstance = eval('self.initGuide("'+thatModuleName+'", "'+moduleDir+'")')
         newGuideName = cmds.ls(selection=True)[0]
         newGuideNamespace = cmds.getAttr(newGuideName+"."+MODULE_NAMESPACE_ATTR)
+        
         # getting a good attribute list
         toSetAttrList = cmds.listAttr(selectedItem)
         guideBaseAttrIdx = toSetAttrList.index(GUIDE_BASE_ATTR)
@@ -682,16 +683,16 @@ class DP_AutoRig_UI:
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
             if nJointsValue > 1:
-                eval('self.guide.'+thatClassName+'.changeJointNumber(newGuideInstance, '+str(nJointsValue)+')')
+                newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
             if customNameValue != "" and customNameValue != None:
-                eval('self.guide.'+thatClassName+'.editUserName(newGuideInstance, checkText="'+customNameValue+'")')
+                newGuideInstance.editUserName(customNameValue)
         if cmds.objExists(selectedItem+"."+mirroirAxisAttr):
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirroirAxisAttr)
             if mirroirAxisValue != "off":
-                eval('self.guide.'+thatClassName+'.changeMirror(newGuideInstance, "'+mirroirAxisValue+'")')
-
+                newGuideInstance.changeMirror(mirroirAxisValue)
+                
         # get and set transformations
         childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
         if childrenList:

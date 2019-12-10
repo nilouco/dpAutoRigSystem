@@ -84,7 +84,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
         indSkinValue = cmds.checkBox(self.indirectSkinCB, query=True, value=True)
         cmds.setAttr(self.moduleGrp+".indirectSkin", indSkinValue)
         if indSkinValue == 0:
-            cmds.setAttr(self.moduleGrp+"."+self.langDic[self.langName]['c_holder'], 0)
+            cmds.setAttr(self.moduleGrp+".holder", 0)
             cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
         else:
             cmds.checkBox(self.holderCB, edit=True, enable=True)
@@ -159,23 +159,12 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if self.getHasIndirectSkin():
-                    self.singleCtrl = self.ctrls.cvControl("id_029_SingleIndSkin", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                    if "Lower" in self.userGuideName:
+                        self.singleCtrl = self.ctrls.cvControl("id_029_SingleIndSkin", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=(0, 0, 180))
+                    else:
+                        self.singleCtrl = self.ctrls.cvControl("id_029_SingleIndSkin", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 else:
                     self.singleCtrl = self.ctrls.cvControl("id_028_Single", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                # edit circle shape to Upper or Lower controls:
-                if "Upper" in self.userGuideName:
-                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[4].yValue", 0)
-                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[5].yValue", 0)
-                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[6].yValue", 0)
-                    if not self.getHasIndirectSkin():
-                        cmds.setAttr(self.singleCtrl+"Shape.controlPoints[3].yValue", 0)
-                elif "Lower" in self.userGuideName:
-                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[0].yValue", 0)
-                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[1].yValue", 0)
-                    cmds.setAttr(self.singleCtrl+"Shape.controlPoints[2].yValue", 0)
-                    if not self.getHasIndirectSkin():
-                        cmds.setAttr(self.singleCtrl+"Shape.controlPoints[7].yValue", 0)
-                        cmds.setAttr(self.singleCtrl+"Shape.controlPoints[8].yValue", 0)
                 utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
