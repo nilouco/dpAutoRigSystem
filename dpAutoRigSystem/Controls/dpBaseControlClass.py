@@ -206,8 +206,8 @@ class ControlStartClass:
             else: #cubic
                 self.getCubicPoints()
             self.cvCurve = self.createCurve(self.cvName, self.cvDegree, self.cvPointList, self.cvKnotList, self.cvPeriodic, dpGuide)
-            # set control direction directon for the control curve:
-            self.setControlDirection(self.cvCurve, self.cvDirection)
+        # set control direction for the control curve:
+        self.setControlDirection(self.cvCurve, self.cvDirection)
         
         # working about action to do, like new control, add shape or replace shapes:
         self.doControlAction(destinationList)

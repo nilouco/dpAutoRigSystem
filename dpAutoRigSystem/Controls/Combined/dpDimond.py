@@ -9,7 +9,7 @@ TITLE = "m105_dimond"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_dimond.png"
 
-dpDimondVersion = 1.1
+dpDimondVersion = 1.2
 
 class Dimond(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -45,9 +45,6 @@ class Dimond(BaseControl.ControlStartClass):
         squareInstance = self.dpUIinst.initControlModule('dpSquare', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        if cvDirection[1] == "Y":
-            cmds.setAttr(curve1+".rotateZ", 45)
-        else:
-            cmds.setAttr(curve1+".rotateY", 45)
+        cmds.setAttr(curve1+".rotateZ", 45)
         mainCurve = self.combineCurves([curve1])
         return mainCurve

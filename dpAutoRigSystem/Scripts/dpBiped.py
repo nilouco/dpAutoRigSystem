@@ -25,9 +25,9 @@ def Biped(dpUIinst):
         spineName = dpUIinst.langDic[dpUIinst.langName]['m011_spine']
         headName = dpUIinst.langDic[dpUIinst.langName]['c_head']
         eyeName = dpUIinst.langDic[dpUIinst.langName]['c_eye']
-        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg']
+        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
         footName = dpUIinst.langDic[dpUIinst.langName]['c_foot']
-        armName = dpUIinst.langDic[dpUIinst.langName]['c_arm']
+        armName = dpUIinst.langDic[dpUIinst.langName]['c_arm'].capitalize()
         fingerIndexName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m032_index']
         fingerMiddleName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m033_middle']
         fingerRingName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m034_ring']
@@ -35,11 +35,11 @@ def Biped(dpUIinst):
         fingerThumbName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m036_thumb']
         earName = dpUIinst.langDic[dpUIinst.langName]['m040_ear']
         upperTeethName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle']
-        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G']
+        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
+        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
         lowerTeethName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle']
-        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G']
+        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
+        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
         noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
         nostrilName = dpUIinst.langDic[dpUIinst.langName]['m079_nostril']
         tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']
@@ -115,7 +115,7 @@ def Biped(dpUIinst):
         # change limb style to biped:
         legLimbInstance.changeStyle(bipedStyleName)
         # change name to leg:
-        legLimbInstance.editUserName(legName.capitalize())
+        legLimbInstance.editUserName(legName)
         cmds.setAttr(legLimbInstance.annotation+".translateY", -4)
         
         # editing leg base guide informations:
@@ -158,7 +158,7 @@ def Biped(dpUIinst):
         # change limb style to biped:
         armLimbInstance.changeStyle(bipedStyleName)
         # change name to arm:
-        armLimbInstance.editUserName(armName.capitalize())
+        armLimbInstance.editUserName(armName)
         cmds.setAttr(armLimbInstance.annotation+".translateX", 3)
         cmds.setAttr(armLimbInstance.annotation+".translateY", 0)
         cmds.setAttr(armLimbInstance.annotation+".translateZ", 2)
@@ -261,7 +261,7 @@ def Biped(dpUIinst):
         # create FkLine module instance:
         upperTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
         # editing upperTeethSide base guide informations:
-        upperTeethSideInstance.editUserName(upperTeethSideName.capitalize())
+        upperTeethSideInstance.editUserName(upperTeethSideName)
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 20.1)
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 2)
@@ -299,7 +299,7 @@ def Biped(dpUIinst):
         # create FkLine module instance:
         lowerTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
         # editing lowerTeethSide base guide informations:
-        lowerTeethSideInstance.editUserName(lowerTeethSideName.capitalize())
+        lowerTeethSideInstance.editUserName(lowerTeethSideName)
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 19.7)
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 2)

@@ -29,15 +29,15 @@ def Quadruped(dpUIinst):
         neckName = dpUIinst.langDic[dpUIinst.langName]['c_neck']
         headName = dpUIinst.langDic[dpUIinst.langName]['c_head']
         eyeName = dpUIinst.langDic[dpUIinst.langName]['c_eye']
-        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg']
+        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
         footName = dpUIinst.langDic[dpUIinst.langName]['c_foot']
         earName = dpUIinst.langDic[dpUIinst.langName]['m040_ear']
         upperTeethName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle']
-        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G']
+        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
+        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
         lowerTeethName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle']
-        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G']
+        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
+        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
         noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
         nostrilName = dpUIinst.langDic[dpUIinst.langName]['m079_nostril']
         tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']
@@ -151,7 +151,7 @@ def Quadruped(dpUIinst):
         # set for not use bend ribbons as default:
         backLegLimbInstance.setBendFalse(backLegLimbInstance)
         # change name to back leg:
-        backLegLimbInstance.editUserName(legName.capitalize()+dpUIinst.langDic[dpUIinst.langName]['c_back'])
+        backLegLimbInstance.editUserName(legName+dpUIinst.langDic[dpUIinst.langName]['c_back'])
         cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
         
         # editing back leg base guide informations:
@@ -217,7 +217,7 @@ def Quadruped(dpUIinst):
         # set for not use bend ribbons as default:
         frontLegLimbInstance.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
-        frontLegLimbInstance.editUserName(legName.capitalize()+dpUIinst.langDic[dpUIinst.langName]['c_front'])
+        frontLegLimbInstance.editUserName(legName+dpUIinst.langDic[dpUIinst.langName]['c_front'])
         cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
         
         # editing front leg base guide informations:
@@ -352,7 +352,7 @@ def Quadruped(dpUIinst):
         # create FkLine module instance:
         upperTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
         # editing upperTeethSide base guide informations:
-        upperTeethSideInstance.editUserName(upperTeethSideName.capitalize())
+        upperTeethSideInstance.editUserName(upperTeethSideName)
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateX", 0.2)
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateY", 12.3)
         cmds.setAttr(upperTeethSideInstance.moduleGrp+".translateZ", 12.3)
@@ -390,7 +390,7 @@ def Quadruped(dpUIinst):
         # create FkLine module instance:
         lowerTeethSideInstance = dpUIinst.initGuide('dpFkLine', guideDir)
         # editing lowerTeethSide base guide informations:
-        lowerTeethSideInstance.editUserName(lowerTeethSideName.capitalize())
+        lowerTeethSideInstance.editUserName(lowerTeethSideName)
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateX", 0.2)
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateY", 11.9)
         cmds.setAttr(lowerTeethSideInstance.moduleGrp+".translateZ", 12.3)

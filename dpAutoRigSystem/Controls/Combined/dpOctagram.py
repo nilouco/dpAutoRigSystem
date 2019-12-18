@@ -9,7 +9,7 @@ TITLE = "m104_octagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_octagram.png"
 
-dpOctagramVersion = 1.1
+dpOctagramVersion = 1.2
 
 class Octagram(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -46,9 +46,6 @@ class Octagram(BaseControl.ControlStartClass):
         # creating curve shapes:
         curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        if cvDirection[1] == "Y":
-            cmds.setAttr(curve2+".rotateZ", 45)
-        else:
-            cmds.setAttr(curve2+".rotateY", 45)
+        cmds.setAttr(curve2+".rotateZ", 45)
         mainCurve = self.combineCurves([curve1, curve2])
         return mainCurve

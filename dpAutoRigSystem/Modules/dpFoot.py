@@ -212,11 +212,11 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
                 # reverse foot controls:
-                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.2), d=self.curveDegree)
-                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.2), d=self.curveDegree)
-                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.2), d=self.curveDegree, rot=(0, 90, 0))
-                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.2), d=self.curveDegree, rot=(0, 90, 0))
-                self.RFECtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.2), d=self.curveDegree, rot=(0, 90, 0))
+                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
+                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
+                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
+                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
+                self.RFECtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, rot=(0, 90, 0))
                 
                 # reverse foot groups:
                 self.RFAGrp = cmds.group(self.RFACtrl, name=self.RFACtrl+"_Grp")
@@ -224,7 +224,6 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 self.RFCGrp = cmds.group(self.RFCCtrl, name=self.RFCCtrl+"_Grp")
                 self.RFDGrp = cmds.group(self.RFDCtrl, name=self.RFDCtrl+"_Grp")
                 self.RFEGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Grp")
-#                self.RFEndGrp = cmds.group(name=side+self.userGuideName+"_RFEnd_Grp")
                 rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp]
                 self.ballRFList.append(self.RFEGrp)
                 
@@ -238,7 +237,6 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 tempToDelG = cmds.parentConstraint(self.cvRFCLoc, self.RFCGrp, maintainOffset=False)
                 tempToDelH = cmds.parentConstraint(self.cvRFDLoc, self.RFDGrp, maintainOffset=False)
                 tempToDelI = cmds.parentConstraint(self.cvRFELoc, self.RFEGrp, maintainOffset=False)
-#                tempToDelJ = cmds.parentConstraint(self.cvEndJoint, self.RFEndGrp, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG, tempToDelH, tempToDelI)
                 
                 # mounting hierarchy:
@@ -246,7 +244,6 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.RFCGrp, self.RFBCtrl)
                 cmds.parent(self.RFDGrp, self.RFCCtrl)
                 cmds.parent(self.RFEGrp, self.RFDCtrl)
-#                cmds.parent(self.RFEndGrp, self.RFEGrp)
                 
                 # reverse foot zero out groups:
                 self.RFEZero = utils.zeroOut([self.RFEGrp])[0]
@@ -281,6 +278,9 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)
                 tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootCtrl, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB)
+                if s == 1:
+                    cmds.setAttr(self.middleFootCtrl+".rotateZ", 180)
+                    cmds.makeIdentity(self.middleFootCtrl, rotate=True, apply=True)
                 self.footCtrlZeroList = utils.zeroOut([self.footCtrl, self.middleFootCtrl])
                 self.middleFootCtrlList.append(self.middleFootCtrl)
 

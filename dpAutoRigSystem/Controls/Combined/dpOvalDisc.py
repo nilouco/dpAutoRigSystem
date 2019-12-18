@@ -9,7 +9,7 @@ TITLE = "m123_ovalDisc"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ovalDisc.png"
 
-dpOvalDiscVersion = 1.1
+dpOvalDiscVersion = 1.2
 
 class OvalDisc(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -46,9 +46,6 @@ class OvalDisc(BaseControl.ControlStartClass):
         # creating curve shapes:
         curve1 = ellipseInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = ellipseInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        if cvDirection[1] == "Y":
-            cmds.setAttr(curve2+".rotateZ", 90)
-        else:
-            cmds.setAttr(curve2+".rotateY", 90)
+        cmds.setAttr(curve2+".rotateZ", 90)
         mainCurve = self.combineCurves([curve1, curve2])
         return mainCurve

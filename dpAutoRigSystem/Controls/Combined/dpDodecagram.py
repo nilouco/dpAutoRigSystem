@@ -9,7 +9,7 @@ TITLE = "m114_dodecagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_dodecagram.png"
 
-dpDodecagramVersion = 1.1
+dpDodecagramVersion = 1.2
 
 class Dodecagram(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -46,9 +46,6 @@ class Dodecagram(BaseControl.ControlStartClass):
         # creating curve shapes:
         curve1 = hexagonInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = hexagonInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        if cvDirection[1] == "Y":
-            cmds.setAttr(curve2+".rotateZ", 90)
-        else:
-            cmds.setAttr(curve2+".rotateY", 90)
+        cmds.setAttr(curve2+".rotateZ", 90)
         mainCurve = self.combineCurves([curve1, curve2])
         return mainCurve

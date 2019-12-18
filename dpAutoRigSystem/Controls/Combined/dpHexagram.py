@@ -9,7 +9,7 @@ TITLE = "m103_hexagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_hexagram.png"
 
-dpHexagramVersion = 1.1
+dpHexagramVersion = 1.2
 
 class Hexagram(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -46,9 +46,6 @@ class Hexagram(BaseControl.ControlStartClass):
         # creating curve shapes:
         curve1 = triangleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = triangleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        if cvDirection[1] == "Y":
-            cmds.setAttr(curve2+".rotateZ", 180)
-        else:
-            cmds.setAttr(curve2+".rotateY", 180)
+        cmds.setAttr(curve2+".rotateZ", 180)
         mainCurve = self.combineCurves([curve1, curve2])
         return mainCurve

@@ -9,7 +9,7 @@ TITLE = "m113_arrow"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrow.png"
 
-dpArrowVersion = 1.1
+dpArrowVersion = 1.2
 
 class Arrow(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -46,6 +46,6 @@ class Arrow(BaseControl.ControlStartClass):
         # creating curve shapes:
         curve1 = arrowFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = arrowFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        cmds.setAttr(curve2+".rotate"+cvDirection[1], 90)
+        cmds.setAttr(curve2+".rotateY", 90)
         mainCurve = self.combineCurves([curve1, curve2])
         return mainCurve
