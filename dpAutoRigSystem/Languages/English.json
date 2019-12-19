@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "date"       : "2010-10-03",
-    "updated"    : "2019-12-08",
+    "updated"    : "2019-12-19",
     "translator" : "Danilo Pinheiro",
 
     "i000_guides"          : "Create GUIDES",
@@ -135,6 +135,12 @@
     "i126_pastedAttr"      : "Pasted attributes with success.",
     "i127_guideVersionDif" : "Found guide version different\nof this current dpAutoRigSystem.\n\nMaybe it could build module with\nunexpected results.\n\nDo you want to continue?",
     "i128_optionDegree"    : "Create guides using this curve degree.",
+    "i129_createPreset"    : "Create Preset",
+    "i130_presetName"      : "Preset Name:",
+    "i131_OK"              : "Ok",
+    "i132_Cancel"          : "Cancel",
+    "i133_presetCreated"   : "Preset created with sucess!",
+    "i134_presetAdvise"    : "Remember to publish it on GitHub as a Collaborator\nor send the json file to a dpAutoRigSystem Developper\nin order to integrate it and share:\n\nDanilo Pinheiro - nilouco@gmail.com",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

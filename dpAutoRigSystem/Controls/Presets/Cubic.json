@@ -1,8 +1,8 @@
 {
-    "preset"     : "Cubic",
-    "author"     : "Danilo Pinheiro",
-    "date"       : "2019-12-05",
-    "updated"    : "2019-12-08",
+    "_preset"     : "Cubic",
+    "_author"     : "Danilo Pinheiro",
+    "_date"       : "2019-12-05",
+    "_updated"    : "2019-12-19",
 
     "id_000_Base"          : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"       : {"type" : "Cube", "degree" : 1},

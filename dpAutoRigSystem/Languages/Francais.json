@@ -3,7 +3,7 @@
     "author"     : "Danilo Pinheiro",
     "contact"    : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "date"       : "2011-08-04",
-    "updated"    : "2019-12-08",
+    "updated"    : "2019-12-19",
     "translator" : "Marina Rüegger",
     
     "i000_guides"          : "Créer des GUIDES",
@@ -135,6 +135,12 @@
     "i126_pastedAttr"      : "Les attributes ont été bien collés.",
     "i127_guideVersionDif" : "Il y a de version de guide differentes\nde cette version du dpAutoRigSystem.\n\nPeut-être ça cause de problèmes\nquand ont construire le Rig.\n\nEst-ce que vous voulez continuer?",
     "i128_optionDegree"    : "Creer des guides avec ce degré de courbe.",
+    "i129_createPreset"    : "Creer de Preset",
+    "i130_presetName"      : "Preset Nom:",
+    "i131_OK"              : "Okay",
+    "i132_Cancel"          : "Canceler",
+    "i133_presetCreated"   : "Preset a été crée avec sucès!",
+    "i134_presetAdvise"    : "Suviens-vous de publisher ça dans GitHub comme un Collaborateur\nou envoyer le fichier json a un Developpeur du dpAutoRigSystem\npour l'integrer et le partager:\n\nDanilo Pinheiro - nilouco@gmail.com",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

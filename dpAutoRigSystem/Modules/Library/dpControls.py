@@ -1,6 +1,8 @@
 # importing libraries:
 import maya.cmds as cmds
 import dpUtils as utils
+import getpass
+import datetime
 
 dic_colors = {
     "yellow": 17,
@@ -637,7 +639,7 @@ class ControlClass:
                         self.renameShape([destTransform])
                     if deleteSource:
                         # update cvControls attributes:
-                        self.transferAttr(sourceItem, [destTransform], ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
+                        self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
     
     
@@ -691,6 +693,53 @@ class ControlClass:
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
                     self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], applyColor=True)
             cmds.select(transformList)
+    
+    
+    def dpCreatePreset(self, *args):
+        """ Creates a json file as a Control Preset and returns it.
+        """
+        resultString = None
+        ctrlList, ctrlIDList = [], []
+        allTransformList = cmds.ls(selection=False, type='transform')
+        for item in allTransformList:
+            if cmds.objExists(item+".dpControl"):
+                if cmds.getAttr(item+".dpControl") == 1:
+                    ctrlList.append(item)
+        if ctrlList:
+            resultDialog = cmds.promptDialog(
+                                            title=self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'],
+                                            message=self.dpUIinst.langDic[self.dpUIinst.langName]['i130_presetName'],
+                                            button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK'], self.dpUIinst.langDic[self.dpUIinst.langName]['i132_Cancel']],
+                                            defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK'],
+                                            cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_Cancel'],
+                                            dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_Cancel'])
+            if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK']:
+                resultName = cmds.promptDialog(query=True, text=True)
+                resultName = resultName[0].upper()+resultName[1:]
+                author = getpass.getuser()
+                date = str(datetime.datetime.now().date())
+                resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+                # add default keys to dict:
+                ctrlIDList.append("_preset")
+                ctrlIDList.append("_author")
+                ctrlIDList.append("_date")
+                ctrlIDList.append("_updated")
+                # get all existing controls info
+                for ctrlNode in ctrlList:
+                    ctrl_ID = cmds.getAttr(ctrlNode+".controlID")
+                    if ctrl_ID.startswith("id_"):
+                        if not ctrl_ID in ctrlIDList:
+                            ctrlIDList.append(ctrl_ID)
+                            ctrl_Type = cmds.getAttr(ctrlNode+".className")
+                            ctrl_Degree = cmds.getAttr(ctrlNode+".degree")
+                            resultString += ',"'+ctrl_ID+'":{"type":"'+ctrl_Type+'","degree":'+str(ctrl_Degree)+'}'
+                # check if we got all controlIDs:
+                for j, pID in enumerate(self.presetDic[self.presetName]):
+                    if not pID in ctrlIDList:
+                        # get missing controlIDs from current preset:
+                        resultString += ',"'+pID+'":{"type":"'+self.presetDic[self.presetName][pID]["type"]+'","degree":'+str(self.presetDic[self.presetName][pID]["degree"])+'}'
+                resultString += "}"
+        return resultString
     
     
     def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):

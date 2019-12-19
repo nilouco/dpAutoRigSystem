@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.00"
+DPAR_VERSION = "3.07.01"
 
 
 
@@ -215,8 +215,12 @@ class DP_AutoRig_UI:
                 print "Error: Cannot load the json preset files!\n",
                 return
             
-            # option menu:
-            self.allUIs["optionMenu"] = cmds.menu( 'optionMenu', label='Window' )
+            # create menu:
+            self.allUIs["createMenu"] = cmds.menu( 'createMenu', label='Create' )
+#            cmds.menuItem( 'translation_MI', label='Translation', command=self.createTranslation )
+            cmds.menuItem( 'preset_MI', label='Preset', command=self.createPreset )
+            # window menu:
+            self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window' )
             cmds.menuItem( 'reloadUI_MI', label='Reload UI', command=self.jobReloadUI )
             cmds.menuItem( 'quit_MI', label='Quit', command=self.deleteExistWindow )
             # help menu:
@@ -633,6 +637,37 @@ class DP_AutoRig_UI:
         # call reload the geometries in skin UI:
         self.reloadPopulatedGeoms()
     
+    
+    def createTranslation(self, *args):
+        """
+        """
+        print "translation wip..."
+        
+        
+    def createPreset(self, *args):
+        """ Just call ctrls create preset and set it as userDefined preset.
+        """
+        newPresetString = self.ctrls.dpCreatePreset()
+        if newPresetString:
+            # json file:
+            resultDict = json.loads(newPresetString)
+            # find path where 'dpAutoRig.py' is been executed:
+            path = os.path.dirname(__file__)
+            # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+            jsonPath = os.path.join(path, PRESET, "").replace("\\", "/")
+            jsonFileName = jsonPath+resultDict['_preset']+'.json'
+            # write json file in the HD:
+            with open(jsonFileName, 'w') as jsonFile:
+                json.dump(resultDict, jsonFile, indent=4, sort_keys=True)
+                
+            # set this new preset as userDefined preset:
+            self.presetName = resultDict['_preset']
+            cmds.optionVar(remove="dpAutoRigLastPreset")
+            cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
+            self.jobReloadUI(self)
+            # show preset creation result window:
+            self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_presetAdvise']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+            
     
     def setupDuplicatedGuide(self, selectedItem, *args):
         """ This method will create a new module instance for a duplicated guide found.
@@ -2337,7 +2372,7 @@ class DP_AutoRig_UI:
                 if self.detectedBug:
                     print "\n\n"
                     print self.bugMessage
-                    cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=['OK'])
+                    cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
         # re-declaring guideMirror and previewMirror groups:
         self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'

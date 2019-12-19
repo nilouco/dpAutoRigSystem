@@ -9,7 +9,7 @@ TITLE = "m101_smile"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_smile.png"
 
-dpSmileVersion = 1.1
+dpSmileVersion = 1.2
 
 class Smile(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -49,9 +49,9 @@ class Smile(BaseControl.ControlStartClass):
         curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)
         curve3 = circleInstance.cvMain(False, cvID, cvName, cvSize*0.3, cvDegree)
         curve4 = mouthInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
-        cmds.setAttr(curve2+".translateX", 0.4)
-        cmds.setAttr(curve2+".translateY", 0.3)
-        cmds.setAttr(curve3+".translateX", -0.4)
-        cmds.setAttr(curve3+".translateY", 0.3)
+        cmds.setAttr(curve2+".translateX", 0.4*cvSize)
+        cmds.setAttr(curve2+".translateY", 0.3*cvSize)
+        cmds.setAttr(curve3+".translateX", -0.4*cvSize)
+        cmds.setAttr(curve3+".translateY", 0.3*cvSize)
         mainCurve = self.combineCurves([curve1, curve2, curve3, curve4])
         return mainCurve
