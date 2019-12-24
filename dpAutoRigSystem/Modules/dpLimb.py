@@ -422,11 +422,18 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint = side + self.userGuideName + "_Guide_JointEnd"
 
                 # getting names from dic:
-                beforeName = self.langDic[self.langName]['c_' + limbTypeName.lower() + '_before']
-                mainName = self.langDic[self.langName]['c_' + limbTypeName.lower() + '_main']
-                cornerName = self.langDic[self.langName]['c_' + limbTypeName.lower() + '_corner']
-                cornerBName = self.langDic[self.langName]['c_' + limbTypeName.lower() + '_cornerB']
-                extremName = self.langDic[self.langName]['c_' + limbTypeName.lower() + '_extrem']
+                if limbTypeName == ARM:
+                    beforeName = self.langDic[self.langName]['c000_arm_before']
+                    mainName = self.langDic[self.langName]['c001_arm_main']
+                    cornerName = self.langDic[self.langName]['c002_arm_corner']
+                    cornerBName = self.langDic[self.langName]['c003_arm_cornerB']
+                    extremName = self.langDic[self.langName]['c004_arm_extrem']
+                else:
+                    beforeName = self.langDic[self.langName]['c005_leg_before']
+                    mainName = self.langDic[self.langName]['c006_leg_main']
+                    cornerName = self.langDic[self.langName]['c007_leg_corner']
+                    cornerBName = self.langDic[self.langName]['c008_leg_cornerB']
+                    extremName = self.langDic[self.langName]['c009_leg_extrem']
 
                 # mount cvLocList and jNameList:
                 if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
@@ -471,7 +478,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # Setup axis order
                     if jName == beforeName:  # Clavicle and hip
                         cmds.setAttr(fkCtrl + ".rotateOrder", 3)
-                    elif jName == extremName and limbTypeName == LEG:  # Hand
+                    elif jName == extremName and limbTypeName == LEG:  # Ankle
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
                     elif jName == extremName and limbTypeName == ARM:  # Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
@@ -557,10 +564,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PointConstraint")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.worldRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_ParentConstraint")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c_Follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_Follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side + self.userGuideName + "_FkIsolate_Rev")
-                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c_Follow'], self.fkIsolateRevNode + ".inputX", force=True)
+                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_Follow'], self.fkIsolateRevNode + ".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.worldRef + "W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
@@ -791,9 +798,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.ikPoleVectorCtrlZeroList.append(self.zeroCornerGrp)
 
                 # working with autoOrient of poleVector:
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 if self.limbType == self.langDic[self.langName]['m028_arm']:
-                    cmds.setAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c_autoOrient'], 0)
+                    cmds.setAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], 0)
                 if self.limbStyle == self.langDic[self.langName]['m042_default']:
                     self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp + "_OrientConstraint")[0]
                 else:  # biped, quadruped, quadSpring
@@ -802,17 +809,17 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     else:  # leg
                         self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("x", "z"), maintainOffset=True, name=self.cornerGrp + "_OrientConstraint")[0]
                 self.cornerOrientRev = cmds.createNode('reverse', name=side + self.userGuideName + "_CornerOrient_Rev")
-                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c_autoOrient'], self.cornerOrientRev + ".inputX", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], self.cornerOrientRev + ".inputX", force=True)
                 cmds.connectAttr(self.cornerOrientRev + '.outputX', self.cornerOrient + "." + self.cornerOrientGrp + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c_autoOrient'], self.cornerOrient + "." + self.ikExtremCtrl + "W1", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], self.cornerOrient + "." + self.ikExtremCtrl + "W1", force=True)
 
                 # working with follow of poleVector:
                 self.cornerPoint = cmds.pointConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, maintainOffset=True, name=self.cornerGrp + "_ParentConstraint")[0]
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.cornerPointRev = cmds.createNode('reverse', name=side + self.userGuideName + "_CornerPoint_Rev")
-                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c_Follow'], self.cornerPointRev + ".inputX", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_Follow'], self.cornerPointRev + ".inputX", force=True)
                 cmds.connectAttr(self.cornerPointRev + '.outputX', self.cornerPoint + "." + self.cornerOrientGrp + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c_Follow'], self.cornerPoint + "." + self.ikExtremCtrl + "W1", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_Follow'], self.cornerPoint + "." + self.ikExtremCtrl + "W1", force=True)
 
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
@@ -899,8 +906,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
                 if self.limbType == self.langDic[self.langName]['m028_arm'] and self.getHasBend() == False:
                     # create forearm joint:
-                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.langDic[self.langName][ 'c_forearm']+self.jSufixList[0])[0]
-                    utils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName][ 'c_forearm'])
+                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.langDic[self.langName][ 'c030_forearm']+self.jSufixList[0])[0]
+                    utils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName][ 'c030_forearm'])
                     # delete its children:
                     childList = cmds.listRelatives(forearmJnt, children=True, fullPath=True)
                     cmds.delete(childList)
@@ -915,19 +922,19 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         forearmDistZ = -(tempDist / 3)
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
-                    forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side + self.userGuideName + "_" + self.langDic[self.langName]['c_forearm'] + "_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
-                    forearmGrp = cmds.group(forearmCtrl, name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c_forearm'] + "_Grp")
-                    forearmZero = cmds.group(forearmGrp, name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c_forearm'] + "_Zero")
+                    forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
+                    forearmGrp = cmds.group(forearmCtrl, name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c030_forearm'] + "_Grp")
+                    forearmZero = cmds.group(forearmGrp, name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c030_forearm'] + "_Zero")
                     tempToDelete = cmds.parentConstraint(forearmJnt, forearmZero, maintainOffset=False)
                     cmds.delete(tempToDelete)
                     cmds.parentConstraint(self.skinJointList[2], forearmZero, maintainOffset=True, name=forearmZero + "_ParentConstraint")
                     cmds.orientConstraint(forearmCtrl, forearmJnt, skip=["x", "y"], maintainOffset=True, name=forearmJnt + "_OrientConstraint")
                     # create attribute to forearm autoRotate:
-                    cmds.addAttr(forearmCtrl, longName=self.langDic[self.langName]['c_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
+                    cmds.addAttr(forearmCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                     self.ctrls.setLockHide([forearmCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v'])
                     # make rotate connections:
-                    forearmMD = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c_forearm'] + "_MD")
-                    cmds.connectAttr(forearmCtrl + '.' + self.langDic[self.langName]['c_autoOrient'], forearmMD + '.input1X')
+                    forearmMD = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c030_forearm'] + "_MD")
+                    cmds.connectAttr(forearmCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], forearmMD + '.input1X')
                     cmds.connectAttr(self.skinJointList[3] + '.rotateZ', forearmMD + '.input2X')
                     cmds.connectAttr(forearmMD + '.outputX', forearmGrp + '.rotateZ')
 
@@ -952,13 +959,13 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(parentConstToRFOffset, longName="fixOffsetZ", attributeType='long', keyable=False)
 
                 # work with scalable extrem hand or foot:
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c_uniformScale'], at="double", min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c_uniformScale'], at="double", min=0.001, dv=1)
-                cmds.setAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c_uniformScale'], edit=True, keyable=True)
-                cmds.setAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c_uniformScale'], edit=True, keyable=True)
-                uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.langDic[self.langName]['c_uniformScale']+"_BC")
-                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c_uniformScale'], uniBlend+".color2R", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c_uniformScale'], uniBlend+".color1R", force=True)
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.setAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c040_uniformScale'], edit=True, keyable=True)
+                cmds.setAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c040_uniformScale'], edit=True, keyable=True)
+                uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.langDic[self.langName]['c040_uniformScale']+"_BC")
+                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c040_uniformScale'], uniBlend+".color2R", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c040_uniformScale'], uniBlend+".color1R", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleZ", force=True)
@@ -1072,7 +1079,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                             cmds.delete(cmds.parentConstraint(iniJoint, loc, mo=False, w=1))
 
-                            if name == self.langDic[self.langName]['c_leg_main']:  # leg
+                            if name == self.langDic[self.langName]['c006_leg_main']:  # leg
                                 if s == 0:  # left side (or first side = original)
                                     cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
                                 else:

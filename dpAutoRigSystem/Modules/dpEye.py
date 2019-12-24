@@ -190,14 +190,14 @@ class Eye(Base.StartClass, Layout.LayoutClass):
             Returns EyelidBaseJxt and EyelidJnt created for rotate and skinning.
         '''
         # declating a concatenated name used for base to compose:
-        baseName = side+self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c_eyelid']+middle
+        baseName = side+self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c042_eyelid']+middle
         # creating joints:
         eyelidBaseZeroJxt = cmds.joint(name=baseName+"_Base_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
         eyelidBaseJxt = cmds.joint(name=baseName+"_Base_Jxt", rotationOrder="yzx", scaleCompensate=False)
         eyelidZeroJxt = cmds.joint(name=baseName+"_Zero_Jxt", rotationOrder="yzx", scaleCompensate=False)
         eyelidJnt = cmds.joint(name=baseName+"_Jnt", rotationOrder="yzx", scaleCompensate=False)
         cmds.addAttr(eyelidJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-        utils.setJointLabel(eyelidJnt, jointLabelNumber, 18, self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c_eyelid']+middle)
+        utils.setJointLabel(eyelidJnt, jointLabelNumber, 18, self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c042_eyelid']+middle)
         cmds.select(eyelidZeroJxt)
         eyelidSupportJxt = cmds.joint(name=baseName+"_Jxt", rotationOrder="yzx", scaleCompensate=False)
         cmds.setAttr(eyelidSupportJxt+".translateX", self.ctrlRadius*0.1)
@@ -216,7 +216,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
             Returns the main control and its zeroOut group.
         '''
         # declating a concatenated name used for base to compose:
-        baseName = side+self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c_eyelid']
+        baseName = side+self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c042_eyelid']
         # creating eyelid control:
         eyelidCtrl = self.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.ctrlRadius*0.4, d=self.curveDegree, rot=rotCtrl)
         utils.originedFrom(objName=eyelidCtrl, attrString=self.base+";"+self.guide)
@@ -228,17 +228,17 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.delete(cmds.pointConstraint(eyelidJnt, eyelidCtrlZero, mo=False))
         cmds.xform(eyelidCtrlZero, translation=(0,0,self.ctrlRadius), relative=True)
         # adding useful control attributes to calibrate eyelid setup:
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_intensity']+"X", attributeType="float", minValue=0, defaultValue=1)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_intensity']+"Y", attributeType="float", minValue=0, defaultValue=1)
-        cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_intensity']+"X", keyable=False, channelBox=True)
-        cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_intensity']+"Y", keyable=False, channelBox=True)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_invert']+"X", attributeType="bool", defaultValue=0)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_invert']+"Y", attributeType="bool", defaultValue=0)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_preset']+"X", attributeType="float", defaultValue=preset, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_preset']+"Y", attributeType="float", defaultValue=preset, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], attributeType="float", minValue=0, defaultValue=0.5, maxValue=1, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_fix']+"ScaleX", attributeType="float", defaultValue=0.01, minValue=0, keyable=False)
-        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c_fix']+"TranslateZ", attributeType="float", defaultValue=0.15, minValue=0, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c049_intensity']+"X", attributeType="float", minValue=0, defaultValue=1)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c049_intensity']+"Y", attributeType="float", minValue=0, defaultValue=1)
+        cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c049_intensity']+"X", keyable=False, channelBox=True)
+        cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c049_intensity']+"Y", keyable=False, channelBox=True)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c053_invert']+"X", attributeType="bool", defaultValue=0)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c053_invert']+"Y", attributeType="bool", defaultValue=0)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c051_preset']+"X", attributeType="float", defaultValue=preset, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c051_preset']+"Y", attributeType="float", defaultValue=preset, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c050_proximity']+self.langDic[self.langName]['c029_middle'], attributeType="float", minValue=0, defaultValue=0.5, maxValue=1, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c052_fix']+"ScaleX", attributeType="float", defaultValue=0.01, minValue=0, keyable=False)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c052_fix']+"TranslateZ", attributeType="float", defaultValue=0.15, minValue=0, keyable=False)
         # creating utility nodes to eyelid setup:
         eyelidIntensityMD = cmds.createNode('multiplyDivide', name=baseName+"_Intensity_MD")
         eyelidInvertMD = cmds.createNode('multiplyDivide', name=baseName+"_Invert_MD")
@@ -269,35 +269,35 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(eyelidCtrl+".translateX", eyelidInvertMD+".input1X", force=True)
         cmds.connectAttr(eyelidCtrl+".translateY", eyelidInvertMD+".input1Y", force=True)
         # working with invert nodes in order to be able to adjust the control by User after the setup done:
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"X", eyelidInvertXCnd+".firstTerm", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"Y", eyelidInvertYCnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"X", eyelidInvertXCnd+".firstTerm", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"Y", eyelidInvertYCnd+".firstTerm", force=True)
         cmds.connectAttr(eyelidInvertXCnd+".outColorR", eyelidInvertMD+".input2X", force=True)
         cmds.connectAttr(eyelidInvertYCnd+".outColorR", eyelidInvertMD+".input2Y", force=True)
         cmds.connectAttr(eyelidInvertMD+".outputX", eyelidIntensityMD+".input1X", force=True)
         cmds.connectAttr(eyelidInvertMD+".outputY", eyelidIntensityMD+".input1Y", force=True)
         # working with intensity attributes in order to chose the control force by User:
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_intensity']+"X", eyelidIntensityMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_intensity']+"Y", eyelidIntensityMD+".input2Y", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c049_intensity']+"X", eyelidIntensityMD+".input2X", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c049_intensity']+"Y", eyelidIntensityMD+".input2Y", force=True)
         cmds.connectAttr(eyelidIntensityMD+".outputX", eyelidPresetMD+".input1X", force=True)
         cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidPresetMD+".input1Y", force=True)
         # working with the predefined values in order to help the Rigger calibrate the control intensity preset:
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_preset']+"X", eyelidPresetMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_preset']+"Y", eyelidPresetMD+".input2Y", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c051_preset']+"X", eyelidPresetMD+".input2X", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c051_preset']+"Y", eyelidPresetMD+".input2Y", force=True)
         cmds.connectAttr(eyelidPresetMD+".outputX", eyelidBaseJxt+".rotateZ", force=True)
         cmds.connectAttr(eyelidPresetMD+".outputY", eyelidBaseJxt+".rotateX", force=True)
         # setup the middle extra joint to be skinned as a helper to deform correctly the mesh following the main eyelid joint:
         cmds.connectAttr(eyelidPresetMD+".outputX", eyelidMiddleMD+".input1X", force=True)
         cmds.connectAttr(eyelidPresetMD+".outputY", eyelidMiddleMD+".input1Y", force=True)
         # using the proximity attribute to let User chose the good deformation on the skinning:
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], eyelidMiddleMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], eyelidMiddleMD+".input2Y", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c050_proximity']+self.langDic[self.langName]['c029_middle'], eyelidMiddleMD+".input2X", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c050_proximity']+self.langDic[self.langName]['c029_middle'], eyelidMiddleMD+".input2Y", force=True)
         cmds.connectAttr(eyelidMiddleMD+".outputX", eyelidMiddleBaseJxt+".rotateZ", force=True)
         cmds.connectAttr(eyelidMiddleMD+".outputY", eyelidMiddleBaseJxt+".rotateX", force=True)
         # try to fix the maintain volume by mimic the SetDrivenKey and SculptDeform technique using nodes to scale and translate the skinned joints:
         cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidFixMD+".input1X", force=True)
         cmds.connectAttr(eyelidIntensityMD+".outputY", eyelidFixMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_fix']+"ScaleX", eyelidFixMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_fix']+"TranslateZ", eyelidFixMD+".input2Y", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c052_fix']+"ScaleX", eyelidFixMD+".input2X", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c052_fix']+"TranslateZ", eyelidFixMD+".input2Y", force=True)
         # modulus of fix values in order to avoid opositive values when the control pass to another direction from start position:
         cmds.connectAttr(eyelidFixMD+".outputX", eyelidFixModulusXCnd+".firstTerm", force=True)
         cmds.connectAttr(eyelidFixMD+".outputX", eyelidFixModulusXCnd+".colorIfTrueR", force=True)
@@ -313,8 +313,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         # fixing middle joint proximity:
         cmds.connectAttr(eyelidFixPMA+".output3Dx", eyelidFixMiddleMD+".input1X", force=True)
         cmds.connectAttr(eyelidFixModulusYCnd+".outColorR", eyelidFixMiddleMD+".input1Y", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], eyelidFixMiddleMD+".input2X", force=True)
-        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c_proximity']+self.langDic[self.langName]['c_middle'], eyelidFixMiddleMD+".input2Y", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c050_proximity']+self.langDic[self.langName]['c029_middle'], eyelidFixMiddleMD+".input2X", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c050_proximity']+self.langDic[self.langName]['c029_middle'], eyelidFixMiddleMD+".input2Y", force=True)
         cmds.connectAttr(eyelidFixMiddleMD+".outputX", eyelidFixMiddleScaleClp+".inputR", force=True)
         cmds.connectAttr(eyelidFixMiddleScaleClp+".outputR", eyelidMiddleJnt+".scaleX", force=True)
         cmds.connectAttr(eyelidFixMiddleMD+".outputY", eyelidMiddleJnt+".translateZ", force=True)
@@ -418,8 +418,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
             self.hasPupil = False
             # create the main control:
             self.eyeCtrl = self.ctrls.cvControl("id_010_EyeLookAtMain", self.userGuideName+"_A_Ctrl", r=(2.25*self.ctrlRadius), d=self.curveDegree)
-            cmds.addAttr(self.eyeCtrl, longName=self.langDic[self.langName]['c_Follow'], attributeType='float', keyable=True, minValue=0, maxValue=1)
-            cmds.setAttr(self.eyeCtrl+"."+self.langDic[self.langName]['c_Follow'], 1)
+            cmds.addAttr(self.eyeCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', keyable=True, minValue=0, maxValue=1)
+            cmds.setAttr(self.eyeCtrl+"."+self.langDic[self.langName]['c032_Follow'], 1)
             cmds.delete(cmds.parentConstraint(sideList[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
             if self.mirrorAxis != 'off':
                 cmds.setAttr(self.eyeCtrl+".translate"+self.mirrorAxis, 0)
@@ -522,31 +522,31 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                     
                     # creating eyelids joints:
                     cmds.select(clear=True)
-                    self.eyelidJxt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c_eyelid']+"_Jxt", scaleCompensate=False)
+                    self.eyelidJxt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c042_eyelid']+"_Jxt", scaleCompensate=False)
                     cmds.delete(cmds.parentConstraint(self.guide, self.eyelidJxt, mo=False))
                     cmds.parent(self.eyelidJxt, self.eyeScaleJnt)
-                    self.upperEyelidBaseJxt, self.upperEyelidJnt = self.createEyelidJoints(side, 'c_upper', "", self.cvUpperEyelidLoc, s+jointLabelAdd)
-                    self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt = self.createEyelidJoints(side, 'c_upper', self.langDic[self.langName]['c_middle'], self.cvUpperEyelidLoc, s+jointLabelAdd)
-                    self.lowerEyelidBaseJxt, self.lowerEyelidJnt = self.createEyelidJoints(side, 'c_lower', "", self.cvLowerEyelidLoc, s+jointLabelAdd)
-                    self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt = self.createEyelidJoints(side, 'c_lower', self.langDic[self.langName]['c_middle'], self.cvLowerEyelidLoc, s+jointLabelAdd)
+                    self.upperEyelidBaseJxt, self.upperEyelidJnt = self.createEyelidJoints(side, 'c044_upper', "", self.cvUpperEyelidLoc, s+jointLabelAdd)
+                    self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt = self.createEyelidJoints(side, 'c044_upper', self.langDic[self.langName]['c029_middle'], self.cvUpperEyelidLoc, s+jointLabelAdd)
+                    self.lowerEyelidBaseJxt, self.lowerEyelidJnt = self.createEyelidJoints(side, 'c045_lower', "", self.cvLowerEyelidLoc, s+jointLabelAdd)
+                    self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt = self.createEyelidJoints(side, 'c045_lower', self.langDic[self.langName]['c029_middle'], self.cvLowerEyelidLoc, s+jointLabelAdd)
                     
                     # creating eyelids controls and setup:
-                    self.upperEyelidCtrl, self.upperEyelidCtrlZero = self.createEyelidSetup(side, 'c_upper', self.upperEyelidJnt, self.upperEyelidBaseJxt, self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt, 30, (0, 0, 0))
-                    self.lowerEyelidCtrl, self.lowerEyelidCtrlZero = self.createEyelidSetup(side, 'c_lower', self.lowerEyelidJnt, self.lowerEyelidBaseJxt, self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt, 30, (0, 0, 180))
+                    self.upperEyelidCtrl, self.upperEyelidCtrlZero = self.createEyelidSetup(side, 'c044_upper', self.upperEyelidJnt, self.upperEyelidBaseJxt, self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt, 30, (0, 0, 0))
+                    self.lowerEyelidCtrl, self.lowerEyelidCtrlZero = self.createEyelidSetup(side, 'c045_lower', self.lowerEyelidJnt, self.lowerEyelidBaseJxt, self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt, 30, (0, 0, 180))
                     # fixing mirror behavior for side controls:
                     if s == 0: #left
-                        cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"X", 1)
-                        cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"Y", 1)
-                        cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"Y", 1)
+                        cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"X", 1)
+                        cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"Y", 1)
+                        cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"Y", 1)
                     else: #right
                         if cmds.getAttr(self.moduleGrp+".flip") == 0:
-                            cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"Y", 1)
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"X", 1)
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"Y", 1)
+                            cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"Y", 1)
+                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"X", 1)
+                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"Y", 1)
                             cmds.setAttr(self.upperEyelidCtrlZero+".rotateY", 180)
                             cmds.setAttr(self.lowerEyelidCtrlZero+".rotateY", 180)
                         else:
-                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c_invert']+"X", 1)
+                            cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"X", 1)
                 
                 # create iris setup:
                 if self.getModuleAttr(IRIS):

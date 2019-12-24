@@ -145,10 +145,10 @@ class LayoutClass:
                 else:
                     L = self.langDic[self.langName]['p002_left']
                     R = self.langDic[self.langName]['p003_right']
-                    T = self.langDic[self.langName]['p006_top']
-                    B = self.langDic[self.langName]['p007_bottom']
-                    F = self.langDic[self.langName]['p008_front']
-                    Bk= self.langDic[self.langName]['p009_back']
+                    T = self.langDic[self.langName]['p004_top']
+                    B = self.langDic[self.langName]['p005_bottom']
+                    F = self.langDic[self.langName]['p006_front']
+                    Bk= self.langDic[self.langName]['p007_back']
                     menuNameItemList = [L+' --> '+R, R+' --> '+L, T+' --> '+B, B+' --> '+T, F+' --> '+Bk, Bk+' --> '+F]
                 # create items for mirrorName menu:
                 self.mirrorNameMenu = cmds.optionMenu("mirrorNameMenu", label='', changeCommand=self.changeMirrorName, parent=self.doubleRigColumn)
@@ -204,7 +204,7 @@ class LayoutClass:
                     self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.indirectSkinLayout)
                     cmds.text(" ", parent=self.indirectSkinLayout)
                     holderValue = cmds.getAttr(self.moduleGrp+".holder")
-                    self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
+                    self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c046_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
                     
                 # create eyelid layout:
                 if self.eyelidExists:

@@ -716,29 +716,39 @@ class ControlClass:
             if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
-                author = getpass.getuser()
-                date = str(datetime.datetime.now().date())
-                resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
-                # add default keys to dict:
-                ctrlIDList.append("_preset")
-                ctrlIDList.append("_author")
-                ctrlIDList.append("_date")
-                ctrlIDList.append("_updated")
-                # get all existing controls info
-                for ctrlNode in ctrlList:
-                    ctrl_ID = cmds.getAttr(ctrlNode+".controlID")
-                    if ctrl_ID.startswith("id_"):
-                        if not ctrl_ID in ctrlIDList:
-                            ctrlIDList.append(ctrl_ID)
-                            ctrl_Type = cmds.getAttr(ctrlNode+".className")
-                            ctrl_Degree = cmds.getAttr(ctrlNode+".degree")
-                            resultString += ',"'+ctrl_ID+'":{"type":"'+ctrl_Type+'","degree":'+str(ctrl_Degree)+'}'
-                # check if we got all controlIDs:
-                for j, pID in enumerate(self.presetDic[self.presetName]):
-                    if not pID in ctrlIDList:
-                        # get missing controlIDs from current preset:
-                        resultString += ',"'+pID+'":{"type":"'+self.presetDic[self.presetName][pID]["type"]+'","degree":'+str(self.presetDic[self.presetName][pID]["degree"])+'}'
-                resultString += "}"
+                confirmSameName = self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']
+                if resultName in self.presetDic:
+                    confirmSameName = cmds.confirmDialog(
+                                                        title=self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'], 
+                                                        message=self.dpUIinst.langDic[self.dpUIinst.langName]['i135_existingName'], 
+                                                        button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
+                                                        defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
+                                                        cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
+                                                        dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
+                if confirmSameName == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    author = getpass.getuser()
+                    date = str(datetime.datetime.now().date())
+                    resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+                    # add default keys to dict:
+                    ctrlIDList.append("_preset")
+                    ctrlIDList.append("_author")
+                    ctrlIDList.append("_date")
+                    ctrlIDList.append("_updated")
+                    # get all existing controls info
+                    for ctrlNode in ctrlList:
+                        ctrl_ID = cmds.getAttr(ctrlNode+".controlID")
+                        if ctrl_ID.startswith("id_"):
+                            if not ctrl_ID in ctrlIDList:
+                                ctrlIDList.append(ctrl_ID)
+                                ctrl_Type = cmds.getAttr(ctrlNode+".className")
+                                ctrl_Degree = cmds.getAttr(ctrlNode+".degree")
+                                resultString += ',"'+ctrl_ID+'":{"type":"'+ctrl_Type+'","degree":'+str(ctrl_Degree)+'}'
+                    # check if we got all controlIDs:
+                    for j, pID in enumerate(self.presetDic[self.presetName]):
+                        if not pID in ctrlIDList:
+                            # get missing controlIDs from current preset:
+                            resultString += ',"'+pID+'":{"type":"'+self.presetDic[self.presetName][pID]["type"]+'","degree":'+str(self.presetDic[self.presetName][pID]["degree"])+'}'
+                    resultString += "}"
         return resultString
     
     

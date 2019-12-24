@@ -265,13 +265,13 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                                 cmds.addAttr(self.fingerCtrl, longName="ikFkBlend", attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                                 self.ikFkRevNode = cmds.createNode("reverse", name=side + self.userGuideName + "_ikFk_Rev")
                                 cmds.connectAttr(self.fingerCtrl + ".ikFkBlend", self.ikFkRevNode + ".inputX", force=True)
-                            if not cmds.objExists(self.fingerCtrl + '.' + self.langDic[self.langName]['c_showControls']):
-                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
+                            if not cmds.objExists(self.fingerCtrl + '.' + self.langDic[self.langName]['c021_showControls']):
+                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                                 self.ctrlShape0 = cmds.listRelatives(side + self.userGuideName + "_0_Ctrl", children=True, type='nurbsCurve')[0]
-                                cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c_showControls'], self.ctrlShape0 + ".visibility", force=True)
-                                cmds.setAttr(self.fingerCtrl + '.' + self.langDic[self.langName]['c_showControls'], keyable=False, channelBox=True)
+                                cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c021_showControls'], self.ctrlShape0 + ".visibility", force=True)
+                                cmds.setAttr(self.fingerCtrl + '.' + self.langDic[self.langName]['c021_showControls'], keyable=False, channelBox=True)
                             for j in range(1, self.nJoints + 1):
-                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c_falange'] + str(j), attributeType='float', keyable=True)
+                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c022_falange'] + str(j), attributeType='float', keyable=True)
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side + self.userGuideName + "_" + str(n - 1) + "_Jnt"
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
@@ -292,10 +292,10 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 for n in range(1, self.nJoints + 1):
                     self.fingerCtrl = side + self.userGuideName + "_1_Ctrl"
                     self.sdkGrp = side + self.userGuideName + "_" + str(n) + "_SDKGrp"
-                    cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c_falange'] + str(n), self.sdkGrp + ".rotateY", force=True)
+                    cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c022_falange'] + str(n), self.sdkGrp + ".rotateY", force=True)
                     if n > 1:
                         self.ctrlShape = cmds.listRelatives(side + self.userGuideName + "_" + str(n) + "_Ctrl", children=True, type='nurbsCurve')[0]
-                        cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c_showControls'], self.ctrlShape + ".visibility", force=True)
+                        cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c021_showControls'], self.ctrlShape + ".visibility", force=True)
 
                 # ik and Fk setup
                 if self.nJoints == 2:

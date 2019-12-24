@@ -201,9 +201,9 @@ class Single(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(self.jxt+".scaleZ", -1)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"Shape", shape=True)
-                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.langDic[self.langName]['c_holder']+"_Grp")
+                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.langDic[self.langName]['c046_holder']+"_Grp")
                         self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c_holder']+"_Jis"))
+                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
                     else:
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))

@@ -175,18 +175,18 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint = side + self.userGuideName + "_Guide_JointEnd"
 
                 # declaring attributes reading from dictionary:
-                ankleRFAttr = self.langDic[self.langName]['c_leg_extrem']
-                middleRFAttr = self.langDic[self.langName]['c_RevFoot_middle']
-                outsideRFAttr = self.langDic[self.langName]['c_RevFoot_A']
-                insideRFAttr = self.langDic[self.langName]['c_RevFoot_B']
-                heelRFAttr = self.langDic[self.langName]['c_RevFoot_C']
-                toeRFAttr = self.langDic[self.langName]['c_RevFoot_D']
-                ballRFAttr = self.langDic[self.langName]['c_RevFoot_E']
-                footRFAttr = self.langDic[self.langName]['c_RevFoot_F']
-                sideRFAttr = self.langDic[self.langName]['c_RevFoot_G']
-                rfRoll = self.langDic[self.langName]['c_RevFoot_roll']
-                rfSpin = self.langDic[self.langName]['c_RevFoot_spin']
-                rfTurn = self.langDic[self.langName]['c_RevFoot_turn']
+                ankleRFAttr = self.langDic[self.langName]['c009_leg_extrem']
+                middleRFAttr = self.langDic[self.langName]['c017_RevFoot_middle']
+                outsideRFAttr = self.langDic[self.langName]['c010_RevFoot_A']
+                insideRFAttr = self.langDic[self.langName]['c011_RevFoot_B']
+                heelRFAttr = self.langDic[self.langName]['c012_RevFoot_C']
+                toeRFAttr = self.langDic[self.langName]['c013_RevFoot_D']
+                ballRFAttr = self.langDic[self.langName]['c014_RevFoot_E']
+                footRFAttr = self.langDic[self.langName]['c015_RevFoot_F']
+                sideRFAttr = self.langDic[self.langName]['c016_RevFoot_G']
+                rfRoll = self.langDic[self.langName]['c018_RevFoot_roll']
+                rfSpin = self.langDic[self.langName]['c019_RevFoot_spin']
+                rfTurn = self.langDic[self.langName]['c020_RevFoot_turn']
 
                 # creating joints:
                 cmds.select(clear=True)
@@ -266,13 +266,13 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(ikHandleMiddleList[0] + '.visibility', 0)
 
                 # creating Fk controls:
-                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side + self.userGuideName + "_" + self.langDic[self.langName]['c_leg_extrem'] + "_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z")
+                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side + self.userGuideName + "_" + self.langDic[self.langName]['c009_leg_extrem'] + "_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z")
                 self.footCtrlList.append(self.footCtrl)
                 cmds.setAttr(self.footCtrl + ".rotateOrder", 1)
 
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
 
-                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side + self.userGuideName + "_" + self.langDic[self.langName]['c_RevFoot_middle'].capitalize() + "_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
+                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side + self.userGuideName + "_" + self.langDic[self.langName]['c017_RevFoot_middle'].capitalize() + "_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
                 cmds.setAttr(self.middleFootCtrl + '.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl + ".rotateOrder", 4)
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)
@@ -287,7 +287,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 # mount hierarchy:
                 cmds.parent(self.footCtrlZeroList[1], self.RFDCtrl, absolute=True)
                 cmds.parent(ikHandleMiddleList[0], self.middleFootCtrl, absolute=True)
-                self.toLimbIkHandleGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c_leg_extrem'] + "_Grp")
+                self.toLimbIkHandleGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c009_leg_extrem'] + "_Grp")
                 self.toLimbIkHandleGrpList.append(self.toLimbIkHandleGrp)
                 cmds.parent(ikHandleAnkleList[0], self.toLimbIkHandleGrp, self.RFECtrl, absolute=True)
                 cmds.makeIdentity(self.toLimbIkHandleGrp, apply=True, translate=True, rotate=True, scale=True)

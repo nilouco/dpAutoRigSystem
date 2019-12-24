@@ -9,6 +9,7 @@ import shutil
 import urllib
 import zipfile
 import StringIO
+import webbrowser
 
 
 # UTILS functions:
@@ -586,11 +587,12 @@ def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
     return [4, None]
 
 
-def visiteWebSite(website, *args):
+def visitWebSite(website, *args):
     """ Start browser with the given website address.
     """
-    webSiteString = "start "+website
-    os.popen(webSiteString)
+    #webSiteString = "start "+website
+    #os.popen(webSiteString)
+    webbrowser.open(website, new=2)
     
     
     

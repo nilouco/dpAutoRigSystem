@@ -31,16 +31,16 @@ def Tweaks(dpUIinst):
         doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
         # part names:
         tweaksName = dpUIinst.langDic[dpUIinst.langName]['m081_tweaks']
-        middleName = dpUIinst.langDic[dpUIinst.langName]['c_middle']
-        eyebrowName = dpUIinst.langDic[dpUIinst.langName]['c_eyebrow']
-        eyelidName = dpUIinst.langDic[dpUIinst.langName]['c_eyelid']
-        cornerName = dpUIinst.langDic[dpUIinst.langName]['c_corner']
-        upperName = dpUIinst.langDic[dpUIinst.langName]['c_upper']
-        lowerName = dpUIinst.langDic[dpUIinst.langName]['c_lower']
-        lipName = dpUIinst.langDic[dpUIinst.langName]['c_lip']
-        holderName = dpUIinst.langDic[dpUIinst.langName]['c_holder']
-        squintName = dpUIinst.langDic[dpUIinst.langName]['c_squint']
-        cheekName = dpUIinst.langDic[dpUIinst.langName]['c_cheek']
+        middleName = dpUIinst.langDic[dpUIinst.langName]['c029_middle']
+        eyebrowName = dpUIinst.langDic[dpUIinst.langName]['c041_eyebrow']
+        eyelidName = dpUIinst.langDic[dpUIinst.langName]['c042_eyelid']
+        cornerName = dpUIinst.langDic[dpUIinst.langName]['c043_corner']
+        upperName = dpUIinst.langDic[dpUIinst.langName]['c044_upper']
+        lowerName = dpUIinst.langDic[dpUIinst.langName]['c045_lower']
+        lipName = dpUIinst.langDic[dpUIinst.langName]['c039_lip']
+        holderName = dpUIinst.langDic[dpUIinst.langName]['c046_holder']
+        squintName = dpUIinst.langDic[dpUIinst.langName]['c054_squint']
+        cheekName = dpUIinst.langDic[dpUIinst.langName]['c055_cheek']
         
         holderMainName = tweaksName+"_"+holderName
         # eybrows names:

@@ -217,8 +217,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base + ".nJoints")
                 # create controls:
-                self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c_hips'] + "A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c027_hips'] + "A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side + self.userGuideName + "_" + self.langDic[self.langName]['c028_chest'] + "A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 # optimize contrls CV shapes:
                 tempHipsACluster = cmds.cluster(self.hipsACtrl)[1]
                 cmds.setAttr(tempHipsACluster+".scaleY", 0.25)
@@ -227,17 +227,17 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(tempChestACluster+".scaleY", 0.4)
                 cmds.delete(self.chestACtrl, constructionHistory=True)
                 
-                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side + self.userGuideName + "_" + self.langDic[self.langName]['c_hips'] + "B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
-                self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side + self.userGuideName + "_" + self.langDic[self.langName]['c_chest'] + "B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
-                cmds.addAttr(self.hipsACtrl, longName=side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side + self.userGuideName + "_" + self.langDic[self.langName]['c027_hips'] + "B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side + self.userGuideName + "_" + self.langDic[self.langName]['c028_chest'] + "B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                cmds.addAttr(self.hipsACtrl, longName=side + self.userGuideName + '_' + self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=side + self.userGuideName + '_active_' + self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl], ['v'], l=False)
                 self.aHipsAList.append(self.hipsACtrl)
                 self.aChestAList.append(self.chestACtrl)
-                self.aVolVariationAttrList.append(side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'])
-                self.aActVolVariationAttrList.append(side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'])
-                self.aMScaleVolVariationAttrList.append(side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'])
+                self.aVolVariationAttrList.append(side + self.userGuideName + '_' + self.langDic[self.langName]['c031_volumeVariation'])
+                self.aActVolVariationAttrList.append(side + self.userGuideName + '_active_' + self.langDic[self.langName]['c031_volumeVariation'])
+                self.aMScaleVolVariationAttrList.append(side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c031_volumeVariation'])
 
                 # Setup axis order
                 if self.rigType == Base.RigType.quadruped:
@@ -358,13 +358,13 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(rbnMD + '.operation', 2)
                 # create a blendColor, a condition and a multiplyDivide in order to get the correct result value of volumeVariation:
                 rbnBlendColors = cmds.createNode('blendColors', name=side + self.userGuideName + "_Rbn_BlendColor")
-                cmds.connectAttr(self.hipsACtrl + '.' + side + self.userGuideName + '_' + self.langDic[self.langName]['c_volumeVariation'], rbnBlendColors + '.blender')
+                cmds.connectAttr(self.hipsACtrl + '.' + side + self.userGuideName + '_' + self.langDic[self.langName]['c031_volumeVariation'], rbnBlendColors + '.blender')
                 rbnCond = cmds.createNode('condition', name=side+self.userGuideName+'_Rbn_Cond')
-                cmds.connectAttr(self.hipsACtrl + '.' + side + self.userGuideName + '_active_' + self.langDic[self.langName]['c_volumeVariation'], rbnCond + '.firstTerm')
+                cmds.connectAttr(self.hipsACtrl + '.' + side + self.userGuideName + '_active_' + self.langDic[self.langName]['c031_volumeVariation'], rbnCond + '.firstTerm')
                 cmds.connectAttr(rbnBlendColors+'.outputR', rbnCond + '.colorIfTrueR')
                 cmds.connectAttr(rbnMD + '.outputX', rbnBlendColors + '.color1R')
                 rbnVVMD = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_Rbn_VV_MD")
-                cmds.connectAttr(self.hipsACtrl + '.' + side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c_volumeVariation'], rbnVVMD + '.input2X')
+                cmds.connectAttr(self.hipsACtrl + '.' + side + self.userGuideName + '_masterScale_' + self.langDic[self.langName]['c031_volumeVariation'], rbnVVMD + '.input2X')
                 cmds.connectAttr(rbnVVMD + '.outputX', rbnCond + '.colorIfFalseR')
                 cmds.setAttr(rbnVVMD + '.operation', 2)
                 cmds.setAttr(rbnBlendColors + '.color2R', 1)
@@ -372,10 +372,10 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # middle ribbon setup:
                 for n in range(1, self.nJoints - 1):
                     if self.currentStyle == 0: #default
-                        self.middle = self.ctrls.cvControl("id_043_SpineMiddle", side + self.userGuideName + "_" + self.langDic[self.langName]['c_middle'] + str(n) + "_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                        self.middle = self.ctrls.cvControl("id_043_SpineMiddle", side + self.userGuideName + "_" + self.langDic[self.langName]['c029_middle'] + str(n) + "_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                         cmds.setAttr(self.middle + ".rotateOrder", 4)
                     else: #biped
-                        self.middle = self.ctrls.cvControl("id_043_SpineMiddle", side + self.userGuideName + "_" + self.langDic[self.langName]['c_middle'] + str(n) + "_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                        self.middle = self.ctrls.cvControl("id_043_SpineMiddle", side + self.userGuideName + "_" + self.langDic[self.langName]['c029_middle'] + str(n) + "_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
                         cmds.setAttr(self.middle + ".rotateOrder", 3)
                     self.aFkCtrl[s].append(self.middle)
                     self.ctrls.setLockHide([self.middle], ['sx', 'sy', 'sz'])

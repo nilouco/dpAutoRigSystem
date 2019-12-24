@@ -22,7 +22,7 @@ def Leg(dpUIinst):
         doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
         # part names:
         legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg']
-        footName = dpUIinst.langDic[dpUIinst.langName]['c_foot']
+        footName = dpUIinst.langDic[dpUIinst.langName]['c038_foot']
         
         # Starting progress window
         progressAmount = 0

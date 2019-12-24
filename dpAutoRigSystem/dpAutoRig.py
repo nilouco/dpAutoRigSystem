@@ -3,7 +3,7 @@
 
 ###################################################################
 #
-#    dpAutoRig Python script
+#    dpAutoRigSystem Python script
 #
 #    author:  Danilo Pinheiro
 #
@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.01"
+DPAR_VERSION = "3.07.02"
 
 
 
@@ -87,6 +87,7 @@ if not "pymel" in sys.modules:
 
 # importing libraries:
 try:
+    import maya.mel as mel
     import pymel.core as pymel
     import json
     import re
@@ -104,6 +105,7 @@ try:
     import Modules.dpLayoutClass as Layout
     import Extras.dpUpdateRigInfo as rigInfo
     import Extras.dpReorderAttr as dpReorderAttr
+    import Languages.Translator.dpTranslator as dpTranslator
     reload(utils)
     reload(dpControls)
     reload(rigInfo)
@@ -124,8 +126,9 @@ MODULES = "Modules"
 SCRIPTS = "Scripts"
 CONTROLS = "Controls"
 COMBINED = "Controls/Combined"
-PRESET = "Controls/Presets"
+PRESETS = "Controls/Presets"
 EXTRAS = "Extras"
+LANGUAGES = "Languages"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -183,7 +186,7 @@ class DP_AutoRig_UI:
             self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('languageRadioMenuCollection')
             # create a language list:
-            self.langList, self.langDic = self.getJsonFileInfo("Languages")
+            self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
             # create menuItems from language list:
             if self.langList:
                 # verify if there is a optionVar of last choosen by user in Maya system:
@@ -194,14 +197,14 @@ class DP_AutoRig_UI:
                 # load the last language from optionVar value:
                 cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
-                print "Error: Cannot load the json language files!\n",
+                print "Error: Cannot load json language files!\n",
                 return
             
             # preset menu:
             self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('presetRadioMenuCollection')
             # create a preset list:
-            self.presetList, self.presetDic = self.getJsonFileInfo(PRESET)
+            self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
             # create menuItems from preset list:
             if self.presetList:
                 # verify if there is a optionVar of last choosen by user in Maya system:
@@ -212,12 +215,12 @@ class DP_AutoRig_UI:
                 # load the last preset from optionVar value:
                 cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
             else:
-                print "Error: Cannot load the json preset files!\n",
+                print "Error: Cannot load json preset files!\n",
                 return
             
             # create menu:
             self.allUIs["createMenu"] = cmds.menu( 'createMenu', label='Create' )
-#            cmds.menuItem( 'translation_MI', label='Translation', command=self.createTranslation )
+            cmds.menuItem( 'translator_MI', label='Translator', command=self.translator )
             cmds.menuItem( 'preset_MI', label='Preset', command=self.createPreset )
             # window menu:
             self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window' )
@@ -229,7 +232,7 @@ class DP_AutoRig_UI:
             cmds.menuItem( 'author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250) )
             cmds.menuItem( 'update_MI', label='Update', command=partial(self.checkForUpdate, True))
-            cmds.menuItem( 'help_MI', label='Help...', command=partial(utils.visiteWebSite, DPAR_SITE) )
+            cmds.menuItem( 'help_MI', label='Help...', command=partial(utils.visitWebSite, DPAR_SITE) )
             
             # create the main layout:
             self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
@@ -610,7 +613,7 @@ class DP_AutoRig_UI:
                     else:
                         selectedGuideNodeList.append(selectedItem)
             if needUpdateSelect:
-                self.jobReloadUI(self)
+                self.jobReloadUI()
                 cmds.select(updatedGuideNodeList)
 
         # re-create module layout:
@@ -638,10 +641,28 @@ class DP_AutoRig_UI:
         self.reloadPopulatedGeoms()
     
     
-    def createTranslation(self, *args):
+    def createJsonFile(self, newString, fileDir, fileNameID, *args):
+        """ Load given string as a json dictionary and save it as a json file with the fileNameID in the fileDir.
+            Returns the loaded json dictionary.
         """
+        # json file:
+        resultDict = json.loads(newString)
+        # find path where 'dpAutoRig.py' is been executed:
+        path = os.path.dirname(__file__)
+        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+        jsonPath = os.path.join(path, fileDir, "").replace("\\", "/")
+        jsonFileName = jsonPath+resultDict[fileNameID]+'.json'
+        # write json file in the HD:
+        with open(jsonFileName, 'w') as jsonFile:
+            json.dump(resultDict, jsonFile, indent=4, sort_keys=True)
+        return resultDict
+    
+    
+    def translator(self, *args):
+        """ call language translator.
         """
-        print "translation wip..."
+        self.translatorInst = dpTranslator.Translator(self, self.langDic, self.langName)
+        self.translatorInst.dpTranslatorMain()
         
         
     def createPreset(self, *args):
@@ -649,24 +670,17 @@ class DP_AutoRig_UI:
         """
         newPresetString = self.ctrls.dpCreatePreset()
         if newPresetString:
-            # json file:
-            resultDict = json.loads(newPresetString)
-            # find path where 'dpAutoRig.py' is been executed:
-            path = os.path.dirname(__file__)
-            # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
-            jsonPath = os.path.join(path, PRESET, "").replace("\\", "/")
-            jsonFileName = jsonPath+resultDict['_preset']+'.json'
-            # write json file in the HD:
-            with open(jsonFileName, 'w') as jsonFile:
-                json.dump(resultDict, jsonFile, indent=4, sort_keys=True)
-                
+            # create json file:
+            resultDict = self.createJsonFile(newPresetString, PRESETS, '_preset')
             # set this new preset as userDefined preset:
             self.presetName = resultDict['_preset']
             cmds.optionVar(remove="dpAutoRigLastPreset")
             cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
-            self.jobReloadUI(self)
             # show preset creation result window:
-            self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_presetAdvise']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+            self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+            # close and reload dpAR UI in order to avoide Maya crash
+            self.jobWinClose()
+            self.jobReloadUI()
             
     
     def setupDuplicatedGuide(self, selectedItem, *args):
@@ -998,7 +1012,8 @@ class DP_AutoRig_UI:
             reload(guide)
         except Exception as e:
             print e
-            print "ERROR loading extension {0}: {1}".format(guideModule, e)
+            errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+e
+            mel.eval('warning \"'+errorString+'\";')
             return
 
         # getting data from guide module:
@@ -1265,8 +1280,8 @@ class DP_AutoRig_UI:
         if self.update_remoteVersion:
             cmds.text(self.update_remoteVersion+self.langDic[self.langName]['i091_onlineVersion'], align="left", parent=updateLayout)
             cmds.text("\n", parent=updateLayout)
-            whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(utils.visiteWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
-            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visiteWebSite, DPAR_GITHUB), parent=updateLayout)
+            whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(utils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
+            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
             installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
@@ -1293,6 +1308,27 @@ class DP_AutoRig_UI:
             except:
                 self.info('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
+    
+    
+    def keepJsonFilesWhenUpdate(self, currentDir, tempUpdateDir, *args):
+        """ Check in given folder if we have custom json files and keep then when we install a new update.
+            It will just check if there are user created json files, and copy them to temporary extracted update folder.
+            So when the install overwrite all files, they will be copied (restored) again.
+        """
+        newUpdateList = []
+        # list all new json files:
+        for newRoot, newDirectories, newFiles in os.walk(tempUpdateDir):
+            for newItem in newFiles:
+                if newItem.endswith('.json'):
+                    newUpdateList.append(os.path.join(newRoot, newItem))
+        
+        # check if some current json file is a custom file created by user to copy it to new update directory in order to avoid overwrite it:
+        for currentRoot, currentDirectories, currentFiles in os.walk(currentDir):
+            for currentItem in currentFiles:
+                if currentItem.endswith('.json'):
+                    if not currentItem in newUpdateList:
+                        # found custom file, then copy it to keep when install the new update
+                        shutil.copy2(os.path.join(currentRoot, currentItem), tempUpdateDir)
     
     
     def installUpdate(self, url, newVersion, *args):
@@ -1334,6 +1370,10 @@ class DP_AutoRig_UI:
             # declare temporary folder:
             dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
             
+            # store custom presets in order to avoid overwrite them when installing the update:
+            self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
+            self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
+            
             # pass in all files to copy them (doing the simple installation):
             for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
                 # declare destination directory:
@@ -1358,7 +1398,7 @@ class DP_AutoRig_UI:
                             os.chmod(destFile, stat.S_IWUSR)
                             os.remove(destFile)
                     # copy the dpAR_File:
-                    shutil.copy(sourceFile, destDir)
+                    shutil.copy2(sourceFile, destDir)
                     
                     installAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
@@ -2043,12 +2083,12 @@ class DP_AutoRig_UI:
                                             m4Fk = cmds.xform(fkCtrl, ws=True, m=True, q=True)
                                             cmds.xform(mainNull, ws=True, m=m4Fk)
                                         newFkConst = cmds.parentConstraint(targetList[0], mainNull, nodeToConst, skipTranslate=["x", "y", "z"], maintainOffset=True)[0]
-                                        cmds.connectAttr(mainCtrl + "." + self.langDic[self.langName]['c_Follow'], newFkConst + "." + targetList[0]+"W0", force=True)
+                                        cmds.connectAttr(mainCtrl + "." + self.langDic[self.langName]['c032_Follow'], newFkConst + "." + targetList[0]+"W0", force=True)
                                         if (cmds.objExists(revNode)):
                                             cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
                                         else:
                                             revNode = cmds.createNode('reverse', name=sideName+fkCtrl+"_FkIsolate_Rev")
-                                            cmds.connectAttr(mainCtrl+'.'+self.langDic[self.langName]['c_Follow'], revNode+".inputX", force=True)
+                                            cmds.connectAttr(mainCtrl+'.'+self.langDic[self.langName]['c032_Follow'], revNode+".inputX", force=True)
                                             cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
 
                                     # verifying what part will be used, the hips or chest:
@@ -2160,9 +2200,9 @@ class DP_AutoRig_UI:
                                 headCtrl  = self.integratedTaskDic[fatherGuide]['headCtrlList'][0]
                                 headParentConst = cmds.parentConstraint(self.rootCtrl, headCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_ParentConstraint")[0]
                                 eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
-                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c_Follow'], eyeRevNode+".inputX", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_Follow'], eyeRevNode+".inputX", force=True)
                                 cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
-                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c_Follow'], headParentConst+"."+headCtrl+"W1", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_Follow'], headParentConst+"."+headCtrl+"W1", force=True)
                                 cmds.parent(upLocGrp, headCtrl, relative=False)
                                 cmds.setAttr(upLocGrp+".visibility", 0)
                                 # head drives eyeScaleGrp:

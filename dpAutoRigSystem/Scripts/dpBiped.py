@@ -23,11 +23,11 @@ def Biped(dpUIinst):
         bipedStyleName = dpUIinst.langDic[dpUIinst.langName]['m026_biped']
         # part names:
         spineName = dpUIinst.langDic[dpUIinst.langName]['m011_spine']
-        headName = dpUIinst.langDic[dpUIinst.langName]['c_head']
-        eyeName = dpUIinst.langDic[dpUIinst.langName]['c_eye']
+        headName = dpUIinst.langDic[dpUIinst.langName]['c024_head']
+        eyeName = dpUIinst.langDic[dpUIinst.langName]['c036_eye']
         legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
-        footName = dpUIinst.langDic[dpUIinst.langName]['c_foot']
-        armName = dpUIinst.langDic[dpUIinst.langName]['c_arm'].capitalize()
+        footName = dpUIinst.langDic[dpUIinst.langName]['c038_foot']
+        armName = dpUIinst.langDic[dpUIinst.langName]['c037_arm'].capitalize()
         fingerIndexName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m032_index']
         fingerMiddleName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m033_middle']
         fingerRingName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m034_ring']
@@ -35,11 +35,11 @@ def Biped(dpUIinst):
         fingerThumbName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m036_thumb']
         earName = dpUIinst.langDic[dpUIinst.langName]['m040_ear']
         upperTeethName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
-        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
+        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
+        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
         lowerTeethName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
-        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
+        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
+        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
         noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
         nostrilName = dpUIinst.langDic[dpUIinst.langName]['m079_nostril']
         tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']

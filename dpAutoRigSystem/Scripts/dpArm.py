@@ -21,7 +21,7 @@ def Arm(dpUIinst):
         # defining naming:
         doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
         # part names:
-        armName = dpUIinst.langDic[dpUIinst.langName]['c_arm']
+        armName = dpUIinst.langDic[dpUIinst.langName]['c037_arm']
         fingerIndexName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m032_index']
         fingerMiddleName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m033_middle']
         fingerRingName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m034_ring']

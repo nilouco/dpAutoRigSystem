@@ -163,8 +163,8 @@ def load_all_ctrls_shapes(path=None):
 
 # global variables to this module:
 CLASS_NAME = "CopyPasteShapes"
-TITLE = "extra_CopyPasteShapes"
-DESCRIPTION = "extra_CopyPasteShapesDesc"
+TITLE = "m137_copyPasteShapes"
+DESCRIPTION = "m138_copyPasteShapesDesc"
 ICON = "/Icons/dp_copyPasteShapes.png"
 
 class CopyPasteShapes():

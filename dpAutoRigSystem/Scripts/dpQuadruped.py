@@ -26,18 +26,18 @@ def Quadruped(dpUIinst):
         quadrupedStyleName = dpUIinst.langDic[dpUIinst.langName]['m037_quadruped']
         # part names:
         spineName = dpUIinst.langDic[dpUIinst.langName]['m011_spine']
-        neckName = dpUIinst.langDic[dpUIinst.langName]['c_neck']
-        headName = dpUIinst.langDic[dpUIinst.langName]['c_head']
-        eyeName = dpUIinst.langDic[dpUIinst.langName]['c_eye']
+        neckName = dpUIinst.langDic[dpUIinst.langName]['c023_neck']
+        headName = dpUIinst.langDic[dpUIinst.langName]['c024_head']
+        eyeName = dpUIinst.langDic[dpUIinst.langName]['c036_eye']
         legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
-        footName = dpUIinst.langDic[dpUIinst.langName]['c_foot']
+        footName = dpUIinst.langDic[dpUIinst.langName]['c038_foot']
         earName = dpUIinst.langDic[dpUIinst.langName]['m040_ear']
         upperTeethName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
-        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
+        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
+        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
         lowerTeethName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_middle'].capitalize()
-        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c_RevFoot_G'].capitalize()
+        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
+        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
         noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
         nostrilName = dpUIinst.langDic[dpUIinst.langName]['m079_nostril']
         tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']
@@ -151,7 +151,7 @@ def Quadruped(dpUIinst):
         # set for not use bend ribbons as default:
         backLegLimbInstance.setBendFalse(backLegLimbInstance)
         # change name to back leg:
-        backLegLimbInstance.editUserName(legName+dpUIinst.langDic[dpUIinst.langName]['c_back'])
+        backLegLimbInstance.editUserName(legName+dpUIinst.langDic[dpUIinst.langName]['c057_back'])
         cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
         
         # editing back leg base guide informations:
@@ -190,7 +190,7 @@ def Quadruped(dpUIinst):
         
         # create BACK FOOT (B) module instance:
         backFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
-        backFootInstance.editUserName(footName+dpUIinst.langDic[dpUIinst.langName]['c_back'])
+        backFootInstance.editUserName(footName+dpUIinst.langDic[dpUIinst.langName]['c057_back'])
         cmds.setAttr(backFootInstance.annotation+".translateY", -3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateX", 3)
         cmds.setAttr(backFootInstance.moduleGrp+".translateZ", -6.5)
@@ -217,7 +217,7 @@ def Quadruped(dpUIinst):
         # set for not use bend ribbons as default:
         frontLegLimbInstance.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
-        frontLegLimbInstance.editUserName(legName+dpUIinst.langDic[dpUIinst.langName]['c_front'])
+        frontLegLimbInstance.editUserName(legName+dpUIinst.langDic[dpUIinst.langName]['c056_front'])
         cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
         
         # editing front leg base guide informations:
@@ -256,7 +256,7 @@ def Quadruped(dpUIinst):
         
         # create FRONT FOOT (A) module instance:
         frontFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
-        frontFootInstance.editUserName(footName+dpUIinst.langDic[dpUIinst.langName]['c_front'])
+        frontFootInstance.editUserName(footName+dpUIinst.langDic[dpUIinst.langName]['c056_front'])
         cmds.setAttr(frontFootInstance.annotation+".translateY", -3)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateX", 2.5)
         cmds.setAttr(frontFootInstance.moduleGrp+".translateZ", 5.5)
