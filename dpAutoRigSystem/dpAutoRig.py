@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.02"
+DPAR_VERSION = "3.07.03"
 
 
 
@@ -167,8 +167,8 @@ class DP_AutoRig_UI:
         self.loadedExtras = False
         self.controlInstanceList = []
         self.degreeOption = 0
-
-
+        
+        
         try:
             # store all UI elements in a dictionary:
             self.allUIs = {}
@@ -255,6 +255,7 @@ class DP_AutoRig_UI:
         # call UI window: Also ensure that when thedock controler X button it it, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uid=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], vcc=self.jobDockVisChange)
+
         #print self.pDockCtrl
         clearDPARLoadingWindow()
         
@@ -573,20 +574,17 @@ class DP_AutoRig_UI:
         """
         import maya.cmds as cmds
         cmds.select(clear=True)
-        import dpAutoRig as autoRig
-        reload( autoRig )
-        autoRigUI = autoRig.DP_AutoRig_UI()
-        cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
-
-
+        cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
+    
+    
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
         if self.pDockCtrl:
             if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
                 if cmds.dockControl('dpAutoRigSystem', exists=True):
                     cmds.deleteUI('dpAutoRigSystem', control=True)
-
-
+    
+    
     def jobDockVisChange(self, *args):
         #Force focus
         cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
@@ -646,16 +644,16 @@ class DP_AutoRig_UI:
             Returns the loaded json dictionary.
         """
         # json file:
-        resultDict = json.loads(newString)
+        resultDic = json.loads(newString)
         # find path where 'dpAutoRig.py' is been executed:
         path = os.path.dirname(__file__)
         # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
         jsonPath = os.path.join(path, fileDir, "").replace("\\", "/")
-        jsonFileName = jsonPath+resultDict[fileNameID]+'.json'
+        jsonFileName = jsonPath+resultDic[fileNameID]+'.json'
         # write json file in the HD:
         with open(jsonFileName, 'w') as jsonFile:
-            json.dump(resultDict, jsonFile, indent=4, sort_keys=True)
-        return resultDict
+            json.dump(resultDic, jsonFile, indent=4, sort_keys=True)
+        return resultDic
     
     
     def translator(self, *args):
@@ -671,15 +669,14 @@ class DP_AutoRig_UI:
         newPresetString = self.ctrls.dpCreatePreset()
         if newPresetString:
             # create json file:
-            resultDict = self.createJsonFile(newPresetString, PRESETS, '_preset')
+            resultDic = self.createJsonFile(newPresetString, PRESETS, '_preset')
             # set this new preset as userDefined preset:
-            self.presetName = resultDict['_preset']
+            self.presetName = resultDic['_preset']
             cmds.optionVar(remove="dpAutoRigLastPreset")
             cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoide Maya crash
-            self.jobWinClose()
             self.jobReloadUI()
             
     

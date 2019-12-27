@@ -1051,19 +1051,19 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # new ribbon feature by James do Carmo, thanks!
                 # not using bend or ikFkSnap systems to quadruped
+                self.loadedRibbon = False
                 if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                     # (James) add bend to limb
                     if self.getHasBend():
-                        loadedRibbon = False
                         try:
                             from Library import jcRibbon
                             RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
-                            loadedRibbon = True
+                            self.loadedRibbon = True
                         except Exception as e:
                             print e
                             print self.langDic[self.langName]['e012_cantLoadRibbon']
                         
-                        if loadedRibbon:
+                        if self.loadedRibbon:
                             num = self.getBendJoints()
                             iniJoint = side + self.userGuideName + "_" + mainName + '_Jnt'
                             corner = side + self.userGuideName + "_" + cornerName + '_Jnt'
@@ -1149,7 +1149,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # do otherCtrlList get extraCtrlList from bendy
                     otherCtrlList = []
                     if self.getHasBend():
-                        if loadedRibbon:
+                        if self.loadedRibbon:
                             otherCtrlList = self.bendGrps['extraCtrlList']
                     otherCtrlList.append(self.toParentExtremCtrl)
                     # create a ghost value in order to avoid ikFkNetwork crashes without footRoll attributes:
@@ -1184,7 +1184,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                         lastIndex = len(otherCtrlList)
                         if self.getHasBend():
-                            if loadedRibbon:
+                            if self.loadedRibbon:
                                 cmds.connectAttr(self.bendGrps['ctrlList'][0] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
                                 cmds.connectAttr(self.bendGrps['ctrlList'][1] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 2) + "]", force=True)
                                 cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)

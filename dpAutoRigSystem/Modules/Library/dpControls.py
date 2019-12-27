@@ -499,7 +499,8 @@ class ControlClass:
         # colorize curveShapes:
         self.colorShape([circle], 'yellow')
         self.colorShape([radiusCtrl], 'cyan')
-        cmds.setAttr(circle+"Shape.lineWidth", 2)
+        if (int(cmds.about(version=True)[:4]) > 2016):
+            cmds.setAttr(circle+"Shape.lineWidth", 2)
         cmds.select(clear=True)
         return [circle, radiusCtrl]
     
