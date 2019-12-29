@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.03"
+DPAR_VERSION = "3.07.04"
 
 
 
@@ -193,7 +193,7 @@ class DP_AutoRig_UI:
                 lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.deleteUI(\"mainTabLayout\"); autoRigUI.mainUI()')
+                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last language from optionVar value:
                 cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
@@ -211,7 +211,7 @@ class DP_AutoRig_UI:
                 lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
                 # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
                 for preset in self.presetList:
-                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.deleteUI(\"mainTabLayout\"); autoRigUI.mainUI()')
+                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last preset from optionVar value:
                 cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
             else:
