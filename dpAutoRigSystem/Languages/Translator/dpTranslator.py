@@ -6,7 +6,7 @@ import maya.cmds as cmds
 import datetime
 import re
 
-DPT_VERSION = 1.0
+DPT_VERSION = 1.1
 
 
 LANGUAGES = "Languages"
@@ -58,6 +58,28 @@ class Translator:
                 if not currentText == "":
                     if not currentText == " ":
                         if not currentText == self.langDic[self.langName]['t007_writeText']:
+                            sourceText = cmds.scrollField(self.sourceTextSF, query=True, text=True)
+                            
+                            if sourceText.startswith("\n"):
+                                if not currentText.startswith("\n"):
+                                    currentText = "\n"+currentText
+                            elif sourceText[0].isupper():
+                                currentText = currentText[0].upper()+currentText[1:]
+                            elif sourceText[0].islower():
+                                currentText = currentText[0].lower()+currentText[1:]
+                            if sourceText.endswith("\n"):
+                                if not currentText.endswith("\n"):
+                                    currentText = currentText+"\n"
+                            else:
+                                if currentText.endswith("\n"):
+                                    currentText = currentText[:-1]
+                                elif sourceText.endswith("."):
+                                    if not currentText.endswith("."):
+                                        currentText = currentText+"."
+                                elif sourceText.endswith(":"):
+                                    if not currentText.endswith(":"):
+                                        currentText = currentText+":"
+                            
                             if self.sourceLangList[self.langIndex].startswith("c"): #control
                                 if not self.validadeNoSpecialChar.search(currentText): #no special char
                                     validatedValue = True
@@ -238,6 +260,8 @@ class Translator:
         footerText = ""
         if self.sourceLangList[self.langIndex].startswith("_"):
             curKeyType = self.langDic[self.langName]['i013_info']
+        elif self.sourceLangList[self.langIndex].startswith("a"):
+            curKeyType = self.langDic[self.langName]['i153_presentation']
         elif self.sourceLangList[self.langIndex].startswith("b"):
             curKeyType = self.langDic[self.langName]['i139_bug']
         elif self.sourceLangList[self.langIndex].startswith("c"):

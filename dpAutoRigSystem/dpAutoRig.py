@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.04"
+DPAR_VERSION = "3.07.05"
 
 
 
@@ -1405,7 +1405,7 @@ class DP_AutoRig_UI:
             shutil.rmtree(folderToDelete)
             
             # report finished update installation:
-            self.info('i095_installUpdate', 'i099_installed', newVersion+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+            self.info('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
             # closes dpUpdateWindow:
             if cmds.window('dpUpdateWindow', query=True, exists=True):
                 cmds.deleteUI('dpUpdateWindow', window=True)
@@ -1413,7 +1413,7 @@ class DP_AutoRig_UI:
             self.jobReloadUI(self)
         except:
             # report fail update installation:
-            self.info('i095_installUpdate', 'e010_failInstallUpdate', newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
+            self.info('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
         cmds.progressWindow(endProgress=True)        
     
     
@@ -2292,12 +2292,6 @@ class DP_AutoRig_UI:
                                     # father's mainJis drives child's staticGrp:
                                     cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True)
                                     cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True)
-                            # Fixed for v3.06.07
-                            # check Single mirror indirectSkin bug in Maya2018:
-                            #if not self.detectedBug:
-                            #    self.detectedBug = self.integratedTaskDic[moduleDic]["detectedBug"]
-                            #    self.bugMessage = self.langDic[self.langName]['b001_BugSingleIndirectSkinMaya2018']
-                
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
