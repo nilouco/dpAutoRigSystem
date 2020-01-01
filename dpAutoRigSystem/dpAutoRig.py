@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.05"
+DPAR_VERSION = "3.07.06"
 
 
 
@@ -1667,7 +1667,7 @@ class DP_AutoRig_UI:
         if objList and attrList:
             for obj in objList:
                 # load dpReorderAttribute:
-                dpRAttr = dpReorderAttr.ReorderAttr()
+                dpRAttr = dpReorderAttr.ReorderAttr(self, self.langDic, self.langName, False)
                 # Reordering Option_Ctrl attributos progress window
                 progressAmount = 0
                 cmds.progressWindow(title='Reordering Attributes', progress=progressAmount, status='Reordering: 0%', isInterruptable=False)

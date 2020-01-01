@@ -57,6 +57,7 @@
     "id_050_FacialSneer"   : {"type" : "Crushed",          "degree" : 3},
     "id_051_FacialGrimace" : {"type" : "Crushed",          "degree" : 3},
     "id_052_FacialFace"    : {"type" : "Smile",            "degree" : 3},
-    "id_053_HeadDeformer"  : {"type" : "ArrowFlat",        "degree" : 1}
+    "id_053_HeadDeformer"  : {"type" : "ArrowFlat",        "degree" : 1},
+    "id_054_SingleMain"    : {"type" : "CurvedCircleUp",   "degree" : 3}
     
 }

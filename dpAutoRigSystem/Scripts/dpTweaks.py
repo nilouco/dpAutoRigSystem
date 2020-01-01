@@ -30,6 +30,7 @@ def Tweaks(dpUIinst):
         # defining naming:
         doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
         # part names:
+        mainName = dpUIinst.langDic[dpUIinst.langName]['c058_main']
         tweaksName = dpUIinst.langDic[dpUIinst.langName]['m081_tweaks']
         middleName = dpUIinst.langDic[dpUIinst.langName]['c029_middle']
         eyebrowName = dpUIinst.langDic[dpUIinst.langName]['c041_eyebrow']
@@ -42,15 +43,15 @@ def Tweaks(dpUIinst):
         squintName = dpUIinst.langDic[dpUIinst.langName]['c054_squint']
         cheekName = dpUIinst.langDic[dpUIinst.langName]['c055_cheek']
         
-        holderMainName = tweaksName+"_"+holderName
+        holderMainName = tweaksName+"_"+holderName+"_"+mainName
         # eybrows names:
         eyebrowMiddleName = tweaksName+"_"+middleName+"_"+eyebrowName
-        eyebrowMainName = tweaksName+"_"+eyebrowName
+        eyebrowMainName = tweaksName+"_"+eyebrowName+"_"+mainName
         eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
         eyebrowName2 = tweaksName+"_"+eyebrowName+"_02"
         eyebrowName3 = tweaksName+"_"+eyebrowName+"_03"
         # eyelids names:
-        eyelidMainName = tweaksName+"_"+eyelidName
+        eyelidMainName = tweaksName+"_"+eyelidName+"_"+mainName
         upperEyelidName0 = tweaksName+"_"+upperName+"_"+eyelidName+"_00"
         upperEyelidName1 = tweaksName+"_"+upperName+"_"+eyelidName+"_01"
         upperEyelidName2 = tweaksName+"_"+upperName+"_"+eyelidName+"_02"
@@ -60,14 +61,14 @@ def Tweaks(dpUIinst):
         eyelidCornerName0 = tweaksName+"_"+cornerName+"_"+eyelidName+"_00"
         eyelidCornerName1 = tweaksName+"_"+cornerName+"_"+eyelidName+"_01"
         # squints names:
-        squintMainName = tweaksName+"_"+squintName
+        squintMainName = tweaksName+"_"+squintName+"_"+mainName
         squintName1 = tweaksName+"_"+squintName+"_01"
         squintName2 = tweaksName+"_"+squintName+"_02"
         squintName3 = tweaksName+"_"+squintName+"_03"
         # cheeks names:
         cheekName1 = tweaksName+"_"+cheekName+"_01"
         # lip names:
-        lipMainName = tweaksName+"_"+lipName
+        lipMainName = tweaksName+"_"+lipName+"_"+mainName
         upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
         upperLipName1 = tweaksName+"_"+upperName+"_"+lipName+"_01"
         upperLipName2 = tweaksName+"_"+upperName+"_"+lipName+"_02"

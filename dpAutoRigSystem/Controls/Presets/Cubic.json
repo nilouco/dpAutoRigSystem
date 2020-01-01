@@ -57,6 +57,7 @@
     "id_050_FacialSneer"   : {"type" : "Cube", "degree" : 1},
     "id_051_FacialGrimace" : {"type" : "Cube", "degree" : 1},
     "id_052_FacialFace"    : {"type" : "Cube", "degree" : 1},
-    "id_053_HeadDeformer"  : {"type" : "Cube", "degree" : 1}
+    "id_053_HeadDeformer"  : {"type" : "Cube", "degree" : 1},
+    "id_054_SingleMain"    : {"type" : "Cube", "degree" : 3}
     
 }

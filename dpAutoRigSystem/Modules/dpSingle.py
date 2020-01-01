@@ -159,10 +159,25 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if self.getHasIndirectSkin():
-                    if "Lower" in self.userGuideName:
-                        self.singleCtrl = self.ctrls.cvControl("id_029_SingleIndSkin", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=(0, 0, 180))
+                    # work with curve shape and rotation cases:
+                    indirectSkinRot = (0, 0, 0)
+                    if self.langDic[self.langName]['c058_main'] in self.userGuideName:
+                        ctrlTypeID = "id_054_SingleMain"
+                        if len(sideList) > 1:
+                            if self.langDic[self.langName]['c041_eyebrow'] in self.userGuideName:
+                                indirectSkinRot = (0, 0, -90)
+                            else:
+                                indirectSkinRot = (0, 0, 90)
                     else:
-                        self.singleCtrl = self.ctrls.cvControl("id_029_SingleIndSkin", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                        ctrlTypeID = "id_029_SingleIndSkin"
+                        if self.langDic[self.langName]['c045_lower'] in self.userGuideName:
+                            indirectSkinRot=(0, 0, 180)
+                        elif self.langDic[self.langName]['c043_corner'] in self.userGuideName:
+                            if "00" in self.userGuideName:
+                                indirectSkinRot=(0, 0, 90)
+                            else:
+                                indirectSkinRot=(0, 0, -90)
+                    self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
                 else:
                     self.singleCtrl = self.ctrls.cvControl("id_028_Single", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide)
