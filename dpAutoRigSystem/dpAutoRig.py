@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.07"
+DPAR_VERSION = "3.07.08"
 
 
 
@@ -1317,7 +1317,7 @@ class DP_AutoRig_UI:
         for newRoot, newDirectories, newFiles in os.walk(tempUpdateDir):
             for newItem in newFiles:
                 if newItem.endswith('.json'):
-                    newUpdateList.append(os.path.join(newRoot, newItem))
+                    newUpdateList.append(newItem)
         
         # check if some current json file is a custom file created by user to copy it to new update directory in order to avoid overwrite it:
         for currentRoot, currentDirectories, currentFiles in os.walk(currentDir):
