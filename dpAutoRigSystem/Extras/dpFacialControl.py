@@ -22,7 +22,7 @@ GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
 
 
-DPFC_VERSION = "1.2"
+DPFC_VERSION = "1.3"
 
 
 class FacialControl():
@@ -123,9 +123,9 @@ class FacialControl():
         """ Function to create a package of facial controls we use as default.
         """
         if cmds.objExists(BODY_BSNAME):
-            self.bsNode(BODY_BSNAME)
+            self.bsNode = BODY_BSNAME
         elif cmds.objExists(HEAD_BSNAME):
-            self.bsNode(HEAD_BSNAME)
+            self.bsNode = HEAD_BSNAME
         # creating controls:
         lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, True, "red")
         rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, True, "blue")
