@@ -334,11 +334,11 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         # joint position:
         cmds.delete(cmds.parentConstraint(cvLoc, mainJnt, maintainOffset=False))
         # create end joint:
-        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName][codeName]+"_JEnd")
+        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName][codeName]+"_JEnd", scaleCompensate=False)
         cmds.delete(cmds.parentConstraint(mainJnt, endJoint, maintainOffset=False))
         cmds.setAttr(endJoint+".translateZ", 1)
         # creating control:
-        if sec == 12:
+        if type == IRIS:
             ctrlId = "id_012_EyeIris"
         else:
             ctrlId = "id_013_EyePupil"
@@ -346,18 +346,29 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         utils.originedFrom(objName=ctrl, attrString=self.base+";"+self.guide)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
-        cmds.parentConstraint(ctrl, mainJnt, maintainOffset=False, name=mainJnt+"_ParentConstraint")
-        cmds.scaleConstraint(ctrl, mainJnt, maintainOffset=True, name=mainJnt+"_ScaleConstraint")
-        cmds.parent(mainJnt, self.jnt)
         ctrlZero = utils.zeroOut([ctrl])
-        cmds.delete(cmds.parentConstraint(cvLoc, ctrlZero, maintainOffset=False))
-        cmds.parent(ctrlZero[0], self.fkEyeCtrl)
+        cmds.delete(cmds.parentConstraint(cvLoc, ctrlZero[0], maintainOffset=False))
+        cmds.parent(ctrlZero[0], self.baseEyeCtrl)
         # fixing flip mirror:
         if s == 1:
             if cmds.getAttr(self.moduleGrp+".flip") == 1:
-                cmds.setAttr(ctrlZero[0]+".scaleX", -1)
-                cmds.setAttr(ctrlZero[0]+".scaleY", -1)
-                cmds.setAttr(ctrlZero[0]+".scaleZ", -1)
+                if not "X" == cmds.getAttr(self.moduleGrp+".aimDirectionName"):
+                    cmds.setAttr(ctrlZero[0]+".scaleX", -1)
+                else:
+                    cmds.setAttr(ctrlZero[0]+".scaleX", 1)
+                if not "Y" == cmds.getAttr(self.moduleGrp+".aimDirectionName"):
+                    cmds.setAttr(ctrlZero[0]+".scaleY", -1)
+                else:
+                    cmds.setAttr(ctrlZero[0]+".scaleY", 1)
+                if not "Z" == cmds.getAttr(self.moduleGrp+".aimDirectionName"):
+                    cmds.setAttr(ctrlZero[0]+".scaleZ", -1)
+                else:
+                    cmds.setAttr(ctrlZero[0]+".scaleZ", 1)
+        cmds.parentConstraint(self.fkEyeCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ParentConstraint")
+        cmds.scaleConstraint(self.fkEyeCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ScaleConstraint")
+        cmds.parent(mainJnt, self.jnt)
+        cmds.parentConstraint(ctrl, mainJnt, maintainOffset=False, name=mainJnt+"_ParentConstraint")
+        cmds.scaleConstraint(ctrl, mainJnt, maintainOffset=True, name=mainJnt+"_ScaleConstraint")
         return ctrl
         
     
