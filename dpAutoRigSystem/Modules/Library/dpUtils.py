@@ -516,10 +516,10 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
 def extractSuffix(nodeName):
     """ Remove suffix from a node name and return the base name.
     """
-    meshSuffixList = ["_Mesh", "_mesh", "_Geo", "_geo", "_Tgt", "_tgt", "_Ctrl", "_ctrl", "_Grp", "_grp"]
-    for meshSuffix in meshSuffixList:
-        if nodeName.endswith(meshSuffix):
-            baseName = nodeName[:nodeName.rfind(meshSuffix)]
+    endSuffixList = ["_Mesh", "_mesh", "_MESH", "_msh", "_MSH", "_Geo", "_geo", "_GEO", "_Tgt", "_tgt", "_TGT", "_Ctrl", "_ctrl", "_CTRL", "_Grp", "_grp", "_GRP"]
+    for endSuffix in endSuffixList:
+        if nodeName.endswith(endSuffix):
+            baseName = nodeName[:nodeName.rfind(endSuffix)]
             return baseName
     return nodeName
 

@@ -107,6 +107,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvUpVectorLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerUpVector", r=0.5, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
 
+        # lock undesirable translate axe for corner guides:
+        cmds.setAttr(self.cvCornerLoc+".tx", lock=True)
+        cmds.setAttr(self.cvCornerBLoc+".tx", lock=True)
+        
         # set quadruped locator config:
         cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
         cmds.setAttr(self.cvCornerBLoc + ".translateZ", 2)
@@ -308,6 +312,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
             cmds.delete(self.cornerGrp + "_AimConstraint")
             cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AimConstraint")
+            # lock undesirable translate axe for corner guides:
+            cmds.setAttr(self.cvCornerLoc+".tx", 0, lock=True)
+            cmds.setAttr(self.cvCornerBLoc+".tx", 0, lock=True)
+            cmds.setAttr(self.cvCornerLoc+".ty", lock=False)
+            cmds.setAttr(self.cvCornerBLoc+".ty", lock=False)
 
         # for Leg type:
         elif type == self.langDic[self.langName]['m030_leg']:
@@ -324,6 +333,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
             cmds.delete(self.cornerGrp + "_AimConstraint")
             cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AimConstraint")
+            # lock undesirable translate axe for corner guides:
+            cmds.setAttr(self.cvCornerLoc+".ty", 0, lock=True)
+            cmds.setAttr(self.cvCornerBLoc+".ty", 0, lock=True)
+            cmds.setAttr(self.cvCornerLoc+".tx", lock=False)
+            cmds.setAttr(self.cvCornerBLoc+".tx", lock=False)
 
         # reset rotations:
         self.reOrientGuide()
