@@ -248,9 +248,9 @@ class RibbonClass:
         extraCtrlList = []
 
         #define attributes
-        limbManualVVAttr = "limbManual_volumeVariation"
-        limbVVAttr       = "limb_volumeVariation"
-        limbMinVVAttr    = "limbMin_volumeVariation"
+        limbManualVVAttr = self.langDic[self.langName]['m019_limb'].lower()+"Manual_"+self.langDic[self.langName]['c031_volumeVariation']
+        limbVVAttr       = self.langDic[self.langName]['m019_limb'].lower()+"_"+self.langDic[self.langName]['c031_volumeVariation']
+        limbMinVVAttr    = self.langDic[self.langName]['m019_limb'].lower()+"Min_"+self.langDic[self.langName]['c031_volumeVariation']
 
         #create a nurbsPlane based in the choose orientation option
         if horizontal:

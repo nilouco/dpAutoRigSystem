@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.11"
+DPAR_VERSION = "3.07.12"
 
 
 
@@ -1560,8 +1560,11 @@ class DP_AutoRig_UI:
         pymel.select(None)
 
         #Hide Models and FX groups
-        pymel.setAttr(self.modelsGrp.visibility, 0)
-        pymel.setAttr(self.fxGrp.visibility, 0)
+        try:
+            pymel.setAttr(self.modelsGrp.visibility, 0)
+            pymel.setAttr(self.fxGrp.visibility, 0)
+        except:
+            pass
 
         #Function not in pymel for the moment
         aToLock = [self.masterGrp.__melobject__(),
@@ -2335,15 +2338,28 @@ class DP_AutoRig_UI:
                 pCtrlVisGrp = pymel.PyNode(self.ctrlsVisGrp)
                 pProxyGrp = pymel.PyNode(self.proxyGrp)
                 
-                if not pymel.hasAttr(pOptCtrl, "general"):
-                    pymel.addAttr(pOptCtrl, ln="general", at="enum", enumName="----------", keyable=True)
-                    pymel.setAttr(pOptCtrl.general, lock=True)
+                # defining attribute name strings:
+                generalAttr = self.langDic[self.langName]['c066_general']
+                vvAttr = self.langDic[self.langName]['c031_volumeVariation']
+                spineAttr = self.langDic[self.langName]['m011_spine']
+                limbAttr = self.langDic[self.langName]['m019_limb'].lower()
+                armAttr = self.langDic[self.langName]['m028_arm']
+                legAttr = self.langDic[self.langName]['m030_leg']
+                frontAttr = self.langDic[self.langName]['c056_front']
+                backAttr = self.langDic[self.langName]['c057_back']
+                leftAttr = self.langDic[self.langName]['p002_left'].lower()
+                rightAttr = self.langDic[self.langName]['p003_right'].lower()
+                tweaksAttr = self.langDic[self.langName]['m081_tweaks'].lower()
+                
+                if not pymel.hasAttr(pOptCtrl, generalAttr):
+                    pymel.addAttr(pOptCtrl, ln=generalAttr, at="enum", enumName="----------", keyable=True)
+                    pymel.setAttr(pOptCtrl+"."+generalAttr, lock=True)
                 
                 # Only create if a VolumeVariation attribute is found
-                if not pymel.hasAttr(pOptCtrl, "volumeVariation"):
-                    if (pOptCtrl.listAttr(string="*volumeVariation*")):
-                        pymel.addAttr(pOptCtrl, ln="volumeVariation", at="enum", enumName="----------", keyable=True)
-                        pymel.setAttr(pOptCtrl.volumeVariation, lock=True)
+                if not pymel.hasAttr(pOptCtrl, vvAttr):
+                    if (pOptCtrl.listAttr(string="*"+vvAttr+"*")):
+                        pymel.addAttr(pOptCtrl, ln=vvAttr, at="enum", enumName="----------", keyable=True)
+                        pymel.setAttr(pOptCtrl+"."+vvAttr, lock=True)
                 
                 # Only create if a IkFk attribute is found
                 if not pymel.hasAttr(pOptCtrl, "ikFkBlend"):
@@ -2376,22 +2392,23 @@ class DP_AutoRig_UI:
                 if currentAttrList:
                     for cAttr in currentAttrList:
                         if cAttr.endswith("_ikFkBlend"):
-                            cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
+                            if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_ikFkBlend")]):
+                                cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_ikFkBlend")])
                 # clean up "VolumeVariation" attributes:
                 if currentAttrList:
                     for cAttr in currentAttrList:
-                        if cAttr.endswith("_volumeVariation"):
-                            try:
-                                cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_volumeVariation")])
-                            except:
-                                # probably exists another attribute with the same name
-                                pass
+                        if cAttr.endswith("_"+vvAttr):
+                            if not cmds.objExists(self.optionCtrl+"."+cAttr[:cAttr.find("_"+vvAttr)]):
+                                cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
                             
                 # list desirable Option_Ctrl attributes order:
-                desiredAttrList = ['general', 'rigScale', 'rigScaleMultiplier', 'globalStretch', 'volumeVariation', 'Spine_active', 'Spine', 'Spine1_active', 'Spine1', 
-                'limb', 'limbMin', 'limbManual', 'ikFkBlend', 'Arm', 'Leg', 'lArm', 'rArm', 'lLeg', 'rLeg', 'lLegFront', 'rLegFront', 'lLegBack', 'rLegBack',
-                'Arm1', 'Leg1', 'lArm1', 'rArm1', 'lLeg1', 'rLeg1', 'lLegFront1', 'rLegFront1', 'lLegBack1', 'rLegBack1',
-                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', 'tweaks']
+                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', 'globalStretch', vvAttr,
+                spineAttr+'_active', spineAttr, spineAttr+'1_active', spineAttr+'1', spineAttr+'2_active', spineAttr+'2',
+                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', armAttr, legAttr, leftAttr+armAttr, rightAttr+armAttr,
+                leftAttr+legAttr, rightAttr+legAttr, leftAttr+legAttr+frontAttr, rightAttr+legAttr+frontAttr, leftAttr+legAttr+backAttr, rightAttr+legAttr+backAttr,
+                armAttr+'1', legAttr+'1', leftAttr+armAttr+'1', rightAttr+armAttr+'1', leftAttr+legAttr+'1', rightAttr+legAttr+'1',
+                leftAttr+legAttr+frontAttr+'1', rightAttr+legAttr+frontAttr+'1', leftAttr+legAttr+backAttr+'1', rightAttr+legAttr+backAttr+'1',
+                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr]
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 

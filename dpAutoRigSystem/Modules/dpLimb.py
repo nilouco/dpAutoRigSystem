@@ -937,8 +937,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
                     forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
-                    forearmGrp = cmds.group(forearmCtrl, name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c030_forearm'] + "_Grp")
-                    forearmZero = cmds.group(forearmGrp, name=side + self.userGuideName + "_" + self.langDic[self.langName][ 'c030_forearm'] + "_Zero")
+                    forearmGrp = cmds.group(forearmCtrl, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Grp")
+                    forearmZero = cmds.group(forearmGrp, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Zero")
                     tempToDelete = cmds.parentConstraint(forearmJnt, forearmZero, maintainOffset=False)
                     cmds.delete(tempToDelete)
                     cmds.parentConstraint(self.skinJointList[2], forearmZero, maintainOffset=True, name=forearmZero + "_ParentConstraint")
