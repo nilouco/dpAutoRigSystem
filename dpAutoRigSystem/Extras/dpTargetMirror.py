@@ -9,7 +9,7 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 ICON = "/Icons/dp_targetMirror.png"
 
-DPTM_VERSION = "2.3"
+DPTM_VERSION = "2.4"
 
 class TargetMirror():
     def __init__(self, dpUIinst, langDic, langName, *args, **kwargs):
@@ -59,6 +59,7 @@ class TargetMirror():
         cmds.separator(style='none', height=15, parent=listMirrorLayout)
         self.mirrorPosCB = cmds.checkBox('mirrorPosCB', label=self.langDic[self.langName]["i057_mirrorPosition"], value=1, parent=listMirrorLayout)
         self.cleanUndoCB = cmds.checkBox('cleanUndoCB', label=self.langDic[self.langName]["i049_clearUndo"], annotation=self.langDic[self.langName]["i050_clearUndoDesc"], align="left", value=1, parent=listMirrorLayout)
+        self.checkHistoryCB = cmds.checkBox('checkHistoryCB', label=self.langDic[self.langName]["i162_checkHistory"], annotation=self.langDic[self.langName]["i161_historyMessage"], align="left", value=0, parent=listMirrorLayout)
         cmds.button(label=self.langDic[self.langName]["i054_targetRun"], annotation=self.langDic[self.langName]["i053_targetRunDesc"], width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpRunMirror, parent=listMirrorLayout)
 
         # call targetMirrorUI Window:
@@ -90,6 +91,8 @@ class TargetMirror():
                 if not item in selMeshList:
                     if self.dpCheckGeometry(item):
                         selMeshList.append(item)
+                    else:
+                        return
             if selMeshList:
                 # get current list
                 currentList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
@@ -135,17 +138,23 @@ class TargetMirror():
             if cmds.objExists(item):
                 childList = cmds.listRelatives(item, children=True)
                 if childList:
-                    itemType = cmds.objectType(childList[0])
-                    if itemType == "mesh" or itemType == "nurbsSurface" or itemType == "subdiv":
-                        historyList = cmds.listHistory(childList[0])
-                        if len(historyList) > 1:
-                            dialogReturn = cmds.confirmDialog(title=self.langDic[self.langName]["i159_historyFound"], message=self.langDic[self.langName]["i160_historyDesc"]+"\n\n"+item+"\n\n"+self.langDic[self.langName]["i161_historyMessage"], button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
-                            if dialogReturn == "Yes":
+                    try:
+                        itemType = cmds.objectType(childList[0])
+                        if itemType == "mesh" or itemType == "nurbsSurface" or itemType == "subdiv":
+                            if cmds.checkBox(self.checkHistoryCB, query=True, value=True):
+                                historyList = cmds.listHistory(childList[0])
+                                if len(historyList) > 1:
+                                    dialogReturn = cmds.confirmDialog(title=self.langDic[self.langName]["i159_historyFound"], message=self.langDic[self.langName]["i160_historyDesc"]+"\n\n"+item+"\n\n"+self.langDic[self.langName]["i161_historyMessage"], button=['Yes','No'], defaultButton='Yes', cancelButton='No', dismissString='No')
+                                    if dialogReturn == "Yes":
+                                        isGeometry = True
+                                else:
+                                    isGeometry = True
+                            else:
                                 isGeometry = True
                         else:
-                            isGeometry = True
-                    else:
-                        mel.eval("warning \""+item+" "+self.langDic[self.langName]["i058_notGeo"]+"\";")
+                            mel.eval("warning \""+item+" "+self.langDic[self.langName]["i058_notGeo"]+"\";")
+                    except:
+                        mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+item+"\";")
                 else:
                     mel.eval("warning \""+self.langDic[self.langName]["i059_selTransform"]+" "+item+" "+self.langDic[self.langName]["i060_shapePlease"]+"\";")
             else:

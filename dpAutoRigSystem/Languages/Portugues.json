@@ -260,6 +260,8 @@
     "i159_historyFound"    : "Histórico encontrado",
     "i160_historyDesc"     : "Existe histórico na sua geometria:",
     "i161_historyMessage"  : "Talvez seu modelo possa ter alguma\ndeformação indesejável.\n\nIsso será propagado nos destinos copiados.\nVocê precisa excluir o histórico do seu modelo antes.\n\nTem certeza de quer continuar?",
+	"i162_checkHistory"    : "Verificar histórico",
+	"i163_sameName"        : "Não podemos continuar porque existe outro node com o mesmo nome, desculpe.",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

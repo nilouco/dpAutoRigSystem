@@ -10,7 +10,7 @@ TITLE = "m097_copySkin"
 DESCRIPTION = "m098_copySkinDesc"
 ICON = "/Icons/dp_copySkin.png"
 
-dpCopySkinVersion = 1.1
+dpCopySkinVersion = 1.2
 
 class CopySkin():
     def __init__(self, dpUIinst, langDic, langName, *args):
@@ -30,20 +30,26 @@ class CopySkin():
             sourceItem = selList[0]
             # get other selected items
             destinationList = selList[1:]
-            shapeList = cmds.listRelatives(sourceItem, shapes=True)
-            if shapeList:
-                # check if there's a skinCluster node connected to the first selected item
-                checkSkin = self.dpCheckSkinCluster(shapeList)
-                if checkSkin:
-                    # get joints influence from skinCluster
-                    skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
-                    if skinInfList:
-                        # call copySkin function
-                        self.dpCopySkin(sourceItem, destinationList, skinInfList)
+            # validade unique node name
+            if len(cmds.ls(sourceItem)) == 1:
+                shapeList = cmds.listRelatives(sourceItem, shapes=True)
+                if shapeList:
+                    # check if there's a skinCluster node connected to the first selected item
+                    checkSkin = self.dpCheckSkinCluster(shapeList)
+                    if checkSkin == True:
+                        # get joints influence from skinCluster
+                        skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
+                        if skinInfList:
+                            # call copySkin function
+                            self.dpCopySkin(sourceItem, destinationList, skinInfList)
+                    elif checkSkin == -1:
+                        mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+sourceItem+"\";")
+                    else:
+                        print self.langDic[self.langName]['e007_notSkinFound']
                 else:
-                    print self.langDic[self.langName]['e007_notSkinFound']
+                    print self.langDic[self.langName]['e006_firstSkinnedGeo']
             else:
-                print self.langDic[self.langName]['e006_firstSkinnedGeo']
+                mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+sourceItem+"\";")
         else:
             print self.langDic[self.langName]['e005_selectOneObj']
 
@@ -52,14 +58,18 @@ class CopySkin():
         """ Verify if there's a skinCluster node in the list of history of the shape.
             Return True if yes.
             Return False if no.
+            Return -1 if there's another node with the same name.
         """
         for shapeNode in shapeList:
             if not shapeNode.endswith("Orig"):
-                histList = cmds.listHistory(shapeNode)
-                if histList:
-                    for histItem in histList:
-                        if cmds.objectType(histItem) == "skinCluster":
-                            return True
+                try:
+                    histList = cmds.listHistory(shapeNode)
+                    if histList:
+                        for histItem in histList:
+                            if cmds.objectType(histItem) == "skinCluster":
+                                return True
+                except:
+                    return -1
         return False
     
     
@@ -69,10 +79,13 @@ class CopySkin():
         for item in destinationList:
             # get correct naming
             skinClusterName = utils.extractSuffix(item)
+            if "|" in skinClusterName:
+                skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
             # create skinCluster node
             cmds.skinCluster(skinInfList, item, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=0)
             cmds.select(sourceItem)
             cmds.select(item, toggle=True)
             # copy skin weights from sourceItem to item node
             cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
-        print self.langDic[self.langName]['i083_copiedSkin'], sourceItem, destinationList
+            # log result
+            print self.langDic[self.langName]['i083_copiedSkin'], sourceItem, item

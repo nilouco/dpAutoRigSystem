@@ -260,6 +260,8 @@
     "i159_historyFound"    : "Histoire trouvé",
     "i160_historyDesc"     : "Il y a de l'histoire dans votre géométrie:",
     "i161_historyMessage"  : "Peut-être que votre modèle pourrait\navoir une déformation indésirable.\n\nCela se propagera dans les cibles copiées.\nVous devez au préalable supprimer\nl'historique de votre modèle.\n\nVoulez-vous vraiment continuer?",
+	"i162_checkHistory"    : "Verifier l'histoire",
+	"i163_sameName"        : "On ne peut pas continuer parce qu'il y a d'autre node avec le même nom, désolé.",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
