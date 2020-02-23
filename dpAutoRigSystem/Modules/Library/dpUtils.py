@@ -232,8 +232,8 @@ def zeroOut(transformList=[]):
                     except:
                         pass
             allChildrenList = cmds.listRelatives(zero, allDescendents=True, children=True, fullPath=True)
-            for child in allChildrenList:
-                cmds.delete(child)
+            if allChildrenList:
+                cmds.delete(allChildrenList)
             cmds.parent(transform, zero, absolute=True)
             zeroList.append(zero)
     return zeroList
@@ -376,7 +376,6 @@ def clearNodeGrp(nodeGrpName='dpAR_GuideMirror_Grp', attrFind='guideBaseMirror',
                 cmds.delete(nodeGrpName)
         else:
             cmds.delete(nodeGrpName)
-            
 
 
 def getGuideChildrenList(nodeName):
@@ -460,6 +459,7 @@ def getCtrlRadius(nodeName):
 def zeroOutJoints(jntList=None):
     """ Duplicate the joints, parent as zeroOut.
         Returns the father joints (zeroOuted).
+        Deprecated = using zeroOut function insted.
     """
     resultList = []
     zeroOutJntSuffix = "_Jzt"

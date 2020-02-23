@@ -495,13 +495,4 @@ class LayoutClass:
             for axis in self.mirrorAxis:
                 cmds.setAttr(self.previewMirrorGrp+'.scale'+axis, -1)
         
-        else:
-            if guideChildrenList:
-                for guideChild in guideChildrenList:
-                    # get initial values from father guide base:
-                    fatherMirrorName = cmds.getAttr(self.moduleGrp+".mirrorName")
-                    # set values to guide base:
-                    cmds.setAttr(guideChild+".mirrorAxis", "off", type='string')
-                    cmds.setAttr(guideChild+".mirrorName", fatherMirrorName, type='string')
-        
         cmds.select(self.moduleGrp)

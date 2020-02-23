@@ -37,6 +37,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         self.aRbnJointList = []
         self.aClusterGrp = []
 
+
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
         Layout.LayoutClass.basicModuleLayout(self)
@@ -98,6 +99,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp + ".ry", -90)
         cmds.setAttr(self.moduleGrp + "_RadiusCtrl.tx", 4)
 
+
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
@@ -141,8 +143,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # delete difference of nJoints:
                 for n in range(self.enteredNJoints, self.currentNJoints):
                     # re-parent the children guides:
-                    childrenGuideBellowList = utils.getGuideChildrenList(
-                        self.guideName + "_JointLoc" + str(n + 1) + "_Grp")
+                    childrenGuideBellowList = utils.getGuideChildrenList(self.guideName + "_JointLoc" + str(n + 1) + "_Grp")
                     if childrenGuideBellowList:
                         for childGuide in childrenGuideBellowList:
                             cmds.parent(childGuide, self.cvLocator)
@@ -165,6 +166,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
             # re-build the preview mirror:
             Layout.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
+
 
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
@@ -394,8 +396,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
                     cmds.delete(tempDel)
                     middleClusterRot = cmds.xform(middleCluster, query=True, worldSpace=True, rotation=True)
-                    cmds.xform(middleCluster, worldSpace=True,
-                               rotation=(middleClusterRot[0] + 90, middleClusterRot[1], middleClusterRot[2]))
+                    cmds.xform(middleCluster, worldSpace=True, rotation=(middleClusterRot[0] + 90, middleClusterRot[1], middleClusterRot[2]))
                     cmds.parentConstraint(self.middle, middleCluster, maintainOffset=True, name=middleCluster + "_ParentConstraint")
                     # parenting constraints like guide locators:
                     self.parentConst = cmds.parentConstraint(self.hipsBCtrl, self.chestBCtrl, self.middle + "_Zero", name=self.middle + "_ParentConstraint", maintainOffset=True)[0]
