@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.14"
+DPAR_VERSION = "3.07.15"
 
 
 
@@ -98,6 +98,7 @@ try:
     import zipfile
     import StringIO
     import datetime
+    import platform
     from functools import partial
     import Modules.Library.dpUtils as utils
     import Modules.Library.dpControls as dpControls
@@ -149,6 +150,7 @@ DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/
 DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
+SSL_MACOS = "https://medium.com/@katopz/how-to-upgrade-openssl-8d005554401"
 
 
 class DP_AutoRig_UI:
@@ -1279,6 +1281,8 @@ class DP_AutoRig_UI:
             cmds.text("\n", parent=updateLayout)
             whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(utils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
+            if (int(cmds.about(version=True)[:4]) < 2019) and platform.system() == "Darwin": #Maya 2018 or older on macOS
+                upgradeSSLmacOSButton = cmds.button('upgradeSSLmacOSButton', label=self.langDic[self.langName]['i164_sslMacOS'], align="center", backgroundColor=(0.8, 0.4, 0.4), command=partial(utils.visitWebSite, SSL_MACOS), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
             installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:

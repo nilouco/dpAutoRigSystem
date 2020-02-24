@@ -4,7 +4,7 @@
     "_date"       : "2011-08-04",
     "_language"   : "Français",
     "_translator" : "Marina Rüegger",
-    "_updated"    : "2020-02-20",
+    "_updated"    : "2020-02-24",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -262,6 +262,7 @@
     "i161_historyMessage"  : "Peut-être que votre modèle pourrait\navoir une déformation indésirable.\n\nCela se propagera dans les cibles copiées.\nVous devez au préalable supprimer\nl'historique de votre modèle.\n\nVoulez-vous vraiment continuer?",
 	"i162_checkHistory"    : "Verifier l'histoire",
 	"i163_sameName"        : "On ne peut pas continuer parce qu'il y a d'autre node avec le même nom, désolé.",
+	"i164_sslMacOS"        : "Comment mettre à jour l'OpenSSL (macOS)",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
