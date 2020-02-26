@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.15"
+DPAR_VERSION = "3.07.16"
 
 
 
@@ -1609,6 +1609,9 @@ class DP_AutoRig_UI:
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleX, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleY, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleZ, force=True)
+            pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleX, force=True)
+            pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleY, force=True)
+            pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleZ, force=True)
             self.ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
             self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         else:
@@ -1620,12 +1623,6 @@ class DP_AutoRig_UI:
         pymel.parent(self.optionCtrlGrp, self.rootCtrl)
         pymel.parent(self.ctrlsVisGrp, self.rootCtrl)
 
-        '''
-        Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
-        Release node MAYA-45759 https://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
-        '''
-        if (int(cmds.about(version=True)[:4]) < 2016):
-            pymel.scaleConstraint(self.masterCtrl, self.scalableGrp, name=self.scalableGrp.name()+"_ScaleConstraint")
         # set lock and hide attributes (cmds function):
         self.ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
         self.ctrls.setLockHide([self.rootCtrl.__melobject__(), self.globalCtrl.__melobject__()], ['sx', 'sy', 'sz', 'v'])

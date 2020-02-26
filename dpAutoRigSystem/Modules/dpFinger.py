@@ -305,7 +305,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     dupIk = cmds.duplicate(self.skinJointList[1])[0]
                     dupFk = cmds.duplicate(self.skinJointList[1])[0]
                 
-                # hide ik and fk joints in order to be Rigger friendly whe skinning
+                # hide ik and fk joints in order to be Rigger friendly while skinning
                 cmds.setAttr(dupIk+".visibility", 0)
                 cmds.setAttr(dupFk+".visibility", 0)
                 
@@ -398,7 +398,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     self.ikCtrlZero = utils.zeroOut([self.ikCtrl])[0]
                     self.ikCtrlZeroList.append(self.ikCtrlZero)
                     cmds.connectAttr(self.ikFkRevNode + ".outputX", self.ikCtrlZero + ".visibility", force=True)
-                    for q in range(2, self.nJoints):
+                    for q in range(2, self.nJoints+1):
                         cmds.connectAttr(side + self.userGuideName + "_1_Ctrl.ikFkBlend", side + self.userGuideName + "_" + str(q) + "_Ctrl.visibility", force=True)
                     cmds.parentConstraint(self.ikCtrl, ikHandleList[0], name=side + self.userGuideName + "_IkHandle_ParentConstraint", maintainOffset=True)
                     cmds.parentConstraint(self.ikCtrl, endIkHandleList[0], name=side + self.userGuideName + "_EndIkHandle_ParentConstraint", maintainOffset=True)
