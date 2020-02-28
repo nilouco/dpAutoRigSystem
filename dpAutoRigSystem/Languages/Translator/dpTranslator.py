@@ -6,7 +6,7 @@ import maya.cmds as cmds
 import datetime
 import re
 
-DPT_VERSION = 1.1
+DPT_VERSION = 1.2
 
 
 LANGUAGES = "Languages"
@@ -22,7 +22,7 @@ class Translator:
         self.translatorString = "dpAutoRigSystem - "+self.langDic[self.langName]['t000_translator']
         self.sourceLangList = sorted(self.langDic[self.langName])
         self.keyLen = len(self.sourceLangList) - 1
-        self.langIndexStart = 6 #after userInfo
+        self.langIndexStart = 7 #after userInfo
         self.langIndex = self.langIndexStart
         self.newLangList = []
         self.resultString = None

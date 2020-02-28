@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.07.16"
+DPAR_VERSION = "3.08.00"
 
 
 
@@ -151,6 +151,7 @@ DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 SSL_MACOS = "https://medium.com/@katopz/how-to-upgrade-openssl-8d005554401"
+DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 
 
 class DP_AutoRig_UI:
@@ -195,7 +196,7 @@ class DP_AutoRig_UI:
                 lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem( idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last language from optionVar value:
                 cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
@@ -221,20 +222,22 @@ class DP_AutoRig_UI:
                 return
             
             # create menu:
-            self.allUIs["createMenu"] = cmds.menu( 'createMenu', label='Create' )
-            cmds.menuItem( 'translator_MI', label='Translator', command=self.translator )
-            cmds.menuItem( 'preset_MI', label='Preset', command=self.createPreset )
+            self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
+            cmds.menuItem('translator_MI', label='Translator', command=self.translator)
+            cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
             # window menu:
-            self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window' )
-            cmds.menuItem( 'reloadUI_MI', label='Reload UI', command=self.jobReloadUI )
-            cmds.menuItem( 'quit_MI', label='Quit', command=self.deleteExistWindow )
+            self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
+            cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
+            cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
             # help menu:
-            self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True )
-            cmds.menuItem( 'about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250) )
-            cmds.menuItem( 'author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250) )
-            cmds.menuItem( 'idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250) )
-            cmds.menuItem( 'update_MI', label='Update', command=partial(self.checkForUpdate, True))
-            cmds.menuItem( 'help_MI', label='Help...', command=partial(utils.visitWebSite, DPAR_SITE) )
+            self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
+            cmds.menuItem('about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+            cmds.menuItem('author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
+            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+            cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
+            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+            cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
+            cmds.menuItem('help_MI', label='Help...', command=partial(utils.visitWebSite, DPAR_SITE))
             
             # create the main layout:
             self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
@@ -1215,6 +1218,7 @@ class DP_AutoRig_UI:
         dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+DPAR_VERSION+' - '+self.langDic[self.langName]['i013_info']+' - '+self.langDic[self.langName][self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpInfoWin)
+        cmds.separator(style='none', height=10, parent=infoColumnLayout)
         infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
         if self.info_description:
             infoDesc = cmds.text(self.langDic[self.langName][self.info_description], align=self.info_align, parent=infoLayout)
@@ -1256,7 +1260,31 @@ class DP_AutoRig_UI:
         
         # creating a info window to show the log:
         self.info( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
-        
+    
+    
+    def donateWin(self, *args):
+        """ Simple window with links to donate in order to support this free and openSource code via PayPal.
+        """
+        # declaring variables:
+        self.donate_title       = 'dpAutoRig - v'+DPAR_VERSION+' - '+self.langDic[self.langName]['i167_donate']
+        self.donate_description = self.langDic[self.langName]['i168_donateDesc']
+        self.donate_winWidth    = 305
+        self.donate_winHeight   = 300
+        self.donate_align       = "center"
+        # creating Donate Window:
+        if cmds.window('dpDonateWindow', query=True, exists=True):
+            cmds.deleteUI('dpDonateWindow', window=True)
+        dpDonateWin = cmds.window('dpDonateWindow', title=self.donate_title, iconName='dpInfo', widthHeight=(self.donate_winWidth, self.donate_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        donateColumnLayout = cmds.columnLayout('donateColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpDonateWin)
+        cmds.separator(style='none', height=10, parent=donateColumnLayout)
+        infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
+        cmds.separator(style='none', height=10, parent=donateColumnLayout)
+        brPaypalButton = cmds.button('brlPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
+        brPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
+        # call Donate Window:
+        cmds.showWindow(dpDonateWin)
+    
     
     def updateWin(self, rawResult, text, *args):
         """ Create a window showing the text info with the description about any module.
