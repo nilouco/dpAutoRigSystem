@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.00"
+DPAR_VERSION = "3.08.01"
 
 
 
@@ -1281,7 +1281,7 @@ class DP_AutoRig_UI:
         infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
         brPaypalButton = cmds.button('brlPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
-        brPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
+        #brPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
         # call Donate Window:
         cmds.showWindow(dpDonateWin)
     

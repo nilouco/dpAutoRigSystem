@@ -109,6 +109,8 @@ class MatchMesh():
                     if fromFather != None:
                         cmds.parent(fromTransform, world=True)
                     for attr in attrList:
+                        cmds.setAttr(fromTransform+"."+attr, lock=False)
+                        cmds.setAttr(toTransform+"."+attr, lock=False)
                         if not "s" in attr:
                             cmds.setAttr(fromTransform+"."+attr, 0)
                             cmds.setAttr(toTransform+"."+attr, 0)
