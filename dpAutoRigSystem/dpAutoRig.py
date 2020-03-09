@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.01"
+DPAR_VERSION = "3.08.02"
 
 
 
@@ -258,8 +258,8 @@ class DP_AutoRig_UI:
         
 
         # call UI window: Also ensure that when thedock controler X button it it, the window is killed and the dock control too
-        self.iUIKilledId = cmds.scriptJob(uid=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
-        self.pDockCtrl = cmds.dockControl( 'dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], vcc=self.jobDockVisChange)
+        self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
+        self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
 
         #print self.pDockCtrl
         clearDPARLoadingWindow()
@@ -585,9 +585,10 @@ class DP_AutoRig_UI:
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
         if self.pDockCtrl:
-            if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
-                if cmds.dockControl('dpAutoRigSystem', exists=True):
-                    cmds.deleteUI('dpAutoRigSystem', control=True)
+            if cmds.objExists(self.pDockCtrl):
+                if (not cmds.dockControl(self.pDockCtrl, vis=True, query=True)):
+                    if cmds.dockControl('dpAutoRigSystem', exists=True):
+                        cmds.deleteUI('dpAutoRigSystem', control=True)
     
     
     def jobDockVisChange(self, *args):
