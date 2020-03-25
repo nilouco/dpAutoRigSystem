@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.02"
+DPAR_VERSION = "3.08.03"
 
 
 
@@ -1638,9 +1638,10 @@ class DP_AutoRig_UI:
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleX, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleY, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleZ, force=True)
-            pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleX, force=True)
-            pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleY, force=True)
-            pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleZ, force=True)
+            # comment to avoid double transformation for tweaks using indirect skinning:
+            #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleX, force=True)
+            #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleY, force=True)
+            #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleZ, force=True)
             self.ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
             self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         else:
