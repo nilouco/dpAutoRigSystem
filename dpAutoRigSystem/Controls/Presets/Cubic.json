@@ -2,7 +2,7 @@
     "_preset"     : "Cubic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2019-12-19",
+    "_updated"    : "2020-03-26",
 
     "id_000_Base"          : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"       : {"type" : "Cube", "degree" : 1},
@@ -58,6 +58,9 @@
     "id_051_FacialGrimace" : {"type" : "Cube", "degree" : 1},
     "id_052_FacialFace"    : {"type" : "Cube", "degree" : 1},
     "id_053_HeadDeformer"  : {"type" : "Cube", "degree" : 1},
-    "id_054_SingleMain"    : {"type" : "Cube", "degree" : 3}
+    "id_054_SingleMain"    : {"type" : "Cube", "degree" : 1},
+	"id_055_PistonMain"    : {"type" : "Cube", "degree" : 1},
+    "id_056_PistonAB"      : {"type" : "Cube", "degree" : 1},
+	"id_057_PistonUpLoc"   : {"type" : "Cube"  "degree" : 1}
     
 }

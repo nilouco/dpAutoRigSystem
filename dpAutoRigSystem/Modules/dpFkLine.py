@@ -62,6 +62,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScaleConstraint")
         cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScaleConstraint")
 
+
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """

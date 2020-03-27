@@ -2,7 +2,7 @@
     "_preset"     : "Classic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2019-12-19",
+    "_updated"    : "2020-03-26",
 
     "id_000_Base"          : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"       : {"type" : "Locator",          "degree" : 1},
@@ -58,6 +58,9 @@
     "id_051_FacialGrimace" : {"type" : "Crushed",          "degree" : 1},
     "id_052_FacialFace"    : {"type" : "Smile",            "degree" : 3},
     "id_053_HeadDeformer"  : {"type" : "ArrowFlat",        "degree" : 1},
-    "id_054_SingleMain"    : {"type" : "Drop",             "degree" : 3}
+    "id_054_SingleMain"    : {"type" : "Drop",             "degree" : 3},
+    "id_055_PistonMain"    : {"type" : "Ball",             "degree" : 3},
+    "id_056_PistonAB"      : {"type" : "Cube",             "degree" : 1},
+    "id_057_PistonUpLoc"   : {"type" : "Locator",          "degree" : 1}
     
 }
