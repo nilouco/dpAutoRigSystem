@@ -423,6 +423,7 @@
 	"m152_originalModel"       : "Modele Originale",
 	"m153_piston"              : "Piston",
     "m154_pistonDesc"          : "Creer un setup de Piston avec\n2 joints et des aim constraints.",
+	"m155_quadrupedExtra"      : "Quadrupède Extra Controlleur",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

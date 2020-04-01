@@ -423,6 +423,7 @@
     "m152_originalModel"       : "Original Model",
     "m153_piston"              : "Piston",
     "m154_pistonDesc"          : "Create a Piston setup using\n2 joints and aim constraints.",
+	"m155_quadrupedExtra"      : "Quadruped Extra Control",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

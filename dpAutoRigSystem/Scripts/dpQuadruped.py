@@ -23,7 +23,7 @@ def Quadruped(dpUIinst):
         # defining naming:
         doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
         bipedStyleName = dpUIinst.langDic[dpUIinst.langName]['m026_biped']
-        quadrupedStyleName = dpUIinst.langDic[dpUIinst.langName]['m037_quadruped']
+        quadrupedStyleName = dpUIinst.langDic[dpUIinst.langName]['m155_quadrupedExtra']
         # part names:
         spineName = dpUIinst.langDic[dpUIinst.langName]['m011_spine']
         neckName = dpUIinst.langDic[dpUIinst.langName]['c023_neck']
@@ -213,7 +213,7 @@ def Quadruped(dpUIinst):
         # change limb guide to front leg type:
         frontLegLimbInstance.changeType(legName)
         # change limb guide to front leg style (biped):
-        frontLegLimbInstance.changeStyle(bipedStyleName)
+        frontLegLimbInstance.changeStyle(quadrupedStyleName)
         # set for not use bend ribbons as default:
         frontLegLimbInstance.setBendFalse(frontLegLimbInstance)
         # change name to front leg:
@@ -243,7 +243,9 @@ def Quadruped(dpUIinst):
         cmds.setAttr(frontLegLimbInstance.cvExtremLoc+".translateZ", 6.5)
 
         # edit location of double front leg joint:
-        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateX", 0.5)
+        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateX", 1.75)
+        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".translateZ", 2.75)
+        cmds.setAttr(frontLegLimbInstance.cvCornerBLoc+".rotateY", 10)
 
         # parent front leg guide to spine chest guide:
         cmds.parent(frontLegBaseGuide, spineInstance.cvLocator, absolute=True)

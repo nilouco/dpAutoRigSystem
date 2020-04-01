@@ -89,7 +89,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp + ".hasBend", 1)
         cmds.addAttr(self.moduleGrp, longName="numBendJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp + ".numBendJoints", 5)
-        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.langDic[self.langName]['m042_default'] + ':' + self.langDic[self.langName]['m026_biped'] + ':' + self.langDic[self.langName]['m037_quadruped'] + ':' + self.langDic[self.langName]['m043_quadSpring'])
+        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.langDic[self.langName]['m042_default'] + ':' + self.langDic[self.langName]['m026_biped'] + ':' + self.langDic[self.langName]['m037_quadruped'] + ':' + self.langDic[self.langName]['m043_quadSpring'] + ':' + self.langDic[self.langName]['m155_quadrupedExtra'])
         cmds.addAttr(self.moduleGrp, longName="alignWorld", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".alignWorld", 1)
 
@@ -204,7 +204,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m041_style'], visible=True, parent=self.styleLayout)
         self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
-        styleMenuItemList = [self.langDic[self.langName]['m042_default'], self.langDic[self.langName]['m026_biped'], self.langDic[self.langName]['m037_quadruped'], self.langDic[self.langName]['m043_quadSpring']]
+        styleMenuItemList = [self.langDic[self.langName]['m042_default'], self.langDic[self.langName]['m026_biped'], self.langDic[self.langName]['m037_quadruped'], self.langDic[self.langName]['m043_quadSpring'], self.langDic[self.langName]['m155_quadrupedExtra']]
         for item in styleMenuItemList:
             cmds.menuItem(label=item, parent=self.styleMenu)
         # read from guide attribute the current value to style:
@@ -276,6 +276,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         if style == self.langDic[self.langName]['m043_quadSpring']:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 3)
+        # for Quadruped Extra style:
+        if style == self.langDic[self.langName]['m155_quadrupedExtra']:
+            cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
+            cmds.setAttr(self.moduleGrp + ".style", 4)
 
     def changeType(self, type, *args):
         """ This function will modify the names of the rigged module to Arm of Leg options
@@ -426,6 +430,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     self.limbStyle = self.langDic[self.langName]['m037_quadruped']
                 elif enumStyle == 3:
                     self.limbStyle = self.langDic[self.langName]['m043_quadSpring']
+                elif enumStyle == 4:
+                    self.limbStyle = self.langDic[self.langName]['m155_quadrupedExtra']
 
                 # re-declaring guide names:
                 self.cvBeforeLoc = side + self.userGuideName + "_Guide_Before"
@@ -450,7 +456,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     extremName = self.langDic[self.langName]['c009_leg_extrem']
 
                 # mount cvLocList and jNameList:
-                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     self.cvLocList = [self.cvBeforeLoc, self.cvMainLoc, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc]
                     self.jNameList = [beforeName, mainName, cornerName, cornerBName, extremName]
                 else:
@@ -572,8 +578,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.worldRefShapeList.append(self.worldRefShape)
 
                 # parenting fkControls from 2 hierarchies (before and limb) using constraint, attention to fkIsolated shoulder:
-                # creating a shoulder_null group in order to use it as position relative:
-                self.shoulderNullGrp = cmds.group(empty=True, name=self.skinJointList[1] + "_null")
+                # creating a shoulder_null group in order to use it as position relative and aim to quadExtraCtrl:
+                self.shoulderNullGrp = cmds.group(empty=True, name=self.skinJointList[1] + "_Null")
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[1], relative=True)
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PointConstraint")
@@ -639,7 +645,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # verify if user wants to apply the good mirror orientation:
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
-                    # these options is valides for Biped, Quadruped and Quadruped Spring
+                    # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
                     if self.mirrorAxis != 'off':
                         for axis in self.mirrorAxis:
                             if axis == "X":
@@ -719,6 +725,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         # could not load the ikSpringSolver plutin, the we will use the regular solution as ikRPSolver:
                         ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
                         ikHandleNotStretchList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_NotStretch_IkHandle", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
+                elif self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    # creating double ikHandle in order to get an extra control for lower articulation in Quadruped Extra Control:
+                    ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 3], solver='ikRPsolver')
+                    ikHandleNotStretchList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_NotStretch_IkHandle", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
+                    ikHandleExtraList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Extra_IkHandle", startJoint=self.ikJointList[len(self.ikJointList) - 3], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
                 else:
                     # using regular solution as ikRPSolver:
                     ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
@@ -729,8 +740,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.rename(ikHandleNotStretchList[1], ikHandleNotStretchList[0].capitalize() + "_Effector")
 
                 # creating ikHandle groups:
+                cmds.setAttr(ikHandleMainList[0] + '.visibility', 0)
                 ikHandleGrp = cmds.group(empty=True, name=side + self.userGuideName + "_IkHandle_Grp")
-                cmds.setAttr(ikHandleGrp + '.visibility', 0)
                 self.ikHandleToRFGrp = cmds.group(empty=True, name=side + self.userGuideName + "_IkHandleToRF_Grp")
                 self.ikHandleToRFGrpList.append(ikHandleGrp)
                 cmds.setAttr(self.ikHandleToRFGrp + '.visibility', 0)
@@ -741,6 +752,24 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(ikHandleNotStretchGrp + '.visibility', 0)
                 cmds.parent(ikHandleNotStretchList[0], ikHandleNotStretchGrp)
 
+                # setup quadruped extra control:
+                if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    cmds.rename(ikHandleExtraList[1], ikHandleExtraList[0].capitalize() + "_Effector")
+                    quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z")
+                    if s == 1:
+                        cmds.setAttr(quadExtraCtrl+".rotateY", 180)
+                        cmds.makeIdentity(quadExtraCtrl, rotate=True, apply=True)
+                    quadExtraCtrlZero = utils.zeroOut([quadExtraCtrl])[0]
+                    cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=False))
+                    cmds.parent(quadExtraCtrlZero, ikHandleGrp)
+                    cmds.parent(ikHandleExtraList[0], self.ikHandleToRFGrp)
+                    cmds.parent(ikHandleMainList[0], quadExtraCtrl)
+                    cmds.setAttr(ikHandleExtraList[0]+".visibility", 0)
+                    cmds.addAttr(quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
+                    cmds.connectAttr(quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
+                    cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", quadExtraCtrlZero + ".visibility", force=True)
+                    self.ctrls.setLockHide([quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
+                
                 # make ikControls lead ikHandles:
                 self.ikHandlePointConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleMainList[0], maintainOffset=True, name=ikHandleMainList[0] + "_ParentConstraint")[0]
                 self.ikHandlePointConstList.append(self.ikHandlePointConst)
@@ -748,7 +777,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz'])
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0] + "_PointConstraint")[0]
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikNSJointList[len(self.ikNSJointList) - 2], maintainOffset=True, name=self.ikNSJointList[len(self.ikNSJointList) - 2] + "_OrientConstraint")
-
+                
                 # twist:
                 cmds.addAttr(self.ikExtremCtrl, longName='twist', attributeType='float', keyable=True)
                 if s == 0:
@@ -835,6 +864,21 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.cornerPointRev + '.outputX', self.cornerPoint + "." + self.cornerOrientGrp + "W0", force=True)
                 cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_Follow'], self.cornerPoint + "." + self.ikExtremCtrl + "W1", force=True)
 
+                # quadExtraCtrl autoOrient setup:
+                if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    cmds.addAttr(quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, keyable=True)
+                    cmds.setAttr(quadExtraCtrl+".autoOrient", 1)
+                    quadExtraRotNull = cmds.group(name=quadExtraCtrl+"_AutoOrient_Null", empty=True)
+                    cmds.delete(cmds.parentConstraint(quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
+                    cmds.parent(quadExtraRotNull, self.ikHandleToRFGrp)
+                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, maintainOffset=True, name=quadExtraCtrlZero+"_AimConstraint")[0]
+                    autoOrientRev = cmds.createNode("reverse", name=quadExtraCtrl+"_AutoOrient_Rev")
+                    autoOrientConst = cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=quadExtraCtrlZero+"_ParentConstraint")[0]
+                    cmds.setAttr(autoOrientConst+".interpType", 0) #noflip
+                    cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientRev+".inputX", force=True)
+                    cmds.connectAttr(autoOrientRev+".outputX", autoOrientConst+"."+self.ikHandleToRFGrp+"W0", force=True)
+                    cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
+                
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
                 distBetGrp = cmds.group(empty=True, name=side + self.userGuideName + "_DistBet_Grp")

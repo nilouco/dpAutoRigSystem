@@ -61,6 +61,7 @@
     "id_054_SingleMain"    : {"type" : "Cube", "degree" : 1},
 	"id_055_PistonMain"    : {"type" : "Cube", "degree" : 1},
     "id_056_PistonAB"      : {"type" : "Cube", "degree" : 1},
-	"id_057_PistonUpLoc"   : {"type" : "Cube"  "degree" : 1}
+	"id_057_PistonUpLoc"   : {"type" : "Cube", "degree" : 1},
+	"id_058_LimbQuadExtra" : {"type" : "Cube", "degree" : 3}
     
 }

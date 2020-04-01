@@ -188,10 +188,10 @@ class Piston(Base.StartClass, Layout.LayoutClass):
 
                 # aim constraints:
                 # B to A:
-                aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True)[0]
+                aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True, name=self.ctrlZeroList[0]+"_AimConstraint")[0]
                 cmds.connectAttr(self.ctrlList[0]+".active", aAimConst+"."+self.aimLocList[1]+"W0", force=True)
                 # A to B:
-                bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True)[0]
+                bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[0]+"_AimConstraint")[0]
                 cmds.connectAttr(self.ctrlList[1]+".active", bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
                 # create a masterModuleGrp to be checked if this rig exists:

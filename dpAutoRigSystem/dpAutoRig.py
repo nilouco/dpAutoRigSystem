@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.04"
+DPAR_VERSION = "3.08.05"
 
 
 
@@ -2104,7 +2104,7 @@ class DP_AutoRig_UI:
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
                                         nodeToConst = cmds.rename(nodeToConst, fkZeroNode + "_spaceSwitch")
                                         mainCtrl = cmds.listConnections(revNode + ".inputX")[0]
-                                        mainNull = sideName + mainParent +"_null"  #Ensure the name is set to prevent unbound variable problem with inner function
+                                        mainNull = sideName + mainParent +"_Null"  #Ensure the name is set to prevent unbound variable problem with inner function
                                         #Replace the old constraint with a new one that will switch with the chest ctrl
                                         cmds.delete(limbIsolateFkConst, icn=False, cn=True)
                                         #cmds.parentConstraint(targetList[1], limbIsolateFkConst, rm=True)

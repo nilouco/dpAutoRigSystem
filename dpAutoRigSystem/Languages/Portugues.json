@@ -423,6 +423,7 @@
 	"m152_originalModel"       : "Modelo Original",
 	"m153_piston"              : "Pistão",
     "m154_pistonDesc"          : "Cria um setup de Pistão usando\n2 joints e aim constraints.",
+    "m155_quadrupedExtra"      : "Quadrúpede Controle Extra",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

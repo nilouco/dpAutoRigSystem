@@ -61,6 +61,7 @@
     "id_054_SingleMain"    : {"type" : "CurvedCircleUp",   "degree" : 3},
 	"id_055_PistonMain"    : {"type" : "Ball",             "degree" : 3},
     "id_056_PistonAB"      : {"type" : "Cube",             "degree" : 1},
-	"id_057_PistonUpLoc"   : {"type" : "Locator",          "degree" : 1}
+	"id_057_PistonUpLoc"   : {"type" : "Locator",          "degree" : 1},
+	"id_058_LimbQuadExtra" : {"type" : "SpitFlat",         "degree" : 3}
     
 }
