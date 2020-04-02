@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.05"
+DPAR_VERSION = "3.08.06"
 
 
 
@@ -698,6 +698,7 @@ class DP_AutoRig_UI:
         nSegmentsAttr = "nJoints"
         customNameAttr = "customName"
         mirroirAxisAttr = "mirrorAxis"
+        dispAnnotAttr = "displayAnnotation"
 
         # unparenting
         parentList = cmds.listRelatives(selectedItem, parent=True)
@@ -744,7 +745,11 @@ class DP_AutoRig_UI:
             mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirroirAxisAttr)
             if mirroirAxisValue != "off":
                 newGuideInstance.changeMirror(mirroirAxisValue)
-                
+        if cmds.objExists(selectedItem+"."+dispAnnotAttr):
+            toSetAttrList.remove(dispAnnotAttr)
+            currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
+            newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
+        
         # get and set transformations
         childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
         if childrenList:
