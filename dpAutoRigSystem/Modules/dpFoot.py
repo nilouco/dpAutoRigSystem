@@ -42,7 +42,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp + ".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # create cvJointLoc and cvLocators:
-        self.cvFootLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_foot", r=0.3, d=1, guide=True)
+        self.cvFootLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Foot", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         self.cvRFALoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName + "_RfA", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
@@ -166,7 +166,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
             for s, side in enumerate(sideList):
                 # redeclaring variables:
                 self.base = side + self.userGuideName + "_Guide_Base"
-                self.cvFootLoc = side + self.userGuideName + "_Guide_foot"
+                self.cvFootLoc = side + self.userGuideName + "_Guide_Foot"
                 self.cvRFALoc = side + self.userGuideName + "_Guide_RfA"
                 self.cvRFBLoc = side + self.userGuideName + "_Guide_RfB"
                 self.cvRFCLoc = side + self.userGuideName + "_Guide_RfC"

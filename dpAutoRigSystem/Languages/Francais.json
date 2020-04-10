@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-03-26",
+    "_updated"       : "2020-04-07",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -78,6 +78,9 @@
     "c064_grimace"           : "Grimace",
     "c065_face"              : "Visage",
 	"c066_general"           : "General",
+	"c067_radius"            : "rayon",
+    "c068_startFrame"        : "frameDepart",
+	"c069_radiusScale"       : "radiusScale",
 
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -422,8 +425,10 @@
     "m151_invert"              : "Inverser",
 	"m152_originalModel"       : "Modele Originale",
 	"m153_piston"              : "Piston",
-    "m154_pistonDesc"          : "Creer un setup de Piston avec\n2 joints et des aim constraints.",
+    "m154_pistonDesc"          : "Description du module Piston:\n\nCreer un setup de Piston avec\n2 joints et des aim constraints.",
 	"m155_quadrupedExtra"      : "Quadrupède Extra Controlleur",
+	"m156_wheel"               : "Roue",
+    "m157_wheelDesc"           : "Description du module Roue:\n\nCreer un setup de Roue avec\nune expression pour auto rotationer.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

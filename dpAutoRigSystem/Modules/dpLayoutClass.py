@@ -349,7 +349,7 @@ class LayoutClass:
                     cmds.loadPlugin("decomposeMatrix.mll")
                 except:
                     try:
-                        # Maya 2013
+                        # Maya 2013 or earlier
                         cmds.loadPlugin("matrixNodes.mll")
                     except:
                         print self.langDic[self.langName]['e002_decomposeMatrixNotFound']

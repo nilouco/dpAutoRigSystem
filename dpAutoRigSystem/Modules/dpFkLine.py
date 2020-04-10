@@ -1,6 +1,5 @@
 # importing libraries:
 import maya.cmds as cmds
-import maya.OpenMaya as om
 
 from Library import dpUtils as utils
 import dpBaseClass as Base
@@ -59,8 +58,6 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ParentConstraint")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
-        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScaleConstraint")
 
 
     def changeJointNumber(self, enteredNJoints, *args):

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-03-26",
+    "_updated"       : "2020-04-07",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -78,6 +78,9 @@
     "c064_grimace"           : "Careta",
     "c065_face"              : "Face",
 	"c066_general"           : "Geral",
+	"c067_radius"            : "raio",
+    "c068_startFrame"        : "frameInicial",
+	"c069_radiusScale"       : "radiusScale",
     
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -422,8 +425,10 @@
     "m151_invert"              : "Inverter",
 	"m152_originalModel"       : "Modelo Original",
 	"m153_piston"              : "Pistão",
-    "m154_pistonDesc"          : "Cria um setup de Pistão usando\n2 joints e aim constraints.",
+    "m154_pistonDesc"          : "Descrição do módulo Pistão:\n\nCria um setup de Pistão usando\n2 joints e aim constraints.",
     "m155_quadrupedExtra"      : "Quadrúpede Controle Extra",
+    "m156_wheel"               : "Roda",
+    "m157_wheelDesc"           : "Descrição do módulo Roda:\n\nCria o setup de uma roda\ncom expressão de auto rotação.",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

@@ -2,7 +2,7 @@
     "_preset"     : "Default",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-03",
-    "_updated"    : "2020-03-26",
+    "_updated"    : "2020-04-05",
 
     "id_000_Base"          : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"       : {"type" : "Locator",          "degree" : 1},
@@ -62,6 +62,10 @@
 	"id_055_PistonMain"    : {"type" : "Ball",             "degree" : 3},
     "id_056_PistonAB"      : {"type" : "Cube",             "degree" : 1},
 	"id_057_PistonUpLoc"   : {"type" : "Locator",          "degree" : 1},
-	"id_058_LimbQuadExtra" : {"type" : "SpitFlat",         "degree" : 3}
+	"id_058_LimbQuadExtra" : {"type" : "SpitFlat",         "degree" : 3},
+	"id_059_AimLoc"        : {"type" : "ArrowFlat",        "degree" : 1},
+	"id_060_WheelCenter"   : {"type" : "Ball",             "degree" : 3},
+	"id_061_WheelMain"     : {"type" : "Cube",             "degree" : 1},
+	"id_062_WheelPivot"    : {"type" : "Dimond",           "degree" : 1}
     
 }

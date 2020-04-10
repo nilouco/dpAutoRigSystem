@@ -364,7 +364,7 @@ class ControlClass:
 
 
     #@utils.profiler
-    def cvJointLoc(self, ctrlName, r=0.3, extraLocs=False, d=1, guide=True, *args):
+    def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
         """Create and return a cvJointLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
         """
         # create locator curve:
@@ -389,15 +389,11 @@ class ControlClass:
         self.transferShape(True, False, cvTemplateBall, [locCtrl])
         for transform in locArrowList:
             self.transferShape(True, False, transform, [locCtrl])
-        if extraLocs: # does not used yet.
-            # create hided locators in order to use them as upAimOrient and fromAimOrient to further joint:
-            cvUpAim = self.cvLocator(ctrlName+"_CvUpAim", (0.25*r), d)
-            cmds.xform(cvUpAim, ws=True, a=True, t=(r, 0, 0))
-            cmds.setAttr(cvUpAim+".visibility", 0)
-            cvFrontAim = self.cvLocator(ctrlName+"_CvFrontAim", (0.25*r), d)
-            cmds.xform(cvFrontAim, ws=True, a=True, t=(0, 0, r))
-            cmds.setAttr(cvFrontAim+".visibility", 0)
-            cmds.parent(cvUpAim, cvFrontAim, locCtrl, relative=True)
+        # set rotation direction:
+        cmds.setAttr(locCtrl+".rotateX", rot[0])
+        cmds.setAttr(locCtrl+".rotateY", rot[1])
+        cmds.setAttr(locCtrl+".rotateZ", rot[2])
+        cmds.makeIdentity(locCtrl, rotate=True, apply=True)
         # create an attribute to be used as guide by module:
         cmds.addAttr(locCtrl, longName="nJoint", attributeType='long')
         cmds.setAttr(locCtrl+".nJoint", 1)

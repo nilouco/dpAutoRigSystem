@@ -62,8 +62,10 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
         # eyelid
         self.jEyelid = cmds.joint(name=self.guideName+"_JEyelid", radius=0.001)
-        # end joints
-        self.cvEndJoint, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
+        # end joints (to aim)
+        self.cvEndJoint = self.ctrls.cvControl("id_059_AimLoc", ctrlName=self.guideName+"_JointEnd", r=0.5, d=1, rot=(-90, 0, -90))
+        self.ctrls.colorShape([self.cvEndJoint], "blue")
+        shapeSizeCH = self.ctrls.shapeSizeSetup(self.cvEndJoint)
         self.connectShapeSize(shapeSizeCH)
         self.cvUpLocGuide = cmds.spaceLocator(name=self.cvEndJoint+"_UpLoc")[0]
         self.cvEndJointZero = cmds.group(self.cvEndJoint, self.cvUpLocGuide, name=self.cvEndJoint+"_Grp")
@@ -111,10 +113,6 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.parentConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=True, name=self.jUpperEyelid+"_ParentConstraint")
         cmds.parentConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=True, name=self.jLowerEyelid+"_ParentConstraint")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
-        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=True, name=self.jUpperEyelid+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=True, name=self.jLowerEyelid+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=True, name=self.jGuideEnd+"_ScaleConstraint")
     
     
     def changeEyelid(self, *args):

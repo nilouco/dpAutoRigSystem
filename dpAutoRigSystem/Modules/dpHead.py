@@ -33,19 +33,19 @@ class Head(Base.StartClass, Layout.LayoutClass):
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # create cvJointLoc and cvLocators:
-        self.cvNeckLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_neck", r=0.5, d=1, guide=True)
+        self.cvNeckLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck", r=0.5, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
-        self.cvHeadLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_head", r=0.4, d=1, guide=True)
+        self.cvHeadLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_Head", r=0.4, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
-        self.cvJawLoc, shapeSizeCH  = self.ctrls.cvLocator(ctrlName=self.guideName+"_jaw", r=0.3, d=1, guide=True)
+        self.cvJawLoc, shapeSizeCH  = self.ctrls.cvLocator(ctrlName=self.guideName+"_Jaw", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
-        self.cvChinLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_chin", r=0.3, d=1, guide=True)
+        self.cvChinLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_Chin", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
-        self.cvChewLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_chew", r=0.3, d=1, guide=True)
+        self.cvChewLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_Chew", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
-        self.cvLLipLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_lLip", r=0.1, d=1, guide=True)
+        self.cvLLipLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_LLip", r=0.1, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
-        self.cvRLipLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_rLip", r=0.1, d=1, guide=True)
+        self.cvRLipLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_RLip", r=0.1, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         # create jointGuides:
         self.jGuideNeck = cmds.joint(name=self.guideName+"_JGuideNeck", radius=0.001)
@@ -165,13 +165,13 @@ class Head(Base.StartClass, Layout.LayoutClass):
             for s, side in enumerate(sideList):
                 # redeclaring variables:
                 self.base       = side+self.userGuideName+"_Guide_Base"
-                self.cvNeckLoc  = side+self.userGuideName+"_Guide_neck"
-                self.cvHeadLoc  = side+self.userGuideName+"_Guide_head"
-                self.cvJawLoc   = side+self.userGuideName+"_Guide_jaw"
-                self.cvChinLoc  = side+self.userGuideName+"_Guide_chin"
-                self.cvChewLoc  = side+self.userGuideName+"_Guide_chew"
-                self.cvLLipLoc  = side+self.userGuideName+"_Guide_lLip"
-                self.cvRLipLoc  = side+self.userGuideName+"_Guide_rLip"
+                self.cvNeckLoc  = side+self.userGuideName+"_Guide_Neck"
+                self.cvHeadLoc  = side+self.userGuideName+"_Guide_Head"
+                self.cvJawLoc   = side+self.userGuideName+"_Guide_Jaw"
+                self.cvChinLoc  = side+self.userGuideName+"_Guide_Chin"
+                self.cvChewLoc  = side+self.userGuideName+"_Guide_Chew"
+                self.cvLLipLoc  = side+self.userGuideName+"_Guide_LLip"
+                self.cvRLipLoc  = side+self.userGuideName+"_Guide_RLip"
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 
                 # creating joints:

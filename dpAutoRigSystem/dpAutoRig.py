@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.06"
+DPAR_VERSION = "3.08.07"
 
 
 
@@ -140,6 +140,7 @@ FINGER = "Finger"
 ARM = "Arm"
 LEG = "Leg"
 SINGLE = "Single"
+WHEEL = "Wheel"
 GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
@@ -1638,6 +1639,8 @@ class DP_AutoRig_UI:
             self.optionCtrlGrp.translateX.set(fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = pymel.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
+            self.rigScaleMD.addAttr("dpRigScale", at="bool")
+            self.rigScaleMD.setDynamicAttr('dpRigScale', True)
             pymel.connectAttr(self.optionCtrl.rigScale, self.rigScaleMD.input1X, force=True)
             pymel.connectAttr(self.optionCtrl.rigScaleMultiplier, self.rigScaleMD.input2X, force=True)
             pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleX, force=True)
@@ -1651,6 +1654,7 @@ class DP_AutoRig_UI:
             self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         else:
             self.optionCtrlGrp = self.optionCtrl.getParent()
+            self.rigScaleMD = self.prefix+'RigScale_MD'
 
         pymel.parent(self.rootCtrl, self.masterCtrl)
         pymel.parent(self.masterCtrl, self.globalCtrl)
@@ -2331,6 +2335,21 @@ class DP_AutoRig_UI:
                                     # father's mainJis drives child's staticGrp:
                                     cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True)
                                     cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True)
+                                    
+                        # integrate the Wheel module with another Option_Ctrl:
+                        if moduleType == WHEEL:
+                            # connect Option_Ctrl RigScale_MD output to the radiusScale:
+                            if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
+                                self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                                self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                                # working with item guide mirror:
+                                self.itemMirrorNameList = [""]
+                                # get itemGuideName:
+                                if self.itemGuideMirrorAxis != "off":
+                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
+                                for s, sideName in enumerate(self.itemMirrorNameList):
+                                    wheelCtrl = self.integratedTaskDic[moduleDic]["wheelCtrlList"][s]
+                                    cmds.connectAttr(self.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
