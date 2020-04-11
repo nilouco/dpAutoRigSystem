@@ -81,6 +81,7 @@
 	"c067_radius"            : "raio",
     "c068_startFrame"        : "frameInicial",
 	"c069_radiusScale"       : "radiusScale",
+	"c070_steering"          : "volante",
     
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",

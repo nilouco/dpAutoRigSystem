@@ -2,7 +2,7 @@
     "_preset"     : "Classic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2020-04-05",
+    "_updated"    : "2020-04-10",
 
     "id_000_Base"          : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"       : {"type" : "Locator",          "degree" : 1},
@@ -66,6 +66,8 @@
 	"id_059_AimLoc"        : {"type" : "Locator",          "degree" : 1},
 	"id_060_WheelCenter"   : {"type" : "Ball",             "degree" : 3},
 	"id_061_WheelMain"     : {"type" : "Cube",             "degree" : 1},
-	"id_062_WheelPivot"    : {"type" : "Dimond",           "degree" : 1}
+	"id_062_WheelPivot"    : {"type" : "Dimond",           "degree" : 1},
+	"id_063_WheelDeform"   : {"type" : "RoundUp",          "degree" : 3},
+	"id_064_WheelMiddle"   : {"type" : "Ellipse",          "degree" : 3}
     
 }

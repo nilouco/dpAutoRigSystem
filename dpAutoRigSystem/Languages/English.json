@@ -81,6 +81,7 @@
     "c067_radius"            : "radius",
     "c068_startFrame"        : "startFrame",
     "c069_radiusScale"       : "radiusScale",
+    "c070_steering"          : "steering",
 
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",

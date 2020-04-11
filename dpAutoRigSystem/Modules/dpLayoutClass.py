@@ -93,6 +93,24 @@ class LayoutClass:
             pass
     
     
+    def loadGeo(self, *args):
+        """ Loads the selected node to geoTextField in selectedModuleLayout.
+        """
+        isGeometry = False
+        selList = cmds.ls(selection=True)
+        if selList:
+            if cmds.objExists(selList[0]):
+                childList = cmds.listRelatives(selList[0], children=True, allDescendents=True)
+                if childList:
+                    for item in childList:
+                        itemType = cmds.objectType(item)
+                        if itemType == "mesh" or itemType == "nurbsSurface":
+                            isGeometry = True
+        if isGeometry:
+            cmds.textField(self.geoTF, edit=True, text=selList[0])
+            cmds.setAttr(self.moduleGrp+".geo", selList[0], type='string')
+    
+    
     def reCreateEditSelectedModuleLayout(self, bSelect=True, *args):
         """ Select the moduleGuide, clear the selectedModuleLayout and re-create the mirrorLayout.
         """
@@ -116,6 +134,7 @@ class LayoutClass:
                 self.indirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
                 self.eyelidExists = cmds.objExists(self.moduleGrp+".eyelid")
                 self.degreeExists = cmds.objExists(self.moduleGrp+".degree")
+                self.geoExists = cmds.objExists(self.moduleGrp+".geo")
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if nJointsAttr > 0:
@@ -216,7 +235,16 @@ class LayoutClass:
                     self.irisCB = cmds.checkBox(label=self.langDic[self.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.eyelidLayout)
                     pupilValue = cmds.getAttr(self.moduleGrp+".pupil")
                     self.pupilCB = cmds.checkBox(label=self.langDic[self.langName]['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.eyelidLayout)
-                    
+                
+                # create geometry layout:
+                if self.geoExists:
+                    self.geoColumn = cmds.rowLayout('geoColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )
+                    cmds.button(label=self.langDic[self.langName]["m146_geo"]+" >", command=self.loadGeo, parent=self.geoColumn)
+                    self.geoTF = cmds.textField('geoTF', text='', parent=self.geoColumn)
+                    currentGeo = cmds.getAttr(self.moduleGrp+".geo")
+                    if currentGeo:
+                        cmds.textField(self.geoTF, edit=True, text=currentGeo, parent=self.geoColumn)
+                
                 # create degree layout:
                 if self.degreeExists:
                     self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )
@@ -233,7 +261,6 @@ class LayoutClass:
                         cmds.optionMenu(self.degreeMenu, edit=True, value='1 - Linear')
                     else:
                         cmds.optionMenu(self.degreeMenu, edit=True, value='3 - Cubic')
-                        
                         
             except:
                 pass
