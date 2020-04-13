@@ -169,8 +169,8 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleX", -1)
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleY", -1)
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleZ", -1)
-                    cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                    cmds.setAttr(ctrl+".scaleCompensate", 1)
+                    cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                    cmds.setAttr(ctrl+".scaleCompensate", 1, channelBox=True)
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                     
                     # working with aim setup:

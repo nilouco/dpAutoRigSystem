@@ -121,6 +121,18 @@ class LayoutClass:
                 cmds.select(self.moduleGrp)
             self.clearSelectedModuleLayout(self)
             try:
+                # check if attributes existing:
+                self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
+                self.aimDirectionAttrExists = cmds.objExists(self.moduleGrp+".aimDirection")
+                self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
+                self.indirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
+                self.eyelidExists = cmds.objExists(self.moduleGrp+".eyelid")
+                self.degreeExists = cmds.objExists(self.moduleGrp+".degree")
+                self.geoExists = cmds.objExists(self.moduleGrp+".geo")
+                self.startFrameExists = cmds.objExists(self.moduleGrp+".startFrame")
+                self.steeringExists = cmds.objExists(self.moduleGrp+".steering")
+                
+                # UI
                 # edit label of frame layout:
                 cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_selectedModule']+" :  "+self.langDic[self.langName][self.title]+" - "+self.userGuideName)
                 # edit button with "S" letter indicating it is selected:
@@ -128,13 +140,6 @@ class LayoutClass:
                 cmds.columnLayout("selectedColumn", adjustableColumn=True, parent="selectedModuleLayout")
                 # re-create segment layout:
                 self.segDelColumn = cmds.rowLayout('segDelColumn', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                self.aimDirectionAttrExists = cmds.objExists(self.moduleGrp+".aimDirection")
-                self.flipAttrExists = cmds.objExists(self.moduleGrp+".flip")
-                self.nJointsAttrExists = cmds.objExists(self.moduleGrp+".nJoints")
-                self.indirectSkinAttrExists = cmds.objExists(self.moduleGrp+".indirectSkin")
-                self.eyelidExists = cmds.objExists(self.moduleGrp+".eyelid")
-                self.degreeExists = cmds.objExists(self.moduleGrp+".degree")
-                self.geoExists = cmds.objExists(self.moduleGrp+".geo")
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if nJointsAttr > 0:
@@ -240,11 +245,31 @@ class LayoutClass:
                 if self.geoExists:
                     self.geoColumn = cmds.rowLayout('geoColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )
                     cmds.button(label=self.langDic[self.langName]["m146_geo"]+" >", command=self.loadGeo, parent=self.geoColumn)
-                    self.geoTF = cmds.textField('geoTF', text='', parent=self.geoColumn)
+                    self.geoTF = cmds.textField('geoTF', text='', enable=True, changeCommand=self.changeGeo, parent=self.geoColumn)
                     currentGeo = cmds.getAttr(self.moduleGrp+".geo")
                     if currentGeo:
                         cmds.textField(self.geoTF, edit=True, text=currentGeo, parent=self.geoColumn)
                 
+                # create startFrame layout:
+                if self.startFrameExists:
+                    self.startFrameColumn = cmds.rowLayout('startFrameColumn', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(self.langDic[self.langName]["i169_startFrame"], parent=self.startFrameColumn)
+                    self.startFrameIF = cmds.intField('startFrameIF', value=1, changeCommand=self.changeStartFrame, parent=self.startFrameColumn)
+                    currentStartFrame = cmds.getAttr(self.moduleGrp+".startFrame")
+                    if currentStartFrame:
+                        cmds.intField(self.startFrameIF, edit=True, value=currentStartFrame, parent=self.startFrameColumn)
+                
+                # create steering layout:
+                if self.steeringExists:
+                    if self.startFrameExists:
+                        self.wheelLayout = self.startFrameColumn
+                    else:
+                        self.wheelLayout = cmds.rowLayout('wheelLayout', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    steeringValue = cmds.getAttr(self.moduleGrp+".steering")
+                    self.steeringCB = cmds.checkBox(label=self.langDic[self.langName]['m158_steering'], value=steeringValue, changeCommand=self.changeSteering, parent=self.wheelLayout)
+                    showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
+                    self.showControlsCB = cmds.checkBox(label=self.langDic[self.langName]['i170_showControls'], value=showControlsValue, changeCommand=self.changeShowControls, parent=self.wheelLayout)
+                    
                 # create degree layout:
                 if self.degreeExists:
                     self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )

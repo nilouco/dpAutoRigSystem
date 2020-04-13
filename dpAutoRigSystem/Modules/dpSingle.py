@@ -195,8 +195,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
                 if not self.getHasIndirectSkin():
-                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                    cmds.setAttr(self.singleCtrl+".scaleCompensate", 1)
+                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                    cmds.setAttr(self.singleCtrl+".scaleCompensate", 1, channelBox=True)
                     cmds.connectAttr(self.singleCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
                     # create a fatherJoint in order to zeroOut the skinning joint:

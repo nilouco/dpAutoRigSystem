@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-04-07",
+    "_updated"       : "2020-04-12",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -79,9 +79,10 @@
     "c065_face"              : "Face",
 	"c066_general"           : "Geral",
 	"c067_radius"            : "raio",
-    "c068_startFrame"        : "frameInicial",
+    "c068_startFrame"        : "quadroInicial",
 	"c069_radiusScale"       : "radiusScale",
 	"c070_steering"          : "volante",
+	"c071_limit"             : "limite",
     
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -272,6 +273,8 @@
     "i166_collabDesc"      : "Aqui temos uma lista de\nótimas pessoas que nos ajudaram\na desenvolver esse script.\n\nObrigado para:",
 	"i167_donate"          : "Doação",
 	"i168_donateDesc"      : "dpAutoRigSystem é um Python script\nGratuito e Código Aberto\ncompartilhado com a comunidade.\n\nSe você quer dar um suporte ao desenvolvimento\nvocê pode doar usando o PayPal.\n\nObrigado!",
+	"i169_startFrame"      : "Quadro Inicial",
+	"i170_showControls"    : "Mostrar Controles",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -430,6 +433,8 @@
     "m155_quadrupedExtra"      : "Quadrúpede Controle Extra",
     "m156_wheel"               : "Roda",
     "m157_wheelDesc"           : "Descrição do módulo Roda:\n\nCria o setup de uma roda\ncom expressão de auto rotação.",
+	"m158_steering"            : "Volante",
+    "m159_steeringDesc"        : "Descricção do módulo Volante:\n\nCreia um setup de Volante\nutil para integrar ao módulo Roda.",
 
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

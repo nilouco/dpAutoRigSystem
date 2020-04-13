@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.08"
+DPAR_VERSION = "3.08.09"
 
 
 
@@ -141,6 +141,7 @@ ARM = "Arm"
 LEG = "Leg"
 SINGLE = "Single"
 WHEEL = "Wheel"
+STEERING = "Steering"
 GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
@@ -638,7 +639,7 @@ class DP_AutoRig_UI:
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
                 pass
-
+        
         # re-select items:
         #if selectedList:
         #    cmds.select(selectedList)
@@ -698,7 +699,7 @@ class DP_AutoRig_UI:
         transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         nSegmentsAttr = "nJoints"
         customNameAttr = "customName"
-        mirroirAxisAttr = "mirrorAxis"
+        mirrorAxisAttr = "mirrorAxis"
         dispAnnotAttr = "displayAnnotation"
 
         # unparenting
@@ -730,8 +731,8 @@ class DP_AutoRig_UI:
         toSetAttrList.remove(GUIDE_BASE_ATTR)
         toSetAttrList.remove(MODULE_NAMESPACE_ATTR)
         toSetAttrList.remove(customNameAttr)
-        toSetAttrList.remove(mirroirAxisAttr)
-        
+        toSetAttrList.remove(mirrorAxisAttr)
+        print "here B_001"
         # check for special attributes
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
@@ -742,8 +743,8 @@ class DP_AutoRig_UI:
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
             if customNameValue != "" and customNameValue != None:
                 newGuideInstance.editUserName(customNameValue)
-        if cmds.objExists(selectedItem+"."+mirroirAxisAttr):
-            mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirroirAxisAttr)
+        if cmds.objExists(selectedItem+"."+mirrorAxisAttr):
+            mirroirAxisValue = cmds.getAttr(selectedItem+'.'+mirrorAxisAttr)
             if mirroirAxisValue != "off":
                 newGuideInstance.changeMirror(mirroirAxisValue)
         if cmds.objExists(selectedItem+"."+dispAnnotAttr):
@@ -764,13 +765,15 @@ class DP_AutoRig_UI:
         # set transformation for Guide_Base
         for transfAttr in transformAttrList:
             cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
+        
         # setting new guide attributes
         for toSetAttr in toSetAttrList:
             try:
                 cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr))
             except:
-                cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
-
+                if cmds.getAttr(selectedItem+"."+toSetAttr):
+                    cmds.setAttr(newGuideName+"."+toSetAttr, cmds.getAttr(selectedItem+"."+toSetAttr), type="string")
+        
         # parenting correctly
         if parentList:
             cmds.parent(newGuideName, parentList[0])
@@ -2338,18 +2341,30 @@ class DP_AutoRig_UI:
                                     
                         # integrate the Wheel module with another Option_Ctrl:
                         if moduleType == WHEEL:
-                            # connect Option_Ctrl RigScale_MD output to the radiusScale:
-                            if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
-                                self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
-                                self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
-                                # working with item guide mirror:
-                                self.itemMirrorNameList = [""]
-                                # get itemGuideName:
-                                if self.itemGuideMirrorAxis != "off":
-                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
-                                for s, sideName in enumerate(self.itemMirrorNameList):
-                                    wheelCtrl = self.integratedTaskDic[moduleDic]["wheelCtrlList"][s]
+                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                            # working with item guide mirror:
+                            self.itemMirrorNameList = [""]
+                            # get itemGuideName:
+                            if self.itemGuideMirrorAxis != "off":
+                                self.itemMirrorNameList = self.itemGuideMirrorNameList
+                            for s, sideName in enumerate(self.itemMirrorNameList):
+                                wheelCtrl = self.integratedTaskDic[moduleDic]["wheelCtrlList"][s]
+                                # connect Option_Ctrl RigScale_MD output to the radiusScale:
+                                if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
                                     cmds.connectAttr(self.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
+                                # get father module:
+                                fatherModule   = self.hookDic[moduleDic]['fatherModule']
+                                fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
+                                if fatherModule == STEERING:
+                                    # getting Steering data:
+                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                    steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][0]
+                                    # connect modules to be integrated:
+                                    cmds.connectAttr(steeringCtrl+'.'+self.langDic[self.langName]['c070_steering'], wheelCtrl+'.'+self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), force=True)
+                                    # reparent wheel module:
+                                    wheelHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
+                                    cmds.parent(wheelHookCtrlGrp, self.ctrlsVisGrp)
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

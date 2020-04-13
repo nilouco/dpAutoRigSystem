@@ -2,7 +2,7 @@
     "_preset"     : "Cubic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2020-04-10",
+    "_updated"    : "2020-04-11",
 
     "id_000_Base"          : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"       : {"type" : "Cube", "degree" : 1},
@@ -68,6 +68,8 @@
 	"id_061_WheelMain"     : {"type" : "Cube", "degree" : 1},
 	"id_062_WheelPivot"    : {"type" : "Cube", "degree" : 1},
 	"id_063_WheelDeform"   : {"type" : "Cube", "degree" : 1},
-	"id_064_WheelMiddle"   : {"type" : "Cube", "degree" : 1}
+	"id_064_WheelMiddle"   : {"type" : "Cube", "degree" : 1},
+	"id_065_SteeringWheel" : {"type" : "Cube", "degree" : 1},
+	"id_066_SteeringMain"  : {"type" : "Cube", "degree" : 1}
     
 }

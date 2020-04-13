@@ -218,8 +218,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
                             cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
-                    cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                    cmds.setAttr(self.mainCtrl+".scaleCompensate", 1)
+                    cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                    cmds.setAttr(self.mainCtrl+".scaleCompensate", 1, channelBox=True)
                     cmds.connectAttr(self.mainCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == self.nJoints:
                         # create end joint:

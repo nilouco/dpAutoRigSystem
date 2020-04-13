@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-04-07",
+    "_updated"       : "2020-04-12",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -32,7 +32,7 @@
     "c018_RevFoot_roll"      : "rouler",
     "c019_RevFoot_spin"      : "tourner",
     "c020_RevFoot_turn"      : "turn",
-    "c021_showControls"      : "montrerControles",
+    "c021_showControls"      : "montrerControleurs",
     "c022_falange"           : "phalange",
     "c023_neck"              : "Cou",
     "c024_head"              : "Tete",
@@ -82,6 +82,7 @@
     "c068_startFrame"        : "frameDepart",
 	"c069_radiusScale"       : "radiusScale",
 	"c070_steering"          : "volant",
+	"c071_limit"             : "limite",
 
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -272,6 +273,8 @@
     "i166_collabDesc"      : "Nous avons ici une liste de\npersonnes formidables qui nous ont aidés\nà développer ce script.\n\nMerci à:",
 	"i167_donate"          : "Faire un don",
 	"i168_donateDesc"      : "dpAutoRigSystem est un script en Python\nGratuit et Open Source\n partagé avec la communauté.\n\nSi vous souhaitez soutenir le développement\nvous pouvez faire un don en utilisant PayPal.\n\nMerci!",
+	"i169_startFrame"      : "Frame de Départ",
+	"i170_showControls"    : "Montrer Controleurs",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -430,6 +433,8 @@
 	"m155_quadrupedExtra"      : "Quadrupède Extra Controlleur",
 	"m156_wheel"               : "Roue",
     "m157_wheelDesc"           : "Description du module Roue:\n\nCreer un setup de Roue avec\nune expression pour auto rotationer.",
+	"m158_steering"            : "Volant",
+    "m159_steeringDesc"        : "Module Description:\n\nCreer un setup de Volant\nutile pour integrer au modeule Roue.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

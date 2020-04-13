@@ -38,7 +38,13 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="geo", dataType='string')
+        cmds.addAttr(self.moduleGrp, longName="startFrame", attributeType='long', defaultValue=1)
+        cmds.addAttr(self.moduleGrp, longName="showControls", attributeType='bool')
+        cmds.addAttr(self.moduleGrp, longName="steering", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
+        cmds.setAttr(self.moduleGrp+".showControls", 1)
+        cmds.setAttr(self.moduleGrp+".steering", 0)
+        
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
         self.cvCenterLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
@@ -94,6 +100,34 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         cmds.parentConstraint(self.cvOutsideLoc, self.jGuideOutside, maintainOffset=False, name=self.cvOutsideLoc+"_ParentConstraint")
     
     
+    def changeStartFrame(self, *args):
+        """ Update moduleGrp startFrame attribute from UI.
+        """
+        newStartFrameValue = cmds.intField(self.startFrameIF, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".startFrame", newStartFrameValue)
+    
+    
+    def changeSteering(self, *args):
+        """ Update moduleGrp steering attribute from UI.
+        """
+        newSterringValue = cmds.checkBox(self.steeringCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".steering", newSterringValue)
+        
+        
+    def changeShowControls(self, *args):
+        """ Update moduleGrp showControls attribute from UI.
+        """
+        newShowControlsValue = cmds.checkBox(self.showControlsCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".showControls", newShowControlsValue)
+    
+    
+    def changeGeo(self, *args):
+        """ Update moduleGrp geo attribute from UI textField.
+        """
+        newGeoValue = cmds.textField(self.geoTF, query=True, text=True)
+        cmds.setAttr(self.moduleGrp+".geo", newGeoValue, type='string')
+    
+        
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -103,7 +137,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
             except:
                 hideJoints = 1
             # declare lists to store names and attributes:
-            self.wheelCtrlList, self.steeringGrpList = [], []
+            self.wheelCtrlList, self.steeringGrpList, self.ctrlHookGrpList = [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -180,7 +214,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 
                 # prepare group to receive steering wheel connection:
                 self.toSteeringGrp = cmds.group(self.insideCtrl, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering'].capitalize()+"_Grp")
-                cmds.addAttr(self.toSteeringGrp, longName=self.langDic[self.langName]['c070_steering'], attributeType='bool')
+                cmds.addAttr(self.toSteeringGrp, longName=self.langDic[self.langName]['c070_steering'], attributeType='bool', keyable=True)
+                cmds.addAttr(self.toSteeringGrp, longName=self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['m151_invert'], attributeType='bool', keyable=True)
                 cmds.setAttr(self.toSteeringGrp+"."+self.langDic[self.langName]['c070_steering'], 1)
                 self.steeringGrpList.append(self.toSteeringGrp)
                 
@@ -189,7 +224,10 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.endJoint, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.wheelCtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.mainCtrl, maintainOffset=False))
-                cmds.move(-self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
+                if s == 1 and cmds.getAttr(self.moduleGrp+".flip") == 1:
+                    cmds.move(self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
+                else:
+                    cmds.move(-self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 cmds.delete(cmds.parentConstraint(self.cvInsideLoc, self.toSteeringGrp, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvOutsideLoc, self.outsideCtrl, maintainOffset=False))
                 
@@ -206,8 +244,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(zeroOutGrp+".scaleY", -1)
                             cmds.setAttr(zeroOutGrp+".scaleZ", -1)
                 
-                cmds.addAttr(self.wheelCtrl, longName='scaleCompensate', attributeType="bool", keyable=True)
-                cmds.setAttr(self.wheelCtrl+".scaleCompensate", 1)
+                cmds.addAttr(self.wheelCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                cmds.setAttr(self.wheelCtrl+".scaleCompensate", 1, channelBox=True)
                 cmds.connectAttr(self.wheelCtrl+".scaleCompensate", self.centerJoint+".segmentScaleCompensate", force=True)
                 # hide visibility attributes:
                 self.ctrls.setLockHide([self.mainCtrl, self.insideCtrl, self.outsideCtrl], ['v'])
@@ -220,12 +258,40 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(zeroGrpList[0], self.outsideCtrl, absolute=True)
                 cmds.parent(zeroGrpList[3], self.insideCtrl, absolute=True)
                 
-                # automatic rotation wheel setup:
+                # add attributes:
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c047_autoRotate'], attributeType="bool", defaultValue=1, keyable=True)
-                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c068_startFrame'], attributeType="long", defaultValue=1, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c068_startFrame'], attributeType="long", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c067_radius'], attributeType="float", min=0.01, defaultValue=self.ctrlRadius, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c069_radiusScale'], attributeType="float", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering'], attributeType="bool", defaultValue=0, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), attributeType="float", defaultValue=0, keyable=False)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
+                
+                # get stored values by user:
+                startFrameValue = cmds.getAttr(self.moduleGrp+".startFrame")
+                steeringValue = cmds.getAttr(self.moduleGrp+".steering")
+                showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
+                cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c068_startFrame'], startFrameValue, channelBox=True)
+                cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering'], steeringValue, channelBox=True)
+                cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c021_showControls'], showControlsValue, channelBox=True)
+                cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 1, channelBox=True)
+                if s == 1:
+                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 0)
+                
+                # automatic rotation wheel setup:
+                receptSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering']+"_MD")
+                inverseSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering']+"_Inv_MD")
+                steeringInvCnd = cmds.createNode('condition', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering']+"_Inv_Cnd")
+                cmds.setAttr(steeringInvCnd+".colorIfTrueR", 1)
+                cmds.setAttr(steeringInvCnd+".colorIfFalseR", -1)
+                cmds.connectAttr(self.wheelCtrl+"."+self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), receptSteeringMD+".input1X", force=True)
+                cmds.connectAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering'], receptSteeringMD+".input2X", force=True)
+                cmds.connectAttr(receptSteeringMD+".outputX", inverseSteeringMD+".input1X", force=True)
+                cmds.connectAttr(steeringInvCnd+".outColorR", inverseSteeringMD+".input2X", force=True)
+                cmds.connectAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), steeringInvCnd+".firstTerm", force=True)
+                cmds.connectAttr(inverseSteeringMD+".outputX", self.toSteeringGrp+".rotateY", force=True)
                 # create locators (frontLoc to get direction and oldLoc to store wheel old position):
                 self.frontLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Front_Loc")[0]
                 self.oldLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Old_Loc")[0]
@@ -262,25 +328,26 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.geoHolder+".visibility", 0, lock=True)
                 
                 # skinning:
-                cmds.skinCluster(self.centerJoint, self.geoHolder, toSelectedBones=False, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c046_holder']+"_SC")
+                cmds.skinCluster(self.centerJoint, self.geoHolder, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c046_holder']+"_SC")
                 if self.loadedGeo:
-                    baseName = utils.extractSuffix(self.loadedGeo)
-                    skinClusterName = baseName+"_SC"
-                    if "|" in skinClusterName:
-                        skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
-                    try:
-                        cmds.skinCluster(self.centerJoint, self.loadedGeo, toSelectedBones=False, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
-                    except:
-                        childList = cmds.listRelatives(self.loadedGeo, children=True, allDescendents=True)
-                        if childList:
-                            for item in childList:
-                                itemType = cmds.objectType(item)
-                                if itemType == "mesh" or itemType == "nurbsSurface":
-                                    try:
-                                        skinClusterName = utils.extractSuffix(item)+"_SC"
-                                        cmds.skinCluster(self.centerJoint, item, toSelectedBones=False, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
-                                    except:
-                                        pass
+                    if cmds.objExists(self.loadedGeo):
+                        baseName = utils.extractSuffix(self.loadedGeo)
+                        skinClusterName = baseName+"_SC"
+                        if "|" in skinClusterName:
+                            skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
+                        try:
+                            cmds.skinCluster(self.centerJoint, self.loadedGeo, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
+                        except:
+                            childList = cmds.listRelatives(self.loadedGeo, children=True, allDescendents=True)
+                            if childList:
+                                for item in childList:
+                                    itemType = cmds.objectType(item)
+                                    if itemType == "mesh" or itemType == "nurbsSurface":
+                                        try:
+                                            skinClusterName = utils.extractSuffix(item)+"_SC"
+                                            cmds.skinCluster(self.centerJoint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
+                                        except:
+                                            pass
                 
                 # lattice:
                 latticeList = cmds.lattice(self.geoHolder, divisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, position=(0, 0, 0), scale=(self.ctrlRadius*2, self.ctrlRadius*2, self.ctrlRadius*2), name=side+self.userGuideName+"_FFD") #[deformer, lattice, base]
@@ -308,13 +375,17 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, clustersGrp, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, defCtrlGrp, maintainOffset=False))
                 outsideDist = cmds.getAttr(self.cvOutsideLoc+".tz")
+                if s == 1:
+                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        outsideDist = -outsideDist
                 cmds.move(outsideDist, defCtrlGrp, moveZ=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 self.ctrls.directConnect(upperDefCtrl, upperClusterList[1])
                 self.ctrls.directConnect(middleDefCtrl, middleClusterList[1])
                 self.ctrls.directConnect(lowerDefCtrl, lowerClusterList[1])
                 # grouping deformers:
                 if self.loadedGeo:
-                    cmds.lattice(latticeList[0], edit=True, geometry=self.loadedGeo)
+                    if cmds.objExists(self.loadedGeo):
+                        cmds.lattice(latticeList[0], edit=True, geometry=self.loadedGeo)
                 defGrp = cmds.group(latticeList[1], latticeList[2], clustersGrp, name=side+self.userGuideName+"_Deform_Grp")
                 cmds.parentConstraint(self.mainCtrl, defGrp, maintainOffset=True, name=defGrp+"_ParentConstraint")
                 cmds.scaleConstraint(self.mainCtrl, defGrp, maintainOffset=True, name=defGrp+"_ScaleConstraint")
@@ -336,6 +407,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 # add module type counter value
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                self.ctrlHookGrpList.append(self.toCtrlHookGrp)
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
@@ -355,6 +427,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                                     "module": {
                                                 "wheelCtrlList"   : self.wheelCtrlList,
                                                 "steeringGrpList" : self.steeringGrpList,
+                                                "ctrlHookGrpList" : self.ctrlHookGrpList,
                                               }
                                     }
 
