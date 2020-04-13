@@ -131,6 +131,7 @@ class LayoutClass:
                 self.geoExists = cmds.objExists(self.moduleGrp+".geo")
                 self.startFrameExists = cmds.objExists(self.moduleGrp+".startFrame")
                 self.steeringExists = cmds.objExists(self.moduleGrp+".steering")
+                self.fatherBExists = cmds.objExists(self.moduleGrp+".fatherB")
                 
                 # UI
                 # edit label of frame layout:
@@ -269,7 +270,16 @@ class LayoutClass:
                     self.steeringCB = cmds.checkBox(label=self.langDic[self.langName]['m158_steering'], value=steeringValue, changeCommand=self.changeSteering, parent=self.wheelLayout)
                     showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
                     self.showControlsCB = cmds.checkBox(label=self.langDic[self.langName]['i170_showControls'], value=showControlsValue, changeCommand=self.changeShowControls, parent=self.wheelLayout)
-                    
+                
+                # create fatherB layout:
+                if self.fatherBExists:
+                    self.fatherBColumn = cmds.rowLayout('fatherBColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )
+                    cmds.button(label=self.langDic[self.langName]["m160_fatherB"]+" >", command=self.loadFatherB, parent=self.fatherBColumn)
+                    self.fatherBTF = cmds.textField('fatherBTF', text='', enable=True, changeCommand=self.changeFatherB, parent=self.fatherBColumn)
+                    currentFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
+                    if currentFatherB:
+                        cmds.textField(self.fatherBTF, edit=True, text=currentFatherB, parent=self.fatherBColumn)
+                
                 # create degree layout:
                 if self.degreeExists:
                     self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedColumn" )

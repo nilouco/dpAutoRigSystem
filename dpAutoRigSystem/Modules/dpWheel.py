@@ -137,7 +137,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
             except:
                 hideJoints = 1
             # declare lists to store names and attributes:
-            self.wheelCtrlList, self.steeringGrpList, self.ctrlHookGrpList = [], [], []
+            self.mainCtrlList, self.wheelCtrlList, self.steeringGrpList, self.ctrlHookGrpList = [], [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -204,6 +204,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree)
                 self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.langDic[self.langName]['c011_RevFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
                 self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.langDic[self.langName]['c010_RevFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
+                self.mainCtrlList.append(self.mainCtrl)
                 self.wheelCtrlList.append(self.wheelCtrl)
                 
                 # origined from attributes:
@@ -425,6 +426,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         """
         self.integratedActionsDic = {
                                     "module": {
+                                                "mainCtrlList"    : self.mainCtrlList,
                                                 "wheelCtrlList"   : self.wheelCtrlList,
                                                 "steeringGrpList" : self.steeringGrpList,
                                                 "ctrlHookGrpList" : self.ctrlHookGrpList,

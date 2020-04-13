@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.09"
+DPAR_VERSION = "3.08.10"
 
 
 
@@ -140,6 +140,7 @@ FINGER = "Finger"
 ARM = "Arm"
 LEG = "Leg"
 SINGLE = "Single"
+PISTON = "Piston"
 WHEEL = "Wheel"
 STEERING = "Steering"
 GUIDE_BASE_NAME = "Guide_Base"
@@ -732,7 +733,7 @@ class DP_AutoRig_UI:
         toSetAttrList.remove(MODULE_NAMESPACE_ATTR)
         toSetAttrList.remove(customNameAttr)
         toSetAttrList.remove(mirrorAxisAttr)
-        print "here B_001"
+        
         # check for special attributes
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
@@ -2355,7 +2356,6 @@ class DP_AutoRig_UI:
                                     cmds.connectAttr(self.rigScaleMD+".outputX", wheelCtrl+".radiusScale", force=True)
                                 # get father module:
                                 fatherModule   = self.hookDic[moduleDic]['fatherModule']
-                                fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
                                 if fatherModule == STEERING:
                                     # getting Steering data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
@@ -2365,6 +2365,38 @@ class DP_AutoRig_UI:
                                     # reparent wheel module:
                                     wheelHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
                                     cmds.parent(wheelHookCtrlGrp, self.ctrlsVisGrp)
+                        
+                        # integrate the Piston module with Wheel:
+                        if moduleType == PISTON:
+                            self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
+                            self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
+                            # working with item guide mirror:
+                            self.itemMirrorNameList = [""]
+                            # get itemGuideName:
+                            if self.itemGuideMirrorAxis != "off":
+                                self.itemMirrorNameList = self.itemGuideMirrorNameList
+                            for s, sideName in enumerate(self.itemMirrorNameList):
+                                loadedFatherB = self.integratedTaskDic[moduleDic]['fatherBList'][s]
+                                if loadedFatherB:
+                                    pistonBCtrlGrp = self.integratedTaskDic[moduleDic]['pistonBCtrlGrpList'][s]
+                                    # find the correct fatherB node in order to parent the B_Ctrl:
+                                    if "__" in loadedFatherB and ":" in loadedFatherB: # means we need to parent to a rigged guide
+                                        fatherBRiggedNodeName = loadedFatherB[loadedFatherB.rfind("__")+2:].replace(":", "_")
+                                        fatherBRiggedNode = self.originedFromDic[fatherBRiggedNodeName]
+                                        if cmds.objExists(fatherBRiggedNode):
+                                            cmds.parent(pistonBCtrlGrp, fatherBRiggedNode)
+                                    else: # probably we will parent to a control curve already generated and rigged before
+                                        if cmds.objExists(loadedFatherB):
+                                            cmds.parent(pistonBCtrlGrp, loadedFatherB)
+                                # get father module:
+                                fatherModule = self.hookDic[moduleDic]['fatherModule']
+                                if fatherModule == WHEEL:
+                                    # getting spine data:
+                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                    # parent piston control group to wheel Main_Ctrl
+                                    pistonHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
+                                    wheelMainCtrl = self.integratedTaskDic[fatherGuide]['mainCtrlList'][s]
+                                    cmds.parent(pistonHookCtrlGrp, wheelMainCtrl)
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

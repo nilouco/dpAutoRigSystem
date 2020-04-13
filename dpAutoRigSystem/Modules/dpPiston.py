@@ -37,6 +37,7 @@ class Piston(Base.StartClass, Layout.LayoutClass):
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
+        cmds.addAttr(self.moduleGrp, longName="fatherB", dataType='string')
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
@@ -62,7 +63,24 @@ class Piston(Base.StartClass, Layout.LayoutClass):
         cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ParentConstraint")
         cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScaleConstraint")
         cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScaleConstraint")
-        
+    
+    
+    def loadFatherB(self, *args):
+        """ Loads the selected node to fatherBTextField in selectedModuleLayout.
+        """
+        selList = cmds.ls(selection=True)
+        if selList:
+            if cmds.objExists(selList[0]):
+                cmds.textField(self.fatherBTF, edit=True, text=selList[0])
+                cmds.setAttr(self.moduleGrp+".fatherB", selList[0], type='string')
+    
+    
+    def changeFatherB(self, *args):
+        """ Update moduleGrp fatherB attribute from UI textField.
+        """
+        newFatherBValue = cmds.textField(self.fatherBTF, query=True, text=True)
+        cmds.setAttr(self.moduleGrp+".fatherB", newFatherBValue, type='string')
+    
     
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
@@ -72,6 +90,8 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            # declare lists to store names and attributes:
+            self.pistonBCtrlGrpList, self.fatherBList, self.ctrlHookGrpList = [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -161,6 +181,8 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                         utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
                         utils.originedFrom(objName=ctrl, attrString=self.cvBLoc)
                         cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
+                        # integrating data:
+                        self.pistonBCtrlGrpList.append(zeroOutCtrlGrp[0])
                     # hide visibility attribute:
                     cmds.setAttr(mainCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
@@ -194,6 +216,16 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                 bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[0]+"_AimConstraint")[0]
                 cmds.connectAttr(self.ctrlList[1]+".active", bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
+                # integrating data:
+                self.loadedFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
+                if self.loadedFatherB:
+                    self.fatherBList.append(self.loadedFatherB)
+                else:
+                    self.fatherBList.append(None)
+                
+                
+                
+                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.mainCtrlList, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.jointList, name=side+self.userGuideName+"_Joint_Grp")
@@ -209,6 +241,7 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                 # add module type counter value
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                self.ctrlHookGrpList.append(self.toCtrlHookGrp)
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
@@ -222,3 +255,12 @@ class Piston(Base.StartClass, Layout.LayoutClass):
     
     def integratingInfo(self, *args):
         Base.StartClass.integratingInfo(self)
+        """ This method will create a dictionary with informations about integrations system between modules.
+        """
+        self.integratedActionsDic = {
+                                    "module": {
+                                                "pistonBCtrlGrpList" : self.pistonBCtrlGrpList,
+                                                "fatherBList"        : self.fatherBList,
+                                                "ctrlHookGrpList"    : self.ctrlHookGrpList,
+                                              }
+                                    }
