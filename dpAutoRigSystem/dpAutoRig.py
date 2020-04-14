@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.10"
+DPAR_VERSION = "3.08.11"
 
 
 
@@ -140,9 +140,9 @@ FINGER = "Finger"
 ARM = "Arm"
 LEG = "Leg"
 SINGLE = "Single"
-PISTON = "Piston"
 WHEEL = "Wheel"
 STEERING = "Steering"
+SUSPENSION = "Suspension"
 GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
@@ -2366,8 +2366,8 @@ class DP_AutoRig_UI:
                                     wheelHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
                                     cmds.parent(wheelHookCtrlGrp, self.ctrlsVisGrp)
                         
-                        # integrate the Piston module with Wheel:
-                        if moduleType == PISTON:
+                        # integrate the Suspension module with Wheel:
+                        if moduleType == SUSPENSION:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2378,25 +2378,48 @@ class DP_AutoRig_UI:
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 loadedFatherB = self.integratedTaskDic[moduleDic]['fatherBList'][s]
                                 if loadedFatherB:
-                                    pistonBCtrlGrp = self.integratedTaskDic[moduleDic]['pistonBCtrlGrpList'][s]
+                                    suspensionBCtrlGrp = self.integratedTaskDic[moduleDic]['suspensionBCtrlGrpList'][s]
                                     # find the correct fatherB node in order to parent the B_Ctrl:
                                     if "__" in loadedFatherB and ":" in loadedFatherB: # means we need to parent to a rigged guide
-                                        fatherBRiggedNodeName = loadedFatherB[loadedFatherB.rfind("__")+2:].replace(":", "_")
-                                        fatherBRiggedNode = self.originedFromDic[fatherBRiggedNodeName]
-                                        if cmds.objExists(fatherBRiggedNode):
-                                            cmds.parent(pistonBCtrlGrp, fatherBRiggedNode)
+                                        # find fatherB module dic:
+                                        fatherBNamespace = loadedFatherB[:loadedFatherB.find(":")]
+                                        for hookItem in self.hookDic:
+                                            if self.hookDic[hookItem]['guideModuleNamespace'] == fatherBNamespace:
+                                                # got father module dic:
+                                                fatherBModuleDic = hookItem
+                                                self.fatherBGuideMirrorAxis     = self.hookDic[fatherBModuleDic]['guideMirrorAxis']
+                                                self.fatherBGuideMirrorNameList = self.hookDic[fatherBModuleDic]['guideMirrorName']
+                                                self.fatherBCustomName          = self.hookDic[fatherBModuleDic]['guideCustomName']
+                                                self.fatherBGuideInstance       = self.hookDic[fatherBModuleDic]['guideInstance']
+                                                # working with fatherB guide mirror:
+                                                self.fatherBMirrorNameList = [""]
+                                                # get itemGuideName:
+                                                if self.fatherBGuideMirrorAxis != "off":
+                                                    self.fatherBMirrorNameList = self.fatherBGuideMirrorNameList
+                                                for fB, fBSideName in enumerate(self.fatherBMirrorNameList):
+                                                    if self.fatherBCustomName:
+                                                        fatherB = fBSideName + self.prefix + self.fatherBCustomName + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
+                                                    else:
+                                                        fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
+                                                    fatherBRiggedNode = self.originedFromDic[fatherB]
+                                                    if s == fB:
+                                                        if cmds.objExists(fatherBRiggedNode):
+                                                            cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ParentConstraint")
+                                                            cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScaleConstraint")
                                     else: # probably we will parent to a control curve already generated and rigged before
                                         if cmds.objExists(loadedFatherB):
-                                            cmds.parent(pistonBCtrlGrp, loadedFatherB)
+                                            cmds.parentConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ParentConstraint")
+                                            cmds.scaleConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScaleConstraint")
                                 # get father module:
                                 fatherModule = self.hookDic[moduleDic]['fatherModule']
                                 if fatherModule == WHEEL:
                                     # getting spine data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    # parent piston control group to wheel Main_Ctrl
-                                    pistonHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
+                                    # parent suspension control group to wheel Main_Ctrl
+                                    suspensionHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
                                     wheelMainCtrl = self.integratedTaskDic[fatherGuide]['mainCtrlList'][s]
-                                    cmds.parent(pistonHookCtrlGrp, wheelMainCtrl)
+                                    cmds.parentConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ParentConstraint")
+                                    cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScaleConstraint")
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

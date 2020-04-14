@@ -7,13 +7,13 @@ import dpLayoutClass as Layout
 
 
 # global variables to this module:    
-CLASS_NAME = "Piston"
-TITLE = "m153_piston"
-DESCRIPTION = "m154_pistonDesc"
-ICON = "/Icons/dp_piston.png"
+CLASS_NAME = "Suspension"
+TITLE = "m153_suspension"
+DESCRIPTION = "m154_suspensionDesc"
+ICON = "/Icons/dp_suspension.png"
 
 
-class Piston(Base.StartClass, Layout.LayoutClass):
+class Suspension(Base.StartClass, Layout.LayoutClass):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -91,7 +91,7 @@ class Piston(Base.StartClass, Layout.LayoutClass):
             except:
                 hideJoints = 1
             # declare lists to store names and attributes:
-            self.pistonBCtrlGrpList, self.fatherBList, self.ctrlHookGrpList = [], [], []
+            self.suspensionBCtrlGrpList, self.fatherBList, self.ctrlHookGrpList = [], [], []
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -157,9 +157,9 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                     self.jointList.append(jnt)
                     
                     # create a control:
-                    mainCtrl = self.ctrls.cvControl("id_055_PistonMain", side+self.userGuideName+"_"+self.langDic[self.langName]["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                    ctrl = self.ctrls.cvControl("id_056_PistonAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
-                    upLocCtrl = self.ctrls.cvControl("id_057_PistonUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree)
+                    mainCtrl = self.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.langDic[self.langName]["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                    ctrl = self.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
+                    upLocCtrl = self.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree)
                     self.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
                     self.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                     # position and orientation of joint and control:
@@ -182,7 +182,7 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                         utils.originedFrom(objName=ctrl, attrString=self.cvBLoc)
                         cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
                         # integrating data:
-                        self.pistonBCtrlGrpList.append(zeroOutCtrlGrp[0])
+                        self.suspensionBCtrlGrpList.append(zeroOutCtrlGrp[0])
                     # hide visibility attribute:
                     cmds.setAttr(mainCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
@@ -223,9 +223,6 @@ class Piston(Base.StartClass, Layout.LayoutClass):
                 else:
                     self.fatherBList.append(None)
                 
-                
-                
-                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.mainCtrlList, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.jointList, name=side+self.userGuideName+"_Joint_Grp")
@@ -259,7 +256,7 @@ class Piston(Base.StartClass, Layout.LayoutClass):
         """
         self.integratedActionsDic = {
                                     "module": {
-                                                "pistonBCtrlGrpList" : self.pistonBCtrlGrpList,
+                                                "suspensionBCtrlGrpList" : self.suspensionBCtrlGrpList,
                                                 "fatherBList"        : self.fatherBList,
                                                 "ctrlHookGrpList"    : self.ctrlHookGrpList,
                                               }

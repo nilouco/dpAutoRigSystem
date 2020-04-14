@@ -208,10 +208,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 self.wheelCtrlList.append(self.wheelCtrl)
                 
                 # origined from attributes:
-                utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc)
-                utils.originedFrom(objName=self.wheelCtrl, attrString=self.cvCenterLoc)
-                utils.originedFrom(objName=self.insideCtrl, attrString=self.base)
-                utils.originedFrom(objName=self.outsideCtrl, attrString=self.base)
+                utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.cvInsideLoc+";"+self.cvOutsideLoc)
                 
                 # prepare group to receive steering wheel connection:
                 self.toSteeringGrp = cmds.group(self.insideCtrl, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering'].capitalize()+"_Grp")
