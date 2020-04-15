@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.11"
+DPAR_VERSION = "3.08.12"
 
 
 
@@ -2359,7 +2359,7 @@ class DP_AutoRig_UI:
                                 if fatherModule == STEERING:
                                     # getting Steering data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][0]
+                                    steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][s]
                                     # connect modules to be integrated:
                                     cmds.connectAttr(steeringCtrl+'.'+self.langDic[self.langName]['c070_steering'], wheelCtrl+'.'+self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), force=True)
                                     # reparent wheel module:
