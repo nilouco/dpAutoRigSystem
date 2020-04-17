@@ -171,7 +171,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     zeroOutCtrlGrp = utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
                     self.mainCtrlList.append(zeroOutCtrlGrp[0])
                     self.ctrlZeroList.append(zeroOutCtrlGrp[1])
-                    cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist*2)
+                    cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
                         utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc)

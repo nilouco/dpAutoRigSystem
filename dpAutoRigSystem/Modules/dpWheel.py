@@ -209,6 +209,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 
                 # origined from attributes:
                 utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.cvInsideLoc+";"+self.cvOutsideLoc)
+                #utils.originedFrom(objName=self.wheelCtrl, attrString=self.cvCenterLoc)
                 
                 # prepare group to receive steering wheel connection:
                 self.toSteeringGrp = cmds.group(self.insideCtrl, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering'].capitalize()+"_Grp")
@@ -265,6 +266,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering'], attributeType="bool", defaultValue=0, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), attributeType="float", defaultValue=0, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c093_tryKeepUndo'], attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
                 
                 # get stored values by user:
                 startFrameValue = cmds.getAttr(self.moduleGrp+".startFrame")
@@ -274,6 +276,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering'], steeringValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c021_showControls'], showControlsValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 1, channelBox=True)
+                cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo'], 1, channelBox=True)
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
                         cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 0)
@@ -302,7 +305,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 self.wheelAutoGrpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Auto_Loc")[0]
                 cmds.pointConstraint(wheelAutoGrp, self.wheelAutoGrpLoc, maintainOffset=False, name=self.wheelAutoGrpLoc+"_PointConstraint")
                 cmds.setAttr(self.wheelAutoGrpLoc+".visibility", 0, lock=True)
-                expString = "float $radius = "+self.wheelCtrl+"."+self.langDic[self.langName]['c067_radius']+" * "+self.wheelCtrl+"."+self.langDic[self.langName]['c069_radiusScale']+\
+                expString = "if ("+self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 0; };"+\
+                        "\nfloat $radius = "+self.wheelCtrl+"."+self.langDic[self.langName]['c067_radius']+" * "+self.wheelCtrl+"."+self.langDic[self.langName]['c069_radiusScale']+\
                         ";\nvector $moveVectorOld = `xform -q -ws -t \""+self.oldLoc+\
                         "\"`;\nvector $moveVector = << "+self.wheelAutoGrpLoc+".translateX, "+self.wheelAutoGrpLoc+".translateY, "+self.wheelAutoGrpLoc+".translateZ >>;"+\
                         "\nvector $dirVector = `xform -q -ws -t \""+self.frontLoc+\
@@ -312,7 +316,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                         "\n$dot = dotProduct($motionVector, $wheelVector, 1);\n"+\
                         wheelAutoGrp+".rotateZ = "+wheelAutoGrp+".rotateZ - 360 / (6.283*$radius) * ($dot*$distance) * ("+self.wheelCtrl+"."+self.langDic[self.langName]['c047_autoRotate']+\
                         ");\nxform -t ($moveVector.x) ($moveVector.y) ($moveVector.z) "+self.oldLoc+\
-                        ";\nif (frame == "+self.wheelCtrl+"."+self.langDic[self.langName]['c068_startFrame']+") { "+wheelAutoGrp+".rotateZ = 0; };"
+                        ";\nif (frame == "+self.wheelCtrl+"."+self.langDic[self.langName]['c068_startFrame']+") { "+wheelAutoGrp+".rotateZ = 0; };"+\
+                        "if ("+self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 1; };"
                 # expression:
                 cmds.expression(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Exp", object=self.frontLoc, string=expString)
                 self.ctrls.setLockHide([self.frontLoc, self.wheelAutoGrpLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
@@ -435,6 +440,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
 #
 # Wheel Auto Rotation Expression:
 #
+# if (WHEEL_CTRL.TRYKEEPUNDO == 1) { undoInfo -stateWithoutFlush 0; };
 # float $radius = WHEEL_CTRL.RADIUS * WHEEL_CTRL.RADIUSSCALE;
 # vector $moveVectorOld = `xform -q -ws -t "OLD_LOC"`;
 # vector $moveVector = << AUTO_GRP_LOC.translateX, AUTO_GRP_LOC.translateY, AUTO_GRP_LOC.translateZ >>;
@@ -446,5 +452,6 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
 # AUTO_GRP.rotateZ = AUTO_GRP.rotateZ - 360 / (6.283*$radius) * ($dot*$distance) * (WHEEL_CTRL.AUTO_ROTATE);
 # xform -t ($moveVector.x) ($moveVector.y) ($moveVector.z) OLD_LOC;
 # if (frame == WHEEL_CTRL.START_FRAME) { AUTO_GRP.rotateZ = 0; };
+# if (WHEEL_CTRL.TRYKEEPUNDO == 1) { undoInfo -stateWithoutFlush 1; };
 #
 ###

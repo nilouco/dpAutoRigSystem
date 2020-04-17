@@ -125,7 +125,6 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
-                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # joint labelling:
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
                 # create a control:
@@ -138,6 +137,8 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.steeringCtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.mainCtrl, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                cmds.setAttr(self.endJoint+".translateY", 1)
                 # zeroOut controls:
                 zeroOutCtrlGrpList = utils.zeroOut([self.steeringCtrl, self.mainCtrl])
                 # hide visibility attribute:
@@ -158,15 +159,16 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c071_limit'], 500, channelBox=True)
                 cmds.setAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c049_intensity'], 0.8, channelBox=True)
                 self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Unit_MD")
+                self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rotate_MD")
                 self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_MD")
-                cmds.setAttr(self.steeringUnitMD+".input2X", 0.1)
-                cmds.setAttr(self.steeringUnitMD+".input2Y", -1)
+                cmds.setAttr(self.steeringInvertMD+".input2X", 0.1)
+                cmds.setAttr(self.steeringUnitMD+".input2X", -1)
                 cmds.transformLimits(self.steeringCtrl, enableRotationZ=(1, 1))
-                cmds.connectAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c071_limit'], self.steeringUnitMD+".input1Y", force=True)
-                cmds.connectAttr(self.steeringUnitMD+".outputY", self.steeringCtrl+".minRotLimit.minRotZLimit", force=True)
+                cmds.connectAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c071_limit'], self.steeringUnitMD+".input1X", force=True)
+                cmds.connectAttr(self.steeringUnitMD+".outputX", self.steeringCtrl+".minRotLimit.minRotZLimit", force=True)
                 cmds.connectAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c071_limit'], self.steeringCtrl+".maxRotLimit.maxRotZLimit", force=True)
-                cmds.connectAttr(self.steeringCtrl+".rotateZ", self.steeringUnitMD+".input1X", force=True)
-                cmds.connectAttr(self.steeringUnitMD+".outputX", self.steeringMD+".input1X", force=True)
+                cmds.connectAttr(self.steeringCtrl+".rotateZ", self.steeringInvertMD+".input1X", force=True)
+                cmds.connectAttr(self.steeringInvertMD+".outputX", self.steeringMD+".input1X", force=True)
                 cmds.connectAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c049_intensity'], self.steeringMD+".input2X", force=True)
                 cmds.connectAttr(self.steeringMD+".outputX", self.steeringCtrl+"."+self.langDic[self.langName]['c070_steering'], force=True)
                 

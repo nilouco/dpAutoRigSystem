@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.08.12"
+DPAR_VERSION = "3.08.13"
 
 
 
@@ -2359,7 +2359,10 @@ class DP_AutoRig_UI:
                                 if fatherModule == STEERING:
                                     # getting Steering data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][s]
+                                    try:
+                                        steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][s]
+                                    except:
+                                        steeringCtrl  = self.integratedTaskDic[fatherGuide]['steeringCtrlList'][0]
                                     # connect modules to be integrated:
                                     cmds.connectAttr(steeringCtrl+'.'+self.langDic[self.langName]['c070_steering'], wheelCtrl+'.'+self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), force=True)
                                     # reparent wheel module:
@@ -2402,8 +2405,12 @@ class DP_AutoRig_UI:
                                                     else:
                                                         fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     fatherBRiggedNode = self.originedFromDic[fatherB]
-                                                    if s == fB:
-                                                        if cmds.objExists(fatherBRiggedNode):
+                                                    if cmds.objExists(fatherBRiggedNode):
+                                                        if len(self.fatherBMirrorNameList) > 1: #means fatherB has mirror
+                                                            if s == fB:
+                                                                cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ParentConstraint")
+                                                                cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScaleConstraint")
+                                                        else:
                                                             cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ParentConstraint")
                                                             cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScaleConstraint")
                                     else: # probably we will parent to a control curve already generated and rigged before

@@ -376,7 +376,7 @@ def Biped(dpUIinst):
         
         # select spineGuide_Base:
         cmds.select(spineInstance.moduleGrp)
-        print dpUIinst.langDic[dpUIinst.langName]['m089_createdBiped']
+        print dpUIinst.langDic[dpUIinst.langName]['m089_createdBiped'],
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
