@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.00"
+DPAR_VERSION = "3.09.01"
 
 
 
@@ -2443,7 +2443,7 @@ class DP_AutoRig_UI:
             # Close progress window
             cmds.progressWindow(endProgress=True)
         
-            #Actualise all controls (Master_Ctrl.controlList) for this rig:
+            #Actualise all controls (All_Grp.controlList) for this rig:
             rigInfo.UpdateRigInfo.updateRigInfoLists()
 
             #Colorize all controller in yellow as a base (Pymel)

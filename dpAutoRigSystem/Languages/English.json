@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-04-16",
+    "_updated"       : "2020-04-17",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -126,6 +126,7 @@
     "e016_notPastedAttr"           : "Can't paste attribute.",
     "e017_loadingExtension"        : "Can't load extension.",
     "e018_selectBlendShape"        : "Select a BlendShape node, a mesh or a connected transform in order to load, please.",
+    "e019_notFoundAllGrp"          : "Not found All_Grp to select controls, sorry.",
 
     "i000_guides"          : "Create GUIDES",
     "i001_modules"         : "Edit MODULES",
@@ -467,6 +468,10 @@
     "m166_bikeDesc"            : "Bike Script Description:\n\nThis scripted module creates a basic bike guide,\nwith all modules already parented using the correct mirror settings\nand a good name convention...\n\nYou just need to place the guides in the correct location\nand press the RIG all button (the green button).\n\nYou also can change it a bit\nin order to get a motorcycle Rig.",
     "m167_createdCar"          : "Created Car Guides.",
     "m168_createdBike"         : "Created Bike Guides.",
+    "m166_selAllControls"      : "Select All Controls",
+    "m167_selAllControlsDesc"  : "This script will find the list of controls\nfrom an attribute in All_Grp\nand select them.",
+    "m168_wichAllGrp"          : "There are more than one All_Grp in this scene.\nFrom which one do you want to select all controls?",
+    "m169_selectedCtrls"       : "Selected All Controls:",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
