@@ -305,7 +305,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 self.wheelAutoGrpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Auto_Loc")[0]
                 cmds.pointConstraint(wheelAutoGrp, self.wheelAutoGrpLoc, maintainOffset=False, name=self.wheelAutoGrpLoc+"_PointConstraint")
                 cmds.setAttr(self.wheelAutoGrpLoc+".visibility", 0, lock=True)
-                expString = "if ("+self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 0; };"+\
+                expString = "if ("+self.wheelCtrl+"."+self.langDic[self.langName]['c047_autoRotate']+" == 1) {"+\
+                        "\nif ("+self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 0; };"+\
                         "\nfloat $radius = "+self.wheelCtrl+"."+self.langDic[self.langName]['c067_radius']+" * "+self.wheelCtrl+"."+self.langDic[self.langName]['c069_radiusScale']+\
                         ";\nvector $moveVectorOld = `xform -q -ws -t \""+self.oldLoc+\
                         "\"`;\nvector $moveVector = << "+self.wheelAutoGrpLoc+".translateX, "+self.wheelAutoGrpLoc+".translateY, "+self.wheelAutoGrpLoc+".translateZ >>;"+\
@@ -314,10 +315,10 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                         "\nvector $motionVector = ($moveVector - $moveVectorOld);"+\
                         "\nfloat $distance = mag($motionVector);"+\
                         "\n$dot = dotProduct($motionVector, $wheelVector, 1);\n"+\
-                        wheelAutoGrp+".rotateZ = "+wheelAutoGrp+".rotateZ - 360 / (6.283*$radius) * ($dot*$distance) * ("+self.wheelCtrl+"."+self.langDic[self.langName]['c047_autoRotate']+\
-                        ");\nxform -t ($moveVector.x) ($moveVector.y) ($moveVector.z) "+self.oldLoc+\
+                        wheelAutoGrp+".rotateZ = "+wheelAutoGrp+".rotateZ - 360 / (6.283*$radius) * ($dot*$distance);"+\
+                        "\nxform -t ($moveVector.x) ($moveVector.y) ($moveVector.z) "+self.oldLoc+\
                         ";\nif (frame == "+self.wheelCtrl+"."+self.langDic[self.langName]['c068_startFrame']+") { "+wheelAutoGrp+".rotateZ = 0; };"+\
-                        "if ("+self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 1; };"
+                        "\nif ("+self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 1; };};"
                 # expression:
                 cmds.expression(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Exp", object=self.frontLoc, string=expString)
                 self.ctrls.setLockHide([self.frontLoc, self.wheelAutoGrpLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
@@ -440,6 +441,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
 #
 # Wheel Auto Rotation Expression:
 #
+# if (WHEEL_CTRL.AUTO_ROTATE == 1) {
 # if (WHEEL_CTRL.TRYKEEPUNDO == 1) { undoInfo -stateWithoutFlush 0; };
 # float $radius = WHEEL_CTRL.RADIUS * WHEEL_CTRL.RADIUSSCALE;
 # vector $moveVectorOld = `xform -q -ws -t "OLD_LOC"`;
@@ -449,9 +451,9 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
 # vector $motionVector = ($moveVector - $moveVectorOld);
 # float $distance = mag($motionVector);
 # $dot = dotProduct($motionVector, $wheelVector, 1);
-# AUTO_GRP.rotateZ = AUTO_GRP.rotateZ - 360 / (6.283*$radius) * ($dot*$distance) * (WHEEL_CTRL.AUTO_ROTATE);
+# AUTO_GRP.rotateZ = AUTO_GRP.rotateZ - 360 / (6.283*$radius) * ($dot*$distance);
 # xform -t ($moveVector.x) ($moveVector.y) ($moveVector.z) OLD_LOC;
 # if (frame == WHEEL_CTRL.START_FRAME) { AUTO_GRP.rotateZ = 0; };
-# if (WHEEL_CTRL.TRYKEEPUNDO == 1) { undoInfo -stateWithoutFlush 1; };
-#
+# if (WHEEL_CTRL.TRYKEEPUNDO == 1) { undoInfo -stateWithoutFlush 1; };};
+# 
 ###

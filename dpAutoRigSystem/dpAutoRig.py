@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.01"
+DPAR_VERSION = "3.09.02"
 
 
 
