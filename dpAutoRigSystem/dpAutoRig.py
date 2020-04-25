@@ -49,7 +49,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.02"
+DPAR_VERSION = "3.09.03"
 
 
 
@@ -2179,7 +2179,7 @@ class DP_AutoRig_UI:
                                     for nFix in fixIkSpringSolverGrp:
                                         cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScaleConstraint")
                             
-                        # integrate the volumeVariation attribute from Spine module to optionCtrl:
+                        # integrate the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
                         if moduleType == SPINE:
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
@@ -2194,6 +2194,7 @@ class DP_AutoRig_UI:
                                 vvAttr = self.integratedTaskDic[moduleDic]['volumeVariationAttrList'][s]
                                 actVVAttr = self.integratedTaskDic[moduleDic]['ActiveVolumeVariationAttrList'][s]
                                 mScaleVVAttr = self.integratedTaskDic[moduleDic]['MasterScaleVolumeVariationAttrList'][s]
+                                ikFkBlendAttr = self.integratedTaskDic[moduleDic]['IkFkBlendAttrList'][s]
                                 #Maya 2016 --> Scale constraint behavior
                                 # is fixed and a single master scale constraint doesn't work anymore
                                 if (int(cmds.about(version=True)[:4]) >= 2016):
@@ -2207,9 +2208,12 @@ class DP_AutoRig_UI:
                                 cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
                                 cmds.connectAttr(self.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)
                                 cmds.setAttr(hipsA+'.'+mScaleVVAttr, keyable=False)
+                                cmds.addAttr(self.optionCtrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+                                cmds.connectAttr(self.optionCtrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
+                                cmds.setAttr(hipsA+'.'+ikFkBlendAttr, keyable=False)
                                 if bColorize:
-                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['FkCtrls'][s], "cyan")
-                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['IkCtrls'][s], "yellow")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
                         
                         # integrate the head orient from the masterCtrl:
                         if moduleType == HEAD:
@@ -2536,7 +2540,9 @@ class DP_AutoRig_UI:
                 # list desirable Option_Ctrl attributes order:
                 desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', 'globalStretch', vvAttr,
                 spineAttr+'_active', spineAttr, spineAttr+'1_active', spineAttr+'1', spineAttr+'2_active', spineAttr+'2',
-                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', armAttr, legAttr, leftAttr+armAttr, rightAttr+armAttr,
+                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', spineAttr+'Fk', spineAttr+'1Fk', spineAttr+'Fk2', 
+                leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
+                armAttr, legAttr, leftAttr+armAttr, rightAttr+armAttr,
                 leftAttr+legAttr, rightAttr+legAttr, leftAttr+legAttr+frontAttr, rightAttr+legAttr+frontAttr, leftAttr+legAttr+backAttr, rightAttr+legAttr+backAttr,
                 armAttr+'1', legAttr+'1', leftAttr+armAttr+'1', rightAttr+armAttr+'1', leftAttr+legAttr+'1', rightAttr+legAttr+'1',
                 leftAttr+legAttr+frontAttr+'1', rightAttr+legAttr+frontAttr+'1', leftAttr+legAttr+backAttr+'1', rightAttr+legAttr+backAttr+'1',
