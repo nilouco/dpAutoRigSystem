@@ -440,6 +440,19 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     # apply volumeVariation to joints in the middle ribbon setup:
                     cmds.connectAttr(rbnCond+'.outColorR', self.aRbnJointList[n]+'.scaleX')
                     cmds.connectAttr(rbnCond+'.outColorR', self.aRbnJointList[n]+'.scaleZ')
+                    # create intensity attribute to drive joint with more force in horizontal:
+                    cmds.addAttr(self.middleCtrl, longName=self.langDic[self.langName]['c049_intensity'], attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+                    cmds.addAttr(self.middleFkCtrl, longName=self.langDic[self.langName]['c049_intensity'], attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
+                    jointFather = cmds.listRelatives(self.aRbnJointList[n], allParents=True)[0]
+                    intRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+str(n)+"_"+self.langDic[self.langName]['c049_intensity']+"_Rev")
+                    middleIntBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+str(n)+"_"+self.langDic[self.langName]['c049_intensity']+"_BC")
+                    middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.langDic[self.langName]['c049_intensity']+"_ParentConstraint")[0]
+                    cmds.connectAttr(self.middleFkCtrl+"."+self.langDic[self.langName]['c049_intensity'], middleIntBC+".color1R", force=True)
+                    cmds.connectAttr(self.middleCtrl+"."+self.langDic[self.langName]['c049_intensity'], middleIntBC+".color2R", force=True)
+                    cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', middleIntBC+".blender", force=True)
+                    cmds.connectAttr(middleIntBC+".outputR", middleIntPC+"."+self.middleCtrl+"W0", force=True)
+                    cmds.connectAttr(self.middleCtrl+"."+self.langDic[self.langName]['c049_intensity'], intRevNode+".inputX", force=True)
+                    cmds.connectAttr(intRevNode+".outputX", middleIntPC+"."+jointFather+"W1", force=True)
                     # fk middle control hierarchy:
                     if n == 1: #first middle
                         cmds.parent(self.middleFkCtrlZero, self.hipsFkCtrl)
@@ -457,11 +470,14 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.revNode+'.outputX', self.middleCtrlZero+".visibility", force=True)
                 
                 # finishing ikFkBlend:
+                chestACtrlShape = cmds.listRelatives(self.chestACtrl, children=True, type="shape")[0]
+                chestBCtrlShape = cmds.listRelatives(self.chestBCtrl, children=True, type="shape")[0]
                 cmds.parent(self.chestFkCtrlZero, self.middleFkCtrl)
                 self.chestCtrlGrpPC = cmds.parentConstraint(self.chestBZero, self.chestFkCtrl, self.chestBGrp, maintainOffset=True, name=self.chestBGrp+"_IkFkBlend_ParentConstraint")[0]
                 cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.chestCtrlGrpPC+"."+self.chestFkCtrl+"W1", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', self.chestCtrlGrpPC+"."+self.chestBZero+"W0", force=True)
-                cmds.connectAttr(self.revNode+'.outputX', self.chestAZero+".visibility", force=True)
+                cmds.connectAttr(self.revNode+'.outputX', chestACtrlShape+".visibility", force=True)
+                cmds.connectAttr(self.revNode+'.outputX', chestBCtrlShape+".visibility", force=True)
                 cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
                 cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
                 

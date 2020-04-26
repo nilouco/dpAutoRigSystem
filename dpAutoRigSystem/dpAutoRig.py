@@ -49,7 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.03"
+DPAR_VERSION = "3.09.04"
+DPAR_UPDATELOG = "WIP: Update Log text...\n\nUsing a new variable to store\nthe last published update info.\nIncoming feature.\nThanks!"
 
 
 
