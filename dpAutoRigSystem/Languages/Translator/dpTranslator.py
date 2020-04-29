@@ -295,7 +295,7 @@ class Translator:
         dpARTranslatorLayout = cmds.columnLayout('dpARTranslatorLayout', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent=dpARTranslatorWin2)
         cmds.separator(style='none', parent=dpARTranslatorLayout)
         langNameLayout = cmds.rowColumnLayout('langNameLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langNameTxt', label=self.langDic[self.langName]['i151_language'], parent=langNameLayout)
+        cmds.text('langNameTxt', label=self.langDic[self.langName]['i151_language']+":", parent=langNameLayout)
         cmds.text('newLangNameTxt', label=self.newLangName, parent=langNameLayout)
         # counter:
         counterLayout = cmds.rowColumnLayout('counterLayout', numberOfColumns=4, columnWidth=[(1, 70), (2, 20), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent=dpARTranslatorLayout)

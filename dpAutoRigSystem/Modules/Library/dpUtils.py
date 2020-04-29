@@ -556,7 +556,7 @@ def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
                 4 - error
                 
         if we have an update to do:
-            return [CheckedNumber, RemoteVersion]
+            return [CheckedNumber, RemoteVersion, RemoteLog]
         if not or ok:
             return [CheckedNumber, None]
     """
@@ -574,18 +574,22 @@ def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
                 remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
                 if remoteVersion == DPAR_VERSION:
                     # 0 - the current version is up to date
-                    return [0, None]
+                    return [0, None, None]
                 else:
                     # 1 - there's a new version
-                    return [1, remoteVersion]
+                    for extraLine in remoteContents:
+                        if "DPAR_UPDATELOG = " in extraLine:
+                            remoteLog = extraLine[18:-2] #these magic numbers filter only the log string sentence
+                            return [1, remoteVersion, remoteLog]
+                    return [1, remoteVersion, None]
         if not gotRemoteFile:
             # 2 - remote file not found using given raw url
-            return [2, None]
+            return [2, None, None]
     except:
         # 3 - internet connection fail (probably)
-        return [3, None]
+        return [3, None, None]
     # 4 - error
-    return [4, None]
+    return [4, None, None]
 
 
 def visitWebSite(website, *args):

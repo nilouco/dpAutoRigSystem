@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-04-17",
+    "_updated"       : "2020-04-28",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -180,7 +180,7 @@
     "i049_clearUndo"       : "Effacer l'Undo (plus vite)",
     "i050_clearUndoDesc"   : "Effacer l'undo pour calculer plus vite (recommendé).",
     "i051_removeDesc"      : "Supprimer les objets selectinées de la liste de targets.",
-    "i052_axis"            : "Axes:",
+    "i052_axis"            : "Axes",
     "i053_targetRunDesc"   : "Créer miroir de targets.",
     "i054_targetRun"       : "Faire le Miroir de Targets!",
     "i055_tgtSelect"       : "S'il vous plaît, selectione quelque géométrie pour l'adjouter dans la liste de miroir.",
@@ -279,7 +279,7 @@
     "i148_finish"          : "Terminer",
     "i149_createLanguage"  : "Creer Langue",
     "i150_languageCreated" : "Langue a été crée avec sucès!",
-    "i151_language"        : "Langue nom:",
+    "i151_language"        : "Langue nom",
     "i152_noSpecialChar"   : "N'utilise pas de caractère spécial pour ce type de phrase, s'il vous plaît.",
     "i153_presentation"    : "Présentation",
     "i154_up"              : "Haut",
@@ -299,6 +299,8 @@
 	"i168_donateDesc"      : "dpAutoRigSystem est un script en Python\nGratuit et Open Source\n partagé avec la communauté.\n\nSi vous souhaitez soutenir le développement\nvous pouvez faire un don en utilisant PayPal.\n\nMerci!",
 	"i169_startFrame"      : "Frame de Départ",
 	"i170_showControls"    : "Montrer Controleurs",
+	"i171_updateLog"       : "Log de la dernière mis à jour",
+	"i172_updateManual"    : "Si la mise à jour automatique ne fonctionne pas correctement,\ntéléchargez la dernière version\net remplacez les fichiers manuellement,\ns'il vous plaît. Merci!",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

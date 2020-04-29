@@ -356,9 +356,9 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
                         scaleGrp = cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sz'])
-                        cmds.scaleConstraint(clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_Scale")
+                        cmds.scaleConstraint(clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScaleConstraint")
                     else:
-                        cmds.scaleConstraint(clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_Scale")
+                        cmds.scaleConstraint(clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_ScaleConstraint")
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_Rbn_ArcLenShape")
                 arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]

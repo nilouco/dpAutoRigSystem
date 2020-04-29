@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.04"
-DPAR_UPDATELOG = "WIP: Update Log text...\n\nUsing a new variable to store\nthe last published update info.\nIncoming feature.\nThanks!"
+DPAR_VERSION = "3.09.05"
+DPAR_UPDATELOG = "Added update log.\nFixed naming convention."
 
 
 
@@ -1293,7 +1293,7 @@ class DP_AutoRig_UI:
         infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
         brPaypalButton = cmds.button('brlPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
-        #brPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
+        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
         # call Donate Window:
         cmds.showWindow(dpDonateWin)
     
@@ -1304,6 +1304,7 @@ class DP_AutoRig_UI:
         # declaring variables:
         self.update_checkedNumber = rawResult[0]
         self.update_remoteVersion = rawResult[1]
+        self.update_remoteLog     = rawResult[2]
         self.update_text          = text
         self.update_winWidth      = 305
         self.update_winHeight     = 300
@@ -1318,7 +1319,12 @@ class DP_AutoRig_UI:
             cmds.text("\n"+DPAR_VERSION+self.langDic[self.langName]['i090_currentVersion'], align="left", parent=updateLayout)
         if self.update_remoteVersion:
             cmds.text(self.update_remoteVersion+self.langDic[self.langName]['i091_onlineVersion'], align="left", parent=updateLayout)
-            cmds.text("\n", parent=updateLayout)
+            cmds.separator(height=30)
+            if self.update_remoteLog:
+                remoteLog = self.update_remoteLog.replace("\\n", "\n")
+                cmds.text(self.langDic[self.langName]['i171_updateLog']+":\n", align="center", parent=updateLayout)
+                cmds.text(remoteLog, align="left", parent=updateLayout)
+                cmds.separator(height=30)
             whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(utils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
             if (int(cmds.about(version=True)[:4]) < 2019) and platform.system() == "Darwin": #Maya 2018 or older on macOS
@@ -1328,6 +1334,7 @@ class DP_AutoRig_UI:
         # automatically check for updates:
         cmds.separator(height=30)
         self.autoCheckUpdateCB = cmds.checkBox('autoCheckUpdateCB', label=self.langDic[self.langName]['i092_autoCheckUpdate'], align="left", value=self.userDefAutoCheckUpdate, changeCommand=self.setAutoCheckUpdatePref, parent=updateLayout)
+        cmds.separator(height=30)
         # call Update Window:
         cmds.showWindow(dpUpdateWin)
         print self.langDic[self.langName][self.update_text]
@@ -1375,90 +1382,96 @@ class DP_AutoRig_UI:
     def installUpdate(self, url, newVersion, *args):
         """ Install the last version from the given url address to download file
         """
-        print self.langDic[self.langName]['i098_installing']
-        # declaring variables:
-        dpAR_Folder = "dpAutoRigSystem"
-        dpAR_DestFolder = utils.findPath("dpAutoRig.py")
-        
-        # progress window:
-        installAmount = 0
-        cmds.progressWindow(title=self.langDic[self.langName]['i098_installing'], progress=installAmount, status='Installing: 0%', isInterruptable=False)
-        maxInstall = 100
-        
-        try:
-            # get remote file from url:
-            remoteSource = urllib.urlopen(url)
+        btYes = self.langDic[self.langName]['i071_yes']
+        btNo = self.langDic[self.langName]['i072_no']
+        confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+        if confirmAutoInstall == btYes:
+            print self.langDic[self.langName]['i098_installing']
+            # declaring variables:
+            dpAR_Folder = "dpAutoRigSystem"
+            dpAR_DestFolder = utils.findPath("dpAutoRig.py")
             
-            installAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+            # progress window:
+            installAmount = 0
+            cmds.progressWindow(title=self.langDic[self.langName]['i098_installing'], progress=installAmount, status='Installing: 0%', isInterruptable=False)
+            maxInstall = 100
             
-            # read the downloaded Zip file stored in the RAM memory:
-            dpAR_Zip = zipfile.ZipFile(StringIO.StringIO(remoteSource.read()))
-            
-            installAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
-            
-            # list Zip file contents in order to extract them in a temporarlly folder:
-            zipNameList = dpAR_Zip.namelist()
-            for fileName in zipNameList:
-                if dpAR_Folder in fileName:
-                    dpAR_Zip.extract(fileName, dpAR_DestFolder)
-            dpAR_Zip.close()
-            
-            installAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
-            
-            # declare temporary folder:
-            dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
-            
-            # store custom presets in order to avoid overwrite them when installing the update:
-            self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
-            self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
-            
-            # pass in all files to copy them (doing the simple installation):
-            for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
-                # declare destination directory:
-                destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
+            try:
+                # get remote file from url:
+                remoteSource = urllib.urlopen(url)
                 
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
                 
-                # make sure we have all folders needed, otherwise, create them in the destination directory:
-                if not os.path.exists(destDir):
-                    os.makedirs(destDir)
+                # read the downloaded Zip file stored in the RAM memory:
+                dpAR_Zip = zipfile.ZipFile(StringIO.StringIO(remoteSource.read()))
                 
-                for dpAR_File in fileList:
-                    sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
-                    destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
-                    # if the file exists (we expect that yes) then delete it:
-                    if os.path.exists(destFile):
-                        try:
-                            os.remove(destFile)
-                        except PermissionError as exc:
-                            # use a brute force to delete without permission:
-                            os.chmod(destFile, stat.S_IWUSR)
-                            os.remove(destFile)
-                    # copy the dpAR_File:
-                    shutil.copy2(sourceFile, destDir)
+                installAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                
+                # list Zip file contents in order to extract them in a temporarlly folder:
+                zipNameList = dpAR_Zip.namelist()
+                for fileName in zipNameList:
+                    if dpAR_Folder in fileName:
+                        dpAR_Zip.extract(fileName, dpAR_DestFolder)
+                dpAR_Zip.close()
+                
+                installAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                
+                # declare temporary folder:
+                dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
+                
+                # store custom presets in order to avoid overwrite them when installing the update:
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
+                
+                # pass in all files to copy them (doing the simple installation):
+                for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
+                    # declare destination directory:
+                    destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
                     
                     installAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
-            
-            # delete the temporary folder used to download and install the update:
-            folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
-            shutil.rmtree(folderToDelete)
-            
-            # report finished update installation:
-            self.info('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
-            # closes dpUpdateWindow:
-            if cmds.window('dpUpdateWindow', query=True, exists=True):
-                cmds.deleteUI('dpUpdateWindow', window=True)
-            # reload UI in order to refresh dpAutoRigSystem:
-            self.jobReloadUI(self)
-        except:
-            # report fail update installation:
-            self.info('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
-        cmds.progressWindow(endProgress=True)        
+                    
+                    # make sure we have all folders needed, otherwise, create them in the destination directory:
+                    if not os.path.exists(destDir):
+                        os.makedirs(destDir)
+                    
+                    for dpAR_File in fileList:
+                        sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
+                        destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
+                        # if the file exists (we expect that yes) then delete it:
+                        if os.path.exists(destFile):
+                            try:
+                                os.remove(destFile)
+                            except PermissionError as exc:
+                                # use a brute force to delete without permission:
+                                os.chmod(destFile, stat.S_IWUSR)
+                                os.remove(destFile)
+                        # copy the dpAR_File:
+                        shutil.copy2(sourceFile, destDir)
+                        
+                        installAmount += 1
+                        cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                
+                # delete the temporary folder used to download and install the update:
+                folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
+                shutil.rmtree(folderToDelete)
+                
+                # report finished update installation:
+                self.info('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
+                # closes dpUpdateWindow:
+                if cmds.window('dpUpdateWindow', query=True, exists=True):
+                    cmds.deleteUI('dpUpdateWindow', window=True)
+                # reload UI in order to refresh dpAutoRigSystem:
+                self.jobReloadUI(self)
+            except:
+                # report fail update installation:
+                self.info('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
+            cmds.progressWindow(endProgress=True)        
+        else:
+            print self.langDic[self.langName]['i038_canceled']
     
     
     def setAutoCheckUpdatePref(self, currentValue, *args):
@@ -1756,8 +1769,10 @@ class DP_AutoRig_UI:
             for guideModule in self.modulesToBeRiggedList:
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
                 if not guideVersion == DPAR_VERSION:
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION, message=self.langDic[self.langName]['i127_guideVersionDif'], button=['Yes', 'No'], defaultButton='Yes', cancelButton='No', dismissString='No')
-                    if userChoose == 'No':
+                    btYes = self.langDic[self.langName]['i071_yes']
+                    btNo = self.langDic[self.langName]['i072_no']
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    if userChoose == btNo:
                         return
                     else:
                         break

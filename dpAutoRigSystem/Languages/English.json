@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-04-17",
+    "_updated"       : "2020-04-28",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -180,7 +180,7 @@
     "i049_clearUndo"       : "Clear Undo (faster)",
     "i050_clearUndoDesc"   : "Clear Undo in order to calculate faster (recommended).",
     "i051_removeDesc"      : "Remove selected objects from target list.",
-    "i052_axis"            : "Axis:",
+    "i052_axis"            : "Axis",
     "i053_targetRunDesc"   : "Create mirrored targets.",
     "i054_targetRun"       : "Do Mirror Targets!",
     "i055_tgtSelect"       : "Please, select any geometry in order to add it in the mirror list.",
@@ -279,7 +279,7 @@
     "i148_finish"          : "Finish",
     "i149_createLanguage"  : "Create Language",
     "i150_languageCreated" : "Language created with success!",
-    "i151_language"        : "Language:",
+    "i151_language"        : "Language",
     "i152_noSpecialChar"   : "Don't use special character for this type of sentence, please.",
     "i153_presentation"    : "Presentation",
     "i154_up"              : "Up",
@@ -299,6 +299,8 @@
 	"i168_donateDesc"      : "dpAutoRigSystem is a Free and Open Source\nPython script shared to community.\n\nIf you want to support the development\nyou can donate using PayPal.\n\nThank you!",
 	"i169_startFrame"      : "Start Frame",
 	"i170_showControls"    : "Show Controls",
+	"i171_updateLog"       : "Last update log",
+	"i172_updateManual"    : "If the automatic update doesn't work well,\ndownload the last version\nand replace the files manually,\nplease. Thanks!",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
