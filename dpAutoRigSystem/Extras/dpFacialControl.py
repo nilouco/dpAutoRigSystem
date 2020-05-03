@@ -292,6 +292,7 @@ class FacialControl():
                                 cmds.connectAttr(integrateTYPMA+".output1D", clp+".input.inputR", force=True)
                                 if "R_" in attr: #hack to set operation as substract in PMA node for Right side
                                     cmds.setAttr(integrateTYPMA+".operation", 2)
+                                cmds.setAttr(fCtrl+".calibrateTY", lock=True)
                             else:
                                 cmds.connectAttr(calibrateMD+".outputX", clp+".input.inputR", force=True)
                             cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)

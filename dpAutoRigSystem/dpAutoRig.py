@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.06"
-DPAR_UPDATELOG = "Quit UI in order to\nforce refresh the script\nafter install auto update."
+DPAR_VERSION = "3.09.07"
+DPAR_UPDATELOG = "Fixed Foot middle control mirror orientation bug.\nLocked calibrateTY for Sneer and Grimace."
 
 
 
