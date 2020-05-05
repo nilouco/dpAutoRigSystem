@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.07"
-DPAR_UPDATELOG = "Fixed Foot middle control mirror orientation bug.\nLocked calibrateTY for Sneer and Grimace."
+DPAR_VERSION = "3.09.08"
+DPAR_UPDATELOG = "Keep existing hierarchy setup\nif integrating to another system."
 
 
 
@@ -1611,9 +1611,10 @@ class DP_AutoRig_UI:
         self.staticGrp      = self.getBaseGrp("staticGrp", self.prefix+"Static_Grp")
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
 
-        #Arrange Hierarchy
-        pymel.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-        pymel.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
+        #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
+        if self.masterGrp.__melobject__() == sAllGrp:
+            pymel.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
+            pymel.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
         pymel.select(None)
 
         #Hide Models and FX groups
