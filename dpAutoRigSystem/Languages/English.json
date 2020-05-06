@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-04-30",
+    "_updated"       : "2020-05-05",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -259,8 +259,8 @@
     "i128_optionDegree"    : "Create guides using this curve degree.",
     "i129_createPreset"    : "Create Preset",
     "i130_presetName"      : "Preset Name:",
-    "i131_OK"              : "Ok",
-    "i132_Cancel"          : "Cancel",
+    "i131_ok"              : "Ok",
+    "i132_cancel"          : "Cancel",
     "i133_presetCreated"   : "Preset created with success!",
     "i134_rememberPublish" : "Remember to publish it on GitHub as a Collaborator\nor send the json file to a dpAutoRigSystem Developper\nin order to integrate it and share:\n\nDanilo Pinheiro - nilouco@gmail.com",
     "i135_existingName"    : "Are you sure to overwrite an existing file?",
@@ -300,8 +300,9 @@
 	"i169_startFrame"      : "Start Frame",
 	"i170_showControls"    : "Show Controls",
 	"i171_updateLog"       : "Last update log",
-	"i172_updateManual"    : "If the automatic update doesn't work well,\ndownload the last version\nand replace the files manually,\nplease. Thanks!",
+	"i172_updateManual"    : "If the automatic update doesn't work well,\ndownload the last version and replace\nthe files manually, please. Thanks!",
 	"i173_reloadScript"    : "Reload the script, please.\nWe hope you enjoy it.",
+	"i174_continue"        : "Continue",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

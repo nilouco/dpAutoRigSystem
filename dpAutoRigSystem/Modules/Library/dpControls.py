@@ -706,11 +706,11 @@ class ControlClass:
             resultDialog = cmds.promptDialog(
                                             title=self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'],
                                             message=self.dpUIinst.langDic[self.dpUIinst.langName]['i130_presetName'],
-                                            button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK'], self.dpUIinst.langDic[self.dpUIinst.langName]['i132_Cancel']],
-                                            defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK'],
-                                            cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_Cancel'],
-                                            dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_Cancel'])
-            if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_OK']:
+                                            button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok'], self.dpUIinst.langDic[self.dpUIinst.langName]['i132_cancel']],
+                                            defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok'],
+                                            cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_cancel'],
+                                            dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_cancel'])
+            if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
                 confirmSameName = self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']

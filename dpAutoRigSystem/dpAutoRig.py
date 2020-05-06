@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.08"
-DPAR_UPDATELOG = "Keep existing hierarchy setup\nif integrating to another system."
+DPAR_VERSION = "3.09.09"
+DPAR_UPDATELOG = "Enhanced auto install updated message dialog box."
 
 
 
@@ -1382,10 +1382,10 @@ class DP_AutoRig_UI:
     def installUpdate(self, url, newVersion, *args):
         """ Install the last version from the given url address to download file
         """
-        btYes = self.langDic[self.langName]['i071_yes']
-        btNo = self.langDic[self.langName]['i072_no']
-        confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
-        if confirmAutoInstall == btYes:
+        btContinue = self.langDic[self.langName]['i174_continue']
+        btCancel = self.langDic[self.langName]['i132_cancel']
+        confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
+        if confirmAutoInstall == btContinue:
             print self.langDic[self.langName]['i098_installing']
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"

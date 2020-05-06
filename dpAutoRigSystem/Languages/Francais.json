@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-04-30",
+    "_updated"       : "2020-05-05",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -259,8 +259,8 @@
     "i128_optionDegree"    : "Creer des guides avec ce degré de courbe.",
     "i129_createPreset"    : "Creer de Preset",
     "i130_presetName"      : "Preset Nom:",
-    "i131_OK"              : "Okay",
-    "i132_Cancel"          : "Canceler",
+    "i131_ok"              : "Okay",
+    "i132_cancel"          : "Canceler",
     "i133_presetCreated"   : "Preset a été crée avec sucès!",
     "i134_rememberPublish" : "Suviens-vous de publisher ça dans GitHub comme un Collaborateur\nou envoyer le fichier json a un Developpeur du dpAutoRigSystem\npour l'integrer et le partager:\n\nDanilo Pinheiro - nilouco@gmail.com",
     "i135_existingName"    : "Êtes-vous sûr de remplacer un fichier existant?",
@@ -302,6 +302,7 @@
 	"i171_updateLog"       : "Log de la dernière mis à jour",
 	"i172_updateManual"    : "Si la mise à jour automatique ne fonctionne pas correctement,\ntéléchargez la dernière version\net remplacez les fichiers manuellement,\ns'il vous plaît. Merci!",
 	"i173_reloadScript"    : "Recharger le script, s'il tu plaît.\nOn espère que tu aimes ça.",
+	"i174_continue"        : "Continuer",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

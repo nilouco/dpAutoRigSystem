@@ -157,11 +157,11 @@ class Translator:
         greetingsDialog = cmds.confirmDialog(
                                             title=self.langDic[self.langName]['t000_translator'],
                                             message=self.langDic[self.langName]['t001_greeting'],
-                                            button=[self.langDic[self.langName]['i131_OK'], self.langDic[self.langName]['i132_Cancel']],
-                                            defaultButton=self.langDic[self.langName]['i131_OK'],
-                                            cancelButton=self.langDic[self.langName]['i132_Cancel'],
-                                            dismissString=self.langDic[self.langName]['i132_Cancel'])
-        if greetingsDialog == self.langDic[self.langName]['i131_OK']:
+                                            button=[self.langDic[self.langName]['i131_ok'], self.langDic[self.langName]['i132_cancel']],
+                                            defaultButton=self.langDic[self.langName]['i131_ok'],
+                                            cancelButton=self.langDic[self.langName]['i132_cancel'],
+                                            dismissString=self.langDic[self.langName]['i132_cancel'])
+        if greetingsDialog == self.langDic[self.langName]['i131_ok']:
             self.dpGetUserInfoUI()
     
     
