@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.09"
-DPAR_UPDATELOG = "Enhanced auto install updated message dialog box."
+DPAR_VERSION = "3.09.10"
+DPAR_UPDATELOG = "Fixed lock connected attributes for Facial Controls\nin order to avoid bake animation conflict."
 
 
 

@@ -297,6 +297,7 @@ class FacialControl():
                                 cmds.connectAttr(calibrateMD+".outputX", clp+".input.inputR", force=True)
                             cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)
                             cmds.connectAttr(invMD+".outputX", fCtrl+"."+attr, force=True)
+                            cmds.setAttr(fCtrl+"."+attr, lock=True)
                         
                         # try to connect attributes into blendShape node:
                         if connectBS and self.bsNode:
