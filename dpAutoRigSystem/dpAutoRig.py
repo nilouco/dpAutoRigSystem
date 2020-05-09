@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.11"
-DPAR_UPDATELOG = "Fixed bugs:\nKeep radius and maintaing transformation\hof duplicated guides.\nFlip attribute consistency when parenting to a\nfather guide with mirror."
+DPAR_VERSION = "3.09.12"
+DPAR_UPDATELOG = "Fixed some minor bugs:\nRemoved prints for false cycle check evaluation.\nAvoid bad module building with Maya refresh."
 
 
 
@@ -1761,6 +1761,9 @@ class DP_AutoRig_UI:
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automatizate the proccess.
         """
+        # force refresh in order to avoid calculus error is creating Rig at the same time of guides:
+        cmds.refresh()
+        
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
         self.riggedModuleDic = {}
@@ -2002,7 +2005,9 @@ class DP_AutoRig_UI:
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     # do task actions in order to integrate the limb and foot:
-                                    cmds.delete(ikHandlePointConst, parentConst, scaleConst)
+                                    cmds.cycleCheck(evaluation=False)
+                                    cmds.delete(ikHandlePointConst, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandlePointConst!
+                                    cmds.cycleCheck(evaluation=True)
                                     cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
                                     #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
@@ -2027,8 +2032,6 @@ class DP_AutoRig_UI:
                                     if (int(cmds.about(version=True)[:4]) >= 2016):
                                         scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                         cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScaleConstraint")
-
-
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add float attributes and connect from ikCtrl to revFootCtrl:
@@ -2123,8 +2126,8 @@ class DP_AutoRig_UI:
 
                                     def setupFollowSpine(mainParent):
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
-                                        targetList = cmds.parentConstraint(limbIsolateFkConst, q=True, tl=True)
-                                        weightList = cmds.parentConstraint(limbIsolateFkConst, q=True, wal=True)
+                                        targetList = cmds.parentConstraint(limbIsolateFkConst, query=True, targetList=True)
+                                        weightList = cmds.parentConstraint(limbIsolateFkConst, query=True, weightAliasList=True)
                                         #Need to sort the list to ensure that the resulat are in the same
                                         #order in Maya 2014 and Maya 2016...
                                         tempList = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])
@@ -2137,18 +2140,18 @@ class DP_AutoRig_UI:
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
                                         fkCtrl = fkZeroNode.replace("_Zero", "")
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
-                                        nodeToConst = cmds.rename(nodeToConst, fkZeroNode + "_spaceSwitch")
+                                        nodeToConst = cmds.rename(nodeToConst, fkCtrl + "_SpaceSwitch_Grp")
                                         mainCtrl = cmds.listConnections(revNode + ".inputX")[0]
                                         mainNull = sideName + mainParent +"_Null"  #Ensure the name is set to prevent unbound variable problem with inner function
                                         #Replace the old constraint with a new one that will switch with the chest ctrl
-                                        cmds.delete(limbIsolateFkConst, icn=False, cn=True)
+                                        cmds.delete(limbIsolateFkConst, inputConnectionsAndNodes=False, constraints=True)
                                         #cmds.parentConstraint(targetList[1], limbIsolateFkConst, rm=True)
                                         if (not cmds.objExists(mainNull)):
                                             mainNull = cmds.group(empty=True, name=mainNull)
                                             cmds.parent(mainNull, mainParent, relative=False)
-                                            m4Fk = cmds.xform(fkCtrl, ws=True, m=True, q=True)
-                                            cmds.xform(mainNull, ws=True, m=m4Fk)
-                                        newFkConst = cmds.parentConstraint(targetList[0], mainNull, nodeToConst, skipTranslate=["x", "y", "z"], maintainOffset=True)[0]
+                                            m4Fk = cmds.xform(fkCtrl, worldSpace=True, matrix=True, query=True)
+                                            cmds.xform(mainNull, worldSpace=True, matrix=m4Fk)
+                                        newFkConst = cmds.parentConstraint(targetList[0], mainNull, nodeToConst, skipTranslate=["x", "y", "z"], maintainOffset=True, name=nodeToConst+"_ParentConstraint")[0]
                                         cmds.connectAttr(mainCtrl + "." + self.langDic[self.langName]['c032_Follow'], newFkConst + "." + targetList[0]+"W0", force=True)
                                         if (cmds.objExists(revNode)):
                                             cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)

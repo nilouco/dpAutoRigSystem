@@ -871,13 +871,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     quadExtraRotNull = cmds.group(name=quadExtraCtrl+"_AutoOrient_Null", empty=True)
                     cmds.delete(cmds.parentConstraint(quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
                     cmds.parent(quadExtraRotNull, self.ikHandleToRFGrp)
-                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, maintainOffset=True, name=quadExtraCtrlZero+"_AimConstraint")[0]
                     autoOrientRev = cmds.createNode("reverse", name=quadExtraCtrl+"_AutoOrient_Rev")
                     autoOrientConst = cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=quadExtraCtrlZero+"_ParentConstraint")[0]
                     cmds.setAttr(autoOrientConst+".interpType", 0) #noflip
                     cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientRev+".inputX", force=True)
                     cmds.connectAttr(autoOrientRev+".outputX", autoOrientConst+"."+self.ikHandleToRFGrp+"W0", force=True)
                     cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
+                    cmds.cycleCheck(evaluation=False)
+                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, maintainOffset=True, name=quadExtraCtrlZero+"_AimConstraint")[0]
+                    cmds.cycleCheck(evaluation=True)
                 
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
