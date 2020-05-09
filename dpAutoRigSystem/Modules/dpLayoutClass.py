@@ -38,7 +38,7 @@ class LayoutClass:
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
         
         # declaring the index color list to override and background color of buttons:
-         #Manually add the "none" color
+        # Manually add the "none" color
         self.colorList = [[0.627, 0.627, 0.627]]
         #WARNING --> color index in maya start to 1
         self.colorList += [cmds.colorIndex(iColor, q=True) for iColor in range(1,32)]
@@ -112,8 +112,9 @@ class LayoutClass:
     
     
     def reCreateEditSelectedModuleLayout(self, bSelect=True, *args):
-        """ Select the moduleGuide, clear the selectedModuleLayout and re-create the mirrorLayout.
+        """ Select the moduleGuide, clear the selectedModuleLayout and re-create the mirrorLayout and custom attribute layouts.
         """
+        self.fatherMirrorExists = None
         # verify the integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             # select the module to be re-build the selectedLayout:
@@ -197,7 +198,7 @@ class LayoutClass:
                     cmds.optionMenu(self.mirrorMenu, edit=True, value=initialMirror)
                     cmds.optionMenu(self.mirrorNameMenu, edit=True, value=initialMirrorName)
                     # verify if there is a mirror in a father maybe:
-                    self.checkFatherMirror()
+                    self.fatherMirrorExists = self.checkFatherMirror()
                     
                 # create Rig button:
                 self.rigButton = cmds.button(label="Rig", command=self.rigModule, backgroundColor=(1.0, 1.0, 0.7), parent=self.doubleRigColumn)
@@ -220,6 +221,8 @@ class LayoutClass:
                     cmds.text(" ", parent=self.flipLayout)
                     flipValue = cmds.getAttr(self.moduleGrp+".flip")
                     self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.flipLayout)
+                    if self.fatherMirrorExists:
+                        cmds.checkBox(self.flipCB, edit=True, enable=False)
                     
                 # create an indirectSkin layout:
                 if self.indirectSkinAttrExists:
@@ -362,6 +365,7 @@ class LayoutClass:
     def checkFatherMirror(self, *args):
         """ Check all fathers and verify if there are mirror applied to father.
             Then, stop mirror for this guide or continue creating its mirror.
+            Return "stopIt" if there's a father guide mirror.
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
@@ -380,6 +384,11 @@ class LayoutClass:
                     cmds.optionMenu(self.mirrorNameMenu, edit=True, value=fatherMirrorName, enable=False)
                 except:
                     pass
+                # update flip attribute info from fatherGuide:
+                fatherFlipExists = cmds.objExists(mirroredGuideFather+".flip")
+                if fatherFlipExists:
+                    fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
+                    cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
     

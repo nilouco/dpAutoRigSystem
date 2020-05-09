@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.10"
-DPAR_UPDATELOG = "Fixed lock connected attributes for Facial Controls\nin order to avoid bake animation conflict."
+DPAR_VERSION = "3.09.11"
+DPAR_UPDATELOG = "Fixed bugs:\nKeep radius and maintaing transformation\hof duplicated guides.\nFlip attribute consistency when parenting to a\nfather guide with mirror."
 
 
 
@@ -726,6 +726,10 @@ class DP_AutoRig_UI:
         newGuideName = cmds.ls(selection=True)[0]
         newGuideNamespace = cmds.getAttr(newGuideName+"."+MODULE_NAMESPACE_ATTR)
         
+        # reset radius as original
+        origRadius = cmds.getAttr(moduleNamespaceValue+":"+GUIDE_BASE_NAME+"_RadiusCtrl.translateX")
+        cmds.setAttr(newGuideName+"_RadiusCtrl.translateX", origRadius)
+        
         # getting a good attribute list
         toSetAttrList = cmds.listAttr(selectedItem)
         guideBaseAttrIdx = toSetAttrList.index(GUIDE_BASE_ATTR)
@@ -758,12 +762,13 @@ class DP_AutoRig_UI:
         childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
         if childrenList:
             for child in childrenList:
-                newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
-                for transfAttr in transformAttrList:
-                    try:
-                        cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
-                    except:
-                        pass
+                if not "|Guide_Base|Guide_Base" in child:
+                    newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
+                    for transfAttr in transformAttrList:
+                        try:
+                            cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
+                        except:
+                            pass
         # set transformation for Guide_Base
         for transfAttr in transformAttrList:
             cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
