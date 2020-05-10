@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.12"
-DPAR_UPDATELOG = "Fixed some minor bugs:\nRemoved prints for false cycle check evaluation.\nAvoid bad module building with Maya refresh."
+DPAR_VERSION = "3.09.13"
+DPAR_UPDATELOG = "Store Maya version.\nDisplay reverseFoot controls.\nControls keep shape visibility."
 
 
 
@@ -1590,6 +1590,7 @@ class DP_AutoRig_UI:
             self.masterGrp.setDynamicAttr('masterGrp', True)
             self.masterGrp.setDynamicAttr("date", localTime)
             # system:
+            self.masterGrp.setDynamicAttr("maya", cmds.about(version=True))
             self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION)
             # author:
             self.masterGrp.setDynamicAttr("author", getpass.getuser())
@@ -1963,9 +1964,8 @@ class DP_AutoRig_UI:
                 self.bugMessage = self.langDic[self.langName]['b000_BugGeneral']
                 
                 # integrating modules together:
-                # working with specific cases:
                 if self.integratedTaskDic:
-                    defaultAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
+                    # working with specific cases:
                     for moduleDic in self.integratedTaskDic:
                         moduleType = moduleDic[:moduleDic.find("__")]
 						
@@ -2035,11 +2035,17 @@ class DP_AutoRig_UI:
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add float attributes and connect from ikCtrl to revFootCtrl:
-                                    floatAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=True)
+                                    floatAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=True, userDefined=True)
                                     for floatAttr in floatAttrList:
-                                        if not floatAttr in defaultAttrList and not cmds.objExists(ikCtrl+'.'+floatAttr):
+                                        if not cmds.objExists(ikCtrl+'.'+floatAttr):
                                             cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
+                                    intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
+                                    for intAttr in intAttrList:
+                                        if not cmds.objExists(ikCtrl+'.'+intAttr):
+                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=1)
+                                            cmds.setAttr(ikCtrl+"."+intAttr, keyable=False, channelBox=True)
+                                            cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
                                         cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
@@ -2055,18 +2061,17 @@ class DP_AutoRig_UI:
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:
-                                floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True)
+                                floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
                                 for f, floatAttr in enumerate(floatAttrList):
                                     if f < len(floatAttrList):
-                                        if not floatAttr in defaultAttrList:
-                                            if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
-                                                currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
-                                                if floatAttr == lvvAttr:
-                                                    cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
-                                                else:
-                                                    cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
-                                            cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
-                                if not floatAttrList[len(floatAttrList)-1] in defaultAttrList and not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                                        if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
+                                            currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
+                                            if floatAttr == lvvAttr:
+                                                cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
+                                            else:
+                                                cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                                        cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+                                if not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
                                     cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
                                     cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
                                 cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
@@ -2082,9 +2087,9 @@ class DP_AutoRig_UI:
                                     for optAttr in optionCtrlAttrList:
                                         if "_IkFkBlend" in optAttr:
                                             cmds.connectAttr(self.optionCtrl+'.'+optAttr, ikFkNetworkList[w]+'.attState', force=True)
-                                    limbAttrList = cmds.listAttr(ikCtrlList[w], visible=True, scalar=True, keyable=True)
+                                    limbAttrList = cmds.listAttr(ikCtrlList[w], visible=True, scalar=True, keyable=True, userDefined=True)
                                     for limbAttr in limbAttrList:
-                                        if not limbAttr in defaultAttrList and "_" in limbAttr:
+                                        if "_" in limbAttr:
                                             cmds.connectAttr(ikCtrlList[w]+'.'+limbAttr, ikFkNetworkList[w]+'.footRollAtts['+str(netIndex)+']', force=True)
                                             netIndex = netIndex + 1
 

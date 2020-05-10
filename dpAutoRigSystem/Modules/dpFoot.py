@@ -187,6 +187,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 rfRoll = self.langDic[self.langName]['c018_RevFoot_roll']
                 rfSpin = self.langDic[self.langName]['c019_RevFoot_spin']
                 rfTurn = self.langDic[self.langName]['c020_RevFoot_turn']
+                showCtrlsAttr = self.langDic[self.langName]['c021_showControls']
 
                 # creating joints:
                 cmds.select(clear=True)
@@ -359,25 +360,32 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.setDrivenKeyframe(self.RFDZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=30, value=0, inTangentType="flat", outTangentType="flat")
                 cmds.setDrivenKeyframe(self.RFDZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=60, value=30, inTangentType="spline", outTangentType="spline")
                 cmds.setDrivenKeyframe(self.RFDZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=360, value=180, inTangentType="flat", outTangentType="flat")
-
+                
                 # organizing keyable attributes:
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)
-
+                
+                # show or hide reverseFoot controls:
+                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='long', min=0, max=1, defaultValue=1)
+                cmds.setAttr(self.footCtrl+"."+showCtrlsAttr, keyable=False, channelBox=True)
+                showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl]
+                for rfCtrl in showHideCtrlList:
+                    rfCtrlShape = cmds.listRelatives(rfCtrl, children=True, type='nurbsCurve')[0]
+                    cmds.connectAttr(self.footCtrl+"."+showCtrlsAttr, rfCtrlShape+".visibility", force=True)
+                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp = cmds.group(self.footCtrlZeroList[0], name=side+self.userGuideName+"_Control_Grp")
                 self.revFootCtrlGrpFinalList.append(self.toCtrlHookGrp)
-
+                
                 self.toScalableHookGrp = cmds.createNode("transform", name=side+self.userGuideName+"_Joint_Grp")
                 mWorldFoot = cmds.getAttr(self.footJnt+".worldMatrix")
-                cmds.xform(self.toScalableHookGrp, m=mWorldFoot, ws=True)
+                cmds.xform(self.toScalableHookGrp, matrix=mWorldFoot, worldSpace=True)
                 cmds.parent(self.footJnt, self.toScalableHookGrp, absolute=True)
                 #Remove the Joint orient to make sure the bone is at the same orientation than it's parent
                 cmds.setAttr(self.footJnt+".jointOrientX", 0)
                 cmds.setAttr(self.footJnt+".jointOrientY", 0)
                 cmds.setAttr(self.footJnt+".jointOrientZ", 0)
-                #self.toScalableHookGrp = cmds.group(self.footJnt, name=side+self.userGuideName+"_Joint_Grp")
                 self.aScalableGrp.append(self.toScalableHookGrp)
-
+                
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")

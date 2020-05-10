@@ -622,15 +622,26 @@ class ControlClass:
             if sourceShapeList:
                 if destinationList:
                     for destTransform in destinationList:
+                        needKeepVis = False
+                        sourceVis = None
                         dupSourceItem = cmds.duplicate(sourceItem)[0]
                         if applyColor:
                             self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
                         if destShapeList:
+                            # keep visibility connections if exists:
+                            for destShape in destShapeList:
+                                visConnectList = cmds.listConnections(destShape+".visibility", destination=False, source=True, plugs=True)
+                                if visConnectList:
+                                    needKeepVis = True
+                                    sourceVis = visConnectList[0]
+                                    break
                             if clearDestinationShapes:
                                 cmds.delete(destShapeList)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
+                            if needKeepVis:
+                                cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
                             cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
