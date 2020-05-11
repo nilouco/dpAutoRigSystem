@@ -115,6 +115,7 @@ class LayoutClass:
         """ Select the moduleGuide, clear the selectedModuleLayout and re-create the mirrorLayout and custom attribute layouts.
         """
         self.fatherMirrorExists = None
+        self.fatherFlipExists = None
         # verify the integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             # select the module to be re-build the selectedLayout:
@@ -222,7 +223,8 @@ class LayoutClass:
                     flipValue = cmds.getAttr(self.moduleGrp+".flip")
                     self.flipCB = cmds.checkBox(label="flip", value=flipValue, changeCommand=self.changeFlip, parent=self.flipLayout)
                     if self.fatherMirrorExists:
-                        cmds.checkBox(self.flipCB, edit=True, enable=False)
+                        if self.fatherFlipExists:
+                            cmds.checkBox(self.flipCB, edit=True, enable=False)
                     
                 # create an indirectSkin layout:
                 if self.indirectSkinAttrExists:
@@ -385,8 +387,8 @@ class LayoutClass:
                 except:
                     pass
                 # update flip attribute info from fatherGuide:
-                fatherFlipExists = cmds.objExists(mirroredGuideFather+".flip")
-                if fatherFlipExists:
+                self.fatherFlipExists = cmds.objExists(mirroredGuideFather+".flip")
+                if self.fatherFlipExists:
                     fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
                     cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
                 # returns a string 'stopIt' if there is mirrored father guide:

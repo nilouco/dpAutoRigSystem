@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-05-05",
+    "_updated"       : "2020-05-10",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -106,6 +106,8 @@
     "c092_hand"              : "Mao",
 	"c093_tryKeepUndo"       : "tentarManterUndo",
 	"c094_basket"            : "Cesta",
+	"c095_breath"            : "Respirar",
+    "c096_belly"             : "Barriga",
 	
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -303,6 +305,10 @@
 	"i172_updateManual"    : "Se a atualização automática não funcionar corretamente,\nbaixe manualmente a última versão e substitua\nos arquivos manualmente, por favor. Obrigado!",
 	"i173_reloadScript"    : "Abra novamente o script, por favor.\nEsperamos que goste.",
 	"i174_continue"        : "Continuar",
+	"i175_simple"          : "Simples",
+	"i176_complete"        : "Completo",
+	"i177_chooseMessage"   : "Qual tipo de guias você gostaria de criar?",
+	"i178_startRigging"    : "Inicia o processo de Rigging",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

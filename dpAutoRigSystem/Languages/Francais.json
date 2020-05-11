@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-05-05",
+    "_updated"       : "2020-05-10",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -106,6 +106,8 @@
     "c092_hand"              : "Main",
 	"c093_tryKeepUndo"       : "essayerMantenirUndo",
 	"c094_basket"            : "Panier",
+	"c095_breath"            : "Respirer",
+    "c096_belly"             : "Ventre",
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -303,6 +305,10 @@
 	"i172_updateManual"    : "Si la mise à jour automatique ne fonctionne pas correctement,\ntéléchargez la dernière version\net remplacez les fichiers manuellement,\ns'il vous plaît. Merci!",
 	"i173_reloadScript"    : "Recharger le script, s'il tu plaît.\nOn espère que tu aimes ça.",
 	"i174_continue"        : "Continuer",
+	"i175_simple"          : "Simple",
+	"i176_complete"        : "Complet",
+	"i177_chooseMessage"   : "Quel type de guides aimeriez-vous créer?",
+	"i178_startRigging"    : "Commence le processus de Rigging",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

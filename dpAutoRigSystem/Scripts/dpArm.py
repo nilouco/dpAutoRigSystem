@@ -42,6 +42,8 @@ def Arm(dpUIinst):
         # change name to arm:
         armLimbInstance.editUserName(armName.capitalize())
         # create finger instances:
+        thumbFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
+        thumbFingerInstance.editUserName(fingerThumbName)
         indexFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
         indexFingerInstance.editUserName(fingerIndexName)
         middleFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
@@ -50,8 +52,6 @@ def Arm(dpUIinst):
         ringFingerInstance.editUserName(fingerRingName)
         pinkyFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
         pinkyFingerInstance.editUserName(fingerPinkyName)
-        thumbFingerInstance  = dpUIinst.initGuide('dpFinger', guideDir)
-        thumbFingerInstance.editUserName(fingerThumbName)
         
         # edit arm limb guide:
         armBaseGuide = armLimbInstance.moduleGrp
@@ -66,8 +66,8 @@ def Arm(dpUIinst):
         cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+dpUIinst.langDic[dpUIinst.langName]['m007_finger']))
         
         # edit finger guides:
-        fingerInstanceList = [indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance, thumbFingerInstance]
-        fingerTZList       = [0.6, 0.2, -0.2, -0.6, 0.72]
+        fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
+        fingerTZList       = [0.72, 0.6, 0.2, -0.2, -0.6]
         for n, fingerInstance in enumerate(fingerInstanceList):
             cmds.setAttr(fingerInstance.moduleGrp+".translateX", 11)
             cmds.setAttr(fingerInstance.moduleGrp+".translateY", 16)
@@ -77,7 +77,7 @@ def Arm(dpUIinst):
             cmds.setAttr(fingerInstance.annotation+".visibility", 0)
             cmds.setAttr(fingerInstance.moduleGrp+".shapeSize", 0.3)
             
-            if n == len(fingerInstanceList)-1:
+            if n == 0:
                 # correct not commun values for thumb guide:
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".translateX", 10.1)
                 cmds.setAttr(thumbFingerInstance.moduleGrp+".rotateX", 60)
@@ -92,7 +92,7 @@ def Arm(dpUIinst):
 
         # select the armGuide_Base:
         cmds.select(armBaseGuide)
-        print dpUIinst.langDic[dpUIinst.langName]['m091_createdArm'],
+        print dpUIinst.langDic[dpUIinst.langName]['m091_createdArm']+"\n",
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

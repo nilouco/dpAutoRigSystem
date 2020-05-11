@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.13"
-DPAR_UPDATELOG = "Store Maya version.\nDisplay reverseFoot controls.\nControls keep shape visibility."
+DPAR_VERSION = "3.09.14"
+DPAR_UPDATELOG = "Integrated modules now have Simple or Complete\noption when creating guides.\nAdded breath, belly and toes in Biped.\n"
 
 
 
@@ -1760,8 +1760,9 @@ class DP_AutoRig_UI:
 
     def rigAll(self, integrate=None, *args):
         """ Create the RIG based in the Guide Modules in the scene.
-            Most important function to automatizate the proccess.
+            Most important function to automate the proccess.
         """
+        print('\ndpAutoRigSystem Log: ' + self.langDic[self.langName]['i178_startRigging'] + '...\n'),
         # force refresh in order to avoid calculus error is creating Rig at the same time of guides:
         cmds.refresh()
         
