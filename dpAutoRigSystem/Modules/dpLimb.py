@@ -416,10 +416,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 enumType = cmds.getAttr(self.moduleGrp + '.type')
                 if enumType == 0:
                     self.limbType = self.langDic[self.langName]['m028_arm']
-                    limbTypeName = ARM
+                    self.limbTypeName = ARM
                 elif enumType == 1:
                     self.limbType = self.langDic[self.langName]['m030_leg']
-                    limbTypeName = LEG
+                    self.limbTypeName = LEG
                 # getting style of the limb:
                 enumStyle = cmds.getAttr(self.moduleGrp + '.style')
                 if enumStyle == 0:
@@ -442,7 +442,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint = side + self.userGuideName + "_Guide_JointEnd"
 
                 # getting names from dic:
-                if limbTypeName == ARM:
+                if self.limbTypeName == ARM:
                     beforeName = self.langDic[self.langName]['c000_arm_before']
                     mainName = self.langDic[self.langName]['c001_arm_main']
                     cornerName = self.langDic[self.langName]['c002_arm_corner']
@@ -498,15 +498,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # Setup axis order
                     if jName == beforeName:  # Clavicle and hip
                         cmds.setAttr(fkCtrl + ".rotateOrder", 3)
-                    elif jName == extremName and limbTypeName == LEG:  # Ankle
+                    elif jName == extremName and self.limbTypeName == LEG:  # Ankle
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
-                    elif jName == extremName and limbTypeName == ARM:  # Hand
+                    elif jName == extremName and self.limbTypeName == ARM:  # Hand
                         cmds.setAttr(fkCtrl + ".rotateOrder", 4)
                     elif jName == mainName:  # Leg and Shoulder
                         cmds.setAttr(fkCtrl + ".rotateOrder", 1)
-                    elif limbTypeName == LEG:  # Other legs ctrl
+                    elif self.limbTypeName == LEG:  # Other legs ctrl
                         cmds.setAttr(fkCtrl + ".rotateOrder", 2)
-                    elif limbTypeName == ARM:  # Other arm ctrl
+                    elif self.limbTypeName == ARM:  # Other arm ctrl
                         cmds.setAttr(fkCtrl + ".rotateOrder", 5)
                     else:
                         # Let the default axis order for other ctrl (Should not happen)
@@ -613,7 +613,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # creating ik controls:
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                if self.limbType == self.langDic[self.langName]['m028_arm']:
+                if self.limbTypeName == ARM:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                     cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2)
                 else:
@@ -649,7 +649,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     if self.mirrorAxis != 'off':
                         for axis in self.mirrorAxis:
                             if axis == "X":
-                                if self.limbType == self.langDic[self.langName]['m028_arm']:
+                                if self.limbTypeName == ARM:
                                     # original guide
                                     if s == 0:
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", -90)
@@ -704,17 +704,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # creating ikHandles:
                 # verify the limb style:
                 if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                    loadedIkSpring = True
                     # verify if the ikSpringSolver plugin is loaded, if not, then load it
-                    if not cmds.pluginInfo('ikSpringSolver.mll', query=True, loaded=True):
-                        loadedIkSpring = False
-                        try:
-                            cmds.loadPlugin('ikSpringSolver.mll')
-                            loadedIkSpring = True
-                        except Exception as e:
-                            print e
-                            print self.langDic[self.langName]['e013_cantLoadIkSpringSolver']
-                            pass
+                    loadedIkSpring = utils.checkLoadedPlugin("ikSpringSolver", self.langDic[self.langName]['e013_cantLoadIkSpringSolver'])
                     if loadedIkSpring:
                         if not cmds.objExists('ikSpringSolver'):
                             cmds.createNode('ikSpringSolver', name='ikSpringSolver')
@@ -842,12 +833,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # working with autoOrient of poleVector:
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
-                if self.limbType == self.langDic[self.langName]['m028_arm']:
+                if self.limbTypeName == ARM:
                     cmds.setAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], 0)
                 if self.limbStyle == self.langDic[self.langName]['m042_default']:
                     self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp + "_OrientConstraint")[0]
                 else:  # biped, quadruped, quadSpring
-                    if self.limbType == self.langDic[self.langName]['m028_arm']:
+                    if self.limbTypeName == ARM:
                         self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp + "_OrientConstraint")[0]
                     else:  # leg
                         self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("x", "z"), maintainOffset=True, name=self.cornerGrp + "_OrientConstraint")[0]
@@ -964,7 +955,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # (James) if we use the ribbon controls we won't implement the forearm control
 
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
-                if self.limbType == self.langDic[self.langName]['m028_arm'] and self.getHasBend() == False:
+                if self.limbTypeName == ARM and self.getHasBend() == False:
                     # create forearm joint:
                     forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.langDic[self.langName][ 'c030_forearm']+self.jSufixList[0])[0]
                     utils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName][ 'c030_forearm'])
@@ -1043,7 +1034,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             :4]) < 2016):  # HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
                         if self.mirrorAxis != 'off':
                             if s == 1:  # mirrored guide
-                                if self.limbType == self.langDic[self.langName]['m030_leg']:
+                                if self.limbTypeName == LEG:
                                     for axis in self.mirrorAxis:
                                         if axis == "X":
                                             # must fix offset of the parentConstrain in the future when this will be integrated
@@ -1094,7 +1085,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(ikStretchClp + ".outputR", parentConstToRFOffset + "." + self.ikNSJointList[-2] + "W2", force=True)
 
                 # create a masterModuleGrp to be checked if this rig exists:
-                if self.limbType == self.langDic[self.langName]['m028_arm']:
+                if self.limbTypeName == ARM:
                     # (James) not implementing the forearm control if we use ribbons (yet)
                     if self.getHasBend() == True:
                         # do not use forearm control
@@ -1147,7 +1138,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             else:
                                 cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
-                            if self.limbType == self.langDic[self.langName]['m028_arm']:
+                            if self.limbTypeName == ARM:
                                 self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd)
                             else:
                                 self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd)
@@ -1174,23 +1165,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                             
                             # implementing auto rotate twist bones:
-                            # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node:
-                            loadedQuatNode = False
-                            if not cmds.pluginInfo('quatNodes.mll', query=True, loaded=True):
-                                try:
-                                    cmds.loadPlugin('quatNodes.mll')
-                                    loadedQuatNode = True
-                                except Exception as e:
-                                    print e
-                                    print self.langDic[self.langName]['e014_cantLoadQuatNode']
-                                    pass
-                            else:
-                                loadedQuatNode = True
-                            if loadedQuatNode:
+                            # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix:
+                            loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+                            loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                            if loadedQuatNode and loadedMatrixPlugin:
                                 twistBoneMD = self.bendGrps['twistBoneMD']
-                                twistBoneMM = cmds.createNode("multMatrix", name=self.skinJointList[1]+"_ExtactAngle_MM")
-                                twistBoneDM = cmds.createNode("decomposeMatrix", name=self.skinJointList[1]+"_ExtactAngle_DM")
-                                twistBoneQtE = cmds.createNode("quatToEuler", name=self.skinJointList[1]+"_ExtactAngle_QtE")
                                 shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
                                 shoulderParentLoc = cmds.spaceLocator(name=twistBoneMD+"_Parent_Loc")[0]
                                 cmds.setAttr(shoulderChildLoc+".visibility", 0)
@@ -1198,12 +1177,20 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 cmds.delete(cmds.parentConstraint(self.skinJointList[1], shoulderParentLoc, mo=False))
                                 cmds.parent(shoulderParentLoc, self.skinJointList[0])
                                 cmds.parent(shoulderChildLoc, self.skinJointList[1], relative=True)
-                                cmds.connectAttr(shoulderChildLoc+".worldMatrix[0]", twistBoneMM+".matrixIn[0]", force=True)
-                                cmds.connectAttr(shoulderParentLoc+".worldInverseMatrix[0]", twistBoneMM+".matrixIn[1]", force=True)
-                                cmds.connectAttr(twistBoneMM+".matrixSum", twistBoneDM+".inputMatrix", force=True)
-                                cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatZ", twistBoneQtE+".inputQuat.inputQuatZ", force=True);
-                                cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatW", twistBoneQtE+".inputQuat.inputQuatW", force=True);
-                                cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotateZ", twistBoneMD+".input2X", force=True)
+                                utils.twistBoneMatrix(shoulderParentLoc, shoulderChildLoc, self.skinJointList[1], twistBoneMD)
+                            
+                            # fix autoRotate flipping issue:
+                            upCtrl = self.bendGrps['ctrlList'][0]
+                            downCtrl = self.bendGrps['ctrlList'][1]
+                            if s == 0: #left
+                                if self.limbTypeName == ARM:
+                                    cmds.setAttr(upCtrl+".invert", 1)
+                                else: #leg
+                                    cmds.setAttr(upCtrl+".invert", 1)
+                                    cmds.setAttr(downCtrl+".invert", 1)
+                            else:
+                                if self.limbTypeName == ARM:
+                                    cmds.setAttr(downCtrl+".invert", 1)
                 
                 if loadedIkFkSnap:
                     # do otherCtrlList get extraCtrlList from bendy
@@ -1248,7 +1235,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 cmds.connectAttr(self.bendGrps['ctrlList'][0] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
                                 cmds.connectAttr(self.bendGrps['ctrlList'][1] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 2) + "]", force=True)
                                 cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)
-                        elif self.limbType == self.langDic[self.langName]['m028_arm']:
+                        elif self.limbTypeName == ARM:
                             cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
                 
                 # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
@@ -1304,7 +1291,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 "ikFkBlendGrpToRevFootList": self.ikFkBlendGrpToRevFootList,
                 "worldRefList": self.worldRefList,
                 "worldRefShapeList": self.worldRefShapeList,
-                "limbType": self.limbType,
+                "limbTypeName": self.limbTypeName,
                 "extremJntList": self.extremJntList,
                 "parentConstToRFOffsetList": self.parentConstToRFOffsetList,
                 "fixIkSpringSolverGrpList": self.fixIkSpringSolverGrpList,

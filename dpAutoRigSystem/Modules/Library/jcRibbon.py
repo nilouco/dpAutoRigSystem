@@ -75,6 +75,10 @@ class RibbonClass:
         
         cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
         cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
+        cmds.addAttr(upctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
+        cmds.addAttr(upctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
+        cmds.addAttr(downctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
+        cmds.addAttr(downctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
         
         if arm:
             upLimb = self.createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
@@ -105,9 +109,13 @@ class RibbonClass:
         
         cmds.delete(upLimb['constraints'][1])
         cmds.parentConstraint(elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_ParentConstraint")
+        cmds.delete(upLimb['constraints'][3])
+        cmds.pointConstraint(elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_PointConstraint")
         
         cmds.delete(downLimb['constraints'][0])
         cmds.parentConstraint(elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_ParentConstraint")
+        cmds.delete(downLimb['constraints'][2])
+        cmds.pointConstraint(elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_ParentConstraint")
         
         upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_ParentConstraint")[0]
         cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrientConstraint")
@@ -122,7 +130,6 @@ class RibbonClass:
         cmds.parentConstraint(cmds.listRelatives(downctrl, c=True)[0], downLimb['middleCtrl'], mo=True, w=1, name=downLimb['middleCtrl']+"_ParentConstraint")
         
         cmds.pointConstraint(lista[1], elbowctrl, mo=True, w=1, name=elbowctrl+"_PointConstraint")
-
         
         upJntGrp = cmds.listRelatives(upLimb['skinJointsList'][0], p=True, f=True)
         downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
@@ -175,6 +182,18 @@ class RibbonClass:
             cmds.connectAttr(elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
             cmds.connectAttr(elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
             cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
+        
+        # autoRotate by twistBone control setup:
+        if upLimb['upTwistBoneMD']:
+            cmds.connectAttr(upctrlCtrl+".autoRotate", upLimb['upTwistBoneMD']+".input1Z", force=True)
+            cmds.connectAttr(upctrlCtrl+".invert", upLimb['twistBoneCnd']+".firstTerm", force=True)
+        if upLimb['bottomTwistBoneMD']:
+            cmds.connectAttr(upctrlCtrl+".autoRotate", upLimb['bottomTwistBoneMD']+".input1Z", force=True)
+        if downLimb['upTwistBoneMD']:
+            cmds.connectAttr(downctrlCtrl+".autoRotate", downLimb['upTwistBoneMD']+".input1Z", force=True)
+            cmds.connectAttr(downctrlCtrl+".invert", downLimb['twistBoneCnd']+".firstTerm", force=True)
+        if downLimb['bottomTwistBoneMD']:
+            cmds.connectAttr(downctrlCtrl+".autoRotate", downLimb['bottomTwistBoneMD']+".input1Z", force=True)
         
         
         # WIP: not used this mirror by dpAR system because each module guide will create each own mirror
@@ -291,16 +310,20 @@ class RibbonClass:
         top_Loc.append(cmds.spaceLocator(name=name+'_Top_Pos_Loc')[0])
         top_Loc.append(cmds.spaceLocator(name=name+'_Top_Aim_Loc')[0])
         top_Loc.append(cmds.spaceLocator(name=name+'_Top_Up_Loc')[0])
+        top_Loc.append(cmds.spaceLocator(name=name+'_Top_Rot0_Loc')[0])
         #parent correctly the top locators
         cmds.parent(top_Loc[1], top_Loc[0], relative=True)
         cmds.parent(top_Loc[2], top_Loc[0], relative=True)
+        cmds.parent(top_Loc[3], top_Loc[0], relative=True)
         #create the locators for the end of the ribbon
         bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Pos_Loc')[0])
         bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Aim_Loc')[0])
         bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Up_Loc')[0])
+        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Rot0_Loc')[0])
         #parent correctly the bottom locators
         cmds.parent(bttm_Loc[1], bttm_Loc[0], relative=True)
         cmds.parent(bttm_Loc[2], bttm_Loc[0], relative=True)
+        cmds.parent(bttm_Loc[3], bttm_Loc[0], relative=True)
         
         #put the top locators in the same place of the top joint
         cmds.parent(top_Loc[0], fols[len(fols)-1], relative=True)
@@ -354,6 +377,7 @@ class RibbonClass:
         #create auxiliary joints that will be used to control the ribbon
         aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Jxt_Rot')[0])
         cmds.setAttr(aux_Jnt[0]+'.jointOrient', 0, 0, 0)
+        cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 5)
         aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_End')[0])
         
         cmds.parent(aux_Jnt[1], mid_Loc[3])
@@ -543,7 +567,7 @@ class RibbonClass:
             # update i
             i = i + 1
         
-        locatorsGrp = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], n=name+'_Loc_Grp')
+        locatorsGrp = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')
         skinJntGrp = cmds.group(rb_Jnt, n=name+'_Jnt_Grp')
         finalSystemGrp = cmds.group(ribbon, locatorsGrp, skinJntGrp, n=name+'_RibbonSystem_Grp')
         
@@ -617,10 +641,14 @@ class RibbonClass:
             bottom = guides[1]
             constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_ParentConstraint"))
             constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_ParentConstraint"))
+            cmds.delete(cmds.parentConstraint(top, bttm_Loc[3], mo=False))
+            cmds.delete(cmds.parentConstraint(bottom, top_Loc[3], mo=False))
+            constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PointConstraint"))
+            constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PointConstraint"))
         
         #fix orientation issues
         cmds.delete(ori)
-        cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrientConstraint")
+        # we'll recreate it again if we don't use twistBone case it don't load matrix plugin.
         
         #fix loc_Grp scale
         if guides:
@@ -648,12 +676,34 @@ class RibbonClass:
             cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocTwistBoneGrp+".scalePivot", bttm_LocTwistBoneGrp+".rotatePivot", absolute=True)
             twistBoneMD = cmds.createNode("multiplyDivide", name=upCtrl+"_TwistBone_MD")
             invertTwistBoneMD = cmds.createNode("multiplyDivide", name=upCtrl+"_InvertTwistBone_MD")
-            cmds.setAttr(invertTwistBoneMD+".input2X", -1)
-            cmds.connectAttr(upCtrl+".autoTwistBone", twistBoneMD+".input1X", force=True)
-            cmds.connectAttr(twistBoneMD+".outputX", invertTwistBoneMD+".input1X", force=True)
-            cmds.connectAttr(invertTwistBoneMD+".outputX", bttm_LocTwistBoneGrp+".rotateZ", force=True)
+            cmds.setAttr(invertTwistBoneMD+".input2Z", -1)
+            cmds.connectAttr(upCtrl+".autoTwistBone", twistBoneMD+".input1Z", force=True)
+            cmds.connectAttr(twistBoneMD+".outputZ", invertTwistBoneMD+".input1Z", force=True)
+            cmds.connectAttr(invertTwistBoneMD+".outputZ", bttm_LocTwistBoneGrp+".rotateZ", force=True)
             cmds.connectAttr(upCtrl+".baseTwist", bttm_LocGrp+".rotateZ", force=True)
             retDict['twistBoneMD'] = twistBoneMD
+        
+        # autoRotate:
+        loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+        if loadedQuatNode and loadedMatrixPlugin:
+            upTwistBoneMD = utils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
+            bottomTwistBoneMD = utils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bttm_TwistBone")
+            twistBonePMA = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")
+            twistBoneInvMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
+            twistBoneCnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
+            cmds.setAttr(twistBoneCnd+".colorIfTrueR", -1)
+            cmds.setAttr(twistBoneCnd+".secondTerm", 1)
+            cmds.connectAttr(twistBonePMA+".output1D", twistBoneInvMD+".input1X", force=True)
+            cmds.connectAttr(twistBoneCnd+".outColor.outColorR", twistBoneInvMD+".input2X", force=True)
+            cmds.connectAttr(upTwistBoneMD+".outputZ", twistBonePMA+".input1D[0]", force=True)
+            cmds.connectAttr(bottomTwistBoneMD+".outputZ", twistBonePMA+".input1D[1]", force=True)
+            cmds.connectAttr(twistBoneInvMD+".outputX", mid_Loc[2]+".rotateX", force=True)
+            retDict['upTwistBoneMD'] = upTwistBoneMD
+            retDict['bottomTwistBoneMD'] = bottomTwistBoneMD
+            retDict['twistBoneCnd'] = twistBoneCnd
+        else:
+            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrientConstraint")
         
         #updating values
         cmds.setAttr(rbScaleMD+".input2X", cmds.getAttr(curveInfoNode+".arcLength"))
@@ -674,7 +724,7 @@ class RibbonClass:
         cmds.setAttr(ribbonShape+'.doubleSided', 1)
         
         retDict['name'] = name
-        retDict['locsList'] = [top_Loc[0], mid_Loc[0], bttm_Loc[0]]
+        retDict['locsList'] = [top_Loc[0], mid_Loc[0], bttm_Loc[0], top_Loc[3], bttm_Loc[3]]
         retDict['skinJointsList'] =  rb_Jnt
         retDict['scaleGrp'] = locatorsGrp
         retDict['finalGrp'] = finalSystemGrp

@@ -22,7 +22,7 @@ GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
 
 
-DPFC_VERSION = "1.4"
+DPFC_VERSION = "1.5"
 
 
 class FacialControl():

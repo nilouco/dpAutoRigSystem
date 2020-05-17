@@ -415,22 +415,13 @@ class LayoutClass:
         if self.verifyGuideModuleIntegrity():
             # check if the father guide is in X=0 in order to permit mirror:
             stopMirrorOperation = self.checkFatherMirror()
-            # loading Maya matrix node (for mirror porpuses)
-            if not (cmds.pluginInfo("decomposeMatrix", query=True, loaded=True)):
-                try:
-                    # Maya 2012
-                    cmds.loadPlugin("decomposeMatrix.mll")
-                except:
-                    try:
-                        # Maya 2013 or earlier
-                        cmds.loadPlugin("matrixNodes.mll")
-                    except:
-                        print self.langDic[self.langName]['e002_decomposeMatrixNotFound']
-                        stopMirrorOperation = "stopIt"
             if not stopMirrorOperation:
-                self.mirrorAxis = item
-                cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')
-                self.createPreviewMirror()
+                # loading Maya matrix node (for mirror porpuses)
+                loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                if loadedMatrixPlugin:
+                    self.mirrorAxis = item
+                    cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')
+                    self.createPreviewMirror()
     
     
     def changeMirrorName(self, item, *args):

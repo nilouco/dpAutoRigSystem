@@ -600,6 +600,56 @@ def visitWebSite(website, *args):
     webbrowser.open(website, new=2)
     
     
+def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", *args):
+    """ Check if plugin is loaded and try to load it.
+        Returns True if ok (loaded)
+        Returns False if not found or not loaded.
+    """
+    loadedPlugin = True
+    if not (cmds.pluginInfo(pluginName, query=True, loaded=True)):
+        loadedPlugin = False
+        try:
+            # Maya 2012
+            cmds.loadPlugin(pluginName+".mll")
+            loadedPlugin = True
+        except:
+            if exceptName:
+                try:
+                    # Maya 2013 or earlier
+                    cmds.loadPlugin(exceptName+".mll")
+                    loadedPlugin = True
+                except:
+                    pass
+    if not loadedPlugin:
+        print message, pluginName
+    return loadedPlugin
+    
+    
+def twistBoneMatrix(nodeA, nodeB, twistBoneName, twistBoneMD=None, axis='Z', inverse=True, *args):
+    """ Create matrix nodes and quaternion to extract rotate.
+        nodeA = father transform node
+        nodeB = child transform node
+        Returns the final multiplyDivide node created or given.
+        Reference:
+        https://bindpose.com/maya-matrix-nodes-part-2-node-based-matrix-twist-calculator/
+    """
+    twistBoneMM = cmds.createNode("multMatrix", name=twistBoneName+"_ExtractAngle_MM")
+    twistBoneDM = cmds.createNode("decomposeMatrix", name=twistBoneName+"_ExtractAngle_DM")
+    twistBoneQtE = cmds.createNode("quatToEuler", name=twistBoneName+"_ExtractAngle_QtE")
+    cmds.connectAttr(nodeB+".worldMatrix[0]", twistBoneMM+".matrixIn[0]", force=True)
+    if inverse:
+        cmds.connectAttr(nodeA+".worldInverseMatrix[0]", twistBoneMM+".matrixIn[1]", force=True)
+    else:
+        cmds.connectAttr(nodeA+".worldMatrix[0]", twistBoneMM+".matrixIn[1]", force=True)
+    cmds.connectAttr(twistBoneMM+".matrixSum", twistBoneDM+".inputMatrix", force=True)
+    cmds.connectAttr(twistBoneDM+".outputQuat.outputQuat"+axis, twistBoneQtE+".inputQuat.inputQuat"+axis, force=True)
+    cmds.connectAttr(twistBoneDM+".outputQuat.outputQuatW", twistBoneQtE+".inputQuat.inputQuatW", force=True)
+    if twistBoneMD:
+        cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotate"+axis, twistBoneMD+".input2"+axis, force=True)
+    else:
+        twistBoneMD = cmds.createNode("multiplyDivide", name=twistBoneName+"_MD")
+        cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotate"+axis, twistBoneMD+".input2"+axis, force=True)
+    return twistBoneMD
     
 
 

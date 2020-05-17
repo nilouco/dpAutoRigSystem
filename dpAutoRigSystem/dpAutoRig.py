@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.14"
-DPAR_UPDATELOG = "Integrated modules now have Simple or Complete\noption when creating guides.\nAdded breath, belly and toes in Biped.\n"
+DPAR_VERSION = "3.09.15"
+DPAR_UPDATELOG = "Added Limb ribbon twist bones.\nBlendShape_Grp and WIP_Grp."
 
 
 
@@ -1616,11 +1616,13 @@ class DP_AutoRig_UI:
         self.fxGrp          = self.getBaseGrp("fxGrp", self.prefix+"FX_Grp")
         self.staticGrp      = self.getBaseGrp("staticGrp", self.prefix+"Static_Grp")
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
+        self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
+        self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if self.masterGrp.__melobject__() == sAllGrp:
             pymel.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-            pymel.parent(self.staticGrp, self.scalableGrp, self.dataGrp)
+            pymel.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
         pymel.select(None)
 
         #Hide Models and FX groups
@@ -2002,7 +2004,7 @@ class DP_AutoRig_UI:
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     parentConstToRFOffset = self.integratedTaskDic[fatherGuide]['parentConstToRFOffsetList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
-                                    limbType              = self.integratedTaskDic[fatherGuide]['limbType']
+                                    limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     # do task actions in order to integrate the limb and foot:
@@ -2014,7 +2016,7 @@ class DP_AutoRig_UI:
                                     #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
                                     cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ParentConstraint")[0]
                                     #cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScaleConstraint")[0]
-                                    if limbType == LEG:
+                                    if limbTypeName == LEG:
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
                                         cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
@@ -2118,7 +2120,7 @@ class DP_AutoRig_UI:
 
                                 if fatherModule == SPINE:
                                     # getting limb data:
-                                    limbType             = self.integratedTaskDic[moduleDic]['limbType']
+                                    limbTypeName         = self.integratedTaskDic[moduleDic]['limbTypeName']
                                     ikCtrlZero           = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
                                     ikPoleVectorCtrlZero = self.integratedTaskDic[moduleDic]['ikPoleVectorZeroList'][s]
                                     limbStyle            = self.integratedTaskDic[moduleDic]['limbStyle']
@@ -2167,7 +2169,7 @@ class DP_AutoRig_UI:
                                             cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
 
                                     # verifying what part will be used, the hips or chest:
-                                    if limbType == self.langDic[self.langName]['m030_leg']:
+                                    if limbTypeName == LEG:
                                         # do task actions in order to integrate the limb of leg type to rootCtrl:
                                         cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                         cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
@@ -2337,8 +2339,8 @@ class DP_AutoRig_UI:
                                 if fatherModule == LIMB and fatherGuideLoc == 'Extrem':
                                     # getting limb type:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                    limbType = self.integratedTaskDic[fatherGuide]['limbType']
-                                    if limbType == ARM:
+                                    limbTypeName = self.integratedTaskDic[fatherGuide]['limbTypeName']
+                                    if limbTypeName == ARM:
                                         origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
                                         origFrom = origFromList[-1]
                                         cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True)
