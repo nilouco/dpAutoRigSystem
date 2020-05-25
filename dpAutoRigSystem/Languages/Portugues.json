@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-05-10",
+    "_updated"       : "2020-05-24",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -108,6 +108,11 @@
 	"c094_basket"            : "Cesta",
 	"c095_breath"            : "Respirar",
     "c096_belly"             : "Barriga",
+	"c097_deformer"          : "Deformador",
+	"c098_center"            : "Centro",
+    "c099_top"               : "Cima",
+    "c100_bottom"            : "Baixo",
+    "c101_symmetry"          : "Simetria",
 	
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -164,7 +169,7 @@
     "i031_integrated"      : "Integrado",
     "i032_meshConnection"  : "Conexão de Mesh",
     "i033_notMasterGrp"    : "Não encontrado masterGrp. Por favor, selecione o Master_Ctrl para encontrar um.",
-    "i034_notSelHeadDef"   : "Selecione objetos para criar o headDeformer, normalmente usamos no blendShape Recept target ou uma lattice.",
+    "i034_notSelHeadDef"   : "Selecione objetos para criar o Head Deformer, normalmente usamos as vertices da mesh final.",
     "i035_transfData"      : "Transferido dados de vertices",
     "i036_from"            : "de",
     "i037_to"              : "para",

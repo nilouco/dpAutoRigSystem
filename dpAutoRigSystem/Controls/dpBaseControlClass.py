@@ -2,6 +2,7 @@
 import maya.cmds as cmds
 import maya.mel as mel
 from dpAutoRigSystem.Modules.Library import dpControls
+from dpAutoRigSystem.Modules.Library import dpUtils as utils
 
 
 class ControlStartClass:
@@ -26,33 +27,10 @@ class ControlStartClass:
         self.cvKnotList = None
         self.cvPeriodic = None
         self.controlsGuideDir = 'Controls'
+        self.suffix = "Ctrl"
         self.presetDic = presetDic
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-    
-    
-    def validateName(self, cvName, *args):
-        """ Check the default name in order to validate it and preserves the _Ctrl suffix naming.
-        """
-        if cmds.objExists(cvName):
-            addSuffix = False
-            if cvName.endswith("_Ctrl"):
-                addSuffix = True
-                cvName = cvName[:cvName.rfind("_")]
-            # find numering:
-            i = 1
-            if not addSuffix:
-                while cmds.objExists(cvName+str(i)):
-                    i += 1
-            else:
-                while cmds.objExists(cvName+str(i)+"_Ctrl"):
-                    i += 1
-            # add number:
-            cvName = cvName+str(i)
-            if addSuffix:
-                # restore suffix
-                cvName = cvName+"_Ctrl"
-        return cvName
     
     
     def getControlUIValues(self, cvName='', *args):
@@ -185,7 +163,7 @@ class ControlStartClass:
         # getting current selection:
         destinationList = cmds.ls(selection=True, type="transform")
         # check if the given name is good or add a sequencial number on it:
-        self.cvName = self.validateName(cvName)
+        self.cvName = utils.validateName(cvName, self.suffix)
         self.cvID = cvID
         self.cvSize = cvSize
         self.cvDegree = cvDegree
@@ -194,7 +172,7 @@ class ControlStartClass:
         self.cvAction = cvAction
         # getting UI info:
         if useUI:
-            self.getControlUIValues(cvName)
+            self.getControlUIValues(self.cvName)
         
         # combine or create curve using the parameters:
         if combine:

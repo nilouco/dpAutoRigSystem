@@ -2,7 +2,7 @@
     "_preset"     : "Default",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-03",
-    "_updated"    : "2020-04-24",
+    "_updated"    : "2020-05-24",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -71,5 +71,6 @@
 	"id_064_WheelMiddle"     : {"type" : "Ellipse",          "degree" : 3},
 	"id_065_SteeringWheel"   : {"type" : "SteeringShape",    "degree" : 3},
 	"id_066_SteeringMain"    : {"type" : "Cube",             "degree" : 1},
-    "id_067_SpineFk"         : {"type" : "Circle",           "degree" : 3}
+    "id_067_SpineFk"         : {"type" : "Circle",           "degree" : 3},
+    "id_068_Symmetry"        : {"type" : "SpitFlat",         "degree" : 3}
 }

@@ -652,6 +652,31 @@ def twistBoneMatrix(nodeA, nodeB, twistBoneName, twistBoneMD=None, axis='Z', inv
     return twistBoneMD
     
 
+def validateName(nodeName, suffix=None, *args):
+    """ Check the default name in order to validate it and preserves the suffix naming.
+        Returns the correct node name.
+    """
+    if cmds.objExists(nodeName):
+        needRestoreSuffix = False
+        if suffix:
+            if nodeName.endswith("_"+suffix):
+                needRestoreSuffix = True
+                nodeName = nodeName[:nodeName.rfind("_")]
+        # find numering:
+        i = 1
+        if not needRestoreSuffix:
+            while cmds.objExists(nodeName+str(i)):
+                i += 1
+        else:
+            while cmds.objExists(nodeName+str(i)+"_"+suffix):
+                i += 1
+        # add number:
+        nodeName = nodeName+str(i)
+        if needRestoreSuffix:
+            # restore suffix
+            nodeName = nodeName+"_"+suffix
+    return nodeName
+
 
 #Profiler decorator
 DPAR_PROFILE_MODE = False

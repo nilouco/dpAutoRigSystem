@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.15"
-DPAR_UPDATELOG = "Added Limb ribbon twist bones.\nBlendShape_Grp and WIP_Grp."
+DPAR_VERSION = "3.09.16"
+DPAR_UPDATELOG = "Improved HeadDeformer."
 
 
 
@@ -1116,8 +1116,8 @@ class DP_AutoRig_UI:
         # initialize this extraModule as an Instance:
         guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName)
         return guideInstance
-        
-        
+    
+    
     def initControlModule(self, guideModule, guideDir, *args):
         """ Call initExtraModule because it's the same code.
         """
