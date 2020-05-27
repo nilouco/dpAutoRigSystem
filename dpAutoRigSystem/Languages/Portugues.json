@@ -314,6 +314,7 @@
 	"i176_complete"        : "Completo",
 	"i177_chooseMessage"   : "Qual tipo de guias você gostaria de criar?",
 	"i178_startRigging"    : "Inicia o processo de Rigging",
+	"i179_addedHeadDef"    : "Adicionado Head Deformer com sucesso.",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

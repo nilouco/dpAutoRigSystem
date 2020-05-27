@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.1"
+DPHD_VERSION = "2.2"
 
 
 class HeadDeformer():
@@ -23,6 +23,7 @@ class HeadDeformer():
         self.presetDic = presetDic
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        self.headCtrl = None
         # call main function
         self.dpHeadDeformer(self)
     
@@ -122,15 +123,14 @@ class HeadDeformer():
                 
             # arrow control curve
             arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", headDeformerName+"_Ctrl", 0.25*bBoxSize, d=0)
-            cmds.setAttr(arrowCtrl+"Shape.overrideEnabled", 1)
-            cmds.setAttr(arrowCtrl+"Shape.overrideColor", 18)
+            
             # add control intensite and calibrate attributes
             for axis in axisList:
                 cmds.addAttr(arrowCtrl, longName=intensityName+axis, attributeType='float', defaultValue=1)
                 cmds.setAttr(arrowCtrl+"."+intensityName+axis, edit=True, keyable=False, channelBox=True)
-            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=1/bBoxSize, keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=1/(3*bBoxSize), keyable=False)
             cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=3/bBoxSize, keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=1/bBoxSize, keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=1/(3*bBoxSize), keyable=False)
             
             # multiply divide in order to intensify influences
             calibrateMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_Calibrate_MD")
@@ -170,7 +170,7 @@ class HeadDeformer():
             clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.langDic[self.langName]["c101_symmetry"]+"_Grp")
             # symmetry controls
             centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90))
-            topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0)
+            topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0))
             symmetryCtrlZeroList = utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
             for axis in axisList:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
@@ -193,25 +193,19 @@ class HeadDeformer():
             cmds.parent(symmetryCtrlZeroList, arrowCtrlGrp)
             
             # try to integrate to Head_Head_Ctrl
-            headCtrl = None
-            headCtrlList = []
             allTransformList = cmds.ls(selection=False, type="transform")
-            for item in allTransformList:
-                if cmds.objExists(item+".controlID"):
-                    if cmds.getAttr(item+".controlID") == "id_023_HeadHead":
-                        headCtrlList.append(item)
+            headCtrlList = self.ctrls.getControlNodeById("id_023_HeadHead")
             if headCtrlList:
                 if len(headCtrlList) > 1:
                     mel.eval("warning" + "\"" + self.langDic[self.langName]["i075_moreOne"] + " Head control.\"" + ";")
                 else:
-                    headCtrl = headCtrlList[0]
-            if headCtrl:
+                    self.headCtrl = headCtrlList[0]
+            if self.headCtrl:
                 # setup hierarchy
-                headCtrlPosList = cmds.xform(headCtrl, query=True, rotatePivot=True, worldSpace=True)
+                headCtrlPosList = cmds.xform(self.headCtrl, query=True, rotatePivot=True, worldSpace=True)
                 cmds.xform(dataGrp, translation=(headCtrlPosList[0], headCtrlPosList[1], headCtrlPosList[2]), worldSpace=True)
-                cmds.parentConstraint(headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ParentConstraint")
-                cmds.scaleConstraint(headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ScaleConstraint")
-                cmds.parent(arrowCtrlGrp, headCtrl)
+                cmds.parentConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ParentConstraint")
+                cmds.scaleConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ScaleConstraint")
                 # influence controls
                 toHeadDefCtrlList = []
                 for item in allTransformList:
@@ -220,21 +214,23 @@ class HeadDeformer():
                             toHeadDefCtrlList.append(item)
                         elif cmds.getAttr(item+".controlID") == "id_027_HeadLipCorner":
                             toHeadDefCtrlList.append(item)
-                headChildrenList = cmds.listRelatives(headCtrl, children=True, allDescendents=True, type="transform")
+                headChildrenList = cmds.listRelatives(self.headCtrl, children=True, allDescendents=True, type="transform")
                 if headChildrenList:
                     for item in headChildrenList:
                         if cmds.objExists(item+".controlID"):
-                            if not cmds.getAttr(item+".controlID") == "id_053_HeadDeformer":
-                                if not cmds.getAttr(item+".controlID") == "id_054_SingleMain":
-                                    if not cmds.getAttr(item+".controlID") == "id_029_SingleIndSkin":
+                            if not cmds.getAttr(item+".controlID") == "id_052_FacialFace":
+                                if not cmds.getAttr(item+".controlID") == "id_029_SingleIndSkin":
+                                    if not cmds.getAttr(item+".controlID") == "id_054_SingleMain":
                                         toHeadDefCtrlList.append(item)
-                                else:
-                                    singleMainShapeList = cmds.listRelatives(item, children=True, shapes=True)
-                                    if singleMainShapeList:
-                                        for mainShape in singleMainShapeList:
-                                            toHeadDefCtrlList.append(mainShape)
+                                    else:
+                                        singleMainShapeList = cmds.listRelatives(item, children=True, shapes=True)
+                                        if singleMainShapeList:
+                                            for mainShape in singleMainShapeList:
+                                                toHeadDefCtrlList.append(mainShape)
                 if toHeadDefCtrlList:
-                    cmds.lattice(headDeformerName+"_FFD", geometry=toHeadDefCtrlList, edit=True)
+                    for item in toHeadDefCtrlList:
+                        cmds.sets(item, include=headDeformerName+"_FFDSet")
+                cmds.parent(arrowCtrlGrp, self.headCtrl)
             
             cmds.parent(squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1], offsetGrp)
             cmds.parent(offsetGrp, clusterGrp, latticeDefList[1], latticeDefList[2], dataGrp)
@@ -249,8 +245,12 @@ class HeadDeformer():
             # try to change deformers to get better result
             cmds.scale(1.25, 1.25, 1.25, offsetGrp)
             
+            # colorize
+            self.ctrls.colorShape([arrowCtrl, centerSymmetryCtrl, topSymmetryCtrl], "cyan")
+            
             # finish selection the arrow control
             cmds.select(arrowCtrl)
+            print self.langDic[self.langName]["i179_addedHeadDef"],
         
         else:
             mel.eval("warning" + "\"" + self.langDic[self.langName]["i034_notSelHeadDef"] + "\"" + ";")

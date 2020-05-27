@@ -22,7 +22,7 @@ GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
 
 
-DPFC_VERSION = "1.5"
+DPFC_VERSION = "1.6"
 
 
 class FacialControl():
@@ -35,7 +35,7 @@ class FacialControl():
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.facialCtrlsGrp = self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp"
-        self.headCtrl = self.langDic[self.langName]["c024_head"]+"_"+self.langDic[self.langName]["c024_head"]+"_Ctrl"
+        self.headCtrl = self.dpGetHeadCtrl()
         # call main function
         self.dpFacialControlUI(self)
         self.bsNode = None
@@ -43,6 +43,14 @@ class FacialControl():
             self.dpLoadTgtList(BODY_BSNAME)
         elif cmds.objExists(HEAD_BSNAME):
             self.dpLoadTgtList(HEAD_BSNAME)
+    
+    
+    def dpGetHeadCtrl(self, *args):
+        """ Find and return the headCtrl if it exists in the scene.
+        """
+        headCtrlList = self.ctrls.getControlNodeById("id_023_HeadHead")
+        if headCtrlList:
+            return headCtrlList[0]
     
     
     def dpCloseFacialControlWin(self, *args):

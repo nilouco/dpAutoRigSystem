@@ -297,6 +297,19 @@ class ControlClass:
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
 
 
+    def getControlNodeById(self, ctrlType, *args):
+        """ Find and return node list with ctrlType in its attribute.
+        """
+        ctrlList = []
+        allTransformList = cmds.ls(selection=False, type="transform")
+        for item in allTransformList:
+            if cmds.objExists(item+".controlID"):
+                if cmds.getAttr(item+".controlID") == ctrlType:
+                    ctrlList.append(item)
+        return ctrlList
+        
+    
+    
     def getControlModuleById(self, ctrlType, *args):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.

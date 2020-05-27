@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.16"
-DPAR_UPDATELOG = "Improved HeadDeformer."
+DPAR_VERSION = "3.09.17"
+DPAR_UPDATELOG = "Improved HeadDeformer calibration.\nAdded Controls function to get node by id."
 
 
 
