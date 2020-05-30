@@ -22,7 +22,7 @@ GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
 
 
-DPFC_VERSION = "1.6"
+DPFC_VERSION = "1.7"
 
 
 class FacialControl():
@@ -181,11 +181,12 @@ class FacialControl():
         cmds.setAttr(grimaceCtrlGrp+".translateZ", 13)
         
         # integrating to dpAutoRigSystem:
-        if cmds.objExists(self.headCtrl):
-            cmds.parent(self.facialCtrlsGrp, self.headCtrl, absolute=True)
-            cmds.setAttr(self.facialCtrlsGrp+".tx", 0)
-            cmds.setAttr(self.facialCtrlsGrp+".ty", 0)
-            cmds.setAttr(self.facialCtrlsGrp+".tz", 0)
+        if self.headCtrl:
+            if cmds.objExists(self.headCtrl):
+                cmds.parent(self.facialCtrlsGrp, self.headCtrl, absolute=True)
+                cmds.setAttr(self.facialCtrlsGrp+".tx", 0)
+                cmds.setAttr(self.facialCtrlsGrp+".ty", 0)
+                cmds.setAttr(self.facialCtrlsGrp+".tz", 0)
     
         # closes window:
         self.dpCloseFacialControlWin()

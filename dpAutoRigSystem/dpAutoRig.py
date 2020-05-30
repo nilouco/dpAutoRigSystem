@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.17"
-DPAR_UPDATELOG = "Improved HeadDeformer calibration.\nAdded Controls function to get node by id."
+DPAR_VERSION = "3.09.18"
+DPAR_UPDATELOG = "Facial Controls bug fix finding head control."
 
 
 
