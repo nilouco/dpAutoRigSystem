@@ -584,10 +584,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PointConstraint")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.worldRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_ParentConstraint")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_Follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side + self.userGuideName + "_FkIsolate_Rev")
-                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_Follow'], self.fkIsolateRevNode + ".inputX", force=True)
+                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], self.fkIsolateRevNode + ".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.worldRef + "W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
@@ -849,11 +849,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # working with follow of poleVector:
                 self.cornerPoint = cmds.pointConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, maintainOffset=True, name=self.cornerGrp + "_ParentConstraint")[0]
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.cornerPointRev = cmds.createNode('reverse', name=side + self.userGuideName + "_CornerPoint_Rev")
-                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_Follow'], self.cornerPointRev + ".inputX", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_follow'], self.cornerPointRev + ".inputX", force=True)
                 cmds.connectAttr(self.cornerPointRev + '.outputX', self.cornerPoint + "." + self.cornerOrientGrp + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_Follow'], self.cornerPoint + "." + self.ikExtremCtrl + "W1", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_follow'], self.cornerPoint + "." + self.ikExtremCtrl + "W1", force=True)
 
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
@@ -1249,9 +1249,101 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         extremNumber = "15"
                     self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
-                    
-                self.extremJntList.append(self.skinJointList[-2])
                 
+                # auto clavicle:
+                # loading Maya matrix node
+                loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+                loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                if loadedQuatNode and loadedMatrixPlugin:
+                    # create auto clavicle group:
+                    self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
+                    cmds.delete(cmds.parentConstraint(self.zeroFkCtrlList[0], self.clavicleCtrlGrp, maintainOffset=False))
+                    cmds.parent(self.clavicleCtrlGrp, self.zeroFkCtrlList[0])
+                    cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
+                    # create auto clavicle attribute:
+                    cmds.addAttr(self.fkCtrlList[0], longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
+                    # ik auto clavicle locators:
+                    acIkUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Up_Loc")[0]
+                    acIkAimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Aim_Loc")[0]
+                    acOrigLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Orig_Loc")[0]
+                    acFkLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Fk_Loc")[0]
+                    acLocGrp = cmds.group(acIkUpLoc, acIkAimLoc, acOrigLoc, acFkLoc, name=side+self.userGuideName+"_AC_Loc_Grp")
+                    cmds.setAttr(acIkUpLoc+".translateY", 1)
+                    cmds.delete(cmds.parentConstraint(self.fkCtrlList[1], acLocGrp, maintainOffset=False))
+                    cmds.parent(acLocGrp, self.toScalableHookGrp)
+                    # aim constraint:
+                    cmds.aimConstraint(self.ikExtremCtrl, acIkAimLoc, maintainOffset=True, weight=1, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AimConstraint")
+                    # fk auto clavicle setup:
+                    cmds.connectAttr(self.fkCtrlList[1]+".rotateX", acFkLoc+".rotateX", force=True)
+                    cmds.connectAttr(self.fkCtrlList[1]+".rotateY", acFkLoc+".rotateY", force=True)
+                    cmds.connectAttr(self.fkCtrlList[1]+".rotateZ", acFkLoc+".rotateZ", force=True)
+                    # auto clavicle matrix rotate extraction:
+                    acIkMM = cmds.createNode("multMatrix", name=side+self.userGuideName+"_AC_Ik_MM")
+                    acIkDM = cmds.createNode("decomposeMatrix", name=side+self.userGuideName+"_AC_Ik_DM")
+                    acIkQtE = cmds.createNode("quatToEuler", name=side+self.userGuideName+"_AC_Ik_QtE")
+                    acFkMM = cmds.createNode("multMatrix", name=side+self.userGuideName+"_AC_Fk_MM")
+                    acFkDM = cmds.createNode("decomposeMatrix", name=side+self.userGuideName+"_AC_Fk_DM")
+                    acFkQtE = cmds.createNode("quatToEuler", name=side+self.userGuideName+"_AC_Fk_QtE")
+                    acBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_AC_BC")
+                    acMirrorFixMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_MirrorFix_MD")
+                    acMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_MD")
+                    # connections auto clavicle Ik:
+                    cmds.connectAttr(acOrigLoc+".worldInverseMatrix[0]", acIkMM+".matrixIn[0]", force=True)
+                    cmds.connectAttr(acIkAimLoc+".worldMatrix[0]", acIkMM+".matrixIn[1]", force=True)
+                    cmds.connectAttr(acIkMM+".matrixSum", acIkDM+".inputMatrix", force=True)
+                    cmds.connectAttr(acIkDM+".outputQuatX", acIkQtE+".inputQuatX", force=True)
+                    cmds.connectAttr(acIkDM+".outputQuatY", acIkQtE+".inputQuatY", force=True)
+                    cmds.connectAttr(acIkDM+".outputQuatZ", acIkQtE+".inputQuatZ", force=True)
+                    cmds.connectAttr(acIkDM+".outputQuatW", acIkQtE+".inputQuatW", force=True)
+                    # connections auto clavicle Fk:
+                    cmds.connectAttr(acOrigLoc+".worldInverseMatrix[0]", acFkMM+".matrixIn[0]", force=True)
+                    cmds.connectAttr(acFkLoc+".worldMatrix[0]", acFkMM+".matrixIn[1]", force=True)
+                    cmds.connectAttr(acFkMM+".matrixSum", acFkDM+".inputMatrix", force=True)
+                    cmds.connectAttr(acFkDM+".outputQuatX", acFkQtE+".inputQuatX", force=True)
+                    cmds.connectAttr(acFkDM+".outputQuatY", acFkQtE+".inputQuatY", force=True)
+                    cmds.connectAttr(acFkDM+".outputQuatZ", acFkQtE+".inputQuatZ", force=True)
+                    cmds.connectAttr(acFkDM+".outputQuatW", acFkQtE+".inputQuatW", force=True)
+                    # fk to auto clavicle blend colors:
+                    cmds.connectAttr(acFkQtE+".outputRotate.outputRotateX", acBC+".color1R", force=True)
+                    cmds.connectAttr(acFkQtE+".outputRotate.outputRotateY", acBC+".color1G", force=True)
+                    cmds.connectAttr(acFkQtE+".outputRotate.outputRotateZ", acBC+".color1B", force=True)
+                    # ik to auto clavicle blend colors:
+                    cmds.connectAttr(acIkQtE+".outputRotate.outputRotateX", acBC+".color2R", force=True)
+                    cmds.connectAttr(acIkQtE+".outputRotate.outputRotateY", acBC+".color2G", force=True)
+                    cmds.connectAttr(acIkQtE+".outputRotate.outputRotateZ", acBC+".color2B", force=True)
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"_ikFkBlend", acBC+".blender", force=True)
+                    cmds.connectAttr(acBC+".output.outputR", acMirrorFixMD+".input1X", force=True)
+                    cmds.connectAttr(acBC+".output.outputG", acMirrorFixMD+".input1Y", force=True)
+                    cmds.connectAttr(acBC+".output.outputB", acMirrorFixMD+".input1Z", force=True)
+                    cmds.connectAttr(acMirrorFixMD+".outputX", acMD+".input1X", force=True)
+                    cmds.connectAttr(acMirrorFixMD+".outputY", acMD+".input1Y", force=True)
+                    cmds.connectAttr(acMirrorFixMD+".outputZ", acMD+".input1Z", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2X", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2Y", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2Z", force=True)
+                    if self.limbTypeName == ARM:
+                        cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateZ", force=True)
+                        cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateX", force=True)
+                        cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
+                    else: #leg
+                        cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateX", force=True)
+                        cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateZ", force=True)
+                        cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
+                    if s == 0: #left side
+                        cmds.setAttr(acMirrorFixMD+".input2X", 1)
+                        cmds.setAttr(acMirrorFixMD+".input2Y", 1)
+                        cmds.setAttr(acMirrorFixMD+".input2Z", 1)
+                        if self.limbTypeName == LEG:
+                            cmds.setAttr(acMirrorFixMD+".input2Y", -1)
+                    else: #right side
+                        if self.limbTypeName == ARM:
+                            cmds.setAttr(acMirrorFixMD+".input2Y", -1)
+                        cmds.setAttr(acMirrorFixMD+".input2Z", -1)
+                    
+                    cmds.setAttr(acLocGrp+".visibility", 0)
+                
+                # integrating dics:
+                self.extremJntList.append(self.skinJointList[-2])
                 self.integrateOrigFromList.append(self.origFromList)
 
                 # add hook attributes to be read when rigging integrated modules:

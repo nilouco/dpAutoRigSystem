@@ -372,7 +372,6 @@ class RibbonClass:
                 cmds.setAttr(bttm_Loc[2]+'.translateY', 2)
                 cmds.setAttr(top_Loc[2]+'.translateY', -2)
                 cmds.setAttr(mid_Loc[3]+'.translateY', 2)
-                
         
         #create auxiliary joints that will be used to control the ribbon
         aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Jxt_Rot')[0])
@@ -702,6 +701,11 @@ class RibbonClass:
             retDict['upTwistBoneMD'] = upTwistBoneMD
             retDict['bottomTwistBoneMD'] = bottomTwistBoneMD
             retDict['twistBoneCnd'] = twistBoneCnd
+            
+            # WIP
+            # temp solution to avoid arms flipping
+            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrientConstraint")
+            
         else:
             cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrientConstraint")
         

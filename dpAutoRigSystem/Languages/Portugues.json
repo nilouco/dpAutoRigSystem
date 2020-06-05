@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-05-24",
+    "_updated"       : "2020-06-03",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -43,7 +43,7 @@
     "c029_middle"            : "Meio",
     "c030_forearm"           : "Antebraco",
     "c031_volumeVariation"   : "variacaoVolume",
-    "c032_Follow"            : "seguir",
+    "c032_follow"            : "seguir",
     "c033_autoOrient"        : "autoOrientar",
     "c034_moveIntensity"     : "moverIntensidade",
     "c035_moveStartRotation" : "moverStartRotation",
@@ -376,7 +376,7 @@
     "m058_updateRigInfoDesc"   : "Ira atualizar as listas de geometrias e controles do Master_Ctrl.",
     "m059_addHandFollow"       : "Adicionar Seguir Mão",
     "m060_addHandFollowDesc"   : "Vai adicionar atributos de seguir a mão IK em setup de bipedes",
-    "m061_stickyLips"          : "Stiky Lips",
+    "m061_stickyLips"          : "Sticky Lips",
     "m062_stickyLipsDesc"      : "Vai criar uma configuração de Labios Colados.",
     "m063_eye"                 : "Olhos",
     "m064_eyeDesc"             : "Criara a configuração dos olhos look at (mira) e tentara integrar com o controle da cabeça.\nPodemos adicionar também as pálpebras, iris e pupilas.",

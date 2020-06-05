@@ -57,11 +57,11 @@ class AddHandFollow():
         """ Create the setDrivenKey.
         """
         armWristIkCtrl = args[0]
-        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineChestACtrl+"W0", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'])
-        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.globalCtrl+"W1", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'])
-        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.rootCtrl+"W2", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'])
-        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineHipsBCtrl+"W3", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'])
-        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.headCtrl+"W4", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'])
+        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineChestACtrl+"W0", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'])
+        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.globalCtrl+"W1", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'])
+        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.rootCtrl+"W2", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'])
+        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineHipsBCtrl+"W3", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'])
+        cmds.setDrivenKeyframe(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.headCtrl+"W4", currentDriver=armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'])
     
     
     def dpDoAddHandFollow(self, *args):
@@ -72,11 +72,11 @@ class AddHandFollow():
             armWristIkCtrl = side+"_"+self.langDic[self.langName]['c037_arm']+"_"+self.langDic[self.langName]['c004_arm_extrem']+"_Ik_Ctrl"
             
             if cmds.objExists(armWristIkCtrl):
-                if cmds.objExists(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow']):
+                if cmds.objExists(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow']):
                     return
                 else:
-                    cmds.addAttr(armWristIkCtrl, ln=self.langDic[self.langName]['c032_Follow'], at="enum", en=self.defaultName+":"+self.globalName+":"+self.rootName+":"+self.hipsName+":"+self.headName+":")
-                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'], edit=True, keyable=True)
+                    cmds.addAttr(armWristIkCtrl, ln=self.langDic[self.langName]['c032_follow'], at="enum", en=self.defaultName+":"+self.globalName+":"+self.rootName+":"+self.hipsName+":"+self.headName+":")
+                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'], edit=True, keyable=True)
                     
                     parentConst = cmds.parentConstraint(self.spineChestACtrl, self.globalCtrl, self.rootCtrl, self.spineHipsBCtrl, self.headCtrl, armWristIkCtrl+"_Orient_Grp", mo=True, name=armWristIkCtrl+"_Orient_Grp_ParentConstraint")
                     
@@ -86,25 +86,25 @@ class AddHandFollow():
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.headCtrl+"W4", 0)
                     self.dpSetHandFollowSDK(armWristIkCtrl)
 
-                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'], 1)
+                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'], 1)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineChestACtrl+"W0", 0)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.globalCtrl+"W1", 1)
                     self.dpSetHandFollowSDK(armWristIkCtrl)
 
-                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'], 2)
+                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'], 2)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.globalCtrl+"W1", 0)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.rootCtrl+"W2", 1)
                     self.dpSetHandFollowSDK(armWristIkCtrl)
 
-                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'], 3)
+                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'], 3)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.rootCtrl+"W2", 0)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineHipsBCtrl+"W3", 1)
                     self.dpSetHandFollowSDK(armWristIkCtrl)
 
-                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'], 4)
+                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'], 4)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.spineHipsBCtrl+"W3", 0)
                     cmds.setAttr(armWristIkCtrl+"_Orient_Grp_ParentConstraint."+self.headCtrl+"W4", 1)
                     self.dpSetHandFollowSDK(armWristIkCtrl)
                     
-                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_Follow'], 0)
+                    cmds.setAttr(armWristIkCtrl+"."+self.langDic[self.langName]['c032_follow'], 0)
 

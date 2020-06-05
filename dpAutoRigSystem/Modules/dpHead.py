@@ -319,10 +319,10 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.zeroCtrlList[1], self.grpHeadA, absolute=True)
 
                 # connect reverseNode:
-                cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_Follow'], orientConst+"."+self.neckCtrl+"W0", force=True)
+                cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
+                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], orientConst+"."+self.neckCtrl+"W0", force=True)
                 self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_Rev")
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_Follow'], self.headRevNode+".inputX", force=True)
+                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.headRevNode+".inputX", force=True)
                 cmds.connectAttr(self.headRevNode+'.outputX', orientConst+"."+self.worldRef+"W1", force=True)
                 
                 # setup neck autoRotate:
@@ -355,10 +355,10 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # jaw follow head or root ctrl (using worldRef)
                 jawParentConst = cmds.parentConstraint(self.headCtrl, self.worldRef, self.zeroCtrlList[2], maintainOffset=True, name=self.zeroCtrlList[2]+"_ParentConstraint")[0]
                 cmds.setAttr(jawParentConst+".interpType", 2) #Shortest, no flip cause problem with scrubing
-                cmds.addAttr(self.jawCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
-                cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_Follow'], jawParentConst+"."+self.headCtrl+"W0", force=True)
+                cmds.addAttr(self.jawCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawParentConst+"."+self.headCtrl+"W0", force=True)
                 jawFollowRev = cmds.createNode("reverse", name=self.jawCtrl+"_Rev")
-                cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_Follow'], jawFollowRev+".inputX", force=True)
+                cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawFollowRev+".inputX", force=True)
                 cmds.connectAttr(jawFollowRev+".outputX", jawParentConst+"."+self.worldRef+"W1", force=True)
                 cmds.scaleConstraint(self.headCtrl, self.zeroCtrlList[2], maintainOffset=True, name=self.zeroCtrlList[2]+"_ScaleConstraint")[0]
 
@@ -404,19 +404,19 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.headCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ParentConstraint")[0]
                 cmds.setAttr(lLipParentConst+".interpType", 2)
-                cmds.addAttr(self.lLipCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
-                cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c032_Follow'], lLipParentConst+"."+self.jawCtrl+"W0", force=True)
+                cmds.addAttr(self.lLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
+                cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], lLipParentConst+"."+self.jawCtrl+"W0", force=True)
                 self.lLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c039_lip']+"_Rev")
-                cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c032_Follow'], self.lLipRevNode+".inputX", force=True)
+                cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.lLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.lLipRevNode+'.outputX', lLipParentConst+"."+self.headCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.headCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ScaleConstraint")[0]
                 # right side lip:
                 rLipParentConst = cmds.parentConstraint(self.jawCtrl, self.headCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ParentConstraint")[0]
                 cmds.setAttr(rLipParentConst+".interpType", 2)
-                cmds.addAttr(self.rLipCtrl, longName=self.langDic[self.langName]['c032_Follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
-                cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_Follow'], rLipParentConst+"."+self.jawCtrl+"W0", force=True)
+                cmds.addAttr(self.rLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
+                cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], rLipParentConst+"."+self.jawCtrl+"W0", force=True)
                 self.rLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c039_lip']+"_Rev")
-                cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_Follow'], self.rLipRevNode+".inputX", force=True)
+                cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.rLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+self.headCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.headCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScaleConstraint")[0]
                 

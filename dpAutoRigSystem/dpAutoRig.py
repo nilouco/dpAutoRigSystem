@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.18"
-DPAR_UPDATELOG = "Facial Controls bug fix finding head control."
+DPAR_VERSION = "3.09.19"
+DPAR_UPDATELOG = "Improved Limb module with auto clavicle.\nTemporary bug fixes to flipping arms ribbons.\nFixed Sticky Lips naming in json dictionaries (Thanks to Filipe Mello)."
 
 
 
@@ -2160,12 +2160,12 @@ class DP_AutoRig_UI:
                                             m4Fk = cmds.xform(fkCtrl, worldSpace=True, matrix=True, query=True)
                                             cmds.xform(mainNull, worldSpace=True, matrix=m4Fk)
                                         newFkConst = cmds.parentConstraint(targetList[0], mainNull, nodeToConst, skipTranslate=["x", "y", "z"], maintainOffset=True, name=nodeToConst+"_ParentConstraint")[0]
-                                        cmds.connectAttr(mainCtrl + "." + self.langDic[self.langName]['c032_Follow'], newFkConst + "." + targetList[0]+"W0", force=True)
+                                        cmds.connectAttr(mainCtrl + "." + self.langDic[self.langName]['c032_follow'], newFkConst + "." + targetList[0]+"W0", force=True)
                                         if (cmds.objExists(revNode)):
                                             cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
                                         else:
                                             revNode = cmds.createNode('reverse', name=sideName+fkCtrl+"_FkIsolate_Rev")
-                                            cmds.connectAttr(mainCtrl+'.'+self.langDic[self.langName]['c032_Follow'], revNode+".inputX", force=True)
+                                            cmds.connectAttr(mainCtrl+'.'+self.langDic[self.langName]['c032_follow'], revNode+".inputX", force=True)
                                             cmds.connectAttr(revNode + ".outputX", newFkConst + "." + mainNull+"W1", force=True)
 
                                     # verifying what part will be used, the hips or chest:
@@ -2281,9 +2281,9 @@ class DP_AutoRig_UI:
                                 headCtrl  = self.integratedTaskDic[fatherGuide]['headCtrlList'][0]
                                 headParentConst = cmds.parentConstraint(self.rootCtrl, headCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_ParentConstraint")[0]
                                 eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
-                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_Follow'], eyeRevNode+".inputX", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], eyeRevNode+".inputX", force=True)
                                 cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
-                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_Follow'], headParentConst+"."+headCtrl+"W1", force=True)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], headParentConst+"."+headCtrl+"W1", force=True)
                                 cmds.parent(upLocGrp, headCtrl, relative=False)
                                 cmds.setAttr(upLocGrp+".visibility", 0)
                                 # head drives eyeScaleGrp:
