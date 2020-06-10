@@ -158,34 +158,34 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
-                if self.getHasIndirectSkin():
-                    # work with curve shape and rotation cases:
-                    indirectSkinRot = (0, 0, 0)
-                    if self.langDic[self.langName]['c058_main'] in self.userGuideName:
-                        ctrlTypeID = "id_054_SingleMain"
-                        if len(sideList) > 1:
-                            if self.langDic[self.langName]['c041_eyebrow'] in self.userGuideName:
-                                indirectSkinRot = (0, 0, -90)
-                            else:
-                                indirectSkinRot = (0, 0, 90)
-                    else:
-                        ctrlTypeID = "id_029_SingleIndSkin"
-                        if self.langDic[self.langName]['c045_lower'] in self.userGuideName:
-                            indirectSkinRot=(0, 0, 180)
-                        elif self.langDic[self.langName]['c043_corner'] in self.userGuideName:
-                            if "00" in self.userGuideName:
-                                indirectSkinRot=(0, 0, 90)
-                            else:
-                                indirectSkinRot=(0, 0, -90)
-                    self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
+                if not self.getHasIndirectSkin():
+                    if self.curveDegree == 0:
+                        self.curveDegree = 1
+                # work with curve shape and rotation cases:
+                indirectSkinRot = (0, 0, 0)
+                if self.langDic[self.langName]['c058_main'] in self.userGuideName:
+                    ctrlTypeID = "id_054_SingleMain"
+                    if len(sideList) > 1:
+                        if self.langDic[self.langName]['c041_eyebrow'] in self.userGuideName:
+                            indirectSkinRot = (0, 0, -90)
+                        else:
+                            indirectSkinRot = (0, 0, 90)
                 else:
-                    self.singleCtrl = self.ctrls.cvControl("id_028_Single", side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                    ctrlTypeID = "id_029_SingleIndSkin"
+                    if self.langDic[self.langName]['c045_lower'] in self.userGuideName:
+                        indirectSkinRot=(0, 0, 180)
+                    elif self.langDic[self.langName]['c043_corner'] in self.userGuideName:
+                        if "00" in self.userGuideName:
+                            indirectSkinRot=(0, 0, 90)
+                        else:
+                            indirectSkinRot=(0, 0, -90)
+                self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
                 utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
                 # zeroOut controls:
-                zeroOutCtrlGrp = utils.zeroOut([self.singleCtrl])[0]
+                zeroOutCtrlGrp = utils.zeroOut([self.singleCtrl], offset=True)[0]
                 # hide visibility attribute:
                 cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
                 # fixing flip mirror:
@@ -234,7 +234,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_Ctrl_Zero_Grp", name=side+self.userGuideName+"_Control_Grp")
                 if self.getHasIndirectSkin():
                     locScale = cmds.spaceLocator(name=side+self.userGuideName+"_Scalable_DO_NOT_DELETE")[0]
                     cmds.setAttr(locScale+".visibility", 0)

@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.19"
-DPAR_UPDATELOG = "Improved Limb module with auto clavicle.\nTemporary bug fixes to flipping arms ribbons.\nFixed Sticky Lips naming in json dictionaries (Thanks to Filipe Mello)."
+DPAR_VERSION = "3.09.20"
+DPAR_UPDATELOG = "Improved Single to update tweaks for gaming.\nZeroOut suffix using _Grp."
 
 
 
@@ -2146,7 +2146,7 @@ class DP_AutoRig_UI:
                                                 if cmds.objectType(tmp) == 'reverse':
                                                     revNode = tmp
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
-                                        fkCtrl = fkZeroNode.replace("_Zero", "")
+                                        fkCtrl = fkZeroNode.replace("_Zero_Grp", "")
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
                                         nodeToConst = cmds.rename(nodeToConst, fkCtrl + "_SpaceSwitch_Grp")
                                         mainCtrl = cmds.listConnections(revNode + ".inputX")[0]

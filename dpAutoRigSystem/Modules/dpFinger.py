@@ -234,7 +234,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     # hide visibility attribute:
                     cmds.setAttr(self.fingerCtrl + '.visibility', keyable=False)
                     # put another group over the control in order to use this to connect values from mainFingerCtrl:
-                    self.sdkGrp = cmds.group(self.fingerCtrl, name=side + self.userGuideName + "_" + str(n) + "_SDKGrp")
+                    self.sdkGrp = cmds.group(self.fingerCtrl, name=side + self.userGuideName + "_" + str(n) + "_SDK")
                     if n == 1:
                         # change pivot of this group to control pivot:
                         pivotPos = cmds.xform(self.fingerCtrl, query=True, worldSpace=True, rotatePivot=True)
@@ -248,6 +248,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(tempDel)
                     # zeroOut controls:
                     utils.zeroOut([self.sdkGrp])
+                    cmds.rename(self.sdkGrp, self.sdkGrp+"_Grp")
                 # create end joint:
                 self.cvEndJoint = side + self.userGuideName + "_Guide_JointEnd"
                 self.endJoint = cmds.joint(name=side + self.userGuideName + "_JEnd", scaleCompensate=False)
@@ -258,7 +259,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 for n in range(0, self.nJoints + 1):
                     self.jnt = side + self.userGuideName + "_" + str(n) + "_Jnt"
                     self.fingerCtrl = side + self.userGuideName + "_" + str(n) + "_Ctrl"
-                    self.zeroCtrl = side + self.userGuideName + "_" + str(n) + "_SDKGrp_Zero"
+                    self.zeroGrp = side + self.userGuideName + "_" + str(n) + "_SDK_Zero_Grp"
                     if n > 0:
                         if n == 1:
                             if not cmds.objExists(self.fingerCtrl + '.ikFkBlend'):
@@ -275,23 +276,23 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side + self.userGuideName + "_" + str(n - 1) + "_Jnt"
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
-                        # parent zeroCtrl Group to the before ctrl:
+                        # parent zeroGrp Group to the before ctrl:
                         self.fatherCtrl = side + self.userGuideName + "_" + str(n - 1) + "_Ctrl"
-                        cmds.parent(self.zeroCtrl, self.fatherCtrl, absolute=True)
+                        cmds.parent(self.zeroGrp, self.fatherCtrl, absolute=True)
                     # freeze joints rotation
                     cmds.makeIdentity(self.jnt, apply=True)
                     # create parent and scale constraints from ctrl to jnt:
                     cmds.delete(cmds.parentConstraint(self.fingerCtrl, self.jnt, maintainOffset=False, name=self.jnt + "_ParentConstraint"))
                 # make first falange be leads from base finger control:
-                cmds.parentConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_1_SDKGrp_Zero", maintainOffset=True, name=side + self.userGuideName + "_1_SDKGrp_Zero" + "_ParentConstraint")
-                cmds.scaleConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_1_SDKGrp_Zero", maintainOffset=True, name=side + self.userGuideName + "_1_SDKGrp_Zero" + "_ScaleConstraint")
+                cmds.parentConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_1_SDK_Zero_Grp", maintainOffset=True, name=side + self.userGuideName + "_1_SDK_Zero_Grp" + "_ParentConstraint")
+                cmds.scaleConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_1_SDK_Zero_Grp", maintainOffset=True, name=side + self.userGuideName + "_1_SDK_Zero_Grp" + "_ScaleConstraint")
                 if self.nJoints != 2:
                     cmds.parentConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_0_Jnt", maintainOffset=True, name=side + self.userGuideName + "_ParentConstraint")
                     cmds.scaleConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_0_Jnt", maintainOffset=True, name=side + self.userGuideName + "_ScaleConstraint")
                 # connecting the attributes from control 1 to falanges rotate:
                 for n in range(1, self.nJoints + 1):
                     self.fingerCtrl = side + self.userGuideName + "_1_Ctrl"
-                    self.sdkGrp = side + self.userGuideName + "_" + str(n) + "_SDKGrp"
+                    self.sdkGrp = side + self.userGuideName + "_" + str(n) + "_SDK_Grp"
                     cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c022_falange'] + str(n), self.sdkGrp + ".rotateY", force=True)
                     if n > 1:
                         self.ctrlShape = cmds.listRelatives(side + self.userGuideName + "_" + str(n) + "_Ctrl", children=True, type='nurbsCurve')[0]
@@ -435,13 +436,13 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                                 cmds.connectAttr(stretchCond + ".outColorR", ikJoint + ".scaleZ", force=True)
 
                     # create a masterModuleGrp to be checked if this rig exists:
-                    self.toCtrlHookGrp = cmds.group(self.ikCtrlZero, side + self.userGuideName + "_0_SDKGrp_Zero", side + self.userGuideName + "_1_SDKGrp_Zero", name=side + self.userGuideName + "_Control_Grp")
+                    self.toCtrlHookGrp = cmds.group(self.ikCtrlZero, side + self.userGuideName + "_0_SDK_Zero_Grp", side + self.userGuideName + "_1_SDK_Zero_Grp", name=side + self.userGuideName + "_Control_Grp")
                     if self.nJoints == 2:
                         self.toScalableHookGrp = cmds.group(side + self.userGuideName + "_0_Jnt", ikBaseJoint, fkBaseJoint, ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side + self.userGuideName + "_Joint_Grp")
                     else:
                         self.toScalableHookGrp = cmds.group(side + self.userGuideName + "_0_Jnt", ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side + self.userGuideName + "_Joint_Grp")
                 else:
-                    self.toCtrlHookGrp = cmds.group(side + self.userGuideName + "_0_SDKGrp_Zero", side + self.userGuideName + "_1_SDKGrp_Zero", name=side + self.userGuideName + "_Control_Grp")
+                    self.toCtrlHookGrp = cmds.group(side + self.userGuideName + "_0_SDK_Zero_Grp", side + self.userGuideName + "_1_SDK_Zero_Grp", name=side + self.userGuideName + "_Control_Grp")
                     self.toScalableHookGrp = cmds.group(side + self.userGuideName + "_0_Jnt", name=side + self.userGuideName + "_Joint_Grp")
                 self.scalableGrpList.append(self.toScalableHookGrp)
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side + self.userGuideName + "_Grp")

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-06-03",
+    "_updated"       : "2020-06-10",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -315,6 +315,9 @@
 	"i177_chooseMessage"   : "Quel type de guides aimeriez-vous créer?",
 	"i178_startRigging"    : "Commence le processus de Rigging",
 	"i179_addedHeadDef"    : "Ajouté le Deformeur de la Têtê avec succès.",
+	"i180_indSkinAnim"     : "Indirect Skinning (Animation)",
+	"i181_jointGame"       : "Facial Joints (Gaming)",
+	"i182_facialMessage"   : "Vous voulez utiliser ça pour?",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -397,7 +400,7 @@
     "m079_nostril"             : "Narine",
     "m080_alignWorld"          : "Aligné au Monde",
     "m081_tweaks"              : "Ajustements",
-    "m082_tweaksDesc"          : "Crée des modules Single et les arrange\npour avoir une bonne configuration de Tweaks Facial\npour utiliser comment indirect skinning.",
+    "m082_tweaksDesc"          : "Crée des modules Single et les arrange\npour avoir une bonne configuration de Tweaks Facial\npour utiliser comment indirect skinning ou joints finales de la face.",
     "m083_rivet"               : "Rivet",
     "m084_rivetDesc"           : "Il va créer de setup pour le Rivet\npour faire le controleur suivir une geometrie mesh.\nOn peut l'utiliser pour les Tweaks\nsur le visage du personnage, par exemple.\n\nIl y a quelques options, comme:\nBack = pour eviter les double transformations,\nAttach transform,\nIl peut être facilement integré dans le scala de Rigs.",
     "m085_facialCtrl"          : "Facial Controleur",
@@ -411,7 +414,7 @@
     "m093_createdTweaks"       : "Créé de Guides pour les Tweaks.",
     "m094_doing"               : "En faire",
     "m095_isolate"             : "Isolé",
-    "m096_isolateDesc"         : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés.",
+    "m096_isolateDesc"         : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés\nou il va utiliser le Root_Ctrl.",
     "m097_copySkin"            : "Copier le Skin",
     "m098_copySkinDesc"        : "Celuici va copier le skinning de\nune premiere geometrie skinée pour\nles outres selectionées.",
     "m099_cvControlDesc"       : "Il va créer une curve\npour être utilisé comme controleur.",
@@ -488,6 +491,8 @@
     "m167_selAllControlsDesc"  : "Ce script va trouver la liste de controleurs\nd'un attribute dans All_Grp\net le selecionner.",
 	"m168_wichAllGrp"          : "Il y a plus d'un All_Grp dans cette scène.\nDans lequel voulez-vous sélectionner tous les contrôles?",
 	"m169_selectedCtrls"       : "Selectonné Tous les Controleurs:",
+	"m170_blendShapes"         : "Blend Shapes",
+    "m171_joints"              : "Joints",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

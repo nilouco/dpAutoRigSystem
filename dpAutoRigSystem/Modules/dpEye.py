@@ -498,7 +498,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.lUpGrpLoc, self.upLocGrp, relative=False)
                 
                 # look at aim constraint:
-                aimConst = cmds.aimConstraint(self.lookAtCtrl, self.fkEyeCtrl+"_Zero", worldUpType="object", worldUpObject=self.upLocGrp+"|"+self.lUpGrpLoc+"|"+self.lUpLoc, maintainOffset=True, name=self.fkEyeCtrl+"_Zero"+"_AimConstraint")[0]
+                aimConst = cmds.aimConstraint(self.lookAtCtrl, eyeZeroList[1], worldUpType="object", worldUpObject=self.upLocGrp+"|"+self.lUpGrpLoc+"|"+self.lUpLoc, maintainOffset=True, name=self.fkEyeCtrl+"_Zero"+"_AimConstraint")[0]
                 cmds.connectAttr(self.lookAtCtrl+".active", aimConst+"."+self.lookAtCtrl+"W0", force=True)
                 # eye aim rotation
                 cmds.addAttr(self.fkEyeCtrl, longName="aimRotation", attributeType="float", keyable=True)

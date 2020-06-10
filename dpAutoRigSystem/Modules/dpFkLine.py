@@ -231,7 +231,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 for n in range(1, self.nJoints+1):
                     self.jnt      = side+self.userGuideName+"_"+str(n)+"_Jnt"
                     self.mainCtrl     = side+self.userGuideName+"_"+str(n)+"_Ctrl"
-                    self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl_Zero"
+                    self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl_Zero_Grp"
                     if n > 1:
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side+self.userGuideName+"_"+str(n-1)+"_Jnt"
@@ -244,7 +244,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     # create scaleConstraint from mainCtrl to jnt:
                     cmds.scaleConstraint(self.mainCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_Ctrl_Zero", name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_Ctrl_Zero_Grp", name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_Jnt", name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group

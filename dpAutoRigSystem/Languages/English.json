@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-06-03",
+    "_updated"       : "2020-06-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -315,6 +315,9 @@
 	"i177_chooseMessage"   : "What kind of guides would you like to create?",
 	"i178_startRigging"    : "Start Rigging proccess",
 	"i179_addedHeadDef"    : "Added Head Deformer with success.",
+	"i180_indSkinAnim"     : "Indirect Skinning (Animation)",
+	"i181_jointGame"       : "Facial Joints (Gaming)",
+	"i182_facialMessage"   : "Do you want use it for?",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -397,7 +400,7 @@
     "m079_nostril"             : "Nostril",
     "m080_alignWorld"          : "Align World",
     "m081_tweaks"              : "Tweaks",
-    "m082_tweaksDesc"          : "Create Single modules and parent them\nin order to get a good Facial Tweaks setup\nto use as indirect skinning.",
+    "m082_tweaksDesc"          : "Create Single modules and parent them\nin order to get a good Facial Tweaks setup\nto use as indirect skinning or final facial joints.",
     "m083_rivet"               : "Rivet",
     "m084_rivetDesc"           : "Create a Rivet setup to make controls follow a geometry mesh. We can use it for Tweaks\non a character face, for example.\n\nThere are some options like:\nBack = to avoid double transformations,\nAttach transform,\nAnd it can be easly integrated to scalable Rigs.",
     "m085_facialCtrl"          : "Facial Control",
@@ -411,7 +414,7 @@
     "m093_createdTweaks"       : "Created Tweaks Guides.",
     "m094_doing"               : "Doing",
     "m095_isolate"             : "Isolate",
-    "m096_isolateDesc"         : "This script will create an Isolate setup.\nNeed 3 nodes selected.",
+    "m096_isolateDesc"         : "This script will create an Isolate setup.\nNeed 3 nodes selected\nor it'll use the Root_Ctrl.",
     "m097_copySkin"            : "Copy Skin",
     "m098_copySkinDesc"        : "This script will copy the skinning from\nthe first selected and skinned geometry\nto the others selected.",
     "m099_cvControlDesc"       : "This class will create a curve shape\nin order to be used as a control.",
@@ -487,7 +490,9 @@
     "m166_selAllControls"      : "Select All Controls",
     "m167_selAllControlsDesc"  : "This script will find the list of controls\nfrom an attribute in All_Grp\nand select them.",
     "m168_wichAllGrp"          : "There are more than one All_Grp in this scene.\nFrom which one do you want to select all controls?",
-    "m169_selectedCtrls"       : "Selected All Controls:",
+	"m169_selectedCtrls"       : "Sellected All Controls:",
+    "m170_blendShapes"         : "Blend Shapes",
+    "m171_joints"              : "Joints",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

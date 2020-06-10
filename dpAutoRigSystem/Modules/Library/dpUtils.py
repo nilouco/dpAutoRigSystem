@@ -213,9 +213,10 @@ def useDefaultRenderLayer():
         cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 
-def zeroOut(transformList=[]):
+def zeroOut(transformList=[], offset=False):
     """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
         If don't have a transformList given, try to get the current selection.
+        If want to create with offset, it'll be a, offset group between zeroGrp and transform.
         Return a list of names of the zeroOut groups.
     """
     zeroList = []
@@ -223,19 +224,24 @@ def zeroOut(transformList=[]):
         transformList = cmds.ls(selection=True)
     if transformList:
         for transform in transformList:
-            zero = cmds.duplicate(transform, name=transform+'_Zero')[0]
-            zeroUserAttrList = cmds.listAttr(zero, userDefined=True)
+            zeroGrp = cmds.duplicate(transform, name=transform+'_Zero_Grp')[0]
+            zeroUserAttrList = cmds.listAttr(zeroGrp, userDefined=True)
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:
                     try:
-                        cmds.deleteAttr(zero+"."+zUserAttr)
+                        cmds.deleteAttr(zeroGrp+"."+zUserAttr)
                     except:
                         pass
-            allChildrenList = cmds.listRelatives(zero, allDescendents=True, children=True, fullPath=True)
+            allChildrenList = cmds.listRelatives(zeroGrp, allDescendents=True, children=True, fullPath=True)
             if allChildrenList:
                 cmds.delete(allChildrenList)
-            cmds.parent(transform, zero, absolute=True)
-            zeroList.append(zero)
+            if offset:
+                offsetGrp = cmds.duplicate(zeroGrp, name=transform+'_Offset_Grp')[0]
+                cmds.parent(transform, offsetGrp, absolute=True)
+                cmds.parent(offsetGrp, zeroGrp, absolute=True)
+            else:
+                cmds.parent(transform, zeroGrp, absolute=True)
+            zeroList.append(zeroGrp)
     return zeroList
 
 

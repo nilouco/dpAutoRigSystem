@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-06-03",
+    "_updated"       : "2020-06-10",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -315,6 +315,9 @@
 	"i177_chooseMessage"   : "Qual tipo de guias você gostaria de criar?",
 	"i178_startRigging"    : "Inicia o processo de Rigging",
 	"i179_addedHeadDef"    : "Adicionado Head Deformer com sucesso.",
+	"i180_indSkinAnim"     : "Indirect Skinning (Animação)",
+	"i181_jointGame"       : "Facial Joints (Gaming)",
+	"i182_facialMessage"   : "Você quer usar isso para para?",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -397,7 +400,7 @@
     "m079_nostril"             : "Narina",
     "m080_alignWorld"          : "Alinhar Mundo",
     "m081_tweaks"              : "Ajustes",
-    "m082_tweaksDesc"          : "Cria modulos Single e os parenteia\npara ter um bom setup de Tweaks Faciais\npara ser usado como indirect skinning.",
+    "m082_tweaksDesc"          : "Cria modulos Single e os parenteia\npara ter um bom setup de Tweaks Faciais\npara ser usado como indirect skinning ou joints finais faciais.",
     "m083_rivet"               : "Rebite",
     "m084_rivetDesc"           : "Cria o setup de Rivet para fazer controles seguirem a mesh da geometria.\nPodemos usar para os Tweaks\nna face de um personagem, por exemplo.\n\nExistem algumas opções como:\nBack = para evitar a dupla transformação,\nAttach transform,\nE ele pode ser facilmente integrado a escala de Rigs.",
     "m085_facialCtrl"          : "Facial Controle",
@@ -411,7 +414,7 @@
     "m093_createdTweaks"       : "Criado Guias para Tweaks.",
     "m094_doing"               : "Fazendo",
     "m095_isolate"             : "Isolar",
-    "m096_isolateDesc"         : "Esse script vai criar um setup de Isolação.\nPrecisa ter 3 nodes seleccionados.",
+    "m096_isolateDesc"         : "Esse script vai criar um setup de Isolação.\nPrecisa ter 3 nodes selecionados\nou sera criado usando o Root_Ctrl.",
     "m097_copySkin"            : "Copiar Skin",
     "m098_copySkinDesc"        : "Esse script vai copiar o skinning de\numa primeira geometria skinada para\nas outras selecionadas em seguida.",
     "m099_cvControlDesc"       : "Essa classe irá criar um shape de curva\npara ser usado como controle.",
@@ -488,6 +491,8 @@
     "m167_selAllControlsDesc"  : "Esse script vai encontrar uma lista de controles\nno All_Grp e seleciona-los.",
 	"m168_wichAllGrp"          : "Tem mais de um All_Grp nessa cena.\nDe qual você quer selecionar todos os controles?",
 	"m169_selectedCtrls"       : "Selecionado Todos os Controles:",
+	"m170_blendShapes"         : "Blend Shapes",
+    "m171_joints"              : "Joints",
 	
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
