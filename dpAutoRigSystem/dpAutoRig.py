@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.20"
-DPAR_UPDATELOG = "Improved Single to update tweaks for gaming.\nZeroOut suffix using _Grp."
+DPAR_VERSION = "3.09.21"
+DPAR_UPDATELOG = "WIP: Facial Control 1.8"
 
 
 
@@ -1592,6 +1592,8 @@ class DP_AutoRig_UI:
             # system:
             self.masterGrp.setDynamicAttr("maya", cmds.about(version=True))
             self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION)
+            self.masterGrp.setDynamicAttr("language", self.langName)
+            self.masterGrp.setDynamicAttr("preset", self.presetName)
             # author:
             self.masterGrp.setDynamicAttr("author", getpass.getuser())
             # rig info to be updated:
