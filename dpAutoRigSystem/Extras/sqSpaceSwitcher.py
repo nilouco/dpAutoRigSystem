@@ -765,7 +765,7 @@ class SpaceSwitcherDialog(QtWidgets.QMainWindow):
                                 iParentIdx = self.pSelSpSys.aDrivers.index(self.aSelDrivers[0])
 
                                 pIdx = self.ui.lstParent.model().createIndex(iParentIdx + 1, 0)
-                                self.ui.lstParent.selectionModel().select(pIdx, QtWidgets.QItemSelectionModel.Select)
+                                self.ui.lstParent.selectionModel().select(pIdx, QtCore.QItemSelectionModel.Select)
                             else:
                                 self._set_mode_info(Mode.Add, True)
                     else:
@@ -776,7 +776,7 @@ class SpaceSwitcherDialog(QtWidgets.QMainWindow):
                         else:
                             self._set_mode_info(Mode.SwitchSelect, True)
                             pIdx = self.ui.lstParent.model().createIndex(0, 0)
-                            self.ui.lstParent.selectionModel().select(pIdx, QtWidgets.QItemSelectionModel.Select)
+                            self.ui.lstParent.selectionModel().select(pIdx, QtCore.QItemSelectionModel.Select)
 
             else:
                 self._update_info(None)
@@ -918,7 +918,7 @@ class SpaceSwitcherDialog(QtWidgets.QMainWindow):
             self.ui.lstParent.setEnabled(True)
             self.createModel.appendRow(self.parentItem)
             for iIdx, nParentInfo in enumerate(pSpData.aDrivers):
-                newParentItem = QtWidgets.QStandardItem(nParentInfo.name())
+                newParentItem = QtGui.QStandardItem(nParentInfo.name())
                 newParentItem.setEditable(False)
                 # Prevent any delete action when the sysem is referenced
                 if pymel.referenceQuery(self.pSelSpSys.nSwConst, isNodeReferenced=True):

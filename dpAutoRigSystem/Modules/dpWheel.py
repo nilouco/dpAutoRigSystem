@@ -192,12 +192,21 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 
                 # create a joint:
                 cmds.select(clear=True)
+                # center joint:
                 self.centerJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.centerJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 utils.setJointLabel(self.centerJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel'])
                 # create end joint:
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_JEnd")
+                # main joint:
+                cmds.select(clear=True)
+                self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Jnt", scaleCompensate=False)
+                cmds.addAttr(self.mainJoint, longName='dpAR_joint', attributeType='float', keyable=False)
+                # joint labelling:
+                utils.setJointLabel(self.mainJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c058_main'])
+                # create end joint:
+                self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_JEnd")
                 
                 # create controls:
                 self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
@@ -223,6 +232,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.endJoint, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.wheelCtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.mainCtrl, maintainOffset=False))
+                cmds.parentConstraint(self.mainCtrl, self.mainJoint, maintainOffset=False)
+                cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.mainEndJoint, maintainOffset=False))
                 if s == 1 and cmds.getAttr(self.moduleGrp+".flip") == 1:
                     cmds.move(self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 else:
@@ -246,6 +257,9 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.wheelCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
                 cmds.setAttr(self.wheelCtrl+".scaleCompensate", 1, channelBox=True)
                 cmds.connectAttr(self.wheelCtrl+".scaleCompensate", self.centerJoint+".segmentScaleCompensate", force=True)
+                cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                cmds.setAttr(self.mainCtrl+".scaleCompensate", 1, channelBox=True)
+                cmds.connectAttr(self.mainCtrl+".scaleCompensate", self.mainJoint+".segmentScaleCompensate", force=True)
                 # hide visibility attributes:
                 self.ctrls.setLockHide([self.mainCtrl, self.insideCtrl, self.outsideCtrl], ['v'])
                 self.ctrls.setLockHide([self.wheelCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v'])
@@ -398,7 +412,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(zeroGrpList[2], name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.centerJoint, defGrp, name=side+self.userGuideName+"_Joint_Grp")
+                self.toScalableHookGrp = cmds.group(self.centerJoint, self.mainJoint, defGrp, name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder, name=side+self.userGuideName+"_Grp")
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')

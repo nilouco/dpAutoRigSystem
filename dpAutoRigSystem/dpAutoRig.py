@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.21"
-DPAR_UPDATELOG = "WIP: Facial Control 1.8"
+DPAR_VERSION = "3.09.22"
+DPAR_UPDATELOG = "Fixed sqSpaceSwith Qt module.\nImproved dpWheel with new base main joint."
 
 
 
