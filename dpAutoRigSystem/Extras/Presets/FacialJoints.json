@@ -1,0 +1,625 @@
+{
+"BrowFrown" : {
+				"MIDDLE" : {
+							"eyebrowMiddleName" : {
+														"ty" : [0, -1.2],
+														"tz" : [0, 0.5]
+														}
+						  },
+				"SIDED" : {
+							"eyebrowName1" : {
+													"tx" : [0, -1.8],
+													"ty" : [0, -2.5],
+													"tz" : [0, 0.8],
+													"rz" : [0, 15.5]
+													},
+							"eyebrowName2" : {
+													"tx" : [0, -0.8],
+													"ty" : [0, 0.68],
+													"tz" : [0, 0.2],
+													"rz" : [0, 9.1]
+													},
+							"eyebrowName3" : {
+													"tx" : [0, 0.2],
+													"ty" : [0, 0.54]
+													}
+						}
+			  },
+"BrowSad" : {
+				"MIDDLE" : {
+							"eyebrowMiddleName" : {
+														"ty" : [0, 0.8],
+														"tz" : [0, 0.2]
+														}
+						  },
+				"SIDED" : {
+							"eyebrowName1" : {
+													"tx" : [0, -2.0],
+													"ty" : [0, 3.0],
+													"tz" : [0, 0.4],
+													"rz" : [0, -9.3]
+													},
+							"eyebrowName2" : {
+													"tx" : [0, -0.96],
+													"ty" : [0, 0.06],
+													"tz" : [0, 0.16]
+													},
+							"eyebrowName3" : {
+													"ty" : [0, -0.5]
+													}
+						}
+			 },
+"BrowDown" : {
+				"MIDDLE" : {
+							"eyebrowMiddleName" : {
+														"ty" : [0, -0.4],
+														"tz" : [0, 0.4]
+														}
+						  },
+				"SIDED" : {
+							"eyebrowName1" : {
+													"ty" : [0, -1.76],
+													"tz" : [0, 0.76]
+													},
+							"eyebrowName2" : {
+													"ty" : [0, -2.52],
+													"tz" : [0, 1.08]
+													},
+							"eyebrowName3" : {
+													"ty" : [0, -1.76],
+													"tz" : [0, 0.76]
+													}
+						}
+			 },
+"BrowUp" : {
+				"MIDDLE" : {
+							"eyebrowMiddleName" : {
+														"ty" : [0, 1.0],
+														"tz" : [0, -0.3]
+														}
+						  },
+				"SIDED" : {
+							"eyebrowName1" : {
+													"ty" : [0, 4.0],
+													"tz" : [0, -0.6]
+													},
+							"eyebrowName2" : {
+													"ty" : [0, 4.0],
+													"tz" : [0, -0.6]
+													},
+							"eyebrowName3" : {
+													"ty" : [0, 4.0],
+													"tz" : [0, -0.6]
+													}
+						}
+			 },
+"MouthNarrow" : {
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, -1.42],
+													"tz" : [0, 0.26]
+													},
+							"upperLipName2" : {
+													"tx" : [0, -3.28],
+													"tz" : [0, 0.16]
+													},
+							"lowerLipName1" : {
+													"tx" : [0, -1.42],
+													"tz" : [0, 0.26]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, -3.28],
+													"tz" : [0, 0.16]
+													},
+							"lipCornerName" : {
+													"tx" : [0, -4.56],
+													"tz" : [0, 0.02]
+													}
+						}
+			 },
+"MouthWide" : {
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, 2.72],
+													"tz" : [0, -0.24]
+													},
+							"upperLipName2" : {
+													"tx" : [0, 4.56],
+													"tz" : [0, -0.84]
+													},
+							"lowerLipName1" : {
+													"tx" : [0, 2.72],
+													"tz" : [0, -0.24]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, 4.56],
+													"tz" : [0, -0.84]
+													},
+							"lipCornerName" : {
+													"tx" : [0, 6.62],
+													"tz" : [0, -1.58]
+													},
+							"cheekName1" :    {
+													"tx" : [0, 2.26],
+													"tz" : [0, -1.18]
+												 }
+						}
+			 },
+"MouthSad" : {
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, -0.96],
+													"rz" : [0, -7.6]
+													},
+							"upperLipName2" : {
+													"ty" : [0, -1.62],
+													"tz" : [0, 0.3],
+													"rz" : [0, -16.1]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, -0.96],
+													"rz" : [0, -7.6]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, -1.62],
+													"tz" : [0, 0.3],
+													"rz" : [0, -16.1]
+													},
+							"lipCornerName" : {
+													"ty" : [0, -3.5],
+													"tz" : [0, 0.44],
+													"rz" : [0, -30.0]
+													}
+						}
+			 },
+"MouthSmile" : {
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, 0.52],
+													"rz" : [0, 5.0]
+													},
+							"upperLipName2" : {
+													"ty" : [0, 1.5],
+													"tz" : [0, -0.26],
+													"rz" : [0, 18.0]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, 0.52],
+													"rz" : [0, 5.0]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, 1.5],
+													"tz" : [0, -0.26],
+													"rz" : [0, 18.0]
+													},
+							"lipCornerName" : {
+													"ty" : [0, 3.9],
+													"tz" : [0, -0.62],
+													"rz" : [0, 37.0]
+													},
+							"squintName1" : {
+													"tx" : [0, -0.18],
+													"ty" : [0, 0.26]
+													},
+							"squintName2" : {
+													"ty" : [0, 0.74]
+													},
+							"squintName3" : {
+													"tx" : [0, 0.16],
+													"ty" : [0, 0.16],
+													"tz" : [0, -0.46]
+													}
+						}
+			 },
+"Pucker" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"tz" : [0, 0.92]
+														},
+							"lowerLipMiddleName" : {
+														"tz" : [0, 0.92]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, -1.96],
+													"tz" : [0, 0.94]
+													},
+							"upperLipName2" : {
+													"tx" : [0, -4.2],
+													"tz" : [0, 0.14]
+													},
+							"lowerLipName1" : {
+													"tx" : [0, -1.96],
+													"tz" : [0, 0.94]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, -4.2],
+													"tz" : [0, 0.14]
+													},
+							"lipCornerName" : {
+													"tx" : [0, -5.84],
+													"tz" : [0, 1.82]
+													}
+						}
+				
+		   }, 
+"LipsOpen" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 1.66]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, -1.66]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, 1.66]
+													},
+							"upperLipName2" : {
+													"ty" : [0, 1.12],
+													"rz" : [0, -8.0]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, -1.66]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, -1.12],
+													"rz" : [0, 8.0]
+													}
+						}
+				
+			  },
+"LipsDown" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, -3.12]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, -3.12]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, -3.12]
+													},
+							"upperLipName2" : {
+													"ty" : [0, -3.12]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, -3.12]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, -3.12]
+													},
+							"lipCornerName" : {
+													"ty" : [0, -2.88]
+													}
+						}
+				
+			  },
+"LipsUp" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 3.12]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, 3.12]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, 3.12]
+													},
+							"upperLipName2" : {
+													"ty" : [0, 3.12]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, 3.12]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, 3.12]
+													},
+							"lipCornerName" : {
+													"ty" : [0, 2.88]
+													}
+						}
+				
+			  },
+"L_Sneer" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 0.14]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, 0.44],
+													"ty" : [0, 1.1]
+													},
+							"upperLipName2" : {
+													"tx" : [0, 0.82],
+													"ty" : [0, 1.84],
+													"rz" : [0, -10.0]
+													},
+							"squintName1" : {
+													"tx" : [0, 0.16],
+													"ty" : [0, 0.34]
+													},
+							"squintName2" : {
+													"tx" : [0, 0.16],
+													"ty" : [0, 0.4]
+													}
+						}
+				
+			  },
+"R_Sneer" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 0.14]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, 0.44],
+													"ty" : [0, 1.1]
+													},
+							"upperLipName2" : {
+													"tx" : [0, 0.82],
+													"ty" : [0, 1.84],
+													"rz" : [0, -10.0]
+													},
+							"squintName1" : {
+													"tx" : [0, 0.16],
+													"ty" : [0, 0.34]
+													},
+							"squintName2" : {
+													"tx" : [0, 0.16],
+													"ty" : [0, 0.4]
+													}
+						}
+				
+			  },
+"L_Grimace" : {
+				"MIDDLE" : {
+							"lowerLipMiddleName" : {
+														"ty" : [0, -0.14]
+														}
+						  },
+				"SIDED" : {
+							"lowerLipName1" : {
+													"tx" : [0, 0.44],
+													"ty" : [0, -1.1]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, 0.82],
+													"ty" : [0, -1.84],
+													"rz" : [0, 10.0]
+													}
+						}
+			  },
+"R_Grimace" : {
+				"MIDDLE" : {
+							"lowerLipMiddleName" : {
+														"ty" : [0, -0.14]
+														}
+						  },
+				"SIDED" : {
+							"lowerLipName1" : {
+													"tx" : [0, 0.44],
+													"ty" : [0, -1.1]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, 0.82],
+													"ty" : [0, -1.84],
+													"rz" : [0, 10.0]
+													}
+						}
+			  },
+"L_Puff" : {
+				"SIDED" : {
+							"cheekName1" : {
+													"tx" : [0, 3.7],
+													"tz" : [0, 3.22],
+													"sx" : [1, 2],
+													"sy" : [1, 2],
+													"sz" : [1, 2]
+													}
+						}
+			  },
+"R_Puff" : {
+				"SIDED" : {
+							"cheekName1" : {
+													"tx" : [0, 3.7],
+													"tz" : [0, 3.22],
+													"sx" : [1, 2],
+													"sy" : [1, 2],
+													"sz" : [1, 2]
+													}
+						}
+			  },
+"AAA" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 0.34]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, -1.66]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, 0.34]
+													},
+							"upperLipName2" : {
+													"ty" : [0, 0.34],
+													"rz" : [0, -3.0]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, -1.66]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, -1.06],
+													"rz" : [0, 7.0]
+													}
+						}
+			  },
+"OOO" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 2.0],
+														"tz" : [0, 1.46]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, -2.0],
+														"tz" : [0, 1.46]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, -1.74],
+													"ty" : [0, 2.2],
+													"tz" : [0, 1.14],
+													"rz" : [0, -10.0]
+													},
+							"upperLipName2" : {
+													"tx" : [0, -3.74],
+													"ty" : [0, 0.98],
+													"tz" : [0, 0.84],
+													"rz" : [0, -35.0]
+													},
+							"lowerLipName1" : {
+													"tx" : [0, -1.56],
+													"ty" : [0, -2.4],
+													"tz" : [0, 1.14],
+													"rz" : [0, 13.0]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, -3.0],
+													"ty" : [0, -1.98],
+													"tz" : [0, 0.84],
+													"rz" : [0, 36.0]
+													},
+							"lipCornerName" : {
+													"tx" : [0, -4.54],
+													"ty" : [0, -0.5],
+													"tz" : [0, 0.3]
+													}
+						}
+			  },
+"UUU" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 1.52],
+														"tz" : [0, 1.3]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, -1.06],
+														"tz" : [0, 1.3]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"tx" : [0, -2.06],
+													"ty" : [0, 1.0],
+													"tz" : [0, 1.1],
+													"rz" : [0, -32.0]
+													},
+							"upperLipName2" : {
+													"tx" : [0, -4.66],
+													"ty" : [0, 0.06],
+													"tz" : [0, 0.68],
+													"rz" : [0, -64.0]
+													},
+							"lowerLipName1" : {
+													"tx" : [0, -2.06],
+													"ty" : [0, -1.06],
+													"tz" : [0, 1.1],
+													"rz" : [0, 25.0]
+													},
+							"lowerLipName2" : {
+													"tx" : [0, -4.56],
+													"ty" : [0, -0.8],
+													"tz" : [0, 0.68],
+													"rz" : [0, 54.0]
+													},
+							"lipCornerName" : {
+													"tx" : [0, -6.98],
+													"ty" : [0, -0.54],
+													"tz" : [0, 0.36]
+													}
+						}
+			  },
+"FFF" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, 0.42],
+														"tz" : [0, 1.3],
+														"rx" : [0, -12.0]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, 1.5],
+														"tz" : [0, -0.42],
+														"rx" : [0, -22.0]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, 0.42],
+													"tz" : [0, 1.3],
+													"rx" : [0, -12.0]
+													},
+							"upperLipName2" : {
+													"ty" : [0, 0.12],
+													"tz" : [0, 0.46],
+													"rx" : [0, -7.7]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, 0.92],
+													"tz" : [0, -0.42],
+													"rx" : [0, -22.0]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, 0.64],
+													"tz" : [0, -0.44],
+													"rx" : [0, -14.0]
+													}
+						}
+			  },
+"MMM" : {
+				"MIDDLE" : {
+							"upperLipMiddleName" : {
+														"ty" : [0, -0.94],
+														"tz" : [0, -0.68],
+														"rx" : [0, 28.0]
+														},
+							"lowerLipMiddleName" : {
+														"ty" : [0, 1.3],
+														"tz" : [0, -0.68],
+														"rx" : [0, -32.0]
+														}
+						  },
+				"SIDED" : {
+							"upperLipName1" : {
+													"ty" : [0, -0.28],
+													"tz" : [0, -0.68],
+													"rx" : [0, 28.0]
+													},
+							"upperLipName2" : {
+													"tz" : [0, -0.34],
+													"rx" : [0, 13.0]
+													},
+							"lowerLipName1" : {
+													"ty" : [0, 0.72],
+													"tz" : [0, -0.68],
+													"rx" : [0, -32.0]
+													},
+							"lowerLipName2" : {
+													"ty" : [0, 0.22],
+													"tz" : [0, -0.34],
+													"rx" : [0, -23.0]
+													}
+						}
+			  }
+}

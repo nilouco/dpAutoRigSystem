@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.22"
-DPAR_UPDATELOG = "Fixed sqSpaceSwith Qt module.\nImproved dpWheel with new base main joint."
+DPAR_VERSION = "3.09.23"
+DPAR_UPDATELOG = "Improved Facial Controls with json preset."
 
 
 

@@ -1,6 +1,8 @@
 # importing libraries:
 import maya.cmds as cmds
 import maya.mel as mel
+import os
+import json
 from functools import partial
 import dpAutoRigSystem.Modules.Library.dpControls as dpControls
 import dpAutoRigSystem.Modules.Library.dpUtils as utils
@@ -25,8 +27,10 @@ TYPE_BS = "typeBS"
 TYPE_JOINTS = "typeJoints"
 MIDDLE = "Middle"
 SIDED = "Sided"
+PRESETS = "Presets"
+FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.8"
+DPFC_VERSION = "1.9"
 
 
 class FacialControl():
@@ -55,7 +59,7 @@ class FacialControl():
             self.dpLoadBSTgtList(HEAD_BSNAME)
         self.dpLoadJointNode(self.tweaksNameList)
         # declaring gaming dictionary:
-        self.dpInitTweaksDic()
+        self.tweaksDic = self.dpInitTweaksDic()
     
     
     def dpInitTweaksVariables(self, *args):
@@ -94,634 +98,43 @@ class FacialControl():
                                 self.squintName1, self.squintName2, self.squintName3, \
                                 self.cheekName1, \
                                 self.upperLipMiddleName, self.upperLipName1, self.upperLipName2, self.lowerLipMiddleName, self.lowerLipName1, self.lowerLipName2, self.lipCornerName]
-        
+        self.tweaksNameStrList = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", \
+                                "squintName1", "squintName2", "squintName3", \
+                                "cheekName1", \
+                                "upperLipMiddleName", "upperLipName1", "upperLipName2", "lowerLipMiddleName", "lowerLipName1", "lowerLipName2", "lipCornerName"]
+    
     
     def dpInitTweaksDic(self, *args):
-        self.tweaksDic = {
-                            "BrowFrown" : {
-                                            MIDDLE : {
-                                                        self.eyebrowMiddleName : {
-                                                                                    "ty" : [0, -1.2],
-                                                                                    "tz" : [0, 0.5]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.eyebrowName1 : {
-                                                                                "tx" : [0, -1.8],
-                                                                                "ty" : [0, -2.5],
-                                                                                "tz" : [0, 0.8],
-                                                                                "rz" : [0, 15.5]
-                                                                                },
-                                                        self.eyebrowName2 : {
-                                                                                "tx" : [0, -0.8],
-                                                                                "ty" : [0, 0.68],
-                                                                                "tz" : [0, 0.2],
-                                                                                "rz" : [0, 9.1]
-                                                                                },
-                                                        self.eyebrowName3 : {
-                                                                                "tx" : [0, 0.2],
-                                                                                "ty" : [0, 0.54]
-                                                                                }
-                                                    }
-                                          },
-                            "BrowSad" : {
-                                            MIDDLE : {
-                                                        self.eyebrowMiddleName : {
-                                                                                    "ty" : [0, 0.8],
-                                                                                    "tz" : [0, 0.2]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.eyebrowName1 : {
-                                                                                "tx" : [0, -2.0],
-                                                                                "ty" : [0, 3.0],
-                                                                                "tz" : [0, 0.4],
-                                                                                "rz" : [0, -9.3]
-                                                                                },
-                                                        self.eyebrowName2 : {
-                                                                                "tx" : [0, -0.96],
-                                                                                "ty" : [0, 0.06],
-                                                                                "tz" : [0, 0.16]
-                                                                                },
-                                                        self.eyebrowName3 : {
-                                                                                "ty" : [0, -0.5]
-                                                                                }
-                                                    }
-                                         },
-                            "BrowDown" : {
-                                            MIDDLE : {
-                                                        self.eyebrowMiddleName : {
-                                                                                    "ty" : [0, -0.4],
-                                                                                    "tz" : [0, 0.4]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.eyebrowName1 : {
-                                                                                "ty" : [0, -1.76],
-                                                                                "tz" : [0, 0.76]
-                                                                                },
-                                                        self.eyebrowName2 : {
-                                                                                "ty" : [0, -2.52],
-                                                                                "tz" : [0, 1.08]
-                                                                                },
-                                                        self.eyebrowName3 : {
-                                                                                "ty" : [0, -1.76],
-                                                                                "tz" : [0, 0.76]
-                                                                                }
-                                                    }
-                                         },
-                            "BrowUp" : {
-                                            MIDDLE : {
-                                                        self.eyebrowMiddleName : {
-                                                                                    "ty" : [0, 1.0],
-                                                                                    "tz" : [0, -0.3]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.eyebrowName1 : {
-                                                                                "ty" : [0, 4.0],
-                                                                                "tz" : [0, -0.6]
-                                                                                },
-                                                        self.eyebrowName2 : {
-                                                                                "ty" : [0, 4.0],
-                                                                                "tz" : [0, -0.6]
-                                                                                },
-                                                        self.eyebrowName3 : {
-                                                                                "ty" : [0, 4.0],
-                                                                                "tz" : [0, -0.6]
-                                                                                }
-                                                    }
-                                         },
-                            "MouthNarrow" : {
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, -1.42],
-                                                                                "tz" : [0, 0.26]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, -3.28],
-                                                                                "tz" : [0, 0.16]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, -1.42],
-                                                                                "tz" : [0, 0.26]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, -3.28],
-                                                                                "tz" : [0, 0.16]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "tx" : [0, -4.56],
-                                                                                "tz" : [0, 0.02]
-                                                                                }
-                                                    }
-                                         },
-                            "MouthWide" : {
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, 2.72],
-                                                                                "tz" : [0, -0.24]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, 4.56],
-                                                                                "tz" : [0, -0.84]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, 2.72],
-                                                                                "tz" : [0, -0.24]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, 4.56],
-                                                                                "tz" : [0, -0.84]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "tx" : [0, 6.62],
-                                                                                "tz" : [0, -1.58]
-                                                                                },
-                                                        self.cheekName1 :    {
-                                                                                "tx" : [0, 2.26],
-                                                                                "tz" : [0, -1.18]
-                                                                             }
-                                                    }
-                                         },
-                            "MouthSad" : {
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, -0.96],
-                                                                                "rz" : [0, -7.6]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, -1.62],
-                                                                                "tz" : [0, 0.3],
-                                                                                "rz" : [0, -16.1]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, -0.96],
-                                                                                "rz" : [0, -7.6]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, -1.62],
-                                                                                "tz" : [0, 0.3],
-                                                                                "rz" : [0, -16.1]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "ty" : [0, -3.5],
-                                                                                "tz" : [0, 0.44],
-                                                                                "rz" : [0, -30.0]
-                                                                                }
-                                                    }
-                                         },
-                            "MouthSmile" : {
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, 0.52],
-                                                                                "rz" : [0, 5.0]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, 1.5],
-                                                                                "tz" : [0, -0.26],
-                                                                                "rz" : [0, 18.0]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, 0.52],
-                                                                                "rz" : [0, 5.0]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, 1.5],
-                                                                                "tz" : [0, -0.26],
-                                                                                "rz" : [0, 18.0]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "ty" : [0, 3.9],
-                                                                                "tz" : [0, -0.62],
-                                                                                "rz" : [0, 37.0]
-                                                                                },
-                                                        self.squintName1 : {
-                                                                                "tx" : [0, -0.18],
-                                                                                "ty" : [0, 0.26]
-                                                                                },
-                                                        self.squintName2 : {
-                                                                                "ty" : [0, 0.74]
-                                                                                },
-                                                        self.squintName3 : {
-                                                                                "tx" : [0, 0.16],
-                                                                                "ty" : [0, 0.16],
-                                                                                "tz" : [0, -0.46]
-                                                                                }
-                                                    }
-                                         },
-                            "Pucker" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "tz" : [0, 0.92]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "tz" : [0, 0.92]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, -1.96],
-                                                                                "tz" : [0, 0.94]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, -4.2],
-                                                                                "tz" : [0, 0.14]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, -1.96],
-                                                                                "tz" : [0, 0.94]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, -4.2],
-                                                                                "tz" : [0, 0.14]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "tx" : [0, -5.84],
-                                                                                "tz" : [0, 1.82]
-                                                                                }
-                                                    }
-                                            
-                                       }, 
-                            "LipsOpen" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 1.66]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -1.66]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, 1.66]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, 1.12],
-                                                                                "rz" : [0, -8.0]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, -1.66]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, -1.12],
-                                                                                "rz" : [0, 8.0]
-                                                                                }
-                                                    }
-                                            
-                                          },
-                            "LipsDown" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, -3.12]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -3.12]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, -3.12]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, -3.12]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, -3.12]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, -3.12]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "ty" : [0, -2.88]
-                                                                                }
-                                                    }
-                                            
-                                          },
-                            "LipsUp" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 3.12]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, 3.12]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, 3.12]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, 3.12]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, 3.12]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, 3.12]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "ty" : [0, 2.88]
-                                                                                }
-                                                    }
-                                            
-                                          },
-                            "L_Sneer" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 0.14]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, 0.44],
-                                                                                "ty" : [0, 1.1]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, 0.82],
-                                                                                "ty" : [0, 1.84],
-                                                                                "rz" : [0, -10.0]
-                                                                                },
-                                                        self.squintName1 : {
-                                                                                "tx" : [0, 0.16],
-                                                                                "ty" : [0, 0.34]
-                                                                                },
-                                                        self.squintName2 : {
-                                                                                "tx" : [0, 0.16],
-                                                                                "ty" : [0, 0.4]
-                                                                                }
-                                                    }
-                                            
-                                          },
-                            "R_Sneer" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 0.14]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, 0.44],
-                                                                                "ty" : [0, 1.1]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, 0.82],
-                                                                                "ty" : [0, 1.84],
-                                                                                "rz" : [0, -10.0]
-                                                                                },
-                                                        self.squintName1 : {
-                                                                                "tx" : [0, 0.16],
-                                                                                "ty" : [0, 0.34]
-                                                                                },
-                                                        self.squintName2 : {
-                                                                                "tx" : [0, 0.16],
-                                                                                "ty" : [0, 0.4]
-                                                                                }
-                                                    }
-                                            
-                                          },
-                            "L_Grimace" : {
-                                            MIDDLE : {
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -0.14]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, 0.44],
-                                                                                "ty" : [0, -1.1]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, 0.82],
-                                                                                "ty" : [0, -1.84],
-                                                                                "rz" : [0, 10.0]
-                                                                                }
-                                                    }
-                                          },
-                            "R_Grimace" : {
-                                            MIDDLE : {
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -0.14]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, 0.44],
-                                                                                "ty" : [0, -1.1]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, 0.82],
-                                                                                "ty" : [0, -1.84],
-                                                                                "rz" : [0, 10.0]
-                                                                                }
-                                                    }
-                                          },
-                            "L_Puff" : {
-                                            SIDED : {
-                                                        self.cheekName1 : {
-                                                                                "tx" : [0, 3.7],
-                                                                                "tz" : [0, 3.22],
-                                                                                "sx" : [1, 2],
-                                                                                "sy" : [1, 2],
-                                                                                "sz" : [1, 2]
-                                                                                }
-                                                    }
-                                          },
-                            "R_Puff" : {
-                                            SIDED : {
-                                                        self.cheekName1 : {
-                                                                                "tx" : [0, 3.7],
-                                                                                "tz" : [0, 3.22],
-                                                                                "sx" : [1, 2],
-                                                                                "sy" : [1, 2],
-                                                                                "sz" : [1, 2]
-                                                                                }
-                                                    }
-                                          },
-                            "AAA" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 0.34]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -1.66]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, 0.34]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, 0.34],
-                                                                                "rz" : [0, -3.0]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, -1.66]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, -1.06],
-                                                                                "rz" : [0, 7.0]
-                                                                                }
-                                                    }
-                                          },
-                            "OOO" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 2.0],
-                                                                                    "tz" : [0, 1.46]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -2.0],
-                                                                                    "tz" : [0, 1.46]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, -1.74],
-                                                                                "ty" : [0, 2.2],
-                                                                                "tz" : [0, 1.14],
-                                                                                "rz" : [0, -10.0]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, -3.74],
-                                                                                "ty" : [0, 0.98],
-                                                                                "tz" : [0, 0.84],
-                                                                                "rz" : [0, -35.0]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, -1.56],
-                                                                                "ty" : [0, -2.4],
-                                                                                "tz" : [0, 1.14],
-                                                                                "rz" : [0, 13.0]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, -3.0],
-                                                                                "ty" : [0, -1.98],
-                                                                                "tz" : [0, 0.84],
-                                                                                "rz" : [0, 36.0]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "tx" : [0, -4.54],
-                                                                                "ty" : [0, -0.5],
-                                                                                "tz" : [0, 0.3]
-                                                                                }
-                                                    }
-                                          },
-                            "UUU" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 1.52],
-                                                                                    "tz" : [0, 1.3]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, -1.06],
-                                                                                    "tz" : [0, 1.3]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "tx" : [0, -2.06],
-                                                                                "ty" : [0, 1.0],
-                                                                                "tz" : [0, 1.1],
-                                                                                "rz" : [0, -32.0]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tx" : [0, -4.66],
-                                                                                "ty" : [0, 0.06],
-                                                                                "tz" : [0, 0.68],
-                                                                                "rz" : [0, -64.0]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "tx" : [0, -2.06],
-                                                                                "ty" : [0, -1.06],
-                                                                                "tz" : [0, 1.1],
-                                                                                "rz" : [0, 25.0]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "tx" : [0, -4.56],
-                                                                                "ty" : [0, -0.8],
-                                                                                "tz" : [0, 0.68],
-                                                                                "rz" : [0, 54.0]
-                                                                                },
-                                                        self.lipCornerName : {
-                                                                                "tx" : [0, -6.98],
-                                                                                "ty" : [0, -0.54],
-                                                                                "tz" : [0, 0.36]
-                                                                                }
-                                                    }
-                                          },
-                            "FFF" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, 0.42],
-                                                                                    "tz" : [0, 1.3],
-                                                                                    "rx" : [0, -12.0]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, 1.5],
-                                                                                    "tz" : [0, -0.42],
-                                                                                    "rx" : [0, -22.0]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, 0.42],
-                                                                                "tz" : [0, 1.3],
-                                                                                "rx" : [0, -12.0]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "ty" : [0, 0.12],
-                                                                                "tz" : [0, 0.46],
-                                                                                "rx" : [0, -7.7]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, 0.92],
-                                                                                "tz" : [0, -0.42],
-                                                                                "rx" : [0, -22.0]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, 0.64],
-                                                                                "tz" : [0, -0.44],
-                                                                                "rx" : [0, -14.0]
-                                                                                }
-                                                    }
-                                          },
-                            "MMM" : {
-                                            MIDDLE : {
-                                                        self.upperLipMiddleName : {
-                                                                                    "ty" : [0, -0.94],
-                                                                                    "tz" : [0, -0.68],
-                                                                                    "rx" : [0, 28.0]
-                                                                                    },
-                                                        self.lowerLipMiddleName : {
-                                                                                    "ty" : [0, 1.3],
-                                                                                    "tz" : [0, -0.68],
-                                                                                    "rx" : [0, -32.0]
-                                                                                    }
-                                                      },
-                                            SIDED : {
-                                                        self.upperLipName1 : {
-                                                                                "ty" : [0, -0.28],
-                                                                                "tz" : [0, -0.68],
-                                                                                "rx" : [0, 28.0]
-                                                                                },
-                                                        self.upperLipName2 : {
-                                                                                "tz" : [0, -0.34],
-                                                                                "rx" : [0, 13.0]
-                                                                                },
-                                                        self.lowerLipName1 : {
-                                                                                "ty" : [0, 0.72],
-                                                                                "tz" : [0, -0.68],
-                                                                                "rx" : [0, -32.0]
-                                                                                },
-                                                        self.lowerLipName2 : {
-                                                                                "ty" : [0, 0.22],
-                                                                                "tz" : [0, -0.34],
-                                                                                "rx" : [0, -23.0]
-                                                                                }
-                                                    }
-                                          }
-                         }
+        """ Load FacialJoints json file.
+            Read its content.
+            Rebuild a dictionary changing string variables to current mounted language names.
+            Return the presetContent
+        """
+        # load json file:
+        presetContent = None
+        file = FACIALPRESET+".json"
+        # find current path:
+        path = os.path.dirname(__file__)
+        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+        jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
+        fileDictionary = open(jsonPath + file, "r")
+        # read the json file content and store it in a dictionary:
+        presetContent = json.loads(fileDictionary.read())
+        # close the json file:
+        fileDictionary.close()
+        if presetContent:
+            # rebuild dictionary using object variables:
+            for storedAttr in presetContent:
+                for sideName in presetContent[storedAttr]:
+                    for toNodeName in presetContent[storedAttr][sideName]:
+                        for i, item in enumerate(self.tweaksNameStrList):
+                            if toNodeName == item:
+                                presetContent[storedAttr][sideName][self.tweaksNameList[i]] = presetContent[storedAttr][sideName].pop(toNodeName)
+                    if sideName == "MIDDLE":
+                        presetContent[storedAttr][MIDDLE] = presetContent[storedAttr].pop(sideName)
+                    elif sideName == "SIDED":
+                        presetContent[storedAttr][SIDED] = presetContent[storedAttr].pop(sideName)
+        return presetContent
     
     
     def dpGetHeadCtrl(self, *args):
@@ -746,7 +159,7 @@ class FacialControl():
         self.dpCloseFacialControlWin()
         
         facialCtrl_winWidth  = 380
-        facialCtrl_winHeight = 450
+        facialCtrl_winHeight = 380
         dpFacialControlWin = cmds.window('dpFacialControlWindow', title=self.langDic[self.langName]["m085_facialCtrl"]+" "+DPFC_VERSION, widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
@@ -787,10 +200,10 @@ class FacialControl():
         cmds.separator(height=20, style="in", horizontal=True, parent=typeCollectionLayout)
         
         # BlendShapes UI:
-        self.bsLayout = cmds.frameLayout("bsLayout", label=self.langDic[self.langName]["m170_blendShapes"], collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
-        self.connectCB = cmds.checkBox("connectCB", label=self.langDic[self.langName]["m140_tryConnectFacial"], value=1, height=30, changeCommand=self.dpChangeConnectCB, parent=self.bsLayout)
+        self.bsLayout = cmds.frameLayout("bsLayout", label=self.langDic[self.langName]["m170_blendShapes"], width=350, collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
+        self.connectCB = cmds.checkBox("connectCB", label=self.langDic[self.langName]["m140_tryConnectFacial"]+" "+self.langDic[self.langName]["m170_blendShapes"], value=1, height=30, changeCommand=self.dpChangeConnectCB, parent=self.bsLayout)
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 120), (2, 180)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.bsLayout)
-        self.loadBSButton = cmds.button("loadBSButton", label=self.langDic[self.langName]["m141_loadBlendShape"]+" >", annotation=self.langDic[self.langName]["m174_loadBSDesc"], backgroundColor=(0.6, 0.6, 1.0), width=120, command=self.dpLoadBSNode, parent=doubleLayout)
+        self.loadBSButton = cmds.button("loadBSButton", label=self.langDic[self.langName]["m141_loadBlendShape"]+" >", annotation=self.langDic[self.langName]["m172_loadBSDesc"], backgroundColor=(0.6, 0.6, 1.0), width=120, command=self.dpLoadBSNode, parent=doubleLayout)
         self.bsNodeTextField = cmds.textField('bsNodeTextField', width=160, text='', editable=False, parent=doubleLayout)
         bsTgtListFoundLayout = cmds.columnLayout('bsTgtListFoundLayout', columnOffset=('left', 10), width=310, rowSpacing=4, parent=self.bsLayout)
         self.bsTgtListTxt = cmds.text("bsTgtListTxt", label=self.langDic[self.langName]["m170_blendShapes"]+" "+self.langDic[self.langName]["m142_targetListFound"], height=30, parent=bsTgtListFoundLayout)
@@ -798,10 +211,9 @@ class FacialControl():
         cmds.text(label='', parent=bsTgtListFoundLayout)
         
         # Joints UI:
-        self.jointsLayout = cmds.frameLayout("jointsLayout", label=self.langDic[self.langName]["m171_joints"], collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
-        cmds.text(self.langDic[self.langName]["m172_loadJointCtrl"], height=30, parent=self.jointsLayout)
+        self.jointsLayout = cmds.frameLayout("jointsLayout", label=self.langDic[self.langName]["m171_joints"], width=350, collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
+        self.connectFJ = cmds.checkBox("connectFJ", label=self.langDic[self.langName]["m140_tryConnectFacial"]+" "+self.langDic[self.langName]["m085_facialCtrl"], value=1, height=30, changeCommand=self.dpChangeConnectFJ, parent=self.jointsLayout)
         doubleJointsLayout = cmds.rowColumnLayout('doubleJointsLayout', numberOfColumns=2, columnWidth=[(1, 120), (2, 180)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.jointsLayout)
-        self.loadJointButton = cmds.button("loadJointButton", label=self.langDic[self.langName]["m173_retargetSelected"], annotation=self.langDic[self.langName]["m175_retargetSelDesc"], backgroundColor=(1.0, 0.6, 0.6), width=120, command=self.dpRetargetJointNode, parent=doubleJointsLayout)
         jntTgtListFoundLayout = cmds.columnLayout('jntTgtListFoundLayout', columnOffset=('left', 10), width=310, rowSpacing=4, parent=self.jointsLayout)
         self.jntTgtListTxt = cmds.text("jntTgtListTxt", label=self.langDic[self.langName]["m171_joints"]+" "+self.langDic[self.langName]["m142_targetListFound"], height=30, parent=jntTgtListFoundLayout)
         self.jntTargetScrollList = cmds.textScrollList('jntTargetScrollList', width=290, height=100, enable=True, parent=jntTgtListFoundLayout)
@@ -815,7 +227,7 @@ class FacialControl():
     
     
     def dpChangeConnectCB(self, *args):
-        """ Set values enable or disable when the user change the connect check box.
+        """ Set values enable or disable when the user change the connect check box for Facial BlendShapes.
         """
         # get
         cbValue = cmds.checkBox(self.connectCB, query=True, value=True)
@@ -826,13 +238,25 @@ class FacialControl():
         cmds.textScrollList(self.bsTargetScrollList, edit=True, removeAll=True, enable=cbValue)
     
     
+    def dpChangeConnectFJ(self, *args):
+        """ Set values enable or disable when the user change the connect check box for Facial Joints.
+        """
+        # get
+        cbValue = cmds.checkBox(self.connectFJ, query=True, value=True)
+        # set
+        cmds.text(self.jntTgtListTxt, edit=True, enable=cbValue)
+        cmds.textScrollList(self.jntTargetScrollList, edit=True, removeAll=True, enable=cbValue)
+        if cbValue:
+            # reload all joint target:
+            self.dpLoadJointNode(self.tweaksNameList)
+    
+    
     def dpGetUserType(self, *args):
-        connectBS = False
-        connectJnt = False
-        if self.userType == TYPE_BS:
-            connectBS = cmds.checkBox(self.connectCB, query=True, value=True)
-        else:
-            connectJnt = True
+        """ Read UI in order to return a list of user choose.
+            Returns [bool, bool] for use or not blendShapes or facial joints.
+        """
+        connectBS = cmds.checkBox(self.connectCB, query=True, value=True)
+        connectJnt = cmds.checkBox(self.connectFJ, query=True, value=True)
         return [connectBS, connectJnt]
     
     
@@ -1066,7 +490,7 @@ class FacialControl():
                                                 cmds.connectAttr(fCtrl+"."+storedAttr, self.bsNode+"."+alias, force=True)
                                             except:
                                                 pass
-                        else:
+                        else: # setup to using facial joints:
                             if connectJnt:
                                 sidedNodeList = None
                                 try:
@@ -1074,6 +498,7 @@ class FacialControl():
                                 except:
                                     pass
                                 if sidedNodeList:
+                                    # sideNode is like MIDDLE or SIDED:
                                     for sidedNode in sidedNodeList:
                                         toNodeList = None
                                         try:
@@ -1081,6 +506,7 @@ class FacialControl():
                                         except:
                                             pass
                                         if toNodeList:
+                                            # toNodeBase is igual to facial control offset group target:
                                             for toNodeBaseName in toNodeList:
                                                 toNode = None
                                                 toNodeSided = toNodeBaseName
@@ -1114,11 +540,13 @@ class FacialControl():
                                                         toNodeTargedList.append(toNode)
                                                     for toNode in toNodeTargedList:
                                                         if cmds.objExists(toNode):
+                                                            # caculate factor for scaled item:
                                                             sizeFactor = self.dpGetSizeFactor(toNode)
                                                             if not sizeFactor:
                                                                 sizeFactor = 1
                                                             toAttrList = self.tweaksDic[attr][sidedNode][toNodeBaseName]
                                                             for toAttr in toAttrList:
+                                                                # read stored values in order to call function to make the setup:
                                                                 oMin = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][0]
                                                                 oMax = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][1]
                                                                 self.dpCreateRemapNode(fCtrl, attr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
@@ -1187,11 +615,9 @@ class FacialControl():
                     self.bsNode = bsNodeName
     
     
-    def dpRetargetJointNode(self, *args):
-        print "yes yes thanks... wip"
-    
-    
     def dpLoadJointNode(self, itemList, *args):
+        """ Load the respective items to build the joint target list (offset group node).
+        """
         leftPrefix = self.langDic[self.langName]["p002_left"]+"_"
         rightPrefix = self.langDic[self.langName]["p003_right"]+"_"
         offsetSuffix = "_Ctrl_Offset_Grp"
@@ -1225,6 +651,8 @@ class FacialControl():
     
     
     def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
+        """ Creates the nodes to remap values and connect it to final output (toNode) item.
+        """
         fromNodeName = utils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
         outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
@@ -1258,11 +686,15 @@ class FacialControl():
                 cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
                 cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
                 cmds.connectAttr(pma+".output1D", toNode+"."+toAttr, force=True)
+                if cmds.objectType(connectedList[0]) == "unitConversion":
+                    cmds.delete(connectedList[0])
         else:
             cmds.connectAttr(remap+".outValue", toNode+"."+toAttr, force=True)
     
 
     def dpGetSizeFactor(self, toNode, *args):
+        """ Get the child control size value and return it.
+        """
         childrenList = cmds.listRelatives(toNode, children=True, type="transform")
         if childrenList:
             for child in childrenList:

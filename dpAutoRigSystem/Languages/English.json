@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-06-10",
+    "_updated"       : "2020-06-23",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -458,7 +458,7 @@
     "m137_copyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "m138_copyPasteShapesDesc" : "Save and restore controllers appearance. Useful when re-building a rig.",
     "m139_facialCtrlsAttr"     : "Facial controls and attributes to create:",
-    "m140_tryConnectFacial"    : "Try connect facial control attributes to BlendShape node.",
+    "m140_tryConnectFacial"    : "Try connect facial control attributes to",
     "m141_loadBlendShape"      : "Load BlendShape",
     "m142_targetListFound"     : "Target list found:",
     "m143_createSelected"      : "Create selected",
@@ -493,10 +493,7 @@
 	"m169_selectedCtrls"       : "Sellected All Controls:",
     "m170_blendShapes"         : "Blend Shapes",
     "m171_joints"              : "Joints",
-    "m172_loadJointCtrl"       : "Load facial joint controls, please.",
-    "m173_retargetSelected"    : "Retarget Selected",
-    "m174_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
-    "m175_retargetSelDesc"     : "Select item in list and retarget it to selected node.",
+    "m172_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

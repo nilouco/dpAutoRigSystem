@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-06-10",
+    "_updated"       : "2020-06-23",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -458,7 +458,7 @@
     "m137_copyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "m138_copyPasteShapesDesc" : "Sauvegarde et restaure l'apparences des controllers. Pratique lorsque le rig doit être reconstruit.",
     "m139_facialCtrlsAttr"     : "Controleurs du visage et des atributs pour creer:",
-    "m140_tryConnectFacial"    : "Essayer de connecter les atributs de controleurs dans le node de BlendShape.",
+    "m140_tryConnectFacial"    : "Essayer de connecter les atributs de controleurs dans",
     "m141_loadBlendShape"      : "Charger BlendShape",
     "m142_targetListFound"     : "Liste de target trouvé:",
     "m143_createSelected"      : "Creer les selectionnés",
@@ -493,10 +493,7 @@
 	"m169_selectedCtrls"       : "Selectonné Tous les Controleurs:",
 	"m170_blendShapes"         : "Blend Shapes",
     "m171_joints"              : "Joints",
-	"m172_loadJointCtrl"       : "Charger les controleurs de joints faciales, s'il vous plait.",
-	"m173_retargetSelected"    : "Recibler Selectionné",
-	"m174_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
-    "m175_retargetSelDesc"     : "Select item in list and retarget it to selected node.",
+	"m172_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

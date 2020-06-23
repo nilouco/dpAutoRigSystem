@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-06-10",
+    "_updated"       : "2020-06-23",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -458,7 +458,7 @@
     "m137_copyPasteShapes"     : "CopyPaste Ctrl Shapes",
     "m138_copyPasteShapesDesc" : "Salva, guarda e restaura a aparência de controles. Pratico quando o rig deve ser reconstruido.",
     "m139_facialCtrlsAttr"     : "Controles faciais e atributos para criar:",
-    "m140_tryConnectFacial"    : "Tentar conectar os atributos do controle no node de BlendShape.",
+    "m140_tryConnectFacial"    : "Tentar conectar os atributos do controle no",
     "m141_loadBlendShape"      : "Carregar BlendShape",
     "m142_targetListFound"     : "Lista de targets encontrada:",
     "m143_createSelected"      : "Criar selecionados",
@@ -493,10 +493,7 @@
 	"m169_selectedCtrls"       : "Selecionado Todos os Controles:",
 	"m170_blendShapes"         : "Blend Shapes",
     "m171_joints"              : "Joints",
-	"m172_loadJointCtrl"       : "Carregue controles de joints faciais, por favor.",
-	"m173_retargetSelected"    : "Redirecionar Selecionado",
-	"m174_loadBSDesc"          : "Carregue o Node de BlendShape aqui para conectar os atributos dos controles.",
-    "m175_retargetSelDesc"     : "Selecione um item na lista e redirecione ele ao node selecionado.",
+	"m172_loadBSDesc"          : "Carregue o Node de BlendShape aqui para conectar os atributos dos controles.",
 	
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
