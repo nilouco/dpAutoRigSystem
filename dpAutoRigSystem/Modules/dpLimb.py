@@ -465,8 +465,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # creating joint to skin, ik, Fk and ikNotStretch chains:
                 self.chainDic = {}
-                self.jSufixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt', '_IkNotStretch_Jxt']
-                self.jEndSufixList = ['_JEnd', '_Ik_JEnd', '_Fk_JEnd', '_IkNotStretch_JEnd']
+                self.jSufixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt', '_IkNotStretch_Jxt', '_IkAC_Jxt']
+                self.jEndSufixList = ['_JEnd', '_Ik_JEnd', '_Fk_JEnd', '_IkNotStretch_JEnd', '_IkAC_JEnd']
                 for t, sufix in enumerate(self.jSufixList):
                     self.wipList = []
                     cmds.select(clear=True)
@@ -481,6 +481,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.ikJointList = self.chainDic[self.jSufixList[1]]
                 self.fkJointList = self.chainDic[self.jSufixList[2]]
                 self.ikNSJointList = self.chainDic[self.jSufixList[3]]
+                self.ikACJointList = self.chainDic[self.jSufixList[4]]
 
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
@@ -549,11 +550,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     tempToDelA = cmds.parentConstraint(self.cvLocList[n], self.skinJointList[n], maintainOffset=False)
                     tempToDelB = cmds.parentConstraint(self.cvLocList[n], self.ikJointList[n], maintainOffset=False)
                     tempToDelB1 = cmds.parentConstraint(self.cvLocList[n], self.ikNSJointList[n], maintainOffset=False)
+                    tempToDelB2 = cmds.parentConstraint(self.cvLocList[n], self.ikACJointList[n], maintainOffset=False)
                     tempToDelC = cmds.parentConstraint(self.cvLocList[n], self.fkJointList[n], maintainOffset=False)
                     tempToDelD = cmds.parentConstraint(self.cvLocList[n], self.zeroFkCtrlList[n], maintainOffset=False)
-                    cmds.delete(tempToDelA, tempToDelB, tempToDelB1, tempToDelC, tempToDelD)
+                    cmds.delete(tempToDelA, tempToDelB, tempToDelB1, tempToDelB2, tempToDelC, tempToDelD)
                     # freezeTransformations (rotates):
-                    cmds.makeIdentity(self.skinJointList[n], self.ikJointList[n], self.ikNSJointList[n], self.fkJointList[n], apply=True, rotate=True)
+                    cmds.makeIdentity(self.skinJointList[n], self.ikJointList[n], self.ikNSJointList[n], self.ikACJointList[n], self.fkJointList[n], apply=True, rotate=True)
                     # fk control leads fk joint:
                     if n == 0:
                         cmds.parentConstraint(self.fkCtrlList[n], self.fkJointList[n], maintainOffset=True, name=side + self.userGuideName + "_" + self.jNameList[n] + "_ParentConstraint")
@@ -565,8 +567,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 tempToDelE = cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False)
                 tempToDelF = cmds.parentConstraint(self.cvEndJoint, self.ikJointList[-1], maintainOffset=False)
                 tempToDelF1 = cmds.parentConstraint(self.cvEndJoint, self.ikNSJointList[-1], maintainOffset=False)
+                tempToDelF2 = cmds.parentConstraint(self.cvEndJoint, self.ikACJointList[-1], maintainOffset=False)
                 tempToDelG = cmds.parentConstraint(self.cvEndJoint, self.fkJointList[-1], maintainOffset=False)
-                cmds.delete(tempToDelE, tempToDelF, tempToDelF1, tempToDelG)
+                cmds.delete(tempToDelE, tempToDelF, tempToDelF1, tempToDelF2, tempToDelG)
 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side + self.userGuideName + "_WorldRef", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
@@ -607,7 +610,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(revNode + '.outputX', parentConst + "." + self.ikJointList[n] + "W0", force=True)
                 # organize the ikFkBlend from before to limb:
                 cmds.parentConstraint(self.fkCtrlList[0], self.ikJointList[0], maintainOffset=True, name=self.ikJointList[0] + "_ParentConstraint")
-                cmds.parentConstraint(self.fkCtrlList[0], self.ikNSJointList[0], maintainOffset=True, name=self.ikJointList[0] + "_ParentConstraint")
+                cmds.parentConstraint(self.fkCtrlList[0], self.ikNSJointList[0], maintainOffset=True, name=self.ikNSJointList[0] + "_ParentConstraint")
                 cmds.parentConstraint(self.fkCtrlList[0], self.fkJointList[0], maintainOffset=True, name=self.fkJointList[0] + "_ParentConstraint")
                 cmds.parentConstraint(self.fkCtrlList[0], self.skinJointList[0], maintainOffset=True, name=self.skinJointList[0] + "_ParentConstraint")
 
@@ -712,23 +715,28 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         # using better quadruped front legs solution as ikSpringSolver:
                         ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikSpringSolver')
                         ikHandleNotStretchList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_NotStretch_IkHandle", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikSpringSolver')
+                        ikHandleACList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_AC_IkHandle", startJoint=self.ikACJointList[1], endEffector=self.ikACJointList[len(self.ikACJointList) - 2], solver='ikSpringSolver')
                     else:
                         # could not load the ikSpringSolver plutin, the we will use the regular solution as ikRPSolver:
                         ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
                         ikHandleNotStretchList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_NotStretch_IkHandle", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
+                        ikHandleACList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_AC_IkHandle", startJoint=self.ikACJointList[1], endEffector=self.ikACJointList[len(self.ikACJointList) - 2], solver='ikRPsolver')
                 elif self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     # creating double ikHandle in order to get an extra control for lower articulation in Quadruped Extra Control:
                     ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 3], solver='ikRPsolver')
                     ikHandleNotStretchList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_NotStretch_IkHandle", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
+                    ikHandleACList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_AC_IkHandle", startJoint=self.ikACJointList[1], endEffector=self.ikACJointList[len(self.ikACJointList) - 2], solver='ikRPsolver')
                     ikHandleExtraList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Extra_IkHandle", startJoint=self.ikJointList[len(self.ikJointList) - 3], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
                 else:
                     # using regular solution as ikRPSolver:
                     ikHandleMainList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_IkHandle", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
                     ikHandleNotStretchList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_NotStretch_IkHandle", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
+                    ikHandleACList = cmds.ikHandle(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_AC_IkHandle", startJoint=self.ikACJointList[1], endEffector=self.ikACJointList[len(self.ikACJointList) - 2], solver='ikRPsolver')
 
                 # renaming effectors:
                 cmds.rename(ikHandleMainList[1], ikHandleMainList[0].capitalize() + "_Effector")
                 cmds.rename(ikHandleNotStretchList[1], ikHandleNotStretchList[0].capitalize() + "_Effector")
+                cmds.rename(ikHandleACList[1], ikHandleACList[0].capitalize() + "_Effector")
 
                 # creating ikHandle groups:
                 cmds.setAttr(ikHandleMainList[0] + '.visibility', 0)
@@ -742,6 +750,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 ikHandleNotStretchGrp = cmds.group(empty=True, name=side + self.userGuideName + "_NotStretch_IkHandle_Grp")
                 cmds.setAttr(ikHandleNotStretchGrp + '.visibility', 0)
                 cmds.parent(ikHandleNotStretchList[0], ikHandleNotStretchGrp)
+                # for ikHandle auto clavicle group:
+                ikHandleACGrp = cmds.group(empty=True, name=side + self.userGuideName + "_AC_IkHandle_Grp")
+                cmds.setAttr(ikHandleACGrp + '.visibility', 0)
+                cmds.parent(ikHandleACList[0], ikHandleACGrp)
 
                 # setup quadruped extra control:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
@@ -767,6 +779,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikJointList[len(self.ikJointList) - 2], maintainOffset=True, name=self.ikJointList[len(self.ikJointList) - 2] + "_OrientConstraint")
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz'])
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0] + "_PointConstraint")[0]
+                cmds.pointConstraint(self.ikExtremCtrl, ikHandleACList[0], maintainOffset=True, name=ikHandleACList[0] + "_PointConstraint")[0]
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikNSJointList[len(self.ikNSJointList) - 2], maintainOffset=True, name=self.ikNSJointList[len(self.ikNSJointList) - 2] + "_OrientConstraint")
                 
                 # twist:
@@ -774,12 +787,14 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 if s == 0:
                     cmds.connectAttr(self.ikExtremCtrl + '.twist', ikHandleMainList[0] + ".twist", force=True)
                     cmds.connectAttr(self.ikExtremCtrl + '.twist', ikHandleNotStretchList[0] + ".twist", force=True)
+                    cmds.connectAttr(self.ikExtremCtrl + '.twist', ikHandleACList[0] + ".twist", force=True)
                 else:
                     twistMultDiv = cmds.createNode('multiplyDivide', name=self.ikExtremCtrl + "_MD")
                     cmds.setAttr(twistMultDiv + '.input2X', -1)
                     cmds.connectAttr(self.ikExtremCtrl + '.twist', twistMultDiv + '.input1X', force=True)
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleMainList[0] + ".twist", force=True)
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleNotStretchList[0] + ".twist", force=True)
+                    cmds.connectAttr(twistMultDiv + '.outputX', ikHandleACList[0] + ".twist", force=True)
 
                 # corner poleVector:
                 baseMiddlePointList = self.ctrls.middlePoint(self.ikJointList[1], self.ikJointList[3], createLocator=True)
@@ -802,8 +817,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # create poleVector constraint:
                 poleVectorConstA = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PoleVectorConstraint")
                 poleVectorConstB = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleNotStretchList[0], weight=1.0, name=ikHandleNotStretchList[0] + "_PoleVectorConstraint")
+                poleVectorConstC = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleACList[0], weight=1.0, name=ikHandleACList[0] + "_PoleVectorConstraint")
                 cmds.connectAttr(self.ikCornerCtrl + '.active', poleVectorConstA[0] + "." + self.ikCornerCtrl + "W0", force=True)
                 cmds.connectAttr(self.ikCornerCtrl + '.active', poleVectorConstB[0] + "." + self.ikCornerCtrl + "W0", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.active', poleVectorConstC[0] + "." + self.ikCornerCtrl + "W0", force=True)
 
                 # create annotation:
                 annotLoc = cmds.spaceLocator(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant_Loc", position=(0, 0, 0))[0]
@@ -1095,10 +1112,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, name=side + self.userGuideName + "_Control_Grp")
                 else:
                     self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, name=side + self.userGuideName + "_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], name=side + self.userGuideName + "_Joint_Grp")
+                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], name=side + self.userGuideName + "_Joint_Grp")
                 self.aScalableGrps.append(self.toScalableHookGrp)
                 cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp + "_ParentConstraint")
-                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, ikHandleGrp, ikHandleNotStretchGrp, name=side + self.userGuideName + "_Grp")
+                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, ikHandleGrp, ikHandleNotStretchGrp, ikHandleACGrp, name=side + self.userGuideName + "_Grp")
+                # clean-up before joint not used to autoClavicle:
+                cmds.delete(self.ikACJointList[0])
 
                 # new ribbon feature by James do Carmo, thanks!
                 # not using bend or ikFkSnap systems to quadruped
@@ -1271,8 +1290,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(acIkUpLoc+".translateY", 1)
                     cmds.delete(cmds.parentConstraint(self.fkCtrlList[1], acLocGrp, maintainOffset=False))
                     cmds.parent(acLocGrp, self.toScalableHookGrp)
-                    # aim constraint:
-                    cmds.aimConstraint(self.ikExtremCtrl, acIkAimLoc, maintainOffset=True, weight=1, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AimConstraint")
+                    # aim constraint: (edited in order to point to limb corner (elbow/knee) outside of clavicle hierarchy to avoid cycle error).
+                    cmds.aimConstraint(self.ikACJointList[2], acIkAimLoc, maintainOffset=True, weight=1, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AimConstraint")
                     # fk auto clavicle setup:
                     cmds.connectAttr(self.fkCtrlList[1]+".rotateX", acFkLoc+".rotateX", force=True)
                     cmds.connectAttr(self.fkCtrlList[1]+".rotateY", acFkLoc+".rotateY", force=True)
