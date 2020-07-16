@@ -184,9 +184,11 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 ballRFAttr = self.langDic[self.langName]['c014_RevFoot_E']
                 footRFAttr = self.langDic[self.langName]['c015_RevFoot_F']
                 sideRFAttr = self.langDic[self.langName]['c016_RevFoot_G']
-                rfRoll = self.langDic[self.langName]['c018_RevFoot_roll']
-                rfSpin = self.langDic[self.langName]['c019_RevFoot_spin']
-                rfTurn = self.langDic[self.langName]['c020_RevFoot_turn']
+                rfRoll = self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()
+                rfSpin = self.langDic[self.langName]['c019_RevFoot_spin'].capitalize()
+                rfTurn = self.langDic[self.langName]['c020_RevFoot_turn'].capitalize()
+                rfAngle = self.langDic[self.langName]['c102_angle'].capitalize()
+                rfPlant = self.langDic[self.langName]['c103_plant'].capitalize()
                 showCtrlsAttr = self.langDic[self.langName]['c021_showControls']
 
                 # creating joints:
@@ -248,6 +250,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 
                 # reverse foot zero out groups:
                 self.RFEZero = utils.zeroOut([self.RFEGrp])[0]
+                self.RFEZeroExtra = utils.zeroOut([self.RFEZero])[0]
                 self.RFDZero = utils.zeroOut([self.RFDGrp])[0]
                 self.RFCZero = utils.zeroOut([self.RFCGrp])[0]
                 self.RFBZero = utils.zeroOut([self.RFBGrp])[0]
@@ -309,26 +312,28 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 for j, rfAttr in enumerate(rfAttrList):
                     for t, rfType in enumerate(rfTypeAttrList):
                         if t == 1 and j == (len(rfAttrList) - 1):  # create turn attr to ball
-                            cmds.addAttr(self.footCtrl, longName=rfAttr+"_"+rfTurn, attributeType='float', keyable=True)
-                            cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfTurn, rfGrpList[j]+".rotateZ", force=True)
-                            self.reverseFootAttrList.append(rfAttr+"_"+rfTurn)
-                        cmds.addAttr(self.footCtrl, longName=rfAttr+"_"+rfType, attributeType='float', keyable=True)
-                        self.reverseFootAttrList.append(rfAttr+"_"+rfType)
+                            cmds.addAttr(self.footCtrl, longName=rfAttr+rfTurn, attributeType='float', keyable=True)
+                            cmds.connectAttr(self.footCtrl+"."+rfAttr+rfTurn, rfGrpList[j]+".rotateZ", force=True)
+                            self.reverseFootAttrList.append(rfAttr+rfTurn)
+                        cmds.addAttr(self.footCtrl, longName=rfAttr+rfType, attributeType='float', keyable=True)
+                        self.reverseFootAttrList.append(rfAttr+rfType)
                         if t == 0:
                             if j > 1:
-                                cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfGrpList[j]+".rotateX", force=True)
+                                cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateX", force=True)
                             else:
-                                cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfGrpList[j]+".rotateZ", force=True)
+                                cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateZ", force=True)
                         else:
-                            cmds.connectAttr(self.footCtrl+"."+rfAttr+"_"+rfType, rfGrpList[j]+".rotateY", force=True)
+                            cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateY", force=True)
 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.cvRFALoc+";"+self.cvRFBLoc+";"+self.cvRFCLoc+";"+self.cvRFDLoc)
                 utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
 
-                # creating pre-defined attributes for footRoll and sideRoll attributes:
-                cmds.addAttr(self.footCtrl, longName=footRFAttr+"_"+rfRoll, attributeType='float', keyable=True)
-                cmds.addAttr(self.footCtrl, longName=sideRFAttr+"_"+rfRoll, attributeType='float', keyable=True)
+                # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
+                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll, attributeType='float', keyable=True)
+                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll+rfAngle, attributeType='float', defaultValue=30, keyable=True)
+                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll+rfPlant, attributeType='float', defaultValue=0, keyable=True)
+                cmds.addAttr(self.footCtrl, longName=sideRFAttr+rfRoll, attributeType='float', keyable=True)
 
                 # create clampNodes in order to limit the side rotations:
                 sideClamp = cmds.createNode("clamp", name=side+self.userGuideName+"_Side_Clp")
@@ -340,26 +345,75 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 sideMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Side_MD")
                 cmds.setAttr(sideMD+".input2X", -1)
                 # connections:
-                cmds.connectAttr(self.footCtrl+"."+sideRFAttr+"_"+rfRoll, sideMD+".input1X", force=True)
+                cmds.connectAttr(self.footCtrl+"."+sideRFAttr+rfRoll, sideMD+".input1X", force=True)
                 cmds.connectAttr(sideMD+".outputX", sideClamp+".inputR", force=True)
                 cmds.connectAttr(sideMD+".outputX", sideClamp+".inputG", force=True)
                 cmds.connectAttr(sideClamp+".outputR", self.RFAZero+".rotateZ", force=True)
                 cmds.connectAttr(sideClamp+".outputG", self.RFBZero+".rotateZ", force=True)
 
                 # for footRoll:
-                footClamp = cmds.createNode("clamp", name=side+self.userGuideName+"_Foot_Clp")
+                footHeelClp = cmds.createNode("clamp", name=side+self.userGuideName+"_Roll_Heel_Clp")
                 # heel values in R
-                cmds.setAttr(footClamp+".minR", -360)
-                cmds.connectAttr(self.footCtrl+"."+footRFAttr+"_"+rfRoll, footClamp+".inputR", force=True)
-                cmds.connectAttr(footClamp+".outputR", self.RFCZero+".rotateX", force=True)
+                cmds.setAttr(footHeelClp+".minR", -360)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, footHeelClp+".inputR", force=True)
+                cmds.connectAttr(footHeelClp+".outputR", self.RFCZero+".rotateX", force=True)
                 
-                # set driven keys
-                cmds.setDrivenKeyframe(self.RFEZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=0, value=0, inTangentType="flat", outTangentType="flat")
-                cmds.setDrivenKeyframe(self.RFEZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=45, value=45, inTangentType="spline", outTangentType="spline")
-                cmds.setDrivenKeyframe(self.RFEZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=200, value=0, inTangentType="flat", outTangentType="flat")
-                cmds.setDrivenKeyframe(self.RFDZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=30, value=0, inTangentType="flat", outTangentType="flat")
-                cmds.setDrivenKeyframe(self.RFDZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=60, value=30, inTangentType="spline", outTangentType="spline")
-                cmds.setDrivenKeyframe(self.RFDZero+".rotateX", currentDriver=self.footCtrl+"."+footRFAttr+"_"+rfRoll, driverValue=360, value=180, inTangentType="flat", outTangentType="flat")
+                # footRoll with angle limit:
+                footPMA = cmds.createNode("plusMinusAverage", name=side+self.userGuideName+"_Roll_PMA")
+                footSR = cmds.createNode("setRange", name=side+self.userGuideName+"_Roll_SR")
+                cmds.setAttr(footSR+".oldMaxY", 180)
+                cmds.setAttr(footPMA+".input1D[0]", 180)
+                cmds.setAttr(footPMA+".operation", 2) #substract
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, footSR+".valueX", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, footSR+".valueY", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfAngle, footSR+".maxX", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfAngle, footSR+".oldMinY", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfAngle, footSR+".oldMaxX", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfAngle, footPMA+".input1D[1]", force=True)
+                cmds.connectAttr(footPMA+".output1D", footSR+".maxY", force=True)
+                
+                # plant angle for foot roll:
+                footPlantClp = cmds.createNode("clamp", name=side+self.userGuideName+"_Roll_Plant_Clp")
+                footPlantCnd = cmds.createNode("condition", name=side+self.userGuideName+"_Roll_Plant_Cnd")
+                cmds.setAttr(footPlantCnd+".operation", 4) #less than
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, footPlantClp+".inputR", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, footPlantClp+".maxR", force=True)
+                cmds.connectAttr(footPlantClp+".outputR", footPlantCnd+".firstTerm", force=True)
+                cmds.connectAttr(footPlantClp+".outputR", footPlantCnd+".colorIfTrueR", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, footPlantCnd+".secondTerm", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, footPlantCnd+".colorIfFalseR", force=True)
+                
+                # back to zero footRoll when greather then angle plus plant values:
+                anglePlantPMA = cmds.createNode("plusMinusAverage", name=side+self.userGuideName+"_AnglePlant_PMA")
+                anglePlantMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AnglePlant_MD")
+                anglePlantRmV = cmds.createNode("remapValue", name=side+self.userGuideName+"_AnglePlant_RmV")
+                anglePlantCnd = cmds.createNode("condition", name=side+self.userGuideName+"_AnglePlant_Cnd")
+                cmds.setAttr(anglePlantMD+".input2X", -1)
+                cmds.setAttr(anglePlantRmV+".inputMax", 90)
+                cmds.setAttr(anglePlantRmV+".value[0].value_Interp", 3) #spline
+                cmds.setAttr(anglePlantRmV+".value[1].value_Interp", 3) #spline
+                cmds.setAttr(anglePlantCnd+".operation", 2) #greather than
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfAngle, anglePlantPMA+".input1D[0]", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, anglePlantPMA+".input1D[1]", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, anglePlantCnd+".firstTerm", force=True)
+                cmds.connectAttr(anglePlantPMA+".output1D", anglePlantCnd+".secondTerm", force=True)
+                cmds.connectAttr(anglePlantPMA+".output1D", anglePlantMD+".input1X", force=True)
+                cmds.connectAttr(anglePlantPMA+".output1D", anglePlantRmV+".inputMin", force=True)
+                cmds.connectAttr(anglePlantMD+".outputX", anglePlantRmV+".outputMax", force=True)
+                cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, anglePlantRmV+".inputValue", force=True)
+                cmds.connectAttr(anglePlantRmV+".outColorR", anglePlantCnd+".colorIfTrueR", force=True)
+                cmds.connectAttr(anglePlantCnd+".outColorR", self.RFEZeroExtra+".rotateX", force=True)
+                
+                # connect to groups in order to rotate them:
+                cmds.connectAttr(footSR+".outValueY", self.RFDZero+".rotateX", force=True)
+                cmds.connectAttr(footSR+".outValueX", self.RFEZero+".rotateX", force=True)
+                if s == 0: #left
+                    cmds.connectAttr(footPlantCnd+".outColorR", self.footCtrlZeroList[1]+".rotateX", force=True)
+                else: #fix right side mirror
+                    footPlantInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Plant_Inv_MD")
+                    cmds.setAttr(footPlantInvMD+".input2X", -1)
+                    cmds.connectAttr(footPlantCnd+".outColorR", footPlantInvMD+".input1X", force=True)
+                    cmds.connectAttr(footPlantInvMD+".outputX", self.footCtrlZeroList[1]+".rotateX", force=True)
                 
                 # organizing keyable attributes:
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)

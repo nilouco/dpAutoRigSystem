@@ -49,8 +49,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.24"
-DPAR_UPDATELOG = "Improved: Limb auto clavicle pointing to\ncorner joint (elbow/knee)."
+DPAR_VERSION = "3.09.25"
+DPAR_UPDATELOG = "Improved: Foot roll angle and plant attributes."
 
 
 
@@ -1989,7 +1989,7 @@ class DP_AutoRig_UI:
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     # getting foot data:
                                     revFootCtrl       = self.integratedTaskDic[moduleDic]['revFootCtrlList'][s]
-                                    revFootCtrlGrp   = self.integratedTaskDic[moduleDic]['revFootCtrlGrpList'][s]
+                                    revFootCtrlGrp    = self.integratedTaskDic[moduleDic]['revFootCtrlGrpList'][s]
                                     revFootCtrlShape  = self.integratedTaskDic[moduleDic]['revFootCtrlShapeList'][s]
                                     toLimbIkHandleGrp = self.integratedTaskDic[moduleDic]['toLimbIkHandleGrpList'][s]
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
@@ -2043,13 +2043,16 @@ class DP_AutoRig_UI:
                                     floatAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=True, userDefined=True)
                                     for floatAttr in floatAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+floatAttr):
+                                            currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
                                             cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
+                                            cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
                                     intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
                                     for intAttr in intAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+intAttr):
+                                            currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
                                             cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=1)
-                                            cmds.setAttr(ikCtrl+"."+intAttr, keyable=False, channelBox=True)
+                                            cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
                                             cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))

@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-06-23",
+    "_updated"       : "2020-07-15",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -113,6 +113,8 @@
     "c099_top"               : "Top",
     "c100_bottom"            : "Bottom",
     "c101_symmetry"          : "Symmetry",
+    "c102_angle"             : "angle",
+    "c103_plant"             : "plant",
 	
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",
@@ -291,7 +293,7 @@
     "i153_presentation"    : "Presentation",
     "i154_up"              : "Up",
     "i155_upDesc"          : "Move attributs to up.",
-    "i156_down"            : "down",
+    "i156_down"            : "Down",
     "i157_downDesc"        : "Move attributs to down.",
     "i158_create"          : "Create",
     "i159_historyFound"    : "History found",
