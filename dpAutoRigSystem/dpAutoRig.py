@@ -3,54 +3,25 @@
 
 ###################################################################
 #
-#    dpAutoRigSystem Python script
+#    dpAutoRigSystem Free Open Source Python Script for Maya
 #
 #    author:  Danilo Pinheiro
 #
 #    contact: nilouco@gmail.com
-#             nilouco.blogspot.com
+#             https://nilouco.blogspot.com
 #
-#    date:
-#        v 1.0 _ 2010-09-18 - start working based in dpAutoRig.mel v1.3
-#        v 2.0 _ 2011-08-03 - first version created
-#        v 2.0 _ 2011-10-09 - first version released for Maya 2011, 2012
-#        v 2.1 _ 2012-03-27 - Mac version updated, thanks to Roger Santos
-#        v 2.2 _ 2012-06-01 - Maya 2013, fixed: limb stretch calcul, (des)active poleVector, leg poleVector parent,
-#                                               ikFkBlend attr for many instances, control size by guide scale,
-#                                               mirror control shape, module count, dontDelete locators
-#        v 2.3 _ 2012-08-27 - new icons by Leandro Wagner, fixed: thumb, spine scale by James do Carmo
-#		 v 2.4 _ 2013-02-01 - fixed: doNotSkin ribbon nurbsSurface, find masterGrp, orient head from masterCtrl,
-#                                    print messages (, at the end), centered pivot of chestB_Ctrl (spine),
-#                                    clavicle pivot position, correct controls mirror based in dpLimb style,
-#                                    quadruped front legs using ikSpring solver, find environment path,
-#                                    loading decomposeMatrix node in order to create mirror, headFollow
-#                             implemented: new feature for dpLimb with bend ribbons by James do Carmo
-#        v 2.5 _ 2014-06-05 - fixed: name convension for controls "_Ctrl", joint scaleCompensate as False,
-#                                    displayAnnotation option for poleVector controls, head scalable,
-#                                    redefined clavicle/hips control, render_Grp, ikStretch/reverseFoot integration
-#                             implemented: dpLimb extremLocToParent control (working for ik/Fk), global_Ctrl,
-#                                          dpFoot footRoll and sideRoll attributes, footMiddleCtrl translate and scale,
-#                                          Proxy_Grp, FX_Grp, Jaw autoTranslate, StickyLips, EyeLookAt, Finger Ik setup,
-#                                          Add Hand Follow, Target Mirror
-#                             changed: all names to UpperCamelCase (PascalCase)
-#       v 2.6 _ 2015-06-08 - fixed: dpTargetMirror with locked transform, arm stretchale, integrated reverseFootCtrl_Old renaming,
-#                                   R_Leg_IkFkBlendGrpToRevFoot_Grp_ParentConstraint offset without stretch, addBend and forearm,
-#                                   fkLine flip mirror, biped ear, quadruped legs, limb start stretch value
-#                            implemented: findPath to Linux OS on dpUtils, eyeScale, sideLips, ballSpin and ballTurn, limb fkIsolated,
-#                                         ikFkSnap (thanks to Renaud Lessard), head translation, finger ikStretch, limb volume variation,
-#                                         eyeLookAt activation with baseCtrl, limb extra bends, shapeSize
-#                            changed: only one limb corner joint, unlocked fk translation,
-#       v 3.0 _ 2015-09-30 - GitHub OpenSource by Sébastien Bourgoing and Renaud Lessard from Squeeze Studio Animation, thanks!
-#                            All updates will be publish in GitHub:
-#                            https://github.com/nilouco/dpAutoRigSystem
+#    GitHub, Wiki:
+#             https://github.com/nilouco/dpAutoRigSystem
 #
+#    Dev Sheet, Collaborators, Logs:
+#             https://docs.google.com/spreadsheets/d/154HoO-bLApA7CKpIJ1bDwSxRF146Kyo2etmHDUJGdiw
 #
 ###################################################################
 
 
 # current version:
-DPAR_VERSION = "3.09.25"
-DPAR_UPDATELOG = "Improved: Foot roll angle and plant attributes."
+DPAR_VERSION = "3.09.26"
+DPAR_UPDATELOG = "#000 - First GitHub branch test.\n#001 - Updated Header"
 
 
 
