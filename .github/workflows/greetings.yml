@@ -1,0 +1,13 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Thank you very much for your help! It is really appreciated by all Riggers and Programmers using dpAutoRigSystem.'' first issue'
+        pr-message: 'Thank you very much for your contribution! It is really appreciated by all Riggers and Programmers using dpAutoRigSystem.'' first pr'
