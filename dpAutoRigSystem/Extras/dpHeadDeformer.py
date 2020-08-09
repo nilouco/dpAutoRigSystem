@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.2"
+DPHD_VERSION = "2.3"
 
 
 class HeadDeformer():
@@ -25,7 +25,12 @@ class HeadDeformer():
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.headCtrl = None
         # call main function
-        self.dpHeadDeformer(self)
+        if (int(cmds.about(version=True)[:4]) == 2020):
+            dialogReturn = cmds.confirmDialog(title="Maya 2020 bug", message=self.langDic[self.langName]["b001_BugMayaHD"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
+            if dialogReturn == self.langDic[self.langName]["i174_continue"]:
+                self.dpHeadDeformer(self)
+        else:
+            self.dpHeadDeformer(self)
     
     
     def dpHeadDeformer(self, *args):
@@ -36,6 +41,7 @@ class HeadDeformer():
         centerSymmetryName = self.langDic[self.langName]["c098_center"]+self.langDic[self.langName]["c101_symmetry"]
         topSymmetryName = self.langDic[self.langName]["c099_top"]+self.langDic[self.langName]["c101_symmetry"]
         intensityName = self.langDic[self.langName]["c049_intensity"]
+        expandName = self.langDic[self.langName]["c104_expand"]
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
@@ -128,20 +134,26 @@ class HeadDeformer():
             for axis in axisList:
                 cmds.addAttr(arrowCtrl, longName=intensityName+axis, attributeType='float', defaultValue=1)
                 cmds.setAttr(arrowCtrl+"."+intensityName+axis, edit=True, keyable=False, channelBox=True)
-            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=1/(3*bBoxSize), keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=3/bBoxSize, keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=1/(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName=expandName, attributeType='float', min=0, defaultValue=1, max=10, keyable=True)
+            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=300/bBoxSize, keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateReduce", attributeType='float', defaultValue=100, keyable=False)
             
             # multiply divide in order to intensify influences
             calibrateMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_Calibrate_MD")
+            calibrateReduceMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_CalibrateReduce_MD")
             intensityMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_"+intensityName.capitalize()+"_MD")
             twistMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_Twist_MD")
             cmds.setAttr(twistMD+".input2Y", -1)
+            cmds.setAttr(calibrateReduceMD+".operation", 2)
             
             # connections
             for axis in axisList:
                 cmds.connectAttr(arrowCtrl+"."+intensityName+axis, calibrateMD+".input1"+axis, force=True)
-                cmds.connectAttr(arrowCtrl+".calibrate"+axis, calibrateMD+".input2"+axis, force=True)
+                cmds.connectAttr(arrowCtrl+".calibrate"+axis, calibrateReduceMD+".input1"+axis, force=True)
+                cmds.connectAttr(arrowCtrl+".calibrateReduce", calibrateReduceMD+".input2"+axis, force=True)
+                cmds.connectAttr(calibrateReduceMD+".output"+axis, calibrateMD+".input2"+axis, force=True)
                 cmds.connectAttr(arrowCtrl+".translate"+axis, intensityMD+".input1"+axis, force=True)
                 cmds.connectAttr(calibrateMD+".output"+axis, intensityMD+".input2"+axis, force=True)
             cmds.connectAttr(intensityMD+".outputX", sideBendDefList[0]+".curvature", force=True)
@@ -153,6 +165,7 @@ class HeadDeformer():
             cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=-0.25*bBoxSize, value=-bBoxSize, inTangentType="auto", outTangentType="auto")
             cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=0, value=-0.5*bBoxSize, inTangentType="auto", outTangentType="auto")
             cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=0.5*bBoxSize, value=-0.25*bBoxSize, inTangentType="auto", outTangentType="flat")
+            cmds.connectAttr(arrowCtrl+"."+expandName, squashDefList[0]+".expand", force=True)
             # fix side values
             for axis in axisList:
                 unitConvNode = cmds.listConnections(intensityMD+".output"+axis, destination=True)[0]
@@ -182,6 +195,7 @@ class HeadDeformer():
             
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
+            utils.zeroOut([arrowCtrl])
             offsetGrp = cmds.group(name=headDeformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=headDeformerName+"_Data_Grp", empty=True)
             cmds.delete(cmds.parentConstraint(latticeDefList[2], arrowCtrlGrp, maintainOffset=False))
@@ -191,6 +205,8 @@ class HeadDeformer():
             cmds.delete(cmds.parentConstraint(latticeDefList[2], symmetryCtrlZeroList[0], maintainOffset=False))
             cmds.delete(cmds.parentConstraint(latticeDefList[2], symmetryCtrlZeroList[1], maintainOffset=False))
             cmds.parent(symmetryCtrlZeroList, arrowCtrlGrp)
+            latticeGrp = cmds.group(name=latticeDefList[1]+"_Grp", empty=True)
+            cmds.parent(latticeDefList[1], latticeDefList[2], latticeGrp)
             
             # try to integrate to Head_Head_Ctrl
             allTransformList = cmds.ls(selection=False, type="transform")
@@ -233,7 +249,7 @@ class HeadDeformer():
                 cmds.parent(arrowCtrlGrp, self.headCtrl)
             
             cmds.parent(squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1], offsetGrp)
-            cmds.parent(offsetGrp, clusterGrp, latticeDefList[1], latticeDefList[2], dataGrp)
+            cmds.parent(offsetGrp, clusterGrp, latticeGrp, dataGrp)
             
             # try to integrate to Scalable_Grp
             for item in allTransformList:

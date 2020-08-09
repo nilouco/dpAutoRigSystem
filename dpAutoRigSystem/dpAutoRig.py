@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.26"
-DPAR_UPDATELOG = "#000 - First GitHub branch test.\n#001 - Updated Header"
+DPAR_VERSION = "3.09.27"
+DPAR_UPDATELOG = "Improved: HeadDeformer zeroOut group,\ncabibration reduce, squash expand and\nshows info about Maya2020 bug."
 
 
 
