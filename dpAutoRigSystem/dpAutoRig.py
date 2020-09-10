@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.27"
-DPAR_UPDATELOG = "Improved: HeadDeformer zeroOut group,\ncabibration reduce, squash expand and\nshows info about Maya2020 bug."
+DPAR_VERSION = "3.09.28"
+DPAR_UPDATELOG = "#144 Fixed Spine middle joint issue for scaled Rig."
 
 
 

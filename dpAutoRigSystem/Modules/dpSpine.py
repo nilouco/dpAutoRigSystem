@@ -352,13 +352,19 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(clustersGrp+".visibility", 0)
                 cmds.parent(downCluster, upCluster, clustersGrp, relative=True)
                 # make ribbon joints groups scalable:
+                middleScaleYMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_MiddleScaleY_MD")
+                cmds.setAttr(middleScaleYMD+".operation", 2)
+                cmds.setAttr(middleScaleYMD+".input1X", 1)
                 for r, rbnJntGrp in enumerate(rbnJointGrpList):
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
                         scaleGrp = cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
-                        self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sz'])
+                        self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
                         cmds.scaleConstraint(clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScaleConstraint")
+                        cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
                     else:
                         cmds.scaleConstraint(clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_ScaleConstraint")
+                if scaleGrp:
+                    cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_Rbn_ArcLenShape")
                 arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]
