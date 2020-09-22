@@ -1044,7 +1044,21 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleZ", force=True)
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', uniBlend+".blender", force=True)
-                
+
+                # add scale multiplier attribute
+
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c105_scaleMultiplier'], at='double', min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c105_scaleMultiplier'], at='double', min=0.001, dv=1)
+                scaleMultIk = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_scaleMultiplier'] + '_MD')
+                scaleMultFk = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_scaleMultiplier'] + '_MD')
+                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c040_uniformScale'], scaleMultIk + ".input1X", force=True)
+                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c105_scaleMultiplier'], scaleMultIk + ".input2X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c040_uniformScale'], scaleMultFk + ".input1X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c105_scaleMultiplier'], scaleMultFk + ".input2X", force=True)
+                cmds.connectAttr(scaleMultFk + '.outputX', uniBlend + '.color1R', force=True)
+                cmds.connectAttr(scaleMultIk + '.outputX', uniBlend + '.color2R', force=True)
+
+
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options are valides for Biped, Quadruped and Quadruped Spring legs
                     if (int(cmds.about(version=True)[

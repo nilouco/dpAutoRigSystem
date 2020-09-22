@@ -117,7 +117,8 @@
 	"c102_angle"             : "angulo",
 	"c103_plant"             : "plantar",
 	"c104_expand"            : "expandir",
-	
+	"c105_scaleMultiplier"   : "multiplicarEscala",
+
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
     "e002_decomposeMatrixNotFound" : "O plugin decomposeMatrix não foi encontrado, não foi possivel continuar o espelhamento.",
