@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.29"
-DPAR_UPDATELOG = "#092 Fixed zero out naming."
+DPAR_VERSION = "3.10.00"
+DPAR_UPDATELOG = "New release version 3.10.00.\nThanks."
 
 
 
