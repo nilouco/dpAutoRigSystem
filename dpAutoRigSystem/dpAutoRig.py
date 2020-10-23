@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.28"
-DPAR_UPDATELOG = "#144 Fixed Spine middle joint issue for scaled Rig."
+DPAR_VERSION = "3.09.29"
+DPAR_UPDATELOG = "#092 Fixed zero out naming."
 
 
 
@@ -2122,7 +2122,7 @@ class DP_AutoRig_UI:
                                                 if cmds.objectType(tmp) == 'reverse':
                                                     revNode = tmp
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
-                                        fkCtrl = fkZeroNode.replace("_Zero_Grp", "")
+                                        fkCtrl = fkZeroNode.replace("_Zero_0_Grp", "")
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
                                         nodeToConst = cmds.rename(nodeToConst, fkCtrl + "_SpaceSwitch_Grp")
                                         mainCtrl = cmds.listConnections(revNode + ".inputX")[0]

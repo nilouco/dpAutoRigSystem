@@ -234,7 +234,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_Ctrl_Zero_Grp", name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_Ctrl_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
                 if self.getHasIndirectSkin():
                     locScale = cmds.spaceLocator(name=side+self.userGuideName+"_Scalable_DO_NOT_DELETE")[0]
                     cmds.setAttr(locScale+".visibility", 0)
