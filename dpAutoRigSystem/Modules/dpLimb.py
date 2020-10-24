@@ -160,7 +160,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
 
         # creating relationship of corner:
-        self.cornerPointGrp = cmds.group(self.cornerGrp, name=self.cornerGrp + "_Zero_Grp")
+        self.cornerPointGrp = cmds.group(self.cornerGrp, name=self.cornerGrp + "_Zero_0_Grp")
         cornerPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cornerPointGrp, maintainOffset=False, name=self.cornerPointGrp + "_PointConstraint")[0]
         cmds.setAttr(cornerPointConst + '.' + self.cvMainLoc[self.cvMainLoc.rfind(":") + 1:] + 'W0', 0.52)
         cmds.setAttr(cornerPointConst + '.' + self.cvExtremLoc[self.cvExtremLoc.rfind(":") + 1:] + 'W1', 0.48)
@@ -537,7 +537,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         self.ctrls.setLockHide([self.toParentExtremCtrl], ['v'])
                 # zeroOut controls:
                 self.zeroFkCtrlList = utils.zeroOut(self.fkCtrlList)
-                self.zeroFkCtrlGrp = cmds.group(self.zeroFkCtrlList[0], self.zeroFkCtrlList[1], name=side + self.userGuideName + "_FkCtrl_Grp")
+                self.zeroFkCtrlGrp = cmds.group(self.zeroFkCtrlList[0], self.zeroFkCtrlList[1], name=side+self.userGuideName+"_Fk_Ctrl_Grp")
                 
                 # invert scale for right side before:
                 if s == 1:
@@ -992,7 +992,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # create forearmCtrl:
                     forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
                     forearmGrp = cmds.group(forearmCtrl, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Grp")
-                    forearmZero = cmds.group(forearmGrp, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Zero_Grp")
+                    forearmZero = cmds.group(forearmGrp, name=side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Zero_0_Grp")
                     tempToDelete = cmds.parentConstraint(forearmJnt, forearmZero, maintainOffset=False)
                     cmds.delete(tempToDelete)
                     cmds.parentConstraint(self.skinJointList[2], forearmZero, maintainOffset=True, name=forearmZero + "_ParentConstraint")

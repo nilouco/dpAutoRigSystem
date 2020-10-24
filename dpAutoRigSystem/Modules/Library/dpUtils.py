@@ -224,7 +224,19 @@ def zeroOut(transformList=[], offset=False):
         transformList = cmds.ls(selection=True)
     if transformList:
         for transform in transformList:
-            zeroGrp = cmds.duplicate(transform, name=transform+'_Zero_Grp')[0]
+            suffix = "_Zero_0_Grp"
+            transformName = transform
+            if transformName.endswith("_Grp"):
+                transformName = extractSuffix(transformName)
+                if "_Zero_" in transformName:
+                    needAddNumber = True
+                    while needAddNumber:
+                        nodeNumber = str(int(transformName[transformName.rfind("_")+1:])+1)
+                        transformName = (transformName[:transformName.rfind("_")+1])+nodeNumber
+                        suffix = "_Grp"
+                        if not cmds.objExists(transformName+suffix):
+                            needAddNumber = False
+            zeroGrp = cmds.duplicate(transform, name=transformName+suffix)[0]
             zeroUserAttrList = cmds.listAttr(zeroGrp, userDefined=True)
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:

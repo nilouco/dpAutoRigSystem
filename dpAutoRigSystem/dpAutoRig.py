@@ -2122,7 +2122,7 @@ class DP_AutoRig_UI:
                                                 if cmds.objectType(tmp) == 'reverse':
                                                     revNode = tmp
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
-                                        fkCtrl = fkZeroNode.replace("_Zero_Grp", "")
+                                        fkCtrl = fkZeroNode.replace("_Zero_0_Grp", "")
                                         nodeToConst = utils.zeroOut([fkCtrl])[0]
                                         nodeToConst = cmds.rename(nodeToConst, fkCtrl + "_SpaceSwitch_Grp")
                                         mainCtrl = cmds.listConnections(revNode + ".inputX")[0]
