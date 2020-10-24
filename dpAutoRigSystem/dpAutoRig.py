@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.09.28"
-DPAR_UPDATELOG = "#144 Fixed Spine middle joint issue for scaled Rig."
+DPAR_VERSION = "3.10.01"
+DPAR_UPDATELOG = "#028 Added Limb scale muliplier attribute."
 
 
 

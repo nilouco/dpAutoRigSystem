@@ -1031,9 +1031,17 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
                 cmds.setAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c040_uniformScale'], edit=True, keyable=True)
                 cmds.setAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c040_uniformScale'], edit=True, keyable=True)
+                # add scale multiplier attribute
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c105_scaleMultiplier'], at='double', min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c105_scaleMultiplier'], at='double', min=0.001, dv=1)
+                ikScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_scaleMultiplier'] + '_MD')
+                fkScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_scaleMultiplier'] + '_MD')
+                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c040_uniformScale'], ikScaleMD + ".input1X", force=True)
+                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c105_scaleMultiplier'], ikScaleMD + ".input2X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c040_uniformScale'], fkScaleMD + ".input1X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c105_scaleMultiplier'], fkScaleMD + ".input2X", force=True)
+                # integrate uniformScale and scaleMultiplier attributes
                 uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.langDic[self.langName]['c040_uniformScale']+"_BC")
-                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c040_uniformScale'], uniBlend+".color2R", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c040_uniformScale'], uniBlend+".color1R", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleZ", force=True)
@@ -1044,21 +1052,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleZ", force=True)
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', uniBlend+".blender", force=True)
-
-                # add scale multiplier attribute
-
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c105_scaleMultiplier'], at='double', min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c105_scaleMultiplier'], at='double', min=0.001, dv=1)
-                scaleMultIk = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_scaleMultiplier'] + '_MD')
-                scaleMultFk = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_scaleMultiplier'] + '_MD')
-                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c040_uniformScale'], scaleMultIk + ".input1X", force=True)
-                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c105_scaleMultiplier'], scaleMultIk + ".input2X", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c040_uniformScale'], scaleMultFk + ".input1X", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c105_scaleMultiplier'], scaleMultFk + ".input2X", force=True)
-                cmds.connectAttr(scaleMultFk + '.outputX', uniBlend + '.color1R', force=True)
-                cmds.connectAttr(scaleMultIk + '.outputX', uniBlend + '.color2R', force=True)
-
-
+                cmds.connectAttr(fkScaleMD + '.outputX', uniBlend + '.color1R', force=True)
+                cmds.connectAttr(ikScaleMD + '.outputX', uniBlend + '.color2R', force=True)
+                
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options are valides for Biped, Quadruped and Quadruped Spring legs
                     if (int(cmds.about(version=True)[
