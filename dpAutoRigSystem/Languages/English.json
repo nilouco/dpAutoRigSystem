@@ -1,6 +1,6 @@
 {
     "_author"        : "Danilo Pinheiro",
-    "_collaborators" : "Aline Lima\nElvis Martins\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThomas Mansencal",
+    "_collaborators" : "Aline Lima\nCaio Cipo\nElvis Martins\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThomas Mansencal",
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2010-10-03",
     "_language"      : "English",
@@ -117,6 +117,7 @@
     "c102_angle"             : "angle",
     "c103_plant"             : "plant",
     "c104_expand"            : "expand",
+    "c105_scaleMultiplier"   : "scaleMultiplier",
 	
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",

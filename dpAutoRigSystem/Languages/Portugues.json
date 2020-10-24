@@ -1,6 +1,6 @@
 {
     "_author"        : "Danilo Pinheiro",
-	"_collaborators" : "Aline Lima\nElvis Martins\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThomas Mansencal",
+	"_collaborators" : "Aline Lima\nCaio Cipo\nElvis Martins\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThomas Mansencal",
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-03",
     "_language"      : "Português",
@@ -117,7 +117,8 @@
 	"c102_angle"             : "angulo",
 	"c103_plant"             : "plantar",
 	"c104_expand"            : "expandir",
-	
+	"c105_scaleMultiplier"   : "multiplicarEscala",
+
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
     "e002_decomposeMatrixNotFound" : "O plugin decomposeMatrix não foi encontrado, não foi possivel continuar o espelhamento.",

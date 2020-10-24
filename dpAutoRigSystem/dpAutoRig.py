@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.00"
-DPAR_UPDATELOG = "New release version 3.10.00.\nThanks."
+DPAR_VERSION = "3.10.01"
+DPAR_UPDATELOG = "#028 Added Limb scale muliplier attribute."
 
 
 
