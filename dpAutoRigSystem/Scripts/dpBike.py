@@ -77,6 +77,7 @@ def Bike(dpUIinst):
             chassisInstance.editUserName(chassisName)
             cmds.setAttr(chassisInstance.moduleGrp+".translateY", 9)
             cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 8)
+            chassisInstance.setArticulation(0)
             
             # Update progress window
             progressAmount += 1
@@ -91,6 +92,7 @@ def Bike(dpUIinst):
             cmds.setAttr(steeringHandleInstance.moduleGrp+".translateZ", 5.1)
             cmds.setAttr(steeringHandleInstance.moduleGrp+".rotateX", -19)
             cmds.setAttr(steeringHandleInstance.radiusCtrl+".translateX", 1.1)
+            steeringHandleInstance.setArticulation(0)
             
             # parent steering handle guide to chassis guide:
             cmds.parent(steeringHandleInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -143,6 +145,7 @@ def Bike(dpUIinst):
             cmds.setAttr(leftPedalInstance.moduleGrp+".translateY", 2.6)
             cmds.setAttr(leftPedalInstance.moduleGrp+".translateZ", -2.1)
             cmds.setAttr(leftPedalInstance.radiusCtrl+".translateX", 0.8)
+            leftPedalInstance.setArticulation(0)
             
             # parent left pedal guide to pedal base guide:
             cmds.parent(leftPedalInstance.moduleGrp, pedalInstance.cvCenterLoc, absolute=True)
@@ -160,6 +163,7 @@ def Bike(dpUIinst):
             cmds.setAttr(rightPedalInstance.moduleGrp+".translateY", 6.3)
             cmds.setAttr(rightPedalInstance.moduleGrp+".translateZ", 0.3)
             cmds.setAttr(rightPedalInstance.radiusCtrl+".translateX", 0.8)
+            rightPedalInstance.setArticulation(0)
             
             # parent right pedal guide to pedal base guide:
             cmds.parent(rightPedalInstance.moduleGrp, pedalInstance.cvCenterLoc, absolute=True)
@@ -222,6 +226,7 @@ def Bike(dpUIinst):
             cmds.setAttr(frontSeatInstance.cvJointLoc+".translateY", 0.9)
             cmds.setAttr(frontSeatInstance.cvJointLoc+".translateZ", 0.8)
             cmds.setAttr(frontSeatInstance.cvJointLoc+".rotateX", 38)
+            frontSeatInstance.setArticulation(0)
             
             # parent front seat guide to chassis guide:
             cmds.parent(frontSeatInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -244,6 +249,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(hornInstance.moduleGrp+".translateZ", 4.5)
                 cmds.setAttr(hornInstance.moduleGrp+".rotateX", 17)
                 cmds.setAttr(hornInstance.radiusCtrl+".translateX", 0.7)
+                hornInstance.setArticulation(0)
                 
                 # parent horn guide to steering guide:
                 cmds.parent(hornInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
@@ -306,6 +312,7 @@ def Bike(dpUIinst):
                 mirrorInstance.changeJointNumber(3)
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateX", 1.2)
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateZ", 0.5)
+                mirrorInstance.setArticulation(0)
                 
                 # parent mirror guide to steering guide:
                 cmds.parent(mirrorInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
@@ -327,6 +334,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(leverInstance.moduleGrp+".translateZ", 4)
                 cmds.setAttr(leverInstance.moduleGrp+".rotateY", 10)
                 cmds.setAttr(leverInstance.radiusCtrl+".translateX",0.8)
+                leverInstance.setArticulation(0)
                 
                 # parent lever guide to steering guide:
                 cmds.parent(leverInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
@@ -345,6 +353,7 @@ def Bike(dpUIinst):
                 frontBasketInstance.changeJointNumber(2)
                 cmds.setAttr(frontBasketInstance.cvJointLoc+".translateY", 0.8)
                 cmds.setAttr(frontBasketInstance.cvJointLoc+".translateZ", 0)
+                frontBasketInstance.setArticulation(0)
                 
                 # parent front basket guide to front wheel guide:
                 cmds.parent(frontBasketInstance.moduleGrp, frontWheelInstance.moduleGrp, absolute=True)
@@ -363,6 +372,7 @@ def Bike(dpUIinst):
                 backBasketInstance.changeJointNumber(2)
                 cmds.setAttr(backBasketInstance.cvJointLoc+".translateY", 0.8)
                 cmds.setAttr(backBasketInstance.cvJointLoc+".translateZ", 0)
+                backBasketInstance.setArticulation(0)
                 
                 # parent back basket guide to chassis guide:
                 cmds.parent(backBasketInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)

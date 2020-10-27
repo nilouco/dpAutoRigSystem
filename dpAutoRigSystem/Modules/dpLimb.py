@@ -63,6 +63,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.afkIsolateConst = []
         self.aScalableGrps = []
         self.origRotList = []
+        self.bendJointList = []
 
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
@@ -77,6 +78,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
     def getAlignWorld(self):
         return cmds.getAttr(self.moduleGrp + ".alignWorld")
         
+    
     # @utils.profiler
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
@@ -92,6 +94,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.langDic[self.langName]['m042_default'] + ':' + self.langDic[self.langName]['m026_biped'] + ':' + self.langDic[self.langName]['m037_quadruped'] + ':' + self.langDic[self.langName]['m043_quadSpring'] + ':' + self.langDic[self.langName]['m155_quadrupedExtra'])
         cmds.addAttr(self.moduleGrp, longName="alignWorld", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".alignWorld", 1)
+        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".articulation", 1)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
@@ -214,7 +218,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         # bend layout:
         self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m044_addBend'], visible=True, parent=self.bendLayout)
-        self.bendChkbox = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
+        self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
         self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
         bendNumMenuItemList = [3, 5, 7]
         for item in bendNumMenuItemList:
@@ -229,9 +233,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         # align world layout:
         self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
-
-        self.bendChkbox = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=self.setAlignWorldFalse, onc=self.setAlignWorldTrue, parent=self.alignWorldLayout)
-                                        
+        self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=self.setAlignWorldFalse, onc=self.setAlignWorldTrue, parent=self.alignWorldLayout)
+        
     def setAlignWorldTrue(self, *args):
         self.hasAlignWorld = True
         cmds.setAttr(self.moduleGrp + ".alignWorld", 1)
@@ -371,6 +374,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            # articulation joint:
+            self.addArticJoint = self.getArticulation()
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -463,7 +468,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     self.cvLocList = [self.cvBeforeLoc, self.cvMainLoc, self.cvCornerLoc, self.cvExtremLoc]
                     self.jNameList = [beforeName, mainName, cornerName, extremName]
 
-                # creating joint to skin, ik, Fk and ikNotStretch chains:
+                # creating joint chains:
                 self.chainDic = {}
                 self.jSufixList = ['_Jnt', '_Ik_Jxt', '_Fk_Jxt', '_IkNotStretch_Jxt', '_IkAC_Jxt']
                 self.jEndSufixList = ['_JEnd', '_Ik_JEnd', '_Fk_JEnd', '_IkNotStretch_JEnd', '_IkAC_JEnd']
@@ -482,6 +487,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.fkJointList = self.chainDic[self.jSufixList[2]]
                 self.ikNSJointList = self.chainDic[self.jSufixList[3]]
                 self.ikACJointList = self.chainDic[self.jSufixList[4]]
+                
+                # hide not skin joints in order to be more Rigger friend when working the Skinning:
+                cmds.setAttr(self.ikJointList[0]+".visibility", 0)
+                cmds.setAttr(self.fkJointList[0]+".visibility", 0)
+                cmds.setAttr(self.ikNSJointList[0]+".visibility", 0)
+                cmds.setAttr(self.ikACJointList[1]+".visibility", 0)
 
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
@@ -1168,9 +1179,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                             if self.limbTypeName == ARM:
-                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd)
+                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint)
                             else:
-                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd)
+                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint)
                             cmds.delete(loc)
                             
                             cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
@@ -1268,16 +1279,46 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
                 
                 # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
-                if self.getHasBend():
-                    beforeNumber = "00"
-                    extremNumber = "11" #default value for 5 bends
+                # default value for 5 bend joints:
+                beforeNumber = "00" #clavicle/hips
+                firstNumber =  "01" #shoulder/leg
+                cornerNumber = "07" #elbow/knee
+                extremNumber = "13" #wrist/ankle
+                if self.getHasBend():                    
+                    if not self.addArticJoint:
+                        extremNumber = "11"
                     numBendJnt = self.getBendJoints()
                     if numBendJnt == 3:
-                        extremNumber = "07"
+                        cornerNumber = "05"
+                        extremNumber = "09"
+                        if not self.addArticJoint:
+                            extremNumber = "07"
                     elif numBendJnt == 7:
-                        extremNumber = "15"
+                        cornerNumber = "09"
+                        extremNumber = "17"
+                        if not self.addArticJoint:
+                            extremNumber = "15"
                     self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
+                    if self.addArticJoint:
+                        self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
+                        utils.setJointLabel(self.bendJointList[numBendJnt], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
+                        cmds.rename(self.bendJointList[numBendJnt], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                
+                # add main articulationJoint:
+                if self.addArticJoint:
+                    # shoulder / leg
+                    firstJntList = utils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
+                    utils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
+                    cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
+                    if not self.getHasBend():
+                        cornerJntList = utils.articulationJoint(self.skinJointList[1], self.skinJointList[2]) #could call to create corrective joints. See parameters to implement it, please.
+                        utils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
+                        cmds.rename(cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
+                        if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                            cornerBJntList = utils.articulationJoint(self.skinJointList[2], self.skinJointList[3]) #could call to create corrective joints. See parameters to implement it, please.
+                            utils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
+                            cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
                 # auto clavicle:
                 # loading Maya matrix node

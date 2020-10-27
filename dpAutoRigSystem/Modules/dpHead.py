@@ -32,6 +32,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
+        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".articulation", 1)
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck", r=0.5, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
@@ -122,6 +124,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            # articulation joint:
+            self.addArticJoint = self.getArticulation()
             # declare lists to store names and attributes:
             self.worldRefList, self.headCtrlList = [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
@@ -175,10 +179,13 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 
                 # creating joints:
-                self.neckJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']+"_Jnt")
+                self.neckJnt = cmds.joint(name=side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+"_Jnt")
                 self.headJxt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_Jxt")
                 cmds.select(clear=True)
-                self.headJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_Jnt", scaleCompensate=False)
+                if self.addArticJoint:
+                    self.headJnt = cmds.joint(name=side+self.userGuideName+"_02_"+self.langDic[self.langName]['c024_head']+"_Jnt", scaleCompensate=False)
+                else:
+                    self.headJnt = cmds.joint(name=side+self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+"_Jnt", scaleCompensate=False)
                 self.jawJnt  = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw']+"_Jnt", scaleCompensate=False)
                 self.chinJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c026_chin']+"_Jnt", scaleCompensate=False)
                 self.chewJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c048_chew']+"_Jnt", scaleCompensate=False)
@@ -187,6 +194,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.lLipJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c039_lip']+"_Jnt", scaleCompensate=False)
                 cmds.select(clear=True)
                 self.rLipJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c039_lip']+"_Jnt", scaleCompensate=False)
+                cmds.select(clear=True)
                 dpARJointList = [self.neckJnt, self.headJnt, self.jawJnt, self.chinJnt, self.chewJnt, self.lLipJnt, self.rLipJnt]
                 for dpARJoint in dpARJointList:
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -419,6 +427,12 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.rLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+self.headCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.headCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScaleConstraint")[0]
+                
+                # articulation joint:
+                if self.addArticJoint:
+                    articJntList = utils.articulationJoint(self.neckJnt, self.headJnt) #could call to create corrective joints. See parameters to implement it, please.
+                    utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c106_base'])
+                    cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.langDic[self.langName]['c106_base']+"_Jar")
                 
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]

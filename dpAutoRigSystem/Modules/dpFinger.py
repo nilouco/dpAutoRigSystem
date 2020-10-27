@@ -32,6 +32,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp + ".nJoints", 1)
 
         cmds.setAttr(self.moduleGrp + ".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
+        
+        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".articulation", 1)
 
         self.cvJointLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_JointLoc1", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
@@ -53,7 +56,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
         self.ctrls.directConnect(self.cvJointLoc, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
 
-        # change the number of falanges to 3:
+        # change the number of phalanges to 3:
         self.changeJointNumber(3)
 
         # create a base cvLoc to start the finger joints:
@@ -136,6 +139,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            # articulation joint:
+            self.addArticJoint = self.getArticulation()
             # declaring lists to send information for integration:
             self.scalableGrpList, self.ikCtrlZeroList = [], []
             # start as no having mirror:
@@ -248,7 +253,6 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(tempDel)
                     # zeroOut controls:
                     utils.zeroOut([self.sdkGrp])
-                    #cmds.rename(self.sdkGrp, self.sdkGrp+"_Grp")
                 # create end joint:
                 self.cvEndJoint = side + self.userGuideName + "_Guide_JointEnd"
                 self.endJoint = cmds.joint(name=side + self.userGuideName + "_JEnd", scaleCompensate=False)
@@ -272,7 +276,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                                 cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c021_showControls'], self.ctrlShape0 + ".visibility", force=True)
                                 cmds.setAttr(self.fingerCtrl + '.' + self.langDic[self.langName]['c021_showControls'], keyable=False, channelBox=True)
                             for j in range(1, self.nJoints + 1):
-                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c022_falange'] + str(j), attributeType='float', keyable=True)
+                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c022_phalange'] + str(j), attributeType='float', keyable=True)
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side + self.userGuideName + "_" + str(n - 1) + "_Jnt"
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
@@ -283,17 +287,17 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.makeIdentity(self.jnt, apply=True)
                     # create parent and scale constraints from ctrl to jnt:
                     cmds.delete(cmds.parentConstraint(self.fingerCtrl, self.jnt, maintainOffset=False, name=self.jnt + "_ParentConstraint"))
-                # make first falange be leads from base finger control:
+                # make first phalange be leads from base finger control:
                 cmds.parentConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_1_SDK_Zero_0_Grp", maintainOffset=True, name=side + self.userGuideName + "_1_SDK_Zero_0_Grp" + "_ParentConstraint")
                 cmds.scaleConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_1_SDK_Zero_0_Grp", maintainOffset=True, name=side + self.userGuideName + "_1_SDK_Zero_0_Grp" + "_ScaleConstraint")
                 if self.nJoints != 2:
                     cmds.parentConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_0_Jnt", maintainOffset=True, name=side + self.userGuideName + "_ParentConstraint")
                     cmds.scaleConstraint(side + self.userGuideName + "_0_Ctrl", side + self.userGuideName + "_0_Jnt", maintainOffset=True, name=side + self.userGuideName + "_ScaleConstraint")
-                # connecting the attributes from control 1 to falanges rotate:
+                # connecting the attributes from control 1 to phalanges rotate:
                 for n in range(1, self.nJoints + 1):
                     self.fingerCtrl = side + self.userGuideName + "_1_Ctrl"
-                    self.sdkGrp = side + self.userGuideName + "_" + str(n) + "_SDK_Zero_0_Grp"
-                    cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c022_falange'] + str(n), self.sdkGrp + ".rotateY", force=True)
+                    self.sdkGrp = side + self.userGuideName + "_" + str(n) + "_SDK_Grp"
+                    cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c022_phalange'] + str(n), self.sdkGrp + ".rotateY", force=True)
                     if n > 1:
                         self.ctrlShape = cmds.listRelatives(side + self.userGuideName + "_" + str(n) + "_Ctrl", children=True, type='nurbsCurve')[0]
                         cmds.connectAttr(self.fingerCtrl + "." + self.langDic[self.langName]['c021_showControls'], self.ctrlShape + ".visibility", force=True)
@@ -344,8 +348,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
                     if not "_JEnd" in ikJoint:
-                        if cmds.objExists(ikJoint + ".dpAR_joint"):
-                            cmds.deleteAttr(ikJoint + ".dpAR_joint")
+                        utils.clearDpArAttr([ikJoint])
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
                         self.fingerCtrl = side + self.userGuideName + "_1_Ctrl"
@@ -364,8 +367,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
-                        if cmds.objExists(fkJoint + ".dpAR_joint"):
-                            cmds.deleteAttr(fkJoint + ".dpAR_joint")
+                        utils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
                         scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
                         cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint + "_ParentConstraint")
@@ -381,6 +383,19 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 for nJnt in self.skinJointList:
                     if (int(cmds.about(version=True)[:4]) >= 2016):
                         cmds.setAttr(nJnt + ".segmentScaleCompensate", 0)
+
+                # add articulationJoint:
+                if self.addArticJoint:
+                    jointList = []
+                    for a in range(0, self.nJoints):
+                        jointList.append(self.skinJointList[a])
+                        artJntList = utils.articulationJoint(self.skinJointList[a], self.skinJointList[a+1]) #could call to create corrective joints. See parameters to implement it, please.
+                        utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+str(a)+"_Jar")
+                        jointList.append(artJntList[0])
+                    jointList.append(self.skinJointList[-1])
+                    for j, jnt in enumerate(jointList):
+                        cmds.rename(jnt, side+self.userGuideName+"_%02d_%s"%(j, jnt[jnt.rfind("_")+1:]))
+                    self.skinJointList[0] = side+self.userGuideName+"_00_Jnt"
 
                 # ik handle
                 if self.nJoints >= 2:
@@ -438,9 +453,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     # create a masterModuleGrp to be checked if this rig exists:
                     self.toCtrlHookGrp = cmds.group(self.ikCtrlZero, side + self.userGuideName + "_0_SDK_Zero_0_Grp", side + self.userGuideName + "_1_SDK_Zero_0_Grp", name=side + self.userGuideName + "_Control_Grp")
                     if self.nJoints == 2:
-                        self.toScalableHookGrp = cmds.group(side + self.userGuideName + "_0_Jnt", ikBaseJoint, fkBaseJoint, ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side + self.userGuideName + "_Joint_Grp")
+                        self.toScalableHookGrp = cmds.group(self.skinJointList[0], ikBaseJoint, fkBaseJoint, ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side + self.userGuideName + "_Joint_Grp")
                     else:
-                        self.toScalableHookGrp = cmds.group(side + self.userGuideName + "_0_Jnt", ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side + self.userGuideName + "_Joint_Grp")
+                        self.toScalableHookGrp = cmds.group(self.skinJointList[0], ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side + self.userGuideName + "_Joint_Grp")
                 else:
                     self.toCtrlHookGrp = cmds.group(side + self.userGuideName + "_0_SDK_Zero_0_Grp", side + self.userGuideName + "_1_SDK_Zero_0_Grp", name=side + self.userGuideName + "_Control_Grp")
                     self.toScalableHookGrp = cmds.group(side + self.userGuideName + "_0_Jnt", name=side + self.userGuideName + "_Joint_Grp")

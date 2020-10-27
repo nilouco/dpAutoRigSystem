@@ -303,3 +303,18 @@ class StartClass:
         """ This method just create this dictionary in order to build information of module integration.
         """
         self.integratedActionsDic = {}
+        
+        
+    # Gets:
+    #
+    def getArticulation(self, *args):
+        return cmds.getAttr(self.moduleGrp+".articulation")
+
+
+    # Sets:
+    #
+    def setArticulation(self, value, *args):
+        self.addArticJoint = value
+        cmds.setAttr(self.moduleGrp + ".articulation", value)
+    
+    

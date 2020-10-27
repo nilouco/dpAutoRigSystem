@@ -33,10 +33,17 @@ class RibbonClass:
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         
         
-    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, *args):
+    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, *args):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
+        cornerName = self.langDic[self.langName]['c007_leg_corner']
+        if arm:
+            cornerName = self.langDic[self.langName]['c002_arm_corner']
+        articNumber = 1
+        if addArtic:
+            articNumber = 2
+        
         if not oriLoc:
             oriLoc = cmds.ls(sl=True, l=True)[0]
         if not iniJnt:
@@ -62,13 +69,13 @@ class RibbonClass:
 
         cmds.delete(cmds.orientConstraint(oriLoc, midLoc, mo=False, skip=skipa, weight=1))
         
-        upctrlList = self.createBendCtrl(prefix+'Up_'+myName+'_Off_Ctrl', r=self.ctrlRadius)
+        upctrlList = self.createBendCtrl(prefix+myName+'_Up_Offset_Ctrl', r=self.ctrlRadius)
         upctrl = upctrlList[0]
         upctrlCtrl = upctrlList[1]
-        downctrlList = self.createBendCtrl(prefix+'Down_'+myName+'_Off_Ctrl', r=self.ctrlRadius)
+        downctrlList = self.createBendCtrl(prefix+myName+'_Down_Offset_Ctrl', r=self.ctrlRadius)
         downctrl = downctrlList[0]
         downctrlCtrl = downctrlList[1]
-        elbowctrlList = self.createElbowCtrl(prefix+myName+'_Off_Ctrl', armStyle=arm)
+        elbowctrlList = self.createElbowCtrl(prefix+myName+'_'+cornerName+'_Offset_Ctrl', armStyle=arm)
         elbowctrl = elbowctrlList[0]
         elbowctrlCtrl = elbowctrlList[1]
         elbowctrlZero = elbowctrlList[2]
@@ -81,15 +88,15 @@ class RibbonClass:
         cmds.addAttr(downctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
         
         if arm:
-            upLimb = self.createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
-            downLimb = self.createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, firstLimb=False, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
+            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, firstLimb=False, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleY", downLimb['extraCtrlGrp']+".scaleY", force=True)
         else:
-            upLimb = self.createRibbon(name=prefix+'Up_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
-            downLimb = self.createRibbon(name=prefix+'Down_'+myName, axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
+            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleY", force=True)
@@ -135,6 +142,12 @@ class RibbonClass:
         downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
         
         limbJoints = list(upLimb['skinJointsList'])
+        if addArtic:
+            # corner joint
+            cmds.select(clear=True)
+            cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt')
+            cmds.parentConstraint(elbowctrlCtrl, cornerJnt, mo=False, name=cornerJnt+"_ParentConstraint")
+            limbJoints.extend([cornerJnt])
         limbJoints.extend(downLimb['skinJointsList'])
         
         jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
@@ -147,7 +160,7 @@ class RibbonClass:
                 cmds.setAttr(nBone+".segmentScaleCompensate", 0)
         
         for i in range(len(limbJoints)):
-            limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+1))
+            limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+articNumber)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
             cmds.addAttr(limbJoints[i], longName="dpAR_joint", attributeType='float', keyable=False)
         
         scaleGrp = cmds.group(upLimb['scaleGrp'], downLimb['scaleGrp'], jntGrp, n=prefix+myName+'_Ribbon_Scale_Grp')
@@ -169,7 +182,7 @@ class RibbonClass:
             if '_Jnt' in item:
                 # remove dpAR skin attribute
                 try:
-                    cmds.deleteAttr(item+".dpAR_joint")
+                    utils.clearDpArAttr([item])
                 except:
                     pass
                 # rename joint
@@ -224,7 +237,7 @@ class RibbonClass:
         extraCtrlList = upLimb['extraCtrlList']
         extraCtrlList.extend(downLimb['extraCtrlList'])
         
-        return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD']}
+        return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD'], 'jntGrp':jntGrp}
     
     
     def createBendCtrl(self, myName='Bend_Ctrl', r=1, zero=True, *args):
@@ -249,7 +262,7 @@ class RibbonClass:
             curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0))
         grp = None
         if zero:
-            zero = cmds.group(curve, n=myName+'_Zero')
+            zero = cmds.group(curve, n=myName+'_Zero_0_Grp')
             grp = cmds.group(zero, n=myName+'_Grp')
             if armStyle:
                 cmds.rotate(0, -90, -90, zero)
@@ -347,8 +360,8 @@ class RibbonClass:
         drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bttm_Jxt')
         drv_Jnt[1] = cmds.rename(drv_Jnt[1], name+'_Drv_Mid_Jxt')
         drv_Jnt[2] = cmds.rename(drv_Jnt[2], name+'_Drv_Top_Jxt')
-        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bttm_End')
-        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_End')
+        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bttm_JEnd')
+        drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_JEnd')
         
         #place joints correctly accordaly with the user options choose
         if (horizontal and axis==(1, 0, 0)) or (horizontal and axis==(0, 0, 1)):
@@ -374,10 +387,10 @@ class RibbonClass:
                 cmds.setAttr(mid_Loc[3]+'.translateY', 2)
         
         #create auxiliary joints that will be used to control the ribbon
-        aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Jxt_Rot')[0])
+        aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Rot_Jxt')[0])
         cmds.setAttr(aux_Jnt[0]+'.jointOrient', 0, 0, 0)
         cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 5)
-        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_End')[0])
+        aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_JEnd')[0])
         
         cmds.parent(aux_Jnt[1], mid_Loc[3])
         cmds.setAttr(aux_Jnt[1]+'.translate', 0, 0, 0)
@@ -729,7 +742,7 @@ class RibbonClass:
         
         retDict['name'] = name
         retDict['locsList'] = [top_Loc[0], mid_Loc[0], bttm_Loc[0], top_Loc[3], bttm_Loc[3]]
-        retDict['skinJointsList'] =  rb_Jnt
+        retDict['skinJointsList'] = rb_Jnt
         retDict['scaleGrp'] = locatorsGrp
         retDict['finalGrp'] = finalSystemGrp
         retDict['middleCtrl'] = mid_Ctrl
@@ -752,7 +765,7 @@ class RibbonClass:
         fols = []
         #create joints and follicles based in the choose options from user
         if horizontal:
-            #calcule the position of the first follicle
+            #calculate the position of the first follicle
             passo = (1/float(num))/2.0;
             for i in range(num):
                 #create the follicle and do correct connections to link it to the 

@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.01"
-DPAR_UPDATELOG = "#028 Added Limb scale muliplier attribute."
+DPAR_VERSION = "3.10.02"
+DPAR_UPDATELOG = "#019 Fix: Ribbon naming convention.\n#168 Enhancement: Hide Limb ikFkAC joint chains.\n#165 Improvement: Articulation joint.\n#167 WIP: Corrective joints.\n#172 Fixed Finger zeroOut control position issue."
 
 
 
@@ -431,9 +431,10 @@ class DP_AutoRig_UI:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.langDic[self.langName]['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
         dpARJoints  = cmds.radioButton( label=self.langDic[self.langName]['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
-        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=2, columnWidth=[(1, 40), (2, 100)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
-        self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="_Jnt", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
-        self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="_Jis", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=3, columnWidth=[(1, 40), (2, 50), (3, 60)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10), (3, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
+        self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="_Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="_Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="_Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
@@ -447,7 +448,7 @@ class DP_AutoRig_UI:
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.langDic[self.langName]['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
-        cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=allGeoms )
+        cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
         #footerB - columnLayout:
@@ -774,18 +775,24 @@ class DP_AutoRig_UI:
             jointList = allJointList
             cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=False)
             cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=False)
+            cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=False)
         elif chooseJnt == "dpARJoints":
             cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=True)
             cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=True)
+            cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=True)
             displayJnt = cmds.checkBox(self.allUIs["_JntCB"], query=True, value=True)
             displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
+            displayJar = cmds.checkBox(self.allUIs["_JarCB"], query=True, value=True)
             for jointNode in allJointList:
                 if cmds.objExists(jointNode+'.'+BASE_NAME+'joint'):
                     if displayJnt:
-                        if "_Jnt" in jointNode:
+                        if jointNode.endswith("_Jnt"):
                             jointList.append(jointNode)
                     if displayJis:
-                        if "_Jis" in jointNode:
+                        if jointNode.endswith("_Jis"):
+                            jointList.append(jointNode)
+                    if displayJar:
+                        if jointNode.endswith("_Jar"):
                             jointList.append(jointNode)
         
         # sort joints by name filter:

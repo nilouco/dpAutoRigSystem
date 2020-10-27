@@ -39,6 +39,9 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
+        cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".articulation", 1)
+        
         self.cvJointLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -141,6 +144,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
                 hideJoints = 1
+            # articulation joint:
+            self.addArticJoint = self.getArticulation()
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -187,6 +192,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
+                self.skinJointList = []
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 for n in range(1, self.nJoints+1):
@@ -198,6 +204,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
                     utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+str(n))
+                    self.skinJointList.append(self.jnt)
                     # create a control:
 #                    self.mainCtrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
                     self.mainCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_"+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
@@ -230,7 +237,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 # grouping:
                 for n in range(1, self.nJoints+1):
                     self.jnt      = side+self.userGuideName+"_"+str(n)+"_Jnt"
-                    self.mainCtrl     = side+self.userGuideName+"_"+str(n)+"_Ctrl"
+                    self.mainCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl"
                     self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl_Zero_0_Grp"
                     if n > 1:
                         # parent joints as a simple chain (line)
@@ -243,9 +250,23 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     cmds.parentConstraint(self.mainCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
                     # create scaleConstraint from mainCtrl to jnt:
                     cmds.scaleConstraint(self.mainCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                
+                # add articulationJoint:
+                if self.addArticJoint:
+                    jointList = []
+                    for a in range(0, self.nJoints-1):
+                        jointList.append(self.skinJointList[a])
+                        artJntList = utils.articulationJoint(self.skinJointList[a], self.skinJointList[a+1]) #could call to create corrective joints. See parameters to implement it, please.
+                        utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+str(a)+"_Jar")
+                        jointList.append(artJntList[0])
+                    jointList.append(self.skinJointList[-1])
+                    for j, jnt in enumerate(jointList):
+                        cmds.rename(jnt, side+self.userGuideName+"_%02d_%s"%(j, jnt[jnt.rfind("_")+1:]))
+                    self.skinJointList[0] = side+self.userGuideName+"_00_Jnt"
+                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_Ctrl_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_Jnt", name=side+self.userGuideName+"_Joint_Grp")
+                self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]

@@ -134,6 +134,7 @@ class LayoutClass:
                 self.startFrameExists = cmds.objExists(self.moduleGrp+".startFrame")
                 self.steeringExists = cmds.objExists(self.moduleGrp+".steering")
                 self.fatherBExists = cmds.objExists(self.moduleGrp+".fatherB")
+                self.articulationExists = cmds.objExists(self.moduleGrp+".articulation")
                 
                 # UI
                 # edit label of frame layout:
@@ -302,6 +303,13 @@ class LayoutClass:
                     else:
                         cmds.optionMenu(self.degreeMenu, edit=True, value='3 - Cubic')
                         
+                # create articulation joint layout:
+                if self.articulationExists:
+                    self.articLayout = cmds.rowLayout('articLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(self.langDic[self.langName]['m173_articulation'], parent=self.articLayout)
+                    articValue = cmds.getAttr(self.moduleGrp+".articulation")
+                    self.articCB = cmds.checkBox(label="", value=articValue, changeCommand=self.changeArticulation, parent=self.articLayout)
+                
             except:
                 pass
     
@@ -430,8 +438,14 @@ class LayoutClass:
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             cmds.setAttr(self.moduleGrp+".mirrorName", item, type='string')
-            
-            
+    
+    
+    def changeArticulation(self, *args):
+        """ Set the attribute value for articulation.
+        """
+        cmds.setAttr(self.moduleGrp+".articulation", cmds.checkBox(self.articCB, query=True, value=True))
+    
+    
     def changeDegree(self, item, *args):
         """ This function receives the degree menu name item and set it as a string in the guide base (moduleGrp).
         """

@@ -696,6 +696,35 @@ def validateName(nodeName, suffix=None, *args):
     return nodeName
 
 
+def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, *args):
+    """ Create a simple joint to help skinning with a half rotation value.
+        Receives the number of corrective joints to be created. Zero by default.
+        Returns the created joint list.
+    """
+    jointList = []
+    if fatherNode and brotherNode:
+        if cmds.objExists(fatherNode) and cmds.objExists(brotherNode):
+            jarName = brotherNode[:brotherNode.rfind("_")]+"_Jar"
+            cmds.select(clear=True)
+            jar = cmds.joint(name=jarName, scaleCompensate=False)
+            cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
+            jointList.append(jar)
+            for i in range(0, corrNumber):
+                jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
+                cmds.setAttr(jcr+".translateX", ((i+1)*dist))
+                cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+                cmds.select(jar)
+                jointList.append(jcr)
+            cmds.delete(cmds.parentConstraint(brotherNode, jar, maintainOffset=0))
+            cmds.makeIdentity(jar, apply=True)
+            cmds.setAttr(jar+".segmentScaleCompensate", 0)
+            cmds.parent(jar, fatherNode)
+            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=brotherNode+"_PointConstraint")[0]
+            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=brotherNode+"_OrientConstraint")[0]
+            cmds.setAttr(oc+".interpType", 2) #Shortest
+            return jointList
+
+
 #Profiler decorator
 DPAR_PROFILE_MODE = False
 def profiler(func):

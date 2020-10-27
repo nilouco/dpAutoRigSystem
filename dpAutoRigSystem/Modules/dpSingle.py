@@ -203,7 +203,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     cmds.select(clear=True)
                     jxtName = self.jnt.replace("_Jnt", "_Jxt")
                     self.jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
-                    cmds.deleteAttr(self.jxt, attribute="dpAR_joint")
+                    utils.clearDpArAttr([self.jxt])
                     cmds.parent(self.jnt, self.jxt)
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']

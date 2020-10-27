@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-08-08",
+    "_updated"       : "2020-10-26",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -34,7 +34,7 @@
     "c019_RevFoot_spin"      : "tourner",
     "c020_RevFoot_turn"      : "turn",
     "c021_showControls"      : "montrerControleurs",
-    "c022_falange"           : "phalange",
+    "c022_phalange"          : "phalange",
     "c023_neck"              : "Cou",
     "c024_head"              : "Tete",
     "c025_jaw"               : "Machoire",
@@ -118,6 +118,7 @@
 	"c103_plant"             : "planter",
 	"c104_expand"            : "etendre",
     "c105_scaleMultiplier"   : "multiplicateurDechelle",
+	"c106_base"              : "Base",
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -499,6 +500,7 @@
 	"m170_blendShapes"         : "Blend Shapes",
     "m171_joints"              : "Joints",
 	"m172_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
+	"m173_articulation"        : "Articulation",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

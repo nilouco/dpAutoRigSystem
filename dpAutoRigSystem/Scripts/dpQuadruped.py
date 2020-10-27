@@ -352,6 +352,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
+                upperTeethInstance.setArticulation(0)
                 # create FkLine module instance:
                 upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
@@ -362,6 +363,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
                 upperTeethMiddleInstance.displayAnnotation(0)
+                upperTeethMiddleInstance.setArticulation(0)
                 # parent upperTeethMiddle guide to upperTeeth guide:
                 cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
@@ -377,6 +379,7 @@ def Quadruped(dpUIinst):
                 upperTeethSideInstance.changeMirror("X")
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
                 upperTeethSideInstance.displayAnnotation(0)
+                upperTeethSideInstance.setArticulation(0)
                 # parent upperTeethSide guide to upperTeeth guide:
                 cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
@@ -388,6 +391,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
+                lowerTeethInstance.setArticulation(0)
                 # parent lowerTeeth guide to head guide:
                 cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 # create FkLine module instance:
@@ -400,6 +404,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
                 lowerTeethMiddleInstance.displayAnnotation(0)
+                lowerTeethMiddleInstance.setArticulation(0)
                 # parent lowerTeeth guide to lowerTeeth guide:
                 cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
@@ -415,6 +420,7 @@ def Quadruped(dpUIinst):
                 lowerTeethSideInstance.changeMirror("X")
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
                 lowerTeethSideInstance.displayAnnotation(0)
+                lowerTeethSideInstance.setArticulation(0)
                 # parent lowerTeethSide guide to lowerTeeth guide:
                 cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
                 
@@ -438,6 +444,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
                 cmds.setAttr(tongueInstance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(tongueInstance.moduleGrp+".shapeSize", 0.4)
+                tongueInstance.setArticulation(0)
                 # parent tongue guide to head guide:
                 cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 
@@ -465,6 +472,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(noseInstance.moduleGrp+".nJoints", 3)
                 cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.7)
                 cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
+                noseInstance.setArticulation(0)
                 # parent nose guide to head guide:
                 cmds.parent(noseInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
                 # parent upperTeeth guide to Nose1 guide:
@@ -482,6 +490,7 @@ def Quadruped(dpUIinst):
                 # setting X mirror:
                 nostrilInstance.changeMirror("X")
                 cmds.setAttr(nostrilInstance.moduleGrp+".flip", 1)
+                nostrilInstance.setArticulation(0)
                 # parent nostril guide to nose guide:
                 cmds.parent(nostrilInstance.moduleGrp, storedNose2Guide, absolute=True)
                 
@@ -506,6 +515,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe1FrontInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe1FrontInstance.moduleGrp+".flip", 1)
                 toe1FrontInstance.displayAnnotation(0)
+                toe1FrontInstance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
@@ -531,6 +541,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe2FrontInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2FrontInstance.moduleGrp+".flip", 1)
                 toe2FrontInstance.displayAnnotation(0)
+                toe2FrontInstance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
@@ -556,6 +567,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe3FrontInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3FrontInstance.moduleGrp+".flip", 1)
                 toe3FrontInstance.displayAnnotation(0)
+                toe3FrontInstance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
@@ -581,6 +593,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe4FrontInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe4FrontInstance.moduleGrp+".flip", 1)
                 toe4FrontInstance.displayAnnotation(0)
+                toe4FrontInstance.setArticulation(0)
                 
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
@@ -606,6 +619,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe1BackInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe1BackInstance.moduleGrp+".flip", 1)
                 toe1BackInstance.displayAnnotation(0)
+                toe1BackInstance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
@@ -631,6 +645,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe2BackInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2BackInstance.moduleGrp+".flip", 1)
                 toe2BackInstance.displayAnnotation(0)
+                toe2BackInstance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
@@ -656,6 +671,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe3BackInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3BackInstance.moduleGrp+".flip", 1)
                 toe3BackInstance.displayAnnotation(0)
+                toe3BackInstance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
@@ -681,6 +697,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe4BackInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe4BackInstance.moduleGrp+".flip", 1)
                 toe4BackInstance.displayAnnotation(0)
+                toe4BackInstance.setArticulation(0)
                 
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
