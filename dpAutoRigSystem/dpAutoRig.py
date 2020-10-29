@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.02"
-DPAR_UPDATELOG = "#019 Fix: Ribbon naming convention.\n#168 Enhancement: Hide Limb ikFkAC joint chains.\n#165 Improvement: Articulation joint.\n#167 WIP: Corrective joints.\n#172 Fixed Finger zeroOut control position issue."
+DPAR_VERSION = "3.10.03"
+DPAR_UPDATELOG = "#173 Fixed loaded window size."
 
 
 
@@ -49,6 +49,7 @@ def dpARLoadingWindow():
     cmds.image('loadingImage', image=(path+"/Icons/dp_loading_0%i.png" %randImage), backgroundColor=(0.8, 0.8, 0.8), parent='dpARLoadLayout')
     cmds.text('versionText', label=loadingString, parent='dpARLoadLayout')
     cmds.showWindow('dpARLoadWin')
+    cmds.window('dpARLoadWin', edit=True, widthHeight=(285, 203))
 
 if not "pymel" in sys.modules:
     dpARLoadingWindow()
