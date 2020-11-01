@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.03"
-DPAR_UPDATELOG = "#173 Fixed loaded window size."
+DPAR_VERSION = "3.10.04"
+DPAR_UPDATELOG = "#010 Fixed Spine segments.\nChanged Joint Articulation (_Jar) numbering.\nReviewed joint number padding."
 
 
 

@@ -86,17 +86,11 @@ class ControlClass:
             # list all children shapes:
             childShapeList = cmds.listRelatives(transform, shapes=True, children=True, fullPath=True)
             if childShapeList:
-                # verify if there is only one shape and return it renamed:
-                if len(childShapeList) == 1:
-                    shape = cmds.rename(childShapeList[0], transform+"Shape")
-                    cmds.select(clear=True)
+                for i, child in enumerate(childShapeList):
+                    shapeName = transform+str(i)+"Shape"
+                    shape = cmds.rename(child, shapeName)
                     resultList.append(shape)
-                # else rename and return one list of renamed shapes:
-                elif len(childShapeList) > 1:
-                    for i, child in enumerate(childShapeList):
-                        shape = cmds.rename(child, transform+str(i)+"Shape")
-                        resultList.append(shape)
-                    cmds.select(clear=True)
+                cmds.select(clear=True)
             else:
                 print "There are not children shape to rename inside of:", transform
         return resultList
@@ -509,7 +503,7 @@ class ControlClass:
         self.colorShape([circle], 'yellow')
         self.colorShape([radiusCtrl], 'cyan')
         if (int(cmds.about(version=True)[:4]) > 2016):
-            cmds.setAttr(circle+"Shape.lineWidth", 2)
+            cmds.setAttr(circle+"0Shape.lineWidth", 2)
         cmds.select(clear=True)
         return [circle, radiusCtrl]
     

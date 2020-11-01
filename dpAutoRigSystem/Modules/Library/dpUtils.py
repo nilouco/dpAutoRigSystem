@@ -719,8 +719,8 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, *args):
             cmds.makeIdentity(jar, apply=True)
             cmds.setAttr(jar+".segmentScaleCompensate", 0)
             cmds.parent(jar, fatherNode)
-            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=brotherNode+"_PointConstraint")[0]
-            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=brotherNode+"_OrientConstraint")[0]
+            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PointConstraint")[0]
+            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrientConstraint")[0]
             cmds.setAttr(oc+".interpType", 2) #Shortest
             return jointList
 

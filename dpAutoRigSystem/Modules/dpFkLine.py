@@ -192,80 +192,68 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
+                self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
-                for n in range(1, self.nJoints+1):
+                for n in range(0, self.nJoints):
                     cmds.select(clear=True)
                     # declare guide:
-                    self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n)
+                    self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n+1)
                     # create a joint:
-                    self.jnt = cmds.joint(name=side+self.userGuideName+"_"+str(n)+"_Jnt", scaleCompensate=False)
+                    self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+str(n))
+                    utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-#                    self.mainCtrl = cmds.circle(name=side+self.userGuideName+"_"+str(n)+"_Ctrl", degree=1, normal=(0, 0, 1), r=self.ctrlRadius, s=6, ch=False)[0]
-                    self.mainCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_"+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                    if n == 1:
-                        utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide)
-                    else:
-                        utils.originedFrom(objName=self.mainCtrl, attrString=self.guide)
+                    self.jntCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.guide, self.mainCtrl, maintainOffset=False))
+                    cmds.delete(cmds.parentConstraint(self.guide, self.jntCtrl, maintainOffset=False))
                     # zeroOut controls:
-                    zeroOutCtrlGrp = utils.zeroOut([self.mainCtrl])[0]
+                    self.zeroOutCtrlGrp = utils.zeroOut([self.jntCtrl])[0]
                     # hide visibility attribute:
-                    cmds.setAttr(self.mainCtrl+'.visibility', keyable=False)
+                    cmds.setAttr(self.jntCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
                     if s == 1:
                         if cmds.getAttr(self.moduleGrp+".flip") == 1:
-                            cmds.setAttr(zeroOutCtrlGrp+".scaleX", -1)
-                            cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
-                            cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
-                    cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                    cmds.setAttr(self.mainCtrl+".scaleCompensate", 1, channelBox=True)
-                    cmds.connectAttr(self.mainCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                            cmds.setAttr(self.zeroOutCtrlGrp+".scaleX", -1)
+                            cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
+                            cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
+                    cmds.addAttr(self.jntCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                    cmds.setAttr(self.jntCtrl+".scaleCompensate", 1, channelBox=True)
+                    cmds.connectAttr(self.jntCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
+                    if n == 0:
+                        utils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide)
+                        self.ctrlZeroGrp = self.zeroOutCtrlGrp
+                    else:
+                        utils.originedFrom(objName=self.jntCtrl, attrString=self.guide)
+                    # grouping:
+                    if n > 0:
+                        # parent joints as a simple chain (line)
+                        self.fatherJnt = side+self.userGuideName+"_%02d_Jnt"%(n-1)
+                        cmds.parent(self.jnt, self.fatherJnt, absolute=True)
+                        # parent zeroCtrl Group to the before jntCtrl:
+                        self.fatherCtrl = side+self.userGuideName+"_%02d_Ctrl"%(n-1)
+                        cmds.parent(self.zeroOutCtrlGrp, self.fatherCtrl, absolute=True)
+                    # control drives joint:
+                    cmds.parentConstraint(self.jntCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
+                    cmds.scaleConstraint(self.jntCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                    # add articulationJoint:
+                    if n > 0:
+                        if self.addArticJoint:
+                            artJntList = utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                    cmds.select(self.jnt)
+                    # end chain:
                     if n == self.nJoints:
                         # create end joint:
-                        cmds.select(self.jnt)
                         self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
-                # grouping:
-                for n in range(1, self.nJoints+1):
-                    self.jnt      = side+self.userGuideName+"_"+str(n)+"_Jnt"
-                    self.mainCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl"
-                    self.zeroCtrl = side+self.userGuideName+"_"+str(n)+"_Ctrl_Zero_0_Grp"
-                    if n > 1:
-                        # parent joints as a simple chain (line)
-                        self.fatherJnt = side+self.userGuideName+"_"+str(n-1)+"_Jnt"
-                        cmds.parent(self.jnt, self.fatherJnt, absolute=True)
-                        # parent zeroCtrl Group to the before mainCtrl:
-                        self.fatherCtrl = side+self.userGuideName+"_"+str(n-1)+"_Ctrl"
-                        cmds.parent(self.zeroCtrl, self.fatherCtrl, absolute=True)
-                    # create parentConstraint from mainCtrl to jnt:
-                    cmds.parentConstraint(self.mainCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
-                    # create scaleConstraint from mainCtrl to jnt:
-                    cmds.scaleConstraint(self.mainCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
-                
-                # add articulationJoint:
-                if self.addArticJoint:
-                    jointList = []
-                    for a in range(0, self.nJoints-1):
-                        jointList.append(self.skinJointList[a])
-                        artJntList = utils.articulationJoint(self.skinJointList[a], self.skinJointList[a+1]) #could call to create corrective joints. See parameters to implement it, please.
-                        utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+str(a)+"_Jar")
-                        jointList.append(artJntList[0])
-                    jointList.append(self.skinJointList[-1])
-                    for j, jnt in enumerate(jointList):
-                        cmds.rename(jnt, side+self.userGuideName+"_%02d_%s"%(j, jnt[jnt.rfind("_")+1:]))
-                    self.skinJointList[0] = side+self.userGuideName+"_00_Jnt"
-                
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(side+self.userGuideName+"_1_Ctrl_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
