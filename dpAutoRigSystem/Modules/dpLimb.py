@@ -1232,94 +1232,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 if self.limbTypeName == ARM:
                                     cmds.setAttr(downCtrl+".invert", 1)
                 
-                if loadedIkFkSnap:
-                    # do otherCtrlList get extraCtrlList from bendy
-                    otherCtrlList = []
-                    if self.getHasBend():
-                        if self.loadedRibbon:
-                            otherCtrlList = self.bendGrps['extraCtrlList']
-                    otherCtrlList.append(self.toParentExtremCtrl)
-                    # create a ghost value in order to avoid ikFkNetwork crashes without footRoll attributes:
-                    cmds.addAttr(self.worldRef, longName='footRollPlaceHolder', attributeType='long', defaultValue=0, keyable=False)
-                    # create ikFkNetwork:
-                    data = sqIkFkTools.IkFkNetwork()
-                    # initialise ikFkNetwork:
-                    if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                        data.init(
-                            self.ikExtremCtrl,
-                            self.ikCornerCtrl,
-                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3], self.ikJointList[4]],
-                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3], self.ikJointList[4]],
-                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
-                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
-                            otherCtrls=otherCtrlList
-                        )
-                    else:
-                        data.init(
-                            self.ikExtremCtrl,
-                            self.ikCornerCtrl,
-                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3]],
-                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3]],
-                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
-                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
-                            otherCtrls=otherCtrlList
-                        )
-                    # serialise ikFkNetwork:
-                    ikFkNet = libSerialization.export_network(data)
-                    ikFkNet = cmds.rename(ikFkNet.__melobject__(), side + self.userGuideName + "_" + str(dpAR_count) + "_IkFkNetwork")
-                    self.ikFkNetworkList.append(ikFkNet)
-                    if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
-                        lastIndex = len(otherCtrlList)
-                        if self.getHasBend():
-                            if self.loadedRibbon:
-                                cmds.connectAttr(self.bendGrps['ctrlList'][0] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
-                                cmds.connectAttr(self.bendGrps['ctrlList'][1] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 2) + "]", force=True)
-                                cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)
-                        elif self.limbTypeName == ARM:
-                            cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
-                
-                # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
-                # default value for 5 bend joints:
-                beforeNumber = "00" #clavicle/hips
-                firstNumber =  "01" #shoulder/leg
-                cornerNumber = "07" #elbow/knee
-                extremNumber = "13" #wrist/ankle
-                if self.getHasBend():                    
-                    if not self.addArticJoint:
-                        extremNumber = "11"
-                    numBendJnt = self.getBendJoints()
-                    if numBendJnt == 3:
-                        cornerNumber = "05"
-                        extremNumber = "09"
-                        if not self.addArticJoint:
-                            extremNumber = "07"
-                    elif numBendJnt == 7:
-                        cornerNumber = "09"
-                        extremNumber = "17"
-                        if not self.addArticJoint:
-                            extremNumber = "15"
-                    self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
-                    self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
-                    if self.addArticJoint:
-                        self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
-                        utils.setJointLabel(self.bendJointList[numBendJnt], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
-                        cmds.rename(self.bendJointList[numBendJnt], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
-                
-                # add main articulationJoint:
-                if self.addArticJoint:
-                    # shoulder / leg
-                    firstJntList = utils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
-                    utils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
-                    cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
-                    if not self.getHasBend():
-                        cornerJntList = utils.articulationJoint(self.skinJointList[1], self.skinJointList[2]) #could call to create corrective joints. See parameters to implement it, please.
-                        utils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
-                        cmds.rename(cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
-                        if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                            cornerBJntList = utils.articulationJoint(self.skinJointList[2], self.skinJointList[3]) #could call to create corrective joints. See parameters to implement it, please.
-                            utils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
-                            cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
-                
                 # auto clavicle:
                 # loading Maya matrix node
                 loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
@@ -1411,6 +1323,99 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         cmds.setAttr(acMirrorFixMD+".input2Z", -1)
                     
                     cmds.setAttr(acLocGrp+".visibility", 0)
+                
+                if loadedIkFkSnap:
+                    # do otherCtrlList get extraCtrlList from bendy
+                    otherCtrlList = []
+                    if self.getHasBend():
+                        if self.loadedRibbon:
+                            otherCtrlList = self.bendGrps['extraCtrlList']
+                    otherCtrlList.append(self.toParentExtremCtrl)
+                    otherCtrlList.append(self.fkCtrlList[0])
+                    # create a ghost value in order to avoid ikFkNetwork crashes without footRoll attributes:
+                    cmds.addAttr(self.worldRef, longName='footRollPlaceHolder', attributeType='long', defaultValue=0, keyable=False)
+                    # create ikFkNetwork:
+                    data = sqIkFkTools.IkFkNetwork()
+                    # initialise ikFkNetwork:
+                    if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                        data.init(
+                            self.ikExtremCtrl,
+                            self.ikCornerCtrl,
+                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3], self.ikJointList[4]],
+                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3], self.fkCtrlList[4]],
+                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
+                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
+                            otherCtrls=otherCtrlList,
+                            beforeCtrlAttr=self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'],
+                            ikShoulders=[self.ikJointList[1], self.ikACJointList[1]]
+                        )
+                    else:
+                        data.init(
+                            self.ikExtremCtrl,
+                            self.ikCornerCtrl,
+                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3]],
+                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3]],
+                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
+                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
+                            otherCtrls=otherCtrlList,
+                            beforeCtrlAttr=self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'],
+                            ikShoulders=[self.ikJointList[1], self.ikACJointList[1]]
+                        )
+                    # serialise ikFkNetwork:
+                    ikFkNet = libSerialization.export_network(data)
+                    ikFkNet = cmds.rename(ikFkNet.__melobject__(), side + self.userGuideName + "_" + str(dpAR_count) + "_IkFkNetwork")
+                    self.ikFkNetworkList.append(ikFkNet)
+                    if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                        lastIndex = len(otherCtrlList)
+                        if self.getHasBend():
+                            if self.loadedRibbon:
+                                cmds.connectAttr(self.bendGrps['ctrlList'][0] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
+                                cmds.connectAttr(self.bendGrps['ctrlList'][1] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 2) + "]", force=True)
+                                cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)
+                        elif self.limbTypeName == ARM:
+                            cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
+                
+                # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
+                # default value for 5 bend joints:
+                beforeNumber = "00" #clavicle/hips
+                firstNumber =  "01" #shoulder/leg
+                cornerNumber = "07" #elbow/knee
+                extremNumber = "13" #wrist/ankle
+                if self.getHasBend():                    
+                    if not self.addArticJoint:
+                        extremNumber = "11"
+                    numBendJnt = self.getBendJoints()
+                    if numBendJnt == 3:
+                        cornerNumber = "05"
+                        extremNumber = "09"
+                        if not self.addArticJoint:
+                            extremNumber = "07"
+                    elif numBendJnt == 7:
+                        cornerNumber = "09"
+                        extremNumber = "17"
+                        if not self.addArticJoint:
+                            extremNumber = "15"
+                    self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
+                    self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
+                    if self.addArticJoint:
+                        self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
+                        utils.setJointLabel(self.bendJointList[numBendJnt], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
+                        cmds.rename(self.bendJointList[numBendJnt], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                
+                # add main articulationJoint:
+                if self.addArticJoint:
+                    # shoulder / leg
+                    firstJntList = utils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
+                    utils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
+                    cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
+                    if not self.getHasBend():
+                        cornerJntList = utils.articulationJoint(self.skinJointList[1], self.skinJointList[2]) #could call to create corrective joints. See parameters to implement it, please.
+                        utils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
+                        cmds.rename(cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
+                        if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                            cornerBJntList = utils.articulationJoint(self.skinJointList[2], self.skinJointList[3]) #could call to create corrective joints. See parameters to implement it, please.
+                            utils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
+                            cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
                 # integrating dics:
                 self.extremJntList.append(self.skinJointList[-2])

@@ -3,9 +3,11 @@ try:
 except:
     import libSerialization
 
+
 import pymel.core as pymel
 from maya import cmds
 import logging, functools
+
 
 # Ensure we always deal with pynodes
 def _cast_string_to_pynode(val):
@@ -17,6 +19,7 @@ def _cast_string_to_pynode(val):
     if isinstance(val, list): return [_cast_string_to_pynode(subval) for subval in val]
     raise IOError("Invalid argument {0}, expected type string or PyNode, got {1}".format(subval, type(subval)))
 
+
 # Ensure we always deal with attributes
 def _cast_string_to_attribute(val):
     if isinstance(val, pymel.Attribute): return val
@@ -27,11 +30,12 @@ def _cast_string_to_attribute(val):
     if isinstance(val, list): return [_cast_string_to_attribute(subval) for subval in val]
     raise IOError("Invalid argument {0}, expected type string or Attribute, got {1}".format(subval, type(subval)))
 
+
 class IkFkNetwork(object):
     _state_ik = 0.0
     _state_fk = 1.0
 
-    def init(self, ikCtrl, ikCtrlSwivel, ikChain, fkCtrls, attState, iEndIndex=2, footRollAtts=[], otherCtrls=[]):
+    def init(self, ikCtrl, ikCtrlSwivel, ikChain, fkCtrls, attState, iEndIndex=2, footRollAtts=[], otherCtrls=[], beforeCtrlAttr=None, ikShoulders=[]):
         # Validate arguments
         self.ikCtrl       = _cast_string_to_pynode(ikCtrl)
         self.ikCtrlSwivel = _cast_string_to_pynode(ikCtrlSwivel)
@@ -41,10 +45,16 @@ class IkFkNetwork(object):
         self.attState     = _cast_string_to_attribute(attState)
         self.footRollAtts = _cast_string_to_attribute(footRollAtts)
         self.otherCtrls   = _cast_string_to_pynode(otherCtrls) # The only goal of this attribute is to use additional control to detect a limb
+        self.beforeCtrlAttr = None
+        self.currentFollowAttr = 0
+        if beforeCtrlAttr:
+            self.beforeCtrlAttr = _cast_string_to_attribute(beforeCtrlAttr)
+        self.ikShoulders = _cast_string_to_pynode(ikShoulders)
 
         # Compute transform offset between ikCtrl and corresponding fkCtrl
         fkHandCtrl = self.fkCtrls[self.iEndIndex]
         self.ikCtrlOffset = self.ikCtrl.getMatrix(worldSpace=True) * fkHandCtrl.getMatrix(worldSpace=True).inverse()
+
 
     def _get_swivel_middle(self, posS, posM, posE):
         fLengthS = posM.distanceTo(posS)
@@ -52,10 +62,30 @@ class IkFkNetwork(object):
         fLengthRatio = fLengthS / (fLengthS+fLengthE)
         return (posE - posS) * fLengthRatio + posS
 
+
+    def storeFollowAttr(self, *args):
+        if self.beforeCtrlAttr:
+            self.currentFollowAttr = self.beforeCtrlAttr.get()
+            self.beforeCtrlAttr.set(0)
+
+
+    def restoreFollowAttr(self, *args):
+        if self.beforeCtrlAttr:
+            self.beforeCtrlAttr.set(self.currentFollowAttr)
+
+
     def snapIkToFk(self):
+        
+        # vai para o ik
+        
+        
+        
+        self.ikACOffset = self.ikShoulders[0].getMatrix(worldSpace=True) * self.ikShoulders[1].getMatrix(worldSpace=True).inverse()
+        self.storeFollowAttr()
+        
         # Set ikCtrl transform
         tmCtrlFk = self.fkCtrls[self.iEndIndex].getMatrix(worldSpace=True)
-        self.ikCtrl.setMatrix(self.ikCtrlOffset * tmCtrlFk, worldSpace=True)
+        self.ikCtrl.setMatrix(self.ikCtrlOffset * tmCtrlFk * self.ikACOffset, worldSpace=True)
 
         # Set ikCtrlSwivel transform
         posRef = self.fkCtrls[self.iEndIndex-1].getTranslation(space='world')
@@ -70,21 +100,31 @@ class IkFkNetwork(object):
 
         self.ikCtrl.setMatrix(self.ikCtrlOffset * tmCtrlFk, worldSpace=True)
         self.ikCtrlSwivel.setTranslation(posSwivel, space='world')
-
+        
         # Reset footroll attributes
         if hasattr(self, 'footRollAtts'): # Hack: libSerialization don't write the attribute if it's empty wich can cause a crash
             for att in self.footRollAtts:
                 att.set(0)
-
+        self.restoreFollowAttr()
+        print "Rosa = fk --> ik"
+        
+    
     def snapFkToIk(self):
+    
+        # vai para o fk
+    
+        self.storeFollowAttr()
         for ctrl, jnt in zip(self.fkCtrls, self.ikChain):
             ctrl.setMatrix(jnt.getMatrix(worldSpace=True), worldSpace=True)
+        self.restoreFollowAttr()
+        print "Roxo = ik --> fk"
         
 
     def switchToIk(self):
         if self.attState.get() != self._state_ik:
             self.snapIkToFk()
             self.setAttState(self._state_ik)
+
 
     def switchToFk(self):
         if self.attState.get() != self._state_fk:
@@ -119,6 +159,7 @@ def CallFnOnNetworkByClass(_sFn, _sCls):
 
 switchToIk = functools.partial(CallFnOnNetworkByClass, 'switchToIk', 'IkFkNetwork')
 switchToFk = functools.partial(CallFnOnNetworkByClass, 'switchToFk', 'IkFkNetwork')
+
 
 '''
 from sstk.maya.animation import sqIkFkTools

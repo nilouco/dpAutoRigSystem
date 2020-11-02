@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.04"
-DPAR_UPDATELOG = "#010 Fixed Spine segments.\nChanged Joint Articulation (_Jar) numbering.\nReviewed joint number padding."
+DPAR_VERSION = "3.10.05"
+DPAR_UPDATELOG = "#045 GuideBase to Rig it.\n#046 Reload UI before Rig it.\n#059 AutoClavicle calculus for ikFkSnap wip."
 
 
 
@@ -1748,6 +1748,7 @@ class DP_AutoRig_UI:
         print('\ndpAutoRigSystem Log: ' + self.langDic[self.langName]['i178_startRigging'] + '...\n'),
         # force refresh in order to avoid calculus error is creating Rig at the same time of guides:
         cmds.refresh()
+        self.jobReloadUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
