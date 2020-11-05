@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.05"
-DPAR_UPDATELOG = "#045 GuideBase to Rig it.\n#046 Reload UI before Rig it.\n#059 AutoClavicle calculus for ikFkSnap wip."
+DPAR_VERSION = "3.10.06"
+DPAR_UPDATELOG = "#179 Fixed FkLine JEnd not created."
 
 
 

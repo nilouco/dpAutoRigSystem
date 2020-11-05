@@ -247,7 +247,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                             utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     # end chain:
-                    if n == self.nJoints:
+                    if n == self.nJoints-1:
                         # create end joint:
                         self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
