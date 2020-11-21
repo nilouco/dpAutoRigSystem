@@ -40,7 +40,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 1)
+        cmds.setAttr(self.moduleGrp+".articulation", 0)
         
         self.cvJointLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.connectShapeSize(shapeSizeCH)
@@ -250,7 +250,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     if n == self.nJoints-1:
                         # create end joint:
                         self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")

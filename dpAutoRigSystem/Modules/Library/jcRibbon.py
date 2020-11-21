@@ -145,7 +145,7 @@ class RibbonClass:
         if addArtic:
             # corner joint
             cmds.select(clear=True)
-            cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt')
+            cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt', radius=1.5)
             cmds.parentConstraint(elbowctrlCtrl, cornerJnt, mo=False, name=cornerJnt+"_ParentConstraint")
             limbJoints.extend([cornerJnt])
         limbJoints.extend(downLimb['skinJointsList'])

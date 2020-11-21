@@ -294,7 +294,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     if n == self.nJoints:
                         # create end joint:
                         self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
+                        self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 
                 # make first phalange be leads from base finger control:

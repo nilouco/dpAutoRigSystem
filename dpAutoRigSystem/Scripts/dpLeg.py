@@ -112,7 +112,6 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe1Instance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(toe1Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe1Instance.moduleGrp+".flip", 1)
-                toe1Instance.setArticulation(0)
                 toe1Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
@@ -138,7 +137,6 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe2Instance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(toe2Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2Instance.moduleGrp+".flip", 1)
-                toe2Instance.setArticulation(0)
                 toe2Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
@@ -164,7 +162,6 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe3Instance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(toe3Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3Instance.moduleGrp+".flip", 1)
-                toe3Instance.setArticulation(0)
                 toe3Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
@@ -190,7 +187,6 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe4Instance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(toe4Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe4Instance.moduleGrp+".flip", 1)
-                toe4Instance.setArticulation(0)
                 toe4Instance.displayAnnotation(0)
                 
                 # parent toe4 guide to foot middle guide:
@@ -216,7 +212,6 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe5Instance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(toe5Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe5Instance.moduleGrp+".flip", 1)
-                toe5Instance.setArticulation(0)
                 toe5Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:

@@ -149,7 +149,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     # create joints:
                     cmds.select(clear=True)
                     jnt = cmds.joint(name=side+self.userGuideName+"_"+letter+"_1_Jnt", scaleCompensate=False)
-                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_JEnd", scaleCompensate=False)
+                    endJoint = cmds.joint(name=side+self.userGuideName+"_"+letter+"_JEnd", scaleCompensate=False, radius=0.5)
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:

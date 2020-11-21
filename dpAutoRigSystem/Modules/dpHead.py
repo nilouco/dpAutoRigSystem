@@ -189,7 +189,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.jawJnt  = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw']+"_Jnt", scaleCompensate=False)
                 self.chinJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c026_chin']+"_Jnt", scaleCompensate=False)
                 self.chewJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c048_chew']+"_Jnt", scaleCompensate=False)
-                self.endJnt  = cmds.joint(name=side+self.userGuideName+"_JEnd", scaleCompensate=False)
+                self.endJnt  = cmds.joint(name=side+self.userGuideName+"_JEnd", scaleCompensate=False, radius=0.5)
                 cmds.select(clear=True)
                 self.lLipJnt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c039_lip']+"_Jnt", scaleCompensate=False)
                 cmds.select(clear=True)

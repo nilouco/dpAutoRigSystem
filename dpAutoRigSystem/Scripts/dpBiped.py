@@ -262,7 +262,6 @@ def Biped(dpUIinst):
                 # setting X mirror:
                 earInstance.changeMirror("X")
                 cmds.setAttr(earInstance.moduleGrp+".flip", 1)
-                earInstance.setArticulation(0)
 
                 # Update progress window
                 progressAmount += 1
@@ -278,7 +277,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
-                upperTeethInstance.setArticulation(0)
                 # parent upperTeeth guide to head guide:
                 cmds.parent(upperTeethInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
                 # create FkLine module instance:
@@ -291,7 +289,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
                 upperTeethMiddleInstance.displayAnnotation(0)
-                upperTeethMiddleInstance.setArticulation(0)
                 # parent upperTeethMiddle guide to upperTeeth guide:
                 cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
@@ -307,7 +304,6 @@ def Biped(dpUIinst):
                 upperTeethSideInstance.changeMirror("X")
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
                 upperTeethSideInstance.displayAnnotation(0)
-                upperTeethSideInstance.setArticulation(0)
                 # parent upperTeethSide guide to upperTeeth guide:
                 cmds.parent(upperTeethSideInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
@@ -319,7 +315,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
-                lowerTeethInstance.setArticulation(0)
                 # parent lowerTeeth guide to head guide:
                 cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 # create FkLine module instance:
@@ -332,7 +327,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
                 lowerTeethMiddleInstance.displayAnnotation(0)
-                lowerTeethMiddleInstance.setArticulation(0)
                 # parent lowerTeeth guide to lowerTeeth guide:
                 cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
                 # create FkLine module instance:
@@ -348,7 +342,6 @@ def Biped(dpUIinst):
                 lowerTeethSideInstance.changeMirror("X")
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
                 lowerTeethSideInstance.displayAnnotation(0)
-                lowerTeethSideInstance.setArticulation(0)
                 # parent lowerTeethSide guide to lowerTeeth guide:
                 cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
                 
@@ -370,7 +363,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.3)
                 cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(noseInstance.moduleGrp+".shapeSize", 0.5)
-                noseInstance.setArticulation(0)
                 # parent nose guide to head guide:
                 cmds.parent(noseInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
                 # create FkLine module instance:
@@ -386,7 +378,6 @@ def Biped(dpUIinst):
                 # setting X mirror:
                 nostrilInstance.changeMirror("X")
                 cmds.setAttr(nostrilInstance.moduleGrp+".flip", 1)
-                nostrilInstance.setArticulation(0)
                 # parent nostril guide to nose guide:
                 cmds.parent(nostrilInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
                 
@@ -410,7 +401,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
                 cmds.setAttr(tongueInstance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(tongueInstance.moduleGrp+".shapeSize", 0.4)
-                tongueInstance.setArticulation(0)
                 # parent tongue guide to head guide:
                 cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
             
@@ -435,7 +425,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe1Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe1Instance.moduleGrp+".flip", 1)
                 toe1Instance.displayAnnotation(0)
-                toe1Instance.setArticulation(0)
                 
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
@@ -461,7 +450,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe2Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2Instance.moduleGrp+".flip", 1)
                 toe2Instance.displayAnnotation(0)
-                toe2Instance.setArticulation(0)
                 
                 # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
@@ -487,7 +475,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe3Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3Instance.moduleGrp+".flip", 1)
                 toe3Instance.displayAnnotation(0)
-                toe3Instance.setArticulation(0)
                 
                 # parent toe3 guide to foot middle guide:
                 cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
@@ -513,7 +500,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe4Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe4Instance.moduleGrp+".flip", 1)
                 toe4Instance.displayAnnotation(0)
-                toe4Instance.setArticulation(0)
                 
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
@@ -539,7 +525,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe5Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe5Instance.moduleGrp+".flip", 1)
                 toe5Instance.displayAnnotation(0)
-                toe5Instance.setArticulation(0)
                 
                 # parent toe5 guide to foot middle guide:
                 cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
@@ -559,7 +544,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(breathInstance.radiusCtrl+".translateX", 0.35)
                 cmds.setAttr(breathInstance.cvEndJoint+".translateZ", 0.2)
                 breathInstance.displayAnnotation(0)
-                breathInstance.setArticulation(0)
                 # parent breath guide to chest guide:
                 cmds.parent(breathInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
                 
@@ -578,7 +562,6 @@ def Biped(dpUIinst):
                 cmds.setAttr(bellyInstance.radiusCtrl+".translateX", 0.35)
                 cmds.setAttr(bellyInstance.cvEndJoint+".translateZ", 0.2)
                 bellyInstance.displayAnnotation(0)
-                bellyInstance.setArticulation(0)
                 # parent belly guide to chest guide:
                 cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             

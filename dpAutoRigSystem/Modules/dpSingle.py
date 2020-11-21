@@ -230,7 +230,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 # create end joint:
                 cmds.select(self.jnt)
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)
                 # create a masterModuleGrp to be checked if this rig exists:

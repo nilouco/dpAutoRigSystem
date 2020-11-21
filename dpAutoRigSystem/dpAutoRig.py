@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.06"
-DPAR_UPDATELOG = "#179 Fixed FkLine JEnd not created."
+DPAR_VERSION = "3.10.07"
+DPAR_UPDATELOG = "#166 JEnd radius size.\n#187 Changed Jar radius to 1.5 by default.\n#190 Don't create Jar for Nose.\n#191 Set FkLine Jar off by defalt."
 
 
 

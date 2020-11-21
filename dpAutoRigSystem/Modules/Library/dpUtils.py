@@ -696,7 +696,7 @@ def validateName(nodeName, suffix=None, *args):
     return nodeName
 
 
-def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, *args):
+def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1.5, *args):
     """ Create a simple joint to help skinning with a half rotation value.
         Receives the number of corrective joints to be created. Zero by default.
         Returns the created joint list.
@@ -706,7 +706,7 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, *args):
         if cmds.objExists(fatherNode) and cmds.objExists(brotherNode):
             jarName = brotherNode[:brotherNode.rfind("_")]+"_Jar"
             cmds.select(clear=True)
-            jar = cmds.joint(name=jarName, scaleCompensate=False)
+            jar = cmds.joint(name=jarName, scaleCompensate=False, radius=jarRadius)
             cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
             jointList.append(jar)
             for i in range(0, corrNumber):

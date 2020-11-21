@@ -99,7 +99,6 @@ def Car(dpUIinst):
             cmds.setAttr(chassisInstance.moduleGrp+".translateY", 12)
             cmds.setAttr(chassisInstance.annotation+".translateY", 16)
             cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 12)
-            chassisInstance.setArticulation(0)
             
             # Update progress window
             progressAmount += 1
@@ -115,7 +114,6 @@ def Car(dpUIinst):
             cmds.setAttr(steeringHandleInstance.moduleGrp+".translateZ", 9.7)
             cmds.setAttr(steeringHandleInstance.moduleGrp+".rotateX", 10.5)
             cmds.setAttr(steeringHandleInstance.radiusCtrl+".translateX", 3)
-            steeringHandleInstance.setArticulation(0)
             
             # parent steering handle guide to chassis guide:
             cmds.parent(steeringHandleInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -252,7 +250,6 @@ def Car(dpUIinst):
             cmds.setAttr(frontDoorInstance.moduleGrp+".translateY", 9.9)
             cmds.setAttr(frontDoorInstance.moduleGrp+".translateZ", 10.7)
             cmds.setAttr(frontDoorInstance.radiusCtrl+".translateX", 3)
-            frontDoorInstance.setArticulation(0)
             
             # parent front door guide to chassis guide:
             cmds.parent(frontDoorInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -273,7 +270,6 @@ def Car(dpUIinst):
             cmds.setAttr(backDoorInstance.moduleGrp+".translateY", 9.9)
             cmds.setAttr(backDoorInstance.moduleGrp+".translateZ", -1)
             cmds.setAttr(backDoorInstance.radiusCtrl+".translateX", 3)
-            backDoorInstance.setArticulation(0)
             
             # parent back door guide to chassis guide:
             cmds.parent(backDoorInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -296,7 +292,6 @@ def Car(dpUIinst):
                 cmds.setAttr(hornInstance.moduleGrp+".translateZ", 6.5)
                 cmds.setAttr(hornInstance.moduleGrp+".rotateX", 28)
                 cmds.setAttr(hornInstance.radiusCtrl+".translateX", 0.7)
-                hornInstance.setArticulation(0)
                 
                 # parent horn guide to steering guide:
                 cmds.parent(hornInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
@@ -317,7 +312,6 @@ def Car(dpUIinst):
                 cmds.setAttr(frontDoorHandleInstance.moduleGrp+".translateY", 11.2)
                 cmds.setAttr(frontDoorHandleInstance.moduleGrp+".translateZ", 1.7)
                 cmds.setAttr(frontDoorHandleInstance.radiusCtrl+".translateX", 0.8)
-                frontDoorHandleInstance.setArticulation(0)
                 
                 # parent front door handle guide to front door guide:
                 cmds.parent(frontDoorHandleInstance.moduleGrp, frontDoorInstance.moduleGrp, absolute=True)
@@ -338,7 +332,6 @@ def Car(dpUIinst):
                 cmds.setAttr(backDoorHandleInstance.moduleGrp+".translateY", 11.2)
                 cmds.setAttr(backDoorHandleInstance.moduleGrp+".translateZ", -9.5)
                 cmds.setAttr(backDoorHandleInstance.radiusCtrl+".translateX", 0.8)
-                backDoorHandleInstance.setArticulation(0)
                 
                 # parent back door handle guide to back door guide:
                 cmds.parent(backDoorHandleInstance.moduleGrp, backDoorInstance.moduleGrp, absolute=True)
@@ -363,7 +356,6 @@ def Car(dpUIinst):
                 cmds.setAttr(frontWiperAInstance.cvJointLoc+".translateY", 0.2)
                 cmds.setAttr(frontWiperAInstance.cvJointLoc+".translateZ", -0.4)
                 cmds.setAttr(frontWiperAInstance.cvJointLoc+".rotateY", -10.3)
-                frontWiperAInstance.setArticulation(0)
                 
                 # parent front wiper A guide to chassis guide:
                 cmds.parent(frontWiperAInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -389,7 +381,6 @@ def Car(dpUIinst):
                 cmds.setAttr(frontWiperBInstance.cvJointLoc+".translateY", 0.2)
                 cmds.setAttr(frontWiperBInstance.cvJointLoc+".translateZ", -0.4)
                 cmds.setAttr(frontWiperBInstance.cvJointLoc+".rotateY", -10.3)
-                frontWiperBInstance.setArticulation(0)
                 
                 # parent front wiper B guide to chassis guide:
                 cmds.parent(frontWiperBInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -407,7 +398,6 @@ def Car(dpUIinst):
                 cmds.setAttr(trunkInstance.moduleGrp+".translateZ", -18.7)
                 cmds.setAttr(trunkInstance.moduleGrp+".rotateX", -36)
                 cmds.setAttr(trunkInstance.radiusCtrl+".translateX", 3.3)
-                trunkInstance.setArticulation(0)
                 
                 # parent trunk guide to chassis guide:
                 cmds.parent(trunkInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -430,7 +420,6 @@ def Car(dpUIinst):
                 cmds.setAttr(backWiperInstance.cvJointLoc+".translateY", 0.4)
                 cmds.setAttr(backWiperInstance.cvJointLoc+".translateZ", 0.1)
                 cmds.setAttr(backWiperInstance.cvJointLoc+".rotateZ", -7)
-                backWiperInstance.setArticulation(0)
                 
                 # parent back wiper guide to trunk guide:
                 cmds.parent(backWiperInstance.moduleGrp, trunkInstance.moduleGrp, absolute=True)
@@ -448,7 +437,6 @@ def Car(dpUIinst):
                 cmds.setAttr(gasInstance.moduleGrp+".translateY", 13)
                 cmds.setAttr(gasInstance.moduleGrp+".translateZ", -17)
                 cmds.setAttr(gasInstance.radiusCtrl+".translateX", 0.6)
-                gasInstance.setArticulation(0)
                 
                 # parent gas guide to chassis guide:
                 cmds.parent(gasInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -466,7 +454,6 @@ def Car(dpUIinst):
                 cmds.setAttr(hoodInstance.moduleGrp+".translateZ", 12.5)
                 cmds.setAttr(hoodInstance.moduleGrp+".rotateX", 12.5)
                 cmds.setAttr(hoodInstance.radiusCtrl+".translateX", 5)
-                hoodInstance.setArticulation(0)
                 
                 # parent hood guide to chassis guide:
                 cmds.parent(hoodInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -482,7 +469,6 @@ def Car(dpUIinst):
                 # editing sun roof base guide informations:
                 cmds.setAttr(sunroofInstance.moduleGrp+".translateY", 19)
                 cmds.setAttr(sunroofInstance.moduleGrp+".translateZ", -2.5)
-                sunroofInstance.setArticulation(0)
                 
                 # parent sun roof guide to chassis guide:
                 cmds.parent(sunroofInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -501,7 +487,6 @@ def Car(dpUIinst):
                 cmds.setAttr(antennaInstance.moduleGrp+".rotateX", -136)
                 cmds.setAttr(antennaInstance.radiusCtrl+".translateX", 0.5)
                 antennaInstance.changeJointNumber(3)
-                antennaInstance.setArticulation(0)
                 
                 # parent antenna guide to chassis guide:
                 cmds.parent(antennaInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -520,7 +505,6 @@ def Car(dpUIinst):
                 cmds.setAttr(leftTurnHandleInstance.moduleGrp+".translateZ", 7.3)
                 cmds.setAttr(leftTurnHandleInstance.moduleGrp+".rotateX", 28)
                 cmds.setAttr(leftTurnHandleInstance.radiusCtrl+".translateX", 1.1)
-                leftTurnHandleInstance.setArticulation(0)
                 
                 # parent left turn handle guide to steering handle guide:
                 cmds.parent(leftTurnHandleInstance.moduleGrp, steeringHandleInstance.moduleGrp, absolute=True)
@@ -539,7 +523,6 @@ def Car(dpUIinst):
                 cmds.setAttr(rightTurnHandleInstance.moduleGrp+".translateZ", 7.3)
                 cmds.setAttr(rightTurnHandleInstance.moduleGrp+".rotateX", 28)
                 cmds.setAttr(rightTurnHandleInstance.radiusCtrl+".translateX", 1.1)
-                rightTurnHandleInstance.setArticulation(0)
                 
                 # parent left turn handle guide to steering handle guide:
                 cmds.parent(rightTurnHandleInstance.moduleGrp, steeringHandleInstance.moduleGrp, absolute=True)
@@ -556,7 +539,6 @@ def Car(dpUIinst):
                 cmds.setAttr(gearLeverInstance.moduleGrp+".translateY", 7.5)
                 cmds.setAttr(gearLeverInstance.moduleGrp+".translateZ", 7.9)
                 cmds.setAttr(gearLeverInstance.radiusCtrl+".translateX", 1.7)
-                gearLeverInstance.setArticulation(0)
                 
                 # parent gear lever guide to chassis guide:
                 cmds.parent(gearLeverInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -573,7 +555,6 @@ def Car(dpUIinst):
                 cmds.setAttr(handBreakInstance.moduleGrp+".translateY", 7.9)
                 cmds.setAttr(handBreakInstance.moduleGrp+".translateZ", 2.3)
                 cmds.setAttr(handBreakInstance.radiusCtrl+".translateX", 1)
-                handBreakInstance.setArticulation(0)
                 
                 # parent hand break guide to chassis guide:
                 cmds.parent(handBreakInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -591,7 +572,6 @@ def Car(dpUIinst):
                 cmds.setAttr(breakInstance.moduleGrp+".translateY", 7.3)
                 cmds.setAttr(breakInstance.moduleGrp+".translateZ", 13)
                 cmds.setAttr(breakInstance.radiusCtrl+".translateX", 1)
-                breakInstance.setArticulation(0)
                 
                 # parent break guide to chassis guide:
                 cmds.parent(breakInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -609,7 +589,6 @@ def Car(dpUIinst):
                 cmds.setAttr(acceleratorInstance.moduleGrp+".translateY", 7.3)
                 cmds.setAttr(acceleratorInstance.moduleGrp+".translateZ", 13)
                 cmds.setAttr(acceleratorInstance.radiusCtrl+".translateX", 1)
-                acceleratorInstance.setArticulation(0)
                 
                 # parent accelerator guide to chassis guide:
                 cmds.parent(acceleratorInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -627,7 +606,6 @@ def Car(dpUIinst):
                 cmds.setAttr(clutchInstance.moduleGrp+".translateY", 7.3)
                 cmds.setAttr(clutchInstance.moduleGrp+".translateZ", 13)
                 cmds.setAttr(clutchInstance.radiusCtrl+".translateX", 1)
-                clutchInstance.setArticulation(0)
                 
                 # parent clutch guide to chassis guide:
                 cmds.parent(clutchInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -646,7 +624,6 @@ def Car(dpUIinst):
                 cmds.setAttr(dashboardAInstance.moduleGrp+".translateZ", 10.9)
                 cmds.setAttr(dashboardAInstance.moduleGrp+".rotateX", 22.5)
                 cmds.setAttr(dashboardAInstance.radiusCtrl+".translateX", 0.4)
-                dashboardAInstance.setArticulation(0)
                 
                 # parent dashboard A guide to chassis guide:
                 cmds.parent(dashboardAInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -665,7 +642,6 @@ def Car(dpUIinst):
                 cmds.setAttr(dashboardBInstance.moduleGrp+".translateZ", 10.9)
                 cmds.setAttr(dashboardBInstance.moduleGrp+".rotateX", 22.5)
                 cmds.setAttr(dashboardBInstance.radiusCtrl+".translateX", 0.4)
-                dashboardBInstance.setArticulation(0)
                 
                 # parent dashboard B guide to chassis guide:
                 cmds.parent(dashboardBInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -692,7 +668,6 @@ def Car(dpUIinst):
                 frontSeatInstance.changeJointNumber(3)
                 cmds.setAttr(frontSeatInstance.cvJointLoc+".translateY", 6.5)
                 cmds.setAttr(frontSeatInstance.cvJointLoc+".translateZ", -2.7)
-                frontSeatInstance.setArticulation(0)
                 
                 # parent front seat guide to chassis guide:
                 cmds.parent(frontSeatInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -712,7 +687,6 @@ def Car(dpUIinst):
                 backSeatInstance.changeJointNumber(2)
                 cmds.setAttr(backSeatInstance.cvJointLoc+".translateY", 0.6)
                 cmds.setAttr(backSeatInstance.cvJointLoc+".translateZ", -1.9)
-                backSeatInstance.setArticulation(0)
                 
                 # parent back seat guide to chassis guide:
                 cmds.parent(backSeatInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
@@ -733,7 +707,6 @@ def Car(dpUIinst):
                 cmds.setAttr(frontDoorInsideHandleInstance.moduleGrp+".translateY", 11.4)
                 cmds.setAttr(frontDoorInsideHandleInstance.moduleGrp+".translateZ", 6.3)
                 cmds.setAttr(frontDoorInsideHandleInstance.radiusCtrl+".translateX", 0.6)
-                frontDoorInsideHandleInstance.setArticulation(0)
                 
                 # parent front door inside handle guide to front door guide:
                 cmds.parent(frontDoorInsideHandleInstance.moduleGrp, frontDoorInstance.moduleGrp, absolute=True)
@@ -754,7 +727,6 @@ def Car(dpUIinst):
                 cmds.setAttr(backDoorInsideHandleInstance.moduleGrp+".translateY", 11.4)
                 cmds.setAttr(backDoorInsideHandleInstance.moduleGrp+".translateZ", -3.6)
                 cmds.setAttr(backDoorInsideHandleInstance.radiusCtrl+".translateX", 0.6)
-                backDoorInsideHandleInstance.setArticulation(0)
                 
                 # parent back door inside handle guide to back door guide:
                 cmds.parent(backDoorInsideHandleInstance.moduleGrp, backDoorInstance.moduleGrp, absolute=True)
@@ -775,7 +747,6 @@ def Car(dpUIinst):
                 cmds.setAttr(frontDoorWindowInstance.moduleGrp+".translateY", 13)
                 cmds.setAttr(frontDoorWindowInstance.moduleGrp+".translateZ", 2.9)
                 cmds.setAttr(frontDoorWindowInstance.radiusCtrl+".translateX", 0.8)
-                frontDoorWindowInstance.setArticulation(0)
                 
                 # parent front door window guide to front door guide:
                 cmds.parent(frontDoorWindowInstance.moduleGrp, frontDoorInstance.moduleGrp, absolute=True)
@@ -796,7 +767,6 @@ def Car(dpUIinst):
                 cmds.setAttr(backDoorWindowInstance.moduleGrp+".translateY", 13.5)
                 cmds.setAttr(backDoorWindowInstance.moduleGrp+".translateZ", -7.1)
                 cmds.setAttr(backDoorWindowInstance.radiusCtrl+".translateX", 0.8)
-                backDoorWindowInstance.setArticulation(0)
                 
                 # parent back door window guide to back door guide:
                 cmds.parent(backDoorWindowInstance.moduleGrp, backDoorInstance.moduleGrp, absolute=True)
@@ -820,7 +790,6 @@ def Car(dpUIinst):
                 mirrorInstance.changeJointNumber(2)
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateY", 0.8)
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateZ", 1)
-                mirrorInstance.setArticulation(0)
                 
                 # parent mirror guide to front door guide:
                 cmds.parent(mirrorInstance.moduleGrp, frontDoorInstance.moduleGrp, absolute=True)
@@ -837,7 +806,6 @@ def Car(dpUIinst):
                 cmds.setAttr(insideMirrorInstance.moduleGrp+".translateY", 18)
                 cmds.setAttr(insideMirrorInstance.moduleGrp+".translateZ", 3.5)
                 cmds.setAttr(insideMirrorInstance.radiusCtrl+".translateX", 1.5)
-                insideMirrorInstance.setArticulation(0)
                 
                 # parent mirror guide to front door guide:
                 cmds.parent(insideMirrorInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)

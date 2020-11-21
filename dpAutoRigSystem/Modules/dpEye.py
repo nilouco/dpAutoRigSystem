@@ -332,7 +332,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         # joint position:
         cmds.delete(cmds.parentConstraint(cvLoc, mainJnt, maintainOffset=False))
         # create end joint:
-        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName][codeName]+"_JEnd", scaleCompensate=False)
+        endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName][codeName]+"_JEnd", scaleCompensate=False, radius=0.5)
         cmds.delete(cmds.parentConstraint(mainJnt, endJoint, maintainOffset=False))
         cmds.setAttr(endJoint+".translateZ", 1)
         # creating control:
@@ -472,7 +472,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 self.ctrls.setLockHide([self.fkEyeCtrl], ['tx', 'ty', 'tz'])
                 # create end joint:
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 cmds.parent(self.endJoint, self.jnt, absolute=True)
                 # create parentConstraint from ctrl to jxt:
@@ -513,7 +513,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 # jointScale position:
                 cmds.delete(cmds.parentConstraint(self.guide, self.eyeScaleJnt, maintainOffset=False))
                 # create endScale joint:
-                self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_JEnd")
+                self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_JEnd", radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.eyeScaleJnt, self.endScaleJoint, maintainOffset=False))
                 cmds.setAttr(self.endScaleJoint+".translateZ", 1)
                 # create constraints to eyeScale:

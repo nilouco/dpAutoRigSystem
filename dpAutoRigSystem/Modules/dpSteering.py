@@ -124,7 +124,7 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd")
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 # joint labelling:
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
                 # create a control:

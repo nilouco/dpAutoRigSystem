@@ -198,7 +198,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 utils.setJointLabel(self.centerJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel'])
                 # create end joint:
-                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_JEnd")
+                self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_JEnd", radius=0.5)
                 # main joint:
                 cmds.select(clear=True)
                 self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Jnt", scaleCompensate=False)
@@ -206,7 +206,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 utils.setJointLabel(self.mainJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c058_main'])
                 # create end joint:
-                self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_JEnd")
+                self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_JEnd", radius=0.5)
                 
                 # create controls:
                 self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
