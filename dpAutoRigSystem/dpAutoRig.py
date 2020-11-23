@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.07"
-DPAR_UPDATELOG = "#166 JEnd radius size.\n#187 Changed Jar radius to 1.5 by default.\n#190 Don't create Jar for Nose.\n#191 Set FkLine Jar off by defalt."
+DPAR_VERSION = "3.10.08"
+DPAR_UPDATELOG = "#137 Fixed Sneer and Grimace Controls translateY limit.\n#152 Improved HeadDeformer TopSymmetry pivot.\n#157 Arranged Spine Fk control shape."
 
 
 

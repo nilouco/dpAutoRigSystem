@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.3"
+DPHD_VERSION = "2.4"
 
 
 class HeadDeformer():
@@ -175,12 +175,14 @@ class HeadDeformer():
 
             self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v'])
             
-            # create symetry setup
+            # create symmetry setup
             centerClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:3][0:5]", relative=True, name=centerSymmetryName+"_Cls") #[Cluster, Handle]
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
             clustersZeroList = utils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.delete(cmds.parentConstraint(centerClusterList[1], clustersZeroList[1]))
             clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.langDic[self.langName]["c101_symmetry"]+"_Grp")
+            # arrange lattice deform points percent
+            cmds.percent(topClusterList[0], [latticeDefList[1]+".pt[0:5][2][0]", latticeDefList[1]+".pt[0:5][2][1]", latticeDefList[1]+".pt[0:5][2][2]", latticeDefList[1]+".pt[0:5][2][3]", latticeDefList[1]+".pt[0:5][2][4]", latticeDefList[1]+".pt[0:5][2][5]"], value=0.5)
             # symmetry controls
             centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90))
             topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0))
@@ -199,14 +201,19 @@ class HeadDeformer():
             offsetGrp = cmds.group(name=headDeformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=headDeformerName+"_Data_Grp", empty=True)
             cmds.delete(cmds.parentConstraint(latticeDefList[2], arrowCtrlGrp, maintainOffset=False))
-            arrowCtrlHeigh = bBoxMaxY + (bBoxSize*0.5)
-            cmds.setAttr(arrowCtrlGrp+".ty", arrowCtrlHeigh)
+            arrowCtrlHeight = bBoxMaxY + (bBoxSize*0.5)
+            cmds.setAttr(arrowCtrlGrp+".ty", arrowCtrlHeight)
             cmds.delete(cmds.parentConstraint(latticeDefList[2], offsetGrp, maintainOffset=False))
             cmds.delete(cmds.parentConstraint(latticeDefList[2], symmetryCtrlZeroList[0], maintainOffset=False))
             cmds.delete(cmds.parentConstraint(latticeDefList[2], symmetryCtrlZeroList[1], maintainOffset=False))
+            topSymmetryHeight = cmds.getAttr(symmetryCtrlZeroList[1]+".ty") - (bBoxSize*0.3)
+            cmds.setAttr(symmetryCtrlZeroList[1]+".ty", topSymmetryHeight)
             cmds.parent(symmetryCtrlZeroList, arrowCtrlGrp)
             latticeGrp = cmds.group(name=latticeDefList[1]+"_Grp", empty=True)
             cmds.parent(latticeDefList[1], latticeDefList[2], latticeGrp)
+            # fix topSymmetryCluster pivot
+            topSymmetryCtrlPos = cmds.xform(symmetryCtrlZeroList[1], query=True, rotatePivot=True, worldSpace=True)
+            cmds.xform(topClusterList[1], rotatePivot=(topSymmetryCtrlPos[0], topSymmetryCtrlPos[1], topSymmetryCtrlPos[2]), worldSpace=True)
             
             # try to integrate to Head_Head_Ctrl
             allTransformList = cmds.ls(selection=False, type="transform")

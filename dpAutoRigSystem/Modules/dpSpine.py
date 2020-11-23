@@ -222,6 +222,9 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # create controls:
                 self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                # create start and end Fk controls:
+                self.hipsFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                self.chestFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 # optimize controls CV shapes:
                 tempHipsACluster = cmds.cluster(self.hipsACtrl)[1]
                 cmds.setAttr(tempHipsACluster+".scaleY", 0.25)
@@ -229,10 +232,10 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 tempChestACluster = cmds.cluster(self.chestACtrl)[1]
                 cmds.setAttr(tempChestACluster+".scaleY", 0.4)
                 cmds.delete(self.chestACtrl, constructionHistory=True)
-                
-                # create start and end Fk controls:
-                self.hipsFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                self.chestFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                hipsFkCtrlCVPos = -0.4*self.ctrlRadius
+                if self.currentStyle == 1:
+                    hipsFkCtrlCVPos = 0.4*self.ctrlRadius
+                cmds.move(0, hipsFkCtrlCVPos, 0, self.hipsFkCtrl+"0Shape.cv[0:5]", relative=True, worldSpace=True, worldSpaceDistance=True)
                 
                 self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
                 self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
@@ -284,7 +287,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(bottomLocGuide, self.hipsACtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(topLocGuide, self.chestACtrl, maintainOffset=False))
                 
-                # change axis orientation for biped stype
+                # change axis orientation for biped style
                 if self.currentStyle == 1: #biped
                     cmds.rotate(0, 0, 0, self.hipsACtrl, self.chestACtrl)
                     cmds.makeIdentity(self.hipsACtrl, self.chestACtrl, apply=True, rotate=True)
