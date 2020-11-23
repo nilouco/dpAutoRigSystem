@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.4"
+DPHD_VERSION = "2.5"
 
 
 class HeadDeformer():
@@ -26,8 +26,19 @@ class HeadDeformer():
         self.headCtrl = None
         # call main function
         if (int(cmds.about(version=True)[:4]) == 2020):
-            dialogReturn = cmds.confirmDialog(title="Maya 2020 bug", message=self.langDic[self.langName]["b001_BugMayaHD"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
-            if dialogReturn == self.langDic[self.langName]["i174_continue"]:
+            callMessage = False
+            installedVersion = cmds.about(installedVersion=True)
+            if not "." in installedVersion:
+                callMessage = True
+            else:
+                updateVersion = int(installedVersion[installedVersion.rfind(".")+1:])
+                if updateVersion < 3:
+                    callMessage = True
+            if callMessage:
+                dialogReturn = cmds.confirmDialog(title="Maya 2020 bug", message=self.langDic[self.langName]["b001_BugMayaHD"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
+                if dialogReturn == self.langDic[self.langName]["i174_continue"]:
+                    self.dpHeadDeformer(self)
+            else:
                 self.dpHeadDeformer(self)
         else:
             self.dpHeadDeformer(self)
@@ -156,11 +167,11 @@ class HeadDeformer():
                 cmds.connectAttr(calibrateReduceMD+".output"+axis, calibrateMD+".input2"+axis, force=True)
                 cmds.connectAttr(arrowCtrl+".translate"+axis, intensityMD+".input1"+axis, force=True)
                 cmds.connectAttr(calibrateMD+".output"+axis, intensityMD+".input2"+axis, force=True)
-            cmds.connectAttr(intensityMD+".outputX", sideBendDefList[0]+".curvature", force=True)
-            cmds.connectAttr(intensityMD+".outputY", squashDefList[0]+".factor", force=True)
-            cmds.connectAttr(intensityMD+".outputZ", frontBendDefList[0]+".curvature", force=True)
+            cmds.connectAttr(intensityMD+".outputX", sideBendDefList[1]+".curvature", force=True)
+            cmds.connectAttr(intensityMD+".outputY", squashDefList[1]+".factor", force=True)
+            cmds.connectAttr(intensityMD+".outputZ", frontBendDefList[1]+".curvature", force=True)
             cmds.connectAttr(arrowCtrl+".ry", twistMD+".input1Y", force=True)
-            cmds.connectAttr(twistMD+".outputY", twistDefList[0]+".endAngle", force=True)
+            cmds.connectAttr(twistMD+".outputY", twistDefList[1]+".endAngle", force=True)
             # change squash to be more cartoon
             cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=-0.25*bBoxSize, value=-bBoxSize, inTangentType="auto", outTangentType="auto")
             cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=0, value=-0.5*bBoxSize, inTangentType="auto", outTangentType="auto")

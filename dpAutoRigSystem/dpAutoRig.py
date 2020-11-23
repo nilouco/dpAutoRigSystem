@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.08"
-DPAR_UPDATELOG = "#137 Fixed Sneer and Grimace Controls translateY limit.\n#152 Improved HeadDeformer TopSymmetry pivot.\n#157 Arranged Spine Fk control shape."
+DPAR_VERSION = "3.10.09"
+DPAR_UPDATELOG = "#127 Fixed HeadDeformer 2020 issue.\nConform to Maya2020.3 update version."
 
 
 

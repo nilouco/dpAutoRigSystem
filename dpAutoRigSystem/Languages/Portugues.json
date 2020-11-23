@@ -5,12 +5,12 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-10-28",
+    "_updated"       : "2020-11-23",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
     "b000_BugGeneral" : "Encontrado um bug, desculpe.\n\nRevise as guias ou a versão do script, por favor.",
-	"b001_BugMayaHD"  : "Há um bug no Maya 2020!\n\nModificar o Deformer Set confunde as conexões MAYA-95404.\n\nIsso significa que os deformadores de entrada terão um erro na Channel Box,\nmas ainda funcionarão.\nIsto é apenas para avisá-lo enquanto aguardamos a\nAutodesk corrigi-lo, desculpe.",
+	"b001_BugMayaHD"  : "Há um bug no Maya 2020!\n\nModificar o Deformer Set confunde as conexões MAYA-95404.\n\nIsso significa que os deformadores de entrada terão um erro na Channel Box,\nmas ainda funcionarão.\n\nA solução seria atualizar a versão do Maya para 2020.3 ou mais recente, por favor.",
     
     "c000_arm_before"        : "Clavicula",
     "c001_arm_main"          : "Ombro",
