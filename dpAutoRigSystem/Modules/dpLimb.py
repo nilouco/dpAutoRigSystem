@@ -1399,8 +1399,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
                     if self.addArticJoint:
                         self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
-                        utils.setJointLabel(self.bendJointList[numBendJnt], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
-                        cmds.rename(self.bendJointList[numBendJnt], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                        utils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
+                        cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
                 
                 # add main articulationJoint:
                 if self.addArticJoint:

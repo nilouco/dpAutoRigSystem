@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.09"
-DPAR_UPDATELOG = "#127 Fixed HeadDeformer 2020 issue.\nConform to Maya2020.3 update version."
+DPAR_VERSION = "3.10.10"
+DPAR_UPDATELOG = "#078 Limb corner joints.\n#193 Scale Limb corner offset control.\nFixed Limb corner stretch scale."
 
 
 
