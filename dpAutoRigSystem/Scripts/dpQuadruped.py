@@ -112,6 +112,8 @@ def Quadruped(dpUIinst):
             cmds.setAttr(headInstance.cvHeadLoc+".translateY", 0)
             cmds.setAttr(headInstance.cvHeadLoc+".translateZ", 2.5)
             cmds.setAttr(headInstance.cvHeadLoc+".rotateX", 45)
+            cmds.setAttr(headInstance.cvUpperLoc+".translateY", 0.5)
+            cmds.setAttr(headInstance.cvUpperLoc+".translateZ", 1.3)
             cmds.setAttr(headInstance.cvJawLoc+".translateY", -1.0)
             cmds.setAttr(headInstance.cvJawLoc+".translateZ", 2.0)
             cmds.setAttr(headInstance.cvJawLoc+".rotateY", 0)
@@ -144,7 +146,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
             
             # parent head guide to spine guide:
-            cmds.parent(eyeInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -330,7 +332,7 @@ def Quadruped(dpUIinst):
                 earInstance.changeJointNumber(2)
                 
                 # parent ear guide to spine guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
                 cmds.setAttr(earInstance.moduleGrp+".scaleX", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)
@@ -466,7 +468,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.7)
                 cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
                 # parent nose guide to head guide:
-                cmds.parent(noseInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+                cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
                 # parent upperTeeth guide to Nose1 guide:
                 cmds.parent(upperTeethInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
                 # create FkLine module instance:

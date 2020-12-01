@@ -127,7 +127,7 @@ def Biped(dpUIinst):
             cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
             
             # parent eye guide to spine guide:
-            cmds.parent(eyeInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -258,7 +258,7 @@ def Biped(dpUIinst):
                 cmds.setAttr(earInstance.cvJointLoc+".translateZ", 0.25)
                 cmds.setAttr(earInstance.cvEndJoint+".translateZ", 0.3)
                 # parent ear guide to head guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
                 # setting X mirror:
                 earInstance.changeMirror("X")
                 cmds.setAttr(earInstance.moduleGrp+".flip", 1)
@@ -278,7 +278,7 @@ def Biped(dpUIinst):
                 cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
                 # parent upperTeeth guide to head guide:
-                cmds.parent(upperTeethInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+                cmds.parent(upperTeethInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
                 # create FkLine module instance:
                 upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
@@ -364,7 +364,7 @@ def Biped(dpUIinst):
                 cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(noseInstance.moduleGrp+".shapeSize", 0.5)
                 # parent nose guide to head guide:
-                cmds.parent(noseInstance.moduleGrp, headInstance.cvHeadLoc, absolute=True)
+                cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
                 # create FkLine module instance:
                 nostrilInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing nostril base guide informations:

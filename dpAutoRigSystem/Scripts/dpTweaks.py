@@ -296,10 +296,10 @@ def Tweaks(dpUIinst):
                         cmds.parent([squintInstance1.moduleGrp, squintInstance2.moduleGrp, squintInstance3.moduleGrp], squintMainInstance.moduleGrp, absolute=True)
                         
                 # try to parent to HEAD guide or control
-                if cmds.objExists("*__*:Guide_Head"):
-                    cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Head")[0], relative=True)
-                elif cmds.objExists("Head_Head_Ctrl"):
-                    cmds.parent(holderMainInstance.moduleGrp, "Head_Head_Ctrl", relative=True)
+                if cmds.objExists("*__*:Guide_Upper"):
+                    cmds.parent(holderMainInstance.moduleGrp, cmds.ls("*__*:Guide_Upper")[0], relative=True)
+                elif cmds.objExists("Head_UpperJaw_Ctrl"):
+                    cmds.parent(holderMainInstance.moduleGrp, "Head_UpperJaw_Ctrl", relative=True)
                     
                 
                 # set tweaks guides position
