@@ -173,6 +173,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 self.cvRFDLoc = side+self.userGuideName+"_Guide_RfD"
                 self.cvRFELoc = side+self.userGuideName+"_Guide_RfE"
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
 
                 # declaring attributes reading from dictionary:
                 ankleRFAttr = self.langDic[self.langName]['c009_leg_extrem']
@@ -326,7 +327,11 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                             cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateY", force=True)
 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.cvRFALoc+";"+self.cvRFBLoc+";"+self.cvRFCLoc+";"+self.cvRFDLoc)
+                utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
+                utils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
+                utils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
+                utils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
+                utils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
                 utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:

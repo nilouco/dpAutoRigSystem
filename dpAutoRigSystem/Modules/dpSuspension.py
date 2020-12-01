@@ -141,6 +141,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvALoc = side+self.userGuideName+"_Guide_JointLocA"
                 self.cvBLoc = side+self.userGuideName+"_Guide_JointLocB"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
                 self.dist = self.ctrls.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
@@ -174,12 +175,10 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
-                        utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc)
-                        utils.originedFrom(objName=ctrl, attrString=self.base+";"+self.cvALoc)
+                        utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
                         cmds.delete(cmds.parentConstraint(self.cvALoc, zeroOutCtrlGrp[0], maintainOffset=False))
                     else:
                         utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
-                        utils.originedFrom(objName=ctrl, attrString=self.cvBLoc)
                         cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
                         # integrating data:
                         self.suspensionBCtrlGrpList.append(zeroOutCtrlGrp[0])

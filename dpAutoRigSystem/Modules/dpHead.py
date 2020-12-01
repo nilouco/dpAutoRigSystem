@@ -177,6 +177,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.cvLLipLoc  = side+self.userGuideName+"_Guide_LLip"
                 self.cvRLipLoc  = side+self.userGuideName+"_Guide_RLip"
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 
                 # creating joints:
                 self.neckJnt = cmds.joint(name=side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+"_Jnt")
@@ -247,14 +248,16 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.jawCtrl + ".rotateOrder", 3)
 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                utils.originedFrom(objName=self.neckCtrl, attrString=self.base+";"+self.cvNeckLoc)
+                utils.originedFrom(objName=self.neckCtrl, attrString=self.base+";"+self.cvNeckLoc+";"+self.radiusGuide)
                 utils.originedFrom(objName=self.headCtrl, attrString=self.cvHeadLoc)
                 utils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
                 utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
                 utils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
+                utils.originedFrom(objName=self.lLipCtrl, attrString=self.cvLLipLoc)
+                utils.originedFrom(objName=self.rLipCtrl, attrString=self.cvRLipLoc)
                 
                 # edit the mirror shape to a good direction of controls:
-                ctrlList = [ self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl ]
+                ctrlList = [self.neckCtrl, self.headCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl]
                 if s == 1:
                     for ctrl in ctrlList:
                         if self.mirrorAxis == 'X':

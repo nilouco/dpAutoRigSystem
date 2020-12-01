@@ -417,6 +417,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 sideLower = side
                 if side:
                     sideLower = side[0].lower()
+                toCornerBendList = []
                 # getting type of limb:
                 enumType = cmds.getAttr(self.moduleGrp + '.type')
                 if enumType == 0:
@@ -445,6 +446,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.cvCornerBLoc = side + self.userGuideName + "_Guide_CornerB"
                 self.cvExtremLoc = side + self.userGuideName + "_Guide_Extrem"
                 self.cvEndJoint = side + self.userGuideName + "_Guide_JointEnd"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
 
                 # getting names from dic:
                 if self.limbTypeName == ARM:
@@ -529,15 +531,25 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     self.fkCtrlList.append(fkCtrl)
                     cmds.setAttr(fkCtrl + '.visibility', keyable=False)
                     # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                    origGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + jName + "_OrigFrom_Grp")
+                    origGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+jName+"_OrigFrom_Grp")
                     self.origFromList.append(origGrp)
-                    utils.originedFrom(objName=origGrp,attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
-                    cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp + "_ParentConstraint")
+                    if n == 0: #Clavicle/Hips
+                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
+                    elif n == 1: #Shoulder/Leg
+                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_")+";"+self.cvMainLoc)
+                    elif n == len(self.jNameList)-1: #Wrist/Ankle
+                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_")+";"+self.cvEndJoint+";"+self.radiusGuide)
+                    else: #Corner
+                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
+                        if self.getHasBend():
+                            toCornerBendList.append(self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
+                    cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_ParentConstraint")
+                    
                     if n > 1:
                         cmds.parent(fkCtrl, self.fkCtrlList[n - 1])
                         cmds.parent(origGrp, self.origFromList[n - 1])
                     # add wrist_toParent_Ctrl
-                    if n == len(self.jNameList) - 1:
+                    if n == len(self.jNameList)-1:
                         self.toParentExtremCtrl = self.ctrls.cvControl("id_032_LimbToParent", ctrlName=side+self.userGuideName+"_"+extremName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                         cmds.parent(self.toParentExtremCtrl, origGrp)
                         if s == 0:
@@ -636,6 +648,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.ikCornerCtrl, longName='active', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 cmds.setAttr(self.ikCornerCtrl + '.active', 1);
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
+                utils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
                 # getting them zeroOut groups:
                 self.ikCornerCtrlZero = utils.zeroOut([self.ikCornerCtrl])[0]
                 self.ikExtremCtrlZero = utils.zeroOut([self.ikExtremCtrl])[0]
@@ -1401,6 +1414,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
                         utils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
                         cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                        if toCornerBendList:
+                            utils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
+                            cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_ParentConstraint")
+                            cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True)
                 
                 # add main articulationJoint:
                 if self.addArticJoint:
@@ -1420,7 +1437,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # integrating dics:
                 self.extremJntList.append(self.skinJointList[-2])
                 self.integrateOrigFromList.append(self.origFromList)
-
+                
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 utils.addHook(objName=self.skinJointList[len(self.skinJointList) - 1],

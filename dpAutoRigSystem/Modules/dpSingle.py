@@ -153,6 +153,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.select(clear=True)
                 # declare guide:
                 self.guide = side+self.userGuideName+"_Guide_JointLoc1"
+                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -180,7 +182,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         else:
                             indirectSkinRot=(0, 0, -90)
                 self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
-                utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide)
+                utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
@@ -229,7 +231,6 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
                 # create end joint:
                 cmds.select(self.jnt)
-                self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 self.mainJisList.append(self.jnt)

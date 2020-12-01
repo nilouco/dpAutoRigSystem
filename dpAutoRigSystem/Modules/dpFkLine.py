@@ -200,6 +200,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     cmds.select(clear=True)
                     # declare guide:
                     self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n+1)
+                    self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                    self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                     # create a joint:
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -225,8 +227,10 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.jntCtrl+".scaleCompensate", 1, channelBox=True)
                     cmds.connectAttr(self.jntCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
-                        utils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide)
+                        utils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
                         self.ctrlZeroGrp = self.zeroOutCtrlGrp
+                    elif n == self.nJoints-1:
+                        utils.originedFrom(objName=self.jntCtrl, attrString=self.guide+";"+self.cvEndJoint)
                     else:
                         utils.originedFrom(objName=self.jntCtrl, attrString=self.guide)
                     # grouping:
@@ -249,7 +253,6 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     # end chain:
                     if n == self.nJoints-1:
                         # create end joint:
-                        self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # create a masterModuleGrp to be checked if this rig exists:

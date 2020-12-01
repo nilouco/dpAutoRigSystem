@@ -214,17 +214,24 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 jointLabelAdd = 0
             # store the number of this guide by module type
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            # naming main controls:
+            hipsName  = self.langDic[self.langName]['c100_bottom']
+            chestName = self.langDic[self.langName]['c099_top']
+            if self.currentStyle == 1: #Biped
+                hipsName  = self.langDic[self.langName]['c027_hips']
+                chestName = self.langDic[self.langName]['c028_chest']
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 # create controls:
-                self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.userGuideName+"_"+hipsName+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.userGuideName+"_"+chestName+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 # create start and end Fk controls:
-                self.hipsFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                self.chestFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                self.hipsFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+hipsName+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                self.chestFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+chestName+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 # optimize controls CV shapes:
                 tempHipsACluster = cmds.cluster(self.hipsACtrl)[1]
                 cmds.setAttr(tempHipsACluster+".scaleY", 0.25)
@@ -237,8 +244,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     hipsFkCtrlCVPos = 0.4*self.ctrlRadius
                 cmds.move(0, hipsFkCtrlCVPos, 0, self.hipsFkCtrl+"0Shape.cv[0:5]", relative=True, worldSpace=True, worldSpaceDistance=True)
                 
-                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+self.langDic[self.langName]['c027_hips']+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
-                self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+self.langDic[self.langName]['c028_chest']+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+chestName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
                 cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_'+self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_active_'+self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_masterScale_'+self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
@@ -303,9 +310,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestACtrl+".scalePivot", self.chestACtrl+".rotatePivot")
                 
                 # add originedFrom attributes to hipsA, hipsB and chestB:
-                utils.originedFrom(objName=self.hipsACtrl, attrString=self.base)
+                utils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
                 utils.originedFrom(objName=self.hipsBCtrl, attrString=bottomLocGuide)
-                utils.originedFrom(objName=self.hipsFkCtrl, attrString=bottomLocGuide)
                 utils.originedFrom(objName=self.chestBCtrl, attrString=topLocGuide)
                 utils.originedFrom(objName=self.chestFkCtrl, attrString=topLocGuide)
                 # create a simple spine ribbon:
@@ -444,8 +450,10 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.parentConst+"."+self.chestBCtrl+"W1", nParentValue)
                     cmds.parent(middleCluster, clustersGrp, relative=True)
                     # add originedFrom attribute to this middle ctrl:
-                    utils.originedFrom(objName=self.middleCtrl, attrString=middleLocGuide)
-                    utils.originedFrom(objName=self.middleFkCtrl, attrString=middleLocGuide)
+                    middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+str(n)+"_OrigFrom_Grp")
+                    utils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
+                    cmds.parentConstraint(self.aRbnJointList[n], middleOrigGrp, maintainOffset=False, name=middleOrigGrp+"_ParentConstraint")
+                    cmds.parent(middleOrigGrp, self.hipsACtrl)
                     # apply volumeVariation to joints in the middle ribbon setup:
                     cmds.connectAttr(rbnCond+'.outColorR', self.aRbnJointList[n]+'.scaleX')
                     cmds.connectAttr(rbnCond+'.outColorR', self.aRbnJointList[n]+'.scaleZ')

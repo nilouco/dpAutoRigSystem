@@ -121,6 +121,7 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 # declare guide:
                 self.guide = side+self.userGuideName+"_Guide_JointLoc1"
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -130,8 +131,8 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 # create a control:
                 self.steeringCtrl = self.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.langDic[self.langName]['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 self.mainCtrl = self.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                utils.originedFrom(objName=self.steeringCtrl, attrString=self.base+";"+self.guide)
-                utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.guide)
+                utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
+                utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
                 self.steeringCtrlList.append(self.steeringCtrl)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))

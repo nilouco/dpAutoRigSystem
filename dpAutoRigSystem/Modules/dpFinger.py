@@ -189,6 +189,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.select(clear=True)
                     # declare guide:
                     self.guide = side+self.userGuideName+"_Guide_JointLoc"+str(n)
+                    self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
+                    self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                     # create a joint:
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
@@ -198,7 +200,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     if n == 1:
                         self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
-                        utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)
+                        utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
                         if s == 1:
                             if self.mirrorAxis == 'X':
@@ -215,7 +217,10 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     else:
                         self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
-                        utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide)
+                        if n == self.nJoints:
+                            utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                        else:
+                            utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide)
                         if n == 0:
                             if self.nJoints == 2:
                                 # problably we are creating the first control to a thumb
@@ -255,10 +260,6 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     self.zeroGrp = utils.zeroOut([self.sdkGrp])
                     
                     # grouping:
-                                                    
-                                                                                
-                                                                                        
-                                                                                               
                     if n > 0:
                         if n == 1:
                             if not cmds.objExists(self.fingerCtrl+'.ikFkBlend'):
@@ -290,10 +291,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                             utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     
-                    
                     if n == self.nJoints:
                         # create end joint:
-                        self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 

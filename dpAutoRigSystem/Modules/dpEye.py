@@ -209,7 +209,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         return eyelidBaseJxt, eyelidJnt
 
 
-    def createEyelidSetup(self, side, lid, eyelidJnt, eyelidBaseJxt, eyelidMiddleBaseJxt, eyelidMiddleJnt, preset, rotCtrl, *args):
+    def createEyelidSetup(self, side, lid, eyelidJnt, eyelidBaseJxt, eyelidMiddleBaseJxt, eyelidMiddleJnt, preset, rotCtrl, cvEyelidLoc, *args):
         ''' Work with the joints created in order to develop a solid and stable eyelid setup for blink and facial eye expressions using direct skinning process in the final render mesh.
             Returns the main control and its zeroOut group.
         '''
@@ -217,7 +217,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         baseName = side+self.userGuideName+"_"+self.langDic[self.langName][lid]+"_"+self.langDic[self.langName]['c042_eyelid']
         # creating eyelid control:
         eyelidCtrl = self.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.ctrlRadius*0.4, d=self.curveDegree, rot=rotCtrl)
-        utils.originedFrom(objName=eyelidCtrl, attrString=self.base+";"+self.guide)
+        utils.originedFrom(objName=eyelidCtrl, attrString=cvEyelidLoc)
         eyelidCtrlZero = utils.zeroOut([eyelidCtrl])[0]
         self.ctrls.setLockHide([eyelidCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         cmds.parent(eyelidCtrlZero, self.baseEyeCtrl)
@@ -341,7 +341,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         else:
             ctrlId = "id_013_EyePupil"
         ctrl = self.ctrls.cvControl(ctrlId, side+self.userGuideName+"_"+self.langDic[self.langName][codeName]+"_1_Ctrl", r=(self.ctrlRadius*0.3), d=self.curveDegree)
-        utils.originedFrom(objName=ctrl, attrString=self.base+";"+self.guide)
+        utils.originedFrom(objName=ctrl, attrString=cvLoc)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
         ctrlZero = utils.zeroOut([ctrl])
@@ -442,13 +442,14 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 # declare guide:
                 self.guide = side+self.userGuideName+"_Guide_JointLoc1"
                 self.cvEndJointZero = side+self.userGuideName+"_Guide_JointEnd_Grp"
+                self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 # create a joint:
                 self.jxt = cmds.joint(name=side+self.userGuideName+"_1_Jxt", scaleCompensate=False)
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
                 self.fkEyeCtrl = self.ctrls.cvControl("id_014_EyeFk", side+self.userGuideName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide)
+                utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
                 self.baseEyeCtrl = self.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.userGuideName+"_Base_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 utils.originedFrom(objName=self.baseEyeCtrl, attrString=self.base+";"+self.guide)
                 # position and orientation of joint and control:
@@ -486,6 +487,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.lookAtCtrl, self.eyeCtrl, relative=False)
                 cmds.makeIdentity(self.lookAtCtrl, apply=True)
                 cmds.addAttr(self.lookAtCtrl, longName="active", attributeType="bool", defaultValue=1, keyable=True)
+                utils.originedFrom(objName=self.lookAtCtrl, attrString=side+self.userGuideName+"_Guide_JointEnd")
                 
                 # up locator:
                 self.cvUpLocGuide = side+self.userGuideName+"_Guide_JointEnd_UpLoc"
@@ -540,8 +542,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                     self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt = self.createEyelidJoints(side, 'c045_lower', self.langDic[self.langName]['c029_middle'], self.cvLowerEyelidLoc, s+jointLabelAdd)
                     
                     # creating eyelids controls and setup:
-                    self.upperEyelidCtrl, self.upperEyelidCtrlZero = self.createEyelidSetup(side, 'c044_upper', self.upperEyelidJnt, self.upperEyelidBaseJxt, self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt, 30, (0, 0, 0))
-                    self.lowerEyelidCtrl, self.lowerEyelidCtrlZero = self.createEyelidSetup(side, 'c045_lower', self.lowerEyelidJnt, self.lowerEyelidBaseJxt, self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt, 30, (0, 0, 180))
+                    self.upperEyelidCtrl, self.upperEyelidCtrlZero = self.createEyelidSetup(side, 'c044_upper', self.upperEyelidJnt, self.upperEyelidBaseJxt, self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt, 30, (0, 0, 0), self.cvUpperEyelidLoc)
+                    self.lowerEyelidCtrl, self.lowerEyelidCtrlZero = self.createEyelidSetup(side, 'c045_lower', self.lowerEyelidJnt, self.lowerEyelidBaseJxt, self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt, 30, (0, 0, 180), self.cvLowerEyelidLoc)
                     # fixing mirror behavior for side controls:
                     if s == 0: #left
                         cmds.setAttr(self.upperEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"X", 1)

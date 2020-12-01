@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.10"
-DPAR_UPDATELOG = "#078 Limb corner joints.\n#193 Scale Limb corner offset control.\nFixed Limb corner stretch scale."
+DPAR_VERSION = "3.10.11"
+DPAR_UPDATELOG = "#040 Spine generic naming.\n#044 Guide jointEnd parent.\nReviewed all guides parenting."
 
 
 
