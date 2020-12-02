@@ -20,7 +20,7 @@ dic_colors = {
 
 class ControlClass:
 
-    def __init__(self, dpUIinst, presetDic, presetName, *args):
+    def __init__(self, dpUIinst, presetDic, presetName, moduleGrp=None, *args):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
@@ -28,6 +28,7 @@ class ControlClass:
         self.presetDic = presetDic
         self.presetName = presetName
         self.attrValueDic = {}
+        self.moduleGrp = moduleGrp
 
 
     # CONTROLS functions:
@@ -354,7 +355,7 @@ class ControlClass:
 
 
     def cvLocator(self, ctrlName, r=1, d=1, guide=False, *args):
-        """Create and return a cvLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
+        """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
         curveInstance = self.getControlInstance("Locator")
         curve = curveInstance.cvMain(False, "Locator", ctrlName, r, d, '+Y', (0, 0, 0), 1, guide)
@@ -365,14 +366,13 @@ class ControlClass:
             # colorize curveShape:
             self.colorShape([curve], 'blue')
             # shapeSize setup:
-            shapeSizeCluster = self.shapeSizeSetup(curve)
-            return [curve, shapeSizeCluster]
+            self.shapeSizeSetup(curve)
         return curve
 
 
     #@utils.profiler
     def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
-        """Create and return a cvJointLocator curve to be usually used in the guideSystem and the clusterHandle to shapeSize.
+        """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
         # create locator curve:
         cvLoc = self.cvLocator(ctrlName+"_CvLoc", r, d)
@@ -407,9 +407,9 @@ class ControlClass:
         # colorize curveShapes:
         self.colorShape([locCtrl], 'blue')
         # shapeSize setup:
-        shapeSizeCluster = self.shapeSizeSetup(locCtrl)
+        self.shapeSizeSetup(locCtrl)
         cmds.select(clear=True)
-        return [locCtrl, shapeSizeCluster]
+        return locCtrl
     
     
     def cvCharacter(self, ctrlType, ctrlName, r=1, d=1, dir="+Y", rot=(0, 0, 0), *args):
@@ -796,7 +796,6 @@ class ControlClass:
     #@utils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
-            Returns the created cluster.
         """
         clusterHandle = None
         childShapeList = cmds.listRelatives(transformNode, shapes=True, children=True)
@@ -811,4 +810,22 @@ class ControlClass:
             cmds.namespace(set=":")
         else:
             print "There are not children shape to create shapeSize setup of:", transformNode
-        return clusterHandle
+        if clusterHandle:
+            self.connectShapeSize(clusterHandle)
+        
+        
+    def connectShapeSize(self, clusterHandle, *args):
+        """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
+        """
+        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleX", force=True)
+        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
+        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
+        # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
+        self.dpARTempGrp = 'dpAR_Temp_Grp'
+        if not cmds.objExists(self.dpARTempGrp):
+            cmds.group(name=self.dpARTempGrp, empty=True)
+            cmds.setAttr(self.dpARTempGrp+".visibility", 0)
+            cmds.setAttr(self.dpARTempGrp+".template", 1)
+            cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
+            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        cmds.parent(clusterHandle, self.dpARTempGrp)

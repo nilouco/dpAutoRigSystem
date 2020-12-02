@@ -41,14 +41,12 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
-        self.cvALoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocA", r=0.3, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvALoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocA", r=0.3, d=1, guide=True)
         self.jAGuide = cmds.joint(name=self.guideName+"_jAGuide", radius=0.001)
         cmds.setAttr(self.jAGuide+".template", 1)
         cmds.parent(self.jAGuide, self.moduleGrp, relative=True)
         
-        self.cvBLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocB", r=0.3, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvBLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocB", r=0.3, d=1, guide=True)
         cmds.parent(self.cvBLoc, self.cvALoc)
         cmds.setAttr(self.cvBLoc+".tz", 3)
         cmds.setAttr(self.cvBLoc+".rotateX", 180)

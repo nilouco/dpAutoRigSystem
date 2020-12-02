@@ -474,8 +474,12 @@ class LayoutClass:
         if self.mirrorAxis != 'off':
             if not cmds.objExists(self.guideMirrorGrp):
                 self.guideMirrorGrp = cmds.group(name=self.guideMirrorGrp, empty=True)
-                cmds.setAttr(self.guideMirrorGrp+".template", 1)
                 cmds.addAttr(self.guideMirrorGrp, longName="selectionChanges", defaultValue=0, attributeType="byte")
+                cmds.setAttr(self.guideMirrorGrp+".template", 1)
+                cmds.setAttr(self.guideMirrorGrp+".hiddenInOutliner", 1)
+                for attr in ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v']:
+                    cmds.setAttr(self.guideMirrorGrp+"."+attr, lock=True, keyable=False)
+                        
             if not cmds.objExists(self.previewMirrorGrpName):
                 if guideChildrenList:
                     guideFatherNameList = []

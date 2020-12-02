@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-11-23",
+    "_updated"       : "2020-12-02",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -140,6 +140,7 @@
     "e017_loadingExtension"        : "Can't load extension.",
     "e018_selectBlendShape"        : "Select a BlendShape node, a mesh or a connected transform in order to load, please.",
     "e019_notFoundAllGrp"          : "Not found All_Grp to select controls, sorry.",
+    "e020_notFoundHeadCtrl"        : "Head Deformer created, but not found Head_Ctrl to parenting, sorry.",
 
     "i000_guides"          : "Create GUIDES",
     "i001_modules"         : "Edit MODULES",
@@ -324,6 +325,7 @@
 	"i180_indSkinAnim"     : "Indirect Skinning (Animation)",
 	"i181_jointGame"       : "Facial Joints (Gaming)",
 	"i182_facialMessage"   : "Do you want use it for?",
+	"i183_hideGuideGrp"    : "Hide guide groups in Outliner.",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

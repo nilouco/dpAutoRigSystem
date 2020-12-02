@@ -47,8 +47,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
-        self.cvCenterLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvCenterLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
         self.jGuideCenter = cmds.joint(name=self.guideName+"_JGuideCenter", radius=0.001)
         cmds.setAttr(self.jGuideCenter+".template", 1)
         cmds.parent(self.jGuideCenter, self.moduleGrp, relative=True)
@@ -56,7 +55,6 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         self.cvFrontLoc = self.ctrls.cvControl("id_059_AimLoc", ctrlName=self.guideName+"_FrontLoc", r=0.3, d=1, rot=(0, 0, 90))
         self.ctrls.colorShape([self.cvFrontLoc], "blue")
         shapeSizeCH = self.ctrls.shapeSizeSetup(self.cvFrontLoc)
-        self.connectShapeSize(shapeSizeCH)
         cmds.parent(self.cvFrontLoc, self.cvCenterLoc)
         cmds.setAttr(self.cvFrontLoc+".tx", 1.3)
         self.jGuideFront = cmds.joint(name=self.guideName+"_JGuideFront", radius=0.001)
@@ -69,8 +67,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(cvFrontLocPosNode+".output1D", self.cvFrontLoc+".tx")
         self.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
         
-        self.cvInsideLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_InsideLoc", r=0.2, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvInsideLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_InsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvInsideLoc, self.cvCenterLoc)
         cmds.setAttr(self.cvInsideLoc+".tz", 0.3)
         self.jGuideInside = cmds.joint(name=self.guideName+"_JGuideInside", radius=0.001)
@@ -82,8 +79,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
         self.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
         
-        self.cvOutsideLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName+"_OutsideLoc", r=0.2, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvOutsideLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_OutsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvOutsideLoc, self.cvCenterLoc)
         cmds.setAttr(self.cvOutsideLoc+".tz", -0.3)
         self.jGuideOutside = cmds.joint(name=self.guideName+"_JGuideOutside", radius=0.001)

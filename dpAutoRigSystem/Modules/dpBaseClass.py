@@ -27,7 +27,6 @@ class StartClass:
         self.rigType = rigType
         self.presetDic = presetDic
         self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         # defining namespace:
         self.guideNamespace = self.guideModuleName + "__" + self.userGuideName
         # defining guideNamespace:
@@ -37,6 +36,9 @@ class StartClass:
         self.moduleGrp = self.guideName+"_Base"
         self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
         self.annotation = self.moduleGrp+"_Ant"
+        # calling dpControls:
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName, self.moduleGrp)
+        # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
             # create GUIDE for this module:
@@ -106,21 +108,6 @@ class StartClass:
         cmds.setAttr(self.annotation+'.template', 1)
     
     
-    def connectShapeSize(self, clusterHandle, *args):
-        """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
-        """
-        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleX", force=True)
-        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleY", force=True)
-        cmds.connectAttr(self.moduleGrp+".shapeSize", clusterHandle+".scaleZ", force=True)
-        # re-declaring Temporary Group and parenting shapeSizeClusterHandle:
-        self.tempGrpName = 'dpAR_Temp_Grp'
-        if not cmds.objExists(self.tempGrpName):
-            cmds.group(name=self.tempGrpName, empty=True)
-            cmds.setAttr(self.tempGrpName+".visibility", 0)
-            cmds.setAttr(self.tempGrpName+".template", 1)
-        cmds.parent(clusterHandle, self.tempGrpName)
-
-
     def updateModuleInstanceInfo(self, *args):
         """ Just update modeuleInstanceInfo attribute in the guideNode transform.
         """

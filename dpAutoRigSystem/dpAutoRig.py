@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.12"
-DPAR_UPDATELOG = "#128 Added Head UpperJaw."
+DPAR_VERSION = "3.10.13"
+DPAR_UPDATELOG = "#200 Guide shapeSize relocated.\n#202 dpAR_Temp_Grp hidden in Outliner.\n#203 HeadDeformer warning if not found Head_Ctrl to parenting."
 
 
 
@@ -381,6 +381,7 @@ class DP_AutoRig_UI:
         self.allUIs["prefixText"] = cmds.text('prefixText', align='left', label=self.langDic[self.langName]['i003_prefix'], parent=self.allUIs["prefixLayout"])
         cmds.setParent(self.allUIs["rigOptionsLayout"])
         self.allUIs["hideJointsCB"] = cmds.checkBox('hideJointsCB', label=self.langDic[self.langName]['i009_hideJointsCB'], align='left', v=0, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["hideGuideGrpCB"] = cmds.checkBox('hideGuideGrpCB', label=self.langDic[self.langName]['i183_hideGuideGrp'], align='left', v=1, changeCommand=self.displayGuideGrp, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["integrateCB"] = cmds.checkBox('integrateCB', label=self.langDic[self.langName]['i010_integrateCB'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["defaultRenderLayerCB"] = cmds.checkBox('defaultRenderLayerCB', label=self.langDic[self.langName]['i004_defaultRL'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["colorizeCtrlCB"] = cmds.checkBox('colorizeCtrlCB', label=self.langDic[self.langName]['i065_colorizeCtrl'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
@@ -947,6 +948,18 @@ class DP_AutoRig_UI:
         elif rawResult[0] == 4:
             if verbose:
                 self.updateWin(rawResult, 'e008_failCheckUpdate')
+    
+    
+    def displayGuideGrp(self, value, *args):
+        """ Change display hidden guide groups in the Outliner:
+            dpAR_Temp_Grp
+            dpAR_GuideMirror_Grp
+        """
+        if cmds.objExists("dpAR_Temp_Grp"):
+            cmds.setAttr("dpAR_Temp_Grp.hiddenInOutliner", value)
+        if cmds.objExists("dpAR_GuideMirror_Grp"):
+            cmds.setAttr("dpAR_GuideMirror_Grp.hiddenInOutliner", value)
+        mel.eval("AEdagNodeCommonRefreshOutliners();")
     
     
     # Start working with Guide Modules:

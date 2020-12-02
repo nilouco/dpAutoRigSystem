@@ -98,18 +98,12 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".articulation", 1)
 
         # create cvJointLoc and cvLocators:
-        self.cvBeforeLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
-        self.cvMainLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Main", r=0.5, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
-        self.cvCornerLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName + "_Corner", r=0.3, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
-        self.cvCornerBLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerB", r=0.5, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
-        self.cvExtremLoc, shapeSizeCH = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Extrem", r=0.5, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
-        self.cvUpVectorLoc, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerUpVector", r=0.5, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
+        self.cvMainLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Main", r=0.5, d=1, guide=True)
+        self.cvCornerLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_Corner", r=0.3, d=1, guide=True)
+        self.cvCornerBLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerB", r=0.5, d=1, guide=True)
+        self.cvExtremLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Extrem", r=0.5, d=1, guide=True)
+        self.cvUpVectorLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerUpVector", r=0.5, d=1, guide=True)
 
         # lock undesirable translate axe for corner guides:
         cmds.setAttr(self.cvCornerLoc+".tx", lock=True)
@@ -138,8 +132,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.jGuideBefore, self.moduleGrp, relative=True)
 
         # create cvEnd:
-        self.cvEndJoint, shapeSizeCH = self.ctrls.cvLocator(ctrlName=self.guideName + "_JointEnd", r=0.1, d=1, guide=True)
-        self.connectShapeSize(shapeSizeCH)
+        self.cvEndJoint = self.ctrls.cvLocator(ctrlName=self.guideName + "_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvExtremLoc)
         cmds.setAttr(self.cvEndJoint + ".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName + "_JGuideEnd", radius=0.001)

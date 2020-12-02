@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.5"
+DPHD_VERSION = "2.6"
 
 
 class HeadDeformer():
@@ -24,6 +24,7 @@ class HeadDeformer():
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.headCtrl = None
+        self.wellDone = True
         # call main function
         if (int(cmds.about(version=True)[:4]) == 2020):
             callMessage = False
@@ -265,6 +266,9 @@ class HeadDeformer():
                     for item in toHeadDefCtrlList:
                         cmds.sets(item, include=headDeformerName+"_FFDSet")
                 cmds.parent(arrowCtrlGrp, self.headCtrl)
+            else:
+                mel.eval("warning" + "\"" + self.langDic[self.langName]["e020_notFoundHeadCtrl"] + "\"" + ";")
+                self.wellDone = False
             
             cmds.parent(squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1], offsetGrp)
             cmds.parent(offsetGrp, clusterGrp, latticeGrp, dataGrp)
@@ -284,7 +288,8 @@ class HeadDeformer():
             
             # finish selection the arrow control
             cmds.select(arrowCtrl)
-            print self.langDic[self.langName]["i179_addedHeadDef"],
+            if self.wellDone:
+                print self.langDic[self.langName]["i179_addedHeadDef"],
         
         else:
             mel.eval("warning" + "\"" + self.langDic[self.langName]["i034_notSelHeadDef"] + "\"" + ";")
