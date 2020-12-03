@@ -248,6 +248,9 @@ class StartClass:
             except:
                 pass
             
+            # unPinGuides before Rig them:
+            self.ctrls.unPinGuide(self.moduleGrp)
+            
             # RIG:
             utils.useDefaultRenderLayer()
             

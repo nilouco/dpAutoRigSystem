@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.13"
-DPAR_UPDATELOG = "#200 Guide shapeSize relocated.\n#202 dpAR_Temp_Grp hidden in Outliner.\n#203 HeadDeformer warning if not found Head_Ctrl to parenting."
+DPAR_VERSION = "3.10.14"
+DPAR_UPDATELOG = "#086 Pin Guide temporarily."
 
 
 
@@ -120,6 +120,8 @@ GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
 MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
+TEMP_GRP = "dpAR_Temp_Grp"
+GUIDEMIRROR_GRP = "dpAR_GuideMirror_Grp"
 INFO_ICON = "dp_info.png"
 DPAR_SITE = "https://nilouco.blogspot.com"
 DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
@@ -146,6 +148,7 @@ class DP_AutoRig_UI:
         self.loadedExtras = False
         self.controlInstanceList = []
         self.degreeOption = 0
+        self.tempGrp = TEMP_GRP
         
         
         try:
@@ -233,7 +236,7 @@ class DP_AutoRig_UI:
             return
         
 
-        # call UI window: Also ensure that when thedock controler X button it it, the window is killed and the dock control too
+        # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
 
@@ -571,7 +574,10 @@ class DP_AutoRig_UI:
     
     def jobDockVisChange(self, *args):
         #Force focus
-        cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
+        try:
+            cmds.dockControl(self.pDockCtrl, r=True, edit=True) #Force focus on the tool when it's open
+        except:
+            pass
     
     
     def jobSelectedGuide(self):
@@ -955,10 +961,10 @@ class DP_AutoRig_UI:
             dpAR_Temp_Grp
             dpAR_GuideMirror_Grp
         """
-        if cmds.objExists("dpAR_Temp_Grp"):
-            cmds.setAttr("dpAR_Temp_Grp.hiddenInOutliner", value)
-        if cmds.objExists("dpAR_GuideMirror_Grp"):
-            cmds.setAttr("dpAR_GuideMirror_Grp.hiddenInOutliner", value)
+        if cmds.objExists(TEMP_GRP):
+            cmds.setAttr(TEMP_GRP+".hiddenInOutliner", value)
+        if cmds.objExists(GUIDEMIRROR_GRP):
+            cmds.setAttr(GUIDEMIRROR_GRP+".hiddenInOutliner", value)
         mel.eval("AEdagNodeCommonRefreshOutliners();")
     
     
@@ -1060,6 +1066,7 @@ class DP_AutoRig_UI:
             
             cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
+    
     
     #@utils.profiler
     def initGuide(self, guideModule, guideDir, rigType=Base.RigType.biped, *args):
@@ -1193,6 +1200,8 @@ class DP_AutoRig_UI:
                     else:
                         moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.default)
                 self.moduleInstancesList.append(moduleInst)
+                # reload pinGuide scriptJob:
+                self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
         self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])

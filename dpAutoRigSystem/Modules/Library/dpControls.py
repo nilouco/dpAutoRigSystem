@@ -290,8 +290,8 @@ class ControlClass:
             # joint labelling:
             utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
-
-
+    
+    
     def getControlNodeById(self, ctrlType, *args):
         """ Find and return node list with ctrlType in its attribute.
         """
@@ -302,7 +302,6 @@ class ControlClass:
                 if cmds.getAttr(item+".controlID") == ctrlType:
                     ctrlList.append(item)
         return ctrlList
-        
     
     
     def getControlModuleById(self, ctrlType, *args):
@@ -360,13 +359,7 @@ class ControlClass:
         curveInstance = self.getControlInstance("Locator")
         curve = curveInstance.cvMain(False, "Locator", ctrlName, r, d, '+Y', (0, 0, 0), 1, guide)
         if guide:
-            # create an attribute to be used as guide by module:
-            cmds.addAttr(curve, longName="nJoint", attributeType='long')
-            cmds.setAttr(curve+".nJoint", 1)
-            # colorize curveShape:
-            self.colorShape([curve], 'blue')
-            # shapeSize setup:
-            self.shapeSizeSetup(curve)
+            self.addGuideAttrs(curve)
         return curve
 
 
@@ -401,13 +394,8 @@ class ControlClass:
         cmds.setAttr(locCtrl+".rotateY", rot[1])
         cmds.setAttr(locCtrl+".rotateZ", rot[2])
         cmds.makeIdentity(locCtrl, rotate=True, apply=True)
-        # create an attribute to be used as guide by module:
-        cmds.addAttr(locCtrl, longName="nJoint", attributeType='long')
-        cmds.setAttr(locCtrl+".nJoint", 1)
-        # colorize curveShapes:
-        self.colorShape([locCtrl], 'blue')
-        # shapeSize setup:
-        self.shapeSizeSetup(locCtrl)
+        if guide:
+            self.addGuideAttrs(locCtrl)
         cmds.select(clear=True)
         return locCtrl
     
@@ -505,6 +493,8 @@ class ControlClass:
         if (int(cmds.about(version=True)[:4]) > 2016):
             cmds.setAttr(circle+"0Shape.lineWidth", 2)
         cmds.select(clear=True)
+        # pinGuide:
+        self.createPinGuide(circle)
         return [circle, radiusCtrl]
     
     
@@ -812,8 +802,8 @@ class ControlClass:
             print "There are not children shape to create shapeSize setup of:", transformNode
         if clusterHandle:
             self.connectShapeSize(clusterHandle)
-        
-        
+    
+    
     def connectShapeSize(self, clusterHandle, *args):
         """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
         """
@@ -829,3 +819,95 @@ class ControlClass:
             cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
             self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         cmds.parent(clusterHandle, self.dpARTempGrp)
+    
+    
+    def addGuideAttrs(self, ctrlName, *args):
+        """ Add and set attributes to this control curve be used as a guide.
+        """
+        # create an attribute to be used as guide by module:
+        cmds.addAttr(ctrlName, longName="nJoint", attributeType='long')
+        cmds.setAttr(ctrlName+".nJoint", 1)
+        # colorize curveShapes:
+        self.colorShape([ctrlName], 'blue')
+        # shapeSize setup:
+        self.shapeSizeSetup(ctrlName)
+        # pinGuide:
+        self.createPinGuide(ctrlName)
+    
+    
+    def createPinGuide(self, ctrlName, *args):
+        """ Add pinGuide attribute if it doesn't exist yet.
+            Create a scriptJob to read this attribute change.
+        """
+        if not ctrlName.endswith("_JointEnd"):
+            if not ctrlName.endswith("_RadiusCtrl"):
+                if not cmds.objExists(ctrlName+".pinGuide"):
+                    cmds.addAttr(ctrlName, longName="pinGuide", attributeType='bool')
+                    cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
+                cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
+                if cmds.getAttr(ctrlName+".pinGuide"):
+                    self.setPinnedGuideColor(ctrlName, True, "red")
+    
+    
+    def setPinnedGuideColor(self, ctrlName, status, color, *args):
+        """ Set the color override for pinned guide shapes.
+        """
+        cmds.setAttr(ctrlName+".overrideEnabled", status)
+        cmds.setAttr(ctrlName+".overrideColor", dic_colors[color])
+        shapeList = cmds.listRelatives(ctrlName, children=True, fullPath=False, shapes=True)
+        if shapeList:
+            for shapeNode in shapeList:
+                if status:
+                    cmds.setAttr(shapeNode+".overrideEnabled", 0)
+                else:
+                    cmds.setAttr(shapeNode+".overrideEnabled", 1)
+    
+    
+    def jobPinGuide(self, ctrlName, *args):
+        """ Pin temporally the guide by scriptJob.
+        """
+        transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
+        if cmds.objExists(self.dpUIinst.tempGrp):
+            if cmds.objExists(ctrlName+".pinGuide"):
+                pcName = ctrlName+"_PinGuide_ParentConstraint"
+                pinValue = cmds.getAttr(ctrlName+".pinGuide")
+                if pinValue:
+                    if not cmds.objExists(pcName):
+                        cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)
+                        self.setPinnedGuideColor(ctrlName, True, "red")
+                else:
+                    if cmds.objExists(pcName):
+                        cmds.delete(pcName)
+                        self.setPinnedGuideColor(ctrlName, False, "red")
+                        
+                for attr in transformAttrList:
+                    cmds.setAttr(ctrlName+"."+attr, lock=pinValue)
+    
+    
+    def startPinGuide(self, guideBase, *args):
+        """ Reload pinGuide job for already created guide.
+        """
+        if cmds.objExists(guideBase):
+            childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")
+            if childrenList:
+                for childNode in childrenList:
+                    if cmds.objExists(childNode+".pinGuide"):
+                        self.createPinGuide(childNode)
+            if cmds.objExists(guideBase+".pinGuide"):
+                self.createPinGuide(guideBase)
+    
+    
+    def unPinGuide(self, guideBase, *args):
+        """ Remove pinGuide setup.
+        """
+        if cmds.objExists(guideBase):
+            childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")
+            if childrenList:
+                for childNode in childrenList:
+                    if cmds.objExists(childNode+".pinGuide"):
+                        cmds.setAttr(childNode+".pinGuide", 0)
+                        self.jobPinGuide(childNode)
+            if cmds.objExists(guideBase+".pinGuide"):
+                cmds.setAttr(guideBase+".pinGuide", 0)
+                self.createPinGuide(guideBase)
+
