@@ -222,8 +222,10 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         # adding useful control attributes to calibrate eyelid setup:
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c049_intensity']+"X", attributeType="float", minValue=0, defaultValue=1)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c049_intensity']+"Y", attributeType="float", minValue=0, defaultValue=1)
+        cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, defaultValue=0.6, maxValue=1)
         cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c049_intensity']+"X", keyable=False, channelBox=True)
         cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c049_intensity']+"Y", keyable=False, channelBox=True)
+        cmds.setAttr(eyelidCtrl+"."+self.langDic[self.langName]['c032_follow'], keyable=True, channelBox=True)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c053_invert']+"X", attributeType="bool", defaultValue=0)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c053_invert']+"Y", attributeType="bool", defaultValue=0)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c051_preset']+"X", attributeType="float", defaultValue=preset, keyable=False)
@@ -245,6 +247,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         eyelidFixNegativeMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Negative_MD")
         eyelidFixMiddleMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_Middle_MD")
         eyelidFixMiddleScaleClp = cmds.createNode('clamp', name=baseName+"_Fix_Middle_Clp")
+        eyelidFollowRev = cmds.createNode('reverse', name=baseName+"_Follow_Rev")
         # seting up the node attributes:
         cmds.setAttr(eyelidInvertXCnd+".colorIfTrueR", 1)
         cmds.setAttr(eyelidInvertXCnd+".colorIfFalseR", -1)
@@ -310,6 +313,15 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(eyelidFixMiddleMD+".outputX", eyelidFixMiddleScaleClp+".inputR", force=True)
         cmds.connectAttr(eyelidFixMiddleScaleClp+".outputR", eyelidMiddleJnt+".scaleX", force=True)
         cmds.connectAttr(eyelidFixMiddleMD+".outputY", eyelidMiddleJnt+".translateZ", force=True)
+        # follow setup:
+        eyelidBaseZeroJxt = cmds.listRelatives(eyelidBaseJxt, parent=True)[0]
+        eyelidMiddleBaseZeroJxt = cmds.listRelatives(eyelidMiddleBaseJxt, parent=True)[0]
+        followPC = cmds.parentConstraint(self.jxt, self.eyeScaleJnt, eyelidBaseZeroJxt, skipTranslate=["x", "y", "z"], skipRotate=["y", "z"], maintainOffset=1, name=baseName+"_Follow_ParentConstraint")[0]
+        cmds.setAttr(followPC+".interpType", 2)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c032_follow'], followPC+"."+self.jxt+"W0", force=True)
+        cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c032_follow'], eyelidFollowRev+".inputX", force=True)
+        cmds.connectAttr(eyelidFollowRev+".outputX", followPC+"."+self.eyeScaleJnt+"W1", force=True)
+        cmds.connectAttr(eyelidBaseZeroJxt+".rotateX", eyelidMiddleBaseZeroJxt+".rotateX", force=True)
         return eyelidCtrl, eyelidCtrlZero
         
         
@@ -362,7 +374,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.parentConstraint(ctrl, mainJnt, maintainOffset=False, name=mainJnt+"_ParentConstraint")
         cmds.scaleConstraint(ctrl, mainJnt, maintainOffset=True, name=mainJnt+"_ScaleConstraint")
         return ctrl
-        
+    
     
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)

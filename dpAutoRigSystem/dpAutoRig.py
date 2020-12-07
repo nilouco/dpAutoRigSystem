@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.14"
-DPAR_UPDATELOG = "#086 Pin Guide temporarily."
+DPAR_VERSION = "3.10.15"
+DPAR_UPDATELOG = "#035 Eyelids auto follow."
 
 
 
@@ -2303,7 +2303,7 @@ class DP_AutoRig_UI:
                                     self.itemMirrorNameList = self.itemGuideMirrorNameList
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
-                                    cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True)
+                                    cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_ParentConstraint")
                             # changing iris and pupil color override:
                             self.itemMirrorNameList = [""]
                             # get itemGuideName:
@@ -2350,7 +2350,7 @@ class DP_AutoRig_UI:
                                     if limbTypeName == ARM:
                                         origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
                                         origFrom = origFromList[-1]
-                                        cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True)
+                                        cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True, name=scalableGrp+"_ParentConstraint")
                 
                         # integrate the Single module with another Single as a father:
                         if moduleType == SINGLE:
