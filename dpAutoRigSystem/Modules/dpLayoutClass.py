@@ -239,10 +239,12 @@ class LayoutClass:
                     
                 # create eyelid layout:
                 if self.eyelidExists:
-                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=4, columnWidth4=(100, 150, 50, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=5, columnWidth5=(100, 75, 75, 50, 40), columnAlign=[(1, 'right'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 10)], parent="selectedColumn" )
                     cmds.text(" ", parent=self.eyelidLayout)
                     eyelidValue = cmds.getAttr(self.moduleGrp+".eyelid")
                     self.eyelidCB = cmds.checkBox(label=self.langDic[self.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.eyelidLayout)
+                    specValue = cmds.getAttr(self.moduleGrp+".specular")
+                    self.specCB = cmds.checkBox(label=self.langDic[self.langName]['i184_specular'], value=specValue, changeCommand=self.changeSpecular, parent=self.eyelidLayout)
                     irisValue = cmds.getAttr(self.moduleGrp+".iris")
                     self.irisCB = cmds.checkBox(label=self.langDic[self.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.eyelidLayout)
                     pupilValue = cmds.getAttr(self.moduleGrp+".pupil")

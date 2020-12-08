@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.15"
-DPAR_UPDATELOG = "#035 Eyelids auto follow."
+DPAR_VERSION = "3.10.16"
+DPAR_UPDATELOG = "#149 Eyelids locked guide translateX.\n#150 EyeLookAt zeroOut controls.\n#180 Eye sub control.\n#185 Eye Side LookAt controls zeroOut.\n#205 Eye specular control."
 
 
 
