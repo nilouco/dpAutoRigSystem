@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.16"
-DPAR_UPDATELOG = "#149 Eyelids locked guide translateX.\n#150 EyeLookAt zeroOut controls.\n#180 Eye sub control.\n#185 Eye Side LookAt controls zeroOut.\n#205 Eye specular control."
+DPAR_VERSION = "3.10.17"
+DPAR_UPDATELOG = "Changed Eye Main control name.\n#207 Remove pinGuide before Rig it.\n#208 Refresh Outliners.\n#209 ZeroOut values for UpperJaw."
 
 
 
@@ -965,7 +965,8 @@ class DP_AutoRig_UI:
             cmds.setAttr(TEMP_GRP+".hiddenInOutliner", value)
         if cmds.objExists(GUIDEMIRROR_GRP):
             cmds.setAttr(GUIDEMIRROR_GRP+".hiddenInOutliner", value)
-        mel.eval("AEdagNodeCommonRefreshOutliners();")
+        mel.eval('source AEdagNodeCommon;')
+        mel.eval('AEdagNodeCommonRefreshOutliners();')
     
     
     # Start working with Guide Modules:
@@ -1762,7 +1763,20 @@ class DP_AutoRig_UI:
                 cmds.progressWindow(endProgress=True)
                 dpRAttr.dpCloseReorderAttrUI()
 
-
+    
+    def unPinAllGuides(self, *args):
+        """ Force to un pin all guides.
+            Useful to clean up guides before start the rigAll process.
+        """
+        pConstList = cmds.ls(selection=False, type="parentConstraint")
+        if pConstList:
+            for pConst in pConstList:
+                if "PinGuide" in pConst:
+                    pinnedGuide = cmds.listRelatives(pConst, parent=True, type="transform")[0]
+                    self.ctrls.setLockHide([pinnedGuide], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'], l=False)
+                    cmds.delete(pConst)
+    
+    
     def rigAll(self, integrate=None, *args):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the proccess.
@@ -1793,6 +1807,9 @@ class DP_AutoRig_UI:
                         return
                     else:
                         break
+            
+            # force unPin all Guides:
+            self.unPinAllGuides()
             
             # Starting progress window
             rigProgressAmount = 0

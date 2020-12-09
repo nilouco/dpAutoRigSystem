@@ -290,7 +290,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 tempDelChew = cmds.parentConstraint(self.cvChewLoc, self.chewCtrl, maintainOffset=False)
                 tempDelLLip = cmds.parentConstraint(self.cvLLipLoc, self.lLipCtrl, maintainOffset=False)
                 tempDelRLip = cmds.parentConstraint(self.cvRLipLoc, self.rLipCtrl, maintainOffset=False)
-                cmds.delete(tempDelNeck, tempDelHead, tempDelJaw, tempDelChin, tempDelChew, tempDelLLip, tempDelRLip)
+                cmds.delete(tempDelNeck, tempDelHead, tempDelUpper, tempDelJaw, tempDelChin, tempDelChew, tempDelLLip, tempDelRLip)
                 
                 # zeroOut controls:
                 self.zeroLipCtrlList = utils.zeroOut([self.lLipCtrl, self.rLipCtrl])

@@ -867,21 +867,21 @@ class ControlClass:
         """ Pin temporally the guide by scriptJob.
         """
         transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
-        if cmds.objExists(self.dpUIinst.tempGrp):
-            if cmds.objExists(ctrlName+".pinGuide"):
-                pcName = ctrlName+"_PinGuide_ParentConstraint"
-                pinValue = cmds.getAttr(ctrlName+".pinGuide")
-                if pinValue:
-                    if not cmds.objExists(pcName):
+        if cmds.objExists(ctrlName+".pinGuide"):
+            pcName = ctrlName+"_PinGuide_ParentConstraint"
+            pinValue = cmds.getAttr(ctrlName+".pinGuide")
+            if pinValue:
+                if not cmds.objExists(pcName):
+                    if cmds.objExists(self.dpUIinst.tempGrp):
                         cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)
                         self.setPinnedGuideColor(ctrlName, True, "red")
-                else:
-                    if cmds.objExists(pcName):
-                        cmds.delete(pcName)
-                        self.setPinnedGuideColor(ctrlName, False, "red")
-                        
-                for attr in transformAttrList:
-                    cmds.setAttr(ctrlName+"."+attr, lock=pinValue)
+            else:
+                if cmds.objExists(pcName):
+                    cmds.delete(pcName)
+                    self.setPinnedGuideColor(ctrlName, False, "red")
+                    
+            for attr in transformAttrList:
+                cmds.setAttr(ctrlName+"."+attr, lock=pinValue)
     
     
     def startPinGuide(self, guideBase, *args):
@@ -901,6 +901,9 @@ class ControlClass:
         """ Remove pinGuide setup.
         """
         if cmds.objExists(guideBase):
+            pcName = guideBase+"_PinGuide_ParentConstraint"
+            if cmds.objExists(pcName):
+                cmds.delete(pcName)
             childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")
             if childrenList:
                 for childNode in childrenList:
