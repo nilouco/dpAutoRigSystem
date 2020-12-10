@@ -400,7 +400,8 @@ class LayoutClass:
                 self.fatherFlipExists = cmds.objExists(mirroredGuideFather+".flip")
                 if self.fatherFlipExists:
                     fatherFlip = cmds.getAttr(mirroredGuideFather+".flip")
-                    cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
+                    if cmds.objExists(self.moduleGrp+".flip"):
+                        cmds.setAttr(self.moduleGrp+".flip", fatherFlip)
                 # returns a string 'stopIt' if there is mirrored father guide:
                 return "stopIt"
     
@@ -532,9 +533,13 @@ class LayoutClass:
                                             cmds.parent(newSphereShape, dupRenamed, shape=True, relative=True)
                                             cmds.delete(newSphere[0]) #transform
                                             szMD = cmds.createNode("multiplyDivide", name=dupRenamed+"_MD")
+                                            szClp = cmds.createNode("clamp", name=dupRenamed+"_Clp")
                                             cmds.connectAttr(self.moduleGrp+".shapeSize", szMD+".input1X", force=True)
-                                            cmds.connectAttr(szMD+".outputX", newSphere[1]+".radius", force=True)
+                                            cmds.connectAttr(szMD+".outputX", szClp+".inputR", force=True)
+                                            cmds.connectAttr(szClp+".outputR", newSphere[1]+".radius", force=True)
                                             cmds.setAttr(szMD+".input2X", 0.1)
+                                            cmds.setAttr(szClp+".minR", 0.001)
+                                            cmds.setAttr(szClp+".maxR", 1000)
                                             cmds.rename(newSphere[1], dupRenamed+"_MNS")
                                 elif cmds.objectType(dup) != 'nurbsCurve':
                                     cmds.delete(dup)

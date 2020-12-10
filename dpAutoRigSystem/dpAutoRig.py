@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.17"
-DPAR_UPDATELOG = "Changed Eye Main control name.\n#207 Remove pinGuide before Rig it.\n#208 Refresh Outliners.\n#209 ZeroOut values for UpperJaw."
+DPAR_VERSION = "3.10.18"
+DPAR_UPDATELOG = "#188 Finger flip attribute.\n#186	Warning guide mirror MNS.\n#008	Limb cvCornerLoc guide."
 
 
 

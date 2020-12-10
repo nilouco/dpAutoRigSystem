@@ -285,6 +285,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvBeforeLoc = self.guideName + "_Before"
         self.cvMainLoc = self.guideName + "_Main"
         self.cornerGrp = self.guideName + "_Corner_Grp"
+        self.cvCornerLoc = self.guideName + "_Corner"
+        self.cvCornerBLoc = self.guideName + "_CornerB"
         self.cvExtremLoc = self.guideName + "_Extrem"
         self.cvEndJoint = self.guideName + "_JointEnd"
         self.cvUpVectorLoc = self.guideName + "_CornerUpVector"
