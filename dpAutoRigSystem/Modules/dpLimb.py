@@ -7,17 +7,18 @@ import dpLayoutClass as Layout
 
 # importing Renaud Lessard module:
 loadedIkFkSnap = False
-
 try:
     from sstk.maya.animation import sqIkFkTools
     from sstk.libs import libSerialization
-
+    reload(sqIkFkTools)
+    reload(libSerialization)
     loadedIkFkSnap = True
 except:
     try:
         from Library import sqIkFkTools
         from Library import libSerialization
-
+        reload(sqIkFkTools)
+        reload(libSerialization)
         loadedIkFkSnap = True
     except:
         print "Not loaded sqIkFkTools"
