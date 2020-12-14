@@ -77,12 +77,12 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.cvRFELoc, self.cvFootLoc)
         # connect cvLocs in jointGuides:
         self.ctrls.directConnect(self.cvFootLoc, self.jGuideFoot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFA, maintainOffset=False, name=self.jGuideRFA+"_ParentConstraint")
-        cmds.parentConstraint(self.cvRFBLoc, self.jGuideRFB, maintainOffset=False, name=self.jGuideRFB+"_ParentConstraint")
-        cmds.parentConstraint(self.cvRFCLoc, self.jGuideRFC, maintainOffset=False, name=self.jGuideRFC+"_ParentConstraint")
-        cmds.parentConstraint(self.cvRFDLoc, self.jGuideRFD, maintainOffset=False, name=self.jGuideRFD+"_ParentConstraint")
-        cmds.parentConstraint(self.cvRFELoc, self.jGuideRFE, maintainOffset=False, name=self.jGuideRFE+"_ParentConstraint")
-        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFAC, maintainOffset=False, name=self.jGuideRFAC+"_ParentConstraint")
+        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFA, maintainOffset=False, name=self.jGuideRFA+"_PaC")
+        cmds.parentConstraint(self.cvRFBLoc, self.jGuideRFB, maintainOffset=False, name=self.jGuideRFB+"_PaC")
+        cmds.parentConstraint(self.cvRFCLoc, self.jGuideRFC, maintainOffset=False, name=self.jGuideRFC+"_PaC")
+        cmds.parentConstraint(self.cvRFDLoc, self.jGuideRFD, maintainOffset=False, name=self.jGuideRFD+"_PaC")
+        cmds.parentConstraint(self.cvRFELoc, self.jGuideRFE, maintainOffset=False, name=self.jGuideRFE+"_PaC")
+        cmds.parentConstraint(self.cvRFALoc, self.jGuideRFAC, maintainOffset=False, name=self.jGuideRFAC+"_PaC")
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -256,10 +256,10 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.RFBZero+".rotateOrder", 5)
                 
                 # creating ikHandles:
-                ikHandleAnkleList = cmds.ikHandle(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_IkHandle", startJoint=self.footJnt, endEffector=self.middleFootJxt, solver='ikSCsolver')
-                ikHandleMiddleList = cmds.ikHandle(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_IkHandle", startJoint=self.middleFootJxt, endEffector=self.endJnt, solver='ikSCsolver')
-                cmds.rename(ikHandleAnkleList[1], ikHandleAnkleList[0]+"_Effector")
-                cmds.rename(ikHandleMiddleList[1], ikHandleMiddleList[0]+"_Effector")
+                ikHandleAnkleList = cmds.ikHandle(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_IKH", startJoint=self.footJnt, endEffector=self.middleFootJxt, solver='ikSCsolver')
+                ikHandleMiddleList = cmds.ikHandle(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_IKH", startJoint=self.middleFootJxt, endEffector=self.endJnt, solver='ikSCsolver')
+                cmds.rename(ikHandleAnkleList[1], ikHandleAnkleList[0]+"_Eff")
+                cmds.rename(ikHandleMiddleList[1], ikHandleMiddleList[0]+"_Eff")
                 cmds.setAttr(ikHandleAnkleList[0]+'.visibility', 0)
                 cmds.setAttr(ikHandleMiddleList[0]+'.visibility', 0)
 
@@ -290,15 +290,15 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 self.toLimbIkHandleGrpList.append(self.toLimbIkHandleGrp)
                 cmds.parent(ikHandleAnkleList[0], self.toLimbIkHandleGrp, self.RFECtrl, absolute=True)
                 cmds.makeIdentity(self.toLimbIkHandleGrp, apply=True, translate=True, rotate=True, scale=True)
-                parentConst = cmds.parentConstraint(self.RFECtrl, self.footJnt, maintainOffset=True, name=self.footJnt+"_ParentConstraint")[0]
+                parentConst = cmds.parentConstraint(self.RFECtrl, self.footJnt, maintainOffset=True, name=self.footJnt+"_PaC")[0]
                 self.parentConstList.append(parentConst)
                 self.footJntList.append(self.footJnt)
                 cmds.parent(self.RFAZeroExtra, self.footCtrl, absolute=True)
                 
-                scaleConst = cmds.scaleConstraint(self.footCtrl, self.footJnt, maintainOffset=True, name=self.footJnt+"_ScaleConstraint")
+                scaleConst = cmds.scaleConstraint(self.footCtrl, self.footJnt, maintainOffset=True, name=self.footJnt+"_ScC")
                 self.scaleConstList.append(scaleConst)
-                cmds.parentConstraint(self.middleFootCtrl, self.middleFootJnt, maintainOffset=True, name=self.middleFootJnt+"_ParentConstraint")
-                cmds.scaleConstraint(self.middleFootCtrl, self.middleFootJnt, maintainOffset=True, name=self.middleFootJnt+"_ScaleConstraint")
+                cmds.parentConstraint(self.middleFootCtrl, self.middleFootJnt, maintainOffset=True, name=self.middleFootJnt+"_PaC")
+                cmds.scaleConstraint(self.middleFootCtrl, self.middleFootJnt, maintainOffset=True, name=self.middleFootJnt+"_ScC")
 
                 # add attributes to footCtrl and connect them to reverseFoot groups rotation:
                 rfAttrList = [outsideRFAttr, insideRFAttr, heelRFAttr, toeRFAttr, ballRFAttr]
@@ -447,7 +447,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

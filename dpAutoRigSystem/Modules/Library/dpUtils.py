@@ -535,9 +535,9 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
 def extractSuffix(nodeName):
     """ Remove suffix from a node name and return the base name.
     """
-    endSuffixList = ["_Mesh", "_mesh", "_MESH", "_msh", "_MSH", "_Geo", "_geo", "_GEO", "_Tgt", "_tgt", "_TGT", "_Ctrl", "_ctrl", "_CTRL", "_Grp", "_grp", "_GRP"]
+    endSuffixList = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp"]
     for endSuffix in endSuffixList:
-        if nodeName.endswith(endSuffix):
+        if nodeName.endswith(endSuffix) or nodeName.endswith(endSuffix.lower()) or nodeName.endswith(endSuffix.upper()):
             baseName = nodeName[:nodeName.rfind(endSuffix)]
             return baseName
     return nodeName
@@ -719,8 +719,8 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1
             cmds.makeIdentity(jar, apply=True)
             cmds.setAttr(jar+".segmentScaleCompensate", 0)
             cmds.parent(jar, fatherNode)
-            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PointConstraint")[0]
-            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrientConstraint")[0]
+            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PoC")[0]
+            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrC")[0]
             cmds.setAttr(oc+".interpType", 2) #Shortest
             return jointList
 

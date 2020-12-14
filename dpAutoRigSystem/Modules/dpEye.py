@@ -75,7 +75,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvEndJoint+".tz", 13)
         cmds.setAttr(self.cvUpLocGuide+".ty", 13)
         cmds.setAttr(self.cvUpLocGuide+".visibility", 0)
-        cmds.orientConstraint(self.ctrls.dpARTempGrp, self.cvEndBackRotGrp, maintainOffset=False, name=self.cvEndBackRotGrp+"_OrientConstraint")
+        cmds.orientConstraint(self.ctrls.dpARTempGrp, self.cvEndBackRotGrp, maintainOffset=False, name=self.cvEndBackRotGrp+"_OrC")
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -108,10 +108,10 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jUpperEyelid, self.jLowerEyelid, self.jEyelid)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_ParentConstraint")
-        cmds.parentConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=True, name=self.jUpperEyelid+"_ParentConstraint")
-        cmds.parentConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=True, name=self.jLowerEyelid+"_ParentConstraint")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=True, name=self.jGuide1+"_PaC")
+        cmds.parentConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=True, name=self.jUpperEyelid+"_PaC")
+        cmds.parentConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=True, name=self.jLowerEyelid+"_PaC")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
     
     
     def changeEyelid(self, *args):
@@ -328,7 +328,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         # follow setup:
         eyelidBaseZeroJxt = cmds.listRelatives(eyelidBaseJxt, parent=True)[0]
         eyelidMiddleBaseZeroJxt = cmds.listRelatives(eyelidMiddleBaseJxt, parent=True)[0]
-        followPC = cmds.parentConstraint(self.jxt, self.eyeScaleJnt, eyelidBaseZeroJxt, skipTranslate=["x", "y", "z"], skipRotate=["y", "z"], maintainOffset=1, name=baseName+"_Follow_ParentConstraint")[0]
+        followPC = cmds.parentConstraint(self.jxt, self.eyeScaleJnt, eyelidBaseZeroJxt, skipTranslate=["x", "y", "z"], skipRotate=["y", "z"], maintainOffset=1, name=baseName+"_Follow_PaC")[0]
         cmds.setAttr(followPC+".interpType", 2)
         cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c032_follow'], followPC+"."+self.jxt+"W0", force=True)
         cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c032_follow'], eyelidFollowRev+".inputX", force=True)
@@ -382,11 +382,11 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(ctrlZero[0]+".scaleZ", -1)
                 else:
                     cmds.setAttr(ctrlZero[0]+".scaleZ", 1)
-        cmds.parentConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ParentConstraint")
-        cmds.scaleConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ScaleConstraint")
+        cmds.parentConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_PaC")
+        cmds.scaleConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ScC")
         cmds.parent(mainJnt, self.jnt)
-        cmds.parentConstraint(ctrl, mainJnt, maintainOffset=False, name=mainJnt+"_ParentConstraint")
-        cmds.scaleConstraint(ctrl, mainJnt, maintainOffset=True, name=mainJnt+"_ScaleConstraint")
+        cmds.parentConstraint(ctrl, mainJnt, maintainOffset=False, name=mainJnt+"_PaC")
+        cmds.scaleConstraint(ctrl, mainJnt, maintainOffset=True, name=mainJnt+"_ScC")
         return ctrl
     
     
@@ -500,11 +500,11 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 cmds.parent(self.endJoint, self.jnt, absolute=True)
                 # create parent and scale constraint from ctrl to jxt:
-                cmds.parentConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=False, name=self.jxt+"_ParentConstraint")
-                cmds.scaleConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=True, name=self.jxt+"_ScaleConstraint")
+                cmds.parentConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=False, name=self.jxt+"_PaC")
+                cmds.scaleConstraint(self.fkEyeCtrl, self.jxt, maintainOffset=True, name=self.jxt+"_ScC")
                 # constraint from sub control to sub joint:
-                cmds.parentConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=False, name=self.subJnt+"_ParentConstraint")
-                cmds.scaleConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=True, name=self.subJnt+"_ScaleConstraint")
+                cmds.parentConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=False, name=self.subJnt+"_PaC")
+                cmds.scaleConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=True, name=self.subJnt+"_ScC")
                 
                 # lookAt control:
                 self.lookAtCtrl = self.ctrls.cvControl("id_011_EyeLookAt", side+self.userGuideName+"_LookAt_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
@@ -525,12 +525,12 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.lUpGrpLoc, self.upLocGrp, relative=False)
                 
                 # look at aim constraint:
-                aimConst = cmds.aimConstraint(self.lookAtCtrl, eyeZeroList[1], worldUpType="object", worldUpObject=self.upLocGrp+"|"+self.lUpGrpLoc+"|"+self.lUpLoc, maintainOffset=True, name=self.fkEyeCtrl+"_Zero_0_Grp"+"_AimConstraint")[0]
+                aimConst = cmds.aimConstraint(self.lookAtCtrl, eyeZeroList[1], worldUpType="object", worldUpObject=self.upLocGrp+"|"+self.lUpGrpLoc+"|"+self.lUpLoc, maintainOffset=True, name=self.fkEyeCtrl+"_Zero_0_Grp"+"_AiC")[0]
                 cmds.connectAttr(self.lookAtCtrl+".active", aimConst+"."+self.lookAtCtrl+"W0", force=True)
                 # eye aim rotation
                 cmds.addAttr(self.fkEyeCtrl, longName="aimRotation", attributeType="float", keyable=True)
                 cmds.connectAttr(self.fkEyeCtrl+".aimRotation", self.jnt+".rotateZ", force=True)
-                cmds.pointConstraint(self.baseEyeCtrl, self.lUpGrpLoc, maintainOffset=True, name=self.lUpGrpLoc+"_PointConstraint")
+                cmds.pointConstraint(self.baseEyeCtrl, self.lUpGrpLoc, maintainOffset=True, name=self.lUpGrpLoc+"_PoC")
                 
                 # create eyeScale setup:
                 cmds.select(clear=True)
@@ -544,9 +544,9 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.eyeScaleJnt, self.endScaleJoint, maintainOffset=False))
                 cmds.setAttr(self.endScaleJoint+".translateZ", 1)
                 # create constraints to eyeScale:
-                cmds.pointConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_PointConstraint")
-                cmds.orientConstraint(self.baseEyeCtrl, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_OrientConstraint")
-                cmds.scaleConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=True, name=self.eyeScaleJnt+"_ScaleConstraint")
+                cmds.pointConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_PoC")
+                cmds.orientConstraint(self.baseEyeCtrl, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_OrC")
+                cmds.scaleConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=True, name=self.eyeScaleJnt+"_ScC")
                 self.eyeScaleGrp = cmds.group(self.eyeScaleJnt, name=self.eyeScaleJnt+"_Grp")
                 self.eyeScaleGrpList.append(self.eyeScaleGrp)
                 
@@ -566,8 +566,8 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.guide, self.eyeSpecCtrl, maintainOffset=False))
                     eyeSpecZeroGrp = utils.zeroOut([self.eyeSpecCtrl])
                     cmds.parent(eyeSpecZeroGrp, self.baseEyeCtrl)
-                    cmds.parentConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=False, name=self.eyeSpecJnt+"_ParentConstraint")
-                    cmds.scaleConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=True, name=self.eyeSpecJnt+"_ScaleConstraint")
+                    cmds.parentConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=False, name=self.eyeSpecJnt+"_PaC")
+                    cmds.scaleConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=True, name=self.eyeSpecJnt+"_ScC")
                     
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):
@@ -623,7 +623,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                     cmds.parent(self.eyeGrp, self.toCtrlHookGrp)
                     cmds.parent(self.upLocGrp, self.toScalableHookGrp)
                 # create a locator in order to avoid delete static group:
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

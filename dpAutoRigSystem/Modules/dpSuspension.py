@@ -57,10 +57,10 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
         
         cmds.parent(self.cvALoc, self.moduleGrp)
         cmds.parent(self.jBGuide, self.jAGuide)
-        cmds.parentConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ParentConstraint")
-        cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ParentConstraint")
-        cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScaleConstraint")
+        cmds.parentConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_PaC")
+        cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_PaC")
+        cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScC")
+        cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScC")
     
     
     def loadFatherB(self, *args):
@@ -163,8 +163,8 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     self.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                     # position and orientation of joint and control:
                     cmds.parent(ctrl, upLocCtrl, mainCtrl)
-                    cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ParentConstraint")
-                    cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScaleConstraint")
+                    cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")
+                    cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScC")
                     self.ctrlList.append(ctrl)
                     # zeroOut controls:
                     zeroOutCtrlGrp = utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
@@ -199,18 +199,18 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     locGrp = cmds.group(aimLoc, upLoc, name=side+self.userGuideName+"_"+letter+"_Loc_Grp")
                     cmds.parent(locGrp, self.locatorsGrp, relative=True)
                     cmds.delete(cmds.parentConstraint(ctrl, locGrp, maintainOffset=False))
-                    cmds.parentConstraint(upLocCtrl, upLoc, maintainOffset=False, name=upLoc+"_ParentConstraint")
-                    cmds.parentConstraint(mainCtrl, locGrp, maintainOffset=True, name=locGrp+"_ParentConstraint")
+                    cmds.parentConstraint(upLocCtrl, upLoc, maintainOffset=False, name=upLoc+"_PaC")
+                    cmds.parentConstraint(mainCtrl, locGrp, maintainOffset=True, name=locGrp+"_PaC")
                     cmds.setAttr(locGrp+".visibility", 0)
                     self.aimLocList.append(aimLoc)
                     self.upLocList.append(upLoc)
 
                 # aim constraints:
                 # B to A:
-                aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True, name=self.ctrlZeroList[0]+"_AimConstraint")[0]
+                aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True, name=self.ctrlZeroList[0]+"_AiC")[0]
                 cmds.connectAttr(self.ctrlList[0]+".active", aAimConst+"."+self.aimLocList[1]+"W0", force=True)
                 # A to B:
-                bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[0]+"_AimConstraint")[0]
+                bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[0]+"_AiC")[0]
                 cmds.connectAttr(self.ctrlList[1]+".active", bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
                 # integrating data:

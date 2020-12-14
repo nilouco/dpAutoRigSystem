@@ -70,10 +70,10 @@ class Single(Base.StartClass, Layout.LayoutClass):
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ParentConstraint")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
-        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScaleConstraint")
-        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScaleConstraint")
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
+        cmds.scaleConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ScC")
+        cmds.scaleConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ScC")
     
     
     def changeIndirectSkin(self, *args):
@@ -224,9 +224,9 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
-                    cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
+                    cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
                     # create scaleConstraint from ctrl to jnt:
-                    cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                    cmds.scaleConstraint(self.singleCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 # create end joint:
                 cmds.select(self.jnt)
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
@@ -235,7 +235,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_Ctrl_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
                 if self.getHasIndirectSkin():
-                    locScale = cmds.spaceLocator(name=side+self.userGuideName+"_Scalable_DO_NOT_DELETE")[0]
+                    locScale = cmds.spaceLocator(name=side+self.userGuideName+"_Scalable_DO_NOT_DELETE_PLEASE_Loc")[0]
                     cmds.setAttr(locScale+".visibility", 0)
                     self.toScalableHookGrp = cmds.group(locScale, name=side+self.userGuideName+"_IndirectSkin_Grp")
                     jxtGrp = cmds.group(side+self.userGuideName+"_Jxt", name=side+self.userGuideName+"_Joint_Grp")
@@ -244,7 +244,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_Jnt", name=side+self.userGuideName+"_Joint_Grp")
                     self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static or scalable group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

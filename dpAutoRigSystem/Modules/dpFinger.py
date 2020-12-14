@@ -278,7 +278,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     # freeze joints rotation
                     cmds.makeIdentity(self.jnt, apply=True)
                     # create parent and scale constraints from ctrl to jnt:
-                    cmds.delete(cmds.parentConstraint(self.fingerCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint"))
+                    cmds.delete(cmds.parentConstraint(self.fingerCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC"))
                     
                     # add articulationJoint:
                     if n > 0:
@@ -293,11 +293,11 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 
                 # make first phalange be leads from base finger control:
-                cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.userGuideName+"_01_SDK_Zero_0_Grp"+"_ParentConstraint")
-                cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.userGuideName+"_01_SDK_Zero_0_Grp"+"_ScaleConstraint")
+                cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.userGuideName+"_01_SDK_Zero_0_Grp"+"_PaC")
+                cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_01_SDK_Zero_0_Grp", maintainOffset=True, name=side+self.userGuideName+"_01_SDK_Zero_0_Grp"+"_ScC")
                 if self.nJoints != 2:
-                    cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Jnt", maintainOffset=True, name=side+self.userGuideName+"_ParentConstraint")
-                    cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Jnt", maintainOffset=True, name=side+self.userGuideName+"_ScaleConstraint")
+                    cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Jnt", maintainOffset=True, name=side+self.userGuideName+"_PaC")
+                    cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Jnt", maintainOffset=True, name=side+self.userGuideName+"_ScC")
                 # connecting the attributes from control 1 to phalanges rotate:
                 for n in range(1, self.nJoints+1):
                     self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
@@ -362,8 +362,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
                         self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
                         scaleCompensateCond = ikJoint.replace("_Ik_Jxt", "_ScaleCompensate_Cnd")
-                        ikFkParentConst = cmds.parentConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_ParentConstraint")[0]
-                        ikFkScaleConst = cmds.scaleConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_ScaleConstraint")[0]
+                        ikFkParentConst = cmds.parentConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_PaC")[0]
+                        ikFkScaleConst = cmds.scaleConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_ScC")[0]
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
                         cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkParentConst+"."+ikJoint+"W0", force=True)
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkScaleConst+"."+fkJoint+"W1", force=True)
@@ -379,8 +379,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         utils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
                         scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
-                        cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ParentConstraint")
-                        cmds.scaleConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ScaleConstraint")
+                        cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_PaC")
+                        cmds.scaleConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ScC")
                         #Not needed in Maya 2016 since we need to deactivate scale compensate on all finger bone
                         if (int(cmds.about(version=True)[:4]) < 2016):
                             cmds.connectAttr(fkCtrl+".scaleCompensate", fkJoint+".segmentScaleCompensate", force=True)
@@ -396,12 +396,12 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 # ik handle
                 if self.nJoints >= 2:
                     if self.nJoints == 2:
-                        ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_00_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IkHandle")
+                        ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_00_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IKH")
                     else:
-                        ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_01_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IkHandle")
-                    cmds.rename(ikHandleList[1], side+self.userGuideName+"_Effector")
+                        ikHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_01_Ik_Jxt", endEffector=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), solver="ikRPsolver", name=side+self.userGuideName+"_IKH")
+                    cmds.rename(ikHandleList[1], side+self.userGuideName+"_Eff")
                     endIkHandleList = cmds.ikHandle(startJoint=side+self.userGuideName+"_%02d_Ik_Jxt"%(self.nJoints), endEffector=side+self.userGuideName+"_Ik_JEnd", solver="ikSCsolver", name=side+self.userGuideName+"_EndIkHandle")
-                    cmds.rename(endIkHandleList[1], side+self.userGuideName+"_EndEffector")
+                    cmds.rename(endIkHandleList[1], side+self.userGuideName+"_End_Eff")
                     self.ikCtrl = self.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree)
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
@@ -412,15 +412,15 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ikCtrlZero+".visibility", force=True)
                     for q in range(2, self.nJoints+1):
                         cmds.connectAttr(side+self.userGuideName+"_01_Ctrl.ikFkBlend", side+self.userGuideName+"_%02d_Ctrl.visibility"%(q), force=True)
-                    cmds.parentConstraint(self.ikCtrl, ikHandleList[0], name=side+self.userGuideName+"_IkHandle_ParentConstraint", maintainOffset=True)
-                    cmds.parentConstraint(self.ikCtrl, endIkHandleList[0], name=side+self.userGuideName+"_EndIkHandle_ParentConstraint", maintainOffset=True)
-                    ikHandleGrp = cmds.group(ikHandleList[0], endIkHandleList[0], name=side+self.userGuideName+"_IkHandle_Grp")
+                    cmds.parentConstraint(self.ikCtrl, ikHandleList[0], name=side+self.userGuideName+"_IKH_PaC", maintainOffset=True)
+                    cmds.parentConstraint(self.ikCtrl, endIkHandleList[0], name=side+self.userGuideName+"_EndIkHandle_PaC", maintainOffset=True)
+                    ikHandleGrp = cmds.group(ikHandleList[0], endIkHandleList[0], name=side+self.userGuideName+"_IKH_Grp")
                     cmds.setAttr(ikHandleGrp+".visibility", 0)
                     self.ctrls.setLockHide([self.ikCtrl], ['sx', 'sy', 'sz', 'v'])
 
                     if self.nJoints == 2:
-                        cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_ParentConstraint")
-                        cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_ScaleConstraint")
+                        cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_PaC")
+                        cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_ScC")
 
                     # stretch
                     cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
@@ -469,7 +469,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

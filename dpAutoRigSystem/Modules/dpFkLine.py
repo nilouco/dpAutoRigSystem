@@ -57,8 +57,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ParentConstraint")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
 
 
     def changeJointNumber(self, enteredNJoints, *args):
@@ -98,8 +98,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     #Prevent a intermidiate node to be added
                     cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1), relative=True)
                     #Do not maintain offset and ensure cv will be at the same place than the joint
-                    cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ParentConstraint")
-                    cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScaleConstraint")
+                    cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
+                    cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScC")
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvEndJoint:
                 self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
@@ -239,8 +239,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                         self.fatherCtrl = side+self.userGuideName+"_%02d_Ctrl"%(n-1)
                         cmds.parent(self.zeroOutCtrlGrp, self.fatherCtrl, absolute=True)
                     # control drives joint:
-                    cmds.parentConstraint(self.jntCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
-                    cmds.scaleConstraint(self.jntCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                    cmds.parentConstraint(self.jntCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
+                    cmds.scaleConstraint(self.jntCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                     # add articulationJoint:
                     if n > 0:
                         if self.addArticJoint:
@@ -257,7 +257,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

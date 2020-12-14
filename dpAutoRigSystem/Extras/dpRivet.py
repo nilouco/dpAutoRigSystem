@@ -456,15 +456,15 @@ class Rivet():
                 
                 # attach follicle and rivet using constraint:
                 if attachTranslate and attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_ParentConstraint")
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC")
                 elif attachTranslate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_ParentConstraint" , skipRotate=("x", "y", "z"))
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))
                 elif attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_ParentConstraint" , skipTranslate=("x", "y", "z"))
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))
                 
                 # try to integrate to dpAutoRigSystem in order to keep the Rig as scalable:
                 if self.masterCtrl:
-                    cmds.scaleConstraint(self.masterCtrl, folTransf, maintainOffset=True, name=folTransf+"_ScaleConstraint")
+                    cmds.scaleConstraint(self.masterCtrl, folTransf, maintainOffset=True, name=folTransf+"_ScC")
             
             # check invert group (back) in order to avoide double transformations:
             if addInvert:

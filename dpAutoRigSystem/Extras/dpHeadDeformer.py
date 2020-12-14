@@ -239,8 +239,8 @@ class HeadDeformer():
                 # setup hierarchy
                 headCtrlPosList = cmds.xform(self.headCtrl, query=True, rotatePivot=True, worldSpace=True)
                 cmds.xform(dataGrp, translation=(headCtrlPosList[0], headCtrlPosList[1], headCtrlPosList[2]), worldSpace=True)
-                cmds.parentConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ParentConstraint")
-                cmds.scaleConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ScaleConstraint")
+                cmds.parentConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_PaC")
+                cmds.scaleConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ScC")
                 # influence controls
                 toHeadDefCtrlList = []
                 for item in allTransformList:

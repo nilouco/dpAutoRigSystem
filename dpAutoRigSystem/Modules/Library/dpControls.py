@@ -182,11 +182,11 @@ class ControlClass:
                 nullA = cmds.group(empty=True, name=a+"_DistBetNull")
                 nullB = cmds.group(empty=True, name=b+"_DistBetNull")
                 nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef")
-                cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_ParentConstraint")
-                cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_ParentConstraint")
+                cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
+                cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
                 tempToDel = cmds.pointConstraint(b, nullC, maintainOffset=False)
                 cmds.delete(tempToDel)
-                pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_ParentConstraint")[0]
+                pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
                 # create distanceBetween node:
                 distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
                 # connect aPos to the distance between point1:
@@ -284,7 +284,7 @@ class ControlClass:
             jointGrp = cmds.group(joint, name=name+"Joint"+str(j)+"_Grp")
             jointGrpList.append(jointGrp)
             # create aimConstraint from aimGrp to jointGrp:
-            cmds.aimConstraint(aimGrp, jointGrp, offset=(0, 0, 0), weight=1, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=upGrp, n=name+"Ribbon"+str(j)+"_AimConstraint" )
+            cmds.aimConstraint(aimGrp, jointGrp, offset=(0, 0, 0), weight=1, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=upGrp, n=name+"Ribbon"+str(j)+"_AiC" )
             # parent this ribbonPos to the ribbonGrp:
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
@@ -868,7 +868,7 @@ class ControlClass:
         """
         transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
         if cmds.objExists(ctrlName+".pinGuide"):
-            pcName = ctrlName+"_PinGuide_ParentConstraint"
+            pcName = ctrlName+"_PinGuide_PaC"
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
             if pinValue:
                 if not cmds.objExists(pcName):
@@ -901,7 +901,7 @@ class ControlClass:
         """ Remove pinGuide setup.
         """
         if cmds.objExists(guideBase):
-            pcName = guideBase+"_PinGuide_ParentConstraint"
+            pcName = guideBase+"_PinGuide_PaC"
             if cmds.objExists(pcName):
                 cmds.delete(pcName)
             childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")

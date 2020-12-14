@@ -301,23 +301,23 @@ class Head(Base.StartClass, Layout.LayoutClass):
 
                 # make joints be ride by controls:
                 cmds.makeIdentity(self.neckJnt, self.headJxt, self.headJnt, self.jawJnt, self.chinJnt, self.chewJnt, self.endJnt, rotate=True, apply=True)
-                cmds.parentConstraint(self.neckCtrl, self.neckJnt, maintainOffset=False, name=self.neckJnt+"_ParentConstraint")
-                cmds.scaleConstraint(self.neckCtrl, self.neckJnt, maintainOffset=False, name=self.neckJnt+"_ScaleConstraint")
+                cmds.parentConstraint(self.neckCtrl, self.neckJnt, maintainOffset=False, name=self.neckJnt+"_PaC")
+                cmds.scaleConstraint(self.neckCtrl, self.neckJnt, maintainOffset=False, name=self.neckJnt+"_ScC")
                 cmds.delete(cmds.parentConstraint(self.headCtrl, self.headJxt, maintainOffset=False))
-                cmds.parentConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_ParentConstraint")
-                cmds.parentConstraint(self.upperCtrl, self.upperJnt, maintainOffset=False, name=self.upperJnt+"_ParentConstraint")
-                cmds.parentConstraint(self.jawCtrl, self.jawJnt, maintainOffset=False, name=self.jawJnt+"_ParentConstraint")
-                cmds.parentConstraint(self.chinCtrl, self.chinJnt, maintainOffset=False, name=self.chinJnt+"_ParentConstraint")
-                cmds.parentConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_ParentConstraint")
-                cmds.parentConstraint(self.lLipCtrl, self.lLipJnt, maintainOffset=False, name=self.lLipJnt+"_ParentConstraint")
-                cmds.parentConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_ParentConstraint")
-                cmds.scaleConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_ScaleConstraint")
-                cmds.scaleConstraint(self.upperCtrl, self.upperJnt, maintainOffset=False, name=self.upperJnt+"_ScaleConstraint")
-                cmds.scaleConstraint(self.jawCtrl, self.jawJnt, maintainOffset=False, name=self.jawJnt+"_ScaleConstraint")
-                cmds.scaleConstraint(self.chinCtrl, self.chinJnt, maintainOffset=False, name=self.chinJnt+"_ScaleConstraint")
-                cmds.scaleConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_ScaleConstraint")
-                cmds.scaleConstraint(self.lLipCtrl, self.lLipJnt, maintainOffset=False, name=self.lLipJnt+"_ScaleConstraint")
-                cmds.scaleConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_ScaleConstraint")
+                cmds.parentConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_PaC")
+                cmds.parentConstraint(self.upperCtrl, self.upperJnt, maintainOffset=False, name=self.upperJnt+"_PaC")
+                cmds.parentConstraint(self.jawCtrl, self.jawJnt, maintainOffset=False, name=self.jawJnt+"_PaC")
+                cmds.parentConstraint(self.chinCtrl, self.chinJnt, maintainOffset=False, name=self.chinJnt+"_PaC")
+                cmds.parentConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_PaC")
+                cmds.parentConstraint(self.lLipCtrl, self.lLipJnt, maintainOffset=False, name=self.lLipJnt+"_PaC")
+                cmds.parentConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_PaC")
+                cmds.scaleConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_ScC")
+                cmds.scaleConstraint(self.upperCtrl, self.upperJnt, maintainOffset=False, name=self.upperJnt+"_ScC")
+                cmds.scaleConstraint(self.jawCtrl, self.jawJnt, maintainOffset=False, name=self.jawJnt+"_ScC")
+                cmds.scaleConstraint(self.chinCtrl, self.chinJnt, maintainOffset=False, name=self.chinJnt+"_ScC")
+                cmds.scaleConstraint(self.chewCtrl, self.chewJnt, maintainOffset=False, name=self.chewJnt+"_ScC")
+                cmds.scaleConstraint(self.lLipCtrl, self.lLipJnt, maintainOffset=False, name=self.lLipJnt+"_ScC")
+                cmds.scaleConstraint(self.rLipCtrl, self.rLipJnt, maintainOffset=False, name=self.rLipJnt+"_ScC")
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False))
                 
                 # create interations between neck and head:
@@ -333,9 +333,9 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.worldRef = cmds.group(empty=True, name=side+self.userGuideName+"_WorldRef")
                 self.worldRefList.append(self.worldRef)
                 cmds.delete(cmds.parentConstraint(self.neckCtrl, self.worldRef, maintainOffset=False))
-                cmds.parentConstraint(self.neckCtrl, self.grpHeadA, maintainOffset=True, skipRotate=["x", "y", "z"], name=self.grpHeadA+"_ParentConstraint")
-                orientConst = cmds.orientConstraint(self.neckCtrl, self.worldRef, self.grpHeadA, maintainOffset=False, name=self.grpHeadA+"_OrientConstraint")[0]
-                cmds.scaleConstraint(self.neckCtrl, self.grpHeadA, maintainOffset=True, name=self.grpHeadA+"_ScaleConstraint")
+                cmds.parentConstraint(self.neckCtrl, self.grpHeadA, maintainOffset=True, skipRotate=["x", "y", "z"], name=self.grpHeadA+"_PaC")
+                orientConst = cmds.orientConstraint(self.neckCtrl, self.worldRef, self.grpHeadA, maintainOffset=False, name=self.grpHeadA+"_OrC")[0]
+                cmds.scaleConstraint(self.neckCtrl, self.grpHeadA, maintainOffset=True, name=self.grpHeadA+"_ScC")
                 cmds.parent(self.zeroCtrlList[1], self.grpHeadA, absolute=True)
 
                 # connect reverseNode:
@@ -374,14 +374,14 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.zeroCtrlList[5], self.chinCtrl, absolute=True)
                 
                 # jaw follow head or root ctrl (using worldRef)
-                jawParentConst = cmds.parentConstraint(self.headCtrl, self.worldRef, self.zeroCtrlList[3], maintainOffset=True, name=self.zeroCtrlList[3]+"_ParentConstraint")[0]
+                jawParentConst = cmds.parentConstraint(self.headCtrl, self.worldRef, self.zeroCtrlList[3], maintainOffset=True, name=self.zeroCtrlList[3]+"_PaC")[0]
                 cmds.setAttr(jawParentConst+".interpType", 2) #Shortest, no flip cause problem with scrubing
                 cmds.addAttr(self.jawCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawParentConst+"."+self.headCtrl+"W0", force=True)
                 jawFollowRev = cmds.createNode("reverse", name=self.jawCtrl+"_Rev")
                 cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawFollowRev+".inputX", force=True)
                 cmds.connectAttr(jawFollowRev+".outputX", jawParentConst+"."+self.worldRef+"W1", force=True)
-                cmds.scaleConstraint(self.headCtrl, self.zeroCtrlList[3], maintainOffset=True, name=self.zeroCtrlList[3]+"_ScaleConstraint")[0]
+                cmds.scaleConstraint(self.headCtrl, self.zeroCtrlList[3], maintainOffset=True, name=self.zeroCtrlList[3]+"_ScC")[0]
 
                 # setup jaw auto translation
                 self.jawSdkGrp = cmds.group(self.jawCtrl, name=self.jawCtrl+"_SDK_Grp")
@@ -423,23 +423,23 @@ class Head(Base.StartClass, Layout.LayoutClass):
 
                 # create lip setup:
                 # left side lip:
-                lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ParentConstraint")[0]
+                lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_PaC")[0]
                 cmds.setAttr(lLipParentConst+".interpType", 2)
                 cmds.addAttr(self.lLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
                 cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], lLipParentConst+"."+self.jawCtrl+"W0", force=True)
                 self.lLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c039_lip']+"_Rev")
                 cmds.connectAttr(self.lLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.lLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.lLipRevNode+'.outputX', lLipParentConst+"."+self.upperCtrl+"W1", force=True)
-                cmds.scaleConstraint(self.upperCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ScaleConstraint")[0]
+                cmds.scaleConstraint(self.upperCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ScC")[0]
                 # right side lip:
-                rLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ParentConstraint")[0]
+                rLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_PaC")[0]
                 cmds.setAttr(rLipParentConst+".interpType", 2)
                 cmds.addAttr(self.rLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
                 cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], rLipParentConst+"."+self.jawCtrl+"W0", force=True)
                 self.rLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c039_lip']+"_Rev")
                 cmds.connectAttr(self.rLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.rLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+self.upperCtrl+"W1", force=True)
-                cmds.scaleConstraint(self.upperCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScaleConstraint")[0]
+                cmds.scaleConstraint(self.upperCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScC")[0]
                 
                 # articulation joint:
                 if self.addArticJoint:
@@ -448,7 +448,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.langDic[self.langName]['c106_base']+"_Jar")
                 
                 # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.worldRef, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])

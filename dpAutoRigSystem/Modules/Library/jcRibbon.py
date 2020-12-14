@@ -95,8 +95,8 @@ class RibbonClass:
             cmds.select(clear=True)
             self.cornerJxt = cmds.joint(name=prefix+myName+'_Corner_Jxt', scaleCompensate=False)
             self.cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt', scaleCompensate=False, radius=1.5)
-            cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ParentConstraint")
-            cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ParentConstraint")
+            cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
+            cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
         
         if arm:
             upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1)
@@ -122,32 +122,32 @@ class RibbonClass:
         cmds.delete(cmds.pointConstraint(downLimb['middleCtrl'], downctrl, mo=False, w=1))
         
         cmds.delete(cmds.parentConstraint(midLoc, elbowctrl, mo=False, w=1))
-        orientConst = cmds.orientConstraint(lista[0], lista[1], elbowctrl, mo=False, w=1)[0]
+        orientConst = cmds.orientConstraint(lista[0], lista[1], elbowctrl, mo=False, w=1, name=elbowctrl+"_OrC")[0]
         cmds.setAttr(orientConst+".interpType", 2)
         
         cmds.delete(upLimb['constraints'][1])
-        cmds.parentConstraint(self.elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_ParentConstraint")
+        cmds.parentConstraint(self.elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_PaC")
         cmds.delete(upLimb['constraints'][3])
-        cmds.pointConstraint(self.elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_PointConstraint")
+        cmds.pointConstraint(self.elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_PoC")
         
         cmds.delete(downLimb['constraints'][0])
-        cmds.parentConstraint(self.elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_ParentConstraint")
+        cmds.parentConstraint(self.elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_PaC")
         cmds.delete(downLimb['constraints'][2])
-        cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_ParentConstraint")
+        cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_PaC")
         
-        upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_ParentConstraint")[0]
-        cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrientConstraint")
+        upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_PaC")[0]
+        cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrC")
         cmds.setAttr(upPC+'.interpType', 2)
         cmds.connectAttr(self.elbowctrlCtrl+'.autoBend', upPC+'.'+self.elbowctrlCtrl+'W1', force=True)
-        cmds.parentConstraint(cmds.listRelatives(upctrl, c=True)[0], upLimb['middleCtrl'], mo=True, w=1, name=upLimb['middleCtrl']+"_ParentConstraint")
+        cmds.parentConstraint(cmds.listRelatives(upctrl, c=True)[0], upLimb['middleCtrl'], mo=True, w=1, name=upLimb['middleCtrl']+"_PaC")
         
-        downPC = cmds.parentConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, downctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=downctrl+"_ParentConstraint")[0]
-        cmds.orientConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], downctrl, mo=True, w=1, name=downctrl+"_OrientConstraint")
+        downPC = cmds.parentConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, downctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=downctrl+"_PaC")[0]
+        cmds.orientConstraint(cmds.listRelatives(downLimb['middleCtrl'], p=True)[0], downctrl, mo=True, w=1, name=downctrl+"_OrC")
         cmds.setAttr(downPC+'.interpType', 2)
         cmds.connectAttr(self.elbowctrlCtrl+'.autoBend', downPC+'.'+self.elbowctrlCtrl+'W1', force=True)
-        cmds.parentConstraint(cmds.listRelatives(downctrl, c=True)[0], downLimb['middleCtrl'], mo=True, w=1, name=downLimb['middleCtrl']+"_ParentConstraint")
+        cmds.parentConstraint(cmds.listRelatives(downctrl, c=True)[0], downLimb['middleCtrl'], mo=True, w=1, name=downLimb['middleCtrl']+"_PaC")
         
-        cmds.pointConstraint(lista[1], elbowctrl, mo=True, w=1, name=elbowctrl+"_PointConstraint")
+        cmds.pointConstraint(lista[1], elbowctrl, mo=True, w=1, name=elbowctrl+"_PoC")
         
         upJntGrp = cmds.listRelatives(upLimb['skinJointsList'][0], p=True, f=True)
         downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
@@ -199,7 +199,7 @@ class RibbonClass:
         
         # implementing pin setup to ribbon corner offset control:
         if elbowctrlList[2]:
-            worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero, mo=True)[0]
+            worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero, mo=True, name=self.elbowctrlZero+"_PaC")[0]
             pinRev = cmds.createNode('reverse', name=self.elbowctrlCtrl+"_Pin_Rev")
             cmds.connectAttr(self.elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
             cmds.connectAttr(self.elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
@@ -506,18 +506,18 @@ class RibbonClass:
         cmds.parent(mid_Loc[3], aux_Jnt[1]) 
         #create needed constraints in the locators in order to set the top always follow, to the base always aim the middle, to the middle always aim the top
         if firstLimb:
-            cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AimConstraint")
-            cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AimConstraint")
-            cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 1, 0), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AimConstraint")
+            cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AiC")
+            cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AiC")
+            cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 1, 0), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AiC")
         else:
             # bug fix to plane twist
-            cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AimConstraint")
-            cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AimConstraint")
-            cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AimConstraint")
+            cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AiC")
+            cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AiC")
+            cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AiC")
         
         #create a point and orient constraint for the middle control
-        cmds.pointConstraint(top_Loc[0], bttm_Loc[0], mid_Loc[0], offset=(0, 0, 0), weight=1, name=mid_Loc[0]+"_PointConstraint")
-        ori = cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrientConstraint")
+        cmds.pointConstraint(top_Loc[0], bttm_Loc[0], mid_Loc[0], offset=(0, 0, 0), weight=1, name=mid_Loc[0]+"_PoC")
+        ori = cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
         
         #ribbon scale (volume variation)
         if numJoints == 3:
@@ -572,16 +572,16 @@ class RibbonClass:
             cmds.makeIdentity(extraCtrl, a=True)
             extraCtrlZero = utils.zeroOut([extraCtrl])[0]
             cmds.parent(extraCtrlZero, extraCtrlGrp)
-            cmds.parentConstraint(fols[i], extraCtrlZero, w=1, name=extraCtrlZero+"_ParentConstraint")
-            cmds.parentConstraint(extraCtrl, jnt, w=1, name=jnt+"_ParentConstraint")
-            cmds.scaleConstraint(extraCtrl, jnt, w=1, name=jnt+"_ScaleConstraint")
+            cmds.parentConstraint(fols[i], extraCtrlZero, w=1, name=extraCtrlZero+"_PaC")
+            cmds.parentConstraint(extraCtrl, jnt, w=1, name=jnt+"_PaC")
+            cmds.scaleConstraint(extraCtrl, jnt, w=1, name=jnt+"_ScC")
             
             # work with volume variation
             rbProportionMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Proportion_MD"))
             rbIntensityMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Intensity_MD"))
             rbAddScalePMA = cmds.createNode("plusMinusAverage", name=extraCtrlName.replace("_Ctrl", "_AddScale_PMA"))
             rbScaleClp = cmds.createNode("clamp", name=extraCtrlName.replace("_Ctrl", "_Scale_Clp"))
-            rbBlendCB = cmds.createNode("blendColors", name=extraCtrlName.replace("_Ctrl", "_Blend_BC"))
+            rbBlendCB = cmds.createNode("blendColors", name=extraCtrlName.replace("_Ctrl", "_BC"))
             cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
             cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
             cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
@@ -605,7 +605,7 @@ class RibbonClass:
             rbIntensityMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Intensity_MD"))
             rbAddScalePMA = cmds.createNode("plusMinusAverage", name=self.elbowctrlCtrl.replace("_Ctrl", "_AddScale_PMA"))
             rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
-            rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_Blend_BC"))
+            rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
             cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
             cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
             cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
@@ -692,12 +692,12 @@ class RibbonClass:
         if guides:
             top = guides[0]
             bottom = guides[1]
-            constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_ParentConstraint"))
-            constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_ParentConstraint"))
+            constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_PaC"))
+            constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_PaC"))
             cmds.delete(cmds.parentConstraint(top, bttm_Loc[3], mo=False))
             cmds.delete(cmds.parentConstraint(bottom, top_Loc[3], mo=False))
-            constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PointConstraint"))
-            constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PointConstraint"))
+            constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PoC"))
+            constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PoC"))
         
         #fix orientation issues
         cmds.delete(ori)
@@ -758,10 +758,10 @@ class RibbonClass:
             
             # WIP
             # temp solution to avoid arms flipping
-            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrientConstraint")
+            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
             
         else:
-            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrientConstraint")
+            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrC")
         
         #updating values
         cmds.setAttr(rbScaleMD+".input2X", cmds.getAttr(curveInfoNode+".arcLength"))

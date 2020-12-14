@@ -51,8 +51,8 @@ class Steering(Base.StartClass, Layout.LayoutClass):
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_ParentConstraint")
-        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_ParentConstraint")
+        cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
+        cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
         
         cmds.setAttr(self.moduleGrp+".translateY", 3)
         cmds.setAttr(self.moduleGrp+".rotateX", 45)
@@ -174,16 +174,16 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 # grouping:
                 cmds.parent(zeroOutCtrlGrpList[0], self.mainCtrl)
                 # create parentConstraint from steeringCtrl to jnt:
-                cmds.parentConstraint(self.steeringCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_ParentConstraint")
+                cmds.parentConstraint(self.steeringCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
                 # create scaleConstraint from steeringCtrl to jnt:
-                cmds.scaleConstraint(self.steeringCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScaleConstraint")
+                cmds.scaleConstraint(self.steeringCtrl, self.jnt, maintainOffset=True, name=self.jnt+"_ScC")
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(zeroOutCtrlGrpList[1], name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_1_Jnt", name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE")[0]
+                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
