@@ -602,7 +602,12 @@ class Eye(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(self.lowerEyelidCtrlZero+".rotateY", 180)
                         else:
                             cmds.setAttr(self.lowerEyelidCtrl+"."+self.langDic[self.langName]['c053_invert']+"X", 1)
-                
+                    # set eyelid scale by Base control attribute:
+                    cmds.addAttr(self.baseEyeCtrl, longName=self.langDic[self.langName]['c042_eyelid'].lower()+self.langDic[self.langName]['i115_size'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
+                    cmds.connectAttr(self.baseEyeCtrl+"."+self.langDic[self.langName]['c042_eyelid'].lower()+self.langDic[self.langName]['i115_size'], self.eyelidJxt+".scaleX", force=True)
+                    cmds.connectAttr(self.baseEyeCtrl+"."+self.langDic[self.langName]['c042_eyelid'].lower()+self.langDic[self.langName]['i115_size'], self.eyelidJxt+".scaleY", force=True)
+                    cmds.connectAttr(self.baseEyeCtrl+"."+self.langDic[self.langName]['c042_eyelid'].lower()+self.langDic[self.langName]['i115_size'], self.eyelidJxt+".scaleZ", force=True)
+                    
                 # create iris setup:
                 if self.getModuleAttr(IRIS):
                     self.irisCtrl = self.createIrisPupilSetup(s, side, IRIS, 'i080_iris', 12, s+jointLabelAdd)

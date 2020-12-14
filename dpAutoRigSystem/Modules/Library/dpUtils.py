@@ -537,8 +537,14 @@ def extractSuffix(nodeName):
     """
     endSuffixList = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp"]
     for endSuffix in endSuffixList:
-        if nodeName.endswith(endSuffix) or nodeName.endswith(endSuffix.lower()) or nodeName.endswith(endSuffix.upper()):
+        if nodeName.endswith(endSuffix):
             baseName = nodeName[:nodeName.rfind(endSuffix)]
+            return baseName
+        if nodeName.endswith(endSuffix.lower()):
+            baseName = nodeName[:nodeName.rfind(endSuffix.lower())]
+            return baseName
+        if nodeName.endswith(endSuffix.upper()):
+            baseName = nodeName[:nodeName.rfind(endSuffix.upper())]
             return baseName
     return nodeName
 

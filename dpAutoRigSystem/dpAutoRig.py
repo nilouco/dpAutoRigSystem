@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.20"
-DPAR_UPDATELOG = "#085 Review current suffix naming.\n#139 Limb isolate and scale multiplier naming review.\n#145 GES suffix exception."
+DPAR_VERSION = "3.10.21"
+DPAR_UPDATELOG = "#007 Duplicating limb corner - Not replicable.\n#145 GES suffix exception - Reviewed utils extractSuffix.\n#141 Eyelid scale new attribute."
 
 
 
