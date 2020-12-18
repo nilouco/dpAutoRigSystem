@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.10.22"
-DPAR_UPDATELOG = "#155 Facial controls blendShapes naming review.\n#140 Eyelid middle advance open.\n#032 Eyelid middle pull."
+DPAR_UPDATELOG = "WIP - #031 Lips super closed."
 
 
 

@@ -120,6 +120,9 @@
     "c105_multiplier"        : "multiplier",
     "c106_base"              : "Base",
     "c107_reduce"            : "Reduce",
+    "c108_open"              : "Open",
+    "c109_close"             : "Close",
+    "c110_start"             : "Start",
 	
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",

@@ -119,7 +119,10 @@
 	"c104_expand"            : "expandir",
 	"c105_multiplier"        : "multiplicador",
 	"c106_base"              : "Base",
-	"c107_reduce"            : "Reduce",
+	"c107_reduce"            : "Reduzir",
+	"c108_open"              : "Abrir",
+    "c109_close"             : "Fechar",
+	"c110_start"             : "Iniciar",
 
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
