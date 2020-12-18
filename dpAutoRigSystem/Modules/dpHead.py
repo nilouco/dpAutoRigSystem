@@ -208,6 +208,10 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 closeIntYName = self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y"
                 closeIntZName = self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z"
                 closeStartRotName = self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
+                unitFixYName = "unitFixY"
+                unitFixZName = "unitFixZ"
+                openMultYName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Y"
+                openMultZName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Z"
                 
                 # creating joints:
                 self.neckJnt = cmds.joint(name=neckJntName)
@@ -411,25 +415,44 @@ class Head(Base.StartClass, Layout.LayoutClass):
 
                 # setup jaw open:
                 self.jawOpenGrp = cmds.group(self.jawCtrl, name=jawOpenGrpName)
-                cmds.addAttr(self.jawCtrl, longName=openIntYName, attributeType='float', keyable=True)
-                cmds.addAttr(self.jawCtrl, longName=openIntZName, attributeType='float', keyable=True)
-                cmds.addAttr(self.jawCtrl, longName=openStartRotName, attributeType='float', keyable=True)
+                cmds.addAttr(self.jawCtrl, longName=openIntYName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
+                cmds.addAttr(self.jawCtrl, longName=openIntZName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
+                cmds.addAttr(self.jawCtrl, longName=openStartRotName, attributeType='float', defaultValue=0, minValue=0, keyable=True)
+                
+                cmds.addAttr(self.jawCtrl, longName=closeIntYName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
+                cmds.addAttr(self.jawCtrl, longName=closeIntZName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
+                cmds.addAttr(self.jawCtrl, longName=closeStartRotName, attributeType='float', defaultValue=0, maxValue=0, keyable=True)
+                
+                cmds.addAttr(self.jawCtrl, longName=unitFixYName, attributeType='float', defaultValue=-0.01)
+                cmds.addAttr(self.jawCtrl, longName=unitFixZName, attributeType='float', defaultValue=-0.1)
+                
+                
+                cmds.addAttr(self.jawCtrl, longName=openMultYName, attributeType='float', defaultValue=1, minValue=0)
+                cmds.addAttr(self.jawCtrl, longName=openMultZName, attributeType='float', defaultValue=2, minValue=0)
+                
                 cmds.setAttr(self.jawCtrl+"."+openIntYName, keyable=False, channelBox=True)
                 cmds.setAttr(self.jawCtrl+"."+openIntZName, keyable=False, channelBox=True)
                 cmds.setAttr(self.jawCtrl+"."+openStartRotName, keyable=False, channelBox=True)
-                cmds.setAttr(self.jawCtrl+"."+openIntYName, 1)
-                cmds.setAttr(self.jawCtrl+"."+openIntZName, 2)
-                cmds.setAttr(self.jawCtrl+"."+openStartRotName, 10)
+                cmds.setAttr(self.jawCtrl+"."+closeIntYName, keyable=False, channelBox=True)
+                cmds.setAttr(self.jawCtrl+"."+closeIntZName, keyable=False, channelBox=True)
+                cmds.setAttr(self.jawCtrl+"."+closeStartRotName, keyable=False, channelBox=True)
+                
+                
+
+                
+                
+                
                 self.jawIntensityFixUnitMD = cmds.createNode('multiplyDivide', name="JawMoveIntensityFixUnit_MD")
                 self.jawIntensityMD = cmds.createNode('multiplyDivide', name="JawMoveIntensity_MD")
                 self.jawIntensityZMD = cmds.createNode('multiplyDivide', name="JawMoveIntensityZ_MD")
                 self.jawStartIntensityMD = cmds.createNode('multiplyDivide', name="JawMoveIntensityStart_MD")
                 self.jawIntensityPMA = cmds.createNode('plusMinusAverage', name="JawMoveIntensity_PMA")
                 self.jawIntensityCnd = cmds.createNode('condition', name="JawMoveIntensity_Cnd")
+                
                 cmds.connectAttr(self.jawCtrl+".rotateX", self.jawIntensityMD+".input1Y", force=True)
                 cmds.connectAttr(self.jawCtrl+"."+openIntYName, self.jawIntensityFixUnitMD+".input1Y", force=True)
                 cmds.connectAttr(self.jawIntensityFixUnitMD+".outputY", self.jawIntensityMD+".input2Y", force=True)
-                cmds.setAttr(self.jawIntensityFixUnitMD+".input2Y", -0.01)
+                cmds.connectAttr(self.jawCtrl+"."+unitFixYName, self.jawIntensityFixUnitMD+".input2Y", force=True)
                 cmds.connectAttr(self.jawIntensityFixUnitMD+".outputY", self.jawStartIntensityMD+".input1X", force=True)
                 cmds.connectAttr(self.jawCtrl+"."+openStartRotName, self.jawStartIntensityMD+".input2X", force=True)
                 cmds.setAttr(self.jawIntensityPMA+".operation", 2)
@@ -443,7 +466,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.jawIntensityCnd+".outColorG", self.jawOpenGrp+".translateY", force=True)
                 cmds.connectAttr(self.jawIntensityCnd+".outColorG", self.jawIntensityZMD+".input1Z", force=True)
                 cmds.connectAttr(self.jawCtrl+"."+openStartRotName, self.jawIntensityFixUnitMD+".input1Z", force=True)
-                cmds.setAttr(self.jawIntensityFixUnitMD+".input2Z", -0.1)
+                cmds.connectAttr(self.jawCtrl+"."+unitFixZName, self.jawIntensityFixUnitMD+".input2Z", force=True)
                 cmds.connectAttr(self.jawIntensityFixUnitMD+".outputZ", self.jawIntensityZMD+".input2Z", force=True)
                 cmds.connectAttr(self.jawIntensityZMD+".outputZ", self.jawOpenGrp+".translateZ", force=True)
                 
