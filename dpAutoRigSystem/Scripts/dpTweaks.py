@@ -87,8 +87,8 @@ def Tweaks(dpUIinst):
         userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
         
         # use indirect skinning or joints:
-        indSkin     = dpUIinst.langDic[dpUIinst.langName]['i180_indSkinAnim']
-        faceJoint   = dpUIinst.langDic[dpUIinst.langName]['i181_jointGame']
+        indSkin     = dpUIinst.langDic[dpUIinst.langName]['i180_indirectSkin']+"\n"+dpUIinst.langDic[dpUIinst.langName]['i185_animation']
+        faceJoint   = dpUIinst.langDic[dpUIinst.langName]['i181_facialJoint']+"\n"+dpUIinst.langDic[dpUIinst.langName]['i186_gaming']
         faceMessage = dpUIinst.langDic[dpUIinst.langName]['i182_facialMessage']
         
         # getting Simple or Complete module guides to create:

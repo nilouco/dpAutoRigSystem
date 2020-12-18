@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.21"
-DPAR_UPDATELOG = "#007 Duplicating limb corner - Not replicable.\n#145 GES suffix exception - Reviewed utils extractSuffix.\n#141 Eyelid scale new attribute."
+DPAR_VERSION = "3.10.22"
+DPAR_UPDATELOG = "#155 Facial controls blendShapes naming review.\n#140 Eyelid middle advance open.\n#032 Eyelid middle pull."
 
 
 

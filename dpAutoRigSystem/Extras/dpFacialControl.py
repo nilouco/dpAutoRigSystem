@@ -30,7 +30,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.10"
+DPFC_VERSION = "1.11"
 
 
 class FacialControl():
@@ -195,8 +195,8 @@ class FacialControl():
         cmds.text("typeText", label=self.langDic[self.langName]["i182_facialMessage"], height=30, parent=facialCtrlLayout)
         typeCollectionLayout = cmds.columnLayout('typeCollectionLayout', columnOffset=('left', 10), width=310, parent=facialCtrlLayout)
         self.typeCollection = cmds.radioCollection('typeCollection', parent=typeCollectionLayout)
-        cmds.radioButton( label=self.langDic[self.langName]['i180_indSkinAnim'], annotation=TYPE_BS, onCommand=self.dpChangeType )
-        cmds.radioButton( label=self.langDic[self.langName]['i181_jointGame'], annotation=TYPE_JOINTS, onCommand=self.dpChangeType )
+        cmds.radioButton( label=self.langDic[self.langName]['m170_blendShapes']+" - "+self.langDic[self.langName]['i185_animation'], annotation=TYPE_BS, onCommand=self.dpChangeType )
+        cmds.radioButton( label=self.langDic[self.langName]['i181_facialJoint']+" - "+self.langDic[self.langName]['i186_gaming'], annotation=TYPE_JOINTS, onCommand=self.dpChangeType )
         cmds.separator(height=20, style="in", horizontal=True, parent=typeCollectionLayout)
         
         # BlendShapes UI:
