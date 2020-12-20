@@ -114,7 +114,87 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.cvChewLoc, self.cvChinLoc)
         cmds.parent(self.cvLLipLoc, self.cvJawLoc)
         cmds.parent(self.cvRLipLoc, self.cvJawLoc)
-
+    
+    
+    def setupJawMove(self, openCloseID, positiveRotation, *args):
+        """ Create the setup for move jaw group when jaw control rotates for open or close adjustements.
+        """
+        # declaring naming:
+        jawBaseName = utils.extractSuffix(self.jawCtrl)
+        jawMoveGrpName = jawBaseName+"_"+self.langDic[self.langName]['c034_move'].capitalize()+self.langDic[self.langName][openCloseID]+"_Grp"
+        intYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y"
+        intZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z"
+        startRotName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
+        unitFixYName = self.langDic[self.langName][openCloseID].lower()+"UnitFixY"
+        unitFixZName = self.langDic[self.langName][openCloseID].lower()+"UnitFixZ"
+        multYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Y"
+        multZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Z"
+        jawMultiplierMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityMultiplier_MD"
+        jawUnitFixMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_MD"
+        jawIntYMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityY_MD"
+        jawIntZMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityZ_MD"
+        jawStartMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_Start_MD"
+        jawIntPMAName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityStart_PMA"
+        jawIntCndName = jawBaseName+self.langDic[self.langName][openCloseID]+"_Intensity_Cnd"
+        
+        # create move group and attributes:
+        self.jawMoveGrp = cmds.group(self.jawCtrl, name=jawMoveGrpName)
+        cmds.addAttr(self.jawCtrl, longName=intYName, attributeType='float', defaultValue=1, keyable=True)
+        cmds.addAttr(self.jawCtrl, longName=intZName, attributeType='float', defaultValue=1, keyable=True)
+        if positiveRotation: #open
+            cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=0, minValue=0, keyable=True)
+        else: #close
+            cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=0, maxValue=0, keyable=True)
+        cmds.addAttr(self.jawCtrl, longName=unitFixYName, attributeType='float', defaultValue=-0.01)
+        cmds.addAttr(self.jawCtrl, longName=unitFixZName, attributeType='float', defaultValue=-0.1)
+        if positiveRotation: #open
+            cmds.addAttr(self.jawCtrl, longName=multYName, attributeType='float', defaultValue=1)
+            cmds.addAttr(self.jawCtrl, longName=multZName, attributeType='float', defaultValue=2)
+        else: #close
+            cmds.addAttr(self.jawCtrl, longName=multYName, attributeType='float', defaultValue=-1)
+            cmds.addAttr(self.jawCtrl, longName=multZName, attributeType='float', defaultValue=-1)
+        cmds.setAttr(self.jawCtrl+"."+intYName, keyable=False, channelBox=True)
+        cmds.setAttr(self.jawCtrl+"."+intZName, keyable=False, channelBox=True)
+        cmds.setAttr(self.jawCtrl+"."+startRotName, keyable=False, channelBox=True)
+        
+        # create utility nodes:
+        jawMultiplierMD = cmds.createNode('multiplyDivide', name=jawMultiplierMDName)
+        jawUnitFixMD = cmds.createNode('multiplyDivide', name=jawUnitFixMDName)
+        jawIntYMD = cmds.createNode('multiplyDivide', name=jawIntYMDName)
+        jawIntZMD = cmds.createNode('multiplyDivide', name=jawIntZMDName)
+        jawStartMD = cmds.createNode('multiplyDivide', name=jawStartMDName)
+        jawIntPMA = cmds.createNode('plusMinusAverage', name=jawIntPMAName)
+        jawIntCnd = cmds.createNode('condition', name=jawIntCndName)
+        
+        # set and connect attributes to move jaw group when open or close:
+        cmds.setAttr(jawIntPMA+".operation", 2)
+        cmds.setAttr(jawIntCnd+".operation", 4) #less than
+        if positiveRotation: #open
+            cmds.setAttr(jawIntCnd+".operation", 2) #greater than
+        cmds.setAttr(jawIntCnd+".colorIfFalseG", 0)
+        cmds.connectAttr(self.jawCtrl+".rotateX", jawIntYMD+".input1Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+intYName, jawMultiplierMD+".input1Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+multYName, jawMultiplierMD+".input2Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+intZName, jawMultiplierMD+".input1Z", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+multZName, jawMultiplierMD+".input2Z", force=True)
+        cmds.connectAttr(jawMultiplierMD+".outputY", jawUnitFixMD+".input1Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+unitFixYName, jawUnitFixMD+".input2Y", force=True)
+        cmds.connectAttr(jawMultiplierMD+".outputZ", jawUnitFixMD+".input1Z", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+unitFixZName, jawUnitFixMD+".input2Z", force=True)
+        cmds.connectAttr(jawUnitFixMD+".outputY", jawIntYMD+".input2Y", force=True)
+        cmds.connectAttr(jawUnitFixMD+".outputY", jawStartMD+".input1X", force=True)
+        cmds.connectAttr(jawUnitFixMD+".outputZ", jawIntZMD+".input2Z", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+startRotName, jawStartMD+".input2X", force=True)
+        cmds.connectAttr(jawIntYMD+".outputY", jawIntPMA+".input1D[0]", force=True)
+        cmds.connectAttr(jawStartMD+".outputX", jawIntPMA+".input1D[1]", force=True)
+        cmds.connectAttr(jawIntPMA+".output1D", jawIntCnd+".colorIfTrueG", force=True)
+        cmds.connectAttr(self.jawCtrl+".rotateX", jawIntCnd+".firstTerm", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+startRotName, jawIntCnd+".secondTerm", force=True)
+        cmds.connectAttr(jawIntCnd+".outColorG", self.jawMoveGrp+".translateY", force=True)
+        cmds.connectAttr(jawIntCnd+".outColorG", jawIntZMD+".input1Z", force=True)
+        cmds.connectAttr(jawIntZMD+".outputZ", self.jawMoveGrp+".translateZ", force=True)
+    
+    
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -201,17 +281,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 chewCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c048_chew']+"_Ctrl"
                 lLipCtrlName = self.langDic[self.langName]['p002_left']+"_"+self.userGuideName+"_"+self.langDic[self.langName]['c039_lip']+"_Ctrl"
                 rLipCtrlName = self.langDic[self.langName]['p003_right']+"_"+self.userGuideName+"_"+self.langDic[self.langName]['c039_lip']+"_Ctrl"
-                jawOpenGrpName = jawCtrlName+"_"+self.langDic[self.langName]['c108_open']+"_Grp"
-                openIntYName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y"
-                openIntZName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z"
-                openStartRotName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
-                closeIntYName = self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y"
-                closeIntZName = self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z"
-                closeStartRotName = self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
-                unitFixYName = "unitFixY"
-                unitFixZName = "unitFixZ"
-                openMultYName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Y"
-                openMultZName = self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Z"
                 
                 # creating joints:
                 self.neckJnt = cmds.joint(name=neckJntName)
@@ -412,69 +481,24 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawFollowRev+".inputX", force=True)
                 cmds.connectAttr(jawFollowRev+".outputX", jawParentConst+"."+self.worldRef+"W1", force=True)
                 cmds.scaleConstraint(self.headCtrl, self.zeroCtrlList[3], maintainOffset=True, name=self.zeroCtrlList[3]+"_ScC")[0]
-
+                
                 # setup jaw open:
-                self.jawOpenGrp = cmds.group(self.jawCtrl, name=jawOpenGrpName)
-                cmds.addAttr(self.jawCtrl, longName=openIntYName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
-                cmds.addAttr(self.jawCtrl, longName=openIntZName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
-                cmds.addAttr(self.jawCtrl, longName=openStartRotName, attributeType='float', defaultValue=0, minValue=0, keyable=True)
-                
-                cmds.addAttr(self.jawCtrl, longName=closeIntYName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
-                cmds.addAttr(self.jawCtrl, longName=closeIntZName, attributeType='float', defaultValue=1, minValue=0, keyable=True)
-                cmds.addAttr(self.jawCtrl, longName=closeStartRotName, attributeType='float', defaultValue=0, maxValue=0, keyable=True)
-                
-                cmds.addAttr(self.jawCtrl, longName=unitFixYName, attributeType='float', defaultValue=-0.01)
-                cmds.addAttr(self.jawCtrl, longName=unitFixZName, attributeType='float', defaultValue=-0.1)
-                
-                
-                cmds.addAttr(self.jawCtrl, longName=openMultYName, attributeType='float', defaultValue=1, minValue=0)
-                cmds.addAttr(self.jawCtrl, longName=openMultZName, attributeType='float', defaultValue=2, minValue=0)
-                
-                cmds.setAttr(self.jawCtrl+"."+openIntYName, keyable=False, channelBox=True)
-                cmds.setAttr(self.jawCtrl+"."+openIntZName, keyable=False, channelBox=True)
-                cmds.setAttr(self.jawCtrl+"."+openStartRotName, keyable=False, channelBox=True)
-                cmds.setAttr(self.jawCtrl+"."+closeIntYName, keyable=False, channelBox=True)
-                cmds.setAttr(self.jawCtrl+"."+closeIntZName, keyable=False, channelBox=True)
-                cmds.setAttr(self.jawCtrl+"."+closeStartRotName, keyable=False, channelBox=True)
-                
-                
-
-                
-                
-                
-                self.jawIntensityFixUnitMD = cmds.createNode('multiplyDivide', name="JawMoveIntensityFixUnit_MD")
-                self.jawIntensityMD = cmds.createNode('multiplyDivide', name="JawMoveIntensity_MD")
-                self.jawIntensityZMD = cmds.createNode('multiplyDivide', name="JawMoveIntensityZ_MD")
-                self.jawStartIntensityMD = cmds.createNode('multiplyDivide', name="JawMoveIntensityStart_MD")
-                self.jawIntensityPMA = cmds.createNode('plusMinusAverage', name="JawMoveIntensity_PMA")
-                self.jawIntensityCnd = cmds.createNode('condition', name="JawMoveIntensity_Cnd")
-                
-                cmds.connectAttr(self.jawCtrl+".rotateX", self.jawIntensityMD+".input1Y", force=True)
-                cmds.connectAttr(self.jawCtrl+"."+openIntYName, self.jawIntensityFixUnitMD+".input1Y", force=True)
-                cmds.connectAttr(self.jawIntensityFixUnitMD+".outputY", self.jawIntensityMD+".input2Y", force=True)
-                cmds.connectAttr(self.jawCtrl+"."+unitFixYName, self.jawIntensityFixUnitMD+".input2Y", force=True)
-                cmds.connectAttr(self.jawIntensityFixUnitMD+".outputY", self.jawStartIntensityMD+".input1X", force=True)
-                cmds.connectAttr(self.jawCtrl+"."+openStartRotName, self.jawStartIntensityMD+".input2X", force=True)
-                cmds.setAttr(self.jawIntensityPMA+".operation", 2)
-                cmds.connectAttr(self.jawIntensityMD+".outputY", self.jawIntensityPMA+".input1D[0]", force=True)
-                cmds.connectAttr(self.jawStartIntensityMD+".outputX", self.jawIntensityPMA+".input1D[1]", force=True)
-                cmds.connectAttr(self.jawIntensityPMA+".output1D", self.jawIntensityCnd+".colorIfTrueG", force=True)
-                cmds.connectAttr(self.jawCtrl+".rotateX", self.jawIntensityCnd+".firstTerm", force=True)
-                cmds.connectAttr(self.jawCtrl+"."+openStartRotName, self.jawIntensityCnd+".secondTerm", force=True)
-                cmds.setAttr(self.jawIntensityCnd+".operation", 2)
-                cmds.setAttr(self.jawIntensityCnd+".colorIfFalseG", 0)
-                cmds.connectAttr(self.jawIntensityCnd+".outColorG", self.jawOpenGrp+".translateY", force=True)
-                cmds.connectAttr(self.jawIntensityCnd+".outColorG", self.jawIntensityZMD+".input1Z", force=True)
-                cmds.connectAttr(self.jawCtrl+"."+openStartRotName, self.jawIntensityFixUnitMD+".input1Z", force=True)
-                cmds.connectAttr(self.jawCtrl+"."+unitFixZName, self.jawIntensityFixUnitMD+".input2Z", force=True)
-                cmds.connectAttr(self.jawIntensityFixUnitMD+".outputZ", self.jawIntensityZMD+".input2Z", force=True)
-                cmds.connectAttr(self.jawIntensityZMD+".outputZ", self.jawOpenGrp+".translateZ", force=True)
-                
+                self.setupJawMove("c108_open", True, *args)
                 # setup jaw close:
+                self.setupJawMove("c109_close", False, *args)
                 
-                
-
                 # create lip setup:
+                # upper lip:
+                
+                # WIP - TO DO here
+                
+                
+                
+                
+                
+                
+                
+                
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_PaC")[0]
                 cmds.setAttr(lLipParentConst+".interpType", 2)

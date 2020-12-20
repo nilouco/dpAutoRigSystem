@@ -46,7 +46,7 @@
     "c031_volumeVariation"   : "variacaoVolume",
     "c032_follow"            : "seguir",
     "c033_autoOrient"        : "autoOrientar",
-    "c034_moveIntensity"     : "moverIntensidade",
+    "c034_move"              : "mover",
     "c035_moveStartRotation" : "moverStartRotation",
     "c036_eye"               : "Olho",
     "c037_arm"               : "Braco",
