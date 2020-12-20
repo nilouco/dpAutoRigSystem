@@ -112,14 +112,18 @@ def Quadruped(dpUIinst):
             cmds.setAttr(headInstance.cvHeadLoc+".translateY", 0)
             cmds.setAttr(headInstance.cvHeadLoc+".translateZ", 2.5)
             cmds.setAttr(headInstance.cvHeadLoc+".rotateX", 45)
-            cmds.setAttr(headInstance.cvUpperLoc+".translateY", 0.5)
-            cmds.setAttr(headInstance.cvUpperLoc+".translateZ", 1.3)
+            cmds.setAttr(headInstance.cvUpperJawLoc+".translateY", 0.5)
+            cmds.setAttr(headInstance.cvUpperJawLoc+".translateZ", 1.3)
             cmds.setAttr(headInstance.cvJawLoc+".translateY", -1.0)
             cmds.setAttr(headInstance.cvJawLoc+".translateZ", 2.0)
             cmds.setAttr(headInstance.cvJawLoc+".rotateY", 0)
-            cmds.setAttr(headInstance.cvLLipLoc+".translateX", 0.6)
-            cmds.setAttr(headInstance.cvLLipLoc+".translateY", -0.15)
-            cmds.setAttr(headInstance.cvLLipLoc+".translateZ", 1.6)
+            cmds.setAttr(headInstance.cvLCornerLipLoc+".translateX", 0.6)
+            cmds.setAttr(headInstance.cvLCornerLipLoc+".translateY", -0.15)
+            cmds.setAttr(headInstance.cvLCornerLipLoc+".translateZ", 1.6)
+            cmds.setAttr(headInstance.cvUpperLipLoc+".translateY", -1.4)
+            cmds.setAttr(headInstance.cvUpperLipLoc+".translateZ", 3.5)
+            cmds.setAttr(headInstance.cvLowerLipLoc+".translateY", -0.2)
+            cmds.setAttr(headInstance.cvLowerLipLoc+".translateZ", 2.5)
             cmds.setAttr(headInstance.annotation+".translateX", 4)
             cmds.setAttr(headInstance.annotation+".translateY", 0)
             
@@ -146,7 +150,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
             
             # parent head guide to spine guide:
-            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
+            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -332,7 +336,7 @@ def Quadruped(dpUIinst):
                 earInstance.changeJointNumber(2)
                 
                 # parent ear guide to spine guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
                 cmds.setAttr(earInstance.moduleGrp+".scaleX", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)
@@ -467,10 +471,8 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(noseInstance.moduleGrp+".nJoints", 3)
                 cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.7)
                 cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
-                # parent nose guide to head guide:
-                cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperLoc, absolute=True)
-                # parent upperTeeth guide to Nose1 guide:
-                cmds.parent(upperTeethInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
+                # parent nose guide and upperTeeth to head guide:
+                cmds.parent(noseInstance.moduleGrp, upperTeethInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
                 # create FkLine module instance:
                 nostrilInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing nostril base guide informations:

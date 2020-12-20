@@ -2302,13 +2302,13 @@ class DP_AutoRig_UI:
                             if fatherModule == HEAD:
                                 # getting head data:
                                 fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
-                                headParentConst = cmds.parentConstraint(self.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
+                                upperJawCtrl  = self.integratedTaskDic[fatherGuide]['upperJawCtrlList'][0]
+                                headParentConst = cmds.parentConstraint(self.rootCtrl, upperJawCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
                                 eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
                                 cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], eyeRevNode+".inputX", force=True)
                                 cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
-                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
-                                cmds.parent(upLocGrp, upperCtrl, relative=False)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], headParentConst+"."+upperJawCtrl+"W1", force=True)
+                                cmds.parent(upLocGrp, upperJawCtrl, relative=False)
                                 cmds.setAttr(upLocGrp+".visibility", 0)
                                 # head drives eyeScaleGrp:
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
@@ -2320,7 +2320,7 @@ class DP_AutoRig_UI:
                                     self.itemMirrorNameList = self.itemGuideMirrorNameList
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
-                                    cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC")
+                                    cmds.parentConstraint(upperJawCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC")
                             # changing iris and pupil color override:
                             self.itemMirrorNameList = [""]
                             # get itemGuideName:
