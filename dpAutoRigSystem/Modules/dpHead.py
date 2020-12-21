@@ -560,13 +560,14 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Z", "c039_lip", *args)
                 
                 # set jaw move and lips calibrate default values:
-                cmds.setAttr(self.jawCtrl+".openStartRotation", 5)
-                cmds.setAttr(self.jawCtrl+".openCalibrateY", -2)
-                cmds.setAttr(self.jawCtrl+".openCalibrateOutput", 30)
-                cmds.setAttr(self.jawCtrl+".closeCalibrateOutput", -10)
-                cmds.setAttr(self.upperLipCtrl+".closeCalibrateZ", 2)
-                cmds.setAttr(self.lowerLipCtrl+".closeCalibrateY", 0)
-                cmds.setAttr(self.lowerLipCtrl+".closeCalibrateZ", 2)
+                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation", 5)
+                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y", -2)
+                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 0)
+                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output'], 30)
+                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output'], -10)
+                cmds.setAttr(self.upperLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 2)
+                cmds.setAttr(self.lowerLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y", 0)
+                cmds.setAttr(self.lowerLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 2)
                 
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperJawCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_PaC")[0]
