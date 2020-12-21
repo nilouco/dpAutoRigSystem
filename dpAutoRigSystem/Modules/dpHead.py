@@ -147,11 +147,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
         calibOutputAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output']
         outputAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c112_output']
         # utility node names:
-        jawCalibrateMDName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_"+self.langDic[self.langName]['c111_calibrate']+"_"+axis+"_MD"
+        jawCalibrateMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+self.langDic[self.langName]['c111_calibrate']+"_"+axis+"_MD"
         jawUnitFixMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_"+axis+"_MD"
-        jawIntMDName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_MD"
+        jawIntMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_MD"
         jawStartMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_Start_"+axis+"_MD"
-        jawIntPMAName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_Start_"+axis+"_PMA"
+        jawIntPMAName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_Start_"+axis+"_PMA"
         jawIntCndName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_Cnd"
         jawOutputRmVName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName]['c112_output']+"_RmV"
         
@@ -559,19 +559,14 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Y", "c039_lip", invertRot=True, *args)
                 self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Z", "c039_lip", *args)
                 
-                
-                #TO DO:
-                # set jaw move and lips calibrate values:
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
+                # set jaw move and lips calibrate default values:
+                cmds.setAttr(self.jawCtrl+".openStartRotation", 5)
+                cmds.setAttr(self.jawCtrl+".openCalibrateY", -2)
+                cmds.setAttr(self.jawCtrl+".openCalibrateOutput", 30)
+                cmds.setAttr(self.jawCtrl+".closeCalibrateOutput", -10)
+                cmds.setAttr(self.upperLipCtrl+".closeCalibrateZ", 2)
+                cmds.setAttr(self.lowerLipCtrl+".closeCalibrateY", 0)
+                cmds.setAttr(self.lowerLipCtrl+".closeCalibrateZ", 2)
                 
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperJawCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_PaC")[0]

@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.22"
-DPAR_UPDATELOG = "WIP - #031 Lips super closed."
+DPAR_VERSION = "3.10.23"
+DPAR_UPDATELOG = "#031 Lips super closed."
 
 
 
