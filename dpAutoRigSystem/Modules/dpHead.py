@@ -138,20 +138,20 @@ class Head(Base.StartClass, Layout.LayoutClass):
         # declaring naming:
         jawBaseName = utils.extractSuffix(self.jawCtrl)
         jawMoveGrpName = jawBaseName+"_"+self.langDic[self.langName]['c034_move']+self.langDic[self.langName][openCloseID]+"_Grp"
-        intYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y"
-        intZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z"
+        intYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c049_intensity'].capitalize().capitalize()+"Y"
+        intZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c049_intensity'].capitalize().capitalize()+"Z"
         startRotName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
         unitFixYName = self.langDic[self.langName][openCloseID].lower()+"UnitFixY"
         unitFixZName = self.langDic[self.langName][openCloseID].lower()+"UnitFixZ"
-        multYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Y"
-        multZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Z"
-        jawMultiplierMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityMultiplier_MD"
+        calibYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+"Y"
+        calibZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+"Z"
+        jawCalibrateMDName = jawBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"_"+self.langDic[self.langName]['c111_calibrate']+"_MD"
         jawUnitFixMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_MD"
-        jawIntYMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityY_MD"
-        jawIntZMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityZ_MD"
+        jawIntYMDName = jawBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y_MD"
+        jawIntZMDName = jawBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z_MD"
         jawStartMDName = jawBaseName+self.langDic[self.langName][openCloseID]+"_Start_MD"
-        jawIntPMAName = jawBaseName+self.langDic[self.langName][openCloseID]+"_IntensityStart_PMA"
-        jawIntCndName = jawBaseName+self.langDic[self.langName][openCloseID]+"_Intensity_Cnd"
+        jawIntPMAName = jawBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"_Start_PMA"
+        jawIntCndName = jawBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName]['c049_intensity'].capitalize()+"_Cnd"
         
         # create move group and attributes:
         self.jawMoveGrp = cmds.group(self.jawCtrl, name=jawMoveGrpName)
@@ -164,17 +164,17 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.addAttr(self.jawCtrl, longName=unitFixYName, attributeType='float', defaultValue=-0.01)
         cmds.addAttr(self.jawCtrl, longName=unitFixZName, attributeType='float', defaultValue=-0.1)
         if positiveRotation: #open
-            cmds.addAttr(self.jawCtrl, longName=multYName, attributeType='float', defaultValue=1)
-            cmds.addAttr(self.jawCtrl, longName=multZName, attributeType='float', defaultValue=2)
+            cmds.addAttr(self.jawCtrl, longName=calibYName, attributeType='float', defaultValue=1)
+            cmds.addAttr(self.jawCtrl, longName=calibZName, attributeType='float', defaultValue=2)
         else: #close
-            cmds.addAttr(self.jawCtrl, longName=multYName, attributeType='float', defaultValue=-1)
-            cmds.addAttr(self.jawCtrl, longName=multZName, attributeType='float', defaultValue=-1)
+            cmds.addAttr(self.jawCtrl, longName=calibYName, attributeType='float', defaultValue=-1)
+            cmds.addAttr(self.jawCtrl, longName=calibZName, attributeType='float', defaultValue=-1)
         cmds.setAttr(self.jawCtrl+"."+intYName, keyable=False, channelBox=True)
         cmds.setAttr(self.jawCtrl+"."+intZName, keyable=False, channelBox=True)
         cmds.setAttr(self.jawCtrl+"."+startRotName, keyable=False, channelBox=True)
         
         # create utility nodes:
-        jawMultiplierMD = cmds.createNode('multiplyDivide', name=jawMultiplierMDName)
+        jawCalibrateMD = cmds.createNode('multiplyDivide', name=jawCalibrateMDName)
         jawUnitFixMD = cmds.createNode('multiplyDivide', name=jawUnitFixMDName)
         jawIntYMD = cmds.createNode('multiplyDivide', name=jawIntYMDName)
         jawIntZMD = cmds.createNode('multiplyDivide', name=jawIntZMDName)
@@ -187,15 +187,17 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(jawIntCnd+".operation", 4) #less than
         if positiveRotation: #open
             cmds.setAttr(jawIntCnd+".operation", 2) #greater than
+        cmds.setAttr(jawIntCnd+".colorIfFalseR", 0)
         cmds.setAttr(jawIntCnd+".colorIfFalseG", 0)
+        cmds.setAttr(jawIntCnd+".colorIfFalseB", 0)
         cmds.connectAttr(self.jawCtrl+".rotateX", jawIntYMD+".input1Y", force=True)
-        cmds.connectAttr(self.jawCtrl+"."+intYName, jawMultiplierMD+".input1Y", force=True)
-        cmds.connectAttr(self.jawCtrl+"."+multYName, jawMultiplierMD+".input2Y", force=True)
-        cmds.connectAttr(self.jawCtrl+"."+intZName, jawMultiplierMD+".input1Z", force=True)
-        cmds.connectAttr(self.jawCtrl+"."+multZName, jawMultiplierMD+".input2Z", force=True)
-        cmds.connectAttr(jawMultiplierMD+".outputY", jawUnitFixMD+".input1Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+intYName, jawCalibrateMD+".input1Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+calibYName, jawCalibrateMD+".input2Y", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+intZName, jawCalibrateMD+".input1Z", force=True)
+        cmds.connectAttr(self.jawCtrl+"."+calibZName, jawCalibrateMD+".input2Z", force=True)
+        cmds.connectAttr(jawCalibrateMD+".outputY", jawUnitFixMD+".input1Y", force=True)
         cmds.connectAttr(self.jawCtrl+"."+unitFixYName, jawUnitFixMD+".input2Y", force=True)
-        cmds.connectAttr(jawMultiplierMD+".outputZ", jawUnitFixMD+".input1Z", force=True)
+        cmds.connectAttr(jawCalibrateMD+".outputZ", jawUnitFixMD+".input1Z", force=True)
         cmds.connectAttr(self.jawCtrl+"."+unitFixZName, jawUnitFixMD+".input2Z", force=True)
         cmds.connectAttr(jawUnitFixMD+".outputY", jawIntYMD+".input2Y", force=True)
         cmds.connectAttr(jawUnitFixMD+".outputY", jawStartMD+".input1X", force=True)
@@ -203,11 +205,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(self.jawCtrl+"."+startRotName, jawStartMD+".input2X", force=True)
         cmds.connectAttr(jawIntYMD+".outputY", jawIntPMA+".input1D[0]", force=True)
         cmds.connectAttr(jawStartMD+".outputX", jawIntPMA+".input1D[1]", force=True)
-        cmds.connectAttr(jawIntPMA+".output1D", jawIntCnd+".colorIfTrueG", force=True)
+        cmds.connectAttr(jawIntPMA+".output1D", jawIntCnd+".colorIfTrueR", force=True)
         cmds.connectAttr(self.jawCtrl+".rotateX", jawIntCnd+".firstTerm", force=True)
         cmds.connectAttr(self.jawCtrl+"."+startRotName, jawIntCnd+".secondTerm", force=True)
-        cmds.connectAttr(jawIntCnd+".outColorG", self.jawMoveGrp+".translateY", force=True)
-        cmds.connectAttr(jawIntCnd+".outColorG", jawIntZMD+".input1Z", force=True)
+        cmds.connectAttr(jawIntCnd+".outColorR", self.jawMoveGrp+".translateY", force=True)
+        cmds.connectAttr(jawIntCnd+".outColorR", jawIntZMD+".input1Z", force=True)
         cmds.connectAttr(jawIntZMD+".outputZ", self.jawMoveGrp+".translateZ", force=True)
         
         # setup upper and lowerLips:
@@ -219,21 +221,33 @@ class Head(Base.StartClass, Layout.LayoutClass):
             lowerLipGrpName = lowerLipBaseName+"_"+self.langDic[self.langName]['c035_driven']+self.langDic[self.langName][openCloseID]+"_Grp"
             lipIntYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c039_lip']+"Y"
             lipIntZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c039_lip']+"Z"
-            lipMultYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c039_lip']+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Y"
-            lipMultZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c039_lip']+self.langDic[self.langName]['c105_multiplier'].capitalize()+"Z"
-            lipsRotIntPMAName = jawBaseName+self.langDic[self.langName]['c039_lip']+"_IntensityStart_PMA"
-            lipsRotIntCndName = jawBaseName+self.langDic[self.langName]['c039_lip']+"_Intensity_Cnd"
-            lowerLipRotMDName = jawBaseName+self.langDic[self.langName]['c039_lip']+"_InvertRotate_MD"
+            lipCalibYName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c039_lip']+self.langDic[self.langName]['c111_calibrate']+"Y"
+            lipCalibZName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c039_lip']+self.langDic[self.langName]['c111_calibrate']+"Z"
+            lipsRotIntPMAName = jawBaseName+self.langDic[self.langName]['c039_lip']+self.langDic[self.langName]['c049_intensity'].capitalize()+"_Start_PMA"
+            lipsRotIntCndName = jawBaseName+self.langDic[self.langName]['c039_lip']+"_"+self.langDic[self.langName]['c049_intensity'].capitalize()+"_Cnd"
+            lowerLipRotMDName = lowerLipBaseName+"_InvertRotate_MD"
+            upperLipCalibMDName = upperLipBaseName+self.langDic[self.langName]['c111_calibrate']+"_MD"
+            lowerLipCalibMDName = lowerLipBaseName+self.langDic[self.langName]['c111_calibrate']+"_MD"
+            upperLipUnitFixMDName = upperLipBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_MD"
+            lowerLipUnitFixMDName = lowerLipBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_MD"
+            upperLipIntYMDName = upperLipBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y_MD"
+            upperLipIntZMDName = upperLipBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z_MD"
+            upperLipStartMDName = upperLipBaseName+self.langDic[self.langName][openCloseID]+"_Start_MD"
+            upperLipIntPMAName = upperLipBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"_Start_PMA"
+            lowerLipIntYMDName = lowerLipBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"Y_MD"
+            lowerLipIntZMDName = lowerLipBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"Z_MD"
+            lowerLipStartMDName = lowerLipBaseName+self.langDic[self.langName][openCloseID]+"_Start_MD"
+            lowerLipIntPMAName = lowerLipBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c049_intensity'].capitalize()+"_Start_PMA"
             
             # add attributes:
             cmds.addAttr(self.upperLipCtrl, longName=lipIntYName, attributeType='float', defaultValue=1, keyable=True)
             cmds.addAttr(self.upperLipCtrl, longName=lipIntZName, attributeType='float', defaultValue=1, keyable=True)
             cmds.addAttr(self.lowerLipCtrl, longName=lipIntYName, attributeType='float', defaultValue=1, keyable=True)
             cmds.addAttr(self.lowerLipCtrl, longName=lipIntZName, attributeType='float', defaultValue=1, keyable=True)
-            cmds.addAttr(self.upperLipCtrl, longName=lipMultYName, attributeType='float', defaultValue=10)
-            cmds.addAttr(self.upperLipCtrl, longName=lipMultZName, attributeType='float', defaultValue=11)
-            cmds.addAttr(self.lowerLipCtrl, longName=lipMultYName, attributeType='float', defaultValue=12)
-            cmds.addAttr(self.lowerLipCtrl, longName=lipMultZName, attributeType='float', defaultValue=13)
+            cmds.addAttr(self.upperLipCtrl, longName=lipCalibYName, attributeType='float', defaultValue=2)
+            cmds.addAttr(self.upperLipCtrl, longName=lipCalibZName, attributeType='float', defaultValue=-3)
+            cmds.addAttr(self.lowerLipCtrl, longName=lipCalibYName, attributeType='float', defaultValue=-1)
+            cmds.addAttr(self.lowerLipCtrl, longName=lipCalibZName, attributeType='float', defaultValue=5)
             
             # set attributes:
             cmds.setAttr(self.upperLipCtrl+"."+lipIntYName, keyable=False, channelBox=True)
@@ -249,12 +263,32 @@ class Head(Base.StartClass, Layout.LayoutClass):
             lipsRotIntPMA = cmds.createNode('plusMinusAverage', name=lipsRotIntPMAName)
             lipRotIntCnd = cmds.createNode('condition', name=lipsRotIntCndName)
             lowerLipRotMD = cmds.createNode('multiplyDivide', name=lowerLipRotMDName)
+            upperLipCalibMD = cmds.createNode('multiplyDivide', name=upperLipCalibMDName)
+            lowerLipCalibMD = cmds.createNode('multiplyDivide', name=lowerLipCalibMDName)
+            upperLipUnitFixMD = cmds.createNode('multiplyDivide', name=upperLipUnitFixMDName)
+            lowerLipUnitFixMD = cmds.createNode('multiplyDivide', name=lowerLipUnitFixMDName)
+            upperLipIntYMD = cmds.createNode('multiplyDivide', name=upperLipIntYMDName)
+            upperLipIntZMD = cmds.createNode('multiplyDivide', name=upperLipIntZMDName)
+            upperLipStartMD = cmds.createNode('multiplyDivide', name=upperLipStartMDName)
+            upperLipIntPMA = cmds.createNode('plusMinusAverage', name=upperLipIntPMAName)
+            lowerLipIntYMD = cmds.createNode('multiplyDivide', name=lowerLipIntYMDName)
+            lowerLipIntZMD = cmds.createNode('multiplyDivide', name=lowerLipIntZMDName)
+            lowerLipStartMD = cmds.createNode('multiplyDivide', name=lowerLipStartMDName)
+            lowerLipIntPMA = cmds.createNode('plusMinusAverage', name=lowerLipIntPMAName)
+            
+            # set values:
             cmds.setAttr(lipsRotIntPMA+".operation", 2) #substract
+            cmds.setAttr(upperLipIntPMA+".operation", 2) #substract
+            cmds.setAttr(lowerLipIntPMA+".operation", 2) #substract
             cmds.setAttr(lipRotIntCnd+".operation", 4) # less than
             cmds.setAttr(lipRotIntCnd+".colorIfFalseR", 0)
+            cmds.setAttr(lipRotIntCnd+".colorIfFalseG", 0)
+            cmds.setAttr(lipRotIntCnd+".colorIfFalseB", 0)
             cmds.setAttr(lowerLipRotMD+".input2X", -1)
+            cmds.setAttr(upperLipIntZMD+".input2X", -1)
+            cmds.setAttr(lowerLipIntZMD+".input2X", -1)
             
-            # connect attributes:
+            # connect jaw attributes:
             cmds.connectAttr(self.jawCtrl+".rotateX", lipsRotIntPMA+".input1D[0]", force=True)
             cmds.connectAttr(self.jawCtrl+"."+startRotName, lipsRotIntPMA+".input1D[1]", force=True)
             cmds.connectAttr(lipsRotIntPMA+".output1D", lipRotIntCnd+".colorIfTrueR", force=True)
@@ -263,10 +297,47 @@ class Head(Base.StartClass, Layout.LayoutClass):
             cmds.connectAttr(lipRotIntCnd+".outColorR", lowerLipRotMD+".input1X", force=True)
             cmds.connectAttr(lowerLipRotMD+".outputX", self.lowerLipDrivenGrp+".rotateX", force=True)
             
+            # upper lip:
+            cmds.connectAttr(self.upperLipCtrl+"."+lipIntYName, upperLipCalibMD+".input1Y", force=True)
+            cmds.connectAttr(self.upperLipCtrl+"."+lipIntZName, upperLipCalibMD+".input1Z", force=True)
+            cmds.connectAttr(self.upperLipCtrl+"."+lipCalibYName, upperLipCalibMD+".input2Y", force=True)
+            cmds.connectAttr(self.upperLipCtrl+"."+lipCalibZName, upperLipCalibMD+".input2Z", force=True)
+            cmds.connectAttr(upperLipCalibMD+".outputY", upperLipUnitFixMD+".input1Y", force=True)
+            cmds.connectAttr(upperLipCalibMD+".outputZ", upperLipUnitFixMD+".input1Z", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+unitFixYName, upperLipUnitFixMD+".input2Y", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+unitFixZName, upperLipUnitFixMD+".input2Z", force=True)
+            cmds.connectAttr(upperLipUnitFixMD+".outputY", upperLipIntYMD+".input2Y", force=True)
+            cmds.connectAttr(self.jawCtrl+".rotateX", upperLipIntYMD+".input1Y", force=True)
+            cmds.connectAttr(upperLipUnitFixMD+".outputY", upperLipStartMD+".input1X", force=True)
+            cmds.connectAttr(upperLipUnitFixMD+".outputZ", upperLipIntZMD+".input2Z", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+startRotName, upperLipStartMD+".input2X", force=True)
+            cmds.connectAttr(upperLipIntYMD+".outputY", upperLipIntPMA+".input1D[0]", force=True)
+            cmds.connectAttr(upperLipStartMD+".outputX", upperLipIntPMA+".input1D[1]", force=True)
+            cmds.connectAttr(upperLipIntPMA+".output1D", jawIntCnd+".colorIfTrueG", force=True)
+            cmds.connectAttr(jawIntCnd+".outColorG", self.upperLipDrivenGrp+".translateY", force=True)
+            cmds.connectAttr(jawIntCnd+".outColorG", upperLipIntZMD+".input1Z", force=True)
+            cmds.connectAttr(upperLipIntZMD+".outputZ", self.upperLipDrivenGrp+".translateZ", force=True)
             
-            
-            
-            
+            # lower lip:
+            cmds.connectAttr(self.lowerLipCtrl+"."+lipIntYName, lowerLipCalibMD+".input1Y", force=True)
+            cmds.connectAttr(self.lowerLipCtrl+"."+lipIntZName, lowerLipCalibMD+".input1Z", force=True)
+            cmds.connectAttr(self.lowerLipCtrl+"."+lipCalibYName, lowerLipCalibMD+".input2Y", force=True)
+            cmds.connectAttr(self.lowerLipCtrl+"."+lipCalibZName, lowerLipCalibMD+".input2Z", force=True)
+            cmds.connectAttr(lowerLipCalibMD+".outputY", lowerLipUnitFixMD+".input1Y", force=True)
+            cmds.connectAttr(lowerLipCalibMD+".outputZ", lowerLipUnitFixMD+".input1Z", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+unitFixYName, lowerLipUnitFixMD+".input2Y", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+unitFixZName, lowerLipUnitFixMD+".input2Z", force=True)
+            cmds.connectAttr(lowerLipUnitFixMD+".outputY", lowerLipIntYMD+".input2Y", force=True)
+            cmds.connectAttr(self.jawCtrl+".rotateX", lowerLipIntYMD+".input1Y", force=True)
+            cmds.connectAttr(lowerLipUnitFixMD+".outputY", lowerLipStartMD+".input1X", force=True)
+            cmds.connectAttr(lowerLipUnitFixMD+".outputZ", lowerLipIntZMD+".input2Z", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+startRotName, lowerLipStartMD+".input2X", force=True)
+            cmds.connectAttr(lowerLipIntYMD+".outputY", lowerLipIntPMA+".input1D[0]", force=True)
+            cmds.connectAttr(lowerLipStartMD+".outputX", lowerLipIntPMA+".input1D[1]", force=True)
+            cmds.connectAttr(lowerLipIntPMA+".output1D", lipRotIntCnd+".colorIfTrueG", force=True)
+            cmds.connectAttr(lipRotIntCnd+".outColorG", self.lowerLipDrivenGrp+".translateY", force=True)
+            cmds.connectAttr(lipRotIntCnd+".outColorG", lowerLipIntZMD+".input1Z", force=True)
+            cmds.connectAttr(lowerLipIntZMD+".outputZ", self.lowerLipDrivenGrp+".translateZ", force=True)
     
     
     def rigModule(self, *args):

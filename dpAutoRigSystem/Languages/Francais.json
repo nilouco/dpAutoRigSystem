@@ -123,6 +123,7 @@
 	"c108_open"              : "Ouvrir",
     "c109_close"             : "Fermer",
 	"c110_start"             : "Commencer",
+	"c111_calibrate"         : "Etalonner",
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
