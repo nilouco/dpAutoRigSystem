@@ -132,7 +132,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
         cmds.parent(self.cvUpperLipLoc, self.cvUpperJawLoc)
     
     
-    def setupJawMove(self, attrCtrl, openCloseID, positiveRotation=True, axis="Y", intAttrID="c049_intensity", invertRot=False, fixValue=0.01, *args):
+    def setupJawMove(self, attrCtrl, openCloseID, positiveRotation=True, axis="Y", intAttrID="c049_intensity", invertRot=False, createOutput=False, fixValue=0.01, *args):
         """ Create the setup for move jaw group when jaw control rotates for open or close adjustements.
             Depends on axis and rotation done.
         """
@@ -144,6 +144,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
         startRotName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
         unitFixAttrName = self.langDic[self.langName][openCloseID].lower()+"UnitFix"+axis
         calibAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+axis
+        calibOutputAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output']
+        outputAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c112_output']
         # utility node names:
         jawCalibrateMDName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_"+self.langDic[self.langName]['c111_calibrate']+"_"+axis+"_MD"
         jawUnitFixMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_"+axis+"_MD"
@@ -151,6 +153,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
         jawStartMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_Start_"+axis+"_MD"
         jawIntPMAName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_Start_"+axis+"_PMA"
         jawIntCndName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_Cnd"
+        jawOutputRmVName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName]['c112_output']+"_RmV"
         
         # create move group and its attributes:
         if not cmds.objExists(drivenGrp):
@@ -166,6 +169,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(attrCtrl, longName=unitFixAttrName, attributeType='float', defaultValue=fixValue)
             else:
                 cmds.addAttr(attrCtrl, longName=unitFixAttrName, attributeType='float', defaultValue=-fixValue)
+            cmds.setAttr(attrCtrl+"."+unitFixAttrName, lock=True)
         if not cmds.objExists(attrCtrl+"."+calibAttrName):
             cmds.addAttr(attrCtrl, longName=calibAttrName, attributeType='float', defaultValue=1)
         if not cmds.objExists(attrCtrl+"."+intAttrName):
@@ -217,6 +221,17 @@ class Head(Base.StartClass, Layout.LayoutClass):
             cmds.connectAttr(invetRotPMA+".output1D", jawIntCnd+".colorIfTrueG", force=True)
             cmds.connectAttr(jawIntCnd+".outColorG", invetRotMD+".input1X", force=True)
             cmds.connectAttr(invetRotMD+".outputX", drivenGrp+".rotateX", force=True)
+            
+        # output to a blendShape target value setup:
+        if createOutput:
+            if not cmds.objExists(self.jawCtrl+"."+outputAttrName):
+                cmds.addAttr(self.jawCtrl, longName=calibOutputAttrName, attributeType='float', defaultValue=1)
+                cmds.addAttr(self.jawCtrl, longName=outputAttrName, attributeType='float', defaultValue=1)
+            jawOutputRmV = cmds.createNode('remapValue', name=jawOutputRmVName)
+            cmds.connectAttr(self.jawCtrl+".rotateX", jawOutputRmV+".inputValue", force=True)
+            cmds.connectAttr(self.jawCtrl+"."+calibOutputAttrName, jawOutputRmV+".inputMax", force=True)
+            cmds.connectAttr(jawOutputRmV+".outValue", self.jawCtrl+"."+outputAttrName, force=True)
+            cmds.setAttr(self.jawCtrl+"."+outputAttrName, lock=True)
     
     
     def rigModule(self, *args):
@@ -532,19 +547,19 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 
                 # setup jaw move:
                 # jaw open:
-                self.setupJawMove(self.jawCtrl, "c108_open", True, "Y", "c049_intensity", *args)
+                self.setupJawMove(self.jawCtrl, "c108_open", True, "Y", "c049_intensity", createOutput=True, *args)
                 self.setupJawMove(self.jawCtrl, "c108_open", True, "Z", "c049_intensity", *args)
                 # jaw close:
-                self.setupJawMove(self.jawCtrl, "c109_close", False, "Y", "c049_intensity", *args)
+                self.setupJawMove(self.jawCtrl, "c109_close", False, "Y", "c049_intensity", createOutput=True, *args)
                 self.setupJawMove(self.jawCtrl, "c109_close", False, "Z", "c049_intensity", *args)
                 # upper lid close:
                 self.setupJawMove(self.upperLipCtrl, "c109_close", False, "Y", "c039_lip", *args)
                 self.setupJawMove(self.upperLipCtrl, "c109_close", False, "Z", "c039_lip", *args)
                 # lower lid close:
-                self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Y", "c039_lip", True, *args) #invert rotateion
+                self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Y", "c039_lip", invertRot=True, *args)
                 self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Z", "c039_lip", *args)
-
-
+                
+                
                 #TO DO:
                 # set jaw move and lips calibrate values:
                 
