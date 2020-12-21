@@ -2,7 +2,7 @@
     "_preset"     : "Cubic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2020-12-08",
+    "_updated"    : "2020-12-20",
 
     "id_000_Base"            : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"         : {"type" : "Cube", "degree" : 1},
@@ -75,6 +75,8 @@
 	"id_068_Symmetry"        : {"type" : "Cube", "degree" : 1},
 	"id_069_HeadUpperJaw"    : {"type" : "Cube", "degree" : 1},
 	"id_070_EyeFkSub"        : {"type" : "Cube", "degree" : 1},
-	"id_071_EyeSpec"         : {"type" : "Cube", "degree" : 1}
+	"id_071_EyeSpec"         : {"type" : "Cube", "degree" : 1},
+	"id_072_HeadUpperLip"    : {"type" : "Cube", "degree" : 1},
+	"id_073_HeadLowerLip"    : {"type" : "Cube", "degree" : 1}
 	
 }

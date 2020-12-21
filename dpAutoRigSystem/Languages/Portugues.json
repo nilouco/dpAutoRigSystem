@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-12-18",
+    "_updated"       : "2020-12-21",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -46,8 +46,8 @@
     "c031_volumeVariation"   : "variacaoVolume",
     "c032_follow"            : "seguir",
     "c033_autoOrient"        : "autoOrientar",
-    "c034_moveIntensity"     : "moverIntensidade",
-    "c035_moveStartRotation" : "moverStartRotation",
+    "c034_move"              : "Mover",
+    "c035_driven"            : "Dirigido",
     "c036_eye"               : "Olho",
     "c037_arm"               : "Braco",
     "c038_foot"              : "Pe",
@@ -119,7 +119,12 @@
 	"c104_expand"            : "expandir",
 	"c105_multiplier"        : "multiplicador",
 	"c106_base"              : "Base",
-	"c107_reduce"            : "Reduce",
+	"c107_reduce"            : "Reduzir",
+	"c108_open"              : "Abrir",
+    "c109_close"             : "Fechar",
+	"c110_start"             : "Iniciar",
+	"c111_calibrate"         : "Calibrar",
+	"c112_output"            : "Saida",
 
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
