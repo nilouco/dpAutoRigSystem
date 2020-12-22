@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.24"
-DPAR_UPDATELOG = "#216 Limb scalable length."
+DPAR_VERSION = "3.10.25"
+DPAR_UPDATELOG = "#218 Limb length volume variation fix."
 
 
 

@@ -34,6 +34,7 @@ class RibbonClass:
         self.limbManualVVAttr = self.langDic[self.langName]['m019_limb'].lower()+"Manual_"+self.langDic[self.langName]['c031_volumeVariation']
         self.limbVVAttr       = self.langDic[self.langName]['m019_limb'].lower()+"_"+self.langDic[self.langName]['c031_volumeVariation']
         self.limbMinVVAttr    = self.langDic[self.langName]['m019_limb'].lower()+"Min_"+self.langDic[self.langName]['c031_volumeVariation']
+        self.limbLengthAttr   = self.langDic[self.langName]['c113_length']
         
         
     def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, *args):
@@ -579,6 +580,7 @@ class RibbonClass:
             # work with volume variation
             rbProportionMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Proportion_MD"))
             rbIntensityMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Intensity_MD"))
+            rbLengthMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Length_MD"))
             rbAddScalePMA = cmds.createNode("plusMinusAverage", name=extraCtrlName.replace("_Ctrl", "_AddScale_PMA"))
             rbScaleClp = cmds.createNode("clamp", name=extraCtrlName.replace("_Ctrl", "_Scale_Clp"))
             rbBlendCB = cmds.createNode("blendColors", name=extraCtrlName.replace("_Ctrl", "_BC"))
@@ -588,7 +590,9 @@ class RibbonClass:
             cmds.setAttr(rbProportionMD+".input2X", proportionList[i])
             cmds.connectAttr(rbProportionMD+".outputX", rbIntensityMD+".input1X", force=True)
             cmds.connectAttr(worldRef+"."+self.limbManualVVAttr, rbIntensityMD+".input2X", force=True)
-            cmds.connectAttr(rbIntensityMD+".outputX", rbAddScalePMA+".input1D[1]", force=True)
+            cmds.connectAttr(worldRef+"."+self.limbLengthAttr, rbLengthMD+".input2X", force=True)
+            cmds.connectAttr(rbIntensityMD+".outputX", rbLengthMD+".input1X", force=True)
+            cmds.connectAttr(rbLengthMD+".outputX", rbAddScalePMA+".input1D[1]", force=True)
             cmds.connectAttr(rbAddScalePMA+".output1D", rbScaleClp+".inputR", force=True)
             cmds.connectAttr(worldRef+"."+self.limbMinVVAttr, rbScaleClp+".minR")
             cmds.setAttr(rbScaleClp+".maxR", 1000000)
@@ -604,6 +608,7 @@ class RibbonClass:
             rbProportionMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Proportion_MD"))
             rbIntensityMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Intensity_MD"))
             rbAddScalePMA = cmds.createNode("plusMinusAverage", name=self.elbowctrlCtrl.replace("_Ctrl", "_AddScale_PMA"))
+            rbLengthMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Length_MD"))
             rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
             rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
             cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
@@ -612,7 +617,9 @@ class RibbonClass:
             cmds.setAttr(rbProportionMD+".input2X", 1)
             cmds.connectAttr(rbProportionMD+".outputX", rbIntensityMD+".input1X", force=True)
             cmds.connectAttr(worldRef+"."+self.limbManualVVAttr, rbIntensityMD+".input2X", force=True)
-            cmds.connectAttr(rbIntensityMD+".outputX", rbAddScalePMA+".input1D[1]", force=True)
+            cmds.connectAttr(worldRef+"."+self.limbLengthAttr, rbLengthMD+".input2X", force=True)
+            cmds.connectAttr(rbIntensityMD+".outputX", rbLengthMD+".input1X", force=True)
+            cmds.connectAttr(rbLengthMD+".outputX", rbAddScalePMA+".input1D[1]", force=True)
             cmds.connectAttr(rbAddScalePMA+".output1D", rbScaleClp+".inputR", force=True)
             cmds.connectAttr(worldRef+"."+self.limbMinVVAttr, rbScaleClp+".minR")
             cmds.setAttr(rbScaleClp+".maxR", 1000000)
