@@ -591,7 +591,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(tempToDelE, tempToDelF, tempToDelF1, tempToDelF2, tempToDelG)
 
                 # creating a group reference to recept the attributes:
-                self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side + self.userGuideName + "_WorldRef", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side + self.userGuideName + "_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 cmds.addAttr(self.worldRef, longName=sideLower + self.userGuideName + '_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 if not cmds.objExists(self.worldRef + '.globalStretch'):
                     cmds.addAttr(self.worldRef, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
@@ -914,8 +914,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 distBetGrp = cmds.group(empty=True, name=side + self.userGuideName + "_DistBet_Grp")
 
                 # creating attributes:
-                cmds.addAttr(self.ikExtremCtrl, longName="stretchable", attributeType='float', minValue=0, defaultValue=1, keyable=True)
-                cmds.addAttr(self.ikExtremCtrl, longName="stretchType", attributeType='enum', enumName="negative:positive:both", defaultValue=1, keyable=False)
+                cmds.addAttr(self.ikExtremCtrl, longName="stretchable", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                cmds.addAttr(self.ikExtremCtrl, longName="startStretch", attributeType='float', defaultValue=1)
+                cmds.addAttr(self.ikExtremCtrl, longName=self.langDic[self.langName]['c113_length'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
 
                 # creating distance betweens, multiplyDivides and reverse nodes:
                 self.distBetweenList = self.ctrls.distanceBet(self.ikJointList[1], self.ikStretchExtremLoc, name=side + self.userGuideName + "_" + kNameList[1] + "_DistBet", keep=True)
@@ -938,53 +939,42 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.stretchRev + '.outputX', self.distBetweenList[5] + "." + self.distBetweenList[4] + "W1", force=True)
 
                 # here we calculate the stretch comparing with the current distance result:
+                self.lenghtStartStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStartStretch_MD")
                 self.stretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_MD")
+                cmds.setAttr(self.stretchMultDiv + '.operation', 2)
                 cmds.connectAttr(self.distBetweenList[1] + '.distance', self.stretchMultDiv + ".input1X", force=True)
-
+                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c113_length'], self.lenghtStartStretchMultDiv + ".input1X", force=True)
+                
+                # calculate stretch value:
                 startStretchValue = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2], keep=False)[0] + self.ctrls.distanceBet(self.ikJointList[2], self.ikStretchExtremLoc, keep=False)[0]
                 startStretchValue = startStretchValue * 0.9999
-                cmds.setAttr(self.stretchMultDiv + '.input2X', startStretchValue)
+                cmds.setAttr(self.ikExtremCtrl + '.startStretch', startStretchValue, lock=True)
+                cmds.connectAttr(self.ikExtremCtrl + '.startStretch', self.lenghtStartStretchMultDiv + '.input2X', force=True)
+                cmds.connectAttr(self.lenghtStartStretchMultDiv + '.outputX', self.stretchMultDiv + '.input2X', force=True)
 
-                cmds.setAttr(self.stretchMultDiv + '.operation', 2)
-
-                # use a condition node to check what value will be send to joints scale:
+                # use a condition node to check what value will be used:
                 self.stretchCond = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_Cnd")
                 cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".firstTerm", force=True)
                 cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".colorIfTrueR", force=True)
-                cmds.setAttr(self.stretchCond + '.secondTerm', 1.0)
-
-                # choosing what type of operation will be used (calculate as a Case):
-                # negative (0) = 4
-                # positive (1) = 2
-                # both     (2) = 1
-                # else     (x) = 2
-                self.stretchCondOp0 = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_StretchOp0_Cnd")
-                self.stretchCondOp1 = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_StretchOp1_Cnd")
-                self.stretchCondOp2 = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_StretchOp2_Cnd")
-                cmds.setAttr(self.stretchCondOp0 + '.colorIfTrueR', 4)
-                cmds.setAttr(self.stretchCondOp1 + '.colorIfTrueR', 2)
-                cmds.setAttr(self.stretchCondOp2 + '.colorIfTrueR', 1)
-                cmds.setAttr(self.stretchCondOp2 + '.colorIfFalseR', 2)
-                cmds.setAttr(self.stretchCondOp1 + '.secondTerm', 1)
-                cmds.setAttr(self.stretchCondOp2 + '.secondTerm', 2)
-                cmds.connectAttr(self.ikExtremCtrl + '.stretchType', self.stretchCondOp0 + '.firstTerm', force=True)
-                cmds.connectAttr(self.ikExtremCtrl + '.stretchType', self.stretchCondOp1 + '.firstTerm', force=True)
-                cmds.connectAttr(self.ikExtremCtrl + '.stretchType', self.stretchCondOp2 + '.firstTerm', force=True)
-                cmds.connectAttr(self.stretchCondOp1 + '.outColorR', self.stretchCondOp0 + '.colorIfFalseR', force=True)
-                cmds.connectAttr(self.stretchCondOp2 + '.outColorR', self.stretchCondOp1 + '.colorIfFalseR', force=True)
-                cmds.connectAttr(self.stretchCondOp0 + ".outColorR", self.stretchCond + '.operation', force=True)
+                cmds.setAttr(self.stretchCond + '.secondTerm', 1)
+                cmds.setAttr(self.stretchCond + '.operation', 2)
+                
+                # use a multiply divide node to conpensate length value that will be send to joints scale:
+                self.lenghtStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStretch_MD")
+                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c113_length'], self.lenghtStretchMultDiv + '.input1X', force=True)
+                cmds.connectAttr(self.stretchCond + '.outColorR', self.lenghtStretchMultDiv + '.input2X', force=True)
                 
                 # connecting stretch output node to skinned and ik joints:
                 maxJntValue = 3 #default for biped
                 if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                     maxJntValue = 4 #because we have 1 more articulation to stretch out
                 for j in range(1, maxJntValue):
-                    cmds.connectAttr(self.stretchCond + '.outColorR', self.skinJointList[j] + '.scaleZ', force=True)
-                    cmds.connectAttr(self.stretchCond + '.outColorR', self.ikJointList[j] + '.scaleZ', force=True)
+                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.skinJointList[j] + '.scaleZ', force=True)
+                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleZ', force=True)
                     # check if we have quadruped spring solver and apply the stretch to all ik spring joint scale axis in order to avoid the Maya issue:
                     if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                        cmds.connectAttr(self.stretchCond + '.outColorR', self.ikJointList[j] + '.scaleX', force=True)
-                        cmds.connectAttr(self.stretchCond + '.outColorR', self.ikJointList[j] + '.scaleY', force=True)
+                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleX', force=True)
+                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleY', force=True)
 
                 # do ikHandle off when before is fk in order to turn off the stretch:
                 cmds.parentConstraint(self.skinJointList[0], self.distBetweenList[4], maintainOffset=True, name=self.distBetweenList[4] + "_PaC")
