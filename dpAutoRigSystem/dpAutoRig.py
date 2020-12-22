@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.10.23"
-DPAR_UPDATELOG = "#031 Lips super closed."
+DPAR_UPDATELOG = "#WIP #216 Limb scalable length... Also maybe working on #062 Stretch vectors...\nReviewed Jaw Move default values naming\nto work well in French and Portuguese."
 
 
 
