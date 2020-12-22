@@ -179,13 +179,12 @@ class ControlClass:
         if cmds.objExists(a) and cmds.objExists(b):
             if keep:
                 # create nulls:
-                nullA = cmds.group(empty=True, name=a+"_DistBetNull")
-                nullB = cmds.group(empty=True, name=b+"_DistBetNull")
-                nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef")
+                nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
+                nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
+                nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
                 cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
                 cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
-                tempToDel = cmds.pointConstraint(b, nullC, maintainOffset=False)
-                cmds.delete(tempToDel)
+                cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
                 pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
                 # create distanceBetween node:
                 distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)

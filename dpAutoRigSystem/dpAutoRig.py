@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.23"
-DPAR_UPDATELOG = "#WIP #216 Limb scalable length... Also maybe working on #062 Stretch vectors...\nReviewed Jaw Move default values naming\nto work well in French and Portuguese."
+DPAR_VERSION = "3.10.24"
+DPAR_UPDATELOG = "#216 Limb scalable length."
 
 
 
@@ -2120,7 +2120,8 @@ class DP_AutoRig_UI:
                                             cmds.connectAttr(ikCtrlList[w]+'.'+limbAttr, ikFkNetworkList[w]+'.footRollAtts['+str(netIndex)+']', force=True)
                                             netIndex = netIndex + 1
 
-                                cmds.setAttr(worldRefShapeList[w]+'.visibility', 0)
+                                cmds.delete(worldRefShapeList[w])
+                                worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
                             
                             # parenting correctly the ikCtrlZero to spineModule:
