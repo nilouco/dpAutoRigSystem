@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.10.25"
-DPAR_UPDATELOG = "#218 Limb length volume variation fix."
+DPAR_UPDATELOG = "WIP - #050 Recreate Sticky Lips."
 
 
 

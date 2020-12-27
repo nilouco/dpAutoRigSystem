@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-12-22",
+    "_updated"       : "2020-12-26",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -397,8 +397,8 @@
     "m058_updateRigInfoDesc"   : "Will update geometry and control lists in the Master_Ctrl.",
     "m059_addHandFollow"       : "Add Hand Follow",
     "m060_addHandFollowDesc"   : "Will add the IK hand follow attribute to a biped setup.",
-    "m061_stickyLips"          : "Sticky Lips",
-    "m062_stickyLipsDesc"      : "Will create a facial stickyLips setup.",
+    "m061_zipper"              : "Zipper",
+    "m062_zipperDesc"          : "Will create a zipper setup, usually used for sticky lips.",
     "m063_eye"                 : "Eye",
     "m064_eyeDesc"             : "Will create eye look at controls and setup, try to integrate head control.\nWe can automaticaly add eyelids, iris and pupil setup.",
     "m065_ikFkSnap"            : "Ik Fk Snap",
