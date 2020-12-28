@@ -128,6 +128,9 @@
 	"c113_length"            : "longueur",
 	"c114_first"             : "Premier",
 	"c115_second"            : "Deuxieme",
+	"c116_crescent"          : "Croissant",
+	"c117_decrescent"        : "Decroissant",
+	"c118_active"            : "activer",
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -341,6 +344,7 @@
 	"i187_load"            : "Charger",
 	"i188_selectEdges"     : "Sélectionner les edges pour créer une courbe de fermeture à glissière à partir du polygone, s'il vous plaît.",
 	"i189_curve"           : "Courbe",
+	"i190_createCurves"    : "Utiliser les boutons pour créer des courbes à partir du polygone avant de générer la configuration de la fermeture à glissière, s'il vous plaît.",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

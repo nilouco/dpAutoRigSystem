@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.1"
+DPZIP_VERSION = "2.2"
 
 
 class Zipper():
@@ -185,16 +185,51 @@ class Zipper():
     def dpCreateCurveBlendSetup(self, *args):
         print "WIP = creating curve blend setup..."
         
+        # declaring names:
+        activeAttr = "zipper"+self.langDic[self.langName]['c118_active'].capitalize()
+        crescentAttr = "zipper"+self.langDic[self.langName]['c116_crescent']
+        decrescentAttr = "zipper"+self.langDic[self.langName]['c117_decrescent']
+        
+        # create zipper control and attributes:
+        self.zipperCtrl = self.ctrls.cvControl('id_074_Zipper', "dpZipper_Ctrl")
+        cmds.addAttr(self.zipperCtrl, longName=activeAttr, attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        cmds.addAttr(self.zipperCtrl, longName=crescentAttr, attributeType='float', minValue=0, defaultValue=0, maxValue=1, keyable=True)
+        cmds.addAttr(self.zipperCtrl, longName=decrescentAttr, attributeType='float', minValue=0, defaultValue=0, maxValue=1, keyable=True)
+        
+        # create blend curves and connect create input from first and second curves:
+        self.firstBlendCurve = cmds.duplicate(self.firstCurve, name=utils.extractSuffix(self.firstCurve)+"_Blend_Crv")[0]
+        self.secondBlendCurve = cmds.duplicate(self.secondCurve, name=utils.extractSuffix(self.secondCurve)+"_Blend_Crv")[0]
+        cmds.connectAttr(self.firstCurve+".worldSpace", self.firstBlendCurve+".create", force=True)
+        cmds.connectAttr(self.secondCurve+".worldSpace", self.secondBlendCurve+".create", force=True)
+        
+        # create curve blendShapes
+        self.firstBS = cmds.blendShape(self.middleCurve, self.firstBlendCurve, topologyCheck=False, name=utils.extractSuffix(self.firstCurve)+"_BS")[0]
+        self.secondBS = cmds.blendShape(self.middleCurve, self.secondBlendCurve, topologyCheck=False, name=utils.extractSuffix(self.secondCurve)+"_BS")[0]
+        cmds.connectAttr(self.zipperCtrl+"."+activeAttr, self.firstBS+"."+self.middleCurve, force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+activeAttr, self.secondBS+"."+self.middleCurve, force=True)
+        
+        
+        
+        # WIP --------------------------
+        
+        
+        # calculate iter counter from middle curve length:
+        cmds.select(self.middleCurve+".cv[*]")
+        curveLength = len(cmds.ls(selection=True, flatten=True))
+        
+        
+        
         # To Do:
-        # ascendent side
-        # descendent side
+        
+        # blend crescent side
+        # blend decrescent side
         # Add two sides
         # Clamp max value to 1 in order to connect it to the blendShape node
         
     
     
     
-    
+        cmds.select(clear=True)
     
     
     
@@ -215,15 +250,17 @@ class Zipper():
             Uses the pre-defined and loaded curves.
         """
         print "wip...."
-        self.dpGetCurveDirection()
-        self.dpSetCurveDirection(self.firstCurve)
-        self.dpSetCurveDirection(self.secondCurve)
-        self.dpGenerateMiddleCurve(self.firstCurve)
-        self.dpCreateCurveBlendSetup()
-        
-        #self.dpSetUsedCurves()
-        
-        
-    
-    
-    
+        if self.firstCurve and self.secondCurve:
+            self.dpGetCurveDirection()
+            self.dpSetCurveDirection(self.firstCurve)
+            self.dpSetCurveDirection(self.secondCurve)
+            self.dpGenerateMiddleCurve(self.firstCurve)
+            self.dpCreateCurveBlendSetup()
+            
+            #self.dpSetUsedCurves()
+        else:
+            mel.eval('warning \"'+self.langDic[self.langName]['i190_createCurves']+'\";')
+
+
+
+

@@ -128,6 +128,9 @@
     "c113_length"            : "length",
 	"c114_first"             : "First",
 	"c115_second"            : "Second",
+	"c116_crescent"          : "Crescent",
+	"c117_decrescent"        : "Decrescent",
+	"c118_active"            : "active",
 	
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",
@@ -341,6 +344,7 @@
 	"i187_load"            : "Load",
 	"i188_selectEdges"     : "Select polygon edges to build zipper curve, please.",
 	"i189_curve"           : "Curve",
+	"i190_createCurves"    : "Use buttons to create curves from polygon before to generate Zipper setup, please.",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
