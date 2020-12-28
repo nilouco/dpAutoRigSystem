@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.0"
+DPZIP_VERSION = "2.1"
 
 
 class Zipper():
@@ -30,8 +30,10 @@ class Zipper():
         self.presetDic = presetDic
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-        self.upperCurve = None
-        self.lowerCurve = None
+        self.firstName = self.langDic[self.langName]['c114_first']
+        self.secondName = self.langDic[self.langName]['c115_second']
+        self.firstCurve = None
+        self.secondCurve = None
         self.middleCurve = None
         self.curveAxis = 0
         self.curveDirection = "X"
@@ -51,13 +53,14 @@ class Zipper():
         # create UI layout and elements:
         zipperLayout = cmds.columnLayout('zipperLayout', adjustableColumn=True, columnOffset=("left", 10))
         cmds.text("Select polygon edges and create curves:", align="left", parent=zipperLayout)
-        zipperLayoutA = cmds.rowColumnLayout('zipperLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 160)], parent=zipperLayout)
-        cmds.button(label="WIP - Upper >>", command=partial(self.dpCreateCurveFromEdge, "c044_upper"), parent=zipperLayoutA)
-        self.upper_TF = cmds.textField('upper_TF', editable=False, parent=zipperLayoutA)
-        cmds.button(label="WIP - Lower >>", command=partial(self.dpCreateCurveFromEdge, "c045_lower"), parent=zipperLayoutA)
-        self.lower_TF = cmds.textField('lower_TF', editable=False, parent=zipperLayoutA)
+        zipperLayoutA = cmds.rowColumnLayout('zipperLayoutA', numberOfColumns=2, columnWidth=[(1, 160), (2, 200)], parent=zipperLayout)
         
-        self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, parent=zipperLayout)
+        self.first_BT = cmds.button('first_BT', label=self.langDic[self.langName]['i187_load']+" "+self.langDic[self.langName]['c114_first']+" "+self.langDic[self.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c114_first"), parent=zipperLayoutA)
+        self.first_TF = cmds.textField('first_TF', editable=False, parent=zipperLayoutA)
+        self.second_BT = cmds.button('second_BT', label=self.langDic[self.langName]['i187_load']+" "+self.langDic[self.langName]['c115_second']+" "+self.langDic[self.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c115_second"), parent=zipperLayoutA)
+        self.second_TF = cmds.textField('second_TF', editable=False, parent=zipperLayoutA)
+        
+        self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, parent=zipperLayout)
         
         cmds.text("WIP - Select a closed edgeLoop and press the run button", parent=zipperLayout)
         cmds.button(label="WIP - RUN - WIP", command=self.dpCreateZipper, backgroundColor=[0.3, 1, 0.7], parent=zipperLayout)
@@ -65,21 +68,25 @@ class Zipper():
         self.dpLoadData()
     
     
-    
-    
-    
-    
-    
     def dpCreateCurveFromEdge(self, zipperId, *args):
-        curveName = "dpZipper_"+self.langDic[self.langName][zipperId]+"_Crv"
+        """ Create curve from selected polygon edges.
+        """
+        self.dpGetCurveDirection()
+        # declaring names:
+        thisName = self.firstName
+        if zipperId == "c115_second":
+            thisName = self.secondName
+        curveName = "dpZipper_"+thisName+"_Crv"
+        pecName = "dpZipper_"+thisName+"_PEC"
+        # get selected edges:
         edgeList = cmds.ls(selection=True, flatten=True)
         if not edgeList == None and not edgeList == [] and not edgeList == "":
-            # clear old curve:
+            # delete old curve:
             self.dpDeleteOldCurve(zipperId)
             # create curve:
             baseCurve = cmds.polyToCurve(name=curveName, form=2, degree=3, conformToSmoothMeshPreview=0)[0]
             # rename polyEdgeToCurve node:
-            cmds.rename(cmds.listConnections(baseCurve+".create")[0], "dpZipper_"+self.langDic[self.langName][zipperId]+"_PEC")
+            cmds.rename(cmds.listConnections(baseCurve+".create")[0], pecName)
             # add attributes:
             cmds.addAttr(baseCurve, longName=ZIPPER_ATTR, attributeType='bool')
             cmds.addAttr(baseCurve, longName=ZIPPER_ID, dataType='string')
@@ -88,11 +95,12 @@ class Zipper():
             # load curve data:
             self.dpLoadData(baseCurve)
         else:
-            print "WIP - Select edges to build zipper curves from polygon, please.",
+            mel.eval('warning \"'+self.langDic[self.langName]['i188_selectEdges']+'\";')
     
     
     def dpDeleteOldCurve(self, zipperId, *args):
-        print "WIP --- clearing oldCurves"
+        """ Check if exist the same old curve to delete it.
+        """
         transformList = cmds.ls(selection=False, type="transform")
         if transformList:
             for node in transformList:
@@ -103,13 +111,15 @@ class Zipper():
     
     
     def dpLoadData(self, curveName=None, *args):
-        print "WIP --- loading data",
+        """ Load curve info from given curve name or try to find any zipper curve existing in the scene.
+            Updates de UI after finding curves.
+        """
         if curveName:
             zipperId = cmds.getAttr(curveName+"."+ZIPPER_ID)
             self.dpUpdateUI(curveName, zipperId)
         else:
-            cmds.textField(self.upper_TF, edit=True, text="")
-            cmds.textField(self.lower_TF, edit=True, text="")
+            cmds.textField(self.first_TF, edit=True, text="")
+            cmds.textField(self.second_TF, edit=True, text="")
             transformList = cmds.ls(selection=False, type="transform")
             if transformList:
                 for node in transformList:
@@ -120,17 +130,23 @@ class Zipper():
     
     
     def dpUpdateUI(self, curveName, zipperId, *args):
-        print "WIP --- updating UI"
-        if zipperId == "c044_upper":
-            cmds.textField(self.upper_TF, edit=True, text=curveName)
-            self.upperCurve = curveName
-        elif zipperId == "c045_lower":
-            cmds.textField(self.lower_TF, edit=True, text=curveName)
-            self.lowerCurve = curveName
-        
-        
+        """ Updates zipper UI with the given curve name and refresh the button, text field and curve variable.
+        """        
+        if zipperId == "c114_first":
+            cmds.textField(self.first_TF, edit=True, text=curveName)
+            cmds.button(self.first_BT, edit=True, label=self.firstName+" "+self.langDic[self.langName]['i189_curve'])
+            self.firstCurve = curveName
+        elif zipperId == "c115_second":
+            cmds.textField(self.second_TF, edit=True, text=curveName)
+            cmds.button(self.second_BT, edit=True, label=self.secondName+" "+self.langDic[self.langName]['i189_curve'])
+            self.secondCurve = curveName
+    
+    
     def dpGetCurveDirection(self, *args):
-        print "wip, change curveDirection",
+        """ Read radioButtonGrp selected item from UI.
+            Set curveAxis variable to be used in the curve reverse setup if needed to set up curve direction.
+            Update curveDirection variable value to be "X", "Y" or "Z".
+        """
         selectedItem = cmds.radioButtonGrp(self.curveDirectionRB, query=True, select=True)
         self.curveAxis = selectedItem-1
         if selectedItem == 1:
@@ -139,11 +155,12 @@ class Zipper():
             self.curveDirection = "Y"
         elif selectedItem == 3:
             self.curveDirection = "Z"
-        print "self.curveDirection =", self.curveDirection
-        return self.curveDirection
-
     
-    def dpCheckCurveDirection(self, curveName, *args):
+    
+    def dpSetCurveDirection(self, curveName, *args):
+        """ Check and set the curve direction.
+            Reverse curve direction if the first CV position is greather than last CV position by current axis.
+        """
         cmds.select(curveName+".cv[*]")
         curveLength = len(cmds.ls(selection=True, flatten=True))
         cmds.select(clear=True)
@@ -155,32 +172,58 @@ class Zipper():
     
     
     def dpGenerateMiddleCurve(self, origCurve, *args):
-        print "WIP - generating middle curve"
+        """ Create a middle curve using an avgCurves node.
+        """
         self.middleCurve = cmds.duplicate(origCurve, name="dpZipper_"+self.langDic[self.langName]['c029_middle']+"_Crv")[0]
         averageCurveNode = cmds.createNode('avgCurves', name="dpZipper_"+self.langDic[self.langName]['c029_middle']+"_AvgC")
         cmds.setAttr(averageCurveNode+".automaticWeight", 0)
-        cmds.connectAttr(self.upperCurve+".worldSpace", averageCurveNode+".inputCurve1", force=True)
-        cmds.connectAttr(self.lowerCurve+".worldSpace", averageCurveNode+".inputCurve2", force=True)
+        cmds.connectAttr(self.firstCurve+".worldSpace", averageCurveNode+".inputCurve1", force=True)
+        cmds.connectAttr(self.secondCurve+".worldSpace", averageCurveNode+".inputCurve2", force=True)
         cmds.connectAttr(averageCurveNode+".outputCurve", self.middleCurve+".create", force=True)
     
     
+    def dpCreateCurveBlendSetup(self, *args):
+        print "WIP = creating curve blend setup..."
+        
+        # To Do:
+        # ascendent side
+        # descendent side
+        # Add two sides
+        # Clamp max value to 1 in order to connect it to the blendShape node
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     def dpSetUsedCurves(self, *args):
-        cmds.setAttr(self.upperCurve+"."+ZIPPER_ATTR, 0)
-        cmds.setAttr(self.lowerCurve+"."+ZIPPER_ATTR, 0)
+        """ Set zipper attribute to off in order to desactivate finding this zipper curve by UI.
+        """
+        cmds.setAttr(self.firstCurve+"."+ZIPPER_ATTR, 0)
+        cmds.setAttr(self.secondCurve+"."+ZIPPER_ATTR, 0)
         self.dpLoadData()
         
     
     def dpCreateZipper(self, *args):
+        """ Main method to buid the all zipper setup.
+            Uses the pre-defined and loaded curves.
+        """
         print "wip...."
         self.dpGetCurveDirection()
-        self.dpCheckCurveDirection(self.upperCurve)
-        self.dpCheckCurveDirection(self.lowerCurve)
-        self.dpGenerateMiddleCurve(self.upperCurve)
+        self.dpSetCurveDirection(self.firstCurve)
+        self.dpSetCurveDirection(self.secondCurve)
+        self.dpGenerateMiddleCurve(self.firstCurve)
+        self.dpCreateCurveBlendSetup()
+        
         #self.dpSetUsedCurves()
         
         
-    
-    
     
     
     
