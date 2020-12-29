@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.4"
+DPZIP_VERSION = "2.5"
 
 
 class Zipper():
@@ -260,7 +260,7 @@ class Zipper():
         halfCurveLength = curveLength * 0.5
         # calculate distance position based 1.0 from our control attribute:
         distPos = 1.0 / curveLength
-        for curve in [self.firstCurve, self.secondCurve]:
+        for c, curve in enumerate([self.firstCurve, self.secondCurve]):
             baseName = utils.extractSuffix(curve)
             for i in range(0, curveLength):
                 lPosA = (i * distPos)
@@ -308,32 +308,29 @@ class Zipper():
                 zipperClp = cmds.createNode("clamp", name=baseName+"_"+str(i)+"_Clp")
                 cmds.setAttr(zipperClp+".maxR", 1)
                 cmds.connectAttr(zipperPMA+".output1D", zipperClp+".inputR", force=True)
+                # output clamp value to blendShape node target weights:
+                if c == 0:
+                    cmds.connectAttr(zipperClp+".outputR", self.firstBS+".inputTarget[0].inputTargetGroup[0].targetWeights["+str(i)+"]")
+                    cmds.connectAttr(zipperClp+".outputR", self.secondBS+".inputTarget[0].inputTargetGroup[0].targetWeights["+str(i)+"]")
+                
                 
                 
                 
                 # WIP ----------------
                 
+                # test
+                #cube = cmds.polyCube()[0]
+                #cmds.setAttr(cube+".tz", i)
+                #cmds.connectAttr(zipperClp+".outputR", cube+".tx", force=True)
+                #if curve == self.firstCurve:
+                #    cmds.setAttr(cube+".ty", 1.5)
+    
                 # TO DO:
                 #
-                # output clamp value to blendShape node target weights:
-                
-#                cmds.connectAttr(zipperClp+".outputR", )
-                
-                
-                
-                
-                # test
-                cube = cmds.polyCube()[0]
-                cmds.setAttr(cube+".tz", i)
-                cmds.connectAttr(zipperClp+".outputR", cube+".tx", force=True)
-                if curve == self.firstCurve:
-                    cmds.setAttr(cube+".ty", 1.5)
-
-                
-        
-        
-    
-    
+                # Work with deformation
+                # wireDeformer
+                # joints
+                # etc
     
         cmds.select(clear=True)
     
