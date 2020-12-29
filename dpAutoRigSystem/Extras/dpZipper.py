@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.2"
+DPZIP_VERSION = "2.3"
 
 
 class Zipper():
@@ -62,7 +62,7 @@ class Zipper():
         
         self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, parent=zipperLayout)
         
-        cmds.text("WIP - Select a closed edgeLoop and press the run button", parent=zipperLayout)
+        cmds.text("WIP - text", parent=zipperLayout)
         cmds.button(label="WIP - RUN - WIP", command=self.dpCreateZipper, backgroundColor=[0.3, 1, 0.7], parent=zipperLayout)
         # check if exists zipper curves and load them:
         self.dpLoadData()
@@ -76,8 +76,8 @@ class Zipper():
         thisName = self.firstName
         if zipperId == "c115_second":
             thisName = self.secondName
-        curveName = "dpZipper_"+thisName+"_Crv"
-        pecName = "dpZipper_"+thisName+"_PEC"
+        curveName = "Zipper_"+thisName+"_Crv"
+        pecName = "Zipper_"+thisName+"_PEC"
         # get selected edges:
         edgeList = cmds.ls(selection=True, flatten=True)
         if not edgeList == None and not edgeList == [] and not edgeList == "":
@@ -174,8 +174,8 @@ class Zipper():
     def dpGenerateMiddleCurve(self, origCurve, *args):
         """ Create a middle curve using an avgCurves node.
         """
-        self.middleCurve = cmds.duplicate(origCurve, name="dpZipper_"+self.langDic[self.langName]['c029_middle']+"_Crv")[0]
-        averageCurveNode = cmds.createNode('avgCurves', name="dpZipper_"+self.langDic[self.langName]['c029_middle']+"_AvgC")
+        self.middleCurve = cmds.duplicate(origCurve, name="Zipper_"+self.langDic[self.langName]['c029_middle']+"_Crv")[0]
+        averageCurveNode = cmds.createNode('avgCurves', name="Zipper_"+self.langDic[self.langName]['c029_middle']+"_AvgC")
         cmds.setAttr(averageCurveNode+".automaticWeight", 0)
         cmds.connectAttr(self.firstCurve+".worldSpace", averageCurveNode+".inputCurve1", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace", averageCurveNode+".inputCurve2", force=True)
@@ -187,14 +187,21 @@ class Zipper():
         
         # declaring names:
         activeAttr = "zipper"+self.langDic[self.langName]['c118_active'].capitalize()
-        crescentAttr = "zipper"+self.langDic[self.langName]['c116_crescent']
-        decrescentAttr = "zipper"+self.langDic[self.langName]['c117_decrescent']
+        crescentAttr = self.langDic[self.langName]['c116_crescent']
+        decrescentAttr = self.langDic[self.langName]['c117_decrescent']
+        autoAttr = self.langDic[self.langName]['c119_auto']
+        autoIntensityAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c049_intensity'].capitalize()
+        autoCalibrateAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']
         
         # create zipper control and attributes:
-        self.zipperCtrl = self.ctrls.cvControl('id_074_Zipper', "dpZipper_Ctrl")
+        self.zipperCtrl = self.ctrls.cvControl('id_074_Zipper', "Zipper_Ctrl")
         cmds.addAttr(self.zipperCtrl, longName=activeAttr, attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
         cmds.addAttr(self.zipperCtrl, longName=crescentAttr, attributeType='float', minValue=0, defaultValue=0, maxValue=1, keyable=True)
         cmds.addAttr(self.zipperCtrl, longName=decrescentAttr, attributeType='float', minValue=0, defaultValue=0, maxValue=1, keyable=True)
+        cmds.addAttr(self.zipperCtrl, longName=autoAttr, attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        cmds.addAttr(self.zipperCtrl, longName=autoIntensityAttr, attributeType='float', defaultValue=1, keyable=True)
+        cmds.addAttr(self.zipperCtrl, longName=autoCalibrateAttr, attributeType='float', defaultValue=1)
+        cmds.addAttr(self.zipperCtrl, longName="distance", attributeType='float', defaultValue=0)
         
         # create blend curves and connect create input from first and second curves:
         self.firstBlendCurve = cmds.duplicate(self.firstCurve, name=utils.extractSuffix(self.firstCurve)+"_Blend_Crv")[0]
@@ -212,19 +219,100 @@ class Zipper():
         
         # WIP --------------------------
         
+        # distance dimension to calculate automatic setup:
+        distDimShape = cmds.distanceDimension(startPoint=(0, 0, 0), endPoint=(1, 1, 1))
+        distDimTransform = cmds.listRelatives(distDimShape, parent=True, type="transform")[0]
+        distDimTransform = cmds.rename(distDimTransform, "Zipper_"+autoAttr.capitalize()+"_DD")
+        distDimShape = distDimTransform+"Shape"
+        firstLoc = cmds.listConnections(distDimShape+".startPoint", source=True, destination=False)[0]
+        firstLoc = cmds.rename(firstLoc, "Zipper_"+autoAttr.capitalize()+"_"+self.firstName+"_Loc")
+        secondLoc = cmds.listConnections(distDimShape+".endPoint", source=True, destination=False)[0]
+        secondLoc = cmds.rename(secondLoc, "Zipper_"+autoAttr.capitalize()+"_"+self.secondName+"_Loc")
+        # attach locators to original curves:
+        firstMoP = cmds.pathAnimation(firstLoc, curve=self.firstCurve, fractionMode=True, name="Zipper_"+autoAttr.capitalize()+"_"+self.firstName+"_MoP")
+        secondMoP = cmds.pathAnimation(secondLoc, curve=self.secondCurve, fractionMode=True, name="Zipper_"+autoAttr.capitalize()+"_"+self.secondName+"_MoP")
+        cmds.delete(cmds.listConnections(firstMoP+".u", source=True, destination=False)[0])
+        cmds.delete(cmds.listConnections(secondMoP+".u", source=True, destination=False)[0])
+        cmds.setAttr(firstMoP+".u", 0.5)
+        cmds.setAttr(secondMoP+".u", 0.5)
+        cmds.connectAttr(distDimShape+".distance", self.zipperCtrl+".distance", force=True)
+        cmds.setAttr(self.zipperCtrl+".distance", lock=True)
+        
+        
+        
+        
+        
+        # automatic intensity and calibration:
+        autoMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_MD")
+        cmds.connectAttr(self.zipperCtrl+"."+autoIntensityAttr, autoMD+".input1X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateAttr, autoMD+".input2X", force=True)
+        
+        #cmds.connectAttr(autoMD+".outputX", ###, force=True)
+        
+        
+        
         
         # calculate iter counter from middle curve length:
         cmds.select(self.middleCurve+".cv[*]")
         curveLength = len(cmds.ls(selection=True, flatten=True))
-        
-        
-        
+        # calculate distance position based 1.0 from our control attribute:
+        distPos = 1.0 / curveLength
+        for curve in [self.firstCurve, self.secondCurve]:
+            baseName = utils.extractSuffix(curve)
+            for i in range(0, curveLength):
+                lPosA = (i * distPos)
+                lPosB = (lPosA + distPos)
+                rPosB = 1 - (i * distPos)
+                rPosA = (rPosB - distPos)
+                if i > 0:
+                    lPosA = lPosA - (distPos*0.5)
+                    rPosA = rPosA - (distPos*0.5)
+                if lPosA < 0:
+                    lPosA = 0
+                if rPosA < 0:
+                    rPosA = 0
+                # create setRange nodes:
+                crescentSR = cmds.createNode("setRange", name=baseName+"_"+crescentAttr+"_"+str(i)+'_SR')
+                decrescentSR = cmds.createNode("setRange", name=baseName+"_"+decrescentAttr+"_"+str(i)+'_SR')
+                # set values for serRange nodes:
+                cmds.setAttr(crescentSR+".oldMinX", lPosA)
+                cmds.setAttr(crescentSR+".oldMaxX", lPosB)
+                cmds.setAttr(crescentSR+".minX", 0)
+                cmds.setAttr(crescentSR+".maxX", 1)
+                cmds.setAttr(decrescentSR+".oldMinX", rPosA)
+                cmds.setAttr(decrescentSR+".oldMaxX", rPosB)
+                cmds.setAttr(decrescentSR+".minX", 0)
+                cmds.setAttr(decrescentSR+".maxX", 1)
+                # connect attributes from control to setRange:
+                cmds.connectAttr(self.zipperCtrl+"."+crescentAttr, crescentSR+".valueX", force=True)
+                cmds.connectAttr(self.zipperCtrl+"."+decrescentAttr, decrescentSR+".valueX", force=True)
+                # add values for two sides:
+                zipperPMA = cmds.createNode("plusMinusAverage", name=baseName+"_"+str(i)+"_PMA")
+                cmds.connectAttr(crescentSR+".outValueX", zipperPMA+".input1D[0]", force=True)
+                cmds.connectAttr(decrescentSR+".outValueX", zipperPMA+".input1D[1]", force=True)
+                # clamp max value to 1 in order to connect it to the blend setup
+                zipperClp = cmds.createNode("clamp", name=baseName+"_"+str(i)+"_Clp")
+                cmds.setAttr(zipperClp+".maxR", 1)
+                cmds.connectAttr(zipperPMA+".output1D", zipperClp+".inputR", force=True)
+                
+#                cmds.connectAttr(zipperClp+".outputR", )
+                
+                
+                
+                
+                # test
+                cube = cmds.polyCube()[0]
+                cmds.setAttr(cube+".tz", i)
+                cmds.connectAttr(zipperClp+".outputR", cube+".tx", force=True)
+                if curve == self.firstCurve:
+                    cmds.setAttr(cube+".ty", 1.5)
+
+                
         # To Do:
         
         # blend crescent side
         # blend decrescent side
-        # Add two sides
-        # Clamp max value to 1 in order to connect it to the blendShape node
+        
         
     
     
