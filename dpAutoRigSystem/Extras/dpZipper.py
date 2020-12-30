@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.6"
+DPZIP_VERSION = "2.7"
 
 
 class Zipper():
@@ -66,6 +66,9 @@ class Zipper():
         self.second_TF = cmds.textField('second_TF', editable=False, parent=zipperLayoutA)
         
         self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, parent=zipperLayout)
+        
+        self.deformTypeRB = cmds.radioButtonGrp('deformTypeRB', label=self.langDic[self.langName]['i192_deformation'], labelArray2=['Wire Deformer', 'Joint Skinning'], numberOfRadioButtons=2, select=1, changeCommand=self.dpChangeDeformType, vertical=True, parent=zipperLayout)
+        self.deformMethodRB = cmds.radioButtonGrp('deformMethodRB', label=self.langDic[self.langName]['i192_deformation']+" METHOD", labelArray2=['Before', 'After'], numberOfRadioButtons=2, select=2, changeCommand=self.dpChangeDeformMethod, vertical=True, parent=zipperLayout)
         
         cmds.text("WIP - text", parent=zipperLayout)
         cmds.button(label="WIP - RUN - WIP", command=self.dpCreateZipper, backgroundColor=[0.3, 1, 0.7], parent=zipperLayout)
@@ -175,6 +178,23 @@ class Zipper():
             self.curveDirection = "Z"
     
     
+    def dpChangeDeformType(self, *args):
+        """
+        """
+        print "wip --- changing deformation type"
+        
+        
+        
+        
+        
+    def dpChangeDeformMethod(self, *args):
+        """
+        """
+        print "wip --- changing deformation method"
+        
+        
+    
+    
     def dpSetCurveDirection(self, curveName, *args):
         """ Check and set the curve direction.
             Reverse curve direction if the first CV position is greather than last CV position by current axis.
@@ -205,7 +225,6 @@ class Zipper():
             Zipper_Ctrl has attributes to control automatic or manual blend.
             This method calculate the setRange values and clamp them to target weights of the curve blendShapes.
         """
-        
         # declaring names:
         activeAttr = "zipper"+self.langDic[self.langName]['c118_active'].capitalize()
         crescentAttr = self.langDic[self.langName]['c116_crescent']
@@ -214,6 +233,8 @@ class Zipper():
         autoIntensityAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c049_intensity'].capitalize()
         autoCalibrateMinAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']+"Min"
         autoCalibrateMaxAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']+"Max"
+        distanceAttr = "distance"
+        rigScaleAttr = "rigScale"
         
         # create zipper control and attributes:
         self.zipperCtrl = self.ctrls.cvControl('id_074_Zipper', "Zipper_Ctrl")
@@ -224,7 +245,22 @@ class Zipper():
         cmds.addAttr(self.zipperCtrl, longName=autoIntensityAttr, attributeType='float', defaultValue=1, keyable=True)
         cmds.addAttr(self.zipperCtrl, longName=autoCalibrateMinAttr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipperCtrl, longName=autoCalibrateMaxAttr, attributeType='float', defaultValue=1)
-        cmds.addAttr(self.zipperCtrl, longName="distance", attributeType='float', defaultValue=0)
+        cmds.addAttr(self.zipperCtrl, longName=distanceAttr, attributeType='float', defaultValue=0)
+        cmds.addAttr(self.zipperCtrl, longName=rigScaleAttr, attributeType='float', defaultValue=1)
+        
+        # prepare to Rig scale:
+        self.rigScaleMD = cmds.createNode("multiplyDivide", name="Zipper_RigScale_MD")
+        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, self.rigScaleMD+".input1Y", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, self.rigScaleMD+".input1Z", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, self.rigScaleMD+".input2X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, self.rigScaleMD+".input2Y", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, self.rigScaleMD+".input2Z", force=True)
+        # check if there's a dpAR Option_Ctrl:
+        optionCtrl = utils.getGroupByMessage("optionCtrl")
+        if optionCtrl:
+            optCtrlRigScaleNode = cmds.listConnections(optionCtrl+"."+rigScaleAttr, source=False, destination=True)[0]
+            cmds.connectAttr(optCtrlRigScaleNode+".outputX", self.zipperCtrl+"."+rigScaleAttr, force=True)
+            cmds.setAttr(self.zipperCtrl+"."+rigScaleAttr, lock=True)
         
         # create blend curves and connect create input from first and second curves:
         self.firstBlendCurve = cmds.duplicate(self.firstCurve, name=utils.extractSuffix(self.firstCurve)+"_Blend_Crv")[0]
@@ -254,25 +290,29 @@ class Zipper():
         cmds.delete(cmds.listConnections(secondMoP+".u", source=True, destination=False)[0])
         cmds.setAttr(firstMoP+".u", 0.5)
         cmds.setAttr(secondMoP+".u", 0.5)
-        cmds.connectAttr(distDimShape+".distance", self.zipperCtrl+".distance", force=True)
-        cmds.setAttr(self.zipperCtrl+".distance", lock=True)
+        cmds.connectAttr(distDimShape+"."+distanceAttr, self.rigScaleMD+".input1X", force=True)
+        cmds.connectAttr(self.rigScaleMD+".outputX", self.zipperCtrl+"."+distanceAttr, force=True)
+        cmds.setAttr(self.zipperCtrl+"."+distanceAttr, lock=True)
         
         # automatic intensity and calibration:
         autoOnOffMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_OnOff_MD")
+        autoScaleMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_Scale_MD")
         autoMaxCalibrateMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_MD")
         autoMainSR = cmds.createNode("setRange", name="Zipper_"+autoAttr.capitalize()+"_SR")
-        cmds.connectAttr(self.zipperCtrl+"."+autoAttr, autoOnOffMD+".input1X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+autoAttr, autoScaleMD+".input1X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, autoScaleMD+".input2X", force=True)
+        cmds.connectAttr(autoScaleMD+".outputX", autoOnOffMD+".input1X", force=True)
         cmds.connectAttr(autoMainSR+".outValueX", autoOnOffMD+".input2X", force=True)
         cmds.connectAttr(self.zipperCtrl+"."+autoIntensityAttr, autoMaxCalibrateMD+".input1X", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, autoMaxCalibrateMD+".input2X", force=True)
+        cmds.connectAttr(self.rigScaleMD+".outputZ", autoMaxCalibrateMD+".input2X", force=True)
         
         # auto distance:
-        initialDistance = cmds.getAttr(distDimShape+".distance")
+        initialDistance = cmds.getAttr(distDimShape+"."+distanceAttr)
         cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, initialDistance)
         cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, initialDistance+1)
         cmds.setAttr(autoMainSR+".minX", 1)
-        cmds.connectAttr(distDimShape+".distance", autoMainSR+".valueX", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, autoMainSR+".oldMinX", force=True)
+        cmds.connectAttr(self.rigScaleMD+".outputX", autoMainSR+".valueX", force=True)
+        cmds.connectAttr(self.rigScaleMD+".outputY", autoMainSR+".oldMinX", force=True)
         cmds.connectAttr(autoMaxCalibrateMD+".outputX", autoMainSR+".oldMaxX", force=True)
         
         # calculate iter counter from middle curve length:
@@ -364,13 +404,24 @@ class Zipper():
                 cmds.parent(self.deformMesh, renderGrp)
     
     
+    def dpCreateWireDeform(self, *args):
+        """ Create two wire deformer for first and second curves.
+        """
+        firstWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=utils.extractSuffix(self.deformMesh)+"_First_Wire")[0]
+        secondWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=utils.extractSuffix(self.deformMesh)+"_Second_Wire")[0]
+        cmds.connectAttr(self.firstCurve+".worldSpace[0]", firstWireDef+".baseWire[0]", force=True)
+        cmds.connectAttr(self.secondCurve+".worldSpace[0]", secondWireDef+".baseWire[1]", force=True)
+        cmds.connectAttr(self.firstBlendCurve+".worldSpace[0]", firstWireDef+".deformedWire[0]", force=True)
+        cmds.connectAttr(self.secondBlendCurve+".worldSpace[0]", secondWireDef+".deformedWire[1]", force=True)
+    
+    
     def dpSetUsedCurves(self, *args):
         """ Set zipper attribute to off in order to desactivate finding this zipper curve by UI.
         """
         cmds.setAttr(self.firstCurve+"."+ZIPPER_ATTR, 0)
         cmds.setAttr(self.secondCurve+"."+ZIPPER_ATTR, 0)
         self.dpLoadData()
-        
+    
     
     def dpCreateZipper(self, *args):
         """ Main method to buid the all zipper setup.
@@ -387,6 +438,11 @@ class Zipper():
                 self.dpCreateCurveBlendSetup()
                 self.dpCreateDeformMesh()
                 
+                # WIP -----------------
+                
+                self.dpCreateWireDeform()
+                
+                
                 #self.dpSetUsedCurves()
                 
             else:
@@ -398,7 +454,7 @@ class Zipper():
 
 # TO DO:
         #
-        # RigScale compensate
+        # RigScale compensate (WIP)
         # group all and parent to dpAR
         # clear and organize UI
         # set good button colors

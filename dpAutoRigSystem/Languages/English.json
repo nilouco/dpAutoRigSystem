@@ -347,6 +347,7 @@
 	"i189_curve"           : "Curve",
 	"i190_createCurves"    : "Use buttons to create curves from polygon before to generate Zipper setup, please.",
 	"i191_selectPoly"      : "Select a polygon geometry to load, please.",
+	"i192_deformation"     : "Deformation",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

@@ -347,6 +347,7 @@
 	"i189_curve"           : "Curva",
 	"i190_createCurves"    : "Use os butões para criar as curvas do polígono antes de gerar o setup de Zipper, por favor.",
 	"i191_selectPoly"      : "Selecione uma geometria de polígonos para carregar, por favor.",
+	"i192_deformation"     : "Deformação",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
