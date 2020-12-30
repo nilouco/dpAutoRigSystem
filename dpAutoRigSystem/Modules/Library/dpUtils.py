@@ -731,6 +731,25 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1
             return jointList
 
 
+def getGroupByMessage(grpAttrName, *args):
+    """ Get connected node by All_Grp message attribute.
+        Return the found node name or False if it not found.
+    """
+    result = False
+    allTransformList = cmds.ls(selection=False, type="transform")
+    if allTransformList:
+        for transform in allTransformList:
+            if cmds.objExists(transform+".masterGrp"):
+                # found All_Grp
+                if cmds.objExists(transform+"."+grpAttrName):
+                    foundNodeList = cmds.listConnections(transform+"."+grpAttrName, source=True, destination=False)
+                    if foundNodeList:
+                        result = foundNodeList[0]
+                        break
+    return result
+
+
+
 #Profiler decorator
 DPAR_PROFILE_MODE = False
 def profiler(func):
