@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.7"
+DPZIP_VERSION = "2.8"
 
 
 class Zipper():
@@ -233,6 +233,7 @@ class Zipper():
         autoIntensityAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c049_intensity'].capitalize()
         autoCalibrateMinAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']+"Min"
         autoCalibrateMaxAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']+"Max"
+        initialDistanceAttr = "initialDistance"
         distanceAttr = "distance"
         rigScaleAttr = "rigScale"
         
@@ -245,16 +246,10 @@ class Zipper():
         cmds.addAttr(self.zipperCtrl, longName=autoIntensityAttr, attributeType='float', defaultValue=1, keyable=True)
         cmds.addAttr(self.zipperCtrl, longName=autoCalibrateMinAttr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipperCtrl, longName=autoCalibrateMaxAttr, attributeType='float', defaultValue=1)
+        cmds.addAttr(self.zipperCtrl, longName=initialDistanceAttr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipperCtrl, longName=distanceAttr, attributeType='float', defaultValue=0)
         cmds.addAttr(self.zipperCtrl, longName=rigScaleAttr, attributeType='float', defaultValue=1)
         
-        # prepare to Rig scale:
-        self.rigScaleMD = cmds.createNode("multiplyDivide", name="Zipper_RigScale_MD")
-        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, self.rigScaleMD+".input1Y", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, self.rigScaleMD+".input1Z", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, self.rigScaleMD+".input2X", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, self.rigScaleMD+".input2Y", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, self.rigScaleMD+".input2Z", force=True)
         # check if there's a dpAR Option_Ctrl:
         optionCtrl = utils.getGroupByMessage("optionCtrl")
         if optionCtrl:
@@ -290,30 +285,38 @@ class Zipper():
         cmds.delete(cmds.listConnections(secondMoP+".u", source=True, destination=False)[0])
         cmds.setAttr(firstMoP+".u", 0.5)
         cmds.setAttr(secondMoP+".u", 0.5)
-        cmds.connectAttr(distDimShape+"."+distanceAttr, self.rigScaleMD+".input1X", force=True)
-        cmds.connectAttr(self.rigScaleMD+".outputX", self.zipperCtrl+"."+distanceAttr, force=True)
+        cmds.connectAttr(distDimShape+"."+distanceAttr, self.zipperCtrl+"."+distanceAttr, force=True)
         cmds.setAttr(self.zipperCtrl+"."+distanceAttr, lock=True)
         
         # automatic intensity and calibration:
         autoOnOffMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_OnOff_MD")
-        autoScaleMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_Scale_MD")
         autoMaxCalibrateMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_MD")
+        rigScaleMD = cmds.createNode("multiplyDivide", name="Zipper_RigScale_MD")
+        rigScaleAutoMD = cmds.createNode("multiplyDivide", name="Zipper_RigScale_Auto_MD")
+        hyperboleScaleMD = cmds.createNode("multiplyDivide", name="Zipper_HyperboleScale_MD")
         autoMainSR = cmds.createNode("setRange", name="Zipper_"+autoAttr.capitalize()+"_SR")
-        cmds.connectAttr(self.zipperCtrl+"."+autoAttr, autoScaleMD+".input1X", force=True)
-        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, autoScaleMD+".input2X", force=True)
-        cmds.connectAttr(autoScaleMD+".outputX", autoOnOffMD+".input1X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+autoAttr, autoOnOffMD+".input1X", force=True)
         cmds.connectAttr(autoMainSR+".outValueX", autoOnOffMD+".input2X", force=True)
         cmds.connectAttr(self.zipperCtrl+"."+autoIntensityAttr, autoMaxCalibrateMD+".input1X", force=True)
-        cmds.connectAttr(self.rigScaleMD+".outputZ", autoMaxCalibrateMD+".input2X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, autoMaxCalibrateMD+".input2X", force=True)
         
         # auto distance:
         initialDistance = cmds.getAttr(distDimShape+"."+distanceAttr)
+        cmds.setAttr(self.zipperCtrl+"."+initialDistanceAttr, initialDistance, lock=True)
         cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, initialDistance)
-        cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, initialDistance+1)
+        cmds.setAttr(self.zipperCtrl+"."+autoCalibrateMaxAttr, initialDistance*20) #magic number, need to be calibrated
         cmds.setAttr(autoMainSR+".minX", 1)
-        cmds.connectAttr(self.rigScaleMD+".outputX", autoMainSR+".valueX", force=True)
-        cmds.connectAttr(self.rigScaleMD+".outputY", autoMainSR+".oldMinX", force=True)
+        cmds.setAttr(hyperboleScaleMD+".input1X", 1)
+        cmds.setAttr(hyperboleScaleMD+".operation", 2) #divide
+        cmds.connectAttr(self.zipperCtrl+"."+autoCalibrateMinAttr, autoMainSR+".oldMinX", force=True)
         cmds.connectAttr(autoMaxCalibrateMD+".outputX", autoMainSR+".oldMaxX", force=True)
+        # rig scale setup to work with automatic distance:
+        cmds.connectAttr(self.zipperCtrl+"."+initialDistanceAttr, rigScaleMD+".input1X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+rigScaleAttr, rigScaleMD+".input2X", force=True)
+        cmds.connectAttr(rigScaleMD+".outputX", hyperboleScaleMD+".input2X", force=True)
+        cmds.connectAttr(self.zipperCtrl+"."+distanceAttr, rigScaleAutoMD+".input1X", force=True)
+        cmds.connectAttr(hyperboleScaleMD+".outputX", rigScaleAutoMD+".input2X", force=True)
+        cmds.connectAttr(rigScaleAutoMD+".outputX", autoMainSR+".valueX", force=True)
         
         # calculate iter counter from middle curve length:
         cmds.select(self.middleCurve+".cv[*]")
@@ -454,7 +457,6 @@ class Zipper():
 
 # TO DO:
         #
-        # RigScale compensate (WIP)
         # group all and parent to dpAR
         # clear and organize UI
         # set good button colors
