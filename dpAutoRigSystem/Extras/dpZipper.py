@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.8"
+DPZIP_VERSION = "2.9"
 
 
 class Zipper():
@@ -38,8 +38,10 @@ class Zipper():
         self.middleCurve = None
         self.firstBlendCurve = None
         self.secondBlendCurve = None
+        self.deformType = 1 #wire
         self.curveAxis = 0
         self.curveDirection = "X"
+        self.jointList = []
         # call main UI function
         self.dpZipperUI(self)
     
@@ -67,7 +69,7 @@ class Zipper():
         
         self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, parent=zipperLayout)
         
-        self.deformTypeRB = cmds.radioButtonGrp('deformTypeRB', label=self.langDic[self.langName]['i192_deformation'], labelArray2=['Wire Deformer', 'Joint Skinning'], numberOfRadioButtons=2, select=1, changeCommand=self.dpChangeDeformType, vertical=True, parent=zipperLayout)
+        self.deformTypeRB = cmds.radioButtonGrp('deformTypeRB', label=self.langDic[self.langName]['i192_deformation'], labelArray2=['Wire Deformer', 'Joint Skinning'], numberOfRadioButtons=2, select=2, changeCommand=self.dpChangeDeformType, vertical=True, parent=zipperLayout)
         self.deformMethodRB = cmds.radioButtonGrp('deformMethodRB', label=self.langDic[self.langName]['i192_deformation']+" METHOD", labelArray2=['Before', 'After'], numberOfRadioButtons=2, select=2, changeCommand=self.dpChangeDeformMethod, vertical=True, parent=zipperLayout)
         
         cmds.text("WIP - text", parent=zipperLayout)
@@ -161,6 +163,12 @@ class Zipper():
             cmds.textField(self.second_TF, edit=True, text=curveName)
             cmds.button(self.second_BT, edit=True, label=self.secondName+" "+self.langDic[self.langName]['i189_curve'], backgroundColor=[0.5, 0.5, 0.8])
             self.secondCurve = curveName
+    
+    
+    def dpGetDeformType(self, *args):
+        """
+        """
+        self.deformType = cmds.radioButtonGrp(self.deformTypeRB, query=True, select=True)
     
     
     def dpGetCurveDirection(self, *args):
@@ -274,19 +282,15 @@ class Zipper():
         distDimTransform = cmds.listRelatives(distDimShape, parent=True, type="transform")[0]
         distDimTransform = cmds.rename(distDimTransform, "Zipper_"+autoAttr.capitalize()+"_DD")
         distDimShape = distDimTransform+"Shape"
+        cmds.connectAttr(distDimShape+"."+distanceAttr, self.zipperCtrl+"."+distanceAttr, force=True)
+        cmds.setAttr(self.zipperCtrl+"."+distanceAttr, lock=True)
         firstLoc = cmds.listConnections(distDimShape+".startPoint", source=True, destination=False)[0]
         firstLoc = cmds.rename(firstLoc, "Zipper_"+autoAttr.capitalize()+"_"+self.firstName+"_Loc")
         secondLoc = cmds.listConnections(distDimShape+".endPoint", source=True, destination=False)[0]
         secondLoc = cmds.rename(secondLoc, "Zipper_"+autoAttr.capitalize()+"_"+self.secondName+"_Loc")
         # attach locators to original curves:
-        firstMoP = cmds.pathAnimation(firstLoc, curve=self.firstCurve, fractionMode=True, name="Zipper_"+autoAttr.capitalize()+"_"+self.firstName+"_MoP")
-        secondMoP = cmds.pathAnimation(secondLoc, curve=self.secondCurve, fractionMode=True, name="Zipper_"+autoAttr.capitalize()+"_"+self.secondName+"_MoP")
-        cmds.delete(cmds.listConnections(firstMoP+".u", source=True, destination=False)[0])
-        cmds.delete(cmds.listConnections(secondMoP+".u", source=True, destination=False)[0])
-        cmds.setAttr(firstMoP+".u", 0.5)
-        cmds.setAttr(secondMoP+".u", 0.5)
-        cmds.connectAttr(distDimShape+"."+distanceAttr, self.zipperCtrl+"."+distanceAttr, force=True)
-        cmds.setAttr(self.zipperCtrl+"."+distanceAttr, lock=True)
+        firstMoP = utils.attachToMotionPath(firstLoc, self.firstCurve, "Zipper_"+autoAttr.capitalize()+"_"+self.firstName+"_MoP", 0.5)
+        secondMoP = utils.attachToMotionPath(secondLoc, self.secondCurve, "Zipper_"+autoAttr.capitalize()+"_"+self.secondName+"_MoP", 0.5)
         
         # automatic intensity and calibration:
         autoOnOffMD = cmds.createNode("multiplyDivide", name="Zipper_"+autoAttr.capitalize()+"_OnOff_MD")
@@ -320,13 +324,13 @@ class Zipper():
         
         # calculate iter counter from middle curve length:
         cmds.select(self.middleCurve+".cv[*]")
-        curveLength = len(cmds.ls(selection=True, flatten=True))
-        halfCurveLength = curveLength * 0.5
+        self.curveLength = len(cmds.ls(selection=True, flatten=True))
+        halfCurveLength = self.curveLength * 0.5
         # calculate distance position based 1.0 from our control attribute:
-        distPos = 1.0 / curveLength
+        distPos = 1.0 / self.curveLength
         for c, curve in enumerate([self.firstCurve, self.secondCurve]):
             baseName = utils.extractSuffix(curve)
-            for i in range(0, curveLength):
+            for i in range(0, self.curveLength+1):
                 lPosA = (i * distPos)
                 lPosB = (lPosA + distPos)
                 rPosB = 1 - (i * distPos)
@@ -418,6 +422,47 @@ class Zipper():
         cmds.connectAttr(self.secondBlendCurve+".worldSpace[0]", secondWireDef+".deformedWire[1]", force=True)
     
     
+    def dpCreateJointAndCtrl(self, thisName, blendCurve, distrib, i, *args):
+        """ Create a joint and a simple fk control.
+            Attach the setup to a motion path.
+            Return the created joint and the control zeroOut group.
+        """
+        cmds.select(clear=True)
+        jnt = cmds.joint(name="Zipper_"+thisName+"_"+str(i).zfill(2)+"_Jpm")
+        ctrl = self.ctrls.cvControl('id_075_ZipperCtrl', "Zipper_"+thisName+"_"+str(i).zfill(2)+"_Ctrl")
+        cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name="Zipper_"+thisName+"_"+str(i).zfill(2)+"_PaC")
+        cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name="Zipper_"+thisName+"_"+str(i).zfill(2)+"_ScC")
+        ctrlZero = utils.zeroOut([ctrl])[0]
+        utils.attachToMotionPath(ctrlZero, blendCurve, "Zipper_"+thisName+"_"+str(i).zfill(2)+"_MoP", (i * distrib))
+        return jnt, ctrlZero
+        
+    
+    
+    def dpCreateJointSetup(self, *args):
+        """
+        """
+        print "wip - creating joint setup here...."
+        ctrlGrp = cmds.group(empty=True, name="Zipper_Ctrls_Grp")
+        jointGrp = cmds.group(empty=True, name="Zipper_Joints_Grp")
+        holderJnt = cmds.joint(name="Zipper_Holder_Jpm")
+        self.jointList.append(holderJnt)
+        
+        distribution = 1.0 / self.curveLength
+        for i in range(0, self.curveLength+1):
+            firstJnt, firstCtrlZero = self.dpCreateJointAndCtrl(self.firstName, self.firstBlendCurve, distribution, i)
+            secondJnt, secondCtrlZero = self.dpCreateJointAndCtrl(self.secondName, self.secondBlendCurve, distribution, i)
+            self.jointList.append(firstJnt)
+            self.jointList.append(secondJnt)
+            cmds.parent(firstJnt, secondJnt, jointGrp)
+            cmds.parent(firstCtrlZero, secondCtrlZero, ctrlGrp)
+            
+        
+            
+            
+            
+            
+            
+    
     def dpSetUsedCurves(self, *args):
         """ Set zipper attribute to off in order to desactivate finding this zipper curve by UI.
         """
@@ -433,7 +478,6 @@ class Zipper():
         print "wip...."
         if self.firstCurve and self.secondCurve:
             if self.origModel:
-            
                 self.dpGetCurveDirection()
                 self.dpSetCurveDirection(self.firstCurve)
                 self.dpSetCurveDirection(self.secondCurve)
@@ -441,9 +485,15 @@ class Zipper():
                 self.dpCreateCurveBlendSetup()
                 self.dpCreateDeformMesh()
                 
+                
+                
                 # WIP -----------------
                 
-                self.dpCreateWireDeform()
+                self.dpGetDeformType()
+                if self.deformType == 1:
+                    self.dpCreateWireDeform()
+                else:
+                    self.dpCreateJointSetup()
                 
                 
                 #self.dpSetUsedCurves()
@@ -457,6 +507,9 @@ class Zipper():
 
 # TO DO:
         #
+        # orient ctrl zeroOut in motionPath
+        # skinning
+        # bind pre matrix
         # group all and parent to dpAR
         # clear and organize UI
         # set good button colors

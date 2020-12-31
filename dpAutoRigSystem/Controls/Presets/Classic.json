@@ -2,7 +2,7 @@
     "_preset"     : "Classic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2020-12-28",
+    "_updated"    : "2020-12-31",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -78,6 +78,7 @@
 	"id_071_EyeSpec"         : {"type" : "Ball",             "degree" : 3},
 	"id_072_HeadUpperLip"    : {"type" : "Cube",             "degree" : 1},
 	"id_073_HeadLowerLip"    : {"type" : "Cube",             "degree" : 1},
-	"id_074_Zipper"          : {"type" : "Circle",           "degree" : 1}
+	"id_074_Zipper"          : {"type" : "Circle",           "degree" : 1},
+	"id_075_ZipperCtrl"      : {"type" : "Circle",           "degree" : 3}
 	
 }

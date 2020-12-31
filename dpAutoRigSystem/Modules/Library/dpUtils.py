@@ -749,6 +749,16 @@ def getGroupByMessage(grpAttrName, *args):
     return result
 
 
+def attachToMotionPath(nodeName, curveName, mopName, uValue):
+    """ Simple function to attach a node in a motion path curve.
+        Sets the u position based to given uValue.
+        Returns the created motion path node.
+    """
+    moPath = cmds.pathAnimation(nodeName, curve=curveName, fractionMode=True, name=mopName)
+    cmds.delete(cmds.listConnections(moPath+".u", source=True, destination=False)[0])
+    cmds.setAttr(moPath+".u", uValue)
+    return moPath
+    
 
 #Profiler decorator
 DPAR_PROFILE_MODE = False
