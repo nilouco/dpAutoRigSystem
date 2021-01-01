@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.25"
-DPAR_UPDATELOG = "#218 Limb length volume variation fix."
+DPAR_VERSION = "3.10.26"
+DPAR_UPDATELOG = "#224 - UpperJaw headDeformer issue fix."
 
 
 

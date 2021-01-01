@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.6"
+DPHD_VERSION = "2.7"
 
 
 class HeadDeformer():
@@ -242,6 +242,7 @@ class HeadDeformer():
                 cmds.parentConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_PaC")
                 cmds.scaleConstraint(self.headCtrl, dataGrp, maintainOffset=True, name=dataGrp+"_ScC")
                 # influence controls
+                self.upperJawCtrl = None
                 toHeadDefCtrlList = []
                 for item in allTransformList:
                     if cmds.objExists(item+".controlID"):
@@ -249,19 +250,26 @@ class HeadDeformer():
                             toHeadDefCtrlList.append(item)
                         elif cmds.getAttr(item+".controlID") == "id_027_HeadLipCorner":
                             toHeadDefCtrlList.append(item)
-                headChildrenList = cmds.listRelatives(self.headCtrl, children=True, allDescendents=True, type="transform")
-                if headChildrenList:
-                    for item in headChildrenList:
-                        if cmds.objExists(item+".controlID"):
-                            if not cmds.getAttr(item+".controlID") == "id_052_FacialFace":
-                                if not cmds.getAttr(item+".controlID") == "id_029_SingleIndSkin":
-                                    if not cmds.getAttr(item+".controlID") == "id_054_SingleMain":
-                                        toHeadDefCtrlList.append(item)
-                                    else:
-                                        singleMainShapeList = cmds.listRelatives(item, children=True, shapes=True)
-                                        if singleMainShapeList:
-                                            for mainShape in singleMainShapeList:
-                                                toHeadDefCtrlList.append(mainShape)
+                        elif cmds.getAttr(item+".controlID") == "id_069_HeadUpperJaw":
+                            self.upperJawCtrl = item
+                            upperJawCtrlShapeList = cmds.listRelatives(item, children=True, shapes=True)
+                            if upperJawCtrlShapeList:
+                                for upperJawShape in upperJawCtrlShapeList:
+                                    toHeadDefCtrlList.append(upperJawShape)
+                if self.upperJawCtrl:
+                    upperJawChildrenList = cmds.listRelatives(self.upperJawCtrl, children=True, allDescendents=True, type="transform")
+                    if upperJawChildrenList:
+                        for upperJawChild in upperJawChildrenList:
+                            if cmds.objExists(upperJawChild+".controlID"):
+                                if not cmds.getAttr(upperJawChild+".controlID") == "id_052_FacialFace":
+                                    if not cmds.getAttr(upperJawChild+".controlID") == "id_029_SingleIndSkin":
+                                        if not cmds.getAttr(upperJawChild+".controlID") == "id_054_SingleMain":
+                                            toHeadDefCtrlList.append(upperJawChild)
+                                        else:
+                                            singleMainShapeList = cmds.listRelatives(upperJawChild, children=True, shapes=True)
+                                            if singleMainShapeList:
+                                                for mainShape in singleMainShapeList:
+                                                    toHeadDefCtrlList.append(mainShape)
                 if toHeadDefCtrlList:
                     for item in toHeadDefCtrlList:
                         cmds.sets(item, include=headDeformerName+"_FFDSet")
