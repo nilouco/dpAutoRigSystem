@@ -731,7 +731,7 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1
             return jointList
 
 
-def getGroupByMessage(grpAttrName, *args):
+def getNodeByMessage(grpAttrName, *args):
     """ Get connected node by All_Grp message attribute.
         Return the found node name or False if it not found.
     """

@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-12-30",
+    "_updated"       : "2021-01-03",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -343,11 +343,11 @@
 	"i185_animation"       : "Animation",
 	"i186_gaming"          : "Gaming",
 	"i187_load"            : "Load",
-	"i188_selectEdges"     : "Select polygon edges to build zipper curve, please.",
+	"i188_selectEdges"     : "Select polygon edges to build Zipper curves, please.",
 	"i189_curve"           : "Curve",
-	"i190_createCurves"    : "Use buttons to create curves from polygon before to generate Zipper setup, please.",
+	"i190_integrateDPAR"   : "Integrate with dpAutoRigSystem.",
 	"i191_selectPoly"      : "Select a polygon geometry to load, please.",
-	"i192_deformation"     : "Deformation",
+	"i120_notUndoable"     : "Attention:\n\nThis script isn't undoable, sorry.\n\nWe recommend save your scene before run.",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -525,6 +525,7 @@
     "m171_joints"              : "Joints",
     "m172_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
     "m173_articulation"        : "Articulation",
+    "m174_createdZipper"       : "Created Zipper.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

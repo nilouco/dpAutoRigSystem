@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-12-30",
+    "_updated"       : "2021-01-03",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -343,11 +343,11 @@
 	"i185_animation"       : "Animation",
 	"i186_gaming"          : "Gaming",
 	"i187_load"            : "Charger",
-	"i188_selectEdges"     : "Sélectionner les edges pour créer une courbe de fermeture à glissière à partir du polygone, s'il vous plaît.",
+	"i188_selectEdges"     : "Sélectionner les edges pour créer des courbes de Zipper à partir du polygone, s'il vous plaît.",
 	"i189_curve"           : "Courbe",
-	"i190_createCurves"    : "Utiliser les boutons pour créer des courbes à partir du polygone avant de générer la configuration de la fermeture à glissière, s'il vous plaît.",
+	"i190_integrateDPAR"   : "Integrer avel le dpAutoRigSystem.",
 	"i191_selectPoly"      : "Sélectionner une geometrie de polygone pour charger, s'il vous plaît.",
-	"i192_deformation"     : "Deformation",
+	"i120_notUndoable"     : "Attention:\n\nCe script n'est pas annulable, désolé.\n\nNous vous recommandons de sauvegarder votre scène avant de l'exécuter.",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -525,6 +525,7 @@
     "m171_joints"              : "Joints",
 	"m172_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
 	"m173_articulation"        : "Articulation",
+	"m174_createdZipper"       : "Créé le Zipper.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

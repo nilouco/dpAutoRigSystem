@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.25"
-DPAR_UPDATELOG = "WIP - #050 Recreate Sticky Lips."
+DPAR_VERSION = "3.10.27"
+DPAR_UPDATELOG = "#050 - Recreate sticky lips.\nDeleted old sqStickyLips module.\nAdded a new dpZipper module."
 
 
 
