@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2020-12-22",
+    "_updated"       : "2021-01-03",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -126,6 +126,12 @@
 	"c111_calibrate"         : "Calibrar",
 	"c112_output"            : "Saida",
 	"c113_length"            : "comprimento",
+	"c114_first"             : "Primeira",
+	"c115_second"            : "Segunda",
+	"c116_crescent"          : "Crescente",
+	"c117_decrescent"        : "Decrescente",
+	"c118_active"            : "activar",
+	"c119_auto"              : "auto",
 
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -336,6 +342,12 @@
 	"i184_specular"        : "Specular",
 	"i185_animation"       : "Animação",
 	"i186_gaming"          : "Jogos",
+	"i187_load"            : "Carregar",
+	"i188_selectEdges"     : "Selecione as edges do polígono para criar as curvas de Zíper, por favor.",
+	"i189_curve"           : "Curva",
+	"i190_integrateDPAR"   : "Integrar com dpAutoRigSystem.",
+	"i191_selectPoly"      : "Selecione uma geometria de polígonos para carregar, por favor.",
+	"i120_notUndoable"     : "Atenção:\n\nEsse script não da para desfazer (undo), desculpe.\n\nRecomendamos salvar seu arquivo antes de rodar.",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -397,8 +409,8 @@
     "m058_updateRigInfoDesc"   : "Ira atualizar as listas de geometrias e controles do Master_Ctrl.",
     "m059_addHandFollow"       : "Adicionar Seguir Mão",
     "m060_addHandFollowDesc"   : "Vai adicionar atributos de seguir a mão IK em setup de bipedes",
-    "m061_stickyLips"          : "Sticky Lips",
-    "m062_stickyLipsDesc"      : "Vai criar uma configuração de Labios Colados.",
+    "m061_zipper"              : "Ziper",
+    "m062_zipperDesc"          : "Vai criar uma configuração zíper que usamos\nnormalmente para os de Labios Colados.",
     "m063_eye"                 : "Olhos",
     "m064_eyeDesc"             : "Criara a configuração dos olhos look at (mira) e tentara integrar com o controle da cabeça.\nPodemos adicionar também as pálpebras, iris e pupilas.",
     "m065_ikFkSnap"            : "Ik Fk Snap",
@@ -513,6 +525,7 @@
     "m171_joints"              : "Joints",
 	"m172_loadBSDesc"          : "Carregue o Node de BlendShape aqui para conectar os atributos dos controles.",
 	"m173_articulation"        : "Articulação",
+	"m174_createdZipper"       : "Criado Zíper.",
 	
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

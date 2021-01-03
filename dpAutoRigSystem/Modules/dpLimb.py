@@ -642,8 +642,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                     cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3)
-                cmds.addAttr(self.ikCornerCtrl, longName='active', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
-                cmds.setAttr(self.ikCornerCtrl + '.active', 1);
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 utils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
                 # getting them zeroOut groups:
@@ -839,9 +838,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 poleVectorConstA = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PVC")
                 poleVectorConstB = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleNotStretchList[0], weight=1.0, name=ikHandleNotStretchList[0] + "_PVC")
                 poleVectorConstC = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleACList[0], weight=1.0, name=ikHandleACList[0] + "_PVC")
-                cmds.connectAttr(self.ikCornerCtrl + '.active', poleVectorConstA[0] + "." + self.ikCornerCtrl + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.active', poleVectorConstB[0] + "." + self.ikCornerCtrl + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.active', poleVectorConstC[0] + "." + self.ikCornerCtrl + "W0", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.'+self.langDic[self.langName]['c118_active'], poleVectorConstA[0] + "." + self.ikCornerCtrl + "W0", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.'+self.langDic[self.langName]['c118_active'], poleVectorConstB[0] + "." + self.ikCornerCtrl + "W0", force=True)
+                cmds.connectAttr(self.ikCornerCtrl + '.'+self.langDic[self.langName]['c118_active'], poleVectorConstC[0] + "." + self.ikCornerCtrl + "W0", force=True)
 
                 # create annotation:
                 annotLoc = cmds.spaceLocator(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant_Loc", position=(0, 0, 0))[0]

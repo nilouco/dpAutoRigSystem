@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.26"
-DPAR_UPDATELOG = "#224 - UpperJaw headDeformer issue fix."
+DPAR_VERSION = "3.10.27"
+DPAR_UPDATELOG = "#050 - Recreate sticky lips.\nDeleted old sqStickyLips module.\nAdded a new dpZipper module."
 
 
 

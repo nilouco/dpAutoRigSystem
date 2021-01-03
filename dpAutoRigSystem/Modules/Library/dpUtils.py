@@ -535,7 +535,7 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
 def extractSuffix(nodeName):
     """ Remove suffix from a node name and return the base name.
     """
-    endSuffixList = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp"]
+    endSuffixList = ["_Mesh", "_Msh", "_Geo", "_Ges", "_Tgt", "_Ctrl", "_Grp", "_Crv"]
     for endSuffix in endSuffixList:
         if nodeName.endswith(endSuffix):
             baseName = nodeName[:nodeName.rfind(endSuffix)]
@@ -730,6 +730,35 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1
             cmds.setAttr(oc+".interpType", 2) #Shortest
             return jointList
 
+
+def getNodeByMessage(grpAttrName, *args):
+    """ Get connected node by All_Grp message attribute.
+        Return the found node name or False if it not found.
+    """
+    result = False
+    allTransformList = cmds.ls(selection=False, type="transform")
+    if allTransformList:
+        for transform in allTransformList:
+            if cmds.objExists(transform+".masterGrp"):
+                # found All_Grp
+                if cmds.objExists(transform+"."+grpAttrName):
+                    foundNodeList = cmds.listConnections(transform+"."+grpAttrName, source=True, destination=False)
+                    if foundNodeList:
+                        result = foundNodeList[0]
+                        break
+    return result
+
+
+def attachToMotionPath(nodeName, curveName, mopName, uValue):
+    """ Simple function to attach a node in a motion path curve.
+        Sets the u position based to given uValue.
+        Returns the created motion path node.
+    """
+    moPath = cmds.pathAnimation(nodeName, curve=curveName, fractionMode=True, name=mopName)
+    cmds.delete(cmds.listConnections(moPath+".u", source=True, destination=False)[0])
+    cmds.setAttr(moPath+".u", uValue)
+    return moPath
+    
 
 #Profiler decorator
 DPAR_PROFILE_MODE = False

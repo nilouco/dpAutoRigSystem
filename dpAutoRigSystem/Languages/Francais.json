@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2020-12-22",
+    "_updated"       : "2021-01-03",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -126,6 +126,12 @@
 	"c111_calibrate"         : "Etalonner",
 	"c112_output"            : "Output",
 	"c113_length"            : "longueur",
+	"c114_first"             : "Premier",
+	"c115_second"            : "Deuxieme",
+	"c116_crescent"          : "Croissant",
+	"c117_decrescent"        : "Decroissant",
+	"c118_active"            : "activer",
+	"c119_auto"              : "auto",
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -336,6 +342,12 @@
 	"i184_specular"        : "Specular",
 	"i185_animation"       : "Animation",
 	"i186_gaming"          : "Gaming",
+	"i187_load"            : "Charger",
+	"i188_selectEdges"     : "Sélectionner les edges pour créer des courbes de Zipper à partir du polygone, s'il vous plaît.",
+	"i189_curve"           : "Courbe",
+	"i190_integrateDPAR"   : "Integrer avel le dpAutoRigSystem.",
+	"i191_selectPoly"      : "Sélectionner une geometrie de polygone pour charger, s'il vous plaît.",
+	"i120_notUndoable"     : "Attention:\n\nCe script n'est pas annulable, désolé.\n\nNous vous recommandons de sauvegarder votre scène avant de l'exécuter.",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -397,8 +409,8 @@
     "m058_updateRigInfoDesc"   : "Il va mettre a jour les listes de géométries et controlleurs du Master_Ctrl.",
     "m059_addHandFollow"       : "Ajouter Suivre Main",
     "m060_addHandFollowDesc"   : "Il va ajouter un attribute dans les mains IK pour suivre le rig de bipéde.",
-    "m061_stickyLips"          : "Sticky Lips",
-    "m062_stickyLipsDesc"      : "Il va créer une configuration de Lèvres Colés.",
+    "m061_zipper"              : "Zipper",
+    "m062_zipperDesc"          : "Il va créer une configuration de zipper qu'on utilise\nsouvant pour les Lèvres Colés.",
     "m063_eye"                 : "Yeux",
     "m064_eyeDesc"             : "Il va créer un rig de yeux avec le look at et essayer de l'intégrer dans le contrôleur de la tête.\nOn peux ajouter les peaupières, les iris et les pupils aussi.",
     "m065_ikFkSnap"            : "Ik Fk Snap",
@@ -513,6 +525,7 @@
     "m171_joints"              : "Joints",
 	"m172_loadBSDesc"          : "Load the BlendShape Node here in order to connect controls attributes.",
 	"m173_articulation"        : "Articulation",
+	"m174_createdZipper"       : "Créé le Zipper.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
