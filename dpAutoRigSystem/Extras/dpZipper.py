@@ -18,7 +18,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.10"
+DPZIP_VERSION = "2.11"
 
 
 class Zipper():
@@ -43,12 +43,10 @@ class Zipper():
         self.optionCtrl = None
         self.upperJawCtrl = None
         self.chinCtrl = None
-        self.deformType = 1 #wire
+        self.nCtrls = 7
         self.curveAxis = 0
         self.curveDirection = "X"
-        self.jointList = []
-        self.jntGrpList = []
-        self.jntInvGrpList = []
+        self.firstJointList, self.secondJointList = [], []
         # call main UI function
         self.dpZipperUI(self)
     
@@ -74,20 +72,32 @@ class Zipper():
         self.second_BT = cmds.button('second_BT', label=self.langDic[self.langName]['i187_load']+" "+self.langDic[self.langName]['c115_second']+" "+self.langDic[self.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c115_second"), backgroundColor=[0.5, 0.5, 0.2], parent=zipperLayoutA)
         self.second_TF = cmds.textField('second_TF', editable=False, parent=zipperLayoutA)
         
-        self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, parent=zipperLayout)
+        zipperLayoutB = cmds.columnLayout('zipperLayout', adjustableColumn=True, columnOffset=("left", 10), parent=zipperLayout)
+        self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label='Curve '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, parent=zipperLayoutB)
         
-        self.deformTypeRB = cmds.radioButtonGrp('deformTypeRB', label=self.langDic[self.langName]['i192_deformation'], labelArray2=['Wire Deformer', 'Joint Skinning'], numberOfRadioButtons=2, select=2, changeCommand=self.dpChangeDeformType, vertical=True, parent=zipperLayout)
-        self.deformMethodRB = cmds.radioButtonGrp('deformMethodRB', label=self.langDic[self.langName]['i192_deformation']+" METHOD", labelArray2=['Before', 'After'], numberOfRadioButtons=2, select=2, changeCommand=self.dpChangeDeformMethod, vertical=True, parent=zipperLayout)
+        cmds.text("Number of controls:")
+        self.nCtrls_IF = cmds.intField('nCtrls_IF', value=self.nCtrls, minValue=0)
         
         #self.separator()
         cmds.text("OPTIONS - WIP")
-        self.goodToDPAR_CB = cmds.checkBox("goodToDPAR_CB", label="Integrate to dpAR - WIP", value=1, parent=zipperLayoutA)
-        self.goodToHead_CB = cmds.checkBox("goodToHead_CB", label="Integrate to Head module - WIP", value=1, parent=zipperLayoutA)
+        self.goodToDPAR_CB = cmds.checkBox("goodToDPAR_CB", label="Integrate to dpAR - WIP", value=1, parent=zipperLayoutB)
+        self.goodToHead_CB = cmds.checkBox("goodToHead_CB", label="Integrate to Head module - WIP", value=1, parent=zipperLayoutB)
         
-        cmds.text("WIP - text", parent=zipperLayout)
-        cmds.button(label="WIP - RUN - WIP", command=self.dpCreateZipper, backgroundColor=[0.3, 1, 0.7], parent=zipperLayout)
+        cmds.text("WIP - text", parent=zipperLayoutB)
+        cmds.button(label="WIP - RUN - WIP", command=self.dpCreateZipper, backgroundColor=[0.3, 1, 0.7], parent=zipperLayoutB)
         # check if exists zipper curves and load them:
         self.dpLoadData()
+    
+    
+    
+    
+    def dpGetNumberOfCtrls(self, *args):
+        """
+        """
+        print "wip"
+        self.nCtrls = cmds.intField(self.nCtrls_IF, query=True, value=True)
+        return self.nCtrls
+    
     
     
     def dpGetGoodToDPAR(self, *args):
@@ -199,11 +209,6 @@ class Zipper():
             self.secondCurve = curveName
     
     
-    def dpGetDeformType(self, *args):
-        """
-        """
-        self.deformType = cmds.radioButtonGrp(self.deformTypeRB, query=True, select=True)
-        return self.deformType
     
     
     def dpGetCurveDirection(self, *args):
@@ -458,84 +463,74 @@ class Zipper():
         cmds.connectAttr(self.secondBlendCurve+".worldSpace[0]", secondWireDef+".deformedWire[1]", force=True)
     
     
-    def dpCreateJointAndGrp(self, thisName, blendCurve, baseCurve, distrib, i, *args):
+    def dpCreateJointAndControl(self, thisName, blendCurve, baseCurve, distrib, i, *args):
         """ Create a joint and a simple fk control.
             Attach the setup to a motion path.
             Return the created joint and the control zeroOut group.
         """
         cmds.select(clear=True)
-        jnt = cmds.joint(name="Zipper_"+thisName+"_"+str(i).zfill(2)+"_Jpm")
-        jntInvGrp = utils.zeroOut([jnt])[0]
-        jntGrp = utils.zeroOut([jntInvGrp])[0]
-        utils.attachToMotionPath(jnt, blendCurve, "Zipper_"+thisName+"_"+str(i).zfill(2)+"_MoP", (i * distrib))
-        utils.attachToMotionPath(jntGrp, baseCurve, "Zipper_"+thisName+"_"+str(i).zfill(2)+"_MoP", (i * distrib))
-        cmds.setAttr(jntInvGrp+".translateX", (-1)*(cmds.getAttr(jnt+".translateX")))
-        cmds.setAttr(jntInvGrp+".translateY", (-1)*(cmds.getAttr(jnt+".translateY")))
-        cmds.setAttr(jntInvGrp+".translateZ", (-1)*(cmds.getAttr(jnt+".translateZ")))
-        
-        
-        return jnt, jntGrp, jntInvGrp
+        jnt = cmds.joint(name="Zipper_"+thisName+"_"+str(i).zfill(2)+"_Jnt")
+        jntZero = utils.zeroOut([jnt])[0]
+        ctrl = self.ctrls.cvControl('id_075_ZipperCtrl', "Zipper_"+thisName+"_"+str(i).zfill(2)+"_Ctrl")
+        ctrlZero = utils.zeroOut([ctrl])[0]
+        utils.attachToMotionPath(ctrlZero, blendCurve, "Zipper_"+thisName+"_"+str(i).zfill(2)+"_MoP", (i * distrib))
+        cmds.delete(cmds.parentConstraint(ctrl, jntZero, maintainOffset=False))
+        self.ctrls.directConnect(ctrl, jnt)
+        return jnt, jntZero, ctrlZero
     
     
-    def dpCreateJointSetup(self, *args):
+    def dpCreateExtraControls(self, *args):
         """
         """
         print "wip - creating joint setup here...."
         
-        cmds.select(clear=True)
-        holderJnt = cmds.joint(name="Zipper_Holder_Jpm")
-        jointGrp = cmds.group(holderJnt, name="Zipper_Joints_Grp")
-        self.ctrls.setLockHide([holderJnt], ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz"])
-        cmds.setAttr(holderJnt+".visibility", 0)
-        self.jointList.append(holderJnt)
-        self.jntGrpList.append(jointGrp)
-        self.jntInvGrpList.append(jointGrp)
+        jointGrp = cmds.group(empty=True, name="Zipper_Joints_Grp")
+        ctrlsGrp = cmds.group(empty=True, name="Zipper_Controls_Grp")
         
-        distribution = 1.0 / self.curveLength
-        for i in range(0, self.curveLength+1):
-            firstJnt, firstJntGrp, firstJntInvGrp = self.dpCreateJointAndGrp(self.firstName, self.firstBlendCurve, self.firstCurve, distribution, i)
-            secondJnt, secondJntGrp, secondJntInvGrp = self.dpCreateJointAndGrp(self.secondName, self.secondBlendCurve, self.secondCurve, distribution, i)
-            self.jointList.append(firstJnt)
-            self.jointList.append(secondJnt)
-            self.jntGrpList.append(firstJntGrp)
-            self.jntGrpList.append(secondJntGrp)
-            self.jntInvGrpList.append(firstJntInvGrp)
-            self.jntInvGrpList.append(secondJntInvGrp)
+        distribution = 1.0 / (self.nCtrls-1)
+        for i in range(0, self.nCtrls):
+            firstJnt, firstJntGrp, firstCtrlGrp = self.dpCreateJointAndControl(self.firstName, self.firstBlendCurve, self.firstCurve, distribution, i)
+            secondJnt, secondJntGrp, secondCtrlGrp =self.dpCreateJointAndControl(self.secondName, self.secondBlendCurve, self.secondCurve, distribution, i)
+            
+            self.firstJointList.append(firstJnt)
+            self.secondJointList.append(secondJnt)
+            
             cmds.parent(firstJntGrp, secondJntGrp, jointGrp)
+            cmds.parent(firstCtrlGrp, secondCtrlGrp, ctrlsGrp)
             
             # if need to integrate to dpAutoRigSystem:
             if self.goodToDPAR:
                 if self.goodToHead:
-                    cmds.orientConstraint(self.upperJawCtrl, firstJntGrp, maintainOffset=True, name=utils.extractSuffix(firstJnt)+"_OrC")
-                    cmds.orientConstraint(self.chinCtrl, secondJntGrp, maintainOffset=True, name=utils.extractSuffix(secondJnt)+"_OrC")
-    
-    
-    def dpCreateSkinningPreMatrix(self, *args):
-        """
-        """
-        print "wip skinning and preMatrix"
-        # create the skinCluster node in the final deformable mesh:
-        skinClusterNode = cmds.skinCluster(self.jointList, self.deformMesh, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=utils.extractSuffix(self.deformMesh)+"_SC")[0]
-        
-        
-        # WIP ------------------
-        
-        
-        
-        
-        
-        # Connecting control zero out group world inverse matrix to skinCluster node bind pre matrix:
-        for j in range(1, len(self.jntGrpList)):
-        
-        
-        
-            mm = cmds.createNode("multMatrix", name="temp_MM")
-            cmds.connectAttr(self.jntGrpList[j]+".worldInverseMatrix[0]", mm+".matrixIn[0]", force=True)
-            cmds.connectAttr(self.jntInvGrpList[j]+".worldInverseMatrix[0]", mm+".matrixIn[1]", force=True)
-        
+                    cmds.orientConstraint(self.upperJawCtrl, firstCtrlGrp, maintainOffset=True, name=utils.extractSuffix(firstJnt)+"_OrC")
+                    cmds.orientConstraint(self.chinCtrl, secondCtrlGrp, maintainOffset=True, name=utils.extractSuffix(secondJnt)+"_OrC")
 
-            #cmds.connectAttr(self.jntGrpList[j]+".worldInverseMatrix[0]", skinClusterNode+".bindPreMatrix["+str(j)+"]", force=True)
-            cmds.connectAttr(mm+".matrixSum", skinClusterNode+".bindPreMatrix["+str(j)+"]", force=True)
+    
+    def dpCreateCurveSkinning(self, *args):
+        """
+        """
+        print "wip skinning for curves......"
+        
+        firstCurveTgt = cmds.duplicate(self.firstCurve, name=utils.extractSuffix(self.firstCurve)+"_Extra_Crv")[0]
+        secondCurveTgt = cmds.duplicate(self.secondCurve, name=utils.extractSuffix(self.secondCurve)+"_Extra_Crv")[0]
+        
+        cmds.skinCluster(self.firstJointList, firstCurveTgt, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=utils.extractSuffix(self.firstCurve)+"_Extra_SC")[0]
+        cmds.skinCluster(self.secondJointList, secondCurveTgt, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=utils.extractSuffix(self.secondCurve)+"_Extra_SC")[0]
+        
+        
+        # WIP -----
+        
+        #cmds.blendShape(self.firstBS, edit=True, target=(self.firstBlendCurve, 1, firstCurveTgt, 1.0))
+        #cmds.blendShape(self.secondBS, edit=True, target=(self.secondBlendCurve, 1, secondCurveTgt, 1.0))
+        
+        #cmds.setAttr(self.firstBS+"."+firstCurveTgt, 1)
+        #cmds.setAttr(self.secondBS+"."+secondCurveTgt, 1)
+        
+        
+        firstExtraBS = cmds.blendShape(firstCurveTgt, self.firstCurve, topologyCheck=False, name=utils.extractSuffix(self.firstCurve)+"_Extra_BS")[0]
+        secondExtraBS = cmds.blendShape(secondCurveTgt, self.secondCurve, topologyCheck=False, name=utils.extractSuffix(self.secondCurve)+"_Extra_BS")[0]
+        
+        cmds.setAttr(firstExtraBS+"."+firstCurveTgt, 1)
+        cmds.setAttr(secondExtraBS+"."+secondCurveTgt, 1)
         
     
     def dpSetUsedCurves(self, *args):
@@ -561,17 +556,18 @@ class Zipper():
                 self.dpGenerateMiddleCurve(self.firstCurve)
                 self.dpCreateCurveBlendSetup()
                 self.dpCreateDeformMesh()
+                self.dpCreateWireDeform()
                 
                 
                 
-                # WIP -----------------
                 
-                self.dpGetDeformType()
-                if self.deformType == 1:
-                    self.dpCreateWireDeform()
-                else:
-                    self.dpCreateJointSetup()
-                    self.dpCreateSkinningPreMatrix()
+                self.dpGetNumberOfCtrls()
+                if self.nCtrls > 0:
+                    self.dpCreateExtraControls()
+                    
+                    # WIP -----------------
+                    
+                    self.dpCreateCurveSkinning()
                 
                 
                 #self.dpSetUsedCurves()
@@ -603,7 +599,7 @@ class Zipper():
         #
         #
         # joint label
-        # 
+        # define initial nCtrls = 0 or 7 ?
         
 
 
