@@ -15,7 +15,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.13"
+DPZIP_VERSION = "2.14"
 
 
 class Zipper():

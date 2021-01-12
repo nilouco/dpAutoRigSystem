@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.27"
-DPAR_UPDATELOG = "WIP - #227 - Create Zipper control."
+DPAR_VERSION = "3.10.28"
+DPAR_UPDATELOG = "#227 Create Zipper control."
 
 
 
