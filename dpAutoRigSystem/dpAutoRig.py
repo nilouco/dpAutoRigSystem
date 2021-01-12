@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.10.27"
-DPAR_UPDATELOG = "#050 - Recreate sticky lips.\nDeleted old sqStickyLips module.\nAdded a new dpZipper module."
+DPAR_UPDATELOG = "WIP - #227 - Create Zipper control."
 
 
 
