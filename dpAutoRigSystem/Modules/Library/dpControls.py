@@ -843,6 +843,7 @@ class ControlClass:
                 if not cmds.objExists(ctrlName+".pinGuide"):
                     cmds.addAttr(ctrlName, longName="pinGuide", attributeType='bool')
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
+                    cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                 cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
                 if cmds.getAttr(ctrlName+".pinGuide"):
                     self.setPinnedGuideColor(ctrlName, True, "red")
@@ -867,20 +868,34 @@ class ControlClass:
         """
         transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
         if cmds.objExists(ctrlName+".pinGuide"):
+            # extracting namespace... need to find an ellegant way using message or stored attribute instead:
+            nameSpaceName = None
+            cmds.namespace(set=":")
+            if ":" in ctrlName:
+                if "|" in ctrlName:
+                    nameSpaceName = ctrlName[ctrlName.rfind("|")+1:ctrlName.rfind(":")]
+                else:
+                    nameSpaceName = ctrlName[:ctrlName.rfind(":")]
             pcName = ctrlName+"_PinGuide_PaC"
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
             if pinValue:
                 if not cmds.objExists(pcName):
                     if cmds.objExists(self.dpUIinst.tempGrp):
+                        if nameSpaceName:
+                            cmds.namespace(set=nameSpaceName)
                         cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)
                         self.setPinnedGuideColor(ctrlName, True, "red")
             else:
-                if cmds.objExists(pcName):
-                    cmds.delete(pcName)
-                    self.setPinnedGuideColor(ctrlName, False, "red")
-                    
+                pConstList = cmds.listRelatives(ctrlName, children=True, type="parentConstraint")
+                if pConstList:
+                    for pConst in pConstList:
+                        if "PinGuide" in pConst:
+                            cmds.delete(pConst)
+                self.setPinnedGuideColor(ctrlName, False, "red")
+            
             for attr in transformAttrList:
                 cmds.setAttr(ctrlName+"."+attr, lock=pinValue)
+            cmds.namespace(set=":")
     
     
     def startPinGuide(self, guideBase, *args):
