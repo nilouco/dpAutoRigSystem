@@ -236,6 +236,12 @@ class LayoutClass:
                     cmds.text(" ", parent=self.indirectSkinLayout)
                     holderValue = cmds.getAttr(self.moduleGrp+".holder")
                     self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c046_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
+                    self.sdkLocatorLayout = cmds.rowLayout('sdkLocatorLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
+                    cmds.text(" ", parent=self.sdkLocatorLayout)
+                    cmds.text(" ", parent=self.sdkLocatorLayout)
+                    cmds.text(" ", parent=self.sdkLocatorLayout)
+                    sdkLocatorValue = cmds.getAttr(self.moduleGrp+".sdkLocator")
+                    self.sdkLocatorCB = cmds.checkBox(label="SDK Locator", value=sdkLocatorValue, enable=False, changeCommand=self.changeSDKLocator, parent=self.sdkLocatorLayout)
                     
                 # create eyelid layout:
                 if self.eyelidExists:

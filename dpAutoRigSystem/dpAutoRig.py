@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.29"
-DPAR_UPDATELOG = "#221 Unpin Guide fix."
+DPAR_VERSION = "3.10.30"
+DPAR_UPDATELOG = "#235 Single extra SDK locator."
 
 
 

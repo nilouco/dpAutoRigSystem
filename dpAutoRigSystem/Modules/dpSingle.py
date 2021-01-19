@@ -41,7 +41,11 @@ class Single(Base.StartClass, Layout.LayoutClass):
     def getHasHolder(self):
         return cmds.getAttr(self.moduleGrp + ".holder")
         
-        
+    
+    def getHasSDKLocator(self):
+        return cmds.getAttr(self.moduleGrp + ".sdkLocator")
+    
+    
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
@@ -52,6 +56,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".indirectSkin", 0)
         cmds.addAttr(self.moduleGrp, longName='holder', attributeType='bool')
         cmds.setAttr(self.moduleGrp+".holder", 0)
+        cmds.addAttr(self.moduleGrp, longName='sdkLocator', attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".sdkLocator", 1)
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
@@ -84,14 +90,22 @@ class Single(Base.StartClass, Layout.LayoutClass):
         if indSkinValue == 0:
             cmds.setAttr(self.moduleGrp+".holder", 0)
             cmds.checkBox(self.holderCB, edit=True, value=False, enable=False)
+            cmds.checkBox(self.sdkLocatorCB, edit=True, enable=False)
         else:
             cmds.checkBox(self.holderCB, edit=True, enable=True)
+            cmds.checkBox(self.sdkLocatorCB, edit=True, enable=True)
             
 
     def changeHolder(self, *args):
         """ Set the attribute value for holder.
         """
         cmds.setAttr(self.moduleGrp+".holder", cmds.checkBox(self.holderCB, query=True, value=True))
+    
+    
+    def changeSDKLocator(self, *args):
+        """ Set the attribute value for sdkLocator.
+        """
+        cmds.setAttr(self.moduleGrp+".sdkLocator", cmds.checkBox(self.sdkLocatorCB, query=True, value=True))
     
     
     def rigModule(self, *args):
@@ -199,21 +213,16 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.singleCtrl+".scaleCompensate", 1, channelBox=True)
                     cmds.connectAttr(self.singleCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
-                    # create a fatherJoint in order to zeroOut the skinning joint:
+                    # create fatherJoints in order to zeroOut the skinning joint:
                     cmds.select(clear=True)
                     jxtName = self.jnt.replace("_Jnt", "_Jxt")
-                    self.jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
-                    utils.clearDpArAttr([self.jxt])
-                    cmds.parent(self.jnt, self.jxt)
+                    jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
+                    utils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
+                    cmds.parent(self.jnt, jxt)
                     attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
                     for attr in attrList:
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr)
-                    if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
-                            cmds.setAttr(self.jxt+".scaleX", -1)
-                            cmds.setAttr(self.jxt+".scaleY", -1)
-                            cmds.setAttr(self.jxt+".scaleZ", -1)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.langDic[self.langName]['c046_holder']+"_Grp")
@@ -221,7 +230,47 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
                     else:
+                        if self.getHasSDKLocator():
+                            # this one will be used to receive inputs from sdk locator:
+                            sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
+                            sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
+                            # sdk locator:
+                            sdkLoc = cmds.spaceLocator(name=sdkJis.replace("_Jis", "_Loc"))[0]
+                            sdkLocGrp = cmds.group(sdkLoc, name=sdkLoc+"_Grp")
+                            cmds.delete(cmds.parentConstraint(self.singleCtrl, sdkLocGrp, maintainOffset=False))
+                            cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
+                            sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
+                            cmds.addAttr(sdkLoc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
+                            cmds.addAttr(sdkLoc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
+                            cmds.addAttr(sdkLoc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
+                            cmds.connectAttr(sdkLoc+".translateX", sdkLocMD+".input1X", force=True)
+                            cmds.connectAttr(sdkLoc+".translateY", sdkLocMD+".input1Y", force=True)
+                            cmds.connectAttr(sdkLoc+".translateZ", sdkLocMD+".input1Z", force=True)
+                            cmds.connectAttr(sdkLoc+".intensityX", sdkLocMD+".input2X", force=True)
+                            cmds.connectAttr(sdkLoc+".intensityY", sdkLocMD+".input2Y", force=True)
+                            cmds.connectAttr(sdkLoc+".intensityZ", sdkLocMD+".input2Z", force=True)
+                            cmds.connectAttr(sdkLocMD+".outputX", sdkLocGrp+".translateX", force=True)
+                            cmds.connectAttr(sdkLocMD+".outputY", sdkLocGrp+".translateY", force=True)
+                            cmds.connectAttr(sdkLocMD+".outputZ", sdkLocGrp+".translateZ", force=True)
+                            cmds.addAttr(self.singleCtrl, longName="displayLocator", attributeType="bool", keyable=False)
+                            cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
+                            cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
+                            cmds.setAttr(sdkLoc+".visibility", lock=True)
+                            for attr in attrList:
+                                cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
+                        # rename indirectSkinning joint from Jnt to Jis:
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
+                    # fix mirror issue:
+                    if s == 1:
+                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                            cmds.setAttr(jxt+".scaleX", -1)
+                            cmds.setAttr(jxt+".scaleY", -1)
+                            cmds.setAttr(jxt+".scaleZ", -1)
+                            if not self.getHasHolder():
+                                if self.getHasSDKLocator():
+                                    cmds.setAttr(sdkLocGrp+".rotateX", 0)
+                                    cmds.setAttr(sdkLocGrp+".rotateY", 0)
+                                    cmds.setAttr(sdkLocGrp+".rotateZ", 0)
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
                     cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
