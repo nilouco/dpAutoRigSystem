@@ -57,7 +57,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName='holder', attributeType='bool')
         cmds.setAttr(self.moduleGrp+".holder", 0)
         cmds.addAttr(self.moduleGrp, longName='sdkLocator', attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".sdkLocator", 1)
+        cmds.setAttr(self.moduleGrp+".sdkLocator", 0)
         
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         

@@ -242,6 +242,7 @@ class LayoutClass:
                     cmds.text(" ", parent=self.sdkLocatorLayout)
                     sdkLocatorValue = cmds.getAttr(self.moduleGrp+".sdkLocator")
                     self.sdkLocatorCB = cmds.checkBox(label="SDK Locator", value=sdkLocatorValue, enable=False, changeCommand=self.changeSDKLocator, parent=self.sdkLocatorLayout)
+                    self.changeIndirectSkin()
                     
                 # create eyelid layout:
                 if self.eyelidExists:
