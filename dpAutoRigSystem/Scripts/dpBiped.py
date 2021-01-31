@@ -114,10 +114,10 @@ def Biped(dpUIinst):
             # woking with Eye system:
             # create eye module instance:
             eyeInstance = dpUIinst.initGuide('dpEye', guideDir)
-            # setting X mirror:
-            eyeInstance.changeMirror("X")
             # editing eyeLookAt base guide informations:
             eyeInstance.editUserName(eyeName)
+            # setting X mirror:
+            eyeInstance.changeMirror("X")
             cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
             cmds.setAttr(eyeInstance.moduleGrp+".translateY", 21)
             cmds.setAttr(eyeInstance.moduleGrp+".translateZ", 1.5)
@@ -136,14 +136,14 @@ def Biped(dpUIinst):
             # working with LEG system:
             # create leg module instance:
             legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
+            # change name to leg:
+            legLimbInstance.editUserName(legName)
             # setting X mirror:
             legLimbInstance.changeMirror("X")
             # change limb guide to leg type:
             legLimbInstance.changeType(legName)
             # change limb style to biped:
             legLimbInstance.changeStyle(bipedStyleName)
-            # change name to leg:
-            legLimbInstance.editUserName(legName)
             cmds.setAttr(legLimbInstance.annotation+".translateY", -4)
             
             # editing leg base guide informations:
@@ -181,12 +181,12 @@ def Biped(dpUIinst):
             # working with ARM system:
             # creating module instances:
             armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
+            # change name to arm:
+            armLimbInstance.editUserName(armName)
             # setting X mirror:
             armLimbInstance.changeMirror("X")
             # change limb style to biped:
             armLimbInstance.changeStyle(bipedStyleName)
-            # change name to arm:
-            armLimbInstance.editUserName(armName)
             cmds.setAttr(armLimbInstance.annotation+".translateX", 3)
             cmds.setAttr(armLimbInstance.annotation+".translateY", 0)
             cmds.setAttr(armLimbInstance.annotation+".translateZ", 2)

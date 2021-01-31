@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.31"
-DPAR_UPDATELOG = "#237 Enable extra SDK locator checkbox."
+DPAR_VERSION = "3.10.32"
+DPAR_UPDATELOG = "#239 Numbering mirror fix."
 
 
 

@@ -556,6 +556,14 @@ class LayoutClass:
                 cmds.deleteAttr(self.previewMirrorGuide+".guideBase")
                 cmds.delete(cmds.listRelatives(self.previewMirrorGuide, shapes=True, type="nurbsCurve"))
                 
+                # clean up old module attributes in order to avoide numbering issue:
+                if cmds.objExists(self.previewMirrorGuide+".customName"):
+                    customNameMirror = "_Mirror"
+                    currentCustomName = cmds.getAttr(self.previewMirrorGuide+".customName")
+                    if currentCustomName:
+                        customNameMirror = currentCustomName+"_Mirror"
+                    cmds.setAttr(self.previewMirrorGuide+".customName", customNameMirror, type="string")
+                
                 # create a decomposeMatrix node in order to get the worldSpace transformations (like using xform):
                 decomposeMatrix = cmds.createNode('decomposeMatrix', name=self.previewMirrorGuide+"_dm")
                 cmds.connectAttr(self.moduleGrp+'.worldMatrix', decomposeMatrix+'.inputMatrix', force=True)

@@ -143,10 +143,10 @@ def Car(dpUIinst):
             # working with FRONT WHEEL system:
             # create wheel module instance:
             frontWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
-            # setting X mirror:
-            frontWheelInstance.changeMirror("X")
             # change name to frontWheel:
             frontWheelInstance.editUserName(frontWheelName)        
+            # setting X mirror:
+            frontWheelInstance.changeMirror("X")
             # editing frontWheel base guide informations:
             cmds.setAttr(frontWheelInstance.moduleGrp+".translateX", 9)
             cmds.setAttr(frontWheelInstance.moduleGrp+".translateY", 4)
@@ -169,10 +169,10 @@ def Car(dpUIinst):
             # working with BACK WHEEL system:
             # create wheel module instance:
             backWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
-            # setting X mirror:
-            backWheelInstance.changeMirror("X")
             # change name to frontWheel:
             backWheelInstance.editUserName(backWheelName)        
+            # setting X mirror:
+            backWheelInstance.changeMirror("X")
             # editing frontWheel base guide informations:
             cmds.setAttr(backWheelInstance.moduleGrp+".translateX", 9)
             cmds.setAttr(backWheelInstance.moduleGrp+".translateY", 4)
