@@ -137,10 +137,10 @@ def Quadruped(dpUIinst):
             # woking with Eye system:
             # create eyeLookAt module instance:
             eyeInstance = dpUIinst.initGuide('dpEye', guideDir, RigType.quadruped)
-            # setting X mirror:
-            eyeInstance.changeMirror("X")
             # editing eyeLookAt base guide informations:
             eyeInstance.editUserName(eyeName)
+            # setting X mirror:
+            eyeInstance.changeMirror("X")
             cmds.setAttr(eyeInstance.moduleGrp+".translateX", 0.5)
             cmds.setAttr(eyeInstance.moduleGrp+".translateY", 13.5)
             cmds.setAttr(eyeInstance.moduleGrp+".translateZ", 11)
