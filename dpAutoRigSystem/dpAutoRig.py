@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.30"
-DPAR_UPDATELOG = "#235 Single extra SDK locator."
+DPAR_VERSION = "3.10.31"
+DPAR_UPDATELOG = "#237 Enable extra SDK locator checkbox."
 
 
 
