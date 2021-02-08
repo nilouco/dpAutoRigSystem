@@ -258,6 +258,9 @@ class Single(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(sdkLoc+".visibility", lock=True)
                             for attr in attrList:
                                 cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
+                            cmds.setAttr(sdkLocGrp+".rotateX", 0)
+                            cmds.setAttr(sdkLocGrp+".rotateY", 0)
+                            cmds.setAttr(sdkLocGrp+".rotateZ", 0)
                         # rename indirectSkinning joint from Jnt to Jis:
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
                     # fix mirror issue:
@@ -266,11 +269,6 @@ class Single(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(jxt+".scaleX", -1)
                             cmds.setAttr(jxt+".scaleY", -1)
                             cmds.setAttr(jxt+".scaleZ", -1)
-                            if not self.getHasHolder():
-                                if self.getHasSDKLocator():
-                                    cmds.setAttr(sdkLocGrp+".rotateX", 0)
-                                    cmds.setAttr(sdkLocGrp+".rotateY", 0)
-                                    cmds.setAttr(sdkLocGrp+".rotateZ", 0)
                 else: # like a fkLine
                     # create parentConstraint from ctrl to jnt:
                     cmds.parentConstraint(self.singleCtrl, self.jnt, maintainOffset=False, name=self.jnt+"_PaC")
