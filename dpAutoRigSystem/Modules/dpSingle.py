@@ -231,36 +231,37 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
                     else:
                         if self.getHasSDKLocator():
-                            # this one will be used to receive inputs from sdk locator:
-                            sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
-                            sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
-                            # sdk locator:
-                            sdkLoc = cmds.spaceLocator(name=sdkJis.replace("_Jis", "_Loc"))[0]
-                            sdkLocGrp = cmds.group(sdkLoc, name=sdkLoc+"_Grp")
-                            cmds.delete(cmds.parentConstraint(self.singleCtrl, sdkLocGrp, maintainOffset=False))
-                            cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
-                            sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
-                            cmds.addAttr(sdkLoc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
-                            cmds.addAttr(sdkLoc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
-                            cmds.addAttr(sdkLoc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
-                            cmds.connectAttr(sdkLoc+".translateX", sdkLocMD+".input1X", force=True)
-                            cmds.connectAttr(sdkLoc+".translateY", sdkLocMD+".input1Y", force=True)
-                            cmds.connectAttr(sdkLoc+".translateZ", sdkLocMD+".input1Z", force=True)
-                            cmds.connectAttr(sdkLoc+".intensityX", sdkLocMD+".input2X", force=True)
-                            cmds.connectAttr(sdkLoc+".intensityY", sdkLocMD+".input2Y", force=True)
-                            cmds.connectAttr(sdkLoc+".intensityZ", sdkLocMD+".input2Z", force=True)
-                            cmds.connectAttr(sdkLocMD+".outputX", sdkLocGrp+".translateX", force=True)
-                            cmds.connectAttr(sdkLocMD+".outputY", sdkLocGrp+".translateY", force=True)
-                            cmds.connectAttr(sdkLocMD+".outputZ", sdkLocGrp+".translateZ", force=True)
-                            cmds.addAttr(self.singleCtrl, longName="displayLocator", attributeType="bool", keyable=False)
-                            cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
-                            cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
-                            cmds.setAttr(sdkLoc+".visibility", lock=True)
-                            for attr in attrList:
-                                cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
-                            cmds.setAttr(sdkLocGrp+".rotateX", 0)
-                            cmds.setAttr(sdkLocGrp+".rotateY", 0)
-                            cmds.setAttr(sdkLocGrp+".rotateZ", 0)
+                            if not self.langDic[self.langName]['c058_main'] in self.userGuideName:
+                                # this one will be used to receive inputs from sdk locator:
+                                sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
+                                sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
+                                # sdk locator:
+                                sdkLoc = cmds.spaceLocator(name=sdkJis.replace("_Jis", "_Loc"))[0]
+                                sdkLocGrp = cmds.group(sdkLoc, name=sdkLoc+"_Grp")
+                                cmds.delete(cmds.parentConstraint(self.singleCtrl, sdkLocGrp, maintainOffset=False))
+                                cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
+                                sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
+                                cmds.addAttr(sdkLoc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
+                                cmds.addAttr(sdkLoc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
+                                cmds.addAttr(sdkLoc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
+                                cmds.connectAttr(sdkLoc+".translateX", sdkLocMD+".input1X", force=True)
+                                cmds.connectAttr(sdkLoc+".translateY", sdkLocMD+".input1Y", force=True)
+                                cmds.connectAttr(sdkLoc+".translateZ", sdkLocMD+".input1Z", force=True)
+                                cmds.connectAttr(sdkLoc+".intensityX", sdkLocMD+".input2X", force=True)
+                                cmds.connectAttr(sdkLoc+".intensityY", sdkLocMD+".input2Y", force=True)
+                                cmds.connectAttr(sdkLoc+".intensityZ", sdkLocMD+".input2Z", force=True)
+                                cmds.connectAttr(sdkLocMD+".outputX", sdkLocGrp+".translateX", force=True)
+                                cmds.connectAttr(sdkLocMD+".outputY", sdkLocGrp+".translateY", force=True)
+                                cmds.connectAttr(sdkLocMD+".outputZ", sdkLocGrp+".translateZ", force=True)
+                                cmds.addAttr(self.singleCtrl, longName="displayLocator", attributeType="bool", keyable=False)
+                                cmds.setAttr(self.singleCtrl+".displayLocator", 0, channelBox=True)
+                                cmds.connectAttr(self.singleCtrl+".displayLocator", sdkLoc+".visibility", force=True)
+                                cmds.setAttr(sdkLoc+".visibility", lock=True)
+                                for attr in attrList:
+                                    cmds.connectAttr(sdkLoc+'.'+attr, sdkJis+'.'+attr)
+                                cmds.setAttr(sdkLocGrp+".rotateX", 0)
+                                cmds.setAttr(sdkLocGrp+".rotateY", 0)
+                                cmds.setAttr(sdkLocGrp+".rotateZ", 0)
                         # rename indirectSkinning joint from Jnt to Jis:
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_Jis"))
                     # fix mirror issue:

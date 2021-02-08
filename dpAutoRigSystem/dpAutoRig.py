@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.33"
-DPAR_UPDATELOG = "#255 ZeroOut SDK locator group fix."
+DPAR_VERSION = "3.10.34"
+DPAR_UPDATELOG = "#256 Avoid Single SDK Main double transformation."
 
 
 
