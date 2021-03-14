@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.34"
-DPAR_UPDATELOG = "#256 Avoid Single SDK Main double transformation."
+DPAR_VERSION = "3.10.35"
+DPAR_UPDATELOG = "#265 Lock zero autoClavicle follow attribute temporarily."
 
 
 
@@ -1367,7 +1367,7 @@ class DP_AutoRig_UI:
     
     def keepJsonFilesWhenUpdate(self, currentDir, tempUpdateDir, *args):
         """ Check in given folder if we have custom json files and keep then when we install a new update.
-            It will just check if there are user created json files, and copy them to temporary extracted update folder.
+            It will just check if there are user created json files, and copy them to temporarily extracted update folder.
             So when the install overwrite all files, they will be copied (restored) again.
         """
         newUpdateList = []
@@ -1416,7 +1416,7 @@ class DP_AutoRig_UI:
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
                 
-                # list Zip file contents in order to extract them in a temporarlly folder:
+                # list Zip file contents in order to extract them in a temporarily folder:
                 zipNameList = dpAR_Zip.namelist()
                 for fileName in zipNameList:
                     if dpAR_Folder in fileName:
@@ -1426,7 +1426,7 @@ class DP_AutoRig_UI:
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
                 
-                # declare temporary folder:
+                # declare temporarily folder:
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
                 
                 # store custom presets in order to avoid overwrite them when installing the update:
@@ -1462,7 +1462,7 @@ class DP_AutoRig_UI:
                         installAmount += 1
                         cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
                 
-                # delete the temporary folder used to download and install the update:
+                # delete the temporarily folder used to download and install the update:
                 folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
                 shutil.rmtree(folderToDelete)
                 
