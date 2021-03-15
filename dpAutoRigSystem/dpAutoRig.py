@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.10.35"
-DPAR_UPDATELOG = "#265 Lock zero autoClavicle follow attribute temporarily."
+DPAR_VERSION = "3.11.00"
+DPAR_UPDATELOG = "Release v3.11.00"
 
 
 
