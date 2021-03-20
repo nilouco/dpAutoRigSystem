@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.00"
-DPAR_UPDATELOG = "Release v3.11.00"
+DPAR_VERSION = "3.11.01"
+DPAR_UPDATELOG = "#263 yellow pupil control."
 
 
 
@@ -2334,7 +2334,7 @@ class DP_AutoRig_UI:
                                     self.ctrls.colorShape([irisCtrl], "cyan")
                                 if self.integratedTaskDic[moduleDic]['hasPupil']:
                                     pupilCtrl = self.integratedTaskDic[moduleDic]['pupilCtrl'][s]
-                                    self.ctrls.colorShape([pupilCtrl], "black")
+                                    self.ctrls.colorShape([pupilCtrl], "yellow")
                         
                         # integrate the Finger module:
                         if moduleType == FINGER:
