@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.01"
-DPAR_UPDATELOG = "#263 yellow pupil control."
+DPAR_VERSION = "3.11.02"
+DPAR_UPDATELOG = "#257 Filter HeadDeformer SDK.\nChanged setDrivenKey to remapValue node."
 
 
 

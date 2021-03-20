@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.7"
+DPHD_VERSION = "2.8"
 
 
 class HeadDeformer():
@@ -159,6 +159,21 @@ class HeadDeformer():
             twistMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_Twist_MD")
             cmds.setAttr(twistMD+".input2Y", -1)
             cmds.setAttr(calibrateReduceMD+".operation", 2)
+
+            # create a remapValue node instead of a setDrivenKey
+            remapV = cmds.createNode("remapValue", name=headDeformerName+"_Squash_RmV")
+            cmds.setAttr(remapV+".inputMin", -0.25*bBoxSize)
+            cmds.setAttr(remapV+".inputMax", 0.5*bBoxSize)
+            cmds.setAttr(remapV+".outputMin", -1*bBoxSize)
+            cmds.setAttr(remapV+".outputMax", -0.25*bBoxSize)            
+            cmds.setAttr(remapV+".value[2].value_Position", 0.149408)
+            cmds.setAttr(remapV+".value[2].value_FloatValue", 0.128889)
+            cmds.setAttr(remapV+".value[3].value_Position", 0.397929)
+            cmds.setAttr(remapV+".value[3].value_FloatValue", 0.742222)
+            cmds.setAttr(remapV+".value[4].value_Position", 0.60355)
+            cmds.setAttr(remapV+".value[4].value_FloatValue", 0.951111)
+            for v in range(0, 5):
+                cmds.setAttr(remapV+".value["+str(v)+"].value_Interp", 3) #spline
             
             # connections
             for axis in axisList:
@@ -174,9 +189,8 @@ class HeadDeformer():
             cmds.connectAttr(arrowCtrl+".ry", twistMD+".input1Y", force=True)
             cmds.connectAttr(twistMD+".outputY", twistDefList[1]+".endAngle", force=True)
             # change squash to be more cartoon
-            cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=-0.25*bBoxSize, value=-bBoxSize, inTangentType="auto", outTangentType="auto")
-            cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=0, value=-0.5*bBoxSize, inTangentType="auto", outTangentType="auto")
-            cmds.setDrivenKeyframe(squashDefList[0]+".lowBound", currentDriver=intensityMD+".outputY", driverValue=0.5*bBoxSize, value=-0.25*bBoxSize, inTangentType="auto", outTangentType="flat")
+            cmds.connectAttr(intensityMD+".outputY", remapV+".inputValue", force=True)
+            cmds.connectAttr(remapV+".outValue", squashDefList[0]+".lowBound", force=True)
             cmds.connectAttr(arrowCtrl+"."+expandName, squashDefList[0]+".expand", force=True)
             # fix side values
             for axis in axisList:
@@ -184,7 +198,7 @@ class HeadDeformer():
                 if unitConvNode:
                     if cmds.objectType(unitConvNode) == "unitConversion":
                         cmds.setAttr(unitConvNode+".conversionFactor", 1)
-
+            
             self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v'])
             
             # create symmetry setup
