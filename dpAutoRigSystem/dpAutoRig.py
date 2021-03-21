@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.02"
-DPAR_UPDATELOG = "#257 Filter HeadDeformer SDK.\nChanged setDrivenKey to remapValue node."
+DPAR_VERSION = "3.11.03"
+DPAR_UPDATELOG = "#271 Fixed Limb creating without Joint Articulation error."
 
 
 

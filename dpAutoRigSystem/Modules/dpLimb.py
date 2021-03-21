@@ -1386,18 +1386,18 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 extremNumber = "13" #wrist/ankle
                 if self.getHasBend():                    
                     if not self.addArticJoint:
-                        extremNumber = "11"
+                        extremNumber = "10"
                     numBendJnt = self.getBendJoints()
                     if numBendJnt == 3:
                         cornerNumber = "05"
                         extremNumber = "09"
                         if not self.addArticJoint:
-                            extremNumber = "07"
+                            extremNumber = "06"
                     elif numBendJnt == 7:
                         cornerNumber = "09"
                         extremNumber = "17"
                         if not self.addArticJoint:
-                            extremNumber = "15"
+                            extremNumber = "14"
                     self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
                     if self.addArticJoint:
