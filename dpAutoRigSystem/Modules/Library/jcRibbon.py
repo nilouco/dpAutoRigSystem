@@ -100,15 +100,15 @@ class RibbonClass:
             cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
         
         if arm:
-            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1)
-            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, firstLimb=False, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2)
+            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, firstLimb=False, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleY", downLimb['extraCtrlGrp']+".scaleY", force=True)
         else:
-            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1)
-            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2)
+            upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, 1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleY", force=True)
@@ -154,7 +154,8 @@ class RibbonClass:
         downJntGrp = cmds.listRelatives(downLimb['skinJointsList'][0], p=True, f=True)
         
         limbJoints = list(upLimb['skinJointsList'])
-        limbJoints.extend([self.cornerJxt])
+        if addArtic:
+            limbJoints.extend([self.cornerJxt])
         limbJoints.extend(downLimb['skinJointsList'])
         
         jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
@@ -168,7 +169,8 @@ class RibbonClass:
         
         # fix renaming:
         limbJoints.pop(len(upLimb['skinJointsList']))
-        limbJoints.insert(len(upLimb['skinJointsList']), self.cornerJnt)
+        if addArtic:
+            limbJoints.insert(len(upLimb['skinJointsList']), self.cornerJnt)
         for i in range(len(limbJoints)):
             limbJoints[i] = cmds.rename(limbJoints[i], prefix+myName+'_%02d_Jnt'%(i+articNumber)) #because 00 is the clavicle and 01 is the shoulder if we have articulation joint
             cmds.addAttr(limbJoints[i], longName="dpAR_joint", attributeType='float', keyable=False)
@@ -284,7 +286,7 @@ class RibbonClass:
         return [grp, curve, zero]
     
     
-    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, v=True, s=0, firstLimb=True, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, *args):
+    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, v=True, s=0, firstLimb=True, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, *args):
         """ Main method to create the Ribbon system.
             centerUpDown = [0, 1, 2] # center, up, down ribbon part to change proportionList used in volumeVariation.
             Returns results in a dictionary.
@@ -603,29 +605,30 @@ class RibbonClass:
             # update i
             i = i + 1
         
-        if centerUpDown == 1: #up
-            # corner scale volumeVariation setup:
-            rbProportionMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Proportion_MD"))
-            rbIntensityMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Intensity_MD"))
-            rbAddScalePMA = cmds.createNode("plusMinusAverage", name=self.elbowctrlCtrl.replace("_Ctrl", "_AddScale_PMA"))
-            rbLengthMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Length_MD"))
-            rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
-            rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
-            cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
-            cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
-            cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
-            cmds.setAttr(rbProportionMD+".input2X", 1)
-            cmds.connectAttr(rbProportionMD+".outputX", rbIntensityMD+".input1X", force=True)
-            cmds.connectAttr(worldRef+"."+self.limbManualVVAttr, rbIntensityMD+".input2X", force=True)
-            cmds.connectAttr(worldRef+"."+self.limbLengthAttr, rbLengthMD+".input2X", force=True)
-            cmds.connectAttr(rbIntensityMD+".outputX", rbLengthMD+".input1X", force=True)
-            cmds.connectAttr(rbLengthMD+".outputX", rbAddScalePMA+".input1D[1]", force=True)
-            cmds.connectAttr(rbAddScalePMA+".output1D", rbScaleClp+".inputR", force=True)
-            cmds.connectAttr(worldRef+"."+self.limbMinVVAttr, rbScaleClp+".minR")
-            cmds.setAttr(rbScaleClp+".maxR", 1000000)
-            cmds.connectAttr(rbScaleClp+".outputR", rbBlendCB+".color1.color1R", force=True)
-            cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleY", force=True)
-            cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleZ", force=True)
+        if addArtic:
+            if centerUpDown == 1: #up
+                # corner scale volumeVariation setup:
+                rbProportionMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Proportion_MD"))
+                rbIntensityMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Intensity_MD"))
+                rbAddScalePMA = cmds.createNode("plusMinusAverage", name=self.elbowctrlCtrl.replace("_Ctrl", "_AddScale_PMA"))
+                rbLengthMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Length_MD"))
+                rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
+                rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
+                cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
+                cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
+                cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
+                cmds.setAttr(rbProportionMD+".input2X", 1)
+                cmds.connectAttr(rbProportionMD+".outputX", rbIntensityMD+".input1X", force=True)
+                cmds.connectAttr(worldRef+"."+self.limbManualVVAttr, rbIntensityMD+".input2X", force=True)
+                cmds.connectAttr(worldRef+"."+self.limbLengthAttr, rbLengthMD+".input2X", force=True)
+                cmds.connectAttr(rbIntensityMD+".outputX", rbLengthMD+".input1X", force=True)
+                cmds.connectAttr(rbLengthMD+".outputX", rbAddScalePMA+".input1D[1]", force=True)
+                cmds.connectAttr(rbAddScalePMA+".output1D", rbScaleClp+".inputR", force=True)
+                cmds.connectAttr(worldRef+"."+self.limbMinVVAttr, rbScaleClp+".minR")
+                cmds.setAttr(rbScaleClp+".maxR", 1000000)
+                cmds.connectAttr(rbScaleClp+".outputR", rbBlendCB+".color1.color1R", force=True)
+                cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleY", force=True)
+                cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleZ", force=True)
         
         locatorsGrp = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')
         skinJntGrp = cmds.group(rb_Jnt, n=name+'_Jnt_Grp')
