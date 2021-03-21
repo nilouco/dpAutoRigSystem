@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.03"
-DPAR_UPDATELOG = "#271 Fixed Limb creating without Joint Articulation error."
+DPAR_UPDATELOG = "WIP #275 New Nose module.\nCreating guides."
 
 
 
