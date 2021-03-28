@@ -176,7 +176,10 @@ class Nose(Base.StartClass, Layout.LayoutClass):
     def changeNostril(self, *args):
         """ Set the attribute value for nostril.
         """
-        cmds.setAttr(self.moduleGrp+".nostril", cmds.checkBox(self.nostrilCB, query=True, value=True))
+        nostrilValue = cmds.checkBox(self.nostrilCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".nostril", nostrilValue)
+        cmds.setAttr(self.cvLNostrilLoc+".visibility", nostrilValue)
+        cmds.setAttr(self.cvRNostrilLoc+".visibility", nostrilValue)
     
 
     def rigModule(self, *args):
@@ -189,6 +192,9 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
+            self.addFlip = self.getModuleAttr("flip")
+            # declare lists to store names and attributes:
+            self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # check if need to add nostril:
             self.addNostril = self.getModuleAttr("nostril")
             # start as no having mirror:
@@ -211,7 +217,7 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
                     # do a group mirror with negative scaling:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                        if not self.addFlip:
                             for axis in self.mirrorAxis:
                                 gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
                                 flipedValue = gotValue*(-2)
@@ -239,6 +245,7 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []
+                self.centerList, self.leftList, self.rightList = [], [], []
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 # creating top nose top controls and joints:
@@ -254,7 +261,8 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                     utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-                    self.noseCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
+                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
+                    self.centerList.append(self.noseCtrl)
                     # position and orientation of joint and control:
                     cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.jnt, maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.noseCtrl, maintainOffset=False))
@@ -264,7 +272,7 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.noseCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        if self.addFlip:
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleX", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
@@ -300,21 +308,28 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 self.cvRNostrilLoc = side+self.userGuideName+"_Guide_cvRNostrilLoc"
                 self.cvBottomLoc   = side+self.userGuideName+"_Guide_cvBottomLoc"
                 self.cvEndJoint    = side+self.userGuideName+"_Guide_JointEnd"
+                
                 # generating naming:
+                leftSideName  = self.langDic[self.langName]['p002_left']
+                rightSideName = self.langDic[self.langName]['p003_right']
+                if self.addFlip:
+                    leftSideName = self.langDic[self.langName]['c123_outer']
+                    rightSideName = self.langDic[self.langName]['c122_inner']
                 middleJntName    = side+self.userGuideName+"_%02d_"%(n+1)+self.langDic[self.langName]['c029_middle']+"_Jnt"
                 tipJntName       = side+self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c120_tip']+"_Jnt"
                 bottomJntName    = side+self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c100_bottom']+"_Jnt"
-                lSideJntName     = side+self.userGuideName+"_%02d_L_"%(n+3)+self.langDic[self.langName]['c121_side']+"_Jnt"
-                rSideJntName     = side+self.userGuideName+"_%02d_R_"%(n+3)+self.langDic[self.langName]['c121_side']+"_Jnt"
-                lNostrilJntName  = side+self.userGuideName+"_%02d_L_"%(n+4)+self.langDic[self.langName]['m079_nostril']+"_Jnt"
-                rNostrilJntName  = side+self.userGuideName+"_%02d_R_"%(n+4)+self.langDic[self.langName]['m079_nostril']+"_Jnt"
+                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+"_"+leftSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
+                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+"_"+rightSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
+                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+"_"+leftSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
+                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+"_"+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
                 middleCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+"_Ctrl"
                 tipCtrlName      = side+self.userGuideName+"_"+self.langDic[self.langName]['c120_tip']+"_Ctrl"
                 bottomCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c100_bottom']+"_Ctrl"
-                lSideCtrlName    = side+self.userGuideName+"_L_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
-                rSideCtrlName    = side+self.userGuideName+"_R_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
-                lNostrilCtrlName = side+self.userGuideName+"_L_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
-                rNostrilCtrlName = side+self.userGuideName+"_R_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
+                lSideCtrlName    = side+self.userGuideName+"_"+leftSideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
+                rSideCtrlName    = side+self.userGuideName+"_"+rightSideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
+                lNostrilCtrlName = side+self.userGuideName+"_"+leftSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
+                rNostrilCtrlName = side+self.userGuideName+"_"+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
+                
                 # creating joints:
                 self.middleJnt = cmds.joint(name=middleJntName)
                 self.tipJnt = cmds.joint(name=tipJntName)
@@ -342,16 +357,26 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 if self.addNostril:
                     utils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_L_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
                     utils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_R_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
+                
                 # creating controls:
-                self.middleCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=middleCtrlName, r=(self.ctrlRadius * 1.5), d=self.curveDegree, dir="-Z")
-                self.tipCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=tipCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
-                self.bottomCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=bottomCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
-                self.lSideCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=lSideCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
-                self.rSideCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=rSideCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
+                self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree)
+                self.tipCtrl = self.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.ctrlRadius * 0.3), d=self.curveDegree)
+                self.bottomCtrl = self.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, dir="-Y")
+                self.lSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90))
+                self.rSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90))
                 if self.addNostril:
-                    self.lNostrilCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=lNostrilCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
-                    self.rNostrilCtrl = self.ctrls.cvControl("id_007_FkLine", ctrlName=rNostrilCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
-
+                    self.lNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree)
+                    self.rNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree)
+                    self.leftList.append(self.lNostrilCtrl)
+                    self.rightList.append(self.rNostrilCtrl)
+                self.centerList.append(self.middleCtrl)
+                self.centerList.append(self.tipCtrl)
+                self.centerList.append(self.bottomCtrl)
+                self.aCtrls.append(self.centerList)
+                self.leftList.append(self.lSideCtrl)
+                self.rightList.append(self.rSideCtrl)
+                self.aLCtrls.append(self.leftList)
+                self.aRCtrls.append(self.rightList)
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 utils.originedFrom(objName=self.middleCtrl, attrString=self.cvMiddleLoc)
                 utils.originedFrom(objName=self.tipCtrl, attrString=self.cvTipLoc)
@@ -372,33 +397,50 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.cvLNostrilLoc, self.lNostrilCtrl, maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.cvRNostrilLoc, self.rNostrilCtrl, maintainOffset=False))
                 
+                # fixing flip mirror:
+                if s == 1:
+                    if self.addFlip:
+                        ctrlToFlipList = [self.middleCtrl, self.bottomCtrl, self.tipCtrl, self.lSideCtrl, self.rSideCtrl]
+                        if self.addNostril:
+                            ctrlToFlipList.append(self.lNostrilCtrl)
+                            ctrlToFlipList.append(self.rNostrilCtrl)
+                        for ctrlToFlip in ctrlToFlipList:
+                            cmds.setAttr(ctrlToFlip+".scaleX", -1)
+                            cmds.setAttr(ctrlToFlip+".scaleY", -1)
+                            cmds.setAttr(ctrlToFlip+".scaleZ", -1)
+                    else:
+                        cmds.setAttr(self.rSideCtrl+".scaleX", -1)
+                        if self.addNostril:
+                            cmds.setAttr(self.rNostrilCtrl+".scaleX", -1)
+
                 # zeroOut controls:
                 self.zeroSideCtrlList = utils.zeroOut([self.lSideCtrl, self.rSideCtrl])
-                cmds.setAttr(self.zeroSideCtrlList[1]+".scaleX", -1)
+                if s == 0:
+                    cmds.setAttr(self.zeroSideCtrlList[1]+".scaleX", -1)
+                elif self.addFlip:
+                    cmds.setAttr(self.zeroSideCtrlList[1]+".scaleX", 1)
                 if self.addNostril:
                     self.zeroNostrilCtrlList = utils.zeroOut([self.lNostrilCtrl, self.rNostrilCtrl])
-                    cmds.setAttr(self.zeroNostrilCtrlList[1]+".scaleX", -1)
+                    if s == 0:
+                        cmds.setAttr(self.zeroNostrilCtrlList[1]+".scaleX", -1)
+                    elif self.addFlip:
+                        cmds.setAttr(self.zeroNostrilCtrlList[1]+".scaleX", 1)
                 self.zeroCtrlList = utils.zeroOut([self.middleCtrl,  self.tipCtrl, self.bottomCtrl])
 
                 # make controls drive joints:
                 cmds.parentConstraint(self.middleCtrl, self.middleJnt, maintainOffset=False, name=self.middleJnt+"_PaC")
                 cmds.scaleConstraint(self.middleCtrl, self.middleJnt, maintainOffset=False, name=self.middleJnt+"_ScC")
-
                 cmds.parentConstraint(self.tipCtrl, self.tipJnt, maintainOffset=False, name=self.tipJnt+"_PaC")
                 cmds.scaleConstraint(self.tipCtrl, self.tipJnt, maintainOffset=False, name=self.tipJnt+"_ScC")
-
                 cmds.parentConstraint(self.bottomCtrl, self.bottomJnt, maintainOffset=False, name=self.bottomJnt+"_PaC")
                 cmds.scaleConstraint(self.bottomCtrl, self.bottomJnt, maintainOffset=False, name=self.bottomJnt+"_ScC")
-
                 cmds.parentConstraint(self.lSideCtrl, self.lSideJnt, maintainOffset=False, name=self.lSideJnt+"_PaC")
                 cmds.scaleConstraint(self.lSideCtrl, self.lSideJnt, maintainOffset=False, name=self.lSideJnt+"_ScC")
-
                 cmds.parentConstraint(self.rSideCtrl, self.rSideJnt, maintainOffset=False, name=self.rSideJnt+"_PaC")
                 cmds.scaleConstraint(self.rSideCtrl, self.rSideJnt, maintainOffset=False, name=self.rSideJnt+"_ScC")
                 if self.addNostril:
                     cmds.parentConstraint(self.lNostrilCtrl, self.lNostrilJnt, maintainOffset=False, name=self.lNostrilJnt+"_PaC")
                     cmds.scaleConstraint(self.lNostrilCtrl, self.lNostrilJnt, maintainOffset=False, name=self.lNostrilJnt+"_ScC")
-
                     cmds.parentConstraint(self.rNostrilCtrl, self.rNostrilJnt, maintainOffset=False, name=self.rNostrilJnt+"_PaC")
                     cmds.scaleConstraint(self.rNostrilCtrl, self.rNostrilJnt, maintainOffset=False, name=self.rNostrilJnt+"_ScC")
 
@@ -413,6 +455,11 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 cmds.select(self.tipJnt)
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+
+                # optimize control CV shapes:
+                tempTipCluster = cmds.cluster(self.tipCtrl)[1]
+                cmds.parentConstraint(self.cvEndJoint, tempTipCluster, maintainOffset=False)
+                cmds.delete([self.tipCtrl], constructionHistory=True)
 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")
@@ -447,3 +494,12 @@ class Nose(Base.StartClass, Layout.LayoutClass):
     
     def integratingInfo(self, *args):
         Base.StartClass.integratingInfo(self)
+        """ This method will create a dictionary with informations about integrations system between modules.
+        """
+        self.integratedActionsDic = {
+                                    "module": {
+                                                "ctrlList" : self.aCtrls,
+                                                "lCtrls"   : self.aLCtrls,
+                                                "rCtrls"   : self.aRCtrls,
+                                              }
+                                    }
