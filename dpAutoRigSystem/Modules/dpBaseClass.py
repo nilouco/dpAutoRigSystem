@@ -300,7 +300,9 @@ class StartClass:
     def getArticulation(self, *args):
         return cmds.getAttr(self.moduleGrp+".articulation")
 
-
+    def getModuleAttr(self, moduleAttr, *args):
+        return cmds.getAttr(self.moduleGrp + "." + moduleAttr)
+    
     # Sets:
     #
     def setArticulation(self, value, *args):

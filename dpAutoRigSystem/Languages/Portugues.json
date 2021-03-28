@@ -132,6 +132,8 @@
 	"c117_decrescent"        : "Decrescente",
 	"c118_active"            : "activar",
 	"c119_auto"              : "auto",
+    "c120_tip"               : "Ponta",
+    "c121_side"              : "Lateral",
 
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -527,8 +529,7 @@
 	"m173_articulation"        : "Articulação",
 	"m174_createdZipper"       : "Criado Zíper.",
 	"m175_zipperFlat"          : "Zipper Flat",
-    "m176_nose"                : "Nariz",
-    "m177_noseDesc"            : "Descrição do módulo Nariz:\n\nEsse módulo cria alguns joints integrados\ncomo alguns FkLines para ser usado\nno rosto como nariz de personagens.",
+    "m176_noseDesc"            : "Descrição do módulo Nariz:\n\nEsse módulo cria alguns joints integrados\ncomo alguns FkLines para ser usado\nno rosto como nariz de personagens.",
 	
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

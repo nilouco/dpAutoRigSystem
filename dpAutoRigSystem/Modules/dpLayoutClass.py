@@ -135,6 +135,7 @@ class LayoutClass:
                 self.steeringExists = cmds.objExists(self.moduleGrp+".steering")
                 self.fatherBExists = cmds.objExists(self.moduleGrp+".fatherB")
                 self.articulationExists = cmds.objExists(self.moduleGrp+".articulation")
+                self.nostrilExists = cmds.objExists(self.moduleGrp+".nostril")
                 
                 # UI
                 # edit label of frame layout:
@@ -318,6 +319,11 @@ class LayoutClass:
                     cmds.text(self.langDic[self.langName]['m173_articulation'], parent=self.articLayout)
                     articValue = cmds.getAttr(self.moduleGrp+".articulation")
                     self.articCB = cmds.checkBox(label="", value=articValue, changeCommand=self.changeArticulation, parent=self.articLayout)
+                    # nostril:
+                    if self.nostrilExists:
+                        cmds.text(" ", parent=self.articLayout)
+                        nostrilValue = cmds.getAttr(self.moduleGrp+".nostril")
+                        self.nostrilCB = cmds.checkBox(label=self.langDic[self.langName]['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
                 
             except:
                 pass
