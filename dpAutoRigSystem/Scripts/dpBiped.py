@@ -26,7 +26,7 @@ def Biped(dpUIinst):
     """
     # check modules integrity:
     guideDir = 'Modules'
-    checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye']
+    checkModuleList = ['dpLimb', 'dpFoot', 'dpFinger', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose']
     checkResultList = dpUIinst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
@@ -53,7 +53,6 @@ def Biped(dpUIinst):
         lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
         lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
         noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
-        nostrilName = dpUIinst.langDic[dpUIinst.langName]['m079_nostril']
         tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']
         toeName = dpUIinst.langDic[dpUIinst.langName]['c013_RevFoot_D'].capitalize()
         breathName = dpUIinst.langDic[dpUIinst.langName]['c095_breath']
@@ -349,37 +348,17 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+noseName))
                 
-                # woking with Nose and Nostril systems:
+                # woking with Nose systems:
                 # create FkLine module instance:
-                noseInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                noseInstance = dpUIinst.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
                 noseInstance.editUserName(noseName)
-                cmds.setAttr(noseInstance.moduleGrp+".translateY", 20.9)
+                cmds.setAttr(noseInstance.moduleGrp+".translateY", 21.2)
                 cmds.setAttr(noseInstance.moduleGrp+".translateZ", 2)
                 cmds.setAttr(noseInstance.radiusCtrl+".translateX", 0.3)
                 noseInstance.changeJointNumber(2)
-                cmds.setAttr(noseInstance.moduleGrp+".nJoints", 2)
-                cmds.setAttr(noseInstance.cvJointLoc+".translateY", -0.15)
-                cmds.setAttr(noseInstance.cvJointLoc+".translateZ", 0.3)
-                cmds.setAttr(noseInstance.cvEndJoint+".translateZ", 0.1)
-                cmds.setAttr(noseInstance.moduleGrp+".shapeSize", 0.5)
                 # parent nose guide to head guide:
                 cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
-                # create FkLine module instance:
-                nostrilInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-                # editing nostril base guide informations:
-                nostrilInstance.editUserName(nostrilName)
-                cmds.setAttr(nostrilInstance.moduleGrp+".translateX", 0.33)
-                cmds.setAttr(nostrilInstance.moduleGrp+".translateY", 20.65)
-                cmds.setAttr(nostrilInstance.moduleGrp+".translateZ", 2.15)
-                cmds.setAttr(nostrilInstance.radiusCtrl+".translateX", 0.2)
-                cmds.setAttr(nostrilInstance.cvEndJoint+".translateZ", 0.1)
-                cmds.setAttr(nostrilInstance.moduleGrp+".shapeSize", 0.3)
-                # setting X mirror:
-                nostrilInstance.changeMirror("X")
-                cmds.setAttr(nostrilInstance.moduleGrp+".flip", 1)
-                # parent nostril guide to nose guide:
-                cmds.parent(nostrilInstance.moduleGrp, noseInstance.moduleGrp, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1

@@ -2,7 +2,7 @@
     "_preset"     : "Cubic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2021-01-11",
+    "_updated"    : "2021-02-28",
 
     "id_000_Base"            : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"         : {"type" : "Cube", "degree" : 1},
@@ -78,6 +78,12 @@
 	"id_071_EyeSpec"         : {"type" : "Cube", "degree" : 1},
 	"id_072_HeadUpperLip"    : {"type" : "Cube", "degree" : 1},
 	"id_073_HeadLowerLip"    : {"type" : "Cube", "degree" : 1},
-	"id_074_Zipper"          : {"type" : "Cube", "degree" : 1}
+	"id_074_Zipper"          : {"type" : "Cube", "degree" : 1},
+    "id_075_NoseTop"         : {"type" : "Cube", "degree" : 1},
+    "id_076_NoseMiddle"      : {"type" : "Cube", "degree" : 1},
+    "id_077_NoseTip"         : {"type" : "Cube", "degree" : 1},
+    "id_078_NoseSide"        : {"type" : "Cube", "degree" : 1},
+    "id_079_Nostril"         : {"type" : "Cube", "degree" : 1},
+    "id_080_NoseBottom"      : {"type" : "Cube", "degree" : 1}
 	
 }

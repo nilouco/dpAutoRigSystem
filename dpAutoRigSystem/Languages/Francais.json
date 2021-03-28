@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2021-01-11",
+    "_updated"       : "2021-03-28",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -132,6 +132,10 @@
 	"c117_decrescent"        : "Decroissant",
 	"c118_active"            : "activer",
 	"c119_auto"              : "auto",
+    "c120_tip"               : "Bout",
+    "c121_side"              : "Cote",
+    "c122_inner"             : "interieure",
+    "c123_outer"             : "Exterieur",
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -527,6 +531,7 @@
 	"m173_articulation"        : "Articulation",
 	"m174_createdZipper"       : "Créé le Zipper.",
 	"m175_zipperFlat"          : "Zipper Flat",
+    "m176_noseDesc"            : "Description du module Nez:\n\nCe module crée des joints intégrées\ncomme en utilisant des FkLines\ndans le visage pour le nez des personnages.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

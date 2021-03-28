@@ -32,10 +32,6 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         Layout.LayoutClass.basicModuleLayout(self)
     
     
-    def getModuleAttr(self, moduleAttr, *args):
-        return cmds.getAttr(self.moduleGrp + "." + moduleAttr)
-        
-    
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:

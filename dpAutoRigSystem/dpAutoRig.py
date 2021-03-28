@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.03"
-DPAR_UPDATELOG = "#271 Fixed Limb creating without Joint Articulation error."
+DPAR_VERSION = "3.11.04"
+DPAR_UPDATELOG = "#275 New Nose module."
 
 
 
@@ -116,6 +116,7 @@ SINGLE = "Single"
 WHEEL = "Wheel"
 STEERING = "Steering"
 SUSPENSION = "Suspension"
+NOSE = "Nose"
 GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
@@ -2489,6 +2490,15 @@ class DP_AutoRig_UI:
                                     wheelMainCtrl = self.integratedTaskDic[fatherGuide]['mainCtrlList'][s]
                                     cmds.parentConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_PaC")
                                     cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScC")
+
+                        # integrate the nose control colors:
+                        if moduleType == NOSE:
+                            self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
+                            if self.itemGuideMirrorAxis == "off":
+                                if bColorize:
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][0], "yellow")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][0], "red")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][0], "blue")
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
