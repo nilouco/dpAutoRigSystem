@@ -4,14 +4,14 @@ import dpAutoRigSystem.Controls.dpBaseControlClass as BaseControl
 reload(BaseControl)
 
 # global variables to this module:    
-CLASS_NAME = "Dimond"
-TITLE = "m105_dimond"
+CLASS_NAME = "DimondFlat"
+TITLE = "m177_dimondFlat"
 DESCRIPTION = "m099_cvControlDesc"
-ICON = "/Icons/dp_dimond.png"
+ICON = "/Icons/dp_dimondFlat.png"
 
-dpDimondVersion = 1.2
+dpDimondFlatVersion = 1.2
 
-class Dimond(BaseControl.ControlStartClass):
+class DimondFlat(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -46,10 +46,5 @@ class Dimond(BaseControl.ControlStartClass):
         # creating curve shapes:
         curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve1+".rotateZ", 45)
-        cmds.makeIdentity(curve1, apply=True)
-        curve2 = cmds.duplicate(curve1)[0]
-        cmds.setAttr(curve2+".rotateX", 90)
-        curve3 = cmds.duplicate(curve1)[0]
-        cmds.setAttr(curve3+".rotateY", 90)
-        mainCurve = self.combineCurves([curve1, curve2, curve3])
+        mainCurve = self.combineCurves([curve1])
         return mainCurve
