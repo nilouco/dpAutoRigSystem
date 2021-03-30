@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.04"
-DPAR_UPDATELOG = "#275 New Nose module."
+DPAR_VERSION = "3.11.05"
+DPAR_UPDATELOG = "#282 Dimond curve shape.\nRenamed old Dimond to Dimond Flat."
 
 
 
