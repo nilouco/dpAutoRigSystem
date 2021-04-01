@@ -547,17 +547,17 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 
                 # setup jaw move:
                 # jaw open:
-                self.setupJawMove(self.jawCtrl, "c108_open", True, "Y", "c049_intensity", createOutput=True, *args)
-                self.setupJawMove(self.jawCtrl, "c108_open", True, "Z", "c049_intensity", *args)
+                self.setupJawMove(self.jawCtrl, "c108_open", True, "Y", "c049_intensity", createOutput=True)
+                self.setupJawMove(self.jawCtrl, "c108_open", True, "Z", "c049_intensity")
                 # jaw close:
-                self.setupJawMove(self.jawCtrl, "c109_close", False, "Y", "c049_intensity", createOutput=True, *args)
-                self.setupJawMove(self.jawCtrl, "c109_close", False, "Z", "c049_intensity", *args)
+                self.setupJawMove(self.jawCtrl, "c109_close", False, "Y", "c049_intensity", createOutput=True)
+                self.setupJawMove(self.jawCtrl, "c109_close", False, "Z", "c049_intensity")
                 # upper lid close:
-                self.setupJawMove(self.upperLipCtrl, "c109_close", False, "Y", "c039_lip", *args)
-                self.setupJawMove(self.upperLipCtrl, "c109_close", False, "Z", "c039_lip", *args)
+                self.setupJawMove(self.upperLipCtrl, "c109_close", False, "Y", "c039_lip")
+                self.setupJawMove(self.upperLipCtrl, "c109_close", False, "Z", "c039_lip")
                 # lower lid close:
-                self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Y", "c039_lip", invertRot=True, *args)
-                self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Z", "c039_lip", *args)
+                self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Y", "c039_lip", invertRot=True)
+                self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Z", "c039_lip")
                 
                 # set jaw move and lips calibrate default values:
                 cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation", 5)

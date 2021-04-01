@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.05"
-DPAR_UPDATELOG = "#282 Dimond curve shape.\nRenamed old Dimond to Dimond Flat."
+DPAR_VERSION = "3.11.06"
+DPAR_UPDATELOG = "#283 Fixed Head error about invertRot variable."
 
 
 
