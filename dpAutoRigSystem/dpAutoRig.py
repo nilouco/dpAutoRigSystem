@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.06"
-DPAR_UPDATELOG = "#283 Fixed Head error about invertRot variable."
+DPAR_VERSION = "3.11.07"
+DPAR_UPDATELOG = "#284 Reviewed DimondFlat presets."
 
 
 
