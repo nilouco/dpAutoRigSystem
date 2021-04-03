@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.07"
-DPAR_UPDATELOG = "#284 Reviewed DimondFlat presets."
+DPAR_VERSION = "3.11.08"
+DPAR_UPDATELOG = "#279 Fixed Head mirror."
 
 
 
