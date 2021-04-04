@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.08"
-DPAR_UPDATELOG = "#279 Fixed Head mirror."
+DPAR_VERSION = "3.11.09"
+DPAR_UPDATELOG = "#225 AutoInstall dictionary missing key issue.\nTrying to fix."
 
 
 
@@ -1434,6 +1434,13 @@ class DP_AutoRig_UI:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
                 
+                # remove all old live files and folders for this current version, that means delete myself, OMG!
+                for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
+                    if not "-"+dpAR_Folder+"-" in eachFolder:
+                        shutil.rmtree(dpAR_DestFolder+"/"+eachFolder)
+                for eachFile in next(os.walk(dpAR_DestFolder))[2]:
+                    os.remove(dpAR_DestFolder+"/"+eachFile)
+
                 # pass in all files to copy them (doing the simple installation):
                 for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
                     # declare destination directory:
