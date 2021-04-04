@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.09"
-DPAR_UPDATELOG = "#287 Dimond name review.\nCorrect name is Diamond.\nThanks Felipe Mello!"
+DPAR_VERSION = "3.11.10"
+DPAR_UPDATELOG = "#287 Dimond name review.\nCorrect name is Diamond.\nThanks Felipe Mello!\n\n#225 Trying fix autoInstall issue about missing dictionary keys."
 
 
 
@@ -255,7 +255,7 @@ class DP_AutoRig_UI:
     
     
     def getJsonFileInfo(self, dir):
-        """ Find all json files in the given path and get content used for each file.
+        """ Find all json files in the given path and get coctemt used for each file.
             Create a dictionary with dictionaries of all file found.
             Return a list with the name of the found files.
         """
@@ -1434,6 +1434,13 @@ class DP_AutoRig_UI:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
                 
+                # remove all old live files and folders for this current version, that means delete myself, OMG!
+                for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
+                    if not "-"+dpAR_Folder+"-" in eachFolder:
+                        shutil.rmtree(dpAR_DestFolder+"/"+eachFolder)
+                for eachFile in next(os.walk(dpAR_DestFolder))[2]:
+                    os.remove(dpAR_DestFolder+"/"+eachFile)
+
                 # pass in all files to copy them (doing the simple installation):
                 for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
                     # declare destination directory:
