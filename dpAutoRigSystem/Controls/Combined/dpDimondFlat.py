@@ -4,14 +4,14 @@ import dpAutoRigSystem.Controls.dpBaseControlClass as BaseControl
 reload(BaseControl)
 
 # global variables to this module:    
-CLASS_NAME = "DiamondFlat"
-TITLE = "m177_DiamondFlat"
+CLASS_NAME = "DimondFlat"
+TITLE = "m177_dimondFlat"
 DESCRIPTION = "m099_cvControlDesc"
-ICON = "/Icons/dp_diamondFlat.png"
+ICON = "/Icons/dp_dimondFlat.png"
 
-dpDiamondFlatVersion = 1.3
+dpDimondFlatVersion = 1.2
 
-class DiamondFlat(BaseControl.ControlStartClass):
+class DimondFlat(BaseControl.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
