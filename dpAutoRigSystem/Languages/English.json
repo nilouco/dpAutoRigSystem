@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2021-04-04",
+    "_updated"       : "2021-04-05",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -535,6 +535,9 @@
     "m177_dimondFlat"          : "Dimond Flat",
     "m178_renamer"             : "Renamer",
     "m179_renamerDesc"         : "Renamer Module Description:\n\nThis module is useful to rename nodes in the scene.",
+    "m180_selected"            : "Selected",
+    "m181_hierarchy"           : "Hierarchy",
+    "m182_suffix"              : "Suffix",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

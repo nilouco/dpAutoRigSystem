@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.10"
-DPAR_UPDATELOG = "WIP #100 Renamer - Starting creating a new extra tool."
+DPAR_UPDATELOG = "WIP #100 Renamer - Added prefix and suffix\nfor selected or hierarchy."
 
 
 
