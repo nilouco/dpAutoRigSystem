@@ -149,7 +149,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
             
             # parent head guide to spine guide:
-            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
+            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -335,7 +335,7 @@ def Quadruped(dpUIinst):
                 earInstance.changeJointNumber(2)
                 
                 # parent ear guide to spine guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
                 cmds.setAttr(earInstance.moduleGrp+".scaleX", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)

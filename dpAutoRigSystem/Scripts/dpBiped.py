@@ -81,7 +81,7 @@ def Biped(dpUIinst):
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+spineName))
             
             
-            # woking with SPINE system:
+            # working with SPINE system:
             # create spine module instance:
             spineInstance = dpUIinst.initGuide('dpSpine', guideDir)
             # editing spine base guide informations:
@@ -95,7 +95,7 @@ def Biped(dpUIinst):
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+headName))
             
-            # woking with HEAD system:
+            # working with HEAD system:
             # create head module instance:
             headInstance = dpUIinst.initGuide('dpHead', guideDir)
             # editing head base guide informations:
@@ -110,7 +110,7 @@ def Biped(dpUIinst):
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+eyeName))
             
-            # woking with Eye system:
+            # working with Eye system:
             # create eye module instance:
             eyeInstance = dpUIinst.initGuide('dpEye', guideDir)
             # editing eyeLookAt base guide informations:
@@ -126,7 +126,7 @@ def Biped(dpUIinst):
             cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
             
             # parent eye guide to spine guide:
-            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
+            cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -244,7 +244,7 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+earName))
                 
-                # woking with EAR system:
+                # working with EAR system:
                 # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing ear base guide informations:
@@ -257,7 +257,7 @@ def Biped(dpUIinst):
                 cmds.setAttr(earInstance.cvJointLoc+".translateZ", 0.25)
                 cmds.setAttr(earInstance.cvEndJoint+".translateZ", 0.3)
                 # parent ear guide to head guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
                 # setting X mirror:
                 earInstance.changeMirror("X")
                 cmds.setAttr(earInstance.moduleGrp+".flip", 1)
@@ -266,7 +266,7 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+upperTeethName))
                 
-                # woking with Teeth system:
+                # working with Teeth system:
                 # create FkLine module instance:
                 upperTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeeth base guide informations:
@@ -348,7 +348,7 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+noseName))
                 
-                # woking with Nose systems:
+                # working with Nose systems:
                 # create FkLine module instance:
                 noseInstance = dpUIinst.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
@@ -364,7 +364,7 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+tongueName))
                 
-                # woking with Tongue system:
+                # working with Tongue system:
                 # create FkLine module instance:
                 tongueInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing tongue base guide informations:
@@ -512,7 +512,7 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+breathName))
                 
-                # woking with Breath system:
+                # working with Breath system:
                 # create FkLine module instance:
                 breathInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing breath base guide informations:
@@ -530,7 +530,7 @@ def Biped(dpUIinst):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+bellyName))
                 
-                # woking with Belly system:
+                # working with Belly system:
                 # create FkLine module instance:
                 bellyInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing belly base guide informations:
