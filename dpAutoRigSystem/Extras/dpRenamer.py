@@ -9,7 +9,7 @@ TITLE = "m178_renamer"
 DESCRIPTION = "m179_renamerDesc"
 ICON = "/Icons/dp_renamer.png"
 
-DPRENAMER_VERSION = "0.5"
+DPRENAMER_VERSION = "0.6"
 
 
 class Renamer():
@@ -58,29 +58,29 @@ class Renamer():
         fieldsLayout = cmds.columnLayout('fieldsLayout', adjustableColumn=True, width=150, parent=mainLayout)
         self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["m180_selected"], self.langDic[self.langName]["m181_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
         cmds.text('dpRenamer - WIP')
-        cmds.button('getInfoFromUI', label="getInfoFromUI", command=self.getInfoFromUI)#self.langDic[self.langName]['i124_copyPasteAttr']"", command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
+#        cmds.button('getInfoFromUI', label="getInfoFromUI", command=self.getInfoFromUI)#self.langDic[self.langName]['i124_copyPasteAttr']"", command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
         
-        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m185_sequence'], value=False)
-        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m187_name'], text="")
-        self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], value1=self.start)
-        self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m186_padding'], value1=self.padding)
-        cmds.button('sequenceBT', label=self.langDic[self.langName]['m185_sequence'], command=partial(self.runRenamer, self.originalList, True, False, False, False), backgroundColor=(1.0, 0.4, 0.2), parent=fieldsLayout)
+        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m185_sequence'], changeCommand=self.refreshPreview, value=False)
+        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m187_name'], changeCommand=self.refreshPreview, text="")
+        self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start)
+        self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m186_padding'], changeCommand=self.refreshPreview, value1=self.padding)
+#        cmds.button('sequenceBT', label=self.langDic[self.langName]['m185_sequence'], command=partial(self.runRenamer, self.originalList, True, False, False, False), backgroundColor=(1.0, 0.4, 0.2), parent=fieldsLayout)
 
         cmds.text(label="")
-        self.prefixCB = cmds.checkBox('prefixCB', label=self.langDic[self.langName]['i144_prefix'], value=False)
-        self.prefixTF = cmds.textField('prefixTF', text="")
-        cmds.button('prefixBT', label=self.langDic[self.langName]['i144_prefix'], command=partial(self.runRenamer, self.originalList, False, True, False, False), backgroundColor=(0.7, 0.9, 1.0), parent=fieldsLayout)
+        self.prefixCB = cmds.checkBox('prefixCB', label=self.langDic[self.langName]['i144_prefix'], changeCommand=self.refreshPreview, value=False)
+        self.prefixTF = cmds.textField('prefixTF', changeCommand=self.refreshPreview, text="")
+#        cmds.button('prefixBT', label=self.langDic[self.langName]['i144_prefix'], command=partial(self.runRenamer, self.originalList, False, True, False, False), backgroundColor=(0.7, 0.9, 1.0), parent=fieldsLayout)
         
         cmds.text(label="")
-        self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m182_suffix'], value=False)
-        self.suffixTF = cmds.textField('suffixTF', text="")
-        cmds.button('suffixBT', label=self.langDic[self.langName]['m182_suffix'], command=partial(self.runRenamer, self.originalList, False, False, True, False), backgroundColor=(0.9, 0.9, 0.7), parent=fieldsLayout)
+        self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m182_suffix'], changeCommand=self.refreshPreview, value=False)
+        self.suffixTF = cmds.textField('suffixTF', changeCommand=self.refreshPreview, text="")
+#        cmds.button('suffixBT', label=self.langDic[self.langName]['m182_suffix'], command=partial(self.runRenamer, self.originalList, False, False, True, False), backgroundColor=(0.9, 0.9, 0.7), parent=fieldsLayout)
         
         cmds.text(label="")
-        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m183_search']+" - "+self.langDic[self.langName]['m184_replace'], value=False)
-        self.searchTF = cmds.textField('searchTF', text="")
-        self.replaceTF = cmds.textField('replaceTF', text="")
-        cmds.button('replaceBT', label=self.langDic[self.langName]['m184_replace'], command=partial(self.runRenamer, self.originalList, False, False, False, True), backgroundColor=(0.9, 1.0, 0.5), parent=fieldsLayout)
+        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m183_search']+" - "+self.langDic[self.langName]['m184_replace'], changeCommand=self.refreshPreview, value=False)
+        self.searchTF = cmds.textField('searchTF', changeCommand=self.refreshPreview, text="")
+        self.replaceTF = cmds.textField('replaceTF', changeCommand=self.refreshPreview, text="")
+#        cmds.button('replaceBT', label=self.langDic[self.langName]['m184_replace'], command=partial(self.runRenamer, self.originalList, False, False, False, True), backgroundColor=(0.9, 1.0, 0.5), parent=fieldsLayout)
         
         cmds.text(label="")
         cmds.text(label="----")
@@ -92,11 +92,12 @@ class Renamer():
         self.originalSL = cmds.textScrollList('selectedSL', width=150, enable=True, parent=selectedLayout)
         cmds.text(label="merci", parent=selectedLayout)
 
-        previewLayout = cmds.columnLayout('previewLayout', adjustableColumn=True, width=100, parent=mainLayout)
-        self.previewSL = cmds.textScrollList('previewSL', width=150, enable=True, parent=previewLayout)
+        previewLayout = cmds.columnLayout('previewLayout', adjustableColumn=True, width=200, parent=mainLayout)
+        cmds.text(label="PREVIEW")
+        self.previewSL = cmds.textScrollList('previewSL', width=250, enable=True, parent=previewLayout)
 
         footerLayout = cmds.columnLayout('footerLayout', adjustableColumn=True, width=100, parent=mainLayout)
-        cmds.button('runRenamerBT', label="Run Forest Run!", command=self.runRenamer, parent=footerLayout)
+        cmds.button('runRenamerBT', label="Run GLOUBER Run!", command=self.runRenamerByUI, parent=footerLayout)
 
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout(mainLayout, edit=True,
@@ -143,6 +144,7 @@ class Renamer():
 
 
     def refreshPreview(self, *args):
+        self.refreshOriginal()
         self.generatePreviewList(None)
         if self.previewList:
             cmds.textScrollList(self.previewSL, edit=True, removeAll=True)
@@ -208,17 +210,17 @@ class Renamer():
         return self.originalList
 
 
-    def runRenamer(self, objList, doSequence, doPrefix, doSuffix, doReplace, *args):
-        if not objList:
-            self.getObjList()
-            
+    def runRenamerByUI(self, *args):
+        self.getObjList()
         if self.originalList:
-            self.generatePreviewList(doSequence, doPrefix, doSuffix, doReplace)
+            self.generatePreviewList()
             if self.previewList:
                 for i, item in enumerate(self.originalList):
                     cmds.rename(item, self.previewList[i])
-            
-            
+#            cmds.select(clear=True)
+            self.refreshPreview()
+        
+        
         else:
             mel.eval("warning \"Need to select anything to run.\";")
             
