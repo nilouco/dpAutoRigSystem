@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.10"
-DPAR_UPDATELOG = "WIP #100 Renamer - UI edit."
+DPAR_UPDATELOG = "WIP #100 Renamer - UI edit, scroll lists."
 
 
 

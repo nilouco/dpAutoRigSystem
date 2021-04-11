@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2021-04-05",
+    "_updated"       : "2021-04-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -538,6 +538,13 @@
     "m180_selected"            : "Selected",
     "m181_hierarchy"           : "Hierarchy",
     "m182_suffix"              : "Suffix",
+    "m183_search"              : "Search",
+    "m184_replace"             : "Replace",
+    "m185_sequence"            : "Sequence",
+    "m186_padding"             : "Padding",
+    "m187_name"                : "Name",
+    "m188_number"              : "Number",
+    "m189_letter"              : "Letter",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
