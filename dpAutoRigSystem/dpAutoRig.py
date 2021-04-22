@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.10"
-DPAR_UPDATELOG = "#240 Upper Head.\nThanks Caio Hidaka for the suggestion!"
+DPAR_VERSION = "3.11.11"
+DPAR_UPDATELOG = "#299 Nose scale fix.\nThanks Caio Hidaka for the feedback!\n\n#300 Nose bottom skin list.\nThanks Saul Almeida for the feedback!\n\n#297 Nose joint name review.\n#294 Nostril review.\n#294 Nostril review."
 
 
 
