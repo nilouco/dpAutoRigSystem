@@ -21,6 +21,8 @@ class Nose(Base.StartClass, Layout.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         Base.StartClass.__init__(self, *args, **kwargs)
+        self.cvLNostrilLoc = self.guideName+"_cvLNostrilLoc"
+        self.cvRNostrilLoc = self.guideName+"_cvRNostrilLoc"
     
     
     def createModuleLayout(self, *args):
