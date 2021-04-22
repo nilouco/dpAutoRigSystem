@@ -343,9 +343,9 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 self.rSideJnt = cmds.joint(name=rSideJntName, scaleCompensate=False)
                 if self.addNostril:
                     self.rNostrilJnt = cmds.joint(name=rNostrilJntName, scaleCompensate=False)
-                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt, self.lNostrilJnt, self.rNostrilJnt]
+                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt, self.lNostrilJnt, self.rNostrilJnt, self.bottomJnt]
                 else:
-                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt]
+                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt, self.bottomJnt]
                 for dpARJoint in dpARJointList:
                     if cmds.objExists(dpARJoint):
                         cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)

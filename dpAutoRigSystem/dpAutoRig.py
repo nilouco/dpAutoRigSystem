@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.11"
-DPAR_UPDATELOG = "#299 Nose scale fix.\nThanks Caio Hidaka for the feedback!"
+DPAR_UPDATELOG = "#299 Nose scale fix.\nThanks Caio Hidaka for the feedback!\n\n#300 Nose bottom skin list.\nThanks Saul Almeida for the feedback!"
 
 
 
