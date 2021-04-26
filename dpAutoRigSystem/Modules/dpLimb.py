@@ -1232,6 +1232,18 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             else:
                                 if self.limbTypeName == ARM:
                                     cmds.setAttr(downCtrl+".invert", 1)
+
+                            # correct ribbon locators orientation:
+                            if self.limbTypeName == LEG:
+                                oriConst = cmds.orientConstraint(self.ikExtremCtrl, self.fkCtrlList[1], self.bendGrps['rotFirst'], maintainOffset=True, name=self.bendGrps['rotFirst']+"_OrC")[0]
+                                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', oriConst+"."+self.fkCtrlList[1]+"W1", force=True)
+                                cmds.connectAttr(revNode+".outputX", oriConst+"."+self.ikExtremCtrl+"W0", force=True)
+                            else:
+                                cmds.orientConstraint(self.fkCtrlList[1], self.bendGrps['rotFirst'], maintainOffset=True, name=self.bendGrps['rotFirst']+"_OrC")
+
+                            oriConst = cmds.orientConstraint(self.ikExtremCtrl, self.fkCtrlList[3], self.bendGrps['rotExtrem'], maintainOffset=True, name=self.bendGrps['rotExtrem']+"_OrC")[0]
+                            cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', oriConst+"."+self.fkCtrlList[3]+"W1", force=True)
+                            cmds.connectAttr(revNode+".outputX", oriConst+"."+self.ikExtremCtrl+"W0", force=True)
                 
                 # auto clavicle:
                 # loading Maya matrix node

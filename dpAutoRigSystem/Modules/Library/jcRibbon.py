@@ -130,11 +130,13 @@ class RibbonClass:
         cmds.parentConstraint(self.elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_PaC")
         cmds.delete(upLimb['constraints'][3])
         cmds.pointConstraint(self.elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_PoC")
+        cmds.orientConstraint(self.elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_OrC")
         
         cmds.delete(downLimb['constraints'][0])
         cmds.parentConstraint(self.elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_PaC")
         cmds.delete(downLimb['constraints'][2])
-        cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_PaC")
+        cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_PoC")
+        cmds.orientConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_OrC")
         
         upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_PaC")[0]
         cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrC")
@@ -249,7 +251,7 @@ class RibbonClass:
         extraCtrlList = upLimb['extraCtrlList']
         extraCtrlList.extend(downLimb['extraCtrlList'])
         
-        return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, self.elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD'], 'jntGrp':jntGrp}
+        return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, self.elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD'], 'jntGrp':jntGrp, 'rotFirst':upLimb['locsList'][4], 'rotExtrem':downLimb['locsList'][3]}
     
     
     def createBendCtrl(self, myName='Bend_Ctrl', r=1, zero=True, *args):

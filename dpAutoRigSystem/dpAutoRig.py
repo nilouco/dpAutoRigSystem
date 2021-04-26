@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.10"
-DPAR_UPDATELOG = "#240 Upper Head.\nThanks Caio Hidaka for the suggestion!"
+DPAR_VERSION = "3.11.11"
+DPAR_UPDATELOG = "WIP #302 Leg bend autoRotate issue.\nTry add some orientConstraint to fix."
 
 
 
