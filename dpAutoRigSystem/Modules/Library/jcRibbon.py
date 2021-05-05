@@ -101,7 +101,7 @@ class RibbonClass:
         
         if arm:
             upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic)
-            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, firstLimb=False, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleX", force=True)
@@ -130,13 +130,11 @@ class RibbonClass:
         cmds.parentConstraint(self.elbowctrlCtrl, upLimb['locsList'][0], mo=True, w=1, name=upLimb['locsList'][0]+"_PaC")
         cmds.delete(upLimb['constraints'][3])
         cmds.pointConstraint(self.elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_PoC")
-#        cmds.orientConstraint(self.elbowctrlCtrl, upLimb['locsList'][3], mo=True, w=1, name=upLimb['locsList'][3]+"_OrC")
         
         cmds.delete(downLimb['constraints'][0])
         cmds.parentConstraint(self.elbowctrlCtrl, downLimb['locsList'][2], mo=True, w=1, name=downLimb['locsList'][2]+"_PaC")
         cmds.delete(downLimb['constraints'][2])
         cmds.pointConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_PoC")
-#        cmds.orientConstraint(self.elbowctrlCtrl, downLimb['locsList'][4], mo=True, w=1, name=downLimb['locsList'][4]+"_OrC")
         
         upPC = cmds.parentConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], self.elbowctrlCtrl, upctrl, mo=True, w=1, skipRotate=['x', 'y', 'z'], name=upctrl+"_PaC")[0]
         cmds.orientConstraint(cmds.listRelatives(upLimb['middleCtrl'], p=True)[0], upctrl, mo=True, w=1, name=upctrl+"_OrC")
@@ -288,7 +286,7 @@ class RibbonClass:
         return [grp, curve, zero]
     
     
-    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, v=True, s=0, firstLimb=True, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, *args):
+    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, *args):
         """ Main method to create the Ribbon system.
             centerUpDown = [0, 1, 2] # center, up, down ribbon part to change proportionList used in volumeVariation.
             Returns results in a dictionary.
@@ -387,21 +385,14 @@ class RibbonClass:
             cmds.setAttr(top_Loc[2]+'.translateX', 2)
             cmds.setAttr(mid_Loc[3]+'.translateX', 2)
         elif horizontal and axis==(0, 0, -1):
-            if firstLimb:
-                cmds.setAttr(bttm_Loc[2]+'.translateX', 2)
-                cmds.setAttr(top_Loc[2]+'.translateX', 2)
-                cmds.setAttr(mid_Loc[3]+'.translateX', 2)
-            else:
-                cmds.setAttr(bttm_Loc[2]+'.translateX', 2)
-                cmds.setAttr(top_Loc[2]+'.translateX', 2)
-                cmds.setAttr(mid_Loc[3]+'.translateX', 2)
+            cmds.setAttr(bttm_Loc[2]+'.translateX', 2)
+            cmds.setAttr(top_Loc[2]+'.translateX', 2)
+            cmds.setAttr(mid_Loc[3]+'.translateX', 2)
         
         #create auxiliary joints that will be used to control the ribbon
         aux_Jnt.append(cmds.duplicate(drv_Jnt[1], name=name+'_Rot_Jxt')[0])
         cmds.setAttr(aux_Jnt[0]+'.jointOrient', 0, 0, 0)
         cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 5)
-#        if axis == (0, 0, -1):
-#            cmds.setAttr(aux_Jnt[0]+'.rotateOrder', 0)
         aux_Jnt.append(cmds.duplicate(aux_Jnt[0], name=name+'_Jxt_Rot_JEnd')[0])
         
         cmds.parent(aux_Jnt[1], mid_Loc[3])
@@ -512,31 +503,15 @@ class RibbonClass:
         cmds.parent(bttm_Loc[2], bttm_Loc[0])
         cmds.parent(mid_Loc[3], aux_Jnt[1]) 
         #create needed constraints in the locators in order to set the top always follow, to the base always aim the middle, to the middle always aim the top
-        if firstLimb:
-            cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AiC")
-            cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AiC")
-            cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AiC")
-#            ori = cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
-        else:
-            # bug fix to plane twist
-            cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AiC")
-            cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AiC")
-            cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AiC")
-#            ori = cmds.orientConstraint(top_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
+        cmds.aimConstraint(drv_Jnt[1], bttm_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=bttm_Loc[2], name=bttm_Loc[1]+"_AiC")
+        cmds.aimConstraint(top_Loc[0], mid_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=mid_Loc[3], name=mid_Loc[1]+"_AiC")
+        cmds.aimConstraint(drv_Jnt[1], top_Loc[1], offset=(0, 0, 0), weight=1, aimVector=(-1, 0, 0), upVector=(0, 0, 1), worldUpType='object', worldUpObject=top_Loc[2], name=top_Loc[1]+"_AiC")
         
         #create a point and orient constraint for the middle control
         cmds.pointConstraint(top_Loc[0], bttm_Loc[0], mid_Loc[0], offset=(0, 0, 0), weight=1, name=mid_Loc[0]+"_PoC")
-#        ori = cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
-#        ori = cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
         cmds.delete(cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=1, mo=False))
-#        midConst = cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrC")[0]
         midConst = cmds.parentConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], weight=0.5, name=aux_Jnt[0]+"_PaC")[0]
         cmds.setAttr(midConst+".interpType", 2) #Shortest
-#        ori = cmds.orientConstraint(guides[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
-#        ori = cmds.orientConstraint(top_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
-#        cmds.delete(cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1))
-#        if iniJnt:
-#            cmds.parentConstraint(iniJnt, aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['y'], name=aux_Jnt[0]+"_PaC")
         
         #ribbon scale (volume variation)
         if numJoints == 3:
@@ -727,25 +702,6 @@ class RibbonClass:
             # this is an important constraint to avoid Ribbon flipping and follow correctely the hierarchy:
             cmds.parentConstraint(top, locatorsGrp, maintainOffset=True, name=locatorsGrp+"_Pac")
             
-            
-            #cmds.delete(ori)
-#            if axis == (0, 0, -1):
-#                if firstLimb:
-#                cmds.parentConstraint(top, aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['y'], name=aux_Jnt[0]+"_PaC")
-#                    cmds.parentConstraint(top_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['y'], name=aux_Jnt[0]+"_PaC")
-#                else:
-#                    cmds.parentConstraint(bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['y'], name=aux_Jnt[0]+"_PaC")
-#            else:
-#                if firstLimb:
-#                cmds.parentConstraint(top, aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['z'], name=aux_Jnt[0]+"_PaC")
-#                    cmds.parentConstraint(top_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['z'], name=aux_Jnt[0]+"_PaC")
-#                else:
-#                    cmds.parentConstraint(bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['z'], name=aux_Jnt[0]+"_PaC")
-        
-        #fix orientation issues
-#        cmds.delete(ori)
-        # we'll recreate it again if we don't use twistBone case it don't load matrix plugin.
-        
         #fix loc_Grp scale
         if guides:
             from math import sqrt, pow
@@ -799,16 +755,6 @@ class RibbonClass:
             retDict['bottomTwistBoneMD'] = bottomTwistBoneMD
             retDict['twistBoneCnd'] = twistBoneCnd
             
-            # WIP
-            # temp solution to avoid arms flipping
-#            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=1, name=aux_Jnt[0]+"_OrC")
-            #cmds.orientConstraint(top_Loc[0], bttm_Loc[0], aux_Jnt[0], offset=(0, 0, 0), weight=0.5, name=aux_Jnt[0]+"_OrC")
-#            cmds.parentConstraint(bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], skipRotate=['z'], name=aux_Jnt[0]+"_PaC")
-#            cmds.parentConstraint(bttm_Loc[0], aux_Jnt[0], maintainOffset=True, skipTranslate=['x', 'y', 'z'], name=aux_Jnt[0]+"_PaC")
-            
-#        else:
-#            cmds.orientConstraint(bttm_Loc[0], aux_Jnt[0], weight=0.5, mo=True, name=aux_Jnt[0]+"_OrC")
-        
         #updating values
         cmds.setAttr(rbScaleMD+".input2X", cmds.getAttr(curveInfoNode+".arcLength"))
         for jnt in rb_Jnt:

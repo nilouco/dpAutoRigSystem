@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.11"
-DPAR_UPDATELOG = "WIP #302 Leg bend autoRotate issue.\nFixed problem.\nNeed to clean-up the code before publish, please."
+DPAR_VERSION = "3.11.12"
+DPAR_UPDATELOG = "#302 Leg bend autoRotate issue.\nFixed the problem of an old temporary fix that caused troubles."
 
 
 
