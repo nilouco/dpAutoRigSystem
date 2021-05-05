@@ -21,6 +21,8 @@ class Nose(Base.StartClass, Layout.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         Base.StartClass.__init__(self, *args, **kwargs)
+        self.cvLNostrilLoc = self.guideName+"_cvLNostrilLoc"
+        self.cvRNostrilLoc = self.guideName+"_cvRNostrilLoc"
     
     
     def createModuleLayout(self, *args):
@@ -318,10 +320,10 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 middleJntName    = side+self.userGuideName+"_%02d_"%(n+1)+self.langDic[self.langName]['c029_middle']+"_Jnt"
                 tipJntName       = side+self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c120_tip']+"_Jnt"
                 bottomJntName    = side+self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c100_bottom']+"_Jnt"
-                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+"_"+leftSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
-                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+"_"+rightSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
-                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+"_"+leftSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
-                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+"_"+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
+                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+leftSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
+                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+rightSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
+                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+leftSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
+                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
                 middleCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+"_Ctrl"
                 tipCtrlName      = side+self.userGuideName+"_"+self.langDic[self.langName]['c120_tip']+"_Ctrl"
                 bottomCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c100_bottom']+"_Ctrl"
@@ -331,21 +333,21 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 rNostrilCtrlName = side+self.userGuideName+"_"+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
                 
                 # creating joints:
-                self.middleJnt = cmds.joint(name=middleJntName)
-                self.tipJnt = cmds.joint(name=tipJntName)
+                self.middleJnt = cmds.joint(name=middleJntName, scaleCompensate=False)
+                self.tipJnt = cmds.joint(name=tipJntName, scaleCompensate=False)
                 cmds.select(self.middleJnt)
-                self.bottomJnt = cmds.joint(name=bottomJntName)
+                self.bottomJnt = cmds.joint(name=bottomJntName, scaleCompensate=False)
                 cmds.select(self.middleJnt)
-                self.lSideJnt = cmds.joint(name=lSideJntName)
+                self.lSideJnt = cmds.joint(name=lSideJntName, scaleCompensate=False)
                 if self.addNostril:
-                    self.lNostrilJnt = cmds.joint(name=lNostrilJntName)
+                    self.lNostrilJnt = cmds.joint(name=lNostrilJntName, scaleCompensate=False)
                 cmds.select(self.middleJnt)
-                self.rSideJnt = cmds.joint(name=rSideJntName)
+                self.rSideJnt = cmds.joint(name=rSideJntName, scaleCompensate=False)
                 if self.addNostril:
-                    self.rNostrilJnt = cmds.joint(name=rNostrilJntName)
-                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt, self.lNostrilJnt, self.rNostrilJnt]
+                    self.rNostrilJnt = cmds.joint(name=rNostrilJntName, scaleCompensate=False)
+                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt, self.lNostrilJnt, self.rNostrilJnt, self.bottomJnt]
                 else:
-                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt]
+                    dpARJointList = [self.middleJnt, self.tipJnt, self.lSideJnt, self.rSideJnt, self.bottomJnt]
                 for dpARJoint in dpARJointList:
                     if cmds.objExists(dpARJoint):
                         cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
