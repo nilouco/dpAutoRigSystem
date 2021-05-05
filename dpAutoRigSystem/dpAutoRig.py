@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.11"
-DPAR_UPDATELOG = "WIP #302 Leg bend autoRotate issue.\nTry add some orientConstraint to fix."
+DPAR_UPDATELOG = "WIP #302 Leg bend autoRotate issue.\nFixed problem.\nNeed to clean-up the code before publish, please."
 
 
 

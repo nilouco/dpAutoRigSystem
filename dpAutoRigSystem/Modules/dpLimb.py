@@ -1224,26 +1224,28 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             upCtrl = self.bendGrps['ctrlList'][0]
                             downCtrl = self.bendGrps['ctrlList'][1]
                             if s == 0: #left
-                                if self.limbTypeName == ARM:
-                                    cmds.setAttr(upCtrl+".invert", 1)
-                                else: #leg
-                                    cmds.setAttr(upCtrl+".invert", 1)
-                                    cmds.setAttr(downCtrl+".invert", 1)
-                            else:
-                                if self.limbTypeName == ARM:
-                                    cmds.setAttr(downCtrl+".invert", 1)
+#                                if self.limbTypeName == ARM:
+                                cmds.setAttr(upCtrl+".invert", 1)
+                                cmds.setAttr(downCtrl+".invert", 1)
+#                                else: #leg
+#                                    cmds.setAttr(upCtrl+".invert", 1)
+#                                    cmds.setAttr(downCtrl+".invert", 1)
+#                            else:
+#                                if self.limbTypeName == ARM:
+#                                    cmds.setAttr(upCtrl+".invert", 1)
+#                                    cmds.setAttr(downCtrl+".invert", 1)
 
-                            # correct ribbon locators orientation:
-                            if self.limbTypeName == LEG:
-                                oriConst = cmds.orientConstraint(self.ikExtremCtrl, self.fkCtrlList[1], self.bendGrps['rotFirst'], maintainOffset=True, name=self.bendGrps['rotFirst']+"_OrC")[0]
-                                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', oriConst+"."+self.fkCtrlList[1]+"W1", force=True)
-                                cmds.connectAttr(revNode+".outputX", oriConst+"."+self.ikExtremCtrl+"W0", force=True)
-                            else:
-                                cmds.orientConstraint(self.fkCtrlList[1], self.bendGrps['rotFirst'], maintainOffset=True, name=self.bendGrps['rotFirst']+"_OrC")
-
-                            oriConst = cmds.orientConstraint(self.ikExtremCtrl, self.fkCtrlList[3], self.bendGrps['rotExtrem'], maintainOffset=True, name=self.bendGrps['rotExtrem']+"_OrC")[0]
-                            cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', oriConst+"."+self.fkCtrlList[3]+"W1", force=True)
-                            cmds.connectAttr(revNode+".outputX", oriConst+"."+self.ikExtremCtrl+"W0", force=True)
+#                            # correct ribbon locators orientation:
+#                            if self.limbTypeName == LEG:
+#                                oriConst = cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[1], self.bendGrps['rotFirst'], maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.bendGrps['rotFirst']+"_OrC")[0]
+#                                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', oriConst+"."+self.fkCtrlList[1]+"W1", force=True)
+#                                cmds.connectAttr(revNode+".outputX", oriConst+"."+self.ikExtremCtrl+"W0", force=True)
+#                            else:
+#                                cmds.parentConstraint(self.fkCtrlList[1], self.bendGrps['rotFirst'], maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.bendGrps['rotFirst']+"_OrC")
+#
+#                            oriConst = cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[3], self.bendGrps['rotExtrem'], maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.bendGrps['rotExtrem']+"_OrC")[0]
+#                            cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', oriConst+"."+self.fkCtrlList[3]+"W1", force=True)
+#                            cmds.connectAttr(revNode+".outputX", oriConst+"."+self.ikExtremCtrl+"W0", force=True)
                 
                 # auto clavicle:
                 # loading Maya matrix node
