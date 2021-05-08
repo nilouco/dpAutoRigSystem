@@ -20,7 +20,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.09"
+DPAR_VERSION = "3.11.13"
 DPAR_UPDATELOG = "#287 Dimond name review.\nCorrect name is Diamond.\nThanks Felipe Mello!"
 
 
@@ -255,7 +255,7 @@ class DP_AutoRig_UI:
     
     
     def getJsonFileInfo(self, dir):
-        """ Find all json files in the given path and get content used for each file.
+        """ Find all json files in the given path and get contents used for each file.
             Create a dictionary with dictionaries of all file found.
             Return a list with the name of the found files.
         """
@@ -1434,6 +1434,13 @@ class DP_AutoRig_UI:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
                 
+                # remove all old live files and folders for this current version, that means delete myself, OMG!
+                for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
+                    if not "-"+dpAR_Folder+"-" in eachFolder:
+                        shutil.rmtree(dpAR_DestFolder+"/"+eachFolder)
+                for eachFile in next(os.walk(dpAR_DestFolder))[2]:
+                    os.remove(dpAR_DestFolder+"/"+eachFile)
+
                 # pass in all files to copy them (doing the simple installation):
                 for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
                     # declare destination directory:
@@ -2304,13 +2311,13 @@ class DP_AutoRig_UI:
                             if fatherModule == HEAD:
                                 # getting head data:
                                 fatherGuide = self.hookDic[moduleDic]['fatherGuide']
-                                upperJawCtrl  = self.integratedTaskDic[fatherGuide]['upperJawCtrlList'][0]
-                                headParentConst = cmds.parentConstraint(self.rootCtrl, upperJawCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
+                                upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
+                                headParentConst = cmds.parentConstraint(self.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
                                 eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
                                 cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], eyeRevNode+".inputX", force=True)
                                 cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
-                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], headParentConst+"."+upperJawCtrl+"W1", force=True)
-                                cmds.parent(upLocGrp, upperJawCtrl, relative=False)
+                                cmds.connectAttr(eyeCtrl+'.'+self.langDic[self.langName]['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
+                                cmds.parent(upLocGrp, upperCtrl, relative=False)
                                 cmds.setAttr(upLocGrp+".visibility", 0)
                                 # head drives eyeScaleGrp:
                                 self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
@@ -2322,7 +2329,7 @@ class DP_AutoRig_UI:
                                     self.itemMirrorNameList = self.itemGuideMirrorNameList
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
-                                    cmds.parentConstraint(upperJawCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC")
+                                    cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC")
                             # changing iris and pupil color override:
                             self.itemMirrorNameList = [""]
                             # get itemGuideName:

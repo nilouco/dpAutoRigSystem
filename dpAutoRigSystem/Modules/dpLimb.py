@@ -1224,14 +1224,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             upCtrl = self.bendGrps['ctrlList'][0]
                             downCtrl = self.bendGrps['ctrlList'][1]
                             if s == 0: #left
-                                if self.limbTypeName == ARM:
-                                    cmds.setAttr(upCtrl+".invert", 1)
-                                else: #leg
-                                    cmds.setAttr(upCtrl+".invert", 1)
-                                    cmds.setAttr(downCtrl+".invert", 1)
-                            else:
-                                if self.limbTypeName == ARM:
-                                    cmds.setAttr(downCtrl+".invert", 1)
+                                cmds.setAttr(upCtrl+".invert", 1)
+                                cmds.setAttr(downCtrl+".invert", 1)
                 
                 # auto clavicle:
                 # loading Maya matrix node

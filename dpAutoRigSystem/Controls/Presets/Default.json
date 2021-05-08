@@ -84,6 +84,7 @@
     "id_077_NoseTip"         : {"type" : "Circle",           "degree" : 3},
     "id_078_NoseSide"        : {"type" : "RoundUp",          "degree" : 3},
     "id_079_Nostril"         : {"type" : "Circle",           "degree" : 3},
-    "id_080_NoseBottom"      : {"type" : "RoundUp",          "degree" : 3}
+    "id_080_NoseBottom"      : {"type" : "RoundUp",          "degree" : 3},
+    "id_081_HeadUpperHead"   : {"type" : "RoundUp",          "degree" : 3}
 	
 }
