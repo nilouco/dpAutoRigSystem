@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.12"
-DPAR_UPDATELOG = "#302 Leg bend autoRotate issue.\nFixed the problem of an old temporary fix that caused troubles."
+DPAR_VERSION = "3.11.13"
+DPAR_UPDATELOG = "#287 Dimond name review.\nCorrect name is Diamond.\nThanks Felipe Mello!"
 
 
 
@@ -255,7 +255,7 @@ class DP_AutoRig_UI:
     
     
     def getJsonFileInfo(self, dir):
-        """ Find all json files in the given path and get coctemt used for each file.
+        """ Find all json files in the given path and get contents used for each file.
             Create a dictionary with dictionaries of all file found.
             Return a list with the name of the found files.
         """
