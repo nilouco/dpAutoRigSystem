@@ -1,11 +1,11 @@
 {
     "_author"        : "Danilo Pinheiro",
-	"_collaborators" : "Aline Lima\nCaio Cipo\nCaio Hidaka\nElvis Martins\nFilipe Mello\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLucas Alves\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPablo Emmanuel De Leo\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThiago Silva\nThomas Mansencal",
+	  "_collaborators" : "Aline Lima\nCaio Cipo\nCaio Hidaka\nElvis Martins\nFilipe Mello\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLucas Alves\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPablo Emmanuel De Leo\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThiago Silva\nThomas Mansencal",
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2021-04-03",
+    "_updated"       : "2021-03-30",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -457,7 +457,7 @@
     "m102_triangle"            : "Triangle",
     "m103_hexagram"            : "Hexagramme",
     "m104_octagram"            : "Octagramme",
-    "m105_Diamond"             : "Diamant",
+    "m105_dimond"              : "Losangue",
     "m106_clip"                : "L'Agrafe",
     "m107_clipFlat"            : "L'Agrafe Plat",
     "m108_clipStraightFlat"    : "L'Agrafe Plat Droit",
@@ -532,7 +532,7 @@
 	"m174_createdZipper"       : "Créé le Zipper.",
 	"m175_zipperFlat"          : "Zipper Flat",
     "m176_noseDesc"            : "Description du module Nez:\n\nCe module crée des joints intégrées\ncomme en utilisant des FkLines\ndans le visage pour le nez des personnages.",
-    "m177_DiamondFlat"         : "Diamant Flat",
+    "m177_dimondFlat"          : "Dimond Flat",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
