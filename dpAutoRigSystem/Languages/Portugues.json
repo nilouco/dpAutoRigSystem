@@ -1,11 +1,11 @@
 {
     "_author"        : "Danilo Pinheiro",
-  	"_collaborators" : "Aline Lima\nCaio Cipo\nCaio Hidaka\nElvis Martins\nFilipe Mello\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLucas Alves\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPablo Emmanuel De Leo\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThiago Silva\nThomas Mansencal",
+    "_collaborators" : "Aline Lima\nCaio Cipo\nCaio Hidaka\nElvis Martins\nFilipe Mello\nGiovani Meneguel\nGlauber Belo\nGuga Pixel\nJames do Carmo\nLeandro Wagner\nLucas Alves\nLuiz Garrido\nMarcelo Meireles\nMarina Ruegger\nMikael Persson\nPablo Emmanuel De Leo\nPaulo Nogueira\nRenaud Lessard\nRichard Kazuo\nRoger Santos\nSébastien Bourgoing\nThiago Silva\nThomas Mansencal",
     "_contact"       : "nilouco@gmail.com\nhttps://nilouco.blogspot.com",
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2021-03-30",
+    "_updated"       : "2021-05-08",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -457,7 +457,7 @@
     "m102_triangle"            : "Triângulo",
     "m103_hexagram"            : "Hexagrama",
     "m104_octagram"            : "Octagrama",
-    "m105_dimond"              : "Losangulo",
+    "m105_Diamond"             : "Diamante",
     "m106_clip"                : "Grampo",
     "m107_clipFlat"            : "Grampo Plano",
     "m108_clipStraightFlat"    : "Grampo Plano Reto",
@@ -532,7 +532,7 @@
 	"m174_createdZipper"       : "Criado Zíper.",
 	"m175_zipperFlat"          : "Zipper Flat",
     "m176_noseDesc"            : "Descrição do módulo Nariz:\n\nEsse módulo cria alguns joints integrados\ncomo alguns FkLines para ser usado\nno rosto como nariz de personagens.",
-    "m177_dimondFlat"          : "Dimond Flat",
+    "m177_DiamondFlat"         : "Diamante Flat",
 	
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
