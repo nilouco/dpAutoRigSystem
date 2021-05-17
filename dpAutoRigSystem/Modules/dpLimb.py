@@ -581,6 +581,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     else:
                         cmds.parentConstraint(self.fkCtrlList[n], self.fkJointList[n], maintainOffset=True, name=side + self.userGuideName + "_" + self.jNameList[n] + "_Fk_PaC")
                     self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
+                cmds.makeIdentity(self.ikACJointList[1], apply=True, jointOrient=True)
 
                 # puting endJoints in the correct position:
                 tempToDelE = cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False)
@@ -1234,7 +1235,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 if loadedQuatNode and loadedMatrixPlugin:
                     # create auto clavicle group:
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
+                    
+                    
+                    
                     cmds.delete(cmds.parentConstraint(self.zeroFkCtrlList[0], self.clavicleCtrlGrp, maintainOffset=False))
+                    
                     cmds.parent(self.clavicleCtrlGrp, self.zeroFkCtrlList[0])
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     # create auto clavicle attribute:
@@ -1246,16 +1251,29 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     acIkAimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Aim_Loc")[0]
                     acOrigLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Orig_Loc")[0]
                     acFkLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Fk_Loc")[0]
-                    acLocGrp = cmds.group(acIkUpLoc, acIkAimLoc, acOrigLoc, acFkLoc, name=side+self.userGuideName+"_AC_Loc_Grp")
+                    acIkMainLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Ik_"+mainName+"_Loc")[0]
+                    acIkCornerLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Ik_"+cornerName+"_Loc")[0]
+                    cmds.parent(acIkCornerLoc, acIkMainLoc)
+                    acLocGrp = cmds.group(acIkUpLoc, acIkAimLoc, acOrigLoc, acFkLoc, acIkMainLoc, name=side+self.userGuideName+"_AC_Loc_Grp")
+                    cmds.setAttr(acLocGrp+".inheritsTransform", 0) #important to calculate world space matrix to extract rotations correctlly
                     cmds.setAttr(acIkUpLoc+".translateY", 1)
                     cmds.delete(cmds.parentConstraint(self.fkCtrlList[1], acLocGrp, maintainOffset=False))
                     cmds.parent(acLocGrp, self.toScalableHookGrp)
+                    self.ctrls.directConnect(self.ikACJointList[1], acIkMainLoc, ['rx', 'ry', 'rz']) #shoulder rotate
+                    cmds.delete(cmds.pointConstraint(self.fkCtrlList[2], acIkCornerLoc, maintainOffset=False))
+
+
+
+
+
+
+
+
+
                     # aim constraint: (edited in order to point to limb corner (elbow/knee) outside of clavicle hierarchy to avoid cycle error).
-                    cmds.aimConstraint(self.ikACJointList[2], acIkAimLoc, maintainOffset=True, weight=1, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AiC")
+                    cmds.aimConstraint(acIkCornerLoc, acIkAimLoc, maintainOffset=True, weight=1, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AiC")
                     # fk auto clavicle setup:
-                    cmds.connectAttr(self.fkCtrlList[1]+".rotateX", acFkLoc+".rotateX", force=True)
-                    cmds.connectAttr(self.fkCtrlList[1]+".rotateY", acFkLoc+".rotateY", force=True)
-                    cmds.connectAttr(self.fkCtrlList[1]+".rotateZ", acFkLoc+".rotateZ", force=True)
+                    self.ctrls.directConnect(self.fkCtrlList[1], acFkLoc, ['rx', 'ry', 'rz'])
                     # auto clavicle matrix rotate extraction:
                     acIkMM = cmds.createNode("multMatrix", name=side+self.userGuideName+"_AC_Ik_MM")
                     acIkDM = cmds.createNode("decomposeMatrix", name=side+self.userGuideName+"_AC_Ik_DM")
@@ -1300,6 +1318,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2X", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2Y", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2Z", force=True)
+                    
+                    
+                    
+                    
                     if self.limbTypeName == ARM:
                         cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateX", force=True)
@@ -1308,6 +1330,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateX", force=True)
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
+
                     if s == 0: #left side
                         cmds.setAttr(acMirrorFixMD+".input2X", 1)
                         cmds.setAttr(acMirrorFixMD+".input2Y", 1)
