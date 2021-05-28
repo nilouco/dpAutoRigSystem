@@ -1281,6 +1281,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.parent(acIkCornerLoc, acIkMainLoc)
                     acLocGrp = cmds.group(acIkUpLoc, acIkAimLoc, acOrigLoc, acFkLoc, acIkMainLoc, name=side+self.userGuideName+"_AC_Loc_Grp")
                     cmds.setAttr(acLocGrp+".inheritsTransform", 0) #important to calculate world space matrix to extract rotations correctlly
+                    cmds.setAttr(acLocGrp+".visibility", 0)
                     if self.limbTypeName == ARM:
                         cmds.setAttr(acIkUpLoc+".translateY", 1)
                     else:
@@ -1327,12 +1328,40 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     acFkDM = cmds.createNode("decomposeMatrix", name=side+self.userGuideName+"_AC_Fk_DM")
                     acFkQtE = cmds.createNode("quatToEuler", name=side+self.userGuideName+"_AC_Fk_QtE")
                     acBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_AC_BC")
-                    acMirrorFixMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_MirrorFix_MD")
+                    acInvBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_AC_Inv_BC")
+                    acInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_Inv_MD")
                     acMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_MD")
 
 
 #                    cmds.setAttr(acIkQtE+".inputRotateOrder", 3)#xzy
 
+                    # add attributes to control inverse value setup to blend ikFk:
+                    ikFkRotAttrList = ["ikRotateX", "ikRotateY", "ikRotateZ", "fkRotateX", "fkRotateY", "fkRotateZ"]
+                    for ikFkRotAttr in ikFkRotAttrList:
+                        cmds.addAttr(self.fkCtrlList[0], longName=ikFkRotAttr, attributeType="float", minValue=-1, defaultValue=1, maxValue=1)
+                    # set values of ik and fk rotates:
+
+                    if s == 0: #left side
+                        if self.limbTypeName == LEG:
+                            cmds.setAttr(self.fkCtrlList[0]+".ikRotateY", -1)
+                            cmds.setAttr(self.fkCtrlList[0]+".fkRotateX", -1)
+                    else: #right side
+                        if self.limbTypeName == ARM:
+                            cmds.setAttr(self.fkCtrlList[0]+".ikRotateY", -1)
+                        else: #leg
+                            cmds.setAttr(self.fkCtrlList[0]+".fkRotateX", -1)
+                        cmds.setAttr(self.fkCtrlList[0]+".ikRotateZ", -1)
+                        
+                        
+                        
+
+                    # connections inverse values from fkCtrlList[0] (Clavile or Hips) to inverseBlendColor:
+                    cmds.connectAttr(self.fkCtrlList[0]+".ikRotateX", acInvBC+".color2R", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+".ikRotateY", acInvBC+".color2G", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+".ikRotateZ", acInvBC+".color2B", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+".fkRotateX", acInvBC+".color1R", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+".fkRotateY", acInvBC+".color1G", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+".fkRotateZ", acInvBC+".color1B", force=True)
 
 
 
@@ -1353,20 +1382,35 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(acFkDM+".outputQuatZ", acFkQtE+".inputQuatZ", force=True)
                     cmds.connectAttr(acFkDM+".outputQuatW", acFkQtE+".inputQuatW", force=True)
                     # fk to auto clavicle blend colors:
-                    cmds.connectAttr(acFkQtE+".outputRotate.outputRotateX", acBC+".color1R", force=True)
-                    cmds.connectAttr(acFkQtE+".outputRotate.outputRotateY", acBC+".color1G", force=True)
-                    cmds.connectAttr(acFkQtE+".outputRotate.outputRotateZ", acBC+".color1B", force=True)
+                    if self.limbTypeName == ARM:
+                        cmds.connectAttr(acFkQtE+".outputRotate.outputRotateX", acBC+".color1G", force=True)
+                        cmds.connectAttr(acFkQtE+".outputRotate.outputRotateY", acBC+".color1B", force=True)
+                        cmds.connectAttr(acFkQtE+".outputRotate.outputRotateZ", acBC+".color1R", force=True)
+                    else: #leg
+                        cmds.connectAttr(acFkQtE+".outputRotate.outputRotateX", acBC+".color1B", force=True)
+                        cmds.connectAttr(acFkQtE+".outputRotate.outputRotateY", acBC+".color1R", force=True)
+                        cmds.connectAttr(acFkQtE+".outputRotate.outputRotateZ", acBC+".color1G", force=True)
                     # ik to auto clavicle blend colors:
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateX", acBC+".color2R", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateY", acBC+".color2G", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateZ", acBC+".color2B", force=True)
                     cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"_ikFkBlend", acBC+".blender", force=True)
-                    cmds.connectAttr(acBC+".output.outputR", acMirrorFixMD+".input1X", force=True)
-                    cmds.connectAttr(acBC+".output.outputG", acMirrorFixMD+".input1Y", force=True)
-                    cmds.connectAttr(acBC+".output.outputB", acMirrorFixMD+".input1Z", force=True)
-                    cmds.connectAttr(acMirrorFixMD+".outputX", acMD+".input1X", force=True)
-                    cmds.connectAttr(acMirrorFixMD+".outputY", acMD+".input1Y", force=True)
-                    cmds.connectAttr(acMirrorFixMD+".outputZ", acMD+".input1Z", force=True)
+                    
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"_ikFkBlend", acInvBC+".blender", force=True)
+                    
+                    cmds.connectAttr(acBC+".output.outputR", acInvMD+".input1X", force=True)
+                    cmds.connectAttr(acBC+".output.outputG", acInvMD+".input1Y", force=True)
+                    cmds.connectAttr(acBC+".output.outputB", acInvMD+".input1Z", force=True)
+
+
+                    cmds.connectAttr(acInvBC+".output.outputR", acInvMD+".input2X", force=True)
+                    cmds.connectAttr(acInvBC+".output.outputG", acInvMD+".input2Y", force=True)
+                    cmds.connectAttr(acInvBC+".output.outputB", acInvMD+".input2Z", force=True)
+
+
+                    cmds.connectAttr(acInvMD+".outputX", acMD+".input1X", force=True)
+                    cmds.connectAttr(acInvMD+".outputY", acMD+".input1Y", force=True)
+                    cmds.connectAttr(acInvMD+".outputZ", acMD+".input1Z", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2X", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2Y", force=True)
                     cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'], acMD+".input2Z", force=True)
@@ -1383,18 +1427,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
 
-                    if s == 0: #left side
-                        cmds.setAttr(acMirrorFixMD+".input2X", 1)
-                        cmds.setAttr(acMirrorFixMD+".input2Y", 1)
-                        cmds.setAttr(acMirrorFixMD+".input2Z", 1)
-                        if self.limbTypeName == LEG:
-                            cmds.setAttr(acMirrorFixMD+".input2Y", -1)
-                    else: #right side
-                        if self.limbTypeName == ARM:
-                            cmds.setAttr(acMirrorFixMD+".input2Y", -1)
-                        cmds.setAttr(acMirrorFixMD+".input2Z", -1)
                     
-                    cmds.setAttr(acLocGrp+".visibility", 0)
+                    
+                    
                 
                 if loadedIkFkSnap:
                     # do otherCtrlList get extraCtrlList from bendy
