@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.13"
-DPAR_UPDATELOG = "#287 Dimond name review.\nCorrect name is Diamond.\nThanks Felipe Mello!"
+DPAR_VERSION = "3.11.14"
+DPAR_UPDATELOG = "#148 AutoClavicle world matrix fix."
 
 
 
