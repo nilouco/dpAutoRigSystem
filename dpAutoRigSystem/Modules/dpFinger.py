@@ -392,7 +392,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
                         cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
                         if "01" in ikJoint:
-                            cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PAC")
+                            cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PoC")
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
