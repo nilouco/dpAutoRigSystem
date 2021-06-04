@@ -210,6 +210,24 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                             elif self.mirrorAxis == 'XYZ':
                                 cmds.setAttr(self.fingerCtrl+'.rotateZ', 180)
                             cmds.makeIdentity(self.fingerCtrl, apply=True, translate=False, rotate=True, scale=False)
+                        # scale compensate attribute:
+                        if not cmds.objExists(self.fingerCtrl+'.ikFkBlend'):
+                            cmds.addAttr(self.fingerCtrl, longName="ikFkBlend", attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
+                            self.ikFkRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_ikFk_Rev")
+                            cmds.connectAttr(self.fingerCtrl+".ikFkBlend", self.ikFkRevNode+".inputX", force=True)
+                        if not cmds.objExists(self.fingerCtrl+'.scaleCompensate'):
+                            cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='bool', keyable=False)
+                            cmds.setAttr(self.fingerCtrl+".scaleCompensate", 1, channelBox=True)
+                            scaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_%02d_ScaleCompensate_MD"%(n))
+                            self.scaleCompensateCond = cmds.createNode("condition", name=side+self.userGuideName+"_%02d_ScaleCompensate_Cnd"%(n))
+                            cmds.connectAttr(self.fingerCtrl+".scaleCompensate", scaleCompensateMD+".input1X", force=True)
+                            cmds.connectAttr(self.ikFkRevNode+".outputX", scaleCompensateMD+".input2X", force=True)
+                            cmds.connectAttr(scaleCompensateMD+".outputX", self.scaleCompensateCond+".firstTerm", force=True)
+                            cmds.setAttr(self.scaleCompensateCond+".secondTerm", 1)
+                            cmds.setAttr(self.scaleCompensateCond+".colorIfFalseR", 0)
+                            cmds.connectAttr(self.fingerCtrl+".scaleCompensate", self.scaleCompensateCond+".colorIfTrueR", force=True)
+                            cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
+                            cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.skinJointList[0]+".segmentScaleCompensate", force=True)
                     else:
                         self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
@@ -228,14 +246,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                                 cmds.makeIdentity(self.fingerCtrl, apply=True)
 
                     # scaleCompensate attribute:
-                    #Not needed in Maya 2016 since we need to deactivate scale compensate on all finger bone
-                    if (int(cmds.about(version=True)[:4]) < 2016):
-                        if n > 0 or self.nJoints == 2:
-                            cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='bool', keyable=True)
-                            scaleCompensateCond = cmds.createNode("condition", name=side+self.userGuideName+"_%02d_ScaleCompensate_Cnd"%(n))
-                            cmds.setAttr(scaleCompensateCond+".secondTerm", 1)
-                            cmds.connectAttr(self.fingerCtrl+".scaleCompensate", scaleCompensateCond+".colorIfTrueR", force=True)
-                            cmds.connectAttr(scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
+                    if n > 1:
+                        cmds.connectAttr(self.scaleCompensateCond+".outColorR", self.jnt+".segmentScaleCompensate", force=True)
 
                     # hide visibility attribute:
                     cmds.setAttr(self.fingerCtrl+'.visibility', keyable=False)
@@ -258,10 +270,6 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     # grouping:
                     if n > 0:
                         if n == 1:
-                            if not cmds.objExists(self.fingerCtrl+'.ikFkBlend'):
-                                cmds.addAttr(self.fingerCtrl, longName="ikFkBlend", attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
-                                self.ikFkRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_ikFk_Rev")
-                                cmds.connectAttr(self.fingerCtrl+".ikFkBlend", self.ikFkRevNode+".inputX", force=True)
                             if not cmds.objExists(self.fingerCtrl+'.'+self.langDic[self.langName]['c021_showControls']):
                                 cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                                 self.ctrlShape0 = cmds.listRelatives(side+self.userGuideName+"_00_Ctrl", children=True, type='nurbsCurve')[0]
@@ -285,6 +293,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         if self.addArticJoint:
                             artJntList = utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
                             utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            cmds.connectAttr(self.scaleCompensateCond+".outColorR", artJntList[0]+".segmentScaleCompensate", force=True)
                     cmds.select(self.jnt)
                     
                     if n == self.nJoints:
@@ -361,24 +370,22 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
                         self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
-                        scaleCompensateCond = ikJoint.replace("_Ik_Jxt", "_ScaleCompensate_Cnd")
+                        self.scaleCompensateCond = ikJoint.replace("_Ik_Jxt", "_ScaleCompensate_Cnd")
                         ikFkParentConst = cmds.parentConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_PaC")[0]
-                        ikFkScaleConst = cmds.scaleConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_ScC")[0]
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
                         cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkParentConst+"."+ikJoint+"W0", force=True)
-                        cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkScaleConst+"."+fkJoint+"W1", force=True)
-                        cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkScaleConst+"."+ikJoint+"W0", force=True)
+                        scaleBC = cmds.createNode("blendColors", name=skinJoint+"_BC")
+                        cmds.connectAttr(fkJoint+".scaleZ", scaleBC+".color1B", force=True)
+                        cmds.connectAttr(ikJoint+".scaleZ", scaleBC+".color2B", force=True)
+                        cmds.connectAttr(self.fingerCtrl+".ikFkBlend", scaleBC+".blender", force=True)
+                        cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
                         cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
-                        #Condition for scale compensate will not exist in maya 2016 since we need to have the compensate
-                        #off for almost every joint
-                        if (int(cmds.about(version=True)[:4]) < 2016):
-                            cmds.connectAttr(self.fingerCtrl+".ikFkBlend", scaleCompensateCond+".firstTerm", force=True)
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
                         utils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
-                        scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
+                        self.scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
                         cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_PaC")
                         cmds.scaleConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ScC")
                         #Not needed in Maya 2016 since we need to deactivate scale compensate on all finger bone
@@ -389,9 +396,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.setAttr(fkCtrl+".rotateOrder", 1)
 
                 #Force Scale compensate to prevent scale problem in Maya 2016
-                for nJnt in self.skinJointList:
-                    if (int(cmds.about(version=True)[:4]) >= 2016):
-                        cmds.setAttr(nJnt+".segmentScaleCompensate", 0)
+                #for nJnt in self.skinJointList:
+                #    if (int(cmds.about(version=True)[:4]) >= 2016):
+                #        cmds.setAttr(nJnt+".segmentScaleCompensate", 0)
                 
                 # ik handle
                 if self.nJoints >= 2:
@@ -405,8 +412,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     self.ikCtrl = self.ctrls.cvControl("id_017_FingerIk", ctrlName=side+self.userGuideName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.3), d=self.curveDegree)
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
-                    cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Ik_JEnd", self.ikCtrl))
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
+                    cmds.delete(cmds.parentConstraint(self.skinJointList[-1], self.ikCtrl, maintainOffset=False))
+                    cmds.delete(cmds.pointConstraint(self.cvEndJoint, self.ikCtrl, maintainOffset=False))
                     self.ikCtrlZero = utils.zeroOut([self.ikCtrl])[0]
                     self.ikCtrlZeroList.append(self.ikCtrlZero)
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ikCtrlZero+".visibility", force=True)
@@ -426,14 +434,15 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                     stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchNormalize_MD")
                     cmds.setAttr(stretchNormMD+".operation", 2)
-                    distBetweenList = self.ctrls.distanceBet(side+self.userGuideName+"_00_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
+                    distBetweenList = self.ctrls.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
                     cmds.connectAttr(self.ikFkRevNode+".outputX", distBetweenList[5]+"."+self.ikCtrl+"W0", force=True)
                     cmds.connectAttr(self.fingerCtrl+".ikFkBlend", distBetweenList[5]+"."+distBetweenList[4]+"W1", force=True)
                     cmds.connectAttr(distBetweenList[1]+".distance", stretchNormMD+".input1X", force=True)
                     cmds.setAttr(stretchNormMD+".input2X", distBetweenList[0])
                     stretchScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchScale_MD")
                     cmds.connectAttr(stretchNormMD+".outputX", stretchScaleMD+".input1X", force=True)
-                    cmds.connectAttr(self.ikCtrl+".stretchable", stretchScaleMD+".input2X", force=True)
+                    cmds.connectAttr(self.ikCtrl+".stretchable", 
+                    stretchScaleMD+".input2X", force=True)
                     stretchCond = cmds.createNode("condition", name=side+self.userGuideName+"_Stretch_Cnd")
                     cmds.connectAttr(stretchScaleMD+".outputX", stretchCond+".firstTerm", force=True)
                     cmds.setAttr(stretchCond+".secondTerm", 1)
