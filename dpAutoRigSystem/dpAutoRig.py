@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.15"
-DPAR_UPDATELOG = "#176 Finger stretchable fix."
+DPAR_VERSION = "3.11.16"
+DPAR_UPDATELOG = "#270 Finger min segments to 2."
 
 
 

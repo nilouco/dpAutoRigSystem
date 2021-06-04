@@ -28,18 +28,26 @@ class Finger(Base.StartClass, Layout.LayoutClass):
     def createGuide(self, *args):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nJoints", 1)
+        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
 
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
 
-        self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
+        self.cvJointLoc1 = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)
         cmds.parent(self.jGuide1, self.moduleGrp, relative=True)
+        self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc2", r=0.25, d=1, guide=True)
+        cmds.parent(self.cvJointLoc, self.cvJointLoc1, relative=True)
+        cmds.setAttr(self.cvJointLoc+".translateZ", 1)
+        cmds.setAttr(self.cvJointLoc+".translateX", -0.01)
+        cmds.setAttr(self.cvJointLoc+".rotateY", -1)
+        self.jGuide = cmds.joint(name=self.guideName+"_JGuide2", radius=0.001)
+        cmds.setAttr(self.jGuide+".template", 1)
+        cmds.parent(self.jGuide, self.jGuide1)
+        self.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
 
         self.cvEndJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.2, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -49,9 +57,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ctrls.setLockHide([self.cvEndJoint], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
 
-        cmds.parent(self.cvJointLoc, self.moduleGrp)
+        cmds.parent(self.cvJointLoc1, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
-        self.ctrls.directConnect(self.cvJointLoc, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        self.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
 
         # change the number of phalanges to 3:
@@ -78,54 +86,57 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 return
         else:
             self.enteredNJoints = enteredNJoints
-        # get the number of joints existing:
-        self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
-        # start analisys the difference between values:
-        if self.enteredNJoints != self.currentNJoints:
-            # unparent temporarely the Ends:
-            self.cvEndJoint = self.guideName+"_JointEnd"
-            cmds.parent(self.cvEndJoint, world=True)
-            self.jGuideEnd = (self.guideName+"_JGuideEnd")
-            cmds.parent(self.jGuideEnd, world=True)
-            # verify if the nJoints is greather or less than the current
-            if self.enteredNJoints > self.currentNJoints:
-                for n in range(self.currentNJoints+1, self.enteredNJoints+1):
-                    # create another N cvJointLoc:
-                    self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.2, d=1, guide=True)
-                    # set its nJoint value as n:
-                    cmds.setAttr(self.cvJointLoc+".nJoint", n)
-                    # parent it to the lastGuide:
-                    cmds.parent(self.cvJointLoc, self.guideName+"_JointLoc"+str(n-1), relative=True)
-                    cmds.setAttr(self.cvJointLoc+".translateZ", 1)
-                    cmds.setAttr(self.cvJointLoc+".rotateY", -1)
-                    # create a joint to use like an arrowLine:
-                    self.jGuide = cmds.joint(name=self.guideName+"_JGuide"+str(n), radius=0.001)
-                    cmds.setAttr(self.jGuide+".template", 1)
-                    cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1))
-                    self.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
-            elif self.enteredNJoints < self.currentNJoints:
-                # re-define cvEndJoint:
-                self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
+        if self.enteredNJoints >= 2:
+            # get the number of joints existing:
+            self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+            # start analisys the difference between values:
+            if self.enteredNJoints != self.currentNJoints:
+                # unparent temporarely the Ends:
                 self.cvEndJoint = self.guideName+"_JointEnd"
-                self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
-                # re-parent the children guides:
-                childrenGuideBellowList = utils.getGuideChildrenList(self.cvJointLoc)
-                if childrenGuideBellowList:
-                    for childGuide in childrenGuideBellowList:
-                        cmds.parent(childGuide, self.cvJointLoc)
-                # delete difference of nJoints:
-                cmds.delete(self.guideName+"_JointLoc"+str(self.enteredNJoints+1))
-                cmds.delete(self.guideName+"_JGuide"+str(self.enteredNJoints+1))
-            # re-parent cvEndJoint:
-            cmds.parent(self.cvEndJoint, self.cvJointLoc)
-            cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-            cmds.parent(self.jGuideEnd, self.jGuide)
-            # actualise the nJoints in the moduleGrp:
-            cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
-            self.currentNJoints = self.enteredNJoints
-            # re-build the preview mirror:
-            Layout.LayoutClass.createPreviewMirror(self)
-        cmds.select(self.moduleGrp)
+                cmds.parent(self.cvEndJoint, world=True)
+                self.jGuideEnd = (self.guideName+"_JGuideEnd")
+                cmds.parent(self.jGuideEnd, world=True)
+                # verify if the nJoints is greather or less than the current
+                if self.enteredNJoints > self.currentNJoints:
+                    for n in range(self.currentNJoints+1, self.enteredNJoints+1):
+                        # create another N cvJointLoc:
+                        self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.2, d=1, guide=True)
+                        # set its nJoint value as n:
+                        cmds.setAttr(self.cvJointLoc+".nJoint", n)
+                        # parent it to the lastGuide:
+                        cmds.parent(self.cvJointLoc, self.guideName+"_JointLoc"+str(n-1), relative=True)
+                        cmds.setAttr(self.cvJointLoc+".translateZ", 1)
+                        cmds.setAttr(self.cvJointLoc+".rotateY", -1)
+                        # create a joint to use like an arrowLine:
+                        self.jGuide = cmds.joint(name=self.guideName+"_JGuide"+str(n), radius=0.001)
+                        cmds.setAttr(self.jGuide+".template", 1)
+                        cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1))
+                        self.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+                elif self.enteredNJoints < self.currentNJoints:
+                    # re-define cvEndJoint:
+                    self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
+                    self.cvEndJoint = self.guideName+"_JointEnd"
+                    self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
+                    # re-parent the children guides:
+                    childrenGuideBellowList = utils.getGuideChildrenList(self.cvJointLoc)
+                    if childrenGuideBellowList:
+                        for childGuide in childrenGuideBellowList:
+                            cmds.parent(childGuide, self.cvJointLoc)
+                    # delete difference of nJoints:
+                    cmds.delete(self.guideName+"_JointLoc"+str(self.enteredNJoints+1))
+                    cmds.delete(self.guideName+"_JGuide"+str(self.enteredNJoints+1))
+                # re-parent cvEndJoint:
+                cmds.parent(self.cvEndJoint, self.cvJointLoc)
+                cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+                cmds.parent(self.jGuideEnd, self.jGuide)
+                # actualise the nJoints in the moduleGrp:
+                cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+                self.currentNJoints = self.enteredNJoints
+                # re-build the preview mirror:
+                Layout.LayoutClass.createPreviewMirror(self)
+            cmds.select(self.moduleGrp)
+        else:
+            self.changeJointNumber(2)
 
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
@@ -380,6 +391,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", scaleBC+".blender", force=True)
                         cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
                         cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
+                        if "01" in ikJoint:
+                            cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PAC")
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
