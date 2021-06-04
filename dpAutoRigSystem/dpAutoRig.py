@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.14"
-DPAR_UPDATELOG = "#148 AutoClavicle world matrix fix."
+DPAR_VERSION = "3.11.15"
+DPAR_UPDATELOG = "#176 Finger stretchable fix."
 
 
 
