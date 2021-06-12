@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.16"
-DPAR_UPDATELOG = "#270 Finger min segments to 2."
+DPAR_UPDATELOG = "WIP #267 Facial control Z axis."
 
 
 

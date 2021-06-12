@@ -19,10 +19,10 @@ BODY_BSNAME = "Body_Recept_BS"
 BROW_TGTLIST = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
 EYELID_TGTLIST = [None, None, "EyelidsClose", "EyelidsOpen"]
 MOUTH_TGTLIST = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
-LIPS_TGTLIST = ["Pucker", "LipsOpen", "LipsDown", "LipsUp"]
+LIPS_TGTLIST = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
 SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None]
 GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
-FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
+FACE_TGTLIST = ["L_Puff", "R_Puff", "Pucker", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
 TYPE_BS = "typeBS"
 TYPE_JOINTS = "typeJoints"
 MIDDLE = "Middle"
@@ -435,7 +435,7 @@ class FacialControl():
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
                             clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
-                            if a == 0 or a == 2: #negative
+                            if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
                             else: #positive
@@ -444,8 +444,10 @@ class FacialControl():
                             cmds.connectAttr(fCtrl+"."+transfList[a], calibrateMD+".input1X", force=True)
                             if a == 0 or a == 1: # -x or +x
                                 cmds.connectAttr(fCtrl+".calibrateTX", calibrateMD+".input2X", force=True)
-                            else: # -y or +y
+                            elif a == 2 or a == 3: # -y or +y
                                 cmds.connectAttr(fCtrl+".calibrateTY", calibrateMD+".input2X", force=True)
+                            else: # -z or +z
+                                cmds.connectAttr(fCtrl+".calibrateTZ", calibrateMD+".input2X", force=True)
                             if addTranslateY: #useful for Sneer and Grimace
                                 integrateTYPMA = cmds.createNode("plusMinusAverage", name=ctrlName+"_"+attr+"_TY_PMA")
                                 cmds.connectAttr(calibrateMD+".outputX", integrateTYPMA+".input1D[0]", force=True)
