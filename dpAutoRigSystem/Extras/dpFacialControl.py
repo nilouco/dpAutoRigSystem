@@ -19,10 +19,10 @@ BODY_BSNAME = "Body_Recept_BS"
 BROW_TGTLIST = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
 EYELID_TGTLIST = [None, None, "EyelidsClose", "EyelidsOpen"]
 MOUTH_TGTLIST = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
-LIPS_TGTLIST = ["Pucker", "LipsOpen", "LipsDown", "LipsUp"]
+LIPS_TGTLIST = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
 SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None]
 GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
-FACE_TGTLIST = ["L_Puff", "R_Puff", "AAA", "OOO", "UUU", "FFF", "MMM"]
+FACE_TGTLIST = ["L_Puff", "R_Puff", "Pucker", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
 TYPE_BS = "typeBS"
 TYPE_JOINTS = "typeJoints"
 MIDDLE = "Middle"
@@ -30,7 +30,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.11"
+DPFC_VERSION = "1.12"
 
 
 class FacialControl():
@@ -115,7 +115,7 @@ class FacialControl():
         file = FACIALPRESET+".json"
         # find current path:
         path = os.path.dirname(__file__)
-        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+        # hack in order to avoid "\\" from os.sep, then we need to use the replace string method:
         jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
         fileDictionary = open(jsonPath + file, "r")
         # read the json file content and store it in a dictionary:
@@ -274,24 +274,24 @@ class FacialControl():
             cmds.frameLayout(self.bsLayout, edit=True, enable=False, collapse=True)
             cmds.frameLayout(self.jointsLayout, edit=True, enable=True, collapse=False)
             cmds.checkBox(self.eyelidCB, edit=True, enable=False)
-        
+
     
     def dpCreateDefaultPackage(self, *args):
         """ Function to create a package of facial controls we use as default.
         """
         connectBS, connectJnt = self.dpGetUserType()
         # creating controls:
-        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "red")
-        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "blue")
+        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
+        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
         if self.userType == TYPE_BS:
-            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, connectBS, connectJnt, "red")
-            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, connectBS, connectJnt, "blue")
-        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, connectBS, connectJnt, "red")
-        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, connectBS, connectJnt, "blue")
-        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "yellow")
-        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, connectBS, connectJnt, "cyan")
+            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
+            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
+        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
+        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
+        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
+        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, True, connectBS, connectJnt, "cyan")
         
         # placing control groups:
         if lBrowCtrlGrp:
@@ -354,48 +354,49 @@ class FacialControl():
         connectBS, connectJnt = self.dpGetUserType()
         
         if cmds.checkBox(self.browCB, query=True, value=True):
-            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "red")
-            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "blue")
+            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
+            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
             if rBrowCtrlGrp:
                 cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.eyelidCB, query=True, enable=True):
             if cmds.checkBox(self.eyelidCB, query=True, value=True):
-                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, connectBS, connectJnt, "red")
-                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, False, True, False, connectBS, connectJnt, "blue")
+                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
+                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
         if cmds.checkBox(self.mouthCB, query=True, value=True):
-            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, connectBS, connectJnt, "red")
-            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, False, False, False, connectBS, connectJnt, "blue")
+            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
+            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
             if rMouthCtrlGrp:
                 cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.lipsCB, query=True, value=True):
-            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "yellow")
+            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
         if cmds.checkBox(self.sneerCB, query=True, value=True):
-            sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "cyan", True, True)
+            sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
         if cmds.checkBox(self.grimaceCB, query=True, value=True):
-            grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, False, connectBS, connectJnt, "cyan", True, True)
+            grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
             if grimaceCtrlGrp:
                 cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
         if cmds.checkBox(self.faceCB, query=True, value=True):
-            faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, connectBS, connectJnt, "cyan")
+            faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, False, True, connectBS, connectJnt, "cyan")
         
     
-    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, limitX=True, limitY=True, directConnection=False, connectBS=True, connectJnt=False, color='yellow', addTranslateY=False, limitMinY=False, *args):
+    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, connectBS=True, connectJnt=False, color='yellow', addTranslateY=False, limitMinY=False, *args):
         """ Important function to receive called parameters and create the specific asked control.
             Convention:
-                transfList = ["tx", "tx", "ty", "ty"]
-                axisDirectionList = [-1, 1, -1, 1] # neg, pos, neg, pos
+                transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
+                axisDirectionList = [-1, 1, -1, 1, -1, 1] # neg, pos, neg, pos, neg, pos
             Returns the created Facial control and its zeroOut group.
         """
         # force limits when working on facial joints:
         if connectJnt:
             limitX = True
             limitY = True
+            limitZ = True
         
         # declaring variables:
         fCtrl = None
         fCtrlGrp = None
         
-        transfList = ["tx", "tx", "ty", "ty"]
+        transfList = ["tx", "tx", "ty", "ty", "tz", "tz"]
         # naming:
         if not side == None:
             ctrlName = side+"_"+ctrlName
@@ -419,23 +420,9 @@ class FacialControl():
                 cmds.delete(allChildrenList)
             cmds.parent(fCtrl, fCtrlGrp, absolute=True)
             self.ctrls.colorShape([fCtrl], color)
-            # lock or limit XY axis:
-            if lockX:
-                cmds.setAttr(fCtrl+".tx", lock=True, keyable=False)
-            else:
-                # add calibrate attributes:
-                cmds.addAttr(fCtrl, longName="calibrateTX", attributeType="float", defaultValue=1, minValue=0.001)
-                if limitX:
-                    cmds.transformLimits(fCtrl, enableTranslationX=(1, 1))
-                    self.dpLimitTranslate(fCtrl, ctrlName, "X")
-            if lockY:
-                cmds.setAttr(fCtrl+".ty", lock=True, keyable=False)
-            else:
-                cmds.addAttr(fCtrl, longName="calibrateTY", attributeType="float", defaultValue=1, minValue=0.001)
-                if limitY:
-                    cmds.transformLimits(fCtrl, enableTranslationY=(1, 1))
-                    self.dpLimitTranslate(fCtrl, ctrlName, "Y", limitMinY)
-            self.ctrls.setLockHide([fCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            # lock or limit XYZ axis:
+            self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
+            self.ctrls.setLockHide([fCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
             # start work with custom attributes
             if attrList:
                 for a, attr in enumerate(attrList):
@@ -448,7 +435,7 @@ class FacialControl():
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
                             clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
-                            if a == 0 or a == 2: #negative
+                            if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
                             else: #positive
@@ -457,8 +444,10 @@ class FacialControl():
                             cmds.connectAttr(fCtrl+"."+transfList[a], calibrateMD+".input1X", force=True)
                             if a == 0 or a == 1: # -x or +x
                                 cmds.connectAttr(fCtrl+".calibrateTX", calibrateMD+".input2X", force=True)
-                            else: # -y or +y
+                            elif a == 2 or a == 3: # -y or +y
                                 cmds.connectAttr(fCtrl+".calibrateTY", calibrateMD+".input2X", force=True)
+                            else: # -z or +z
+                                cmds.connectAttr(fCtrl+".calibrateTZ", calibrateMD+".input2X", force=True)
                             if addTranslateY: #useful for Sneer and Grimace
                                 integrateTYPMA = cmds.createNode("plusMinusAverage", name=ctrlName+"_"+attr+"_TY_PMA")
                                 cmds.connectAttr(calibrateMD+".outputX", integrateTYPMA+".input1D[0]", force=True)
@@ -561,6 +550,26 @@ class FacialControl():
         return fCtrl, fCtrlGrp
     
     
+    def dpLockLimitAttr(self, fCtrl, ctrlName, lockList, limitList, limitMinY, *args):
+        """ Lock or limit attributes for XYZ.
+        """
+        axisList = ["X", "Y", "Z"]
+        for i, axis in enumerate(axisList):
+            if lockList[i]:
+                cmds.setAttr(fCtrl+".translate"+axis, lock=True, keyable=False)
+            else:
+                # add calibrate attributes:
+                cmds.addAttr(fCtrl, longName="calibrateT"+axis, attributeType="float", defaultValue=1, minValue=0.001)
+                if limitList[i]:
+                    if i == 0: #X
+                        cmds.transformLimits(fCtrl, enableTranslationX=(1, 1))
+                    elif i == 1: #Y
+                        cmds.transformLimits(fCtrl, enableTranslationY=(1, 1))
+                    else: #Z
+                        cmds.transformLimits(fCtrl, enableTranslationZ=(1, 1))
+                    self.dpLimitTranslate(fCtrl, ctrlName, axis, limitMinY)
+
+    
     def dpLimitTranslate(self, fCtrl, ctrlName, axis, limitMinY=False, *args):
         """ Create a hyperbolic setup to limit min and max value for translation of the control.
             Resuming it's just divide 1 by the calibrate value.
@@ -577,7 +586,6 @@ class FacialControl():
             cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
         else:
             cmds.transformLimits(fCtrl, translationY=(0, 1))
-
     
     
     def dpLoadBSNode(self, *args):

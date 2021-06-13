@@ -53,7 +53,7 @@
     "id_046_FacialBrow"      : {"type" : "Bean",             "degree" : 3},
     "id_047_FacialEyelid"    : {"type" : "Lens",             "degree" : 3},
     "id_048_FacialMouth"     : {"type" : "Triangle",         "degree" : 1},
-    "id_049_FacialLips"      : {"type" : "DiamondFlat",      "degree" : 1},
+    "id_049_FacialLips"      : {"type" : "Diamond",          "degree" : 1},
     "id_050_FacialSneer"     : {"type" : "Crushed",          "degree" : 3},
     "id_051_FacialGrimace"   : {"type" : "Crushed",          "degree" : 3},
     "id_052_FacialFace"      : {"type" : "Smile",            "degree" : 3},
