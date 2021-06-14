@@ -75,11 +75,7 @@ class IkFkNetwork(object):
 
 
     def snapIkToFk(self):
-        
-        # vai para o ik
-        
-        
-        
+        # from Fk to Ik
         self.ikACOffset = self.ikShoulders[0].getMatrix(worldSpace=True) * self.ikShoulders[1].getMatrix(worldSpace=True).inverse()
         self.storeFollowAttr()
         
@@ -106,18 +102,14 @@ class IkFkNetwork(object):
             for att in self.footRollAtts:
                 att.set(0)
         self.restoreFollowAttr()
-        print "Rosa = fk --> ik"
         
     
     def snapFkToIk(self):
-    
-        # vai para o fk
-    
+        # From Ik to Fk
         self.storeFollowAttr()
         for ctrl, jnt in zip(self.fkCtrls, self.ikChain):
             ctrl.setMatrix(jnt.getMatrix(worldSpace=True), worldSpace=True)
         self.restoreFollowAttr()
-        print "Roxo = ik --> fk"
         
 
     def switchToIk(self):
