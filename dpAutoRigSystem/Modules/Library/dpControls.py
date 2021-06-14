@@ -634,6 +634,11 @@ class ControlClass:
                                     break
                             if clearDestinationShapes:
                                 cmds.delete(destShapeList)
+                        # hack: unparent destination children in order to get a good shape hierarchy order as index 0:
+                        destChildrenList = cmds.listRelatives(destTransform, shapes=False, type="transform", fullPath=True)
+                        if destChildrenList:
+                            self.destChildrenGrp = cmds.group(destChildrenList, name="dpTemp_DestChildren_Grp")
+                            cmds.parent(self.destChildrenGrp, world=True)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
                             if needKeepVis:
@@ -641,6 +646,10 @@ class ControlClass:
                             cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
+                        # restore children transforms to correct parent hierarchy:
+                        if destChildrenList:
+                            cmds.parent((cmds.listRelatives(self.destChildrenGrp, shapes=False, type="transform", fullPath=True)), destTransform)
+                            cmds.delete(self.destChildrenGrp)
                     if deleteSource:
                         # update cvControls attributes:
                         self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
