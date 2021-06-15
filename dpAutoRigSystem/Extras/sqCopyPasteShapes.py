@@ -67,12 +67,24 @@ def fetch_ctrl_shapes(source, target):
     """
     # Remove any previous shapes
     pymel.delete(filter(lambda x: isinstance(x, pymel.nodetypes.CurveShape), target.getShapes()))
+
+    # Working with shape order trying to keep the shape as the first child node of the transform
+    childrenGrp = None
+    children = target.getChildren()
+    if children:
+        childrenGrp = pymel.group(children, name='dpTemp_DestChildren_Grp')
+        pymel.parent(childrenGrp, world=True)
+    
     for source_shape in source.getShapes():
         shape_snapshot = _duplicate_shape(source_shape)
         tmp_transform = shape_snapshot.getParent()
         shape_snapshot.setParent(target, r=True, s=True)
         shape_snapshot.rename(target.name() + 'Shape')
         pymel.delete(tmp_transform)
+
+    if children:
+        pymel.parent(children, target)
+        pymel.delete(childrenGrp)
 
     # TODO: Restore AnnotationShapes
     #pymel.delete(source)
@@ -169,8 +181,8 @@ ICON = "/Icons/dp_copyPasteShapes.png"
 
 class CopyPasteShapes():
     def __init__(self, *args, **kwargs):
-        if cmds.window("CopyPasteShapes", query=True, exists=True):
-            cmds.deleteUI("CopyPasteShapes")
+        if cmds.window("sqCopyPasteShapesWindow", query=True, exists=True):
+            cmds.deleteUI("sqCopyPasteShapesWindow")
 
         win = cmds.window('sqCopyPasteShapesWindow', title='CopyPasteShapes', widthHeight=(200, 100), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False, menuBarVisible=False, titleBar=True)
         layout = cmds.columnLayout('sqCopyPasteShapesLayout', adjustableColumn=True, parent=win)

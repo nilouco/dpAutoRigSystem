@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.17"
-DPAR_UPDATELOG = "#267 Facial control Z axis:\n\nRedefined targets lists to:\nLips: R_LipsSide, L_LipsSide, LipsUp, LipsDown, LipsBack, LipsFront\nFace: added Pucker and BigSmile.\n#268 Lips Control target redesign\n#269 Face Control new attributes.\n#158	BigSmile target."
+DPAR_VERSION = "3.11.18"
+DPAR_UPDATELOG = "#154 Replace control shapes order.\nIt'll keep the curve shapes as the first child\nto maintain Maya hierarchy working well\nusing keyboard arrows."
 
 
 
