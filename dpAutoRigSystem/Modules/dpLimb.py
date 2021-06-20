@@ -1,5 +1,6 @@
 # importing libraries:
 import maya.cmds as cmds
+import math
 
 from Library import dpUtils as utils
 import dpBaseClass as Base
@@ -817,22 +818,80 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleACList[0] + ".twist", force=True)
 
                 # corner poleVector:
-                baseMiddlePointList = self.ctrls.middlePoint(self.ikJointList[1], self.ikJointList[3], createLocator=True)
-                poleVectorLoc = cmds.spaceLocator(name=side + self.userGuideName + "_PoleVectorLoc")
-                cmds.delete(cmds.parentConstraint(self.ikJointList[2], poleVectorLoc, maintainOffset=False))
-                cmds.delete(cmds.aimConstraint(self.ikJointList[1], poleVectorLoc, aimVector=(1.0, 0.0, 0.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikJointList[1], maintainOffset=False))
+
+
+
+
+                # WIP
+                startPos  = cmds.xform(self.ikJointList[1], query=True, worldSpace=True, rotatePivot=True) #shoulder, leg
+                cornerPos = cmds.xform(self.ikJointList[2], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
+                endPos    = cmds.xform(self.ikJointList[3], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
+
+                upperLimbLen = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2])[0]
+                lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
+                chainLen = upperLimbLen + lowerLimbLen
+
+                pvRatio = upperLimbLen / chainLen
+                
+                pvBasePosX = (endPos[0] - startPos[0]) * pvRatio + startPos[0]
+                pvBasePosY = (endPos[1] - startPos[1]) * pvRatio + startPos[1]
+                pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio + startPos[2]
+
+                cornerBasePosX = cornerPos[0] - pvBasePosX
+                cornerBasePosY = cornerPos[1] - pvBasePosY
+                cornerBasePosZ = cornerPos[2] - pvBasePosZ
+
+                magDir = math.sqrt(cornerBasePosX**2 + cornerBasePosY**2 + cornerBasePosZ**2)
+                
+                normalDirX = cornerBasePosX / magDir
+                normalDirY = cornerBasePosY / magDir
+                normalDirZ = cornerBasePosZ / magDir
+
+                pvDistX = normalDirX * chainLen
+                pvDistY = normalDirY * chainLen
+                pvDistZ = normalDirZ * chainLen
+
+                pvPosX = pvBasePosX + pvDistX
+                pvPosY = pvBasePosY + pvDistY
+                pvPosZ = pvBasePosZ + pvDistZ
+
+                
+                
+
+
+
+                cmds.move(pvPosX, pvPosY, pvPosZ, self.ikCornerCtrlZero, relative=True, objectSpace=True, worldSpaceDistance=True)
+                cmds.delete(cmds.aimConstraint(self.ikJointList[2], self.ikCornerCtrlZero, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="objectrotation", worldUpVector=(0, 1, 0), worldUpObject=self.cvCornerLoc, maintainOffset=False))
+
+
+
+
+
+                
+
+
+
+
+
+
+
+
+#                baseMiddlePointList = self.ctrls.middlePoint(self.ikJointList[1], self.ikJointList[3], createLocator=True)
+#                poleVectorLoc = cmds.spaceLocator(name=side + self.userGuideName + "_PoleVectorLoc")
+#                cmds.delete(cmds.parentConstraint(self.ikJointList[2], poleVectorLoc, maintainOffset=False))
+#                cmds.delete(cmds.aimConstraint(self.ikJointList[1], poleVectorLoc, aimVector=(1.0, 0.0, 0.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikJointList[1], maintainOffset=False))
 
                 # corner look at base:
-                cmds.delete(cmds.aimConstraint(baseMiddlePointList[1], poleVectorLoc, aimVector=(0.0, 0.0, -1.0), upVector=(0.0, 1.0, 0.0), maintainOffset=False))
+#                cmds.delete(cmds.aimConstraint(baseMiddlePointList[1], poleVectorLoc, aimVector=(0.0, 0.0, -1.0), upVector=(0.0, 1.0, 0.0), maintainOffset=False))
 
                 # move to along Z axis in order to go away from base middle locator:
-                distToMove = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[3])[0] * 1.1
-                cmds.move(0, 0, distToMove, poleVectorLoc, relative=True, objectSpace=True, worldSpaceDistance=True)
+#                distToMove = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[3])[0] * 1.1
+#                cmds.move(0, 0, distToMove, poleVectorLoc, relative=True, objectSpace=True, worldSpaceDistance=True)
 
                 # put poleVector control in the correct position:
-                cornerPos = cmds.xform(poleVectorLoc, query=True, worldSpace=True, rotatePivot=True)
-                cmds.delete(cmds.parentConstraint(poleVectorLoc, self.ikCornerCtrlZero, maintainOffset=False))
-                cmds.delete(baseMiddlePointList[1], poleVectorLoc)
+#                cornerPos = cmds.xform(poleVectorLoc, query=True, worldSpace=True, rotatePivot=True)
+#                cmds.delete(cmds.parentConstraint(poleVectorLoc, self.ikCornerCtrlZero, maintainOffset=False))
+#                cmds.delete(baseMiddlePointList[1], poleVectorLoc)
 
                 # create poleVector constraint:
                 poleVectorConstA = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PVC")
