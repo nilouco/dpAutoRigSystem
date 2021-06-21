@@ -659,10 +659,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
                 cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
 
-                # mirror poleVector control zeroOut group:
-                if s == 1:
-                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleX", -1)
-
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
                 self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
                 self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
@@ -855,28 +851,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 pvPosZ = pvBasePosZ + pvDistZ
                 # place poleVector zero out group in the correct position
                 cmds.move(pvPosX, pvPosY, pvPosZ, self.ikCornerCtrlZero, objectSpace=False, worldSpaceDistance=True)
-                # orient it correctly
-                cmds.delete(cmds.aimConstraint(self.ikJointList[2], self.ikCornerCtrlZero, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="objectrotation", worldUpVector=(0, 1, 0), worldUpObject=self.cvCornerLoc, maintainOffset=False))
-
-
-
-
-#                baseMiddlePointList = self.ctrls.middlePoint(self.ikJointList[1], self.ikJointList[3], createLocator=True)
-#                poleVectorLoc = cmds.spaceLocator(name=side + self.userGuideName + "_PoleVectorLoc")
-#                cmds.delete(cmds.parentConstraint(self.ikJointList[2], poleVectorLoc, maintainOffset=False))
-#                cmds.delete(cmds.aimConstraint(self.ikJointList[1], poleVectorLoc, aimVector=(1.0, 0.0, 0.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikJointList[1], maintainOffset=False))
-
-                # corner look at base:
-#                cmds.delete(cmds.aimConstraint(baseMiddlePointList[1], poleVectorLoc, aimVector=(0.0, 0.0, -1.0), upVector=(0.0, 1.0, 0.0), maintainOffset=False))
-
-                # move to along Z axis in order to go away from base middle locator:
-#                distToMove = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[3])[0] * 1.1
-#                cmds.move(0, 0, distToMove, poleVectorLoc, relative=True, objectSpace=True, worldSpaceDistance=True)
-
-                # put poleVector control in the correct position:
-#                cornerPos = cmds.xform(poleVectorLoc, query=True, worldSpace=True, rotatePivot=True)
-#                cmds.delete(cmds.parentConstraint(poleVectorLoc, self.ikCornerCtrlZero, maintainOffset=False))
-#                cmds.delete(baseMiddlePointList[1], poleVectorLoc)
 
                 # create poleVector constraint:
                 poleVectorConstA = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PVC")
@@ -888,7 +862,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # create annotation:
                 annotLoc = cmds.spaceLocator(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant_Loc", position=(0, 0, 0))[0]
-                annotation = cmds.annotate(annotLoc, tx="", point=cornerPos)
+                annotation = cmds.annotate(annotLoc, tx="", point=(pvPosX, pvPosY, pvPosZ))
                 annotation = cmds.listRelatives(annotation, parent=True)[0]
                 annotation = cmds.rename(annotation, side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant")
                 cmds.parent(annotation, self.ikCornerCtrl)
@@ -901,7 +875,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.ikCornerCtrl + ".displayAnnotation", annotation + ".visibility", force=True)
 
                 # prepare groups to rotate and translate automatically:
-                cmds.aimConstraint(annotLoc, self.ikCornerCtrl, aimVector=(0.0, 0.0, -1.0), upVector=(0.0, 1.0, 0.0), name=self.ikCornerCtrl + "_AiC")
                 self.ctrls.setLockHide([self.ikCornerCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 self.cornerGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_PoleVector_Grp", absolute=True)
                 self.cornerOrientGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_PoleVectorOrient_Grp", absolute=True)
@@ -909,11 +882,19 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 tempToDelB = cmds.parentConstraint(self.ikExtremCtrl, self.cornerOrientGrp, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB)
                 cmds.parent(self.ikCornerCtrlZero, self.cornerGrp, absolute=True)
+                # set a good orientation for the poleVector ctrl
+                cmds.setAttr(self.ikCornerCtrlZero + ".rotateX", 0)
+                cmds.setAttr(self.ikCornerCtrlZero + ".rotateY", 0)
+                cmds.setAttr(self.ikCornerCtrlZero + ".rotateZ", 0)
+                if s == 1:
+                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleX", -1)
+                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleY", -1)
+                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleZ", -1)
                 self.zeroCornerGrp = utils.zeroOut([self.cornerGrp])[0]
                 self.ikPoleVectorCtrlZeroList.append(self.zeroCornerGrp)
 
                 # working with autoOrient of poleVector:
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                 if self.limbTypeName == ARM:
                     cmds.setAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], 0)
                 if self.limbStyle == self.langDic[self.langName]['m042_default']:
