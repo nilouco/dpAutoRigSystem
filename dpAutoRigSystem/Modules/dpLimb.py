@@ -67,6 +67,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.origRotList = []
         self.bendJointList = []
 
+
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
         Layout.LayoutClass.basicModuleLayout(self)
@@ -107,9 +108,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvExtremLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Extrem", r=0.5, d=1, guide=True)
         self.cvUpVectorLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerUpVector", r=0.5, d=1, guide=True)
 
-        # lock undesirable translate axe for corner guides:
-        cmds.setAttr(self.cvCornerLoc+".tx", lock=True)
-        cmds.setAttr(self.cvCornerBLoc+".tx", lock=True)
+        # lock undesirable translate and rotate axis for corner guides:
+        self.setLockCornerAttr(ARM)
         
         # set quadruped locator config:
         cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
@@ -316,11 +316,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
             cmds.delete(self.cornerGrp + "_AiC")
             cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
-            # lock undesirable translate axe for corner guides:
-            cmds.setAttr(self.cvCornerLoc+".tx", 0, lock=True)
-            cmds.setAttr(self.cvCornerBLoc+".tx", 0, lock=True)
-            cmds.setAttr(self.cvCornerLoc+".ty", lock=False)
-            cmds.setAttr(self.cvCornerBLoc+".ty", lock=False)
+            self.setLockCornerAttr(ARM)
 
         # for Leg type:
         elif type == self.langDic[self.langName]['m030_leg']:
@@ -337,11 +333,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
             cmds.delete(self.cornerGrp + "_AiC")
             cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
-            # lock undesirable translate axe for corner guides:
-            cmds.setAttr(self.cvCornerLoc+".ty", 0, lock=True)
-            cmds.setAttr(self.cvCornerBLoc+".ty", 0, lock=True)
-            cmds.setAttr(self.cvCornerLoc+".tx", lock=False)
-            cmds.setAttr(self.cvCornerBLoc+".tx", lock=False)
+            self.setLockCornerAttr(LEG)
 
         # reset rotations:
         self.reOrientGuide()
@@ -362,6 +354,22 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvExtremLoc + '.rotateX', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateY', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateZ', 0)
+
+    def setLockCornerAttr(self, limbType, *args):
+        """ Set corner guide lock attributes to specific limb type (arm or leg).
+        """
+        trAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']
+        cornerAttrList = ['tx', 'ry', 'rz'] #arm
+        if limbType == LEG:
+            cornerAttrList = ['ty', 'rx', 'rz'] #leg
+        for attr in trAttrList:
+            if attr in cornerAttrList:
+                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=True)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=True)
+            else:
+                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=False)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
+
 
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
