@@ -394,7 +394,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # do a group mirror with negative scaling:
                     if s == 1:
                         for axis in self.mirrorAxis:
-                            cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp + '.scale' + axis, -1)
+                            cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp+'.scale' + axis, -1)
                 # joint labelling:
                 jointLabelAdd = 1
             else:  # if not mirror:
@@ -487,7 +487,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.ikNSJointList = self.chainDic[self.jSufixList[3]]
                 self.ikACJointList = self.chainDic[self.jSufixList[4]]
                 
-                # hide not skin joints in order to be more Rigger friend when working the Skinning:
+                # hide not skin joints in order to be more Rigger friendly when working the Skinning:
                 cmds.setAttr(self.ikJointList[0]+".visibility", 0)
                 cmds.setAttr(self.fkJointList[0]+".visibility", 0)
                 cmds.setAttr(self.ikNSJointList[0]+".visibility", 0)
@@ -817,61 +817,46 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleNotStretchList[0] + ".twist", force=True)
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleACList[0] + ".twist", force=True)
 
-                # corner poleVector:
-
-
-
-
-                # WIP
+                # working on corner poleVector:
+                # based on Renauld Lessard swivel code: 
+                # https://github.com/renaudll/omtk/blob/master/omtk/modules/rigIK.py
+                
+                # get joint chain positions
                 startPos  = cmds.xform(self.ikJointList[1], query=True, worldSpace=True, rotatePivot=True) #shoulder, leg
                 cornerPos = cmds.xform(self.ikJointList[2], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
                 endPos    = cmds.xform(self.ikJointList[3], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
-
+                # calculate distances (joint lenghts)
                 upperLimbLen = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2])[0]
                 lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
                 chainLen = upperLimbLen + lowerLimbLen
-
+                # ratio of placement of the middle joint
                 pvRatio = upperLimbLen / chainLen
-                
+                # calculate the position of the base middle locator
                 pvBasePosX = (endPos[0] - startPos[0]) * pvRatio + startPos[0]
                 pvBasePosY = (endPos[1] - startPos[1]) * pvRatio + startPos[1]
                 pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio + startPos[2]
-
+                # working with vectors
                 cornerBasePosX = cornerPos[0] - pvBasePosX
                 cornerBasePosY = cornerPos[1] - pvBasePosY
                 cornerBasePosZ = cornerPos[2] - pvBasePosZ
-
+                # magnitude of the vector
                 magDir = math.sqrt(cornerBasePosX**2 + cornerBasePosY**2 + cornerBasePosZ**2)
-                
+                # normalize the vector
                 normalDirX = cornerBasePosX / magDir
                 normalDirY = cornerBasePosY / magDir
                 normalDirZ = cornerBasePosZ / magDir
-
+                # calculate the poleVector position by multiplying the unitary vector by the chain length
                 pvDistX = normalDirX * chainLen
                 pvDistY = normalDirY * chainLen
                 pvDistZ = normalDirZ * chainLen
-
+                # get the poleVector position
                 pvPosX = pvBasePosX + pvDistX
                 pvPosY = pvBasePosY + pvDistY
                 pvPosZ = pvBasePosZ + pvDistZ
-
-                
-                
-
-
-
-                cmds.move(pvPosX, pvPosY, pvPosZ, self.ikCornerCtrlZero, relative=True, objectSpace=True, worldSpaceDistance=True)
+                # place poleVector zero out group in the correct position
+                cmds.move(pvPosX, pvPosY, pvPosZ, self.ikCornerCtrlZero, objectSpace=False, worldSpaceDistance=True)
+                # orient it correctly
                 cmds.delete(cmds.aimConstraint(self.ikJointList[2], self.ikCornerCtrlZero, aimVector=(0, 0, 1), upVector=(0, 1, 0), worldUpType="objectrotation", worldUpVector=(0, 1, 0), worldUpObject=self.cvCornerLoc, maintainOffset=False))
-
-
-
-
-
-                
-
-
-
-
 
 
 
