@@ -152,7 +152,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem + "_PaC")
 
         # align cornerLocs:
-        cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
 
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -176,8 +176,15 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvUpVectorGrp = cmds.group(self.cvUpVectorLoc, name=self.cvUpVectorLoc + "_Grp")
         cornerPositionList = cmds.xform(self.cvCornerLoc, query=True, worldSpace=True, rotatePivot=True)
         cmds.move(cornerPositionList[0], cornerPositionList[1], cornerPositionList[2], self.cvUpVectorGrp)
-        cmds.pointConstraint(self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp + "_PoC")
+        cornerUpVectorPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp + "_PoC")[0]
+        cmds.setAttr(cornerUpVectorPointConst + '.' + self.cvMainLoc[self.cvMainLoc.rfind(":") + 1:] + 'W0', 0.52)
+        cmds.setAttr(cornerUpVectorPointConst + '.' + self.cvExtremLoc[self.cvExtremLoc.rfind(":") + 1:] + 'W1', 0.48)
         cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
+
+        # display cornerUpVector:
+        cmds.addAttr(self.cvCornerLoc, longName="displayUpVector", attributeType="bool")
+        cmds.setAttr(self.cvCornerLoc+".displayUpVector", keyable=False, channelBox=True)
+        cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc + ".visibility", force=True)
 
         # re orient guides:
         self.reOrientGuide()
@@ -280,7 +287,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".style", 4)
 
     def changeType(self, type, *args):
-        """ This function will modify the names of the rigged module to Arm of Leg options
+        """ This function will modify the names of the rigged module to Arm or Leg options
             and rotate the moduleGrp in order to be more easy to user edit.
         """
         # re-declaring guide names:
@@ -314,8 +321,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".rotateY", 0)
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
-            cmds.delete(self.cornerGrp + "_AiC")
-            cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            cmds.delete(self.cornerAIC)
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
             self.setLockCornerAttr(ARM)
 
         # for Leg type:
@@ -331,8 +338,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateX", 10)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
-            cmds.delete(self.cornerGrp + "_AiC")
-            cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            cmds.delete(self.cornerAIC)
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
             self.setLockCornerAttr(LEG)
 
         # reset rotations:
@@ -939,7 +946,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(autoOrientRev+".outputX", autoOrientConst+"."+self.ikHandleToRFGrp+"W0", force=True)
                     cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
                     cmds.cycleCheck(evaluation=False)
-                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, maintainOffset=True, name=quadExtraCtrlZero+"_AiC")[0]
+                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
                 
                 # stretch system:
