@@ -107,9 +107,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvCornerBLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerB", r=0.5, d=1, guide=True)
         self.cvExtremLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Extrem", r=0.5, d=1, guide=True)
         self.cvUpVectorLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerUpVector", r=0.5, d=1, guide=True)
-
-        # lock undesirable translate and rotate axis for corner guides:
-        self.setLockCornerAttr(ARM)
         
         # set quadruped locator config:
         cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
@@ -185,6 +182,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.addAttr(self.cvCornerLoc, longName="displayUpVector", attributeType="bool")
         cmds.setAttr(self.cvCornerLoc+".displayUpVector", keyable=False, channelBox=True)
         cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc + ".visibility", force=True)
+
+        # lock undesirable translate and rotate axis for corner guides:
+        self.setInitialCornerRotate()
+        self.setLockCornerAttr(ARM)
 
         # re orient guides:
         self.reOrientGuide()
@@ -361,6 +362,17 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvExtremLoc + '.rotateX', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateY', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateZ', 0)
+        
+
+    def setInitialCornerRotate(self, *args):
+        """ Get rotate from corner zeroOut group
+            invert this value multiplying it to -1
+            set the cornerLoc rotate with it.
+        """
+        rotAxisList = ["rx", "ry", "rz"]
+        for rotAxis in rotAxisList:
+            cmds.setAttr(self.cvCornerLoc+"."+rotAxis, -1*cmds.getAttr(self.cornerGrp+"."+rotAxis))
+
 
     def setLockCornerAttr(self, limbType, *args):
         """ Set corner guide lock attributes to specific limb type (arm or leg).
