@@ -184,11 +184,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc + ".visibility", force=True)
 
         # lock undesirable translate and rotate axis for corner guides:
-        self.setInitialCornerRotate()
         self.setLockCornerAttr(ARM)
 
         # re orient guides:
         self.reOrientGuide()
+        cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
@@ -303,12 +303,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
         # reset translations:
         translateAttrList = ['tx', 'ty', 'tz']
-        for tAttr in translateAttrList:
-            cmds.setAttr(self.cvBeforeLoc + "." + tAttr, 0)
-            cmds.setAttr(self.cvMainLoc + "." + tAttr, 0)
-            cmds.setAttr(self.cornerGrp + "." + tAttr, 0)
-            cmds.setAttr(self.cvExtremLoc + "." + tAttr, 0)
-            cmds.setAttr(self.cvUpVectorLoc + "." + tAttr, 0)
+        guideList = [self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvExtremLoc, self.cvUpVectorLoc]
+        for guideNode in guideList:
+            for tAttr in translateAttrList:
+                cmds.setAttr(guideNode + "." + tAttr, lock=False)
+                cmds.setAttr(guideNode + "." + tAttr, 0)
 
         # for Arm type:
         if type == self.langDic[self.langName]['m028_arm']:
@@ -316,6 +315,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvBeforeLoc + ".translateX", -1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -4)
             cmds.setAttr(self.cvExtremLoc + ".translateZ", 10)
+            cmds.setAttr(self.cvExtremLoc + ".translateX", lock=True)
             cmds.setAttr(self.cornerGrp + ".translateY", -0.75)
             cmds.setAttr(self.cvEndJoint + ".translateZ", 1.3)
             cmds.setAttr(self.moduleGrp + ".rotateX", 90)
@@ -332,6 +332,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvBeforeLoc + ".translateY", 1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -2)
             cmds.setAttr(self.cvExtremLoc + ".translateZ", 10)
+            cmds.setAttr(self.cvExtremLoc + ".translateY", lock=True)
             cmds.setAttr(self.cornerGrp + ".translateX", 0.75)
             cmds.setAttr(self.cvEndJoint + ".translateZ", 1.3)
             cmds.setAttr(self.moduleGrp + ".rotateX", 0)
@@ -362,16 +363,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvExtremLoc + '.rotateX', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateY', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateZ', 0)
-        
-
-    def setInitialCornerRotate(self, *args):
-        """ Get rotate from corner zeroOut group
-            invert this value multiplying it to -1
-            set the cornerLoc rotate with it.
-        """
-        rotAxisList = ["rx", "ry", "rz"]
-        for rotAxis in rotAxisList:
-            cmds.setAttr(self.cvCornerLoc+"."+rotAxis, -1*cmds.getAttr(self.cornerGrp+"."+rotAxis))
 
 
     def setLockCornerAttr(self, limbType, *args):

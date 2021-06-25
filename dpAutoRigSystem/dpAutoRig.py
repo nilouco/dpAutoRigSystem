@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.18"
-DPAR_UPDATELOG = "WIP #061 PoleVector calculus."
+DPAR_VERSION = "3.11.19"
+DPAR_UPDATELOG = "#061 PoleVector calculation.\nAlso locked some Limb guide attributes."
 
 
 
