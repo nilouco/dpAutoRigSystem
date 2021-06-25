@@ -1,5 +1,6 @@
 # importing libraries:
 import maya.cmds as cmds
+import math
 
 from Library import dpUtils as utils
 import dpBaseClass as Base
@@ -66,6 +67,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.origRotList = []
         self.bendJointList = []
 
+
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
         Layout.LayoutClass.basicModuleLayout(self)
@@ -105,10 +107,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvCornerBLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerB", r=0.5, d=1, guide=True)
         self.cvExtremLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Extrem", r=0.5, d=1, guide=True)
         self.cvUpVectorLoc = self.ctrls.cvLocator(ctrlName=self.guideName + "_CornerUpVector", r=0.5, d=1, guide=True)
-
-        # lock undesirable translate axe for corner guides:
-        cmds.setAttr(self.cvCornerLoc+".tx", lock=True)
-        cmds.setAttr(self.cvCornerBLoc+".tx", lock=True)
         
         # set quadruped locator config:
         cmds.parent(self.cvCornerBLoc, self.cvCornerLoc, relative=True)
@@ -151,7 +149,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem + "_PaC")
 
         # align cornerLocs:
-        cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
 
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -175,11 +173,22 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.cvUpVectorGrp = cmds.group(self.cvUpVectorLoc, name=self.cvUpVectorLoc + "_Grp")
         cornerPositionList = cmds.xform(self.cvCornerLoc, query=True, worldSpace=True, rotatePivot=True)
         cmds.move(cornerPositionList[0], cornerPositionList[1], cornerPositionList[2], self.cvUpVectorGrp)
-        cmds.pointConstraint(self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp + "_PoC")
+        cornerUpVectorPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp + "_PoC")[0]
+        cmds.setAttr(cornerUpVectorPointConst + '.' + self.cvMainLoc[self.cvMainLoc.rfind(":") + 1:] + 'W0', 0.52)
+        cmds.setAttr(cornerUpVectorPointConst + '.' + self.cvExtremLoc[self.cvExtremLoc.rfind(":") + 1:] + 'W1', 0.48)
         cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
+
+        # display cornerUpVector:
+        cmds.addAttr(self.cvCornerLoc, longName="displayUpVector", attributeType="bool")
+        cmds.setAttr(self.cvCornerLoc+".displayUpVector", keyable=False, channelBox=True)
+        cmds.connectAttr(self.cvCornerLoc+".displayUpVector", self.cvUpVectorLoc + ".visibility", force=True)
+
+        # lock undesirable translate and rotate axis for corner guides:
+        self.setLockCornerAttr(ARM)
 
         # re orient guides:
         self.reOrientGuide()
+        cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
@@ -279,7 +288,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".style", 4)
 
     def changeType(self, type, *args):
-        """ This function will modify the names of the rigged module to Arm of Leg options
+        """ This function will modify the names of the rigged module to Arm or Leg options
             and rotate the moduleGrp in order to be more easy to user edit.
         """
         # re-declaring guide names:
@@ -294,12 +303,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
         # reset translations:
         translateAttrList = ['tx', 'ty', 'tz']
-        for tAttr in translateAttrList:
-            cmds.setAttr(self.cvBeforeLoc + "." + tAttr, 0)
-            cmds.setAttr(self.cvMainLoc + "." + tAttr, 0)
-            cmds.setAttr(self.cornerGrp + "." + tAttr, 0)
-            cmds.setAttr(self.cvExtremLoc + "." + tAttr, 0)
-            cmds.setAttr(self.cvUpVectorLoc + "." + tAttr, 0)
+        guideList = [self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvExtremLoc, self.cvUpVectorLoc]
+        for guideNode in guideList:
+            for tAttr in translateAttrList:
+                cmds.setAttr(guideNode + "." + tAttr, lock=False)
+                cmds.setAttr(guideNode + "." + tAttr, 0)
 
         # for Arm type:
         if type == self.langDic[self.langName]['m028_arm']:
@@ -307,19 +315,16 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvBeforeLoc + ".translateX", -1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -4)
             cmds.setAttr(self.cvExtremLoc + ".translateZ", 10)
+            cmds.setAttr(self.cvExtremLoc + ".translateX", lock=True)
             cmds.setAttr(self.cornerGrp + ".translateY", -0.75)
             cmds.setAttr(self.cvEndJoint + ".translateZ", 1.3)
             cmds.setAttr(self.moduleGrp + ".rotateX", 90)
             cmds.setAttr(self.moduleGrp + ".rotateY", 0)
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
-            cmds.delete(self.cornerGrp + "_AiC")
-            cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
-            # lock undesirable translate axe for corner guides:
-            cmds.setAttr(self.cvCornerLoc+".tx", 0, lock=True)
-            cmds.setAttr(self.cvCornerBLoc+".tx", 0, lock=True)
-            cmds.setAttr(self.cvCornerLoc+".ty", lock=False)
-            cmds.setAttr(self.cvCornerBLoc+".ty", lock=False)
+            cmds.delete(self.cornerAIC)
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            self.setLockCornerAttr(ARM)
 
         # for Leg type:
         elif type == self.langDic[self.langName]['m030_leg']:
@@ -327,6 +332,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.cvBeforeLoc + ".translateY", 1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -2)
             cmds.setAttr(self.cvExtremLoc + ".translateZ", 10)
+            cmds.setAttr(self.cvExtremLoc + ".translateY", lock=True)
             cmds.setAttr(self.cornerGrp + ".translateX", 0.75)
             cmds.setAttr(self.cvEndJoint + ".translateZ", 1.3)
             cmds.setAttr(self.moduleGrp + ".rotateX", 0)
@@ -334,13 +340,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateX", 10)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
-            cmds.delete(self.cornerGrp + "_AiC")
-            cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
-            # lock undesirable translate axe for corner guides:
-            cmds.setAttr(self.cvCornerLoc+".ty", 0, lock=True)
-            cmds.setAttr(self.cvCornerBLoc+".ty", 0, lock=True)
-            cmds.setAttr(self.cvCornerLoc+".tx", lock=False)
-            cmds.setAttr(self.cvCornerBLoc+".tx", lock=False)
+            cmds.delete(self.cornerAIC)
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            self.setLockCornerAttr(LEG)
 
         # reset rotations:
         self.reOrientGuide()
@@ -361,6 +363,23 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.cvExtremLoc + '.rotateX', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateY', 0)
         cmds.setAttr(self.cvExtremLoc + '.rotateZ', 0)
+
+
+    def setLockCornerAttr(self, limbType, *args):
+        """ Set corner guide lock attributes to specific limb type (arm or leg).
+        """
+        trAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz']
+        cornerAttrList = ['tx', 'ry', 'rz'] #arm
+        if limbType == LEG:
+            cornerAttrList = ['ty', 'rx', 'rz'] #leg
+        for attr in trAttrList:
+            if attr in cornerAttrList:
+                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=True)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=True)
+            else:
+                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=False)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
+
 
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
@@ -393,7 +412,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # do a group mirror with negative scaling:
                     if s == 1:
                         for axis in self.mirrorAxis:
-                            cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp + '.scale' + axis, -1)
+                            cmds.setAttr(side + self.userGuideName + '_' + self.mirrorGrp+'.scale' + axis, -1)
                 # joint labelling:
                 jointLabelAdd = 1
             else:  # if not mirror:
@@ -486,7 +505,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.ikNSJointList = self.chainDic[self.jSufixList[3]]
                 self.ikACJointList = self.chainDic[self.jSufixList[4]]
                 
-                # hide not skin joints in order to be more Rigger friend when working the Skinning:
+                # hide not skin joints in order to be more Rigger friendly when working the Skinning:
                 cmds.setAttr(self.ikJointList[0]+".visibility", 0)
                 cmds.setAttr(self.fkJointList[0]+".visibility", 0)
                 cmds.setAttr(self.ikNSJointList[0]+".visibility", 0)
@@ -658,10 +677,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
                 cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
 
-                # mirror poleVector control zeroOut group:
-                if s == 1:
-                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleX", -1)
-
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
                 self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
                 self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
@@ -816,23 +831,44 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleNotStretchList[0] + ".twist", force=True)
                     cmds.connectAttr(twistMultDiv + '.outputX', ikHandleACList[0] + ".twist", force=True)
 
-                # corner poleVector:
-                baseMiddlePointList = self.ctrls.middlePoint(self.ikJointList[1], self.ikJointList[3], createLocator=True)
-                poleVectorLoc = cmds.spaceLocator(name=side + self.userGuideName + "_PoleVectorLoc")
-                cmds.delete(cmds.parentConstraint(self.ikJointList[2], poleVectorLoc, maintainOffset=False))
-                cmds.delete(cmds.aimConstraint(self.ikJointList[1], poleVectorLoc, aimVector=(1.0, 0.0, 0.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikJointList[1], maintainOffset=False))
-
-                # corner look at base:
-                cmds.delete(cmds.aimConstraint(baseMiddlePointList[1], poleVectorLoc, aimVector=(0.0, 0.0, -1.0), upVector=(0.0, 1.0, 0.0), maintainOffset=False))
-
-                # move to along Z axis in order to go away from base middle locator:
-                distToMove = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[3])[0] * 1.1
-                cmds.move(0, 0, distToMove, poleVectorLoc, relative=True, objectSpace=True, worldSpaceDistance=True)
-
-                # put poleVector control in the correct position:
-                cornerPos = cmds.xform(poleVectorLoc, query=True, worldSpace=True, rotatePivot=True)
-                cmds.delete(cmds.parentConstraint(poleVectorLoc, self.ikCornerCtrlZero, maintainOffset=False))
-                cmds.delete(baseMiddlePointList[1], poleVectorLoc)
+                # working on corner poleVector:
+                # based on Renauld Lessard swivel code: 
+                # https://github.com/renaudll/omtk/blob/master/omtk/modules/rigIK.py
+                
+                # get joint chain positions
+                startPos  = cmds.xform(self.ikJointList[1], query=True, worldSpace=True, rotatePivot=True) #shoulder, leg
+                cornerPos = cmds.xform(self.ikJointList[2], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
+                endPos    = cmds.xform(self.ikJointList[3], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
+                # calculate distances (joint lenghts)
+                upperLimbLen = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2])[0]
+                lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
+                chainLen = upperLimbLen + lowerLimbLen
+                # ratio of placement of the middle joint
+                pvRatio = upperLimbLen / chainLen
+                # calculate the position of the base middle locator
+                pvBasePosX = (endPos[0] - startPos[0]) * pvRatio + startPos[0]
+                pvBasePosY = (endPos[1] - startPos[1]) * pvRatio + startPos[1]
+                pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio + startPos[2]
+                # working with vectors
+                cornerBasePosX = cornerPos[0] - pvBasePosX
+                cornerBasePosY = cornerPos[1] - pvBasePosY
+                cornerBasePosZ = cornerPos[2] - pvBasePosZ
+                # magnitude of the vector
+                magDir = math.sqrt(cornerBasePosX**2 + cornerBasePosY**2 + cornerBasePosZ**2)
+                # normalize the vector
+                normalDirX = cornerBasePosX / magDir
+                normalDirY = cornerBasePosY / magDir
+                normalDirZ = cornerBasePosZ / magDir
+                # calculate the poleVector position by multiplying the unitary vector by the chain length
+                pvDistX = normalDirX * chainLen
+                pvDistY = normalDirY * chainLen
+                pvDistZ = normalDirZ * chainLen
+                # get the poleVector position
+                pvPosX = pvBasePosX + pvDistX
+                pvPosY = pvBasePosY + pvDistY
+                pvPosZ = pvBasePosZ + pvDistZ
+                # place poleVector zero out group in the correct position
+                cmds.move(pvPosX, pvPosY, pvPosZ, self.ikCornerCtrlZero, objectSpace=False, worldSpaceDistance=True)
 
                 # create poleVector constraint:
                 poleVectorConstA = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PVC")
@@ -844,7 +880,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # create annotation:
                 annotLoc = cmds.spaceLocator(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant_Loc", position=(0, 0, 0))[0]
-                annotation = cmds.annotate(annotLoc, tx="", point=cornerPos)
+                annotation = cmds.annotate(annotLoc, tx="", point=(pvPosX, pvPosY, pvPosZ))
                 annotation = cmds.listRelatives(annotation, parent=True)[0]
                 annotation = cmds.rename(annotation, side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant")
                 cmds.parent(annotation, self.ikCornerCtrl)
@@ -857,7 +893,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.ikCornerCtrl + ".displayAnnotation", annotation + ".visibility", force=True)
 
                 # prepare groups to rotate and translate automatically:
-                cmds.aimConstraint(annotLoc, self.ikCornerCtrl, aimVector=(0.0, 0.0, -1.0), upVector=(0.0, 1.0, 0.0), name=self.ikCornerCtrl + "_AiC")
                 self.ctrls.setLockHide([self.ikCornerCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 self.cornerGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_PoleVector_Grp", absolute=True)
                 self.cornerOrientGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_PoleVectorOrient_Grp", absolute=True)
@@ -865,11 +900,19 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 tempToDelB = cmds.parentConstraint(self.ikExtremCtrl, self.cornerOrientGrp, maintainOffset=False)
                 cmds.delete(tempToDelA, tempToDelB)
                 cmds.parent(self.ikCornerCtrlZero, self.cornerGrp, absolute=True)
+                # set a good orientation for the poleVector ctrl
+                cmds.setAttr(self.ikCornerCtrlZero + ".rotateX", 0)
+                cmds.setAttr(self.ikCornerCtrlZero + ".rotateY", 0)
+                cmds.setAttr(self.ikCornerCtrlZero + ".rotateZ", 0)
+                if s == 1:
+                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleX", -1)
+                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleY", -1)
+                    cmds.setAttr(self.ikCornerCtrlZero + ".scaleZ", -1)
                 self.zeroCornerGrp = utils.zeroOut([self.cornerGrp])[0]
                 self.ikPoleVectorCtrlZeroList.append(self.zeroCornerGrp)
 
                 # working with autoOrient of poleVector:
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                 if self.limbTypeName == ARM:
                     cmds.setAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], 0)
                 if self.limbStyle == self.langDic[self.langName]['m042_default']:
@@ -906,7 +949,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(autoOrientRev+".outputX", autoOrientConst+"."+self.ikHandleToRFGrp+"W0", force=True)
                     cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
                     cmds.cycleCheck(evaluation=False)
-                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, maintainOffset=True, name=quadExtraCtrlZero+"_AiC")[0]
+                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
                 
                 # stretch system:

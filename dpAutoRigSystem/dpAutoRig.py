@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.18"
-DPAR_UPDATELOG = "#154 Replace control shapes order.\nIt'll keep the curve shapes as the first child\nto maintain Maya hierarchy working well\nusing keyboard arrows."
+DPAR_VERSION = "3.11.19"
+DPAR_UPDATELOG = "#061 PoleVector calculation.\nAlso locked some Limb guide attributes."
 
 
 
