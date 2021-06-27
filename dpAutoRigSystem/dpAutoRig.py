@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.19"
-DPAR_UPDATELOG = "#061 PoleVector calculation.\nAlso locked some Limb guide attributes."
+DPAR_VERSION = "3.11.20"
+DPAR_UPDATELOG = "#236 Avoid existing All_Grp name conflit."
 
 
 
@@ -1550,7 +1550,6 @@ class DP_AutoRig_UI:
                 #Since there is no connection between the master and the node found, create the connection
                 self.masterGrp.addAttr(sAttrName, attributeType='message')
                 nGrpNode.message.connect(self.masterGrp.attr(sAttrName))
-
         return nGrpNode
 
     '''
@@ -1575,7 +1574,6 @@ class DP_AutoRig_UI:
                 #Since there is no connection between the master and the node found, create the connection
                 self.masterGrp.addAttr(sAttrName, attributeType='message')
                 nCtrl.message.connect(self.masterGrp.attr(sAttrName))
-
         return nCtrl
 
     '''
@@ -1584,16 +1582,23 @@ class DP_AutoRig_UI:
     '''
     def createBaseRigNode(self):
         sAllGrp = "All_Grp"
+        needCreateAllGrp = True
         # create master hierarchy:
         allTransformList = pymel.ls(self.prefix + "*", selection=False, type="transform")
         #Get all the masterGrp obj and ensure it not referenced
         self.masterGrp = [n for n in allTransformList if n.hasAttr("masterGrp") and not pymel.referenceQuery(n, isNodeReferenced=True)]
         localTime = str( time.asctime( time.localtime(time.time()) ) )
         if self.masterGrp:
-            # Take the first one in the list, in almost all case, it will be fine.
-            # If not, the user need to clean it's scene for the moment
-            self.masterGrp = self.masterGrp[0]
-        else:
+            # validate master (All_Grp) node
+            # If it doesn't work, the user need to clean it's scene to avoid duplicated names, for the moment.
+            for nodeGrp in self.masterGrp:
+                if self.validateMasterGrp(nodeGrp):
+                    self.masterGrp = nodeGrp
+                    needCreateAllGrp = False
+        if needCreateAllGrp:
+            if cmds.objExists(sAllGrp):
+                # rename existing All_Grp node without connections as All_Grp_Old
+                cmds.rename(sAllGrp, sAllGrp+"_Old")
             #Create Master Grp
             self.masterGrp = pymel.createNode("transform", name=self.prefix+sAllGrp)
             self.masterGrp.addAttr("masterGrp", at="bool")
@@ -1612,11 +1617,11 @@ class DP_AutoRig_UI:
 
         # add date data log:
         self.masterGrp.setDynamicAttr("lastModification", localTime)
+        self.masterGrp.setDynamicAttr('name', self.masterGrp.__melobject__())
         
         # module counts:
         for guideType in self.guideModuleList:
             self.masterGrp.setDynamicAttr(guideType+"Count", 0)
-        
 
         #Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
@@ -1741,7 +1746,18 @@ class DP_AutoRig_UI:
         self.baseRootJnt = self.baseRootJnt.__melobject__()
         self.baseRootJntGrp = self.baseRootJntGrp.__melobject__()
         
-        
+
+    def validateMasterGrp(self, nodeGrp, *args):
+        """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
+        """
+        masterGroupList = ["modelsGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
+        for masterGroupAttr in masterGroupList:
+            if not nodeGrp.getAttr(masterGroupAttr):
+                pymel.setAttr(nodeGrp.masterGrp, 0)
+                return False
+        return nodeGrp.getAttr("masterGrp")
+
+
     def reorderAttributes(self, objList, attrList, *args):
         """ Reorder Attributes of a given objectList following the desiredAttribute list.
             Useful for organize the Option_Ctrl attributes, for example.
