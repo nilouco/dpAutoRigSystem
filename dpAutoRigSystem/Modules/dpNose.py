@@ -354,6 +354,7 @@ class Nose(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 utils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.langDic[self.langName]['c029_middle'])
                 utils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c120_tip'])
+                utils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c100_bottom'])
                 utils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_L_"%(n+3)+self.langDic[self.langName]['c121_side'])
                 utils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_R_"%(n+3)+self.langDic[self.langName]['c121_side'])
                 if self.addNostril:
