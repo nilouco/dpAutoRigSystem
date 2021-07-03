@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.20"
-DPAR_UPDATELOG = "#236 Avoid existing All_Grp name conflit."
+DPAR_VERSION = "3.11.21"
+DPAR_UPDATELOG = "#328 Fixed Nose bottom joint label."
 
 
 
