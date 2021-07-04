@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.21"
-DPAR_UPDATELOG = "#328 Fixed Nose bottom joint label."
+DPAR_VERSION = "3.11.22"
+DPAR_UPDATELOG = "#295 - Nose side guide rotate fix."
 
 
 
