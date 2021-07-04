@@ -191,10 +191,13 @@ class CopyPasteShapes():
         cmds.showWindow(win)
 
     def onBtnSavePressed(self, state):
-        path = cmds.fileDialog2(fileMode=0, caption="Safe Shapes")
+        path = cmds.fileDialog2(fileMode=0, caption="Save Shapes")
         if not path:
             return
         path = next(iter(path), None)
+        # make sure we save the file as mayaAscii
+        if not path.endswith(".ma"):
+            path = path.replace(".*", ".ma")
         save_all_ctrls_shapes(path)
 
     def onBtnLoadPressed(self, state):

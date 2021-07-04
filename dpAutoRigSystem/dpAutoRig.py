@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.22"
-DPAR_UPDATELOG = "#295 - Nose side guide rotate fix."
+DPAR_UPDATELOG = "#162 - Replace connected shape.\nThis is useful to keep visibility connections\nwhen replacing control shapes like\nSpine and reverseFoot."
 
 
 
