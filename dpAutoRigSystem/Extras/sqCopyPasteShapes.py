@@ -61,10 +61,24 @@ def hold_ctrl_shapes(ctrl, parent=None):
     snapshot_transform.rename('{0}Snapshot'.format(ctrl.name()))
     return snapshot_transform
 
+
+def check_ctrl_shape_vis_connection(target):
+    """
+    Return the visibility connections for the shapes:
+    """
+    for targetShape in target.getShapes():
+        connected = cmds.listConnections(targetShape+".visibility", source=True, destination=False, plugs=True)
+        if connected:
+            return connected[0]
+
+
 def fetch_ctrl_shapes(source, target):
     """
     Restore a snapshot for all shapes of a specific ctrls.
     """
+    # store income connection to control shape before replace it
+    connected = check_ctrl_shape_vis_connection(target)
+
     # Remove any previous shapes
     pymel.delete(filter(lambda x: isinstance(x, pymel.nodetypes.CurveShape), target.getShapes()))
 
@@ -81,6 +95,9 @@ def fetch_ctrl_shapes(source, target):
         shape_snapshot.setParent(target, r=True, s=True)
         shape_snapshot.rename(target.name() + 'Shape')
         pymel.delete(tmp_transform)
+        # Restore visibility connections.
+        if connected:
+            cmds.connectAttr(connected, target.name()+'Shape.visibility', force=True)
 
     if children:
         pymel.parent(children, target)
@@ -108,7 +125,6 @@ def fetch_all_ctrls_shapes():
         if len(cmds.ls(sTargetName)) == 1:
             if pymel.objExists(sTargetName):
                 oTarget = pymel.PyNode(str(sTargetName))
-
                 fetch_ctrl_shapes(oSource, oTarget)
             else:
                 pymel.warning("Can't find {0}".format(sTargetName))

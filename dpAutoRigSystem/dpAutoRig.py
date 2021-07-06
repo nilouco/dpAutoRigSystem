@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.22"
-DPAR_UPDATELOG = "#162 - Replace connected shape.\nThis is useful to keep visibility connections\nwhen replacing control shapes like\nSpine and reverseFoot."
+DPAR_VERSION = "3.11.23"
+DPAR_UPDATELOG = "#162 - Replace connected shape.\nThis is useful to keep visibility connections\nwhen replacing control shapes like\nSpine and reverseFoot.\n\n#317 Fixed duplicated object name.\n\n#324 Continue if not found control to replace shape.\n\nAlso fixed save file as mayaAscii."
 
 
 
