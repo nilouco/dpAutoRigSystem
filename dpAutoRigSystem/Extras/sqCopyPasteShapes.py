@@ -61,10 +61,24 @@ def hold_ctrl_shapes(ctrl, parent=None):
     snapshot_transform.rename('{0}Snapshot'.format(ctrl.name()))
     return snapshot_transform
 
+
+def check_ctrl_shape_vis_connection(target):
+    """
+    Return the visibility connections for the shapes:
+    """
+    for targetShape in target.getShapes():
+        connected = cmds.listConnections(targetShape+".visibility", source=True, destination=False, plugs=True)
+        if connected:
+            return connected[0]
+
+
 def fetch_ctrl_shapes(source, target):
     """
     Restore a snapshot for all shapes of a specific ctrls.
     """
+    # store income connection to control shape before replace it
+    connected = check_ctrl_shape_vis_connection(target)
+
     # Remove any previous shapes
     pymel.delete(filter(lambda x: isinstance(x, pymel.nodetypes.CurveShape), target.getShapes()))
 
@@ -81,6 +95,9 @@ def fetch_ctrl_shapes(source, target):
         shape_snapshot.setParent(target, r=True, s=True)
         shape_snapshot.rename(target.name() + 'Shape')
         pymel.delete(tmp_transform)
+        # Restore visibility connections.
+        if connected:
+            cmds.connectAttr(connected, target.name()+'Shape.visibility', force=True)
 
     if children:
         pymel.parent(children, target)
@@ -96,7 +113,7 @@ def hold_all_ctrls_shapes(**kwargs):
     ctrls = get_all_ctrls()
     return [hold_ctrl_shapes(oCtrl, **kwargs) for oCtrl in ctrls]
 
-# TODO: Fix bug when two objects have the same name.
+
 def fetch_all_ctrls_shapes():
     """
     Restore the snapshots of all shapes of all ctrls.
@@ -105,13 +122,14 @@ def fetch_all_ctrls_shapes():
 
     for oSource in aSources:
         sTargetName = oSource.name()[:-8]
-        if pymel.objExists(sTargetName):
-            oTarget = pymel.PyNode(str(sTargetName))
-
-            fetch_ctrl_shapes(oSource, oTarget)
-            #pymel.delete(oSource)
+        if len(cmds.ls(sTargetName)) == 1:
+            if pymel.objExists(sTargetName):
+                oTarget = pymel.PyNode(str(sTargetName))
+                fetch_ctrl_shapes(oSource, oTarget)
+            else:
+                pymel.warning("Can't find {0}".format(sTargetName))
         else:
-            pymel.warning("Can't find {0}".format(sTargetName))
+            pymel.warning("Skipped: more than one object named {0}".format(sTargetName))
 
 def get_default_path_snapshot(current_path=None):
     if current_path is None:
@@ -191,10 +209,13 @@ class CopyPasteShapes():
         cmds.showWindow(win)
 
     def onBtnSavePressed(self, state):
-        path = cmds.fileDialog2(fileMode=0, caption="Safe Shapes")
+        path = cmds.fileDialog2(fileMode=0, caption="Save Shapes")
         if not path:
             return
         path = next(iter(path), None)
+        # make sure we save the file as mayaAscii
+        if not path.endswith(".ma"):
+            path = path.replace(".*", ".ma")
         save_all_ctrls_shapes(path)
 
     def onBtnLoadPressed(self, state):
