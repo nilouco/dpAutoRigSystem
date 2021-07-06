@@ -96,7 +96,7 @@ def hold_all_ctrls_shapes(**kwargs):
     ctrls = get_all_ctrls()
     return [hold_ctrl_shapes(oCtrl, **kwargs) for oCtrl in ctrls]
 
-# TODO: Fix bug when two objects have the same name.
+
 def fetch_all_ctrls_shapes():
     """
     Restore the snapshots of all shapes of all ctrls.
@@ -105,13 +105,15 @@ def fetch_all_ctrls_shapes():
 
     for oSource in aSources:
         sTargetName = oSource.name()[:-8]
-        if pymel.objExists(sTargetName):
-            oTarget = pymel.PyNode(str(sTargetName))
+        if len(cmds.ls(sTargetName)) == 1:
+            if pymel.objExists(sTargetName):
+                oTarget = pymel.PyNode(str(sTargetName))
 
-            fetch_ctrl_shapes(oSource, oTarget)
-            #pymel.delete(oSource)
+                fetch_ctrl_shapes(oSource, oTarget)
+            else:
+                pymel.warning("Can't find {0}".format(sTargetName))
         else:
-            pymel.warning("Can't find {0}".format(sTargetName))
+            pymel.warning("Skipped: more than one object named {0}".format(sTargetName))
 
 def get_default_path_snapshot(current_path=None):
     if current_path is None:
