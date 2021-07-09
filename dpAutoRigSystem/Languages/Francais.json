@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2021-05-08",
+    "_updated"       : "2021-07-09",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -352,6 +352,8 @@
 	"i190_integrateDPAR"   : "Integrer avel le dpAutoRigSystem.",
 	"i191_selectPoly"      : "Sélectionner une geometrie de polygone pour charger, s'il vous plaît.",
 	"i120_notUndoable"     : "Attention:\n\nCe script n'est pas annulable, désolé.\n\nNous vous recommandons de sauvegarder votre scène avant de l'exécuter.",
+    "i121_calibration"     : "Calibrage",
+    "i122_transferCalib"   : "Transfert Calibrage",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

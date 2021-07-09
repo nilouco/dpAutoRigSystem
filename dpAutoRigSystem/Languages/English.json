@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2021-05-08",
+    "_updated"       : "2021-07-09",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -352,6 +352,8 @@
 	"i190_integrateDPAR"   : "Integrate with dpAutoRigSystem.",
 	"i191_selectPoly"      : "Select a polygon geometry to load, please.",
 	"i120_notUndoable"     : "Attention:\n\nThis script isn't undoable, sorry.\n\nWe recommend save your scene before run.",
+	"i121_calibration"     : "Calibration",
+	"i122_transferCalib"   : "Transfer Calibration",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

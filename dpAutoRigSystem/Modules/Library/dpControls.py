@@ -937,3 +937,8 @@ class ControlClass:
                 cmds.setAttr(guideBase+".pinGuide", 0)
                 self.createPinGuide(guideBase)
 
+
+    def transferCalibration(self, sourceItem=False, destinationItem=False, attrList=False, verbose=False, *args):
+        """ Transfer calibration attributes.
+        """
+        print "transfering calibration... WIP",

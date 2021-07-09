@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.23"
-DPAR_UPDATELOG = "#162 - Replace connected shape.\nThis is useful to keep visibility connections\nwhen replacing control shapes like\nSpine and reverseFoot.\n\n#317 Fixed duplicated object name.\n\n#324 Continue if not found control to replace shape.\n\nAlso fixed save file as mayaAscii."
+DPAR_UPDATELOG = "#325 WIP Transfer Calibration."
 
 
 
@@ -529,6 +529,10 @@ class DP_AutoRig_UI:
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.langDic[self.langName]['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.langDic[self.langName]['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=utils.zeroOut, parent=self.allUIs["editSelectionFL"])
+        
+        # calibrationControls - frameLayout:
+        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["calibrationButton"] = cmds.button("calibrationButton", label=self.langDic[self.langName]['i122_transferCalib'], backgroundColor=(0.8, 1.0, 0.8), command=self.ctrls.transferCalibration, parent=self.allUIs["calibrationFL"])
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
