@@ -532,7 +532,10 @@ class DP_AutoRig_UI:
         
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["calibrationButton"] = cmds.button("calibrationButton", label=self.langDic[self.langName]['i122_transferCalib'], backgroundColor=(0.8, 1.0, 0.8), command=self.ctrls.transferCalibration, parent=self.allUIs["calibrationFL"])
+        self.allUIs["calibration3Layout"] = cmds.paneLayout("calibration3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
+        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i122_transfer'], backgroundColor=(0.8, 1.0, 0.8), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration3Layout"])
+        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i124_import'], backgroundColor=(0.8, 1.0, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration3Layout"])
+        self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.langDic[self.langName]['m010_Mirror'], backgroundColor=(0.8, 1.0, 0.4), height=30, command=self.ctrls.mirrorCalibration, parent=self.allUIs["calibration3Layout"])
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,

@@ -938,6 +938,43 @@ class ControlClass:
                 self.createPinGuide(guideBase)
 
 
+    def importCalibration(self, *args):
+        """ Import calibration from a referenced file.
+            Transfer calibration for same nodes by name using calibrationList attribute.
+        """
+        importCalibrationNamespace = "dpImportCalibration"
+        sourceRefNodeList = []
+        # get user file to import calibration from
+        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i124_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'])
+        if not importCalibrationPath:
+            return
+        importCalibrationPath = next(iter(importCalibrationPath), None)
+        print "dpImportCalibrationPath =", importCalibrationPath
+        # create a file reference:
+        refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
+        refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
+        refNodeList = cmds.referenceQuery(refNode, nodes=True)
+        if refNodeList:
+            for refNode in refNodeList:
+                if cmds.objExists(refNode+".calibrationList"):
+                    sourceRefNodeList.append(refNode)
+        if sourceRefNodeList:
+            for sourceRefNode in sourceRefNodeList:
+                destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:]
+                if cmds.objExists(destinationNode):
+                    self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
+        # remove referenced file:
+        cmds.file(importCalibrationPath, removeReference=True)
+
+        
+
+    def mirrorCalibration(self, *args):
+        """
+        """
+        print "mirrorCalibration... WIP",
+
+
+
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
         """ Transfer calibration attributes.
         """
@@ -953,12 +990,10 @@ class ControlClass:
                 attrList = self.getCalibrationAttr(sourceItem)
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
+            if verbose:
+                print self.dpUIinst.langDic[self.dpUIinst.langName]['i123_transferedCalib'], sourceItem, destinationList, attrList
         else:
-            #TODO:
-            print "WIP: open UI here ???"
-            verbose = False
-        if verbose:
-            print "Transfered calibration:", sourceItem, destinationList, attrList
+            print self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'],
 
 
     def setCalibrationAttr(self, nodeName, attrList, *args):
