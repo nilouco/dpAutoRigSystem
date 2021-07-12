@@ -356,6 +356,8 @@
 	"i122_transfer"        : "Transfer",
 	"i123_transferedCalib" : "Transfered calibration:",
     "i124_import"          : "Import",
+    "i125_mirrorAll"       : "Do you want to mirror calibration for all controls?",
+    "i126_mirrorPrefix"    : "Which mirror prefix to use?",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

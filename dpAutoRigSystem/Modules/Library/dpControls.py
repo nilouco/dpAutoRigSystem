@@ -949,7 +949,6 @@ class ControlClass:
         if not importCalibrationPath:
             return
         importCalibrationPath = next(iter(importCalibrationPath), None)
-        print "dpImportCalibrationPath =", importCalibrationPath
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
         refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
@@ -965,14 +964,45 @@ class ControlClass:
                     self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
         # remove referenced file:
         cmds.file(importCalibrationPath, removeReference=True)
-
+        print "dpImportCalibrationPath: "+importCalibrationPath,
         
 
-    def mirrorCalibration(self, *args):
+    def mirrorCalibration(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
+        """ Mirror calibration by naming using prefixes to find nodes.
+            Ask to mirror calibration of all controls if nothing is selected.
         """
-        """
-        print "mirrorCalibration... WIP",
-
+        if not fromPrefix:
+            fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixTF"], query=True, text=True)
+            toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixTF"], query=True, text=True)
+        if fromPrefix and toPrefix:
+            if not nodeName:
+                currentSelectionList = cmds.ls(selection=True, type="transform")
+                if currentSelectionList:
+                    for selectedNode in currentSelectionList:
+                        if selectedNode.startswith(fromPrefix):
+                            self.mirrorCalibration(selectedNode, fromPrefix, toPrefix)
+                else:
+                    # ask to run for all nodes:
+                    mirrorAll = cmds.confirmDialog(
+                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_Mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'],
+                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i125_mirrorAll'], 
+                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
+                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
+                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
+                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
+                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                        allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
+                        if allNodeList:
+                            for node in allNodeList:
+                                self.mirrorCalibration(node, fromPrefix, toPrefix)
+            else:
+                attrList = self.getCalibrationAttr(nodeName)
+                if attrList:
+                    destinationNode = toPrefix+nodeName[len(fromPrefix):]
+                    if cmds.objExists(destinationNode):
+                        self.transferAttr(nodeName, [destinationNode], attrList)
+        else:
+            print self.dpUIinst.langDic[self.dpUIinst.langName]['i126_mirrorPrefix'],
 
 
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
@@ -980,7 +1010,7 @@ class ControlClass:
         """
         if not sourceItem:
             # check current selection:
-            currentSelectionList = cmds.ls(selection=True)
+            currentSelectionList = cmds.ls(selection=True, type="transform")
             if currentSelectionList:
                 if len(currentSelectionList) > 1:
                     sourceItem = currentSelectionList[0]
