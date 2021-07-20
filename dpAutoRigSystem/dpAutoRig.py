@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.23"
-DPAR_UPDATELOG = "#162 - Replace connected shape.\nThis is useful to keep visibility connections\nwhen replacing control shapes like\nSpine and reverseFoot.\n\n#317 Fixed duplicated object name.\n\n#324 Continue if not found control to replace shape.\n\nAlso fixed save file as mayaAscii."
+DPAR_VERSION = "3.11.24"
+DPAR_UPDATELOG = "#325 Transfer Calibration for controls.\n#264	Renamed multiplier attribute to uniformScaleMultiplier."
 
 
 
@@ -510,17 +510,17 @@ class DP_AutoRig_UI:
         
         # curveShapes - frameLayout:
         self.allUIs["controlShapesLayout"] = cmds.frameLayout('controlShapesLayout', label=self.langDic[self.langName]['i100_curveShapes'], collapsable=True, collapse=False, parent=self.allUIs["createControlLayout"])
-        self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(50, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
+        self.allUIs["controlModuleLayout"] = cmds.gridLayout('controlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['controlShapesLayout'])
         # here we populate the control module layout with the items from Controls folder:
         self.controlModuleList = self.startGuideModules(CONTROLS, "start", "controlModuleLayout")
         
         self.allUIs["combinedControlShapesLayout"] = cmds.frameLayout('combinedControlShapesLayout', label=self.langDic[self.langName]['i118_combinedShapes'], collapsable=True, collapse=False, parent=self.allUIs["createControlLayout"])
-        self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(50, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
+        self.allUIs["combinedControlModuleLayout"] = cmds.gridLayout('combinedControlModuleLayout', numberOfColumns=7, cellWidthHeight=(48, 50), backgroundColor=(0.3, 0.3, 0.3), parent=self.allUIs['combinedControlShapesLayout'])
         # here we populate the control module layout with the items from Controls folder:
         self.combinedControlModuleList = self.startGuideModules(COMBINED, "start", "combinedControlModuleLayout")
         
         # editSeletedControls - frameLayout:
-        self.allUIs["editSelectionFL"] = cmds.frameLayout('editSelectionFL', label=self.langDic[self.langName]['i111_editSelection'], collapsable=True, collapse=False, marginHeight=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["editSelectionFL"] = cmds.frameLayout('editSelectionFL', label=self.langDic[self.langName]['i111_editSelection'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
         self.allUIs["editSelection3Layout"] = cmds.paneLayout("editSelection3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
         self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.langDic[self.langName]['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelection3Layout"])
         self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.langDic[self.langName]['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelection3Layout"])
@@ -529,6 +529,21 @@ class DP_AutoRig_UI:
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.langDic[self.langName]['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.langDic[self.langName]['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=utils.zeroOut, parent=self.allUIs["editSelectionFL"])
+        
+        # calibrationControls - frameLayout:
+        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
+        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i122_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration2Layout"])
+        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i124_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration2Layout"])
+        self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.langDic[self.langName]['m010_Mirror']+" "+self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
+        # mirror calibration - layout:
+        self.allUIs["mirrorCalibrationLayout"] = cmds.rowColumnLayout('mirrorCalibrationLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorCalibrationFL" )
+        self.allUIs["prefixT"] = cmds.text("prefixT", label=self.langDic[self.langName]['i144_prefix'], parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["fromPrefixT"] = cmds.text("fromPrefixT", label=self.langDic[self.langName]['i036_from'], parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["fromPrefixTF"] = cmds.textField('fromPrefixTF', text="L_", parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["toPrefixT"] = cmds.text("toPrefixT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["toPrefixTF"] = cmds.textField('toPrefixTF', text="R_", parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.langDic[self.langName]['m010_Mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ctrls.mirrorCalibration, parent=self.allUIs["mirrorCalibrationLayout"])
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
@@ -1696,6 +1711,7 @@ class DP_AutoRig_UI:
             #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleZ, force=True)
             self.ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
             self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setCalibrationAttr(self.optionCtrl.__melobject__(), ['rigScaleMultiplier'])
         else:
             self.optionCtrlGrp = self.optionCtrl.getParent()
             self.rigScaleMD = self.prefix+'RigScale_MD'

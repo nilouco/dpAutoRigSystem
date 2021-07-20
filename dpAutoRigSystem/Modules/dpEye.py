@@ -369,6 +369,20 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(eyelidCtrl+"."+self.langDic[self.langName]['c032_follow'], eyelidFollowRev+".inputX", force=True)
         cmds.connectAttr(eyelidFollowRev+".outputX", followPC+"."+self.eyeScaleJnt+"W1", force=True)
         cmds.connectAttr(eyelidBaseZeroJxt+".rotateX", eyelidMiddleBaseZeroJxt+".rotateX", force=True)
+        # calibration attribute:
+        eyelidCalibrationList = [
+            self.langDic[self.langName]['c049_intensity']+"X",
+            self.langDic[self.langName]['c049_intensity']+"Y",
+            self.langDic[self.langName]['c032_follow'],
+            self.langDic[self.langName]['c051_preset']+"X",
+            self.langDic[self.langName]['c051_preset']+"Y",
+            self.langDic[self.langName]['c050_proximity']+self.langDic[self.langName]['c029_middle'],
+            self.langDic[self.langName]['c052_fix']+"ScaleX",
+            self.langDic[self.langName]['c052_fix']+"TranslateZ",
+            self.langDic[self.langName]['c052_fix']+self.langDic[self.langName]['c029_middle']+"TranslateZ",
+            self.langDic[self.langName]['c107_reduce']+self.langDic[self.langName]['c029_middle']+"Open"
+        ]
+        self.ctrls.setCalibrationAttr(eyelidCtrl, eyelidCalibrationList)
         return eyelidCtrl, eyelidCtrlZero
         
         

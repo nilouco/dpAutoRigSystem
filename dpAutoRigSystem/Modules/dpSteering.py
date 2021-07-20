@@ -171,6 +171,13 @@ class Steering(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.steeringCtrl+"."+self.langDic[self.langName]['c049_intensity'], self.steeringMD+".input2X", force=True)
                 cmds.connectAttr(self.steeringMD+".outputX", self.steeringCtrl+"."+self.langDic[self.langName]['c070_steering'], force=True)
                 
+                # calibration attributes:
+                steeringCalibrationList = [
+                                            self.langDic[self.langName]['c071_limit'],
+                                            self.langDic[self.langName]['c049_intensity']
+                                            ]
+                self.ctrls.setCalibrationAttr(self.steeringCtrl, steeringCalibrationList)
+
                 # grouping:
                 cmds.parent(zeroOutCtrlGrpList[0], self.mainCtrl)
                 # create parentConstraint from steeringCtrl to jnt:

@@ -937,3 +937,109 @@ class ControlClass:
                 cmds.setAttr(guideBase+".pinGuide", 0)
                 self.createPinGuide(guideBase)
 
+
+    def importCalibration(self, *args):
+        """ Import calibration from a referenced file.
+            Transfer calibration for same nodes by name using calibrationList attribute.
+        """
+        importCalibrationNamespace = "dpImportCalibration"
+        sourceRefNodeList = []
+        # get user file to import calibration from
+        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i124_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'])
+        if not importCalibrationPath:
+            return
+        importCalibrationPath = next(iter(importCalibrationPath), None)
+        # create a file reference:
+        refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
+        refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
+        refNodeList = cmds.referenceQuery(refNode, nodes=True)
+        if refNodeList:
+            for refNode in refNodeList:
+                if cmds.objExists(refNode+".calibrationList"):
+                    sourceRefNodeList.append(refNode)
+        if sourceRefNodeList:
+            for sourceRefNode in sourceRefNodeList:
+                destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:]
+                if cmds.objExists(destinationNode):
+                    self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
+        # remove referenced file:
+        cmds.file(importCalibrationPath, removeReference=True)
+        print "dpImportCalibrationPath: "+importCalibrationPath,
+        
+
+    def mirrorCalibration(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
+        """ Mirror calibration by naming using prefixes to find nodes.
+            Ask to mirror calibration of all controls if nothing is selected.
+        """
+        if not fromPrefix:
+            fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixTF"], query=True, text=True)
+            toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixTF"], query=True, text=True)
+        if fromPrefix and toPrefix:
+            if not nodeName:
+                currentSelectionList = cmds.ls(selection=True, type="transform")
+                if currentSelectionList:
+                    for selectedNode in currentSelectionList:
+                        if selectedNode.startswith(fromPrefix):
+                            self.mirrorCalibration(selectedNode, fromPrefix, toPrefix)
+                else:
+                    # ask to run for all nodes:
+                    mirrorAll = cmds.confirmDialog(
+                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_Mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'],
+                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i125_mirrorAll'], 
+                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
+                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
+                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
+                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
+                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                        allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
+                        if allNodeList:
+                            for node in allNodeList:
+                                self.mirrorCalibration(node, fromPrefix, toPrefix)
+            else:
+                attrList = self.getCalibrationAttr(nodeName)
+                if attrList:
+                    destinationNode = toPrefix+nodeName[len(fromPrefix):]
+                    if cmds.objExists(destinationNode):
+                        self.transferAttr(nodeName, [destinationNode], attrList)
+        else:
+            print self.dpUIinst.langDic[self.dpUIinst.langName]['i126_mirrorPrefix'],
+
+
+    def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
+        """ Transfer calibration attributes.
+        """
+        if not sourceItem:
+            # check current selection:
+            currentSelectionList = cmds.ls(selection=True, type="transform")
+            if currentSelectionList:
+                if len(currentSelectionList) > 1:
+                    sourceItem = currentSelectionList[0]
+                    destinationList = currentSelectionList[1:]
+        if sourceItem:
+            if not attrList:
+                attrList = self.getCalibrationAttr(sourceItem)
+            if attrList:
+                self.transferAttr(sourceItem, destinationList, attrList)
+            if verbose:
+                print self.dpUIinst.langDic[self.dpUIinst.langName]['i123_transferedCalib'], sourceItem, destinationList, attrList
+        else:
+            print self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'],
+
+
+    def setCalibrationAttr(self, nodeName, attrList, *args):
+        """ Set the calibration attribute that contains a list of attributes to be used in the transfer calibration.
+            Add calibrationList attribute if it doesn't exists.
+        """
+        if cmds.objExists(nodeName):
+            if attrList:
+                calibrationAttr = ';'.join(attrList)
+                if not cmds.objExists(nodeName+".calibrationList"):
+                    cmds.addAttr(nodeName, longName="calibrationList", dataType="string")
+                cmds.setAttr(nodeName+".calibrationList", calibrationAttr, type="string")
+
+
+    def getCalibrationAttr(self, nodeName, *args):
+        """ Return the calibrationList attribute if it exists in the given nodeName.
+        """
+        if cmds.objExists(nodeName+".calibrationList"):
+            return list(cmds.getAttr(nodeName+".calibrationList").split(";"))

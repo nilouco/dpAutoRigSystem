@@ -620,7 +620,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.worldRefShapeList.append(self.worldRefShape)
 
                 # parenting fkControls from 2 hierarchies (before and limb) using constraint, attention to fkIsolated shoulder:
-                # creating a shoulder_null group in order to use it as position relative and aim to quadExtraCtrl:
+                # creating a shoulder_null group in order to use it as position relative and aim to self.quadExtraCtrl:
                 self.shoulderNullGrp = cmds.group(empty=True, name=self.skinJointList[1] + "_Null")
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[1], relative=True)
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
@@ -793,20 +793,20 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # setup quadruped extra control:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     cmds.rename(ikHandleExtraList[1], ikHandleExtraList[0].capitalize() + "_Eff")
-                    quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z")
+                    self.quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z")
                     if s == 1:
-                        cmds.setAttr(quadExtraCtrl+".rotateY", 180)
-                        cmds.makeIdentity(quadExtraCtrl, rotate=True, apply=True)
-                    quadExtraCtrlZero = utils.zeroOut([quadExtraCtrl])[0]
+                        cmds.setAttr(self.quadExtraCtrl+".rotateY", 180)
+                        cmds.makeIdentity(self.quadExtraCtrl, rotate=True, apply=True)
+                    quadExtraCtrlZero = utils.zeroOut([self.quadExtraCtrl])[0]
                     cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=False))
                     cmds.parent(quadExtraCtrlZero, ikHandleGrp)
                     cmds.parent(ikHandleExtraList[0], self.ikHandleToRFGrp)
-                    cmds.parent(ikHandleMainList[0], quadExtraCtrl)
+                    cmds.parent(ikHandleMainList[0], self.quadExtraCtrl)
                     cmds.setAttr(ikHandleExtraList[0]+".visibility", 0)
-                    cmds.addAttr(quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
-                    cmds.connectAttr(quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
+                    cmds.addAttr(self.quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
+                    cmds.connectAttr(self.quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
                     cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", quadExtraCtrlZero + ".visibility", force=True)
-                    self.ctrls.setLockHide([quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
+                    self.ctrls.setLockHide([self.quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
                 
                 # make ikControls lead ikHandles:
                 self.ikHandlePointConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleMainList[0], maintainOffset=True, name=ikHandleMainList[0] + "_PoC")[0]
@@ -937,17 +937,17 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                    cmds.addAttr(quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, keyable=True)
-                    cmds.setAttr(quadExtraCtrl+".autoOrient", 1)
-                    quadExtraRotNull = cmds.group(name=quadExtraCtrl+"_AutoOrient_Null", empty=True)
-                    cmds.delete(cmds.parentConstraint(quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
+                    cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, keyable=True)
+                    cmds.setAttr(self.quadExtraCtrl+".autoOrient", 1)
+                    quadExtraRotNull = cmds.group(name=self.quadExtraCtrl+"_AutoOrient_Null", empty=True)
+                    cmds.delete(cmds.parentConstraint(self.quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
                     cmds.parent(quadExtraRotNull, self.ikHandleToRFGrp)
-                    autoOrientRev = cmds.createNode("reverse", name=quadExtraCtrl+"_AutoOrient_Rev")
+                    autoOrientRev = cmds.createNode("reverse", name=self.quadExtraCtrl+"_AutoOrient_Rev")
                     autoOrientConst = cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=quadExtraCtrlZero+"_PaC")[0]
                     cmds.setAttr(autoOrientConst+".interpType", 0) #noflip
-                    cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientRev+".inputX", force=True)
+                    cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientRev+".inputX", force=True)
                     cmds.connectAttr(autoOrientRev+".outputX", autoOrientConst+"."+self.ikHandleToRFGrp+"W0", force=True)
-                    cmds.connectAttr(quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
+                    cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
                     cmds.cycleCheck(evaluation=False)
                     aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
@@ -1086,14 +1086,14 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.fkCtrlList[-1]+"."+self.langDic[self.langName]['c040_uniformScale'], edit=True, keyable=True)
                 cmds.setAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c040_uniformScale'], edit=True, keyable=True)
                 # add scale multiplier attribute
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c105_multiplier'], at='double', min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c105_multiplier'], at='double', min=0.001, dv=1)
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
                 ikScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_multiplier'].capitalize() + '_Ik_MD')
                 fkScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side + self.userGuideName + "_" + self.langDic[self.langName]['c105_multiplier'].capitalize() + '_Fk_MD')
                 cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c040_uniformScale'], ikScaleMD + ".input1X", force=True)
-                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c105_multiplier'], ikScaleMD + ".input2X", force=True)
+                cmds.connectAttr(self.ikExtremCtrl + "." +self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize(), ikScaleMD + ".input2X", force=True)
                 cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c040_uniformScale'], fkScaleMD + ".input1X", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c105_multiplier'], fkScaleMD + ".input2X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1] + "." + self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize(), fkScaleMD + ".input2X", force=True)
                 # integrate uniformScale and scaleMultiplier attributes
                 uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.langDic[self.langName]['c040_uniformScale'][0].capitalize()+self.langDic[self.langName]['c040_uniformScale'][1:]+"_BC")
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleX", force=True)
@@ -1507,6 +1507,23 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             utils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
+                # calibration attribute:
+                if self.limbTypeName == ARM:
+                    ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
+                else: #leg
+                    ikExtremCalibrationList = [
+                                            self.langDic[self.langName]['c015_RevFoot_F']+self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()+self.langDic[self.langName]['c102_angle'].capitalize(),
+                                            self.langDic[self.langName]['c015_RevFoot_F']+self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()+self.langDic[self.langName]['c103_plant'].capitalize(),
+                                            self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()
+                    ]
+                fkExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
+                fkBeforeCalibrationList = [self.langDic[self.langName]['c032_follow']]
+                if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    self.ctrls.setCalibrationAttr(self.quadExtraCtrl, ['autoOrient'])
+                self.ctrls.setCalibrationAttr(self.ikExtremCtrl, ikExtremCalibrationList)
+                self.ctrls.setCalibrationAttr(self.fkCtrlList[-1], fkExtremCalibrationList)
+                self.ctrls.setCalibrationAttr(self.fkCtrlList[0], fkBeforeCalibrationList)
+
                 # integrating dics:
                 self.extremJntList.append(self.skinJointList[-2])
                 self.integrateOrigFromList.append(self.origFromList)
