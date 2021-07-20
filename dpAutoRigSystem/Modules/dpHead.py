@@ -619,6 +619,25 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # hiding visibility attributes:
                 self.ctrls.setLockHide([self.headCtrl, self.neckCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl], ['v'], l=False)
                 
+                # calibration attributes:
+                neckCalibrationList = [self.langDic[self.langName]['c047_autoRotate']]
+                jawCalibrationList = [
+                                    self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y",
+                                    self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z",
+                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y",
+                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z",
+                                    self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output'],
+                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output']
+                ]
+                lipCalibrationList = [
+                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y",
+                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z"
+                ]
+                self.ctrls.setCalibrationAttr(self.neckCtrl, neckCalibrationList)
+                self.ctrls.setCalibrationAttr(self.jawCtrl, jawCalibrationList)
+                self.ctrls.setCalibrationAttr(self.upperLipCtrl, lipCalibrationList)
+                self.ctrls.setCalibrationAttr(self.lowerLipCtrl, lipCalibrationList)
+
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.grpNeck, self.grpHead, self.zeroCtrlList[3], self.zeroCtrlList[6], self.zeroCtrlList[7], name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.neckJnt, self.headJnt, self.lCornerLipJnt, self.rCornerLipJnt, name=side+self.userGuideName+"_Joint_Grp")

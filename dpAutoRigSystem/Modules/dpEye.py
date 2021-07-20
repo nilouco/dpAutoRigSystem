@@ -370,7 +370,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
         cmds.connectAttr(eyelidFollowRev+".outputX", followPC+"."+self.eyeScaleJnt+"W1", force=True)
         cmds.connectAttr(eyelidBaseZeroJxt+".rotateX", eyelidMiddleBaseZeroJxt+".rotateX", force=True)
         # calibration attribute:
-        calibrationAttrList = [
+        eyelidCalibrationList = [
             self.langDic[self.langName]['c049_intensity']+"X",
             self.langDic[self.langName]['c049_intensity']+"Y",
             self.langDic[self.langName]['c032_follow'],
@@ -382,7 +382,7 @@ class Eye(Base.StartClass, Layout.LayoutClass):
             self.langDic[self.langName]['c052_fix']+self.langDic[self.langName]['c029_middle']+"TranslateZ",
             self.langDic[self.langName]['c107_reduce']+self.langDic[self.langName]['c029_middle']+"Open"
         ]
-        self.ctrls.setCalibrationAttr(eyelidCtrl, calibrationAttrList)
+        self.ctrls.setCalibrationAttr(eyelidCtrl, eyelidCalibrationList)
         return eyelidCtrl, eyelidCtrlZero
         
         

@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.23"
-DPAR_UPDATELOG = "#325 WIP Transfer Calibration."
+DPAR_VERSION = "3.11.24"
+DPAR_UPDATELOG = "#325 Transfer Calibration for controls.\n#264	Renamed multiplier attribute to uniformScaleMultiplier."
 
 
 
@@ -1711,6 +1711,7 @@ class DP_AutoRig_UI:
             #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleZ, force=True)
             self.ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
             self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setCalibrationAttr(self.optionCtrl.__melobject__(), ['rigScaleMultiplier'])
         else:
             self.optionCtrlGrp = self.optionCtrl.getParent()
             self.rigScaleMD = self.prefix+'RigScale_MD'
