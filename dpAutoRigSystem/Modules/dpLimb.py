@@ -938,7 +938,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, keyable=True)
-                    cmds.setAttr(self.quadExtraCtrl+".autoOrient", 1)
+                    cmds.setAttr(self.quadExtraCtrl+".autoOrient", 0)
                     quadExtraRotNull = cmds.group(name=self.quadExtraCtrl+"_AutoOrient_Null", empty=True)
                     cmds.delete(cmds.parentConstraint(self.quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
                     cmds.parent(quadExtraRotNull, self.ikHandleToRFGrp)
@@ -948,9 +948,13 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientRev+".inputX", force=True)
                     cmds.connectAttr(autoOrientRev+".outputX", autoOrientConst+"."+self.ikHandleToRFGrp+"W0", force=True)
                     cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
+                    # avoid cycle error from Maya warning:
                     cmds.cycleCheck(evaluation=False)
                     aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
+                    # hack to parent constraint offset recalculation (Update button on Attribute Editor):
+                    cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, edit=True, maintainOffset=True)
+                    cmds.setAttr(self.quadExtraCtrl+".autoOrient", 1)
                 
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]

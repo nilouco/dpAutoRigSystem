@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.24"
-DPAR_UPDATELOG = "#325 Transfer Calibration for controls.\n#264	Renamed multiplier attribute to uniformScaleMultiplier."
+DPAR_VERSION = "3.11.25"
+DPAR_UPDATELOG = "#344 - Quadruped leg extra autoOrient issue fixed."
 
 
 
