@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.25"
-DPAR_UPDATELOG = "#344 - Quadruped leg extra autoOrient issue fixed."
+DPAR_VERSION = "3.11.26"
+DPAR_UPDATELOG = "#030 - Head neck joints."
 
 
 

@@ -216,7 +216,7 @@ def useDefaultRenderLayer():
 def zeroOut(transformList=[], offset=False):
     """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
         If don't have a transformList given, try to get the current selection.
-        If want to create with offset, it'll be a, offset group between zeroGrp and transform.
+        If want to create with offset, it'll be an offset group between zeroGrp and transform.
         Return a list of names of the zeroOut groups.
     """
     zeroList = []
@@ -475,23 +475,25 @@ def getCtrlRadius(nodeName):
     return radius
 
 
-def zeroOutJoints(jntList=None):
+def zeroOutJoints(jntList=None, displayBone=False):
     """ Duplicate the joints, parent as zeroOut.
         Returns the father joints (zeroOuted).
-        Deprecated = using zeroOut function insted.
     """
     resultList = []
     zeroOutJntSuffix = "_Jzt"
     if jntList:
         for jnt in jntList:
             if cmds.objExists(jnt):
-                jxtName = jnt.replace("_Jnt", "").replace("_Jxt", "")
+                jxtName = jnt.replace("_Jnt", "").replace("_"+zeroOutJntSuffix, "")
                 if not zeroOutJntSuffix in jxtName:
                     jxtName += zeroOutJntSuffix
                 dup = cmds.duplicate(jnt, name=jxtName)[0]
                 deleteChildren(dup)
                 clearDpArAttr([dup])
+                deleteJointLabel(dup)
                 cmds.parent(jnt, dup)
+                if not displayBone:
+                    cmds.setAttr(dup+".drawStyle", 2) #none
                 resultList.append(dup)
     return resultList
 
@@ -530,6 +532,17 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
     cmds.setAttr(jointName+".type", typeNumber)
     if typeNumber == 18: #other
         cmds.setAttr(jointName+".otherType", labelString, type="string")
+
+
+def deleteJointLabel(jointName):
+    """ Set joint labelling to
+        side = None
+        type = Other
+        other type = ""
+    """
+    cmds.setAttr(jointName+".side", 3)#None
+    cmds.setAttr(jointName+".type", 18)#Other
+    cmds.setAttr(jointName+".otherType", "", type="string")
 
 
 def extractSuffix(nodeName):

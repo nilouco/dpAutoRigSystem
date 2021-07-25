@@ -100,6 +100,7 @@ def Biped(dpUIinst):
             headInstance = dpUIinst.initGuide('dpHead', guideDir)
             # editing head base guide informations:
             headInstance.editUserName(headName)
+            headInstance.changeJointNumber(2)
             cmds.setAttr(headInstance.moduleGrp+".translateY", 17)
             cmds.setAttr(headInstance.annotation+".translateY", 3.5)
             
