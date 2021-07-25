@@ -689,25 +689,19 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+self.upperJawCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.upperJawCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScC")[0]
                 
-
-
-
-
-
-
-
-
-
                 # articulation joint:
                 if self.addArticJoint:
                     # neckBase
-                    neckJxt = cmds.duplicate(self.neckJointList[0], name=side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jxt")[0]
-                    cmds.delete(cmds.listRelatives(neckJxt, children=True, fullPath=True))
-                    cmds.parent(self.neckJointList[0], neckJxt)
-                    articJntList = utils.articulationJoint(neckJxt, self.neckJointList[0])
+                    neckBaseJzt = utils.zeroOutJoints([self.neckJointList[0]])[0]
+#                    neckJxt = cmds.duplicate(self.neckJointList[0], name=side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jxt")[0]
+#                    cmds.delete(cmds.listRelatives(neckJxt, children=True, fullPath=True))
+#                    cmds.parent(self.neckJointList[0], neckJxt)
+                    articJntList = utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
                     utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base'])
                     cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
-                    self.neckJointList.insert(0, neckJxt)
+                    self.neckJointList.insert(0, neckBaseJzt)
+                    cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
+                    cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
                     # headBase
                     articJntList = utils.articulationJoint(self.neckJointList[-1], self.headJnt) #could call to create corrective joints. See parameters to implement it, please.
                     utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base'])
