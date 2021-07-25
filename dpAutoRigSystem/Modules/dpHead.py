@@ -368,7 +368,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.radiusGuide     = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 
                 # generating naming:
-#                headJxtName = side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_Jxt"
                 headJntName = side+self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+"_Jnt"
                 if self.addArticJoint:
                     headJntName = side+self.userGuideName+"_02_"+self.langDic[self.langName]['c024_head']+"_Jnt"
@@ -406,8 +405,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     self.neckLocList.append(cvNeckLoc)
                     neckJnt = cmds.joint(name=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Jnt", scaleCompensate=False)
                     self.neckJointList.append(neckJnt)
-#                self.headJxt = cmds.joint(name=headJxtName)
-#                cmds.select(clear=True)
                 self.headJnt = cmds.joint(name=headJntName, scaleCompensate=False)
                 self.upperJawJnt = cmds.joint(name=upperJawJntName, scaleCompensate=False)
                 self.upperHeadJnt = cmds.joint(name=upperHeadJntName, scaleCompensate=False)
@@ -462,8 +459,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                 self.upperCtrlList.append(self.upperHeadCtrl)
                 self.aCtrls.append([self.upperLipCtrl, self.lowerLipCtrl])
-#                self.aCtrls.append([self.headCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl])
-#                self.aCtrls.extend(self.neckCtrlList)
                 self.aLCtrls.append([self.lCornerLipCtrl])
                 self.aRCtrls.append([self.rCornerLipCtrl])
                 
@@ -487,8 +482,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 if self.rigType == Base.RigType.quadruped:
                     for n in range(0, self.nJoints):
                         cmds.setAttr(self.neckCtrlList[n]+".rotateOrder", 1)
-                        cmds.rotate(90, 0, 0, self.neckCtrlList[n])
-                        cmds.makeIdentity(self.neckCtrl, apply=True, rotate=True)
                     cmds.setAttr(self.headCtrl+".rotateOrder", 1)
                     cmds.setAttr(self.upperJawCtrl+".rotateOrder", 1)
                     cmds.setAttr(self.upperHeadCtrl+".rotateOrder", 1)
@@ -534,7 +527,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
 
                 # edit the mirror shape to a good direction of controls:
                 toFlipList = [self.headCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl]
-#                toFlipList.extend(self.neckCtrlList)
                 # fixing flip mirror:
                 if s == 1:
                     if self.addFlip:
@@ -554,11 +546,9 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.zeroCtrlList.extend(self.zeroCornerLipCtrlList)
 
                 # make joints be ride by controls:
-#                cmds.makeIdentity(self.neckJointList, self.headJnt, self.jawJnt, self.chinJnt, self.chewJnt, self.endJnt, rotate=True, apply=True)
                 for n in range(0, self.nJoints):
                     cmds.parentConstraint(self.neckCtrlList[n], self.neckJointList[n], maintainOffset=False, name=self.neckJointList[n]+"_PaC")
                     cmds.scaleConstraint(self.neckCtrlList[n], self.neckJointList[n], maintainOffset=False, name=self.neckJointList[n]+"_ScC")
-#                cmds.delete(cmds.parentConstraint(self.headCtrl, self.headJxt, maintainOffset=False))
                 cmds.parentConstraint(self.headCtrl, self.headJnt, maintainOffset=False, name=self.headJnt+"_PaC")
                 cmds.parentConstraint(self.upperJawCtrl, self.upperJawJnt, maintainOffset=False, name=self.upperJawJnt+"_PaC")
                 cmds.parentConstraint(self.upperHeadCtrl, self.upperHeadJnt, maintainOffset=False, name=self.upperHeadJnt+"_PaC")
@@ -584,36 +574,31 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # hide unnecessary zero out bone display:
                 utils.zeroOutJoints([self.lCornerLipJnt, self.rCornerLipJnt])
 
-                # create interations between neck and head:
-#                self.grpNeck  = cmds.group(self.zeroNeckCtrlList[0], name=self.neckCtrlList[0]+"_Grp")
+                # head follow/isolate create interations between neck and head:
                 self.headOrientGrp = cmds.group(empty=True, name=self.headCtrl+"_Orient_Grp")
                 self.zeroHeadGrp = utils.zeroOut([self.headOrientGrp])[0]
                 cmds.parent(self.zeroHeadGrp, self.neckCtrlList[-1])
-                # arrange pivots:
-                self.neckPivot = cmds.xform(self.neckCtrlList[0], query=True, worldSpace=True, translation=True)
-#                self.headPivot = cmds.xform(self.headCtrl, query=True, worldSpace=True, translation=True)
-#                cmds.xform(self.grpNeck, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]))
-#                cmds.xform(self.zeroHeadGrp, self.headOrientGrp, pivots=(self.headPivot[0], self.headPivot[1], self.headPivot[2]))
-                
                 self.worldRef = cmds.group(empty=True, name=side+self.userGuideName+"_WorldRef_Grp")
                 self.worldRefList.append(self.worldRef)
                 cmds.delete(cmds.parentConstraint(self.neckCtrlList[0], self.worldRef, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.zeroCtrlList[0], self.zeroHeadGrp, maintainOffset=False))
                 cmds.parent(self.zeroCtrlList[0], self.headOrientGrp, absolute=True)
-                orientConst = cmds.orientConstraint(self.neckCtrlList[-1], self.worldRef, self.headOrientGrp, maintainOffset=False, name=self.headOrientGrp+"_OrC")[0]
+                headOrientConst = cmds.orientConstraint(self.neckCtrlList[-1], self.worldRef, self.headOrientGrp, maintainOffset=True, name=self.headOrientGrp+"_OrC")[0]
+                cmds.setAttr(headOrientConst+".interpType", 2) #shortest
 
                 # connect reverseNode:
                 cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], orientConst+"."+self.neckCtrlList[-1]+"W0", force=True)
+                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], headOrientConst+"."+self.neckCtrlList[-1]+"W0", force=True)
                 self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c032_follow'].capitalize()+"_Rev")
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.headRevNode+".inputX", force=True)
-                cmds.connectAttr(self.headRevNode+'.outputX', orientConst+"."+self.worldRef+"W1", force=True)
+                cmds.connectAttr(self.headRevNode+'.outputX', headOrientConst+"."+self.worldRef+"W1", force=True)
                 
                 # setup neck autoRotate:
                 for n in range(0, self.nJoints):
+                    self.neckPivot = cmds.xform(self.neckCtrlList[n], query=True, worldSpace=True, translation=True)
                     self.neckOrientGrp = cmds.group(self.neckCtrlList[n], name=self.neckCtrlList[n]+"_Orient_Grp")
                     cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
-                    cmds.addAttr(self.neckCtrlList[n], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=(0.1*(n+1)), keyable=True)
+                    cmds.addAttr(self.neckCtrlList[n], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=(0.15*(n+1)), keyable=True)
                     neckARMDName = self.langDic[self.langName]['c047_autoRotate'][0].capitalize()+self.langDic[self.langName]['c047_autoRotate'][1:]
                     neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_MD")
                     cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
@@ -696,9 +681,6 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 if self.addArticJoint:
                     # neckBase
                     neckBaseJzt = utils.zeroOutJoints([self.neckJointList[0]])[0]
-#                    neckJxt = cmds.duplicate(self.neckJointList[0], name=side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jxt")[0]
-#                    cmds.delete(cmds.listRelatives(neckJxt, children=True, fullPath=True))
-#                    cmds.parent(self.neckJointList[0], neckJxt)
                     articJntList = utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
                     utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base'])
                     cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
@@ -752,13 +734,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 # add hook attributes to be read when rigging integrated modules:
                 utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-#                utils.addHook(objName=self.zeroHeadGrp, hookType='rootHook')
                 utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
                 utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-
-#                #Ensure head Jxt matrix
-#                mHead = cmds.getAttr(self.headCtrl + ".worldMatrix")
-#                cmds.xform(self.headJxt, m=mHead, ws=True)
 
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)

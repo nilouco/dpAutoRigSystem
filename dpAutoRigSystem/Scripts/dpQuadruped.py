@@ -67,7 +67,7 @@ def Quadruped(dpUIinst):
             if userDetail == simple:
                 maxProcess = 8
             else:
-                maxProcess = 21
+                maxProcess = 20
                 
             # Starting progress window
             progressAmount = 0
@@ -101,16 +101,13 @@ def Quadruped(dpUIinst):
             headInstance = dpUIinst.initGuide('dpHead', guideDir, RigType.quadruped)
             # editing head base guide informations:
             headInstance.editUserName(headName)
-            cmds.setAttr(headInstance.moduleGrp+".translateY", 11)
-            cmds.setAttr(headInstance.moduleGrp+".translateZ", 7)
+            cmds.setAttr(headInstance.moduleGrp+".translateY", 9.5)
+            cmds.setAttr(headInstance.moduleGrp+".translateZ", 5.5)
             cmds.setAttr(headInstance.moduleGrp+".rotateX", 0)
             cmds.setAttr(headInstance.moduleGrp+".rotateY", 45)
             cmds.setAttr(headInstance.moduleGrp+".rotateZ", 90)
-            cmds.setAttr(headInstance.cvNeckLoc+".rotateX", 0)
-            cmds.setAttr(headInstance.cvNeckLoc+".rotateZ", -90)
-            cmds.setAttr(headInstance.cvHeadLoc+".translateY", 0)
-            cmds.setAttr(headInstance.cvHeadLoc+".translateZ", 2.5)
-            cmds.setAttr(headInstance.cvHeadLoc+".rotateX", 45)
+            cmds.setAttr(headInstance.cvHeadLoc+".translateY", 5)
+            cmds.setAttr(headInstance.cvHeadLoc+".rotateX", -45)
             cmds.setAttr(headInstance.cvUpperJawLoc+".translateY", 0.5)
             cmds.setAttr(headInstance.cvUpperJawLoc+".translateZ", 1.3)
             cmds.setAttr(headInstance.cvJawLoc+".translateY", -1.0)
@@ -125,6 +122,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(headInstance.cvLowerLipLoc+".translateZ", 2.5)
             cmds.setAttr(headInstance.annotation+".translateX", 4)
             cmds.setAttr(headInstance.annotation+".translateY", 0)
+            headInstance.changeJointNumber(3)
             
             # parent head guide to chest guide:
             cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
@@ -670,26 +668,6 @@ def Quadruped(dpUIinst):
                 
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+neckName))
-                
-                # woking with NeckBase system:
-                # create fkLine module instance:
-                neckBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
-                # editing fkLine base guide informations:
-                neckBaseInstance.editUserName(neckName+"Base")
-                cmds.setAttr(neckBaseInstance.moduleGrp+".translateY", 9.5)
-                cmds.setAttr(neckBaseInstance.moduleGrp+".translateZ", 5.5)
-                cmds.setAttr(neckBaseInstance.moduleGrp+".rotateX", -45)
-                cmds.setAttr(neckBaseInstance.radiusCtrl+".translateX", 2.8)
-                
-                # parent neckBase guide to spine guide:
-                cmds.parent(neckBaseInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
-                
-                # parent head guide to neckBase guide:
-                cmds.parent(headInstance.moduleGrp, neckBaseInstance.cvJointLoc, absolute=True)
             
             # Close progress window
             cmds.progressWindow(endProgress=True)
