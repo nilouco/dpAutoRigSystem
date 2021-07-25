@@ -609,15 +609,15 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Z", force=True)
                     cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
                     if self.rigType == Base.RigType.quadruped:
-                        cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateZ", force=True)
-                        quadrupedRotYFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YFix_MD")
-                        cmds.connectAttr(neckARMD+".outputZ", quadrupedRotYFixMD+".input1X", force=True)
-                        cmds.setAttr(quadrupedRotYFixMD+".input2X", -1)
-                        cmds.connectAttr(quadrupedRotYFixMD+".outputX", self.neckOrientGrp+".rotateY", force=True)
+                        cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
+                        quadrupedRotYZFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YZ_Fix_MD")
+                        cmds.connectAttr(neckARMD+".outputY", quadrupedRotYZFixMD+".input1X", force=True)
+                        cmds.setAttr(quadrupedRotYZFixMD+".input2X", -1)
+                        cmds.connectAttr(quadrupedRotYZFixMD+".outputX", self.neckOrientGrp+".rotateZ", force=True)
                     else:
                         cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateY", force=True)
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateZ", force=True)
-                        
+                
                 # mount controls hierarchy:
                 cmds.parent(self.zeroCtrlList[1], self.headCtrl, absolute=True) #upperJawCtrl
                 cmds.parent(self.zeroCtrlList[3], self.jawCtrl, absolute=True) #chinCtrl
