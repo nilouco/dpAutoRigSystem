@@ -305,7 +305,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
             # declare lists to store names and attributes:
-            self.worldRefList, self.upperCtrlList, self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], [], [], []
+            self.worldRefList, self.upperCtrlList = [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # start as no having mirror:
             sideList = [""]
@@ -351,6 +351,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
+                self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
                 # redeclaring variables:
                 self.base            = side+self.userGuideName+"_Guide_Base"
                 self.cvHeadLoc       = side+self.userGuideName+"_Guide_Head"
@@ -452,7 +453,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.headCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
                 self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree)
                 self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree)
-                self.jawCtrl  = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=self.ctrlRadius, d=self.curveDegree)
+                self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=self.ctrlRadius, d=self.curveDegree)
                 self.chinCtrl = self.ctrls.cvControl("id_025_HeadChin", ctrlName=chinCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree)
                 self.chewCtrl = self.ctrls.cvControl("id_026_HeadChew", ctrlName=chewCtrlName, r=(self.ctrlRadius * 0.15), d=self.curveDegree)
                 self.lCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=lCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree)
@@ -460,8 +461,9 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                 self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                 self.upperCtrlList.append(self.upperHeadCtrl)
-                self.aCtrls.append([self.headCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl])
-                self.aCtrls.extend(self.neckCtrlList)
+                self.aCtrls.append([self.upperLipCtrl, self.lowerLipCtrl])
+#                self.aCtrls.append([self.headCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl])
+#                self.aCtrls.extend(self.neckCtrlList)
                 self.aLCtrls.append([self.lCornerLipCtrl])
                 self.aRCtrls.append([self.rCornerLipCtrl])
                 
@@ -602,33 +604,34 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # connect reverseNode:
                 cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], orientConst+"."+self.neckCtrlList[-1]+"W0", force=True)
-                self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_Rev")
+                self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c032_follow'].capitalize()+"_Rev")
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.headRevNode+".inputX", force=True)
                 cmds.connectAttr(self.headRevNode+'.outputX', orientConst+"."+self.worldRef+"W1", force=True)
                 
                 # setup neck autoRotate:
-                self.neckOrientGrp = cmds.group(self.neckCtrlList[0], name=self.neckCtrlList[0]+"_Orient_Grp")
-                cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
-                cmds.addAttr(self.neckCtrlList[0], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
-                neckARMDName = self.langDic[self.langName]['c047_autoRotate'][0].capitalize()+self.langDic[self.langName]['c047_autoRotate'][1:]
-                neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[0]+"_"+neckARMDName+"_MD")
-                cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
-                cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
-                cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)
-                cmds.connectAttr(self.neckCtrlList[0]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2X", force=True)
-                cmds.connectAttr(self.neckCtrlList[0]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Y", force=True)
-                cmds.connectAttr(self.neckCtrlList[0]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Z", force=True)
-                cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
-                if self.rigType == Base.RigType.quadruped:
-                    cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateZ", force=True)
-                    quadrupedRotYFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[0]+"_"+neckARMDName+"_YFix_MD")
-                    cmds.connectAttr(neckARMD+".outputZ", quadrupedRotYFixMD+".input1X", force=True)
-                    cmds.setAttr(quadrupedRotYFixMD+".input2X", -1)
-                    cmds.connectAttr(quadrupedRotYFixMD+".outputX", self.neckOrientGrp+".rotateY", force=True)
-                else:
-                    cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateY", force=True)
-                    cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateZ", force=True)
-                    
+                for n in range(0, self.nJoints):
+                    self.neckOrientGrp = cmds.group(self.neckCtrlList[n], name=self.neckCtrlList[n]+"_Orient_Grp")
+                    cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
+                    cmds.addAttr(self.neckCtrlList[n], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=(0.1*(n+1)), keyable=True)
+                    neckARMDName = self.langDic[self.langName]['c047_autoRotate'][0].capitalize()+self.langDic[self.langName]['c047_autoRotate'][1:]
+                    neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_MD")
+                    cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
+                    cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
+                    cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)
+                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2X", force=True)
+                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Y", force=True)
+                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Z", force=True)
+                    cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
+                    if self.rigType == Base.RigType.quadruped:
+                        cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateZ", force=True)
+                        quadrupedRotYFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YFix_MD")
+                        cmds.connectAttr(neckARMD+".outputZ", quadrupedRotYFixMD+".input1X", force=True)
+                        cmds.setAttr(quadrupedRotYFixMD+".input2X", -1)
+                        cmds.connectAttr(quadrupedRotYFixMD+".outputX", self.neckOrientGrp+".rotateY", force=True)
+                    else:
+                        cmds.connectAttr(neckARMD+".outputY", self.neckOrientGrp+".rotateY", force=True)
+                        cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateZ", force=True)
+                        
                 # mount controls hierarchy:
                 cmds.parent(self.zeroCtrlList[1], self.headCtrl, absolute=True) #upperJawCtrl
                 cmds.parent(self.zeroCtrlList[3], self.jawCtrl, absolute=True) #chinCtrl
