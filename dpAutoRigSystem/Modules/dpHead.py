@@ -533,8 +533,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvLowerLipLoc, self.lowerLipCtrl, maintainOffset=False))
 
                 # edit the mirror shape to a good direction of controls:
-                toFlipList = [self.headCtrl, self.upperJawCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl]
-                toFlipList.extend(self.neckCtrlList)
+                toFlipList = [self.headCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl]
+#                toFlipList.extend(self.neckCtrlList)
                 # fixing flip mirror:
                 if s == 1:
                     if self.addFlip:
@@ -547,7 +547,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.zeroCornerLipCtrlList = utils.zeroOut([self.lCornerLipCtrl, self.rCornerLipCtrl])
                 self.lLipGrp = cmds.group(self.lCornerLipCtrl, name=self.lCornerLipCtrl+"_Grp")
                 self.rLipGrp = cmds.group(self.rCornerLipCtrl, name=self.rCornerLipCtrl+"_Grp")
-                cmds.setAttr(self.zeroCornerLipCtrlList[1]+".scaleX", -1)
+                if not self.addFlip:
+                    cmds.setAttr(self.zeroCornerLipCtrlList[1]+".scaleX", -1)
                 self.zeroNeckCtrlList = utils.zeroOut(self.neckCtrlList)
                 self.zeroCtrlList = utils.zeroOut([self.headCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl, self.upperHeadCtrl])
                 self.zeroCtrlList.extend(self.zeroCornerLipCtrlList)
