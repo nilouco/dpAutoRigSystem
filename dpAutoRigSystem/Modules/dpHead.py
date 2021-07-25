@@ -404,7 +404,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     # neck segments:
                     cvNeckLoc = side+self.userGuideName+"_Guide_Neck"+str(n)
                     self.neckLocList.append(cvNeckLoc)
-                    neckJnt = cmds.joint(name=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Jnt")
+                    neckJnt = cmds.joint(name=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Jnt", scaleCompensate=False)
                     self.neckJointList.append(neckJnt)
 #                self.headJxt = cmds.joint(name=headJxtName)
 #                cmds.select(clear=True)
