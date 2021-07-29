@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.27"
-DPAR_UPDATELOG = "#143 - Quadruped neck autoRotate fix."
+DPAR_UPDATELOG = "WIP #319 - Chain module."
 
 
 
