@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.27"
-DPAR_UPDATELOG = "#143 - Quadruped neck autoRotate fix."
+DPAR_VERSION = "3.11.28"
+DPAR_UPDATELOG = "#353 - Reduce Head neck segments fixed error."
 
 
 
