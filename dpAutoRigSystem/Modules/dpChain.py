@@ -26,6 +26,15 @@ class Chain(Base.StartClass, Layout.LayoutClass):
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
         Layout.LayoutClass.basicModuleLayout(self)
+        # Custom MODULE LAYOUT:
+        # verify if we are creating or re-loading this module instance:
+        firstTime = cmds.getAttr(self.moduleGrp+'.nJoints')
+        if firstTime == 1:
+            try:
+                cmds.intField(self.nJointsIF, edit=True, value=3, minValue=3)
+            except:
+                pass
+            self.changeJointNumber(3)
     
     
     def createGuide(self, *args):
@@ -86,7 +95,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
             if self.enteredNJoints > self.currentNJoints:
                 for n in range(self.currentNJoints+1, self.enteredNJoints+1):
                     # create another N cvJointLoc:
-                    self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                    self.cvJointLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
                     # set its nJoint value as n:
                     cmds.setAttr(self.cvJointLoc+".nJoint", n)
                     # parent it to the lastGuide:

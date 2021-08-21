@@ -182,8 +182,8 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvNeckLoc)
                 # delete difference of nJoints:
-                cmds.delete(self.guideName+"_Neck"+str(self.enteredNJoints+1))
-                cmds.delete(self.guideName+"_JGuideNeck"+str(self.enteredNJoints+1))
+                cmds.delete(self.guideName+"_Neck"+str(self.enteredNJoints))
+                cmds.delete(self.guideName+"_JGuideNeck"+str(self.enteredNJoints))
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:

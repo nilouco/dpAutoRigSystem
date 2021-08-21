@@ -20,7 +20,7 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.27"
+DPAR_VERSION = "3.11.28"
 DPAR_UPDATELOG = "WIP #319 - Chain module."
 
 
