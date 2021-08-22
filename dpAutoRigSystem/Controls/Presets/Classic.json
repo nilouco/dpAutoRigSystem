@@ -2,7 +2,7 @@
     "_preset"     : "Classic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2021-05-08",
+    "_updated"    : "2021-08-21",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -85,6 +85,8 @@
     "id_078_NoseSide"        : {"type" : "Circle",           "degree" : 1},
     "id_079_Nostril"         : {"type" : "Circle",           "degree" : 1},
     "id_080_NoseBottom"      : {"type" : "Circle",           "degree" : 1},
-    "id_081_HeadUpperHead"   : {"type" : "RoundUp",          "degree" : 3}
-	
+    "id_081_HeadUpperHead"   : {"type" : "RoundUp",          "degree" : 3},
+    "id_082_ChainFk"         : {"type" : "Circle",           "degree" : 3},
+    "id_083_ChainToParent"   : {"type" : "Ball",             "degree" : 3}
+
 }
