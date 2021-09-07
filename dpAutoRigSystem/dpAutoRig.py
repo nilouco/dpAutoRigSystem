@@ -117,6 +117,7 @@ WHEEL = "Wheel"
 STEERING = "Steering"
 SUSPENSION = "Suspension"
 NOSE = "Nose"
+CHAIN = "Chain"
 GUIDE_BASE_NAME = "Guide_Base"
 GUIDE_BASE_ATTR = "guideBase"
 MODULE_NAMESPACE_ATTR = "moduleNamespace"
@@ -2538,6 +2539,28 @@ class DP_AutoRig_UI:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][0], "yellow")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][0], "red")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][0], "blue")
+                        
+                        # worldRef of chain controlled by optionCtrl:
+                        if moduleType == CHAIN:
+                            # getting limb data:
+                            worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
+                            worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
+                            for w, worldRef in enumerate(worldRefList):
+                                # do actions in order to make chain be controlled by optionCtrl:
+                                floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
+                                for f, floatAttr in enumerate(floatAttrList):
+                                    if f < len(floatAttrList):
+                                        if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
+                                            currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
+                                            cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
+                                        cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)
+                                if not cmds.objExists(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1]):
+                                    cmds.addAttr(self.optionCtrl, longName=floatAttrList[len(floatAttrList)-1], attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=1, keyable=True)
+                                    cmds.connectAttr(self.optionCtrl+'.'+floatAttrList[len(floatAttrList)-1], worldRef+'.'+floatAttrList[len(floatAttrList)-1], force=True)
+                                cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
+                                cmds.delete(worldRefShapeList[w])
+                                worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
+                                cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
                 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

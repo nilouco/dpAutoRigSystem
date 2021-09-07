@@ -21,6 +21,8 @@ class Chain(Base.StartClass, Layout.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         Base.StartClass.__init__(self, *args, **kwargs)
+        self.worldRefList = []
+        self.worldRefShapeList = []
     
     
     def createModuleLayout(self, *args):
@@ -200,6 +202,9 @@ class Chain(Base.StartClass, Layout.LayoutClass):
             dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
+                sideLower = side
+                if side:
+                    sideLower = side[0].lower()
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
@@ -218,7 +223,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     for n in range(0, self.nJoints):
                         newJoint = cmds.joint(name=side+self.userGuideName+"_%02d"%n+suffix)
                         self.wipList.append(newJoint)
-                    jEndJnt = cmds.joint(name=side + self.userGuideName + self.jEndSuffixList[t], radius=0.5)
+                    jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSuffixList[t], radius=0.5)
                     self.wipList.append(jEndJnt)
                     self.chainDic[suffix] = self.wipList
                 # getting jointLists:
@@ -227,8 +232,8 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 self.fkJointList = self.chainDic[self.jSuffixList[2]]
                 
                 # hide not skin joints in order to be more Rigger friendly when working the Skinning:
-#                    cmds.setAttr(self.ikJointList[0]+".visibility", 0)
-#                    cmds.setAttr(self.fkJointList[0]+".visibility", 0)
+#                cmds.setAttr(self.ikJointList[0]+".visibility", 0)
+#                cmds.setAttr(self.fkJointList[0]+".visibility", 0)
 
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
@@ -285,7 +290,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.fkCtrlList[0] + ".scaleY", -1)
                     cmds.setAttr(self.fkCtrlList[0] + ".scaleZ", -1)
 
-                # working with position, orientation of joints and make an orientConstrain for Fk controls:
+                # working with position, orientation of joints and make an orientConstraint for Fk controls:
                 for n in range(0, self.nJoints):
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Guide_JointLoc"+str(n+1), self.skinJointList[n], maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(side+self.userGuideName+"_Guide_JointLoc"+str(n+1), self.ikJointList[n], maintainOffset=False))
@@ -308,8 +313,47 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%n)
                 cmds.select(self.skinJointList[n])
 
+
+
+
+
+
+
+
+
+
+                # creating a group reference to recept the attributes:
+                self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                self.worldRefList.append(self.worldRef)
+                self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
+                self.worldRefShapeList.append(self.worldRefShape)
+
+                # create constraint in order to blend ikFk:
+                self.ikFkRevList = []
+                for n in range(0, self.nJoints):
+                    parentConst = cmds.parentConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=self.skinJointList[n]+"_IkFkBlend_PaC")[0]
+                    cmds.setAttr(parentConst+".interpType", 2) #shortest
+                    if n == 0:
+                        revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
+                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', revNode+".inputX", force=True)
+                    else:
+                        revNode = side+self.userGuideName+"_IkFkBlend_Rev"
+                    self.ikFkRevList.append(revNode)
+                    # connecting ikFkBlend using the reverse node:
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', parentConst+"."+self.fkJointList[n]+"W1", force=True)
+                    cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
+
+
+
+
+
+
+
+
+
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.origFromList[0], name=side+self.userGuideName+"_Control_Grp")
+                self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
@@ -341,3 +385,11 @@ class Chain(Base.StartClass, Layout.LayoutClass):
     
     def integratingInfo(self, *args):
         Base.StartClass.integratingInfo(self)
+        """ This method will create a dictionary with informations about integrations system between modules.
+        """
+        self.integratedActionsDic = {
+            "module": {
+                "worldRefList": self.worldRefList,
+                "worldRefShapeList": self.worldRefShapeList,
+            }
+        }
