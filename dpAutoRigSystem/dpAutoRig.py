@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.28"
-DPAR_UPDATELOG = "WIP #377 - Ribbon additional joints."
+DPAR_VERSION = "3.11.29"
+DPAR_UPDATELOG = "#377 - Ribbon additional joints for Limb module."
 
 
 

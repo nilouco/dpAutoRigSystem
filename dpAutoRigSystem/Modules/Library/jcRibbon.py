@@ -566,14 +566,9 @@ class RibbonClass:
         for jnt in rb_Jnt:
             cmds.makeIdentity(jnt, apply=True)
             
-
-
-
-
-            
             # create extra control
-            extraCtrlName = jnt.replace("_Jnt", "_Ctrl")
-            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraCtrlName, r=self.ctrlRadius, d=self.curveDegree)
+            extraName = jnt[:-4] #removed _Jnt suffix
+            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
@@ -584,12 +579,12 @@ class RibbonClass:
             cmds.scaleConstraint(extraCtrl, jnt, w=1, name=jnt+"_ScC")
             
             # work with volume variation
-            rbProportionMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Proportion_MD"))
-            rbIntensityMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Intensity_MD"))
-            rbLengthMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Length_MD"))
-            rbAddScalePMA = cmds.createNode("plusMinusAverage", name=extraCtrlName.replace("_Ctrl", "_AddScale_PMA"))
-            rbScaleClp = cmds.createNode("clamp", name=extraCtrlName.replace("_Ctrl", "_Scale_Clp"))
-            rbBlendCB = cmds.createNode("blendColors", name=extraCtrlName.replace("_Ctrl", "_BC"))
+            rbProportionMD = cmds.createNode("multiplyDivide", name=extraName+"_Proportion_MD")
+            rbIntensityMD = cmds.createNode("multiplyDivide", name=extraName+"_Intensity_MD")
+            rbLengthMD = cmds.createNode("multiplyDivide", name=extraName+"_Length_MD")
+            rbAddScalePMA = cmds.createNode("plusMinusAverage", name=extraName+"_AddScale_PMA")
+            rbScaleClp = cmds.createNode("clamp", name=extraName+"_Scale_Clp")
+            rbBlendCB = cmds.createNode("blendColors", name=extraName+"_BC")
             cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
             cmds.setAttr(rbBlendCB+".color2", 1, 1, 1, type="double3")
             cmds.connectAttr(rbNormalizeMD+".outputX", rbProportionMD+".input1X", force=True)
@@ -627,7 +622,16 @@ class RibbonClass:
                         cmds.setAttr(jad+".translate"+addAxis, addDir*self.ctrlRadius*0.5)
                         utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
-                        
+                        # control:
+                        addCtrl = self.ctrls.cvControl("id_082_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree)
+                        extraCtrlList.append(addCtrl)
+                        addCtrlGrp = utils.zeroOut([addCtrl])[0]
+                        cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))
+                        cmds.parentConstraint(addCtrl, jad, maintainOffset=True, name=jad+"_PaC")
+                        cmds.scaleConstraint(addCtrl, jad, maintainOffset=True, name=jad+"_ScC")
+                        cmds.parent(addCtrlGrp, extraCtrl, absolute=True)
+                        cmds.setAttr(addCtrlGrp+".scaleY", 1)
+                        cmds.setAttr(addCtrlGrp+".scaleZ", 1)
                         d = d + 1
 
             # update i
@@ -639,7 +643,7 @@ class RibbonClass:
                 rbProportionMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Proportion_MD"))
                 rbIntensityMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Intensity_MD"))
                 rbAddScalePMA = cmds.createNode("plusMinusAverage", name=self.elbowctrlCtrl.replace("_Ctrl", "_AddScale_PMA"))
-                rbLengthMD = cmds.createNode("multiplyDivide", name=extraCtrlName.replace("_Ctrl", "_Length_MD"))
+                rbLengthMD = cmds.createNode("multiplyDivide", name=extraName+"_Length_MD")
                 rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
                 rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
                 cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
