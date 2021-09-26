@@ -346,8 +346,46 @@ class Chain(Base.StartClass, Layout.LayoutClass):
 
 
 
+                # ik spline:
+                ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
+                ikSplineList[1] = cmds.rename(ikSplineList[1], side+self.userGuideName+"_Eff")
+                ikSplineList[2] = cmds.rename(ikSplineList[2], side+self.userGuideName+"_IkC")
+                self.ikSplineHandle = ikSplineList[0]
+                self.ikSplineCurve = ikSplineList[2]
+                # ik clusters:
+                self.ikClusterList = []
+                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[0:1]", name=side+self.userGuideName+"_Ik_0_Cls")[1]) #[Deform, Handle]
+                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[2]", name=side+self.userGuideName+"_Ik_1_Cls")[1]) #[Deform, Handle]
+                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[3]", name=side+self.userGuideName+"_Ik_2_Cls")[1]) #[Deform, Handle]
+                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[4]", name=side+self.userGuideName+"_Ik_3_Cls")[1]) #[Deform, Handle]
+                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[5:6]", name=side+self.userGuideName+"_Ik_4_Cls")[1]) #[Deform, Handle]
+                # ik cluster positions:
+                firstIkJointPos = cmds.xform(self.ikJointList[0], query=True, worldSpace=True, rotatePivot=True)
+                cmds.xform(self.ikClusterList[0], worldSpace=True, rotatePivot=firstIkJointPos)
+                endIkJointPos = cmds.xform(self.ikJointList[-2], query=True, worldSpace=True, rotatePivot=True)
+                cmds.xform(self.ikClusterList[-1], worldSpace=True, rotatePivot=endIkJointPos)
+                # ik cluster group:
+                self.ikClusterGrp = cmds.group(self.ikClusterList, name=side+self.userGuideName+"_Ik_Cluster_Grp")
 
 
+                # ik controls:
+                self.ikCtrlList = []
+                self.ikCtrlGrp = cmds.group(name=side+self.userGuideName+"_Ik_Ctrl_Grp", empty=True)
+                for c, clusterNode in enumerate(self.ikClusterList):
+                    if c == 0: #first
+                        self.ikCtrlMain = self.ctrls.cvControl("id_086_ChainIkMain", ctrlName=side+self.userGuideName+"_Ik_Main_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                        cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
+                        ikCtrlMainZero = utils.zeroOut([self.ikCtrlMain])
+                        cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
+#                    ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                    ikCtrl = self.ctrls.cvControl("id_014_EyeFk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                    self.ikCtrlList.append(ikCtrl)
+                    cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
+                    cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
+                    ikCtrlZero = utils.zeroOut([ikCtrl])
+                    cmds.parent(ikCtrlZero, self.ikCtrlMain)
+                    if c == 3: #last
+                        cmds.orientConstraint(ikCtrl, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
 
 
 
