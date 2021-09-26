@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.29"
-DPAR_UPDATELOG = "#377 - Ribbon additional joints for Limb module."
+DPAR_VERSION = "3.11.30"
+DPAR_UPDATELOG = "#377 - Ribbon additional joints for Limb module./nFixed load UI with old guides without additional attribute."
 
 
 

@@ -82,7 +82,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         return cmds.getAttr(self.moduleGrp + ".alignWorld")
         
     def getHasAdditional(self):
-        return cmds.getAttr(self.moduleGrp+".additional")
+        if cmds.objExists(self.moduleGrp+".additional"):
+            return cmds.getAttr(self.moduleGrp+".additional")
+        else:
+            return 0
     
     # @utils.profiler
     def createGuide(self, *args):
