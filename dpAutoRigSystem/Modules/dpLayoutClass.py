@@ -319,11 +319,12 @@ class LayoutClass:
                     cmds.text(self.langDic[self.langName]['m173_articulation'], parent=self.articLayout)
                     articValue = cmds.getAttr(self.moduleGrp+".articulation")
                     self.articCB = cmds.checkBox(label="", value=articValue, changeCommand=self.changeArticulation, parent=self.articLayout)
-                    # nostril:
-                    if self.nostrilExists:
-                        cmds.text(" ", parent=self.articLayout)
-                        nostrilValue = cmds.getAttr(self.moduleGrp+".nostril")
-                        self.nostrilCB = cmds.checkBox(label=self.langDic[self.langName]['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
+                
+                # create nostril:
+                if self.nostrilExists:
+                    cmds.text(" ", parent=self.articLayout)
+                    nostrilValue = cmds.getAttr(self.moduleGrp+".nostril")
+                    self.nostrilCB = cmds.checkBox(label=self.langDic[self.langName]['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
                 
             except:
                 pass

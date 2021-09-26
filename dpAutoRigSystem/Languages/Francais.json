@@ -539,6 +539,7 @@
 	"m175_zipperFlat"          : "Zipper Flat",
     "m176_noseDesc"            : "Description du module Nez:\n\nCe module crée des joints intégrées\ncomme en utilisant des FkLines\ndans le visage pour le nez des personnages.",
     "m177_DiamondFlat"         : "Diamant Flat",
+    "m178_additional"          : "Additionnel",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
