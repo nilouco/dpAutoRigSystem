@@ -231,9 +231,17 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 self.ikJointList = self.chainDic[self.jSuffixList[1]]
                 self.fkJointList = self.chainDic[self.jSuffixList[2]]
                 
+
+
+
+
                 # hide not skin joints in order to be more Rigger friendly when working the Skinning:
 #                cmds.setAttr(self.ikJointList[0]+".visibility", 0)
 #                cmds.setAttr(self.fkJointList[0]+".visibility", 0)
+
+
+
+
 
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
@@ -319,15 +327,6 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%n)
                 cmds.select(self.skinJointList[n])
 
-
-
-
-
-
-
-
-
-
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
@@ -350,8 +349,6 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', parentConst+"."+self.fkJointList[n]+"W1", force=True)
                     cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
 
-
-
                 # ik spline:
                 ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
                 ikSplineList[1] = cmds.rename(ikSplineList[1], side+self.userGuideName+"_Eff")
@@ -373,7 +370,6 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 # ik cluster group:
                 self.ikClusterGrp = cmds.group(self.ikClusterList, name=side+self.userGuideName+"_Ik_Cluster_Grp")
 
-
                 # ik controls:
                 self.ikCtrlList = []
                 self.ikCtrlGrp = cmds.group(name=side+self.userGuideName+"_Ik_Ctrl_Grp", empty=True)
@@ -383,8 +379,6 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
                         ikCtrlMainZero = utils.zeroOut([self.ikCtrlMain])
                         cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
-
-
 
                     ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     self.ikCtrlList.append(ikCtrl)
@@ -397,13 +391,37 @@ class Chain(Base.StartClass, Layout.LayoutClass):
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
+                # calculate the arclenght to ik stretch and volumeVariation:
+                curveInfoNode = cmds.arclen(ikSplineList[2], constructionHistory=True)
+                curveInfoNode = cmds.rename(curveInfoNode, side+self.userGuideName+"_Ik_CurveInfo")
+                
+                ikScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_ScaleCompensate_MD")
+                ikNormalizeMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Normalize_MD")
+                initialDistance = cmds.getAttr(curveInfoNode+".arcLength")
+                cmds.setAttr(ikNormalizeMD+".operation", 2)
+                cmds.connectAttr(curveInfoNode+".arcLength", ikNormalizeMD+".input1X", force=True)
+                cmds.connectAttr(ikScaleMD+".outputX", ikNormalizeMD+".input2X", force=True)
+                cmds.setAttr(ikScaleMD+".input2X", initialDistance)
+
+                if cmds.objExists(self.worldRef):
+#                    if not cmds.objExists(self.worldRef+"."+self.limbManualVVAttr):
+#                        cmds.addAttr(self.worldRef, longName=self.limbVVAttr, attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+#                        cmds.addAttr(self.worldRef, longName=self.limbManualVVAttr, attributeType="float", defaultValue=1, keyable=True)
+#                        cmds.addAttr(self.worldRef, longName=self.limbMinVVAttr, attributeType="float", defaultValue=0.01, keyable=True)
+                    cmds.connectAttr(self.worldRef+".scaleX", ikScaleMD+".input1X", force=True)
+                
+                for j in range(0, len(self.ikJointList)-2):
+                    cmds.connectAttr(ikNormalizeMD+".outputX", self.ikJointList[j]+".scaleZ", force=True)
+
+
+
+
+
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', self.fkZeroGrpList[0] + ".visibility", force=True)
                 cmds.connectAttr(self.ikFkRevList[0]+".outputX", self.ikCtrlGrp+".visibility", force=True)
                 self.ctrls.setLockHide(self.fkCtrlList, ['v'], l=False)
                 self.ctrls.setLockHide(self.ikCtrlList, ['v'], l=False)
-
-
 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
