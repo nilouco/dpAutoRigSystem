@@ -177,7 +177,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
                     # do a group mirror with negative scaling:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                        if not self.getModuleAttr("flip"):
                             for axis in self.mirrorAxis:
                                 gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
                                 flipedValue = gotValue*(-2)
@@ -277,10 +277,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 if n == (self.nJoints-1):
                     self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
-                    if s == 0:
-                        cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
-                    else:
-                        cmds.setAttr(self.toParentExtremCtrl+".translateZ", -self.ctrlRadius)
+                    cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
+                    if s == 1:
+                        if self.getModuleAttr("flip"):
+                            cmds.setAttr(self.toParentExtremCtrl+".translateZ", -self.ctrlRadius)
                     utils.zeroOut([self.toParentExtremCtrl])
                     self.ctrls.setLockHide([self.toParentExtremCtrl], ['v'])
 
@@ -289,6 +289,12 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.fkCtrlList[0] + ".scaleX", -1)
                     cmds.setAttr(self.fkCtrlList[0] + ".scaleY", -1)
                     cmds.setAttr(self.fkCtrlList[0] + ".scaleZ", -1)
+                    # fix flipping issue for right side:
+                    for f in range(1, len(self.fkCtrlList)):
+                        attrList = ["tx", "ty", "tz", "rx", "ry", "rz"]
+                        for attr in attrList:
+                            attrValue = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
+                            cmds.setAttr(self.fkZeroGrpList[f]+"."+attr, -1*attrValue)
 
                 # working with position, orientation of joints and make an orientConstraint for Fk controls:
                 for n in range(0, self.nJoints):
@@ -377,8 +383,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
                         ikCtrlMainZero = utils.zeroOut([self.ikCtrlMain])
                         cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
-#                    ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                    ikCtrl = self.ctrls.cvControl("id_014_EyeFk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+
+
+
+                    ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     self.ikCtrlList.append(ikCtrl)
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
                     cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
@@ -387,13 +395,20 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     if c == 3: #last
                         cmds.orientConstraint(ikCtrl, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
 
+                self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
+
+                # connecting visibilities:
+                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', self.fkZeroGrpList[0] + ".visibility", force=True)
+                cmds.connectAttr(self.ikFkRevList[0]+".outputX", self.ikCtrlGrp+".visibility", force=True)
+                self.ctrls.setLockHide(self.fkCtrlList, ['v'], l=False)
+                self.ctrls.setLockHide(self.ikCtrlList, ['v'], l=False)
 
 
 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
+                self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
+                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, name=side+self.userGuideName+"_Joint_Grp")
+                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.ikStaticDataGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
