@@ -284,6 +284,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 # add extrem_toParent_Ctrl
                 if n == (self.nJoints-1):
                     self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree)
+                    cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
                     cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
                     if s == 1:
@@ -330,6 +331,8 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                if not cmds.objExists(self.worldRef+'.globalStretch'):
+                    cmds.addAttr(self.worldRef, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
                 self.worldRefShapeList.append(self.worldRefShape)
@@ -382,40 +385,53 @@ class Chain(Base.StartClass, Layout.LayoutClass):
 
                     ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     self.ikCtrlList.append(ikCtrl)
+                    self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
                     cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
                     ikCtrlZero = utils.zeroOut([ikCtrl])
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
-                    if c == 3: #last
+                    if c == 4: #last
                         cmds.orientConstraint(ikCtrl, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
+                    else:
+                        self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz"])
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
-                # calculate the arclenght to ik stretch and volumeVariation:
+                # ik stretch:
                 curveInfoNode = cmds.arclen(ikSplineList[2], constructionHistory=True)
                 curveInfoNode = cmds.rename(curveInfoNode, side+self.userGuideName+"_Ik_CurveInfo")
-                
-                ikScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_ScaleCompensate_MD")
+                # create stretch nodes:
+#                ikScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_ScaleCompensate_MD")
                 ikNormalizeMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Normalize_MD")
+                globalStretchBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_GlobalStretch_BC")
+                stretchableBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_Stretchable_BC")
+                stretchBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_Stretch_BC")
+                ikStretchRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_Stretch_Rev")
+                # get and set stretch attribute values:
                 initialDistance = cmds.getAttr(curveInfoNode+".arcLength")
+#                cmds.setAttr(ikScaleMD+".input2X", initialDistance)
                 cmds.setAttr(ikNormalizeMD+".operation", 2)
+                cmds.setAttr(ikNormalizeMD+".input2X", initialDistance)
+                cmds.setAttr(globalStretchBC+".color2", 1, 1, 1, type="double3")
+                cmds.setAttr(stretchableBC+".color2", 1, 1, 1, type="double3")
+                cmds.setAttr(stretchBC+".color2", 1, 1, 1, type="double3")
+                # connect stretch attributes:
                 cmds.connectAttr(curveInfoNode+".arcLength", ikNormalizeMD+".input1X", force=True)
-                cmds.connectAttr(ikScaleMD+".outputX", ikNormalizeMD+".input2X", force=True)
-                cmds.setAttr(ikScaleMD+".input2X", initialDistance)
-
+#                cmds.connectAttr(ikScaleMD+".outputX", ikNormalizeMD+".input2X", force=True)
+                cmds.connectAttr(ikNormalizeMD+".outputX", globalStretchBC+".color1.color1R", force=True)
+                cmds.connectAttr(globalStretchBC+".output.outputR", stretchableBC+".color1.color1R", force=True)
+                cmds.connectAttr(stretchableBC+".output.outputR", stretchBC+".color1.color1R", force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+".stretchable", stretchableBC+".blender", force=True)
+                cmds.connectAttr(ikStretchRevNode+".outputX", stretchBC+".blender", force=True)
+                # work with worldRef node:
                 if cmds.objExists(self.worldRef):
-#                    if not cmds.objExists(self.worldRef+"."+self.limbManualVVAttr):
-#                        cmds.addAttr(self.worldRef, longName=self.limbVVAttr, attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
-#                        cmds.addAttr(self.worldRef, longName=self.limbManualVVAttr, attributeType="float", defaultValue=1, keyable=True)
-#                        cmds.addAttr(self.worldRef, longName=self.limbMinVVAttr, attributeType="float", defaultValue=0.01, keyable=True)
-                    cmds.connectAttr(self.worldRef+".scaleX", ikScaleMD+".input1X", force=True)
-                
+#                    cmds.connectAttr(self.worldRef+".scaleX", ikScaleMD+".input1X", force=True)
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', ikStretchRevNode+".inputX", force=True)
+                    cmds.connectAttr(self.worldRef+".globalStretch", globalStretchBC+".blender", force=True)
+                # output stretch values to joint scale:
                 for j in range(0, len(self.ikJointList)-2):
-                    cmds.connectAttr(ikNormalizeMD+".outputX", self.ikJointList[j]+".scaleZ", force=True)
-
-
-
-
+                    cmds.connectAttr(stretchBC+".output.outputR", self.ikJointList[j]+".scaleZ", force=True)
+                    cmds.connectAttr(stretchBC+".output.outputR", self.skinJointList[j]+".scaleZ", force=True)
 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', self.fkZeroGrpList[0] + ".visibility", force=True)
