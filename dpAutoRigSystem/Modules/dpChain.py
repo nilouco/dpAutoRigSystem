@@ -401,7 +401,6 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 curveInfoNode = cmds.arclen(ikSplineList[2], constructionHistory=True)
                 curveInfoNode = cmds.rename(curveInfoNode, side+self.userGuideName+"_Ik_CurveInfo")
                 # create stretch nodes:
-#                ikScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_ScaleCompensate_MD")
                 ikNormalizeMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Normalize_MD")
                 globalStretchBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_GlobalStretch_BC")
                 stretchableBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_Stretchable_BC")
@@ -409,15 +408,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 ikStretchRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_Stretch_Rev")
                 # get and set stretch attribute values:
                 initialDistance = cmds.getAttr(curveInfoNode+".arcLength")
-#                cmds.setAttr(ikScaleMD+".input2X", initialDistance)
                 cmds.setAttr(ikNormalizeMD+".operation", 2)
                 cmds.setAttr(ikNormalizeMD+".input2X", initialDistance)
-                cmds.setAttr(globalStretchBC+".color2", 1, 1, 1, type="double3")
-                cmds.setAttr(stretchableBC+".color2", 1, 1, 1, type="double3")
-                cmds.setAttr(stretchBC+".color2", 1, 1, 1, type="double3")
                 # connect stretch attributes:
                 cmds.connectAttr(curveInfoNode+".arcLength", ikNormalizeMD+".input1X", force=True)
-#                cmds.connectAttr(ikScaleMD+".outputX", ikNormalizeMD+".input2X", force=True)
                 cmds.connectAttr(ikNormalizeMD+".outputX", globalStretchBC+".color1.color1R", force=True)
                 cmds.connectAttr(globalStretchBC+".output.outputR", stretchableBC+".color1.color1R", force=True)
                 cmds.connectAttr(stretchableBC+".output.outputR", stretchBC+".color1.color1R", force=True)
@@ -425,9 +419,12 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(ikStretchRevNode+".outputX", stretchBC+".blender", force=True)
                 # work with worldRef node:
                 if cmds.objExists(self.worldRef):
-#                    cmds.connectAttr(self.worldRef+".scaleX", ikScaleMD+".input1X", force=True)
                     cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', ikStretchRevNode+".inputX", force=True)
                     cmds.connectAttr(self.worldRef+".globalStretch", globalStretchBC+".blender", force=True)
+                    for bsNode in [globalStretchBC, stretchableBC, stretchBC]:
+                        cmds.connectAttr(self.worldRef+".scaleX", bsNode+".color2.color2R", force=True)
+                        cmds.connectAttr(self.worldRef+".scaleX", bsNode+".color2.color2G", force=True)
+                        cmds.connectAttr(self.worldRef+".scaleX", bsNode+".color2.color2B", force=True)
                 # output stretch values to joint scale:
                 for j in range(0, len(self.ikJointList)-2):
                     cmds.connectAttr(stretchBC+".output.outputR", self.ikJointList[j]+".scaleZ", force=True)
