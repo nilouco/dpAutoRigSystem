@@ -221,7 +221,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     self.wipList = []
                     cmds.select(clear=True)
                     for n in range(0, self.nJoints):
-                        newJoint = cmds.joint(name=side+self.userGuideName+"_%02d"%n+suffix)
+                        newJoint = cmds.joint(name=side+self.userGuideName+"_%02d"%n+suffix, scaleCompensate=False)
                         self.wipList.append(newJoint)
                     jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSuffixList[t], radius=0.5)
                     self.wipList.append(jEndJnt)
@@ -231,9 +231,6 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 self.ikJointList = self.chainDic[self.jSuffixList[1]]
                 self.fkJointList = self.chainDic[self.jSuffixList[2]]
                 
-
-
-
 
                 # hide not skin joints in order to be more Rigger friendly when working the Skinning:
 #                cmds.setAttr(self.ikJointList[0]+".visibility", 0)
@@ -285,6 +282,9 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 if n == (self.nJoints-1):
                     self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                     cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName="active"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="bool", defaultValue=1, keyable=True)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
                     cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
                     if s == 1:
@@ -314,7 +314,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     cmds.makeIdentity(self.skinJointList[n], self.ikJointList[n], self.fkJointList[n], apply=True, rotate=True)
                     # fk control leads fk joint:
                     cmds.parentConstraint(self.fkCtrlList[n], self.fkJointList[n], maintainOffset=True, name=side+self.userGuideName+"_%02d_Fk_PaC"%n)
-                    self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
+                    if n == self.nJoints-1:
+                        cmds.scaleConstraint(self.fkCtrlList[n], self.fkJointList[n], maintainOffset=True, name=side+self.userGuideName+"_%02d_Fk_ScC"%n)
+                    else:
+                        self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
 
                 # puting endJoints in the correct position:
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False))
@@ -351,6 +354,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     # connecting ikFkBlend using the reverse node:
                     cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', parentConst+"."+self.fkJointList[n]+"W1", force=True)
                     cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
+                    if n == (self.nJoints-1):
+                        scaleConst = cmds.scaleConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=self.skinJointList[n]+"_IkFkBlend_ScC")[0]
+                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', scaleConst+"."+self.fkJointList[n]+"W1", force=True)
+                        cmds.connectAttr(revNode+".outputX", scaleConst+"."+self.ikJointList[n]+"W0", force=True)
 
                 # ik spline:
                 ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
@@ -382,18 +389,20 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
                         ikCtrlMainZero = utils.zeroOut([self.ikCtrlMain])
                         cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
-
                     ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     self.ikCtrlList.append(ikCtrl)
-                    self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
                     cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
                     ikCtrlZero = utils.zeroOut([ikCtrl])
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
                     if c == 4: #last
                         cmds.orientConstraint(ikCtrl, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
+                        cmds.scaleConstraint(ikCtrl, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_ScC")
+                        self.ctrls.setLockHide([ikCtrl], ["v"])
+                    elif not c == 0:
+                        self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "v"])
                     else:
-                        self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz"])
+                        self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
@@ -430,6 +439,28 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(stretchBC+".output.outputR", self.ikJointList[j]+".scaleZ", force=True)
                     cmds.connectAttr(stretchBC+".output.outputR", self.skinJointList[j]+".scaleZ", force=True)
 
+                # volumeVariation:
+                vvBC = cmds.createNode('blendColors', name=side+self.userGuideName+"_VV_BC")
+                vvCond = cmds.createNode('condition', name=side+self.userGuideName+'_VV_Cond')
+                vvMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_VV_MD")
+                vvClp = cmds.createNode('clamp', name=side+self.userGuideName+"_VV_Clp")
+                cmds.setAttr(vvClp+".maxR", 1000)
+                cmds.connectAttr(self.toParentExtremCtrl+'.'+self.langDic[self.langName]['c031_volumeVariation'], vvBC+'.blender')
+                cmds.connectAttr(self.toParentExtremCtrl+".active"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), vvCond+'.firstTerm')
+                cmds.connectAttr(self.toParentExtremCtrl+".min"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), vvClp+'.min.minR')
+                cmds.connectAttr(vvBC+'.outputR', vvClp+'.input.inputR')
+                cmds.connectAttr(vvClp+'.output.outputR', vvCond+'.colorIfTrueR')
+                cmds.connectAttr(vvMD+".outputX", vvBC+'.color1R')
+                cmds.connectAttr(self.worldRef+".scaleX", vvMD+'.input1X')
+                cmds.connectAttr(stretchBC+".output.outputR", vvMD+'.input2X')
+                cmds.setAttr(vvMD+'.operation', 2)
+                cmds.setAttr(vvBC+'.color2R', 1)
+                cmds.setAttr(vvCond+".secondTerm", 1)
+                #output volumeVariation values to joint scale axis:
+                for j in range(0, len(self.skinJointList)-2):
+                    cmds.connectAttr(vvCond+".outColorR", self.skinJointList[j]+".scaleX", force=True)
+                    cmds.connectAttr(vvCond+".outColorR", self.skinJointList[j]+".scaleY", force=True)
+
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', self.fkZeroGrpList[0] + ".visibility", force=True)
                 cmds.connectAttr(self.ikFkRevList[0]+".outputX", self.ikCtrlGrp+".visibility", force=True)
@@ -438,7 +469,12 @@ class Chain(Base.StartClass, Layout.LayoutClass):
 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, name=side+self.userGuideName+"_Joint_Grp")
+                self.toScalableHookGrp = cmds.group(empty=True, name=side+self.userGuideName+"_Joint_Grp")
+                cmds.delete(cmds.parentConstraint(self.skinJointList[0], self.toScalableHookGrp, maintainOffset=False))
+                cmds.parent((self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, self.toScalableHookGrp))
+                cmds.connectAttr(self.worldRef+".scaleX", self.toScalableHookGrp+".scaleX", force=True)
+                cmds.connectAttr(self.worldRef+".scaleX", self.toScalableHookGrp+".scaleY", force=True)
+                cmds.connectAttr(self.worldRef+".scaleX", self.toScalableHookGrp+".scaleZ", force=True)
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.ikStaticDataGrp, name=side+self.userGuideName+"_Grp")
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
