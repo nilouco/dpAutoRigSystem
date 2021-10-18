@@ -2,7 +2,7 @@
     "_preset"     : "Cubic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2021-09-07",
+    "_updated"    : "2021-10-17",
 
     "id_000_Base"            : {"type" : "Cube", "degree" : 1},
     "id_001_Locator"         : {"type" : "Cube", "degree" : 1},
@@ -90,6 +90,7 @@
     "id_083_ChainToParent"   : {"type" : "Cube", "degree" : 1},
     "id_084_ChainWorldRef"   : {"type" : "Cube", "degree" : 1},
     "id_085_ChainIk"         : {"type" : "Cube", "degree" : 1},
-    "id_086_ChainIkMain"     : {"type" : "Cube", "degree" : 3}
+    "id_086_ChainIkMain"     : {"type" : "Cube", "degree" : 1},
+    "id_087_ChainIkLast"     : {"type" : "Cube", "degree" : 1}
 	
 }

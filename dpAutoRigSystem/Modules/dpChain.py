@@ -407,11 +407,19 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     ikCtrlZero = utils.zeroOut([ikCtrl])
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
                     if c == 4: #last
-                        cmds.orientConstraint(ikCtrl, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
-                        cmds.connectAttr(ikCtrl+".scaleX", self.ikJointList[-2]+".scaleX", force=True)
-                        cmds.connectAttr(ikCtrl+".scaleY", self.ikJointList[-2]+".scaleY", force=True)
-                        cmds.connectAttr(ikCtrl+".scaleZ", self.ikJointList[-2]+".scaleZ", force=True)
-                        self.ctrls.setLockHide([ikCtrl], ["v"])
+                        self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
+                        # last ik control:
+                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_Last_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
+                        self.ctrls.colorShape([self.ikCtrlLast], 'cyan')
+                        cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlLast, maintainOffset=False))
+                        ikCtrlLastZero = utils.zeroOut([self.ikCtrlLast])[0]
+                        cmds.parent(ikCtrlLastZero, self.ikCtrlMain)
+                        cmds.parent(ikCtrlZero, self.ikCtrlLast)
+                        self.ctrls.setLockHide([self.ikCtrlLast], ["v"])
+                        cmds.orientConstraint(self.ikCtrlLast, self.ikJointList[-2], maintainOffset=True, name=self.ikJointList[-2]+"_OrC")
+                        cmds.connectAttr(self.ikCtrlLast+".scaleX", self.ikJointList[-2]+".scaleX", force=True)
+                        cmds.connectAttr(self.ikCtrlLast+".scaleY", self.ikJointList[-2]+".scaleY", force=True)
+                        cmds.connectAttr(self.ikCtrlLast+".scaleZ", self.ikJointList[-2]+".scaleZ", force=True)
                     elif not c == 0:
                         self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "v"])
                     else:
