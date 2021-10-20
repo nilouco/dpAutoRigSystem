@@ -146,7 +146,36 @@ class Chain(Base.StartClass, Layout.LayoutClass):
         else:
             self.changeJointNumber(3)
     
+
+    def setupAimLocators(self, side, ikCtrlMain, ikNumb, ikFakeCtrl, *args):
+        """ Creates the up and fake locators to use in the aimConstraint.
+            Return them as a list.
+        """
+        # up locator:
+        upLoc = cmds.spaceLocator(name=side+self.userGuideName+"_%02d_Up_Loc"%ikNumb)[0]
+        cmds.delete(cmds.parentConstraint(ikCtrlMain, upLoc, maintainOffset=False))
+        cmds.parent(upLoc, ikCtrlMain, relative=False)
+        cmds.setAttr(upLoc+".translateY", 2*self.ctrlRadius)
+        cmds.setAttr(upLoc+".visibility", 0)
+        # fake aim locator:
+        fakeLoc = cmds.spaceLocator(name=side+self.userGuideName+"_%02d_Fake_Loc"%ikNumb)[0]
+        cmds.delete(cmds.parentConstraint(ikFakeCtrl, fakeLoc, maintainOffset=False))
+        cmds.parent(fakeLoc, ikCtrlMain, relative=False)
+        cmds.setAttr(fakeLoc+".visibility", 0)
+        return [upLoc, fakeLoc]
     
+
+    def setupAimConst(self, ikCtrl, ikToAimCtrl, upLoc, fakeLoc, ikCtrlZero, zDir=1, *args):
+        """ Creates an aim constraint to extrem ik controls use autoOrient attributes.
+        """
+        # look at aim constraint:
+        aimConst = cmds.aimConstraint(ikToAimCtrl, fakeLoc, ikCtrlZero, worldUpType="object", worldUpObject=upLoc, aimVector=(0, 0, zDir), upVector=(0, 1, 0), maintainOffset=True, name=ikCtrlZero+"_AiC")[0]
+        cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
+        aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
+        cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimRev+".inputX", force=True)
+        cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
+
+
     def rigModule(self, *args):
         Base.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -379,7 +408,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 self.ikClusterGrp = cmds.group(self.ikClusterList, name=side+self.userGuideName+"_Ik_Cluster_Grp")
 
                 # ik controls:
-                self.ikCtrlList = []
+                self.ikCtrlList, self.ikCtrlZeroList = [], []
                 self.ikCtrlGrp = cmds.group(name=side+self.userGuideName+"_Ik_Ctrl_Grp", empty=True)
                 for c, clusterNode in enumerate(self.ikClusterList):
                     if c == 0: #first
@@ -387,26 +416,32 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
                         ikCtrlMainZero = utils.zeroOut([self.ikCtrlMain])[0]
                         cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
-                        # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
-                        ikMainLoc = cmds.spaceLocator(name=side+self.userGuideName+"_Ik_Main_Loc")[0]
-                        ikMainLocGrp = cmds.group(ikMainLoc, name=side+self.userGuideName+"_Ik_MainLoc_Grp")
-                        # need to keep ikMainLocGrp at the world without any transformation to use it to extract ikMainCtrl rotateZ properly:
-                        cmds.setAttr(ikMainLocGrp+".inheritsTransform", 0)
-                        cmds.setAttr(ikMainLocGrp+".visibility", 0)
-                        self.ctrls.setLockHide([ikMainLocGrp], ['rx', 'ry', 'rz'], l=True, k=True)
-                        cmds.parentConstraint(self.ikCtrlMain, ikMainLoc, maintainOffset=False, skipTranslate=("x", "y", "z"), name=ikMainLoc+"_PaC")
-                        mainTwistMatrixMD = utils.twistBoneMatrix(ikMainLocGrp, ikMainLoc, "ikCtrlMain_TwistMatrix")
-                        cmds.setAttr(mainTwistMatrixMD+".input1Z", 1)
-                        # connect output of rotate in Z to ikSplineHandle roll attribute:
-                        cmds.connectAttr(mainTwistMatrixMD+".outputZ", self.ikSplineHandle+".roll", force=True)
+                        # loading Maya matrix node
+                        loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+                        loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                        if loadedQuatNode and loadedMatrixPlugin:
+                            # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
+                            ikMainLoc = cmds.spaceLocator(name=side+self.userGuideName+"_Ik_Main_Loc")[0]
+                            ikMainLocGrp = cmds.group(ikMainLoc, name=side+self.userGuideName+"_Ik_MainLoc_Grp")
+                            # need to keep ikMainLocGrp at the world without any transformation to use it to extract ikMainCtrl rotateZ properly:
+                            cmds.setAttr(ikMainLocGrp+".inheritsTransform", 0)
+                            cmds.setAttr(ikMainLocGrp+".visibility", 0)
+                            self.ctrls.setLockHide([ikMainLocGrp], ['rx', 'ry', 'rz'], l=True, k=True)
+                            cmds.parentConstraint(self.ikCtrlMain, ikMainLoc, maintainOffset=False, skipTranslate=("x", "y", "z"), name=ikMainLoc+"_PaC")
+                            mainTwistMatrixMD = utils.twistBoneMatrix(ikMainLocGrp, ikMainLoc, "ikCtrlMain_TwistMatrix")
+                            cmds.setAttr(mainTwistMatrixMD+".input1Z", 1)
+                            # connect output of rotate in Z to ikSplineHandle roll attribute:
+                            cmds.connectAttr(mainTwistMatrixMD+".outputZ", self.ikSplineHandle+".roll", force=True)
 
                     ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     self.ikCtrlList.append(ikCtrl)
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
                     cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
-                    ikCtrlZero = utils.zeroOut([ikCtrl])
+                    ikCtrlZero = utils.zeroOut([ikCtrl])[0]
+                    self.ikCtrlZeroList.append(ikCtrlZero)
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
                     if c == 4: #last
+                        cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
                         self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_Last_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
@@ -421,9 +456,21 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(self.ikCtrlLast+".scaleY", self.ikJointList[-2]+".scaleY", force=True)
                         cmds.connectAttr(self.ikCtrlLast+".scaleZ", self.ikJointList[-2]+".scaleZ", force=True)
                     elif not c == 0:
-                        self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "v"])
-                    else:
+                        self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v"])
+                    else: #first
+                        cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
+
+                # ik controls position:
+                cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")
+                cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlLast, self.ikCtrlZeroList[2], maintainOffset=True, name=self.ikCtrlZeroList[2]+"_PoC")
+                cmds.pointConstraint(self.ikCtrlList[2], self.ikCtrlLast, self.ikCtrlZeroList[3], maintainOffset=True, name=self.ikCtrlZeroList[3]+"_PoC")
+                
+                # ik controls orientation:
+                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlMain, 0, self.ikCtrlList[1])
+                lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2])
+                self.setupAimConst(self.ikCtrlList[0], self.ikCtrlList[1], firstUpLoc, firstFakeLoc, self.ikCtrlZeroList[0], 1)
+                self.setupAimConst(self.ikCtrlList[-1], self.ikCtrlList[-2], lastUpLoc, lastFakeLoc, self.ikCtrlZeroList[-1], -1)
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
