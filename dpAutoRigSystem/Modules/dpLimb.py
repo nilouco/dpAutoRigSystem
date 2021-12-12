@@ -243,7 +243,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 break
         # additional ribbon joint:
         self.hasAdditional = self.getHasAdditional()
-        self.additionalCB = cmds.checkBox("additionalCB", label=self.langDic[self.langName]['m178_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
+        self.additionalCB = cmds.checkBox("additionalCB", label=self.langDic[self.langName]['m180_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
         
         # align world layout:
         self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")

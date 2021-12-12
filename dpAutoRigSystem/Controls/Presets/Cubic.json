@@ -92,6 +92,6 @@
     "id_085_ChainIk"         : {"type" : "Cube", "degree" : 1},
     "id_086_ChainIkMain"     : {"type" : "Cube", "degree" : 1},
     "id_087_ChainIkLast"     : {"type" : "Cube", "degree" : 1},
-    "id_082_LimbAdditional"  : {"type" : "Cube", "degree" : 1}
+    "id_088_LimbAdditional"  : {"type" : "Cube", "degree" : 1}
 	
 }
