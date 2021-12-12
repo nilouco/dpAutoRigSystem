@@ -33,10 +33,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
         firstTime = cmds.getAttr(self.moduleGrp+'.nJoints')
         if firstTime == 1:
             try:
-                cmds.intField(self.nJointsIF, edit=True, value=3, minValue=3)
+                cmds.intField(self.nJointsIF, edit=True, value=5, minValue=5)
             except:
                 pass
-            self.changeJointNumber(3)
+            self.changeJointNumber(5)
     
     
     def createGuide(self, *args):
@@ -84,7 +84,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 return
         else:
             self.enteredNJoints = enteredNJoints
-        if self.enteredNJoints >= 3:
+        if self.enteredNJoints >= 5:
             # get the number of joints existing:
             self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
             # start analisys the difference between values:
@@ -144,36 +144,44 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 Layout.LayoutClass.createPreviewMirror(self)
             cmds.select(self.moduleGrp)
         else:
-            self.changeJointNumber(3)
+            self.changeJointNumber(5)
     
 
-    def setupAimLocators(self, side, ikCtrlMain, ikNumb, ikFakeCtrl, *args):
+    def setupAimLocators(self, side, toUpParent, ikNumb, ikFakeCtrl, toFakeParent, hasFake=True, *args):
         """ Creates the up and fake locators to use in the aimConstraint.
             Return them as a list.
         """
+        fakeLoc = None
         # up locator:
         upLoc = cmds.spaceLocator(name=side+self.userGuideName+"_%02d_Up_Loc"%ikNumb)[0]
-        cmds.delete(cmds.parentConstraint(ikCtrlMain, upLoc, maintainOffset=False))
-        cmds.parent(upLoc, ikCtrlMain, relative=False)
+        cmds.delete(cmds.parentConstraint(toUpParent, upLoc, maintainOffset=False))
+        cmds.parent(upLoc, toUpParent, relative=False)
         cmds.setAttr(upLoc+".translateY", 2*self.ctrlRadius)
-        cmds.setAttr(upLoc+".visibility", 0)
-        # fake aim locator:
-        fakeLoc = cmds.spaceLocator(name=side+self.userGuideName+"_%02d_Fake_Loc"%ikNumb)[0]
-        cmds.delete(cmds.parentConstraint(ikFakeCtrl, fakeLoc, maintainOffset=False))
-        cmds.parent(fakeLoc, ikCtrlMain, relative=False)
-        cmds.setAttr(fakeLoc+".visibility", 0)
+        
+        
+        cmds.setAttr(upLoc+".visibility", 1)
+        if hasFake:
+            # fake aim locator:
+            fakeLoc = cmds.spaceLocator(name=side+self.userGuideName+"_%02d_Fake_Loc"%ikNumb)[0]
+            cmds.delete(cmds.parentConstraint(ikFakeCtrl, fakeLoc, maintainOffset=False))
+            cmds.parent(fakeLoc, toFakeParent, relative=False)
+            
+            
+            cmds.setAttr(fakeLoc+".visibility", 1)
         return [upLoc, fakeLoc]
+        
     
 
-    def setupAimConst(self, ikCtrl, ikToAimCtrl, upLoc, fakeLoc, ikCtrlZero, zDir=1, *args):
+    def setupAimConst(self, ikCtrl, ikToAimCtrl, upLoc, fakeLoc, ikCtrlZero, zDir=1, autoOrient=True, *args):
         """ Creates an aim constraint to extrem ik controls use autoOrient attributes.
         """
         # look at aim constraint:
         aimConst = cmds.aimConstraint(ikToAimCtrl, fakeLoc, ikCtrlZero, worldUpType="object", worldUpObject=upLoc, aimVector=(0, 0, zDir), upVector=(0, 1, 0), maintainOffset=True, name=ikCtrlZero+"_AiC")[0]
-        cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
-        aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
-        cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimRev+".inputX", force=True)
-        cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
+        if autoOrient:
+            cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
+            aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
+            cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimRev+".inputX", force=True)
+            cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
 
 
     def rigModule(self, *args):
@@ -456,7 +464,10 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(self.ikCtrlLast+".scaleY", self.ikJointList[-2]+".scaleY", force=True)
                         cmds.connectAttr(self.ikCtrlLast+".scaleZ", self.ikJointList[-2]+".scaleZ", force=True)
                     elif not c == 0:
-                        self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v"])
+                        if c == 2:
+                            self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "sx", "sy", "sz", "v"])
+                        else:
+                            self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v"])
                     else: #first
                         cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
@@ -467,10 +478,44 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 cmds.pointConstraint(self.ikCtrlList[2], self.ikCtrlLast, self.ikCtrlZeroList[3], maintainOffset=True, name=self.ikCtrlZeroList[3]+"_PoC")
                 
                 # ik controls orientation:
-                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlMain, 0, self.ikCtrlList[1])
-                lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2])
+                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlMain, 0, self.ikCtrlList[1], self.ikCtrlMain)
+                lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2], self.ikCtrlLast)
                 self.setupAimConst(self.ikCtrlList[0], self.ikCtrlList[1], firstUpLoc, firstFakeLoc, self.ikCtrlZeroList[0], 1)
                 self.setupAimConst(self.ikCtrlList[-1], self.ikCtrlList[-2], lastUpLoc, lastFakeLoc, self.ikCtrlZeroList[-1], -1)
+
+
+
+
+                # WIP
+                midUpLoc, midFakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 13, self.ikCtrlList[2], self.ikCtrlList[2], False)
+                self.setupAimConst(self.ikCtrlList[1], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[1], 1, False)
+
+                
+                
+#                upLoc, fakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 3, self.ikCtrlList[2], self.ikCtrlList[2], False)
+                self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], -1, False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
