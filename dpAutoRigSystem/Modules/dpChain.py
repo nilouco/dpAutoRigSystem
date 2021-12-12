@@ -263,14 +263,9 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 self.ikJointList = self.chainDic[self.jSuffixList[1]]
                 self.fkJointList = self.chainDic[self.jSuffixList[2]]
                 
-
                 # hide not skin joints in order to be more Rigger friendly when working the Skinning:
-#                cmds.setAttr(self.ikJointList[0]+".visibility", 0)
-#                cmds.setAttr(self.fkJointList[0]+".visibility", 0)
-
-                
-
-
+                cmds.setAttr(self.ikJointList[0]+".visibility", 0)
+                cmds.setAttr(self.fkJointList[0]+".visibility", 0)
 
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
@@ -419,6 +414,27 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlMain, maintainOffset=False))
                         ikCtrlMainZero = utils.zeroOut([self.ikCtrlMain])[0]
                         cmds.parent(ikCtrlMainZero, self.ikCtrlGrp)
+                        
+                        # orienting controls
+                        if s == 1:
+                            cmds.parent(self.base, world=True)
+                        guideBaseRX = cmds.getAttr(self.base+".rotateX")
+                        guideBaseRY = cmds.getAttr(self.base+".rotateY")
+                        guideBaseRZ = cmds.getAttr(self.base+".rotateZ")
+                        cmds.setAttr(ikCtrlMainZero+".rotateX", guideBaseRX)
+                        cmds.setAttr(ikCtrlMainZero+".rotateY", guideBaseRY)
+                        cmds.setAttr(ikCtrlMainZero+".rotateZ", guideBaseRZ)
+                        
+                        # fixing flip mirror:
+                        if s == 1:
+                            if self.getModuleAttr("flip"):
+                                for axis in self.mirrorAxis:
+                                    cmds.setAttr(ikCtrlMainZero+'.scale'+axis, -1)
+                            else:
+                                cmds.setAttr(ikCtrlMainZero+".scaleX", -1)
+                                cmds.setAttr(ikCtrlMainZero+".scaleY", -1)
+                                cmds.setAttr(ikCtrlMainZero+".scaleZ", -1)
+
                         # loading Maya matrix node
                         loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
                         loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
@@ -443,6 +459,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                     ikCtrlZero = utils.zeroOut([ikCtrl])[0]
                     self.ikCtrlZeroList.append(ikCtrlZero)
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
+                    cmds.rotate(0, 0, 0, ikCtrlZero)
                     if c == 4: #last
                         cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
@@ -475,14 +492,21 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 # ik controls orientation:
                 firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlMain, 0, self.ikCtrlList[1], self.ikCtrlMain)
                 lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2], self.ikCtrlLast)
-                self.setupAimConst(self.ikCtrlList[0], self.ikCtrlList[1], firstUpLoc, firstFakeLoc, self.ikCtrlZeroList[0], 1)
-                self.setupAimConst(self.ikCtrlList[-1], self.ikCtrlList[-2], lastUpLoc, lastFakeLoc, self.ikCtrlZeroList[-1], -1)
                 midUpLoc, midFakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 13, self.ikCtrlList[2], self.ikCtrlList[2], False)
-                self.setupAimConst(self.ikCtrlList[1], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[1], 1, False)
-                self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], -1, False)
                 lastMidLoc = cmds.duplicate(lastFakeLoc, name=lastFakeLoc.replace("Fake", "Middle"))[0]
                 cmds.setAttr(lastMidLoc+".translateZ", 0)
-                cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, 1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
+                if s == 0:
+                    self.setupAimConst(self.ikCtrlList[0], self.ikCtrlList[1], firstUpLoc, firstFakeLoc, self.ikCtrlZeroList[0], 1)
+                    self.setupAimConst(self.ikCtrlList[-1], self.ikCtrlList[-2], lastUpLoc, lastFakeLoc, self.ikCtrlZeroList[-1], -1)
+                    self.setupAimConst(self.ikCtrlList[1], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[1], 1, False)
+                    self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], -1, False)
+                    cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, 1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
+                else:
+                    self.setupAimConst(self.ikCtrlList[0], self.ikCtrlList[1], firstUpLoc, firstFakeLoc, self.ikCtrlZeroList[0], -1)
+                    self.setupAimConst(self.ikCtrlList[-1], self.ikCtrlList[-2], lastUpLoc, lastFakeLoc, self.ikCtrlZeroList[-1], -1)
+                    self.setupAimConst(self.ikCtrlList[1], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[1], -1, False)
+                    self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], 1, False)
+                    cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, -1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
@@ -600,7 +624,7 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
-                cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                cmds.delete(self.base, side+self.userGuideName+'_'+self.mirrorGrp)
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)

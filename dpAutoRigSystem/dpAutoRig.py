@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.28"
-DPAR_UPDATELOG = "WIP #319 - Chain module."
+DPAR_VERSION = "3.11.31"
+DPAR_UPDATELOG = "#319 - Chain module.\nAdded a new module named Chain\nto have ik/fk joints setup."
 
 
 
