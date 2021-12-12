@@ -438,10 +438,11 @@ class DP_AutoRig_UI:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.langDic[self.langName]['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
         dpARJoints  = cmds.radioButton( label=self.langDic[self.langName]['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
-        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=3, columnWidth=[(1, 40), (2, 50), (3, 60)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10), (3, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
+        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0), (4, 'left', 0)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="_Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="_Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="_Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="_Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
@@ -801,13 +802,16 @@ class DP_AutoRig_UI:
             cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=False)
             cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=False)
             cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=False)
+            cmds.checkBox(self.allUIs["_JadCB"], edit=True, enable=False)
         elif chooseJnt == "dpARJoints":
             cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=True)
             cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=True)
             cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=True)
+            cmds.checkBox(self.allUIs["_JadCB"], edit=True, enable=True)
             displayJnt = cmds.checkBox(self.allUIs["_JntCB"], query=True, value=True)
             displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
             displayJar = cmds.checkBox(self.allUIs["_JarCB"], query=True, value=True)
+            displayJad = cmds.checkBox(self.allUIs["_JadCB"], query=True, value=True)
             for jointNode in allJointList:
                 if cmds.objExists(jointNode+'.'+BASE_NAME+'joint'):
                     if displayJnt:
@@ -818,6 +822,9 @@ class DP_AutoRig_UI:
                             jointList.append(jointNode)
                     if displayJar:
                         if jointNode.endswith("_Jar"):
+                            jointList.append(jointNode)
+                    if displayJad:
+                        if jointNode.endswith("_Jad"):
                             jointList.append(jointNode)
         
         # sort joints by name filter:

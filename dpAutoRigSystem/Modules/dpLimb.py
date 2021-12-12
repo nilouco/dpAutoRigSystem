@@ -81,6 +81,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
     def getAlignWorld(self):
         return cmds.getAttr(self.moduleGrp + ".alignWorld")
         
+    def getHasAdditional(self):
+        if cmds.objExists(self.moduleGrp+".additional"):
+            return cmds.getAttr(self.moduleGrp+".additional")
+        else:
+            return 0
     
     # @utils.profiler
     def createGuide(self, *args):
@@ -99,6 +104,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".alignWorld", 1)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
+        cmds.addAttr(self.moduleGrp, longName="additional", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".additional", 0)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
@@ -190,6 +197,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.reOrientGuide()
         cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
 
+
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
@@ -219,7 +227,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         cmds.optionMenu(self.styleMenu, edit=True, select=int(currentStyle + 1))
 
         # bend layout:
-        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")
+        self.bendMainLayout = cmds.rowColumnLayout("bendMainLayout", numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="selectedColumn")
+        self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent=self.bendMainLayout)
         cmds.text(label=self.langDic[self.langName]['m044_addBend'], visible=True, parent=self.bendLayout)
         self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
         self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
@@ -232,7 +241,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
             if currentNumberBendJoints == item:
                 cmds.optionMenu(self.bendNumJointsMenu, edit=True, select=i + 1)
                 break
-                
+        # additional ribbon joint:
+        self.hasAdditional = self.getHasAdditional()
+        self.additionalCB = cmds.checkBox("additionalCB", label=self.langDic[self.langName]['m178_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
+        
         # align world layout:
         self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
@@ -249,17 +261,23 @@ class Limb(Base.StartClass, Layout.LayoutClass):
     def setBendTrue(self, *args):
         self.hasBend = True
         cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=True)
+        cmds.checkBox(self.additionalCB, edit=True, enable=True)
         cmds.setAttr(self.moduleGrp + ".hasBend", 1)
 
     def setBendFalse(self, *args):
         self.hasBend = False
         cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=False)
+        cmds.checkBox(self.additionalCB, edit=True, enable=False)
         cmds.setAttr(self.moduleGrp + ".hasBend", 0)
 
     def changeNumBend(self, numberBendJoints, *args):
         """ Change the number of joints used in the bend ribbon.
         """
         cmds.setAttr(self.moduleGrp + ".numBendJoints", int(numberBendJoints))
+
+    def changeAdditional(self, *args):
+        self.hasAdditional = cmds.checkBox(self.additionalCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".additional", self.hasAdditional)
 
     def changeStyle(self, style, *args):
         """ Change the style to be applyed custom actions to be more animator friendly.
@@ -1228,9 +1246,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                             if self.limbTypeName == ARM:
-                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint)
+                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional)
                             else:
-                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint)
+                                self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional)
                             cmds.delete(loc)
                             
                             cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
