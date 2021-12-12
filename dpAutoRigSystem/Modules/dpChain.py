@@ -157,19 +157,14 @@ class Chain(Base.StartClass, Layout.LayoutClass):
         cmds.delete(cmds.parentConstraint(toUpParent, upLoc, maintainOffset=False))
         cmds.parent(upLoc, toUpParent, relative=False)
         cmds.setAttr(upLoc+".translateY", 2*self.ctrlRadius)
-        
-        
-        cmds.setAttr(upLoc+".visibility", 1)
+        cmds.setAttr(upLoc+".visibility", 0)    
         if hasFake:
             # fake aim locator:
             fakeLoc = cmds.spaceLocator(name=side+self.userGuideName+"_%02d_Fake_Loc"%ikNumb)[0]
             cmds.delete(cmds.parentConstraint(ikFakeCtrl, fakeLoc, maintainOffset=False))
             cmds.parent(fakeLoc, toFakeParent, relative=False)
-            
-            
-            cmds.setAttr(fakeLoc+".visibility", 1)
+            cmds.setAttr(fakeLoc+".visibility", 0)
         return [upLoc, fakeLoc]
-        
     
 
     def setupAimConst(self, ikCtrl, ikToAimCtrl, upLoc, fakeLoc, ikCtrlZero, zDir=1, autoOrient=True, *args):
@@ -482,40 +477,12 @@ class Chain(Base.StartClass, Layout.LayoutClass):
                 lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2], self.ikCtrlLast)
                 self.setupAimConst(self.ikCtrlList[0], self.ikCtrlList[1], firstUpLoc, firstFakeLoc, self.ikCtrlZeroList[0], 1)
                 self.setupAimConst(self.ikCtrlList[-1], self.ikCtrlList[-2], lastUpLoc, lastFakeLoc, self.ikCtrlZeroList[-1], -1)
-
-
-
-
-                # WIP
                 midUpLoc, midFakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 13, self.ikCtrlList[2], self.ikCtrlList[2], False)
                 self.setupAimConst(self.ikCtrlList[1], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[1], 1, False)
-
-                
-                
-#                upLoc, fakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 3, self.ikCtrlList[2], self.ikCtrlList[2], False)
                 self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], -1, False)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                lastMidLoc = cmds.duplicate(lastFakeLoc, name=lastFakeLoc.replace("Fake", "Middle"))[0]
+                cmds.setAttr(lastMidLoc+".translateZ", 0)
+                cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, 1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
 
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
