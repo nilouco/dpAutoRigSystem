@@ -92,6 +92,6 @@
     "id_085_ChainIk"         : {"type" : "CompressedCircle", "degree" : 3},
     "id_086_ChainIkMain"     : {"type" : "Ball",             "degree" : 3},
     "id_087_ChainIkLast"     : {"type" : "Ball",             "degree" : 3},
-    "id_082_LimbAdditional"  : {"type" : "Cube",             "degree" : 1}
+    "id_088_LimbAdditional"  : {"type" : "Cube",             "degree" : 1}
 	
 }

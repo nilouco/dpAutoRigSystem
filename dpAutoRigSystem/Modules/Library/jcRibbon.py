@@ -623,7 +623,7 @@ class RibbonClass:
                         utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
-                        addCtrl = self.ctrls.cvControl("id_082_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree)
+                        addCtrl = self.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = utils.zeroOut([addCtrl])[0]
                         cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))

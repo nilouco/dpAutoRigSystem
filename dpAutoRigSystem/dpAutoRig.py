@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.31"
-DPAR_UPDATELOG = "#319 - Chain module.\nAdded a new module named Chain\nto have ik/fk joints setup."
+DPAR_VERSION = "3.11.32"
+DPAR_UPDATELOG = "#385 - Resolve additional IDs conflits\nin presets and dictionaries."
 
 
 

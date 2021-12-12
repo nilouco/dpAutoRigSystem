@@ -541,7 +541,7 @@
     "m177_DiamondFlat"         : "Diamond Flat",
     "m178_chain"               : "Chain",
     "m179_chainDesc"           : "Chain Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nDifferent from FkLine, when it's rigged, the controls will be FK (forward kinematics) or\niK (inverse kinematics).\n\nWe can choose if the switch attributes will be in Option_Ctrl\nor at the base control.",
-    "m178_additional"          : "Additional",
+    "m180_additional"          : "Additional",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
