@@ -374,25 +374,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 fkBaseJoint = cmds.rename(dupFk, dupFk.replace("_Jnt2", "_Fk_Jxt"))
                 fkJointList = cmds.listRelatives(fkBaseJoint, children=True, allDescendents=True)
                 fkJointList.append(fkBaseJoint)
-                # ik fk blend connnections
-                for i, ikJoint in enumerate(ikJointList):
-                    if not "_JEnd" in ikJoint:
-                        utils.clearDpArAttr([ikJoint])
-                        fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
-                        skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
-                        self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
-                        self.scaleCompensateCond = ikJoint.replace("_Ik_Jxt", "_ScaleCompensate_Cnd")
-                        ikFkParentConst = cmds.parentConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_PaC")[0]
-                        cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
-                        cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkParentConst+"."+ikJoint+"W0", force=True)
-                        scaleBC = cmds.createNode("blendColors", name=skinJoint+"_BC")
-                        cmds.connectAttr(fkJoint+".scaleZ", scaleBC+".color1B", force=True)
-                        cmds.connectAttr(ikJoint+".scaleZ", scaleBC+".color2B", force=True)
-                        cmds.connectAttr(self.fingerCtrl+".ikFkBlend", scaleBC+".blender", force=True)
-                        cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
-                        cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
-                        if "01" in ikJoint:
-                            cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PoC")
+
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
@@ -443,31 +425,61 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.parentConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_PaC")
                         cmds.scaleConstraint(side+self.userGuideName+"_00_Ctrl", side+self.userGuideName+"_00_Ik_Jxt", maintainOffset=True, name=side+self.userGuideName+"_00_Ik_Jxt_ScC")
 
-                    # stretch
-                    cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                    stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchNormalize_MD")
-                    cmds.setAttr(stretchNormMD+".operation", 2)
-                    distBetweenList = self.ctrls.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
-                    cmds.connectAttr(self.ikFkRevNode+".outputX", distBetweenList[5]+"."+self.ikCtrl+"W0", force=True)
-                    cmds.connectAttr(self.fingerCtrl+".ikFkBlend", distBetweenList[5]+"."+distBetweenList[4]+"W1", force=True)
-                    cmds.connectAttr(distBetweenList[1]+".distance", stretchNormMD+".input1X", force=True)
-                    cmds.setAttr(stretchNormMD+".input2X", distBetweenList[0])
-                    stretchScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchScale_MD")
-                    cmds.connectAttr(stretchNormMD+".outputX", stretchScaleMD+".input1X", force=True)
-                    cmds.connectAttr(self.ikCtrl+".stretchable", 
-                    stretchScaleMD+".input2X", force=True)
-                    stretchCond = cmds.createNode("condition", name=side+self.userGuideName+"_Stretch_Cnd")
-                    cmds.connectAttr(stretchScaleMD+".outputX", stretchCond+".firstTerm", force=True)
-                    cmds.setAttr(stretchCond+".secondTerm", 1)
-                    cmds.setAttr(stretchCond+".operation", 2)
-                    cmds.connectAttr(stretchScaleMD+".outputX", stretchCond+".colorIfTrueR", force=True)
-                    for i, ikJoint in enumerate(ikJointList):
-                        if not "_JEnd" in ikJoint:
-                            if self.nJoints == 2 and i == 0:
-                                pass
-                            else:
-                                cmds.connectAttr(stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
+                # ik stretch
+                cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchNormalize_MD")
+                cmds.setAttr(stretchNormMD+".operation", 2)
+                distBetweenList = self.ctrls.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
+                cmds.connectAttr(self.ikFkRevNode+".outputX", distBetweenList[5]+"."+self.ikCtrl+"W0", force=True)
+                cmds.connectAttr(self.fingerCtrl+".ikFkBlend", distBetweenList[5]+"."+distBetweenList[4]+"W1", force=True)
+                cmds.connectAttr(distBetweenList[1]+".distance", stretchNormMD+".input1X", force=True)
+                # TO DO? stretch compensate to ik Z axis
+                ikStretchZUniformScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_IkStretchZ_MD")
+                cmds.setAttr(ikStretchZUniformScaleMD+".input2X", distBetweenList[0])
+                cmds.connectAttr(self.skinJointList[0]+".scaleZ", ikStretchZUniformScaleMD+".input1X", force=True)
+                cmds.connectAttr(ikStretchZUniformScaleMD+".outputX", stretchNormMD+".input2X", force=True)
+                stretchScaleMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchScale_MD")
+                cmds.connectAttr(stretchNormMD+".outputX", stretchScaleMD+".input1X", force=True)
+                cmds.connectAttr(self.ikCtrl+".stretchable", stretchScaleMD+".input2X", force=True)
+                self.stretchCond = cmds.createNode("condition", name=side+self.userGuideName+"_Stretch_Cnd")
+                cmds.connectAttr(stretchScaleMD+".outputX", self.stretchCond+".firstTerm", force=True)
+                cmds.setAttr(self.stretchCond+".secondTerm", 1)
+                cmds.setAttr(self.stretchCond+".operation", 2)
+                cmds.connectAttr(stretchScaleMD+".outputX", self.stretchCond+".colorIfTrueR", force=True)
 
+                # ik fk blend connnections
+                for i, ikJoint in enumerate(ikJointList):
+                    if not "_JEnd" in ikJoint:
+                        utils.clearDpArAttr([ikJoint])
+                        fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
+                        skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
+                        self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
+                        self.scaleCompensateCond = ikJoint.replace("_Ik_Jxt", "_ScaleCompensate_Cnd")
+                        ikFkParentConst = cmds.parentConstraint(ikJoint, fkJoint, skinJoint, maintainOffset=True, name=skinJoint+"_PaC")[0]
+                        cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
+                        cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkParentConst+"."+ikJoint+"W0", force=True)
+                        scaleBC = cmds.createNode("blendColors", name=skinJoint+"_BC")
+                        cmds.connectAttr(fkJoint+".scaleX", scaleBC+".color1R", force=True)
+                        cmds.connectAttr(fkJoint+".scaleY", scaleBC+".color1G", force=True)
+                        cmds.connectAttr(fkJoint+".scaleZ", scaleBC+".color1B", force=True)
+                        cmds.connectAttr(ikJoint+".scaleX", scaleBC+".color2R", force=True)
+                        cmds.connectAttr(ikJoint+".scaleY", scaleBC+".color2G", force=True)
+                        cmds.connectAttr(ikJoint+".scaleZ", scaleBC+".color2B", force=True)
+                        cmds.connectAttr(self.stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
+                        cmds.connectAttr(self.fingerCtrl+".ikFkBlend", scaleBC+".blender", force=True)
+                        cmds.connectAttr(scaleBC+".output.outputR", skinJoint+".scaleX", force=True)
+                        cmds.connectAttr(scaleBC+".output.outputG", skinJoint+".scaleY", force=True)
+                        cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
+                        cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
+                        if "01" in ikJoint:
+                            cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PoC")
+                        if self.nJoints > 2:
+                            if i > 0:
+                                # fix ik scale
+                                cmds.connectAttr(self.skinJointList[0]+".scaleX", ikJointList[i]+".scaleX", force=True)
+                                cmds.connectAttr(self.skinJointList[0]+".scaleY", ikJointList[i]+".scaleY", force=True)
+
+                if self.nJoints >= 2:
                     # create a masterModuleGrp to be checked if this rig exists:
                     self.toCtrlHookGrp = cmds.group(self.ikCtrlZero, side+self.userGuideName+"_00_SDK_Zero_0_Grp", side+self.userGuideName+"_01_SDK_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
                     if self.nJoints == 2:
@@ -477,6 +489,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 else:
                     self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_00_SDK_Zero_0_Grp", side+self.userGuideName+"_01_SDK_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
                     self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_00_Jnt", name=side+self.userGuideName+"_Joint_Grp")
+
                 self.scalableGrpList.append(self.toScalableHookGrp)
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # add hook attributes to be read when rigging integrated modules:
