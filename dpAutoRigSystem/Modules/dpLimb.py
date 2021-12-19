@@ -1521,11 +1521,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     utils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
                     if not self.getHasBend():
-                        cornerJntList = utils.articulationJoint(self.skinJointList[1], self.skinJointList[2]) #could call to create corrective joints. See parameters to implement it, please.
+                        cornerJntList = utils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
                         utils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
                         cmds.rename(cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
                         if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                            cornerBJntList = utils.articulationJoint(self.skinJointList[2], self.skinJointList[3]) #could call to create corrective joints. See parameters to implement it, please.
+                            cornerBJntList = utils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
                             utils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 

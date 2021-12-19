@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.32"
-DPAR_UPDATELOG = "#385 - Resolve additional IDs conflits\nin presets and dictionaries."
+DPAR_VERSION = "3.11.33"
+DPAR_UPDATELOG = "#348 - Reviewed Jar scale."
 
 
 

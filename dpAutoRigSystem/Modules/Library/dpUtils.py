@@ -715,7 +715,7 @@ def validateName(nodeName, suffix=None, *args):
     return nodeName
 
 
-def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1.5, *args):
+def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1.5, doScale=True, *args):
     """ Create a simple joint to help skinning with a half rotation value.
         Receives the number of corrective joints to be created. Zero by default.
         Returns the created joint list.
@@ -741,6 +741,8 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1
             cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PoC")[0]
             oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrC")[0]
             cmds.setAttr(oc+".interpType", 2) #Shortest
+            if doScale:
+                cmds.scaleConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_ScC")
             return jointList
 
 
