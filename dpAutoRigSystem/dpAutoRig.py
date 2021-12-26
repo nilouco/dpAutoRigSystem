@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.34"
-DPAR_UPDATELOG = "WIP #361 - Float precision."
+DPAR_VERSION = "3.11.35"
+DPAR_UPDATELOG = "#351 - Spine min segments to 3."
 
 
 
