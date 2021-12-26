@@ -465,14 +465,19 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(ikJoint+".scaleX", scaleBC+".color2R", force=True)
                         cmds.connectAttr(ikJoint+".scaleY", scaleBC+".color2G", force=True)
                         cmds.connectAttr(ikJoint+".scaleZ", scaleBC+".color2B", force=True)
-                        cmds.connectAttr(self.stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
+                        if self.nJoints == 2:
+                            if not "00" in ikJoint: # to avoid thumb cycle error about the stretch
+                                cmds.connectAttr(self.stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
+                        else:
+                            cmds.connectAttr(self.stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", scaleBC+".blender", force=True)
                         cmds.connectAttr(scaleBC+".output.outputR", skinJoint+".scaleX", force=True)
                         cmds.connectAttr(scaleBC+".output.outputG", skinJoint+".scaleY", force=True)
                         cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
                         cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
                         if "01" in ikJoint:
-                            cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PoC")
+                            if not self.nJoints == 2: # to avoid thumb cycle error when parenting All_Grp transform node
+                                cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PoC")
                         if self.nJoints > 2:
                             if i > 0:
                                 # fix ik scale

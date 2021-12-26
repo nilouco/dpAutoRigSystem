@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.35"
-DPAR_UPDATELOG = "#351 - Spine min segments to 3."
+DPAR_VERSION = "3.11.36"
+DPAR_UPDATELOG = "#331 - Fixed Finger thumb cycle\nabout stretch and parenting All_Grp."
 
 
 
