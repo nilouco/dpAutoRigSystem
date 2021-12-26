@@ -1307,8 +1307,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     
                     # create auto clavicle attribute:
-#                    cmds.addAttr(self.fkCtrlList[0], longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
-                    cmds.addAttr(self.fkCtrlList[0], longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                    cmds.addAttr(self.fkCtrlList[0], longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
                     
                     # ik auto clavicle locators:
                     acIkUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Up_Loc")[0]
