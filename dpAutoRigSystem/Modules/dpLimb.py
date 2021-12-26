@@ -1012,7 +1012,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 
                 # calculate stretch value:
                 startStretchValue = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2], keep=False)[0] + self.ctrls.distanceBet(self.ikJointList[2], self.ikStretchExtremLoc, keep=False)[0]
-                startStretchValue = startStretchValue * 0.9999
+                newStartStretchValue = startStretchValue * 0.9999
+                if newStartStretchValue >= startStretchValue:
+                    newStartStretchValue = startStretchValue
                 cmds.setAttr(self.ikExtremCtrl + '.startStretch', startStretchValue, lock=True)
                 cmds.connectAttr(self.ikExtremCtrl + '.startStretch', self.lenghtStartStretchMultDiv + '.input2X', force=True)
                 cmds.connectAttr(self.lenghtStartStretchMultDiv + '.outputX', self.stretchMultDiv + '.input2X', force=True)
