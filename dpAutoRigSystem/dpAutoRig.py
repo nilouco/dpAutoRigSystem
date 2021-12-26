@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.37"
-DPAR_UPDATELOG = "#355 - Fixed Head zeroOut rotate."
+DPAR_VERSION = "3.11.38"
+DPAR_UPDATELOG = "#330 - Back Limb autoClavicle follow\nto 0.3 by default."
 
 
 
