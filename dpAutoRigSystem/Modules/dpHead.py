@@ -544,7 +544,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.zeroNeckCtrlList = utils.zeroOut(self.neckCtrlList)
                 self.zeroCtrlList = utils.zeroOut([self.headCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl, self.upperHeadCtrl])
                 self.zeroCtrlList.extend(self.zeroCornerLipCtrlList)
-
+                
                 # make joints be ride by controls:
                 for n in range(0, self.nJoints):
                     cmds.parentConstraint(self.neckCtrlList[n], self.neckJointList[n], maintainOffset=False, name=self.neckJointList[n]+"_PaC")
@@ -583,15 +583,15 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.neckCtrlList[0], self.worldRef, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.zeroCtrlList[0], self.zeroHeadGrp, maintainOffset=False))
                 cmds.parent(self.zeroCtrlList[0], self.headOrientGrp, absolute=True)
-                headOrientConst = cmds.orientConstraint(self.neckCtrlList[-1], self.worldRef, self.headOrientGrp, maintainOffset=True, name=self.headOrientGrp+"_OrC")[0]
-                cmds.setAttr(headOrientConst+".interpType", 2) #shortest
+                headRotateParentConst = cmds.parentConstraint(self.neckCtrlList[-1], self.worldRef, self.headOrientGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=self.headOrientGrp+"_PaC")[0]
+                cmds.setAttr(headRotateParentConst+".interpType", 2) #shortest
 
                 # connect reverseNode:
                 cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], headOrientConst+"."+self.neckCtrlList[-1]+"W0", force=True)
+                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], headRotateParentConst+"."+self.neckCtrlList[-1]+"W0", force=True)
                 self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c032_follow'].capitalize()+"_Rev")
                 cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.headRevNode+".inputX", force=True)
-                cmds.connectAttr(self.headRevNode+'.outputX', headOrientConst+"."+self.worldRef+"W1", force=True)
+                cmds.connectAttr(self.headRevNode+'.outputX', headRotateParentConst+"."+self.worldRef+"W1", force=True)
                 
                 # setup neck autoRotate:
                 for n in range(0, self.nJoints):
@@ -720,7 +720,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 self.ctrls.setCalibrationAttr(self.jawCtrl, jawCalibrationList)
                 self.ctrls.setCalibrationAttr(self.upperLipCtrl, lipCalibrationList)
                 self.ctrls.setCalibrationAttr(self.lowerLipCtrl, lipCalibrationList)
-
+                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.zeroNeckCtrlList[0], self.zeroCtrlList[2], self.zeroCtrlList[8], self.zeroCtrlList[9], name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.neckJointList[0], name=side+self.userGuideName+"_Joint_Grp")
