@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.33"
-DPAR_UPDATELOG = "#348 - Reviewed Jar scale."
+DPAR_VERSION = "3.11.34"
+DPAR_UPDATELOG = "WIP #361 - Float precision."
 
 
 
