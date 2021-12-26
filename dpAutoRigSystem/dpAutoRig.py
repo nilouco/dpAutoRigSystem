@@ -21,7 +21,7 @@
 
 # current version:
 DPAR_VERSION = "3.11.35"
-DPAR_UPDATELOG = "#351 - Spine min segments to 3."
+DPAR_UPDATELOG = "WIP #331 - Fix Finger thumb cycle."
 
 
 
