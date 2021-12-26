@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.33"
-DPAR_UPDATELOG = "#348 - Reviewed Jar scale."
+DPAR_VERSION = "3.11.35"
+DPAR_UPDATELOG = "#351 - Spine min segments to 3."
 
 
 

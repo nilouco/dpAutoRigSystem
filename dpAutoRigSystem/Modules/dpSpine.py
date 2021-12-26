@@ -42,15 +42,6 @@ class Spine(Base.StartClass, Layout.LayoutClass):
     def createModuleLayout(self, *args):
         Base.StartClass.createModuleLayout(self)
         Layout.LayoutClass.basicModuleLayout(self)
-        # Custom MODULE LAYOUT:
-        # verify if we are creating or re-loading this module instance:
-        firstTime = cmds.getAttr(self.moduleGrp+'.nJoints')
-        if firstTime == 1:
-            try:
-                cmds.intField(self.nJointsIF, edit=True, value=3, minValue=3)
-            except:
-                pass
-            self.changeJointNumber(3)
     
     
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
@@ -83,9 +74,8 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         Base.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
+        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', defaultValue=1)
         cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.langDic[self.langName]['m042_default']+':'+self.langDic[self.langName]['m026_biped'])
-        cmds.setAttr(self.moduleGrp+".nJoints", 1)
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5, d=1, guide=True)
         self.cvEndJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
@@ -97,6 +87,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".rx", -90)
         cmds.setAttr(self.moduleGrp+".ry", -90)
         cmds.setAttr(self.moduleGrp+"_RadiusCtrl.tx", 4)
+        self.changeJointNumber(3)
 
 
     def changeJointNumber(self, enteredNJoints, *args):
@@ -111,59 +102,62 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 return
         else:
             self.enteredNJoints = enteredNJoints
-        # get the number of joints existing:
-        self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
-        # start analisys the difference between values:
-        if self.enteredNJoints != self.currentNJoints:
-            self.cvEndJoint = self.guideName+"_JointEnd"
-            if self.currentNJoints > 1:
-                # delete current point constraints:
-                for n in range(2, self.currentNJoints):
-                    cmds.delete(self.guideName+"_PaC"+str(n))
-            # verify if the nJoints is greather or less than the current
-            if self.enteredNJoints > self.currentNJoints:
-                # add the new cvLocators:
-                for n in range(self.currentNJoints+1, self.enteredNJoints+1):
-                    # create another N cvLocator:
-                    self.cvLocator = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
-                    # set its nJoint value as n:
-                    cmds.setAttr(self.cvLocator+".nJoint", n)
-                    # parent its group to the first cvJointLocator:
-                    self.cvLocGrp = cmds.group(self.cvLocator, name=self.cvLocator+"_Grp")
-                    cmds.parent(self.cvLocGrp, self.guideName+"_JointLoc"+str(n-1), relative=True)
-                    cmds.setAttr(self.cvLocGrp+".translateZ", 2)
-                    if n > 2:
-                        cmds.parent(self.cvLocGrp, self.guideName+"_JointLoc1", absolute=True)
-            elif self.enteredNJoints<self.currentNJoints:
+        if self.enteredNJoints >= 3:
+            # get the number of joints existing:
+            self.currentNJoints = cmds.getAttr(self.moduleGrp+".nJoints")
+            # start analisys the difference between values:
+            if self.enteredNJoints != self.currentNJoints:
+                self.cvEndJoint = self.guideName+"_JointEnd"
+                if self.currentNJoints > 1:
+                    # delete current point constraints:
+                    for n in range(2, self.currentNJoints):
+                        cmds.delete(self.guideName+"_PaC"+str(n))
+                # verify if the nJoints is greather or less than the current
+                if self.enteredNJoints > self.currentNJoints:
+                    # add the new cvLocators:
+                    for n in range(self.currentNJoints+1, self.enteredNJoints+1):
+                        # create another N cvLocator:
+                        self.cvLocator = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc"+str(n), r=0.3, d=1, guide=True)
+                        # set its nJoint value as n:
+                        cmds.setAttr(self.cvLocator+".nJoint", n)
+                        # parent its group to the first cvJointLocator:
+                        self.cvLocGrp = cmds.group(self.cvLocator, name=self.cvLocator+"_Grp")
+                        cmds.parent(self.cvLocGrp, self.guideName+"_JointLoc"+str(n-1), relative=True)
+                        cmds.setAttr(self.cvLocGrp+".translateZ", 2)
+                        if n > 2:
+                            cmds.parent(self.cvLocGrp, self.guideName+"_JointLoc1", absolute=True)
+                elif self.enteredNJoints < self.currentNJoints:
+                    # re-parent cvEndJoint:
+                    self.cvLocator = self.guideName+"_JointLoc" + str(self.enteredNJoints)
+                    cmds.parent(self.cvEndJoint, world=True)
+                    # delete difference of nJoints:
+                    for n in range(self.enteredNJoints, self.currentNJoints):
+                        # re-parent the children guides:
+                        childrenGuideBellowList = utils.getGuideChildrenList(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
+                        if childrenGuideBellowList:
+                            for childGuide in childrenGuideBellowList:
+                                cmds.parent(childGuide, self.cvLocator)
+                        cmds.delete(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
                 # re-parent cvEndJoint:
-                self.cvLocator = self.guideName+"_JointLoc" + str(self.enteredNJoints)
-                cmds.parent(self.cvEndJoint, world=True)
-                # delete difference of nJoints:
-                for n in range(self.enteredNJoints, self.currentNJoints):
-                    # re-parent the children guides:
-                    childrenGuideBellowList = utils.getGuideChildrenList(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
-                    if childrenGuideBellowList:
-                        for childGuide in childrenGuideBellowList:
-                            cmds.parent(childGuide, self.cvLocator)
-                    cmds.delete(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
-            # re-parent cvEndJoint:
-            cmds.parent(self.cvEndJoint, self.cvLocator)
-            cmds.setAttr(self.cvEndJoint+".tz", 1.3)
-            cmds.setAttr(self.cvEndJoint+".visibility", 0)
-            # re-create parentConstraints:
-            if self.enteredNJoints > 1:
-                for n in range(2, self.enteredNJoints):
-                    self.parentConst = cmds.parentConstraint(self.guideName+"_JointLoc1", self.cvEndJoint, self.guideName+"_JointLoc"+str(n)+"_Grp", name=self.guideName+"_PaC"+str(n), maintainOffset=True)[0]
-                    nParentValue = (n-1) / float(self.enteredNJoints-1)
-                    cmds.setAttr(self.parentConst+".Guide_JointLoc1W0", 1-nParentValue)
-                    cmds.setAttr(self.parentConst+".Guide_JointEndW1", nParentValue)
-                    self.ctrls.setLockHide([self.guideName+"_JointLoc"+ str(n)], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-            # actualise the nJoints in the moduleGrp:
-            cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
-            self.currentNJoints = self.enteredNJoints
-            # re-build the preview mirror:
-            Layout.LayoutClass.createPreviewMirror(self)
-        cmds.select(self.moduleGrp)
+                cmds.parent(self.cvEndJoint, self.cvLocator)
+                cmds.setAttr(self.cvEndJoint+".tz", 1.3)
+                cmds.setAttr(self.cvEndJoint+".visibility", 0)
+                # re-create parentConstraints:
+                if self.enteredNJoints > 1:
+                    for n in range(2, self.enteredNJoints):
+                        self.parentConst = cmds.parentConstraint(self.guideName+"_JointLoc1", self.cvEndJoint, self.guideName+"_JointLoc"+str(n)+"_Grp", name=self.guideName+"_PaC"+str(n), maintainOffset=True)[0]
+                        nParentValue = (n-1) / float(self.enteredNJoints-1)
+                        cmds.setAttr(self.parentConst+".Guide_JointLoc1W0", 1-nParentValue)
+                        cmds.setAttr(self.parentConst+".Guide_JointEndW1", nParentValue)
+                        self.ctrls.setLockHide([self.guideName+"_JointLoc"+ str(n)], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                # actualise the nJoints in the moduleGrp:
+                cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
+                self.currentNJoints = self.enteredNJoints
+                # re-build the preview mirror:
+                Layout.LayoutClass.createPreviewMirror(self)
+            cmds.select(self.moduleGrp)
+        else:
+            self.changeJointNumber(3)
 
 
     def rigModule(self, *args):
