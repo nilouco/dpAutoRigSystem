@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.36"
-DPAR_UPDATELOG = "#331 - Fixed Finger thumb cycle\nabout stretch and parenting All_Grp."
+DPAR_VERSION = "3.11.37"
+DPAR_UPDATELOG = "#355 - Fixed Head zeroOut rotate."
 
 
 
