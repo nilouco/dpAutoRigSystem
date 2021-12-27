@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.11.38"
-DPAR_UPDATELOG = "#330 - Back Limb autoClavicle follow\nto 0.3 by default."
+DPAR_VERSION = "3.12.00"
+DPAR_UPDATELOG = "Release v3.12.00\n\nWe'll change all the code to start\nthe transition from Python 2 to Python 3."
 
 
 
