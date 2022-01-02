@@ -20,14 +20,14 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.00"
-DPAR_UPDATELOG = "Release v3.12.00\n\nWe'll change all the code to start\nthe transition from Python 2 to Python 3."
+DPAR_VERSION = "3.12.01"
+DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfirst pass:\n\n\worked in dpAutoRig.py file\nprint\nbackticks\noperators <>\nfrom maya import cmds/mel\nclass (object)."
 
 
 
 ###################### Start: Loading.
 
-import maya.cmds as cmds
+from maya import cmds
 import sys
 import os
 import random
@@ -40,7 +40,7 @@ def dpARLoadingWindow():
     """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
     """
     loadingString = "Loading dpAutoRigSystem v%s ... " %DPAR_VERSION
-    print loadingString,
+    print (loadingString,)
     path = os.path.dirname(__file__)
     randImage = random.randint(0,7)
     clearDPARLoadingWindow()
@@ -60,7 +60,7 @@ if not "pymel" in sys.modules:
 
 # importing libraries:
 try:
-    import maya.mel as mel
+    from maya import mel
     import pymel.core as pymel
     import json
     import re
@@ -86,8 +86,8 @@ try:
     reload(Base)
     reload(Layout)
 except Exception as e:
-    print "Error: importing python modules!!!\n",
-    print e
+    print ("Error: importing python modules!!!\n",)
+    print (e)
     try:
         clearDPARLoadingWindow()
         self.jobWinClose()
@@ -134,8 +134,8 @@ SSL_MACOS = "https://medium.com/@katopz/how-to-upgrade-openssl-8d005554401"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 
 
-class DP_AutoRig_UI:
-    
+class DP_AutoRig_UI(object):
+
     ###################### Start: UI
     
     def __init__(self):
@@ -177,11 +177,11 @@ class DP_AutoRig_UI:
                 lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last language from optionVar value:
                 cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
-                print "Error: Cannot load json language files!\n",
+                print ("Error: Cannot load json language files!\n",)
                 return
             
             # preset menu:
@@ -195,11 +195,11 @@ class DP_AutoRig_UI:
                 lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
                 # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
                 for preset in self.presetList:
-                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last preset from optionVar value:
                 cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
             else:
-                print "Error: Cannot load json preset files!\n",
+                print ("Error: Cannot load json preset files!\n",)
                 return
             
             # create menu:
@@ -231,9 +231,9 @@ class DP_AutoRig_UI:
             self.autoCheckUpdate()
         
         except Exception as e:
-            print "Error: dpAutoRig UI window !!!\n"
-            print "Exception:", e
-            print self.langDic[self.langName]['i008_errorUI'],
+            print ("Error: dpAutoRig UI window !!!\n")
+            print ("Exception:", e)
+            print (self.langDic[self.langName]['i008_errorUI'],)
             clearDPARLoadingWindow()
             return
         
@@ -283,7 +283,7 @@ class DP_AutoRig_UI:
                     resultDic[typeName] = content
                     resultList.append(typeName)
                 except:
-                    print "Error: json file corrupted:", file,
+                    print ("Error: json file corrupted:", file,)
                 # close the json file:
                 fileDictionary.close()
         return resultList, resultDic
@@ -576,7 +576,7 @@ class DP_AutoRig_UI:
     def jobReloadUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
-        import maya.cmds as cmds
+        from maya import cmds
         cmds.select(clear=True)
         cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
     
@@ -693,7 +693,7 @@ class DP_AutoRig_UI:
             Returns a guideBase for a new module instance.
         """
         # Duplicating a module guide
-        print self.langDic[self.langName]['i067_duplicating']
+        print (self.langDic[self.langName]['i067_duplicating'])
 
         # declaring variables
         transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
@@ -741,7 +741,7 @@ class DP_AutoRig_UI:
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue > 1:
+            if nJointsValue != 1: #Py2: >
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -958,7 +958,7 @@ class DP_AutoRig_UI:
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        print "\n", self.langDic[self.langName]['i084_checkUpdate']
+        print ("\n", self.langDic[self.langName]['i084_checkUpdate'])
         
         # compare current version with GitHub master
         rawResult = utils.checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL)
@@ -1001,7 +1001,7 @@ class DP_AutoRig_UI:
         # find path where 'dpAutoRig.py' is been executed:
         path = utils.findPath("dpAutoRig.py")
         if not self.loadedPath:
-            print "dpAutoRigPath: "+path
+            print ("dpAutoRigPath: "+path)
             self.loadedPath = True
         # list all guide modules:
         guideModuleList = utils.findAllModules(path, guideDir)
@@ -1022,19 +1022,19 @@ class DP_AutoRig_UI:
                 return notFoundModuleList
             # avoid print again the same message:
             if guideDir == MODULES and not self.loadedModules:
-                print guideDir+" : "+str(guideModuleList)
+                print (guideDir+" : "+str(guideModuleList))
                 self.loadedModules = True
             if guideDir == SCRIPTS and not self.loadedScripts:
-                print guideDir+" : "+str(guideModuleList)
+                print (guideDir+" : "+str(guideModuleList))
                 self.loadedScripts = True
             if guideDir == CONTROLS and not self.loadedControls:
-                print guideDir+" : "+str(guideModuleList)
+                print (guideDir+" : "+str(guideModuleList))
                 self.loadedControls = True
             if guideDir == COMBINED and not self.loadedCombined:
-                print guideDir+" : "+str(guideModuleList)
+                print (guideDir+" : "+str(guideModuleList))
                 self.loadedCombined = True
             if guideDir == EXTRAS and not self.loadedExtras:
-                print guideDir+" : "+str(guideModuleList)
+                print (guideDir+" : "+str(guideModuleList))
                 self.loadedExtras = True
         return guideModuleList
     
@@ -1053,7 +1053,7 @@ class DP_AutoRig_UI:
             guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
             reload(guide)
         except Exception as e:
-            print e
+            print (e)
             errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+e
             mel.eval('warning \"'+errorString+'\";')
             return
@@ -1280,7 +1280,7 @@ class DP_AutoRig_UI:
         # get the number of riggedModules:
         nRiggedModule = len(self.riggedModuleDic)
         # pass for rigged module to add informations in logText:
-        if nRiggedModule > 0:
+        if nRiggedModule != 0:
             if nRiggedModule == 1:
                 logText += str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ':\n\n'
                 print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ', thanks!\n'),
@@ -1368,7 +1368,7 @@ class DP_AutoRig_UI:
         cmds.separator(height=30)
         # call Update Window:
         cmds.showWindow(dpUpdateWin)
-        print self.langDic[self.langName][self.update_text]
+        print (self.langDic[self.langName][self.update_text])
     
     
     def downloadUpdate(self, url, ext, *args):
@@ -1413,11 +1413,12 @@ class DP_AutoRig_UI:
     def installUpdate(self, url, newVersion, *args):
         """ Install the last version from the given url address to download file
         """
+        repr = None
         btContinue = self.langDic[self.langName]['i174_continue']
         btCancel = self.langDic[self.langName]['i132_cancel']
         confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
         if confirmAutoInstall == btContinue:
-            print self.langDic[self.langName]['i098_installing']
+            print (self.langDic[self.langName]['i098_installing'])
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
             dpAR_DestFolder = utils.findPath("dpAutoRig.py")
@@ -1432,13 +1433,13 @@ class DP_AutoRig_UI:
                 remoteSource = urllib.urlopen(url)
                 
                 installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # read the downloaded Zip file stored in the RAM memory:
                 dpAR_Zip = zipfile.ZipFile(StringIO.StringIO(remoteSource.read()))
                 
                 installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # list Zip file contents in order to extract them in a temporarily folder:
                 zipNameList = dpAR_Zip.namelist()
@@ -1448,7 +1449,7 @@ class DP_AutoRig_UI:
                 dpAR_Zip.close()
                 
                 installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # declare temporarily folder:
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
@@ -1470,7 +1471,7 @@ class DP_AutoRig_UI:
                     destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
                     
                     installAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                    cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                     
                     # make sure we have all folders needed, otherwise, create them in the destination directory:
                     if not os.path.exists(destDir):
@@ -1491,7 +1492,7 @@ class DP_AutoRig_UI:
                         shutil.copy2(sourceFile, destDir)
                         
                         installAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                        cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # delete the temporarily folder used to download and install the update:
                 folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
@@ -1509,7 +1510,7 @@ class DP_AutoRig_UI:
                 self.info('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
         else:
-            print self.langDic[self.langName]['i038_canceled']
+            print (self.langDic[self.langName]['i038_canceled'])
     
     
     def setAutoCheckUpdatePref(self, currentValue, *args):
@@ -1798,7 +1799,7 @@ class DP_AutoRig_UI:
                 for i, desAttr in enumerate(attrList):
                     # update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + `progressAmount` + ' '+ obj + ' attributes'))
+                    cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + repr(progressAmount) + ' '+ obj + ' attributes'))
                     # get current user defined attributes:
                     currentAttrList = cmds.listAttr(obj, userDefined=True)
                     if desAttr in currentAttrList:
@@ -1900,7 +1901,7 @@ class DP_AutoRig_UI:
                 
                 # Update progress window
                 rigProgressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + `rigProgressAmount` + ' '+str(guideModuleCustomName)))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+str(guideModuleCustomName)))
                 
                 # Rig it :)
                 guideModule.rigModule()
@@ -1913,7 +1914,7 @@ class DP_AutoRig_UI:
             if integrate == 1:
                 # Update progress window
                 rigProgressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + `rigProgressAmount` + ' '+self.langDic[self.langName]['i010_integrateCB']))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+self.langDic[self.langName]['i010_integrateCB']))
                 
                 # get all parent info from rigged modules:
                 self.originedFromDic = utils.getOriginedFromDic()
@@ -1989,20 +1990,21 @@ class DP_AutoRig_UI:
                                 
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
-                                if len(self.fatherMirrorNameList) > 1: # tell us 'the father has mirror'
-                                    if s == f:
-                                        # parent them to the correct side of the father's mirror:
+                                if self.fatherRiggedParentNode:
+                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'  #Py2: >
+                                        if s == f:
+                                            # parent them to the correct side of the father's mirror:
+                                            if self.ctrlHookGrp:
+                                                cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
+                                                # make ctrlHookGrp inactive:
+                                                cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
+
+                                    else:
+                                        # parent them to the unique father:
                                         if self.ctrlHookGrp:
                                             cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
                                             # make ctrlHookGrp inactive:
                                             cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-
-                                else:
-                                    # parent them to the unique father:
-                                    if self.ctrlHookGrp:
-                                        cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                        # make ctrlHookGrp inactive:
-                                        cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
                         
                         elif self.parentNode:
                             # parent module control to just a node in the scene:
@@ -2516,7 +2518,7 @@ class DP_AutoRig_UI:
                                                         fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     fatherBRiggedNode = self.originedFromDic[fatherB]
                                                     if cmds.objExists(fatherBRiggedNode):
-                                                        if len(self.fatherBMirrorNameList) > 1: #means fatherB has mirror
+                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror  #Py2: >
                                                             if s == fB:
                                                                 cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
                                                                 cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
@@ -2578,7 +2580,7 @@ class DP_AutoRig_UI:
                             dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
                             if ( dpARType == guideType ):
                                 typeCounter = typeCounter + 1
-                    if ( typeCounter > cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
+                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):  #Py2: >
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             # Close progress window
@@ -2693,8 +2695,8 @@ class DP_AutoRig_UI:
             # show dialogBox if detected a bug:
             if integrate == 1:
                 if self.detectedBug:
-                    print "\n\n"
-                    print self.bugMessage
+                    print ("\n\n")
+                    print (self.bugMessage)
                     cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
         # re-declaring guideMirror and previewMirror groups:
@@ -2772,8 +2774,8 @@ class DP_AutoRig_UI:
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
-                print self.langDic[self.langName]['i077_skinned'] + ', '.join(geomSkinList),
+                print (self.langDic[self.langName]['i077_skinned'] + ', '.join(geomSkinList),)
         else:
-            print self.langDic[self.langName]['i029_skinNothing'],
+            print (self.langDic[self.langName]['i029_skinNothing'],)
 
     ###################### End: Skinning.
