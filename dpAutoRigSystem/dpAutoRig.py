@@ -741,7 +741,7 @@ class DP_AutoRig_UI:
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue != 1:
+            if nJointsValue != 1: #Py2: >
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -1991,7 +1991,7 @@ class DP_AutoRig_UI:
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
                                 if self.fatherRiggedParentNode:
-                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'
+                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'  #Py2: >
                                         if s == f:
                                             # parent them to the correct side of the father's mirror:
                                             if self.ctrlHookGrp:
@@ -2518,7 +2518,7 @@ class DP_AutoRig_UI:
                                                         fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     fatherBRiggedNode = self.originedFromDic[fatherB]
                                                     if cmds.objExists(fatherBRiggedNode):
-                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
+                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror  #Py2: >
                                                             if s == fB:
                                                                 cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
                                                                 cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
@@ -2580,7 +2580,7 @@ class DP_AutoRig_UI:
                             dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
                             if ( dpARType == guideType ):
                                 typeCounter = typeCounter + 1
-                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
+                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):  #Py2: >
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             # Close progress window
