@@ -134,7 +134,7 @@ SSL_MACOS = "https://medium.com/@katopz/how-to-upgrade-openssl-8d005554401"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 
 
-class DP_AutoRig_UI:
+class DP_AutoRig_UI(object):
 
     ###################### Start: UI
     
