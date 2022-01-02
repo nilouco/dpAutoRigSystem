@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.00"
-DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfirst pass"
+DPAR_VERSION = "3.12.01"
+DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfirst pass:\n\n\worked in dpAutoRig.py file\nprint\nbackticks\noperators <>\nfrom maya import cmds/mel\nclass (object)."
 
 
 
