@@ -741,7 +741,7 @@ class DP_AutoRig_UI:
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue > 1:
+            if nJointsValue != 1:
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -1280,7 +1280,7 @@ class DP_AutoRig_UI:
         # get the number of riggedModules:
         nRiggedModule = len(self.riggedModuleDic)
         # pass for rigged module to add informations in logText:
-        if nRiggedModule > 0:
+        if nRiggedModule != 0:
             if nRiggedModule == 1:
                 logText += str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ':\n\n'
                 print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ', thanks!\n'),
@@ -1990,20 +1990,21 @@ class DP_AutoRig_UI:
                                 
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
-                                if len(self.fatherMirrorNameList) > 1: # tell us 'the father has mirror'
-                                    if s == f:
-                                        # parent them to the correct side of the father's mirror:
+                                if self.fatherRiggedParentNode:
+                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'
+                                        if s == f:
+                                            # parent them to the correct side of the father's mirror:
+                                            if self.ctrlHookGrp:
+                                                cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
+                                                # make ctrlHookGrp inactive:
+                                                cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
+
+                                    else:
+                                        # parent them to the unique father:
                                         if self.ctrlHookGrp:
                                             cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
                                             # make ctrlHookGrp inactive:
                                             cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
-
-                                else:
-                                    # parent them to the unique father:
-                                    if self.ctrlHookGrp:
-                                        cmds.parent(self.ctrlHookGrp, self.fatherRiggedParentNode)
-                                        # make ctrlHookGrp inactive:
-                                        cmds.setAttr(self.ctrlHookGrp+".ctrlHook", 0)
                         
                         elif self.parentNode:
                             # parent module control to just a node in the scene:
@@ -2517,7 +2518,7 @@ class DP_AutoRig_UI:
                                                         fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     fatherBRiggedNode = self.originedFromDic[fatherB]
                                                     if cmds.objExists(fatherBRiggedNode):
-                                                        if len(self.fatherBMirrorNameList) > 1: #means fatherB has mirror
+                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
                                                             if s == fB:
                                                                 cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
                                                                 cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
@@ -2579,7 +2580,7 @@ class DP_AutoRig_UI:
                             dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
                             if ( dpARType == guideType ):
                                 typeCounter = typeCounter + 1
-                    if ( typeCounter > cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
+                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             # Close progress window
