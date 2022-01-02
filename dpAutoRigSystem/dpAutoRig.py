@@ -27,7 +27,7 @@ DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfirst pass"
 
 ###################### Start: Loading.
 
-import maya.cmds as cmds
+from maya import cmds
 import sys
 import os
 import random
@@ -60,7 +60,7 @@ if not "pymel" in sys.modules:
 
 # importing libraries:
 try:
-    import maya.mel as mel
+    from maya import mel
     import pymel.core as pymel
     import json
     import re
@@ -177,7 +177,7 @@ class DP_AutoRig_UI:
                 lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
                 # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
                 for idiom in self.langList:
-                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last language from optionVar value:
                 cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
@@ -195,7 +195,7 @@ class DP_AutoRig_UI:
                 lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
                 # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
                 for preset in self.presetList:
-                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='import maya.cmds as cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
                 # load the last preset from optionVar value:
                 cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
             else:
@@ -576,7 +576,7 @@ class DP_AutoRig_UI:
     def jobReloadUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
-        import maya.cmds as cmds
+        from maya import cmds
         cmds.select(clear=True)
         cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
     
