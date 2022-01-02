@@ -135,7 +135,7 @@ DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%
 
 
 class DP_AutoRig_UI:
-    
+
     ###################### Start: UI
     
     def __init__(self):
@@ -1413,6 +1413,7 @@ class DP_AutoRig_UI:
     def installUpdate(self, url, newVersion, *args):
         """ Install the last version from the given url address to download file
         """
+        repr = None
         btContinue = self.langDic[self.langName]['i174_continue']
         btCancel = self.langDic[self.langName]['i132_cancel']
         confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
@@ -1432,13 +1433,13 @@ class DP_AutoRig_UI:
                 remoteSource = urllib.urlopen(url)
                 
                 installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # read the downloaded Zip file stored in the RAM memory:
                 dpAR_Zip = zipfile.ZipFile(StringIO.StringIO(remoteSource.read()))
                 
                 installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # list Zip file contents in order to extract them in a temporarily folder:
                 zipNameList = dpAR_Zip.namelist()
@@ -1448,7 +1449,7 @@ class DP_AutoRig_UI:
                 dpAR_Zip.close()
                 
                 installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # declare temporarily folder:
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
@@ -1470,7 +1471,7 @@ class DP_AutoRig_UI:
                     destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
                     
                     installAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                    cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                     
                     # make sure we have all folders needed, otherwise, create them in the destination directory:
                     if not os.path.exists(destDir):
@@ -1491,7 +1492,7 @@ class DP_AutoRig_UI:
                         shutil.copy2(sourceFile, destDir)
                         
                         installAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + `installAmount`))
+                        cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # delete the temporarily folder used to download and install the update:
                 folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
@@ -1798,7 +1799,7 @@ class DP_AutoRig_UI:
                 for i, desAttr in enumerate(attrList):
                     # update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + `progressAmount` + ' '+ obj + ' attributes'))
+                    cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + repr(progressAmount) + ' '+ obj + ' attributes'))
                     # get current user defined attributes:
                     currentAttrList = cmds.listAttr(obj, userDefined=True)
                     if desAttr in currentAttrList:
@@ -1900,7 +1901,7 @@ class DP_AutoRig_UI:
                 
                 # Update progress window
                 rigProgressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + `rigProgressAmount` + ' '+str(guideModuleCustomName)))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+str(guideModuleCustomName)))
                 
                 # Rig it :)
                 guideModule.rigModule()
@@ -1913,7 +1914,7 @@ class DP_AutoRig_UI:
             if integrate == 1:
                 # Update progress window
                 rigProgressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + `rigProgressAmount` + ' '+self.langDic[self.langName]['i010_integrateCB']))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+self.langDic[self.langName]['i010_integrateCB']))
                 
                 # get all parent info from rigged modules:
                 self.originedFromDic = utils.getOriginedFromDic()
