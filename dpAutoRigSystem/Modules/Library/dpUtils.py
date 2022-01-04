@@ -658,7 +658,7 @@ def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", 
                 except:
                     pass
     if not loadedPlugin:
-        print message, pluginName
+        print(message, pluginName)
     return loadedPlugin
     
     

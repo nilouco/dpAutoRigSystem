@@ -12,8 +12,8 @@ try:
     from functools import partial
     import maya.cmds as cmds
 except Exception as e:
-    print "Error: importing python modules!!!\n",
-    print e
+    print("Error: importing python modules!!!\n")
+    print(e)
 
 
 # global variables to this module:
@@ -225,7 +225,7 @@ class PoseReaderDialog(QtWidgets.QMainWindow):
                 try: # Maya 2013 or earlier
                     cmds.loadPlugin("matrixNodes.mll")
                 except:
-                    print self.langDic[self.langName]['e002_decomposeMatrixNotFound']
+                    print(self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
                     
         aSel = pymel.selected()
         if (len(aSel) == 2):

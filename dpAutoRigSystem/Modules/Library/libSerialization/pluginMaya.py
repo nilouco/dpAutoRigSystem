@@ -173,7 +173,7 @@ def _setAttr(_plug, _val):
             raise Exception("Unknow TYPE_DAGNODE {0}".format(_val))
 
     else:
-        print _val, sType
+        print(_val, sType)
         raise NotImplementedError
 
 def _getNetworkAttr(_att):

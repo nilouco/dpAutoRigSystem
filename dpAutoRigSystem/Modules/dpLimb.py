@@ -22,7 +22,7 @@ except:
         reload(libSerialization)
         loadedIkFkSnap = True
     except:
-        print "Not loaded sqIkFkTools"
+        print("Not loaded sqIkFkTools")
         pass
 
 # global variables to this module:
@@ -1220,8 +1220,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
                             self.loadedRibbon = True
                         except Exception as e:
-                            print e
-                            print self.langDic[self.langName]['e012_cantLoadRibbon']
+                            print(e)
+                            print(self.langDic[self.langName]['e012_cantLoadRibbon'])
                         
                         if self.loadedRibbon:
                             num = self.getBendJoints()

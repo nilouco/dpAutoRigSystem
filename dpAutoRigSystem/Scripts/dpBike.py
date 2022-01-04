@@ -373,7 +373,7 @@ def Bike(dpUIinst):
             
             # select spineGuide_Base:
             cmds.select(chassisInstance.moduleGrp)
-            print dpUIinst.langDic[dpUIinst.langName]['m168_createdBike']+"\n",
+            print(dpUIinst.langDic[dpUIinst.langName]['m168_createdBike'])
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

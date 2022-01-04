@@ -80,7 +80,7 @@ class SelectAllControls():
                             else:
                                 ctrlsToSelectList.append(ctrlName)
                     cmds.select(ctrlsToSelectList)
-                    print self.langDic[self.langName]["m169_selectedCtrls"]+str(ctrlsToSelectList)
+                    print(self.langDic[self.langName]["m169_selectedCtrls"]+str(ctrlsToSelectList))
             else:
                 mel.eval("warning \""+self.langDic[self.langName]["e019_notFoundAllGrp"]+"\";")
     

@@ -45,13 +45,13 @@ class CopySkin():
                     elif checkSkin == -1:
                         mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+sourceItem+"\";")
                     else:
-                        print self.langDic[self.langName]['e007_notSkinFound']
+                        print(self.langDic[self.langName]['e007_notSkinFound'])
                 else:
-                    print self.langDic[self.langName]['e006_firstSkinnedGeo']
+                    print(self.langDic[self.langName]['e006_firstSkinnedGeo'])
             else:
                 mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+sourceItem+"\";")
         else:
-            print self.langDic[self.langName]['e005_selectOneObj']
+            print(self.langDic[self.langName]['e005_selectOneObj'])
 
 
     def dpCheckSkinCluster(self, shapeList, *args):
@@ -88,4 +88,4 @@ class CopySkin():
             # copy skin weights from sourceItem to item node
             cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
             # log result
-            print self.langDic[self.langName]['i083_copiedSkin'], sourceItem, item
+            print(self.langDic[self.langName]['i083_copiedSkin'], sourceItem, item)

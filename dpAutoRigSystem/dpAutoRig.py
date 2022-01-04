@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.01"
-DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfirst pass:\n\n\worked in dpAutoRig.py file\nprint\nbackticks\noperators <>\nfrom maya import cmds/mel\nclass (object)."
+DPAR_VERSION = "3.12.02"
+DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nsecond pass:\n\n\worked files\nprint."
 
 
 
@@ -40,7 +40,7 @@ def dpARLoadingWindow():
     """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
     """
     loadingString = "Loading dpAutoRigSystem v%s ... " %DPAR_VERSION
-    print (loadingString,)
+    print(loadingString)
     path = os.path.dirname(__file__)
     randImage = random.randint(0,7)
     clearDPARLoadingWindow()
@@ -86,8 +86,8 @@ try:
     reload(Base)
     reload(Layout)
 except Exception as e:
-    print ("Error: importing python modules!!!\n",)
-    print (e)
+    print("Error: importing python modules!!!\n")
+    print(e)
     try:
         clearDPARLoadingWindow()
         self.jobWinClose()
@@ -181,7 +181,7 @@ class DP_AutoRig_UI(object):
                 # load the last language from optionVar value:
                 cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
             else:
-                print ("Error: Cannot load json language files!\n",)
+                print("Error: Cannot load json language files!\n")
                 return
             
             # preset menu:
@@ -199,7 +199,7 @@ class DP_AutoRig_UI(object):
                 # load the last preset from optionVar value:
                 cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
             else:
-                print ("Error: Cannot load json preset files!\n",)
+                print("Error: Cannot load json preset files!\n")
                 return
             
             # create menu:
@@ -231,9 +231,9 @@ class DP_AutoRig_UI(object):
             self.autoCheckUpdate()
         
         except Exception as e:
-            print ("Error: dpAutoRig UI window !!!\n")
-            print ("Exception:", e)
-            print (self.langDic[self.langName]['i008_errorUI'],)
+            print("Error: dpAutoRig UI window !!!\n")
+            print("Exception:", e)
+            print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
             return
         
@@ -283,7 +283,7 @@ class DP_AutoRig_UI(object):
                     resultDic[typeName] = content
                     resultList.append(typeName)
                 except:
-                    print ("Error: json file corrupted:", file,)
+                    print("Error: json file corrupted:", file)
                 # close the json file:
                 fileDictionary.close()
         return resultList, resultDic
@@ -693,7 +693,7 @@ class DP_AutoRig_UI(object):
             Returns a guideBase for a new module instance.
         """
         # Duplicating a module guide
-        print (self.langDic[self.langName]['i067_duplicating'])
+        print(self.langDic[self.langName]['i067_duplicating'])
 
         # declaring variables
         transformAttrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
@@ -958,7 +958,7 @@ class DP_AutoRig_UI(object):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        print ("\n", self.langDic[self.langName]['i084_checkUpdate'])
+        print("\n", self.langDic[self.langName]['i084_checkUpdate'])
         
         # compare current version with GitHub master
         rawResult = utils.checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL)
@@ -1001,7 +1001,7 @@ class DP_AutoRig_UI(object):
         # find path where 'dpAutoRig.py' is been executed:
         path = utils.findPath("dpAutoRig.py")
         if not self.loadedPath:
-            print ("dpAutoRigPath: "+path)
+            print("dpAutoRigPath: "+path)
             self.loadedPath = True
         # list all guide modules:
         guideModuleList = utils.findAllModules(path, guideDir)
@@ -1022,19 +1022,19 @@ class DP_AutoRig_UI(object):
                 return notFoundModuleList
             # avoid print again the same message:
             if guideDir == MODULES and not self.loadedModules:
-                print (guideDir+" : "+str(guideModuleList))
+                print(guideDir+" : "+str(guideModuleList))
                 self.loadedModules = True
             if guideDir == SCRIPTS and not self.loadedScripts:
-                print (guideDir+" : "+str(guideModuleList))
+                print(guideDir+" : "+str(guideModuleList))
                 self.loadedScripts = True
             if guideDir == CONTROLS and not self.loadedControls:
-                print (guideDir+" : "+str(guideModuleList))
+                print(guideDir+" : "+str(guideModuleList))
                 self.loadedControls = True
             if guideDir == COMBINED and not self.loadedCombined:
-                print (guideDir+" : "+str(guideModuleList))
+                print(guideDir+" : "+str(guideModuleList))
                 self.loadedCombined = True
             if guideDir == EXTRAS and not self.loadedExtras:
-                print (guideDir+" : "+str(guideModuleList))
+                print(guideDir+" : "+str(guideModuleList))
                 self.loadedExtras = True
         return guideModuleList
     
@@ -1053,7 +1053,7 @@ class DP_AutoRig_UI(object):
             guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
             reload(guide)
         except Exception as e:
-            print (e)
+            print(e)
             errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+e
             mel.eval('warning \"'+errorString+'\";')
             return
@@ -1283,10 +1283,10 @@ class DP_AutoRig_UI(object):
         if nRiggedModule != 0:
             if nRiggedModule == 1:
                 logText += str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ':\n\n'
-                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ', thanks!\n'),
+                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i015_success'] + ', thanks!\n')
             else:
                 logText += str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i016_success'] + ':\n\n'
-                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i016_success'] + ', thanks!\n'),
+                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.langDic[self.langName]['i016_success'] + ', thanks!\n')
             riggedGuideModuleList = []
             for riggedGuideModule in self.riggedModuleDic:
                 riggedGuideModuleList.append(riggedGuideModule)
@@ -1368,7 +1368,7 @@ class DP_AutoRig_UI(object):
         cmds.separator(height=30)
         # call Update Window:
         cmds.showWindow(dpUpdateWin)
-        print (self.langDic[self.langName][self.update_text])
+        print(self.langDic[self.langName][self.update_text])
     
     
     def downloadUpdate(self, url, ext, *args):
@@ -1418,7 +1418,7 @@ class DP_AutoRig_UI(object):
         btCancel = self.langDic[self.langName]['i132_cancel']
         confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
         if confirmAutoInstall == btContinue:
-            print (self.langDic[self.langName]['i098_installing'])
+            print(self.langDic[self.langName]['i098_installing'])
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
             dpAR_DestFolder = utils.findPath("dpAutoRig.py")
@@ -1510,7 +1510,7 @@ class DP_AutoRig_UI(object):
                 self.info('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
         else:
-            print (self.langDic[self.langName]['i038_canceled'])
+            print(self.langDic[self.langName]['i038_canceled'])
     
     
     def setAutoCheckUpdatePref(self, currentValue, *args):
@@ -1830,7 +1830,7 @@ class DP_AutoRig_UI(object):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the process.
         """
-        print('\ndpAutoRigSystem Log: ' + self.langDic[self.langName]['i178_startRigging'] + '...\n'),
+        print('\ndpAutoRigSystem Log: ' + self.langDic[self.langName]['i178_startRigging'] + '...\n')
         # force refresh in order to avoid calculus error is creating Rig at the same time of guides:
         cmds.refresh()
         self.jobReloadUI()
@@ -2695,8 +2695,8 @@ class DP_AutoRig_UI(object):
             # show dialogBox if detected a bug:
             if integrate == 1:
                 if self.detectedBug:
-                    print ("\n\n")
-                    print (self.bugMessage)
+                    print("\n\n")
+                    print(self.bugMessage)
                     cmds.confirmDialog(title=self.langDic[self.langName]['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
         # re-declaring guideMirror and previewMirror groups:
@@ -2774,8 +2774,8 @@ class DP_AutoRig_UI(object):
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
-                print (self.langDic[self.langName]['i077_skinned'] + ', '.join(geomSkinList),)
+                print(self.langDic[self.langName]['i077_skinned'] + ', '.join(geomSkinList))
         else:
-            print (self.langDic[self.langName]['i029_skinNothing'],)
+            print(self.langDic[self.langName]['i029_skinNothing'])
 
     ###################### End: Skinning.

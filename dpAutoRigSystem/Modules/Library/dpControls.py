@@ -93,7 +93,7 @@ class ControlClass:
                     resultList.append(shape)
                 cmds.select(clear=True)
             else:
-                print "There are not children shape to rename inside of:", transform
+                print("There are not children shape to rename inside of:", transform)
         return resultList
 
 
@@ -106,7 +106,7 @@ class ControlClass:
                     # connect attributes:
                     cmds.connectAttr(fromObj+"."+attr, toObj+"."+attr, force=f)
                 except:
-                    print "Error: Cannot connect", toObj, ".", attr, "directely."
+                    print("Error: Cannot connect", toObj, ".", attr, "directely.")
         
         
     def setLockHide(self, objList, attrList, l=True, k=False, *args):
@@ -119,7 +119,7 @@ class ControlClass:
                         # set lock and hide of given attributes:
                         cmds.setAttr(obj+"."+attr, lock=l, keyable=k)
                     except:
-                        print "Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k
+                        print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k)
                         
                         
     def setNonKeyable(self, objList, attrList, *args):
@@ -133,7 +133,7 @@ class ControlClass:
                             # set lock and hide of given attributes:
                             cmds.setAttr(obj+"."+attr, keyable=False, channelBox=True)
                         except:
-                            print "Error: Cannot set", obj, ".", attr, "as nonKeayble, sorry."
+                            print("Error: Cannot set", obj, ".", attr, "as nonKeayble, sorry.")
 
 
     def setNotRenderable(self, objList, *args):
@@ -153,7 +153,7 @@ class ControlClass:
                         try:
                             cmds.setAttr(obj+"."+attr, 0)
                         except:
-                            #print "Error: Cannot set not renderable ", attr, "as zero for", obj
+                            #print("Error: Cannot set not renderable ", attr, "as zero for", obj)
                             pass
                 # verify if the object is a transform type:
                 elif objType == "transform":
@@ -166,7 +166,7 @@ class ControlClass:
                                 try:
                                     cmds.setAttr(shape+"."+attr, 0)
                                 except:
-                                    #print "Error: Cannot set not renderable ", attr, "as zero for", shape
+                                    #print("Error: Cannot set not renderable ", attr, "as zero for", shape)
                                     pass
 
 
@@ -537,7 +537,7 @@ class ControlClass:
             if selList:
                 sourceItem = selList[0]
             else:
-                print self.dpUIinst.langDic[self.dpUIinst.langName]["e015_selectToCopyAttr"]
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]["e015_selectToCopyAttr"])
         if cmds.objExists(sourceItem):
             if not attrList:
                 # getting channelBox selected attributes:
@@ -554,7 +554,7 @@ class ControlClass:
                         value = cmds.getAttr(sourceItem+'.'+attr)
                         self.attrValueDic[attr] = value
                 if verbose:
-                    print self.dpUIinst.langDic[self.dpUIinst.langName]["i125_copiedAttr"]
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]["i125_copiedAttr"])
         return self.attrValueDic
     
     
@@ -576,9 +576,9 @@ class ControlClass:
                         except:
                             pass
                             if verbose:
-                                print self.dpUIinst.langDic[self.dpUIinst.langName]["e016_notPastedAttr"], attr
+                                print(self.dpUIinst.langDic[self.dpUIinst.langName]["e016_notPastedAttr"], attr)
             if verbose:
-                print self.dpUIinst.langDic[self.dpUIinst.langName]["i126_pastedAttr"]
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]["i126_pastedAttr"])
     
     
     def copyAndPasteAttr(self, verbose=False, *args):
@@ -797,7 +797,7 @@ class ControlClass:
         """
         clusterHandle = None
         childShapeList = cmds.listRelatives(transformNode, shapes=True, children=True)
-    #    print "Child length {0}".format(len(childShapeList))
+    #    print("Child length {0}".format(len(childShapeList)))
         if childShapeList:
             thisNamespace = childShapeList[0].split(":")[0]
             cmds.namespace(set=thisNamespace, force=True)
@@ -807,7 +807,7 @@ class ControlClass:
             cmds.xform(clusterHandle, scalePivot=(0, 0, 0), worldSpace=True)
             cmds.namespace(set=":")
         else:
-            print "There are not children shape to create shapeSize setup of:", transformNode
+            print("There are not children shape to create shapeSize setup of:", transformNode)
         if clusterHandle:
             self.connectShapeSize(clusterHandle)
     
@@ -964,7 +964,7 @@ class ControlClass:
                     self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
         # remove referenced file:
         cmds.file(importCalibrationPath, removeReference=True)
-        print "dpImportCalibrationPath: "+importCalibrationPath,
+        print("dpImportCalibrationPath: "+importCalibrationPath)
         
 
     def mirrorCalibration(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
@@ -1002,7 +1002,7 @@ class ControlClass:
                     if cmds.objExists(destinationNode):
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
-            print self.dpUIinst.langDic[self.dpUIinst.langName]['i126_mirrorPrefix'],
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i126_mirrorPrefix'])
 
 
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
@@ -1021,9 +1021,9 @@ class ControlClass:
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
-                print self.dpUIinst.langDic[self.dpUIinst.langName]['i123_transferedCalib'], sourceItem, destinationList, attrList
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i123_transferedCalib'], sourceItem, destinationList, attrList)
         else:
-            print self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'],
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'])
 
 
     def setCalibrationAttr(self, nodeName, attrList, *args):

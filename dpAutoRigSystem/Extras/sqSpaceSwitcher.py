@@ -14,8 +14,8 @@ try:
         from ..Modules.Library import libSerialization
     from functools import partial
 except Exception as e:
-    print "Error: importing python modules!!!\n",
-    print e
+    print("Error: importing python modules!!!\n")
+    print(e)
 
 # TODO - Fix warning message on scene open when the tool is already (Don't seem to cause any problem)
 # TODO - Need more testing
