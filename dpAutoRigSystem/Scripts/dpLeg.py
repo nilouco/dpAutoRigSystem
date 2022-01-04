@@ -56,7 +56,7 @@ def Leg(dpUIinst):
 
             # Update progress window
             progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+legName))
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+legName))
             
             # create leg module instance:
             legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
@@ -78,7 +78,7 @@ def Leg(dpUIinst):
             
             # Update progress window
             progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+footName))
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+footName))
             
             # create foot module instance:
             footInstance = dpUIinst.initGuide('dpFoot', guideDir)
@@ -94,7 +94,7 @@ def Leg(dpUIinst):
                 
                 # Update progress window
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+toeName+'_1'))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_1'))
                 
                 # create toe1 module instance:
                 toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -119,7 +119,7 @@ def Leg(dpUIinst):
                 
                 # Update progress window
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+toeName+'_2'))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_2'))
                 
                 # create toe2 module instance:
                 toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -144,7 +144,7 @@ def Leg(dpUIinst):
                 
                 # Update progress window
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+toeName+'_3'))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_3'))
                 
                 # create toe3 module instance:
                 toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -169,7 +169,7 @@ def Leg(dpUIinst):
                 
                 # Update progress window
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+toeName+'_4'))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_4'))
                 
                 # create toe4 module instance:
                 toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -194,7 +194,7 @@ def Leg(dpUIinst):
                 
                 # Update progress window
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+toeName+'_5'))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_5'))
                 
                 # create toe5 module instance:
                 toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)

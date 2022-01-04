@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.02"
-DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nsecond pass:\n\n\worked files\nprint."
+DPAR_VERSION = "3.12.03"
+DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nthird pass:\n\n\worked files\nbackticks."
 
 
 

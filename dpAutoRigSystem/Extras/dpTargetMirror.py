@@ -193,7 +193,7 @@ class TargetMirror():
                     if cmds.progressWindow(query=True, isCancelled=True):
                         cancelled = True
                         break
-                    cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + `progressAmount` + ' target'))
+                    cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
                     if not item == origNode:
                         # start copying
                         if self.dpCheckGeometry(item):
