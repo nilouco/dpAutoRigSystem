@@ -25,7 +25,7 @@ import unittest
 class EmptyClass(object): pass
 class TestSerialization(unittest.TestCase):
     def setUp(self):
-        print self.shortDescription()
+        print(self.shortDescription())
         from maya import cmds
         cmds.file(new=True, f=True)
 

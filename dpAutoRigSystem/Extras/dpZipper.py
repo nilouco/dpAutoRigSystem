@@ -453,7 +453,7 @@ class Zipper():
                     self.dpZipperDataGrp()
                     self.dpZipperCloseUI()
                     cmds.select(self.zipperCtrl)
-                    print self.langDic[self.langName]['m174_createdZipper'],
+                    print(self.langDic[self.langName]['m174_createdZipper'])
                 else:
                     mel.eval('warning \"'+self.langDic[self.langName]['i191_selectPoly']+'\";')
             else:

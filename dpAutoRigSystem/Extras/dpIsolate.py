@@ -64,7 +64,7 @@ class Isolate():
         if len(nodeList) == 3:
             for nodeName in nodeList:
                 if not cmds.objExists(nodeName):
-                    print self.langDic[self.langName]['e004_objNotExist'], nodeName
+                    print(self.langDic[self.langName]['e004_objNotExist'], nodeName)
                     return
         # call scripted function
         self.dpIsolate(self.isolateName, nodeList)

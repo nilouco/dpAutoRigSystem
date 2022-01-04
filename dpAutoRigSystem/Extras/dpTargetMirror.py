@@ -74,7 +74,7 @@ class TargetMirror():
             if self.dpCheckGeometry(selectedList[0]):
                 cmds.textField(self.originalModelTextField, edit=True, text=selectedList[0])
         else:
-            print "Original Model > None"
+            print("Original Model > None")
     
     
     def dpAddSelect(self, *args):

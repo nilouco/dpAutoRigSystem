@@ -26,7 +26,7 @@ class IkFkSnap():
                 self.sqIkFkTools = __import__("dpAutoRigSystem.Modules.Library.sqIkFkTools", {}, {}, ["sqIkFkTools"])
                 loadedPlugin = True
             except:
-                print "Error loading sqIkFkTools.",
+                print("Error loading sqIkFkTools.")
         if loadedPlugin:
             # call main function
             self.dpMain(self)

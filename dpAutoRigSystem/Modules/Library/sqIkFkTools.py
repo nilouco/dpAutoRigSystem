@@ -147,7 +147,7 @@ def CallFnOnNetworkByClass(_sFn, _sCls):
         try:
             getattr(rigPart, _sFn)()
         except Exception, e:
-            print str(e)
+            print(str(e))
 
 switchToIk = functools.partial(CallFnOnNetworkByClass, 'switchToIk', 'IkFkNetwork')
 switchToFk = functools.partial(CallFnOnNetworkByClass, 'switchToFk', 'IkFkNetwork')

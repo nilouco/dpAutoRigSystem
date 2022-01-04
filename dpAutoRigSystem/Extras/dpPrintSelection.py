@@ -53,12 +53,12 @@ class PrintSelection():
         """
         if resultDic:
             # log
-            print "\n-------"
-            print "Print Selection Result:"
-            print "List:"
-            print resultDic['list']
-            print "String:"
-            print resultDic['string']
-            print "-------"
+            print("\n-------")
+            print("Print Selection Result:")
+            print("List:")
+            print(resultDic['list'])
+            print("String:")
+            print(resultDic['string'])
+            print("-------")
         else:
             mel.eval("warning \""+self.langDic[self.langName]['i042_notSelection']+"\";")

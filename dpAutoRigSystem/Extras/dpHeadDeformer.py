@@ -311,7 +311,7 @@ class HeadDeformer():
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:
-                print self.langDic[self.langName]["i179_addedHeadDef"],
+                print(self.langDic[self.langName]["i179_addedHeadDef"])
         
         else:
             mel.eval("warning" + "\"" + self.langDic[self.langName]["i034_notSelHeadDef"] + "\"" + ";")

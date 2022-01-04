@@ -12,8 +12,8 @@ try:
     except:
         pass
 except Exception as e:
-    print "Error: importing python modules!!!\n",
-    print e
+    print("Error: importing python modules!!!\n")
+    print(e)
 
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
@@ -70,6 +70,6 @@ class UpdateRigInfo():
                     if i < len(meshList):
                         meshString = meshString + ";"
                 cmds.setAttr(masterGrp+".geometryList", meshString, type="string")
-            print "Control List = ", ctrlString
-            print "Mesh List    = ", meshString
-            print "Updated Rig Info: "+masterGrp,
+            print("Control List = "+ctrlString)
+            print("Mesh List    = "+meshString)
+            print("Updated Rig Info: "+masterGrp)

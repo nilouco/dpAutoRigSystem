@@ -214,7 +214,7 @@ class Translator:
                 # fill newLangList it "" (nothing) in order to generate all list array and just update its values:
                 for i in range(self.langIndex, self.keyLen+1):
                     self.newLangList.append(None)
-                print self.newLangList
+                print(self.newLangList)
                 # starting result string:
                 self.resultString = '{"_author":"'+self.authorName+'","_contact":"'+contactName+'","_date":"'+date+'","_language":"'+self.newLangName+'","_translator":"dpTranslator v'+str(DPT_VERSION)+'","_updated":"'+date+'"'
 

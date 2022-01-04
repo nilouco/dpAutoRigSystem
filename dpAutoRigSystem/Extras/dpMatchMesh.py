@@ -154,9 +154,9 @@ class MatchMesh():
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
                     
                     if not cancelled:
-                        print self.langDic[self.langName]['i035_transfData'], self.langDic[self.langName]['i036_from'].upper(), ":", fromMesh, ",", self.langDic[self.langName]['i037_to'].upper(), ":", toMesh
+                        print(self.langDic[self.langName]['i035_transfData'], self.langDic[self.langName]['i036_from'].upper(), ":", fromMesh, ",", self.langDic[self.langName]['i037_to'].upper(), ":", toMesh)
                     else:
-                        print self.langDic[self.langName]['i038_canceled']
+                        print(self.langDic[self.langName]['i038_canceled'])
                     
                 else:
                     mel.eval("warning \""+self.langDic[self.langName]['i039_notMatchDif']+"\";")
