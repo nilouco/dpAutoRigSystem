@@ -139,7 +139,7 @@ class MatchMesh():
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        cmds.progressWindow(edit=True, maxValue=nbVertice, progress=progressAmount, status=('Transfering: ' + `progressAmount` + ' vertex'))
+                        cmds.progressWindow(edit=True, maxValue=nbVertice, progress=progressAmount, status=('Transfering: ' + repr(progressAmount) + ' vertex'))
                         
                         # transfer data
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)

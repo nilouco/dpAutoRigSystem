@@ -35,7 +35,7 @@ def Arm(dpUIinst):
 
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+armName))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+armName))
         
         # creating module instances:
         armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
@@ -63,7 +63,7 @@ def Arm(dpUIinst):
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+dpUIinst.langDic[dpUIinst.langName]['m007_finger']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dpUIinst.langDic[dpUIinst.langName]['m007_finger']))
         
         # edit finger guides:
         fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
