@@ -1,7 +1,7 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
-import maya.OpenMaya as om
+from maya import cmds
+from maya import mel
+from maya import OpenMaya as om
 
 # global variables to this module:    
 CLASS_NAME = "MatchMesh"

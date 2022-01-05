@@ -14,7 +14,7 @@
 
 
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 import dpUtils as utils
 import dpControls
 

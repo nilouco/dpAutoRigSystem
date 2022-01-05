@@ -1,5 +1,5 @@
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 
 # global variables to this module:    
 CLASS_NAME = "IkFkSnap"

@@ -3,7 +3,7 @@ try:
 except:
     import libPymel
 
-import pymel.core as pymel
+from pymel import core as pymel
 from maya import OpenMaya
 import logging
 log = logging.getLogger(__name__)

@@ -1,5 +1,5 @@
 import logging
-import pymel.core as pymel
+from pymel import core as pymel
 #
 # A PyNodeChain is a special pymel-related object that act exactly like a standard array.
 # However it allow us to have more bells and whistles.

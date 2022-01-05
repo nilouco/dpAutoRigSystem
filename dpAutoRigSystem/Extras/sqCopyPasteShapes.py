@@ -3,7 +3,7 @@ Based on https://github.com/renaudll/omtk/blob/master/omtk/libs/libRigging.py
 """
 import os
 from maya import cmds
-import pymel.core as pymel
+from pymel import core as pymel
 
 def _is_ctrl(ctrl):
     """

@@ -1,7 +1,7 @@
 # importing libraries:
-import maya.cmds as cmds
-import dpBaseControlClass as BaseControl
-reload(BaseControl)
+from maya import cmds
+import dpBaseControlClass
+reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "ClipStraight"
@@ -11,14 +11,14 @@ ICON = "/Icons/dp_clipStraight.png"
 
 dpClipStraightVersion = 1.1
 
-class ClipStraight(BaseControl.ControlStartClass):
+class ClipStraight(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        BaseControl.ControlStartClass.__init__(self, *args, **kwargs)
+        dpBaseControlClass.ControlStartClass.__init__(self, *args, **kwargs)
     
     
     def cvMain(self, useUI, cvID=None, cvName=CLASS_NAME+'_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, *args):

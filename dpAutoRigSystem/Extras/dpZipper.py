@@ -1,9 +1,9 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 from functools import partial
-import dpAutoRigSystem.Modules.Library.dpControls as dpControls
-import dpAutoRigSystem.Modules.Library.dpUtils as utils
+from dpAutoRigSystem.Modules.Library import dpControls
+from dpAutoRigSystem.Modules.Library import dpUtils as utils
 
 
 # global variables to this module:    

@@ -1,7 +1,7 @@
 # importing libraries:
-import maya.cmds as cmds
-import dpAutoRigSystem.Controls.dpBaseControlClass as BaseControl
-reload(BaseControl)
+from maya import cmds
+from dpAutoRigSystem.Controls import dpBaseControlClass
+reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Ball"
@@ -11,14 +11,14 @@ ICON = "/Icons/dp_ball.png"
 
 dpBallVersion = 1.1
 
-class Ball(BaseControl.ControlStartClass):
+class Ball(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        BaseControl.ControlStartClass.__init__(self, *args, **kwargs)
+        dpBaseControlClass.ControlStartClass.__init__(self, *args, **kwargs)
         # dependence module list:
         self.checkModuleList = ['dpCircle']
     

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 import datetime
 import re
 

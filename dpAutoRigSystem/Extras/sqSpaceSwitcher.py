@@ -1,8 +1,8 @@
 try:
     import math
-    import maya.cmds as cmds
-    import pymel.core as pymel
-    import maya.OpenMaya as om
+    from maya import cmds
+    from pymel import core as pymel
+    from maya import OpenMaya as om
     from Ui import uiSpaceSwitcher as uiSpaceSwitcher
     reload(uiSpaceSwitcher)
     from maya import OpenMayaUI

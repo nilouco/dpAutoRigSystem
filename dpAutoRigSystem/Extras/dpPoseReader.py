@@ -1,5 +1,5 @@
 try:
-    import pymel.core as pymel
+    from pymel import core as pymel
     try:
         from sstk.libs.libQt import QtCore, QtWidgets
         from sstk.libs import libSerialization
@@ -10,7 +10,7 @@ try:
     reload(poseReaderUI)
     from maya import OpenMayaUI
     from functools import partial
-    import maya.cmds as cmds
+    from maya import cmds
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
