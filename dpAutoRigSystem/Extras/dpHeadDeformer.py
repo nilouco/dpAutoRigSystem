@@ -11,10 +11,10 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.8"
+DPHD_VERSION = "2.9"
 
 
-class HeadDeformer():
+class HeadDeformer(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst

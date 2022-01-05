@@ -18,7 +18,7 @@ dic_colors = {
     "none": 0,
 }
 
-class ControlClass:
+class ControlClass(object):
 
     def __init__(self, dpUIinst, presetDic, presetName, moduleGrp=None, *args):
         """ Initialize the module class defining variables to use creating preset controls.

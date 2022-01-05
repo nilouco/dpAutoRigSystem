@@ -197,7 +197,7 @@ TITLE = "m137_copyPasteShapes"
 DESCRIPTION = "m138_copyPasteShapesDesc"
 ICON = "/Icons/dp_copyPasteShapes.png"
 
-class CopyPasteShapes():
+class CopyPasteShapes(object):
     def __init__(self, *args, **kwargs):
         if cmds.window("sqCopyPasteShapesWindow", query=True, exists=True):
             cmds.deleteUI("sqCopyPasteShapesWindow")

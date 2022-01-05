@@ -10,9 +10,9 @@ TITLE = "m097_copySkin"
 DESCRIPTION = "m098_copySkinDesc"
 ICON = "/Icons/dp_copySkin.png"
 
-dpCopySkinVersion = 1.2
+dpCopySkinVersion = 1.3
 
-class CopySkin():
+class CopySkin(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst

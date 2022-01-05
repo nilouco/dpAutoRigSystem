@@ -9,14 +9,14 @@ TITLE = "m135_copyPasteAttr"
 DESCRIPTION = "m136_copyPasteAttrDesc"
 ICON = "/Icons/dp_copyPasteAttr.png"
 
-DPCP_VERSION = "2.0"
+DPCP_VERSION = "2.1"
 
 
 # import libraries
 from maya import cmds
 
 
-class CopyPasteAttr():
+class CopyPasteAttr(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
         # defining variables
         self.dpUIinst = dpUIinst

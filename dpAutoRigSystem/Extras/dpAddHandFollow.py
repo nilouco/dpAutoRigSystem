@@ -9,7 +9,7 @@ DESCRIPTION = "m060_addHandFollowDesc"
 ICON = "/Icons/dp_addHandFollow.png"
 
 
-class AddHandFollow():
+class AddHandFollow(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst

@@ -10,7 +10,7 @@ DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
 
 
-class MatchMesh():
+class MatchMesh(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst

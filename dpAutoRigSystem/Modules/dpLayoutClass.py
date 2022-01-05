@@ -7,7 +7,7 @@ from Library import dpUtils as utils
 reload(utils)
 
 
-class LayoutClass:
+class LayoutClass(object):
     def __init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON):
         """ Initialize the layout class.
         """

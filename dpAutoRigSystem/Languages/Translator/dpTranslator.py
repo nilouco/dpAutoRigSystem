@@ -11,7 +11,7 @@ DPT_VERSION = 1.2
 
 LANGUAGES = "Languages"
 
-class Translator:
+class Translator(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         """ Initialize the module class defining variables to use creating languages.
         """

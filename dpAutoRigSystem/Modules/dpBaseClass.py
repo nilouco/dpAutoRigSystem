@@ -6,12 +6,12 @@ from Library import dpControls
 from Library import dpUtils as utils
 
 
-class RigType:
+class RigType(object):
     biped = "biped"
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-class StartClass:
+class StartClass(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
