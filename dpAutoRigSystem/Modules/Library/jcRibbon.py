@@ -19,7 +19,7 @@ import dpUtils as utils
 import dpControls
 
 
-class RibbonClass:
+class RibbonClass(object):
 
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, ctrlRadius, curveDegree, *args):
         # defining variables:

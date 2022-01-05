@@ -9,9 +9,9 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 ICON = "/Icons/dp_targetMirror.png"
 
-DPTM_VERSION = "2.4"
+DPTM_VERSION = "2.5"
 
-class TargetMirror():
+class TargetMirror(object):
     def __init__(self, dpUIinst, langDic, langName, *args, **kwargs):
         self.langDic = langDic
         self.langName = langName

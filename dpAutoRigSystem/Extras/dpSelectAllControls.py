@@ -9,7 +9,7 @@ DESCRIPTION = "m167_selAllControlsDesc"
 ICON = "/Icons/dp_selAllControls.png"
 
 
-class SelectAllControls():
+class SelectAllControls(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst

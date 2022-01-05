@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.04"
-DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfifth pass:\n\n\worked files\nimporting modules."
+DPAR_VERSION = "3.12.05"
+DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nlast pass:\n\n\worked files\ndefine root class with (object)."
 
 
 

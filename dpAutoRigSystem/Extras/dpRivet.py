@@ -29,9 +29,9 @@ ICON = "/Icons/dp_rivet.png"
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DPRV_VERSION = "1.1"
+DPRV_VERSION = "1.2"
 
-class Rivet():
+class Rivet(object):
     def __init__(self, dpUIinst, langDic, langName, *args, **kwargs):
         # declaring variables
         self.langDic = langDic

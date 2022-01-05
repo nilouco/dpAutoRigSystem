@@ -15,10 +15,10 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.14"
+DPZIP_VERSION = "2.15"
 
 
-class Zipper():
+class Zipper(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
         # redeclaring variables
         self.dpUIinst = dpUIinst

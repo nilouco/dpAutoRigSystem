@@ -316,7 +316,7 @@ class PoseReaderDialog(QtWidgets.QMainWindow):
         self.populateData()
 
 
-class PoseReader():
+class PoseReader(object):
     def __init__(self, *args, **kwargs):
         #Try to kill the existing window
         try:

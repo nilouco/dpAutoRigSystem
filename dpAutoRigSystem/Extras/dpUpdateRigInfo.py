@@ -22,7 +22,7 @@ DESCRIPTION = "m058_updateRigInfoDesc"
 ICON = "/Icons/dp_updateRigInfo.png"
 
 
-class UpdateRigInfo():
+class UpdateRigInfo(object):
     def __init__(self, *args, **kwargs):
         # call main function
         self.dpMain(self)

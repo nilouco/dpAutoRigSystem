@@ -8,9 +8,9 @@ TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
 
-dpIsolateVersion = 1.0
+dpIsolateVersion = 1.1
 
-class Isolate():
+class Isolate(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst

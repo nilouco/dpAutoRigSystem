@@ -9,9 +9,9 @@ TITLE = "m047_colorOver"
 DESCRIPTION = "m048_coloOverDesc"
 ICON = "/Icons/dp_colorOverride.png"
 
-DPCO_VERSION = "2.0"
+DPCO_VERSION = "2.1"
 
-class ColorOverride():
+class ColorOverride(object):
     def __init__(self, dpUIinst, presetDic, presetName, *args, **kwargs):
         # defining variables
         self.dpUIinst = dpUIinst

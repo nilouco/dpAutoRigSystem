@@ -9,7 +9,7 @@ DESCRIPTION = "m054_printSelDesc"
 ICON = "/Icons/dp_printSelection.png"
 
 
-class PrintSelection():
+class PrintSelection(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst

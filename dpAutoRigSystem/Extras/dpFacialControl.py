@@ -30,10 +30,10 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.12"
+DPFC_VERSION = "1.13"
 
 
-class FacialControl():
+class FacialControl(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
