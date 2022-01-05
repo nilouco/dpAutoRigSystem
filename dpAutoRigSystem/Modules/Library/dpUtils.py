@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.OpenMaya as om
+from maya import cmds
+from maya import OpenMaya as om
 import os
 import sys
 import re

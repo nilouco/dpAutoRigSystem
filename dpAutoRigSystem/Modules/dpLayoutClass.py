@@ -1,7 +1,7 @@
 # importing libraries:
 from functools import partial
 
-import maya.cmds as cmds
+from maya import cmds
 
 from Library import dpUtils as utils
 reload(utils)

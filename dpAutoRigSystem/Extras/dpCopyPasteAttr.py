@@ -1,5 +1,5 @@
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 from functools import partial
 from ..Modules.Library import dpControls
 
@@ -13,7 +13,7 @@ DPCP_VERSION = "2.0"
 
 
 # import libraries
-import maya.cmds as cmds
+from maya import cmds
 
 
 class CopyPasteAttr():

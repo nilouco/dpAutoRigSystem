@@ -1,7 +1,7 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
-import dpAutoRigSystem.Modules.Library.dpUtils as utils
+from maya import cmds
+from maya import mel
+from dpAutoRigSystem.Modules.Library import dpUtils as utils
 reload(utils)
 
 # global variables to this module:    

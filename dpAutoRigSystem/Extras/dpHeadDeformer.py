@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 from ..Modules.Library import dpControls as dpControls
 from ..Modules.Library import dpUtils as utils
 
@@ -26,14 +26,14 @@ class HeadDeformer():
         self.headCtrl = None
         self.wellDone = True
         # call main function
-        if (int(cmds.about(version=True)[:4]) == 2020):
+        if (int(cmds.about(version=True)[:4]) == 2020): #to be removed in Python3
             callMessage = False
             installedVersion = cmds.about(installedVersion=True)
             if not "." in installedVersion:
                 callMessage = True
             else:
                 updateVersion = int(installedVersion[installedVersion.rfind(".")+1:])
-                if updateVersion < 3:
+                if not updateVersion == 4: #Py2: < 3
                     callMessage = True
             if callMessage:
                 dialogReturn = cmds.confirmDialog(title="Maya 2020 bug", message=self.langDic[self.langName]["b001_BugMayaHD"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])

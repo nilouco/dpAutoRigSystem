@@ -13,7 +13,7 @@ from core import import_json, import_json_file, export_json, export_json_file
 
 #if consts.engine_name == 'maya':
 from pluginMaya import export_network, import_network, isNetworkInstanceOfClass, getNetworksByClass, getConnectedNetworks, getConnectedNetworksByHierarchy
-import pymel.core as pymel
+from pymel import core as pymel
 _dag_types.append(pymel.PyNode)
 _dag_types.append(pymel.Attribute)
 _basic_types.append(pymel.datatypes.Matrix)

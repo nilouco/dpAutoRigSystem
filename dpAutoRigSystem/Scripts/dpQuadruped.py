@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 from ..Modules.dpBaseClass import RigType
 
 # global variables to this module:    

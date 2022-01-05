@@ -39,9 +39,9 @@ try:
     #Ex Linux --> sys.path.append("/home/yourUserName/dpAutoRigSystem")
     sys.path.append("Your Path to the project")
     
-    import maya.cmds as cmds
+    from maya import cmds
     import dpAutoRigSystem
-    import dpAutoRigSystem.dpAutoRig as autoRig
+    from dpAutoRigSystem import dpAutoRig as autoRig
     reload(autoRig)
     autoRigUI = autoRig.DP_AutoRig_UI()
     print("\ndpAutoRigSystem loaded with success.")

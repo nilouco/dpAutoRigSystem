@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.03"
-DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nthird pass:\n\n\worked files\nbackticks."
+DPAR_VERSION = "3.12.04"
+DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nfifth pass:\n\n\worked files\nimporting modules."
 
 
 
@@ -61,7 +61,7 @@ if not "pymel" in sys.modules:
 # importing libraries:
 try:
     from maya import mel
-    import pymel.core as pymel
+    from pymel import core as pymel
     import json
     import re
     import time
@@ -73,13 +73,13 @@ try:
     import datetime
     import platform
     from functools import partial
-    import Modules.Library.dpUtils as utils
-    import Modules.Library.dpControls as dpControls
-    import Modules.dpBaseClass as Base
-    import Modules.dpLayoutClass as Layout
-    import Extras.dpUpdateRigInfo as rigInfo
-    import Extras.dpReorderAttr as dpReorderAttr
-    import Languages.Translator.dpTranslator as dpTranslator
+    from Modules.Library import dpUtils as utils
+    from Modules.Library import dpControls
+    from Modules import dpBaseClass as Base
+    from Modules import dpLayoutClass as Layout
+    from Extras import dpUpdateRigInfo as rigInfo
+    from Extras import dpReorderAttr
+    from Languages.Translator import dpTranslator
     reload(utils)
     reload(dpControls)
     reload(rigInfo)
@@ -2140,7 +2140,7 @@ class DP_AutoRig_UI(object):
                                 # do actions in order to make limb be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
                                 for f, floatAttr in enumerate(floatAttrList):
-                                    if f < len(floatAttrList):
+                                    if f != len(floatAttrList): #Py2: <
                                         if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
                                             if floatAttr == lvvAttr:
@@ -2558,7 +2558,7 @@ class DP_AutoRig_UI(object):
                                 # do actions in order to make chain be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
                                 for f, floatAttr in enumerate(floatAttrList):
-                                    if f < len(floatAttrList):
+                                    if f != len(floatAttrList): #Py2: <
                                         if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
                                             cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)

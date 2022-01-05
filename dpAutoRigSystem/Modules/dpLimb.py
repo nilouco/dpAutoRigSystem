@@ -1,5 +1,5 @@
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 import math
 
 from Library import dpUtils as utils
