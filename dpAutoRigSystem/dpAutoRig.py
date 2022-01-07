@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.12.05"
-DPAR_UPDATELOG = "WIP N392 - Py2 modernization\nlast pass:\n\n\worked files\ndefine root class with (object)."
+DPAR_VERSION = "3.13.00"
+DPAR_UPDATELOG = "N392 - Py2 modernization.\n\nThis version will be discontinued.\nBecause Autodesk changed Maya 2022\nto use Python3.\nSo, this dpAutoRigSystem version 3.13.00\nwill work only for Maya 2020 or before.\n\nIf you want to use an updated dpAR version\nyou should install the last version manually in Maya 2022 or newer.\n\nThank you very much."
 
 
 
@@ -151,6 +151,7 @@ class DP_AutoRig_UI(object):
         self.controlInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
+        self.userDefAutoCheckUpdate = 0
         
         
         try:
@@ -228,7 +229,7 @@ class DP_AutoRig_UI(object):
             self.mainUI()
             
             # check if we need to automatically check for update:
-            self.autoCheckUpdate()
+#            self.autoCheckUpdate()
         
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
@@ -958,8 +959,12 @@ class DP_AutoRig_UI(object):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
+        self.setAutoCheckUpdatePref(0)
         print("\n", self.langDic[self.langName]['i084_checkUpdate'])
-        
+        print("\n", self.langDic[self.langName]['i127_lastPy2'])
+        btOk = self.langDic[self.langName]['i131_ok']
+        cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION, message=self.langDic[self.langName]['i127_lastPy2'], button=[btOk], defaultButton=btOk, cancelButton=btOk, dismissString=btOk)
+        return
         # compare current version with GitHub master
         rawResult = utils.checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL)
         

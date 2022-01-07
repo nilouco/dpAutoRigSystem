@@ -358,6 +358,7 @@
     "i124_import"          : "Importar",
     "i125_mirrorAll"       : "Você quer fazer o espelhamento de calibração para todos os controles?",
     "i126_mirrorPrefix"    : "Qual o prefixo de espelhamento a usar?",
+    "i127_lastPy2"         : "Essa é a última versão do Python2 para o Maya 2020 ou anterior.\nSe você usa o Maya 2022 ou mais recente, instale manualmente\na versão atualizada do dpAutoRigSystem\nescrita em Python3, por favor.\nObrigado.",
 
     "m001_fkLine"              : "Linha Fk",
     "m002_fkLineDesc"          : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
