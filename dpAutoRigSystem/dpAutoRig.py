@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION = "3.13.00"
-DPAR_UPDATELOG = "N392 - Py2 modernization.\n\nThis version will be discontinued.\nBecause Autodesk changed Maya 2022\nto use Python3.\nSo, this dpAutoRigSystem version 3.13.00\nwill work only for Maya 2020 or before.\n\nIf you want to use an updated dpAR version\nyou should install the last version manually in Maya 2022 or newer.\n\nThank you very much."
+DPAR_VERSION_PY3 = "3.13.01"
+DPAR_UPDATELOG = "N405 - No PyMEL for dpUpdateRigInfo."
 
 
 
@@ -39,7 +39,7 @@ def clearDPARLoadingWindow():
 def dpARLoadingWindow():
     """ Just create a Loading window in order to show we are working to user when calling dpAutoRigSystem.
     """
-    loadingString = "Loading dpAutoRigSystem v%s ... " %DPAR_VERSION
+    loadingString = "Loading dpAutoRigSystem v%s ... " %DPAR_VERSION_PY3
     print(loadingString)
     path = os.path.dirname(__file__)
     randImage = random.randint(0,7)
@@ -141,7 +141,7 @@ class DP_AutoRig_UI(object):
     def __init__(self):
         """ Start the window, menus and main layout for dpAutoRig UI.
         """
-        self.dpARVersion = DPAR_VERSION
+        self.dpARVersion = DPAR_VERSION_PY3
         self.loadedPath = False
         self.loadedModules = False
         self.loadedScripts = False
@@ -163,7 +163,7 @@ class DP_AutoRig_UI(object):
             self.deleteExistWindow()
             dpAR_winWidth  = 305
             dpAR_winHeight = 605
-            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
+            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION_PY3)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
             
             # creating menus:
             self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
@@ -963,10 +963,10 @@ class DP_AutoRig_UI(object):
         print("\n", self.langDic[self.langName]['i084_checkUpdate'])
         print("\n", self.langDic[self.langName]['i127_lastPy2'])
         btOk = self.langDic[self.langName]['i131_ok']
-        cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION, message=self.langDic[self.langName]['i127_lastPy2'], button=[btOk], defaultButton=btOk, cancelButton=btOk, dismissString=btOk)
+        cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_lastPy2'], button=[btOk], defaultButton=btOk, cancelButton=btOk, dismissString=btOk)
         return
         # compare current version with GitHub master
-        rawResult = utils.checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL)
+        rawResult = utils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
         
         # call Update Window about rawRsult:
         if rawResult[0] == 0:
@@ -1263,7 +1263,7 @@ class DP_AutoRig_UI(object):
         # creating Info Window:
         if cmds.window('dpInfoWindow', query=True, exists=True):
             cmds.deleteUI('dpInfoWindow', window=True)
-        dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+DPAR_VERSION+' - '+self.langDic[self.langName]['i013_info']+' - '+self.langDic[self.langName][self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+DPAR_VERSION_PY3+' - '+self.langDic[self.langName]['i013_info']+' - '+self.langDic[self.langName][self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
         # creating text layout:
         infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpInfoWin)
         cmds.separator(style='none', height=10, parent=infoColumnLayout)
@@ -1314,7 +1314,7 @@ class DP_AutoRig_UI(object):
         """ Simple window with links to donate in order to support this free and openSource code via PayPal.
         """
         # declaring variables:
-        self.donate_title       = 'dpAutoRig - v'+DPAR_VERSION+' - '+self.langDic[self.langName]['i167_donate']
+        self.donate_title       = 'dpAutoRig - v'+DPAR_VERSION_PY3+' - '+self.langDic[self.langName]['i167_donate']
         self.donate_description = self.langDic[self.langName]['i168_donateDesc']
         self.donate_winWidth    = 305
         self.donate_winHeight   = 300
@@ -1352,7 +1352,7 @@ class DP_AutoRig_UI(object):
         updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
         if self.update_text:
             updateDesc = cmds.text("\n"+self.langDic[self.langName][self.update_text], align="center", parent=updateLayout)
-            cmds.text("\n"+DPAR_VERSION+self.langDic[self.langName]['i090_currentVersion'], align="left", parent=updateLayout)
+            cmds.text("\n"+DPAR_VERSION_PY3+self.langDic[self.langName]['i090_currentVersion'], align="left", parent=updateLayout)
         if self.update_remoteVersion:
             cmds.text(self.update_remoteVersion+self.langDic[self.langName]['i091_onlineVersion'], align="left", parent=updateLayout)
             cmds.separator(height=30)
@@ -1635,7 +1635,7 @@ class DP_AutoRig_UI(object):
             self.masterGrp.setDynamicAttr("date", localTime)
             # system:
             self.masterGrp.setDynamicAttr("maya", cmds.about(version=True))
-            self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION)
+            self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION_PY3)
             self.masterGrp.setDynamicAttr("language", self.langName)
             self.masterGrp.setDynamicAttr("preset", self.presetName)
             # author:
@@ -1853,10 +1853,10 @@ class DP_AutoRig_UI(object):
             # check guide versions to be sure we are building with the same dpAutoRigSystem version:
             for guideModule in self.modulesToBeRiggedList:
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
-                if not guideVersion == DPAR_VERSION:
+                if not guideVersion == DPAR_VERSION_PY3:
                     btYes = self.langDic[self.langName]['i071_yes']
                     btNo = self.langDic[self.langName]['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
                     if userChoose == btNo:
                         return
                     else:
