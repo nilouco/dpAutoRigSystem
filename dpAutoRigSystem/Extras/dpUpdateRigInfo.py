@@ -1,19 +1,6 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
 
-try:
-    from pymel import core as pymel
-    loadedSqBindPose = False
-    try:
-        from sstk.maya.animation import sqBindPose as sqBindPose
-        reload(sqBindPose)
-        loadedSqBindPose = True
-    except:
-        pass
-except Exception as e:
-    print("Error: importing python modules!!!\n")
-    print(e)
 
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
@@ -53,10 +40,6 @@ class UpdateRigInfo(object):
             ctrlString = ""
             if ctrlList:
                 for i, item in enumerate(ctrlList):
-                    if (loadedSqBindPose):
-                        nCurNode = pymel.PyNode(item)
-                        if sqBindPose.is_pose_outdated(nCurNode):
-                            sqBindPose.store_pose(pymel.PyNode(item))
                     ctrlString = ctrlString + str(item)
                     if i < len(ctrlList):
                         ctrlString = ctrlString + ";"
@@ -71,5 +54,5 @@ class UpdateRigInfo(object):
                         meshString = meshString + ";"
                 cmds.setAttr(masterGrp+".geometryList", meshString, type="string")
             print("Control List = "+ctrlString)
-            print("Mesh List    = "+meshString)
+            print("Mesh List = "+meshString)
             print("Updated Rig Info: "+masterGrp)
