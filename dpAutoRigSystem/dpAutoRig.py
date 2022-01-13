@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.01"
-DPAR_UPDATELOG = "N405 - No PyMEL for dpUpdateRigInfo."
+DPAR_VERSION_PY3 = "3.13.02"
+DPAR_UPDATELOG = "N405 - No PyMEL for all modules.\n\nDeleted: libSerialization, sqIkFkTools, Ui, sqSpaceSwitcher, sqCopyPasteShapes, dpPoseReader."
 
 
 
