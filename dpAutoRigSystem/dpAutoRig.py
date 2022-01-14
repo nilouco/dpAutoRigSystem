@@ -60,7 +60,6 @@ dpARLoadingWindow()
 # importing libraries:
 try:
     from maya import mel
-#    from pymel import core as pymel
     import json
     import re
     import time
@@ -1597,8 +1596,8 @@ class DP_AutoRig_UI(object):
         
 
     '''
-    Pymel
-    ensure that the main group and Ctrl of the rig exist in the scene or else create them
+        Ensure that the main group and Ctrl of the rig exist in the scene or else create them
+        TODO maybe move it to utils?
     '''
     def createBaseRigNode(self):
         sAllGrp = "All_Grp"
@@ -2568,7 +2567,7 @@ class DP_AutoRig_UI(object):
             #Colorize all controller in yellow as a base
             if (bColorize):
                 aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
-                aAllCtrls = cmds.ls("*_Ctrl", type="shape")
+                aAllCtrls = cmds.ls("*_Ctrl")
                 lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
                 rPattern = re.compile(self.langDic[self.langName]['p003_right'] + '_.*._Ctrl')
                 for pCtrl in aAllCtrls:
@@ -2584,11 +2583,6 @@ class DP_AutoRig_UI(object):
 
             # Add usefull attributes for the animators
             if (bAddAttr):
-                pOptCtrl = pymel.PyNode(self.optionCtrl)
-                pRenderGrp = pymel.PyNode(self.renderGrp)
-                pCtrlVisGrp = pymel.PyNode(self.ctrlsVisGrp)
-                pProxyGrp = pymel.PyNode(self.proxyGrp)
-                
                 # defining attribute name strings:
                 generalAttr = self.langDic[self.langName]['c066_general']
                 vvAttr = self.langDic[self.langName]['c031_volumeVariation']
@@ -2602,39 +2596,38 @@ class DP_AutoRig_UI(object):
                 rightAttr = self.langDic[self.langName]['p003_right'].lower()
                 tweaksAttr = self.langDic[self.langName]['m081_tweaks'].lower()
                 
-                if not pymel.hasAttr(pOptCtrl, generalAttr):
-                    pymel.addAttr(pOptCtrl, ln=generalAttr, at="enum", enumName="----------", keyable=True)
-                    pymel.setAttr(pOptCtrl+"."+generalAttr, lock=True)
+                if not cmds.objExists(self.optionCtrl+"."+generalAttr):
+                    cmds.addAttr(self.optionCtrl, longName=generalAttr, attributeType="enum", enumName="----------", keyable=True)
+                    cmds.setAttr(self.optionCtrl+"."+generalAttr, lock=True)
                 
                 # Only create if a VolumeVariation attribute is found
-                if not pymel.hasAttr(pOptCtrl, vvAttr):
-                    if (pOptCtrl.listAttr(string="*"+vvAttr+"*")):
-                        pymel.addAttr(pOptCtrl, ln=vvAttr, at="enum", enumName="----------", keyable=True)
-                        pymel.setAttr(pOptCtrl+"."+vvAttr, lock=True)
+                if not cmds.objExists(self.optionCtrl+"."+vvAttr):
+                    if cmds.listAttr(self.optionCtrl, string="*"+vvAttr+"*"):
+                        cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
+                        cmds.setAttr(self.optionCtrl+"."+vvAttr, lock=True)
                 
                 # Only create if a IkFk attribute is found
-                if not pymel.hasAttr(pOptCtrl, "ikFkBlend"):
-                    if (pOptCtrl.listAttr(string="*ikFk*")):
-                        pymel.addAttr(pOptCtrl, ln="ikFkBlend", at="enum", enumName="----------", keyable=True)
-                        pymel.setAttr(pOptCtrl.ikFkBlend, lock=True)
+                if not cmds.objExists(self.optionCtrl+".ikFkBlend"):
+                    if cmds.listAttr(self.optionCtrl, string="*ikFk*"):
+                        cmds.addAttr(self.optionCtrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
+                        cmds.setAttr(self.optionCtrl+".ikFkBlend", lock=True)
                 
-                if not pymel.hasAttr(pOptCtrl, "display"):
-                    pymel.addAttr(pOptCtrl, ln="display", at="enum", enumName="----------", keyable=True)
-                    pymel.setAttr(pOptCtrl.display, lock=True)
+                if not cmds.objExists(self.optionCtrl+".display"):
+                    cmds.addAttr(self.optionCtrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
+                    cmds.setAttr(self.optionCtrl+".display", lock=True)
                 
-                if not pymel.hasAttr(pOptCtrl, "mesh"):
-                    pymel.addAttr(pOptCtrl, ln="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
-                    pymel.connectAttr(pOptCtrl.mesh, pRenderGrp.visibility, force=True)
+                if not cmds.objExists(self.optionCtrl+".mesh"):
+                    cmds.addAttr(self.optionCtrl, longName="mesh", min=0, max=1, defaultValue=1, attributeType="long", keyable=True)
+                    cmds.connectAttr(self.optionCtrl+".mesh", self.renderGrp+".visibility", force=True)
                 
-                if not pymel.hasAttr(pOptCtrl, "proxy"):
-                    pymel.addAttr(pOptCtrl, ln="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
-                    pymel.connectAttr(pOptCtrl.proxy, pProxyGrp.visibility, force=True)
-                    #pymel.setAttr(pOptCtrl.proxy, channelBox=True)
+                if not cmds.objExists(self.optionCtrl+".proxy"):
+                    cmds.addAttr(self.optionCtrl, longName="proxy", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                    cmds.connectAttr(self.optionCtrl+".proxy", self.proxyGrp+".visibility", force=True)
                 
-                if not pymel.hasAttr(pOptCtrl, "control"):
-                    pymel.addAttr(pOptCtrl, ln="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                    pymel.connectAttr(pOptCtrl.control, pCtrlVisGrp.visibility, force=True)
-                    pymel.setAttr(pOptCtrl.control, channelBox=True)
+                if not cmds.objExists(self.optionCtrl+".control"):
+                    cmds.addAttr(self.optionCtrl, longName="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                    cmds.connectAttr(self.optionCtrl+".control", self.ctrlsVisGrp+".visibility", force=True)
+                    cmds.setAttr(self.optionCtrl+".control", channelBox=True)
                 
                 # try to organize Option_Ctrl attributes:
                 # get current user defined attributes:
