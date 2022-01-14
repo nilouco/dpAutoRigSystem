@@ -20,8 +20,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.02"
-DPAR_UPDATELOG = "N405 - No PyMEL for all modules.\n\nDeleted: libSerialization, sqIkFkTools, Ui, sqSpaceSwitcher, sqCopyPasteShapes, dpPoseReader."
+DPAR_VERSION_PY3 = "3.13.03"
+DPAR_UPDATELOG = "N404 - No PyMEL for dpAR main."
 
 
 
@@ -51,8 +51,7 @@ def dpARLoadingWindow():
     cmds.showWindow('dpARLoadWin')
     cmds.window('dpARLoadWin', edit=True, widthHeight=(285, 203))
 
-if not "pymel" in sys.modules:
-    dpARLoadingWindow()
+dpARLoadingWindow()
 
 ###################### End: Loading.
 
@@ -61,7 +60,7 @@ if not "pymel" in sys.modules:
 # importing libraries:
 try:
     from maya import mel
-    from pymel import core as pymel
+#    from pymel import core as pymel
     import json
     import re
     import time
@@ -132,6 +131,7 @@ DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 SSL_MACOS = "https://medium.com/@katopz/how-to-upgrade-openssl-8d005554401"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
+MASTER_ATTR = "masterGrp"
 
 
 class DP_AutoRig_UI(object):
@@ -1563,47 +1563,38 @@ class DP_AutoRig_UI(object):
     ###################### Start: Rigging Modules Instances
 
     '''
-    Pymel
-    Generic function to create base group
+        Generic function to create base group
+        TODO maybe move it to utils?
     '''
     def getBaseGrp(self, sAttrName, sGrpName):
-        nGrpNode = None
-        try:
-            nGrpNode = self.masterGrp.getAttr(sAttrName)
-        except pymel.MayaAttributeError:
-            try:
-                nGrpNode = pymel.PyNode(sGrpName)
-            except pymel.MayaNodeError:
-                nGrpNode = pymel.createNode("transform", name=sGrpName)
-            finally:
-                #Since there is no connection between the master and the node found, create the connection
-                self.masterGrp.addAttr(sAttrName, attributeType='message')
-                nGrpNode.message.connect(self.masterGrp.attr(sAttrName))
-        return nGrpNode
+        if not cmds.objExists(sGrpName):
+            cmds.createNode("transform", name=sGrpName)
+        if not cmds.objExists(self.masterGrp+"."+sAttrName):
+            cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
+        if not cmds.listConnections(self.masterGrp+"."+sAttrName, destination=False, source=True):
+            cmds.connectAttr(sGrpName+".message", self.masterGrp+"."+sAttrName, force=True)
+        return sGrpName
+
 
     '''
-    Pymel
-    Generic function to create base controller
+        Generic function to create base controller
+        TODO maybe move it to utils?
     '''
     def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree = 1, iSection = 8):
-        nCtrl = None
+        nCtrl = sCtrlName
         self.ctrlCreated = False
-        try:
-            nCtrl= self.masterGrp.getAttr(sAttrName)
-        except pymel.MayaAttributeError:
-            try:
-                nCtrl = pymel.PyNode(self.prefix + sCtrlName)
-            except pymel.MayaNodeError:
-                if (sCtrlName != (self.prefix + "Option_Ctrl")):
-                    nCtrl = pymel.PyNode(self.ctrls.cvControl(sCtrlType, sCtrlName, r=fRadius, d=iDegree, dir="+X"))
-                else:
-                    nCtrl = pymel.PyNode(self.ctrls.cvCharacter(sCtrlType, sCtrlName, r=(fRadius*0.2)))
-                self.ctrlCreated = True
-            finally:
-                #Since there is no connection between the master and the node found, create the connection
-                self.masterGrp.addAttr(sAttrName, attributeType='message')
-                nCtrl.message.connect(self.masterGrp.attr(sAttrName))
+        if not cmds.objExists(self.masterGrp+"."+sAttrName):
+            cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
+        if not cmds.objExists(sCtrlName):
+            if (sCtrlName != (self.prefix + "Option_Ctrl")):
+                nCtrl = self.ctrls.cvControl(sCtrlType, sCtrlName, r=fRadius, d=iDegree, dir="+X")
+            else:
+                nCtrl = self.ctrls.cvCharacter(sCtrlType, sCtrlName, r=(fRadius*0.2))
+            cmds.setAttr(nCtrl+".rotateOrder", 3)
+            cmds.connectAttr(sCtrlName+".message", self.masterGrp+"."+sAttrName, force=True)
+            self.ctrlCreated = True
         return nCtrl
+        
 
     '''
     Pymel
@@ -1611,16 +1602,20 @@ class DP_AutoRig_UI(object):
     '''
     def createBaseRigNode(self):
         sAllGrp = "All_Grp"
+        masterGrpList = []
         needCreateAllGrp = True
         # create master hierarchy:
-        allTransformList = pymel.ls(self.prefix + "*", selection=False, type="transform")
+        allTransformList = cmds.ls(self.prefix+"*", selection=False, type="transform")
         #Get all the masterGrp obj and ensure it not referenced
-        self.masterGrp = [n for n in allTransformList if n.hasAttr("masterGrp") and not pymel.referenceQuery(n, isNodeReferenced=True)]
+        for item in allTransformList:
+            if cmds.objExists(item+"."+MASTER_ATTR):
+                if not cmds.referenceQuery(item, isNodeReferenced=True):
+                    masterGrpList.append(item)
         localTime = str( time.asctime( time.localtime(time.time()) ) )
-        if self.masterGrp:
+        if masterGrpList:
             # validate master (All_Grp) node
             # If it doesn't work, the user need to clean it's scene to avoid duplicated names, for the moment.
-            for nodeGrp in self.masterGrp:
+            for nodeGrp in masterGrpList:
                 if self.validateMasterGrp(nodeGrp):
                     self.masterGrp = nodeGrp
                     needCreateAllGrp = False
@@ -1629,28 +1624,38 @@ class DP_AutoRig_UI(object):
                 # rename existing All_Grp node without connections as All_Grp_Old
                 cmds.rename(sAllGrp, sAllGrp+"_Old")
             #Create Master Grp
-            self.masterGrp = pymel.createNode("transform", name=self.prefix+sAllGrp)
-            self.masterGrp.addAttr("masterGrp", at="bool")
-            self.masterGrp.setDynamicAttr('masterGrp', True)
-            self.masterGrp.setDynamicAttr("date", localTime)
+            self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
+            # adding All_Grp attributes
+            cmds.addAttr(self.masterGrp, longName=MASTER_ATTR, attributeType="bool")
+            cmds.addAttr(self.masterGrp, longName="date", dataType="string")
             # system:
-            self.masterGrp.setDynamicAttr("maya", cmds.about(version=True))
-            self.masterGrp.setDynamicAttr("system", "dpAutoRig_"+DPAR_VERSION_PY3)
-            self.masterGrp.setDynamicAttr("language", self.langName)
-            self.masterGrp.setDynamicAttr("preset", self.presetName)
+            cmds.addAttr(self.masterGrp, longName="maya", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="system", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="language", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="preset", dataType="string")
             # author:
-            self.masterGrp.setDynamicAttr("author", getpass.getuser())
+            cmds.addAttr(self.masterGrp, longName="author", dataType="string")
             # rig info to be updated:
-            self.masterGrp.setDynamicAttr("geometryList", "")
-            self.masterGrp.setDynamicAttr("controlList", "")
+            cmds.addAttr(self.masterGrp, longName="geometryList", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="controlList", dataType="string")
+            # setting All_Grp data
+            cmds.setAttr(self.masterGrp+"."+MASTER_ATTR, True)
+            cmds.setAttr(self.masterGrp+".date", localTime, type="string")
+            cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
+            cmds.setAttr(self.masterGrp+".system", "dpAutoRig_"+DPAR_VERSION_PY3, type="string")
+            cmds.setAttr(self.masterGrp+".language", self.langName, type="string")
+            cmds.setAttr(self.masterGrp+".preset", self.presetName, type="string")
+            cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
+            # add date data log:
+            cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="name", dataType="string")
+            # module counts:
+            for guideType in self.guideModuleList:
+                cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
 
-        # add date data log:
-        self.masterGrp.setDynamicAttr("lastModification", localTime)
-        self.masterGrp.setDynamicAttr('name', self.masterGrp.__melobject__())
-        
-        # module counts:
-        for guideType in self.guideModuleList:
-            self.masterGrp.setDynamicAttr(guideType+"Count", 0)
+        # update data
+        cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
+        cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
 
         #Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
@@ -1666,126 +1671,92 @@ class DP_AutoRig_UI(object):
         self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
-        if self.masterGrp.__melobject__() == sAllGrp:
-            pymel.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
-            pymel.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
-        pymel.select(None)
+        if needCreateAllGrp:
+            if self.masterGrp == sAllGrp:
+                cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
+                cmds.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
+        cmds.select(None)
 
         #Hide Models and FX groups
         try:
-            pymel.setAttr(self.modelsGrp.visibility, 0)
-            pymel.setAttr(self.fxGrp.visibility, 0)
+            cmds.setAttr(self.modelsGrp+".visibility", 0)
+            cmds.setAttr(self.fxGrp+".visibility", 0)
         except:
             pass
 
-        #Function not in pymel for the moment
-        aToLock = [self.masterGrp.__melobject__(),
-                   self.modelsGrp.__melobject__(),
-                   self.ctrlsGrp.__melobject__(),
-                   self.renderGrp.__melobject__(),
-                   self.dataGrp.__melobject__(),
-                   self.proxyGrp.__melobject__(),
-                   self.fxGrp.__melobject__(),
-                   self.staticGrp.__melobject__(),
-                   self.ctrlsVisGrp.__melobject__()]
+        #Lock and Hide attributes
+        aToLock = [self.masterGrp,
+                   self.modelsGrp,
+                   self.ctrlsGrp,
+                   self.renderGrp,
+                   self.dataGrp,
+                   self.proxyGrp,
+                   self.fxGrp,
+                   self.staticGrp,
+                   self.ctrlsVisGrp]
         self.ctrls.setLockHide(aToLock, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
 
         #Control Setup
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
-        if (self.ctrlCreated):
-#            self.masterCtrl.setDynamicAttr("masterCtrl", True)
-            self.masterCtrl.rotateOrder.set(3)
-
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13), iSection=4)
-        if (self.ctrlCreated):
-            self.globalCtrl.rotateOrder.set(3)
-
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
-        if (self.ctrlCreated):
-            self.rootCtrl.rotateOrder.set(3)
-
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
-            pymel.makeIdentity(self.optionCtrl, apply=True)
-            self.optionCtrlGrp = pymel.PyNode(utils.zeroOut([self.optionCtrl.__melobject__()])[0])
-            self.optionCtrlGrp.translateX.set(fMasterRadius)
+            cmds.makeIdentity(self.optionCtrl, apply=True)
+            self.optionCtrlGrp = utils.zeroOut([self.optionCtrl])[0]
+            cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
-            self.rigScaleMD = pymel.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
-            self.rigScaleMD.addAttr("dpRigScale", at="bool")
-            self.rigScaleMD.setDynamicAttr('dpRigScale', True)
-            pymel.connectAttr(self.optionCtrl.rigScale, self.rigScaleMD.input1X, force=True)
-            pymel.connectAttr(self.optionCtrl.rigScaleMultiplier, self.rigScaleMD.input2X, force=True)
-            pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleX, force=True)
-            pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleY, force=True)
-            pymel.connectAttr(self.rigScaleMD.outputX, self.masterCtrl.scaleZ, force=True)
-            # comment to avoid double transformation for tweaks using indirect skinning:
-            #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleX, force=True)
-            #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleY, force=True)
-            #pymel.connectAttr(self.rigScaleMD.outputX, self.scalableGrp.scaleZ, force=True)
-            self.ctrls.setLockHide([self.masterCtrl.__melobject__()], ['sx', 'sy', 'sz'])
-            self.ctrls.setNonKeyable([self.optionCtrl.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-            self.ctrls.setCalibrationAttr(self.optionCtrl.__melobject__(), ['rigScaleMultiplier'])
+            self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
+            cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool")
+            cmds.setAttr(self.rigScaleMD+".dpRigScale", True)
+            cmds.connectAttr(self.optionCtrl+".rigScale", self.rigScaleMD+".input1X", force=True)
+            cmds.connectAttr(self.optionCtrl+".rigScaleMultiplier", self.rigScaleMD+".input2X", force=True)
+            cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleX", force=True)
+            cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleY", force=True)
+            cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleZ", force=True)
+            self.ctrls.setLockHide([self.masterCtrl], ['sx', 'sy', 'sz'])
+            self.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setCalibrationAttr(self.optionCtrl, ['rigScaleMultiplier'])
+            cmds.parent(self.rootCtrl, self.masterCtrl)
+            cmds.parent(self.masterCtrl, self.globalCtrl)
+            cmds.parent(self.globalCtrl, self.ctrlsGrp)
+            cmds.parent(self.optionCtrlGrp, self.rootCtrl)
+            cmds.parent(self.ctrlsVisGrp, self.rootCtrl)
         else:
-            self.optionCtrlGrp = self.optionCtrl.getParent()
             self.rigScaleMD = self.prefix+'RigScale_MD'
 
-        pymel.parent(self.rootCtrl, self.masterCtrl)
-        pymel.parent(self.masterCtrl, self.globalCtrl)
-        pymel.parent(self.globalCtrl, self.ctrlsGrp)
-        pymel.parent(self.optionCtrlGrp, self.rootCtrl)
-        pymel.parent(self.ctrlsVisGrp, self.rootCtrl)
+        # set lock and hide attributes
+        self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
+        self.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
 
-        # set lock and hide attributes (cmds function):
-        self.ctrls.setLockHide([self.scalableGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
-        self.ctrls.setLockHide([self.rootCtrl.__melobject__(), self.globalCtrl.__melobject__()], ['sx', 'sy', 'sz', 'v'])
-
-        self.masterCtrl.visibility.setKeyable(False)
-        pymel.select(None)
+        cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
+        cmds.select(None)
 
         #Base joint
-        try:
-            self.baseRootJnt = pymel.PyNode(self.prefix+"BaseRoot_Jnt")
-            self.baseRootJntGrp = pymel.PyNode(self.prefix+"BaseRoot_Joint_Grp")
-        except pymel.MayaNodeError:
-            self.baseRootJnt = pymel.createNode("joint", name=self.prefix+"BaseRoot_Jnt")
-            self.baseRootJntGrp = pymel.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
-            pymel.parent(self.baseRootJnt, self.baseRootJntGrp)
-            pymel.parent(self.baseRootJntGrp, self.scalableGrp)
-            pymel.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
-            pymel.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
-            self.baseRootJntGrp.visibility.set(False)
-            self.ctrls.setLockHide([self.baseRootJnt.__melobject__(), self.baseRootJntGrp.__melobject__()], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-
-        #Ensure object returned are cmds supported
-        self.masterGrp = self.masterGrp.__melobject__()
-        self.modelsGrp = self.modelsGrp.__melobject__()
-        self.ctrlsGrp = self.ctrlsGrp.__melobject__()
-        self.ctrlsVisGrp = self.ctrlsVisGrp.__melobject__()
-        self.dataGrp = self.dataGrp.__melobject__()
-        self.renderGrp = self.renderGrp.__melobject__()
-        self.proxyGrp = self.proxyGrp.__melobject__()
-        self.fxGrp = self.fxGrp.__melobject__()
-        self.staticGrp = self.staticGrp.__melobject__()
-        self.scalableGrp = self.scalableGrp.__melobject__()
-        self.masterCtrl = self.masterCtrl.__melobject__()
-        self.rootCtrl = self.rootCtrl.__melobject__()
-        self.globalCtrl = self.globalCtrl.__melobject__()
-        self.optionCtrl = self.optionCtrl.__melobject__()
-        self.optionCtrlGrp = self.optionCtrlGrp.__melobject__()
-        self.baseRootJnt = self.baseRootJnt.__melobject__()
-        self.baseRootJntGrp = self.baseRootJntGrp.__melobject__()
+        self.baseRootJnt = self.prefix+"BaseRoot_Jnt"
+        self.baseRootJntGrp = self.prefix+"BaseRoot_Joint_Grp"
+        if not cmds.objExists(self.baseRootJnt):
+            self.baseRootJnt = cmds.createNode("joint", name=self.prefix+"BaseRoot_Jnt")
+            if not cmds.objExists(self.baseRootJntGrp):
+                self.baseRootJntGrp = cmds.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
+            cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
+            cmds.parent(self.baseRootJntGrp, self.scalableGrp)
+            cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
+            cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
+            cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
+            self.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
         
 
     def validateMasterGrp(self, nodeGrp, *args):
         """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
         """
-        masterGroupList = ["modelsGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
-        for masterGroupAttr in masterGroupList:
-            if not nodeGrp.getAttr(masterGroupAttr):
-                pymel.setAttr(nodeGrp.masterGrp, 0)
+        masterGroupAttrList = ["modelsGrp", "ctrlsGrp", "ctrlsVisibilityGrp", "dataGrp", "renderGrp", "proxyGrp", "fxGrp", "staticGrp", "scalableGrp", "blendShapesGrp", "wipGrp"]
+        for masterGroupAttr in masterGroupAttrList:
+            if not cmds.objExists(nodeGrp+"."+masterGroupAttr):
+                cmds.setAttr(nodeGrp+"."+MASTER_ATTR, 0)
                 return False
-        return nodeGrp.getAttr("masterGrp")
+        return cmds.getAttr(nodeGrp+"."+MASTER_ATTR)
 
 
     def reorderAttributes(self, objList, attrList, *args):
@@ -2594,22 +2565,22 @@ class DP_AutoRig_UI(object):
             #Actualise all controls (All_Grp.controlList) for this rig:
             rigInfo.UpdateRigInfo.updateRigInfoLists()
 
-            #Colorize all controller in yellow as a base (Pymel)
+            #Colorize all controller in yellow as a base
             if (bColorize):
-                aBCtrl = [pymel.PyNode(self.globalCtrl), pymel.PyNode(self.rootCtrl), pymel.PyNode(self.optionCtrl)]
-                aAllCtrls = pymel.ls("*_Ctrl")
+                aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
+                aAllCtrls = cmds.ls("*_Ctrl", type="shape")
                 lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
                 rPattern = re.compile(self.langDic[self.langName]['p003_right'] + '_.*._Ctrl')
                 for pCtrl in aAllCtrls:
-                    if not pCtrl.getShape().overrideEnabled.get():
-                        if (lPattern.match(pCtrl.name())):
-                            self.ctrls.colorShape([pCtrl.__melobject__()], "red")
-                        elif (rPattern.match(pCtrl.name())):
-                            self.ctrls.colorShape([pCtrl.__melobject__()], "blue")
+                    if not cmds.getAttr(pCtrl+".overrideEnabled"):
+                        if (lPattern.match(pCtrl)):
+                            self.ctrls.colorShape([pCtrl], "red")
+                        elif (rPattern.match(pCtrl)):
+                            self.ctrls.colorShape([pCtrl], "blue")
                         elif (pCtrl in aBCtrl):
-                            self.ctrls.colorShape([pCtrl.__melobject__()], "black")
+                            self.ctrls.colorShape([pCtrl], "black")
                         else:
-                            self.ctrls.colorShape([pCtrl.__melobject__()], "yellow")
+                            self.ctrls.colorShape([pCtrl], "yellow")
 
             # Add usefull attributes for the animators
             if (bAddAttr):
