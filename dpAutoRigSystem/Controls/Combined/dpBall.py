@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from dpAutoRigSystem.Controls import dpBaseControlClass
+from importLib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m116_ball"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ball.png"
 
-dpBallVersion = 1.1
+dpBallVersion = 1.2
 
 class Ball(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

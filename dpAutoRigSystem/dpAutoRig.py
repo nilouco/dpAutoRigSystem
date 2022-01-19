@@ -67,9 +67,9 @@ try:
     import urllib
     import shutil
     import zipfile
-    import StringIO
     import datetime
     import platform
+    from io import StringIO
     from functools import partial
     from Modules.Library import dpUtils as utils
     from Modules.Library import dpControls
@@ -78,6 +78,7 @@ try:
     from Extras import dpUpdateRigInfo as rigInfo
     from Extras import dpReorderAttr
     from Languages.Translator import dpTranslator
+    from importlib import reload
     reload(utils)
     reload(dpControls)
     reload(rigInfo)

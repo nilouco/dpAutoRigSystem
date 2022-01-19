@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m112_arrowFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrowFlat.png"
 
-dpArrowFlatVersion = 1.1
+dpArrowFlatVersion = 1.2
 
 class ArrowFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

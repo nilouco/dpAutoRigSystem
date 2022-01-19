@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m106_clip"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clip.png"
 
-dpClipVersion = 1.1
+dpClipVersion = 1.2
 
 class Clip(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importLib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m115_locator"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_locator.png"
 
-dpLocatorVersion = 1.1
+dpLocatorVersion = 1.2
 
 class Locator(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

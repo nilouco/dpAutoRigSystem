@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m117_ballonFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ballonFlat.png"
 
-dpBallonFlatVersion = 1.1
+dpBallonFlatVersion = 1.2
 
 class BallonFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

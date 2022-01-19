@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m119_compressedCircle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_compressedCircle.png"
 
-dpCompressedCircleVersion = 1.1
+dpCompressedCircleVersion = 1.2
 
 class CompressedCircle(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

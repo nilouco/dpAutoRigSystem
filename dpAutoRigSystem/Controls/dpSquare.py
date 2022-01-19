@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importLib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m100_square"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_square.png"
 
-dpSquareVersion = 1.1
+dpSquareVersion = 1.2
 
 class Square(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

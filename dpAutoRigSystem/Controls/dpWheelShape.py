@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importLib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m162_wheelShape"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_wheelShape.png"
 
-dpWheelShapeVersion = 1.0
+dpWheelShapeVersion = 1.1
 
 class WheelShape(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

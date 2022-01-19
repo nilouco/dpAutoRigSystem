@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importLib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m131_plus"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_plus.png"
 
-dpPlusVersion = 1.1
+dpPlusVersion = 1.2
 
 class Plus(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

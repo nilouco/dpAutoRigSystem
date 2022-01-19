@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m127_bean"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_bean.png"
 
-dpBeanVersion = 1.1
+dpBeanVersion = 1.2
 
 class Bean(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

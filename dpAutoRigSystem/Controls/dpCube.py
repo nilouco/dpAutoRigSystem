@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m111_cube"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_cube.png"
 
-dpCubeVersion = 1.1
+dpCubeVersion = 1.2
 
 class Cube(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

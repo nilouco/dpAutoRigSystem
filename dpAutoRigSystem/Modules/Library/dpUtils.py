@@ -8,8 +8,8 @@ import cProfile
 import shutil
 import urllib
 import zipfile
-import StringIO
 import webbrowser
+from io import StringIO
 
 
 # UTILS functions:
