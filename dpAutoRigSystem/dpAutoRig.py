@@ -20,17 +20,17 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.03"
-DPAR_UPDATELOG = "N404 - No PyMEL for dpAR main."
+DPAR_VERSION_PY3 = "3.13.04"
+DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
 
 ###################### Start: Loading.
 
-from maya import cmds
 import sys
 import os
 import random
+from maya import cmds
 
 def clearDPARLoadingWindow():
     if cmds.window('dpARLoadWin', query=True, exists=True):
@@ -59,7 +59,6 @@ dpARLoadingWindow()
 
 # importing libraries:
 try:
-    from maya import mel
     import json
     import re
     import time
@@ -69,6 +68,7 @@ try:
     import zipfile
     import datetime
     import platform
+    from maya import mel
     from io import StringIO
     from functools import partial
     from Modules.Library import dpUtils as utils
@@ -1384,7 +1384,7 @@ class DP_AutoRig_UI(object):
         if downloadFolder:
             cmds.progressWindow(title='Download Update', progress=50, status='Downloading...', isInterruptable=False)
             try:
-                urllib.urlretrieve(url, downloadFolder[0])
+                urllib.request.urlretrieve(url, downloadFolder[0])
                 self.info('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
@@ -1435,7 +1435,7 @@ class DP_AutoRig_UI(object):
             
             try:
                 # get remote file from url:
-                remoteSource = urllib.urlopen(url)
+                remoteSource = urllib.request.urlopen(url)
                 
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
