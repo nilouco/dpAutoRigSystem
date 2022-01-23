@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ###################################################################
@@ -20,7 +20,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.04"
+DPAR_VERSION_PY3 = "3.13.05"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
@@ -56,42 +56,41 @@ dpARLoadingWindow()
 ###################### End: Loading.
 
 
-
 # importing libraries:
-try:
-    import json
-    import re
-    import time
-    import getpass
-    import urllib
-    import shutil
-    import zipfile
-    import datetime
-    import platform
-    from maya import mel
-    from io import StringIO
-    from functools import partial
-    from Modules.Library import dpUtils as utils
-    from Modules.Library import dpControls
-    from Modules import dpBaseClass as Base
-    from Modules import dpLayoutClass as Layout
-    from Extras import dpUpdateRigInfo as rigInfo
-    from Extras import dpReorderAttr
-    from Languages.Translator import dpTranslator
-    from importlib import reload
-    reload(utils)
-    reload(dpControls)
-    reload(rigInfo)
-    reload(Base)
-    reload(Layout)
-except Exception as e:
-    print("Error: importing python modules!!!\n")
-    print(e)
-    try:
-        clearDPARLoadingWindow()
-        self.jobWinClose()
-    except:
-        pass
+#try:
+import json
+import re
+import time
+import getpass
+import urllib
+import shutil
+import zipfile
+import datetime
+import platform
+from maya import mel
+from io import StringIO
+from functools import partial
+from .Modules.Library import dpUtils
+from .Modules.Library import dpControls
+from .Modules import dpBaseClass
+from .Modules import dpLayoutClass
+from .Extras import dpUpdateRigInfo
+from .Extras import dpReorderAttr
+from .Languages.Translator import dpTranslator
+from importlib import reload
+reload(dpUtils)
+reload(dpControls)
+reload(dpUpdateRigInfo)
+reload(dpBaseClass)
+reload(dpLayoutClass)
+#except Exception as e:
+#    print("Error: importing python modules!!!\n")
+#    print(e)
+#    try:
+#        clearDPARLoadingWindow()
+#        self.jobWinClose()
+#    except:
+#        pass
 
 # declaring member variables
 ENGLISH = "English"
@@ -154,89 +153,89 @@ class DP_AutoRig_UI(object):
         self.userDefAutoCheckUpdate = 0
         
         
-        try:
-            # store all UI elements in a dictionary:
-            self.allUIs = {}
-            self.iDeleteJobId = 0
-            self.iSelChangeJobId = 0
-            # creating User Interface (UI) Window:
-            self.deleteExistWindow()
-            dpAR_winWidth  = 305
-            dpAR_winHeight = 605
-            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION_PY3)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
-            
-            # creating menus:
-            self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
-            # language menu:
-            self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
-            cmds.radioMenuItemCollection('languageRadioMenuCollection')
-            # create a language list:
-            self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
-            # create menuItems from language list:
-            if self.langList:
-                # verify if there is a optionVar of last choosen by user in Maya system:
-                lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
-                # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
-                for idiom in self.langList:
-                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
-                # load the last language from optionVar value:
-                cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
-            else:
-                print("Error: Cannot load json language files!\n")
-                return
-            
-            # preset menu:
-            self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
-            cmds.radioMenuItemCollection('presetRadioMenuCollection')
-            # create a preset list:
-            self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
-            # create menuItems from preset list:
-            if self.presetList:
-                # verify if there is a optionVar of last choosen by user in Maya system:
-                lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
-                # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
-                for preset in self.presetList:
-                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
-                # load the last preset from optionVar value:
-                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
-            else:
-                print("Error: Cannot load json preset files!\n")
-                return
-            
-            # create menu:
-            self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
-            cmds.menuItem('translator_MI', label='Translator', command=self.translator)
-            cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
-            # window menu:
-            self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
-            cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
-            cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
-            # help menu:
-            self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-            cmds.menuItem('about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
-            cmds.menuItem('author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
-            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
-            cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
-            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
-            cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-            cmds.menuItem('help_MI', label='Help...', command=partial(utils.visitWebSite, DPAR_SITE))
-            
-            # create the main layout:
-            self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
-            # here we will populate with layout from mainUI based in the choose language.
-            
-            # call mainUI in order to populate the main layout:
-            self.mainUI()
-            
-            # check if we need to automatically check for update:
+#        try:
+        # store all UI elements in a dictionary:
+        self.allUIs = {}
+        self.iDeleteJobId = 0
+        self.iSelChangeJobId = 0
+        # creating User Interface (UI) Window:
+        self.deleteExistWindow()
+        dpAR_winWidth  = 305
+        dpAR_winHeight = 605
+        self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION_PY3)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
+        
+        # creating menus:
+        self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
+        # language menu:
+        self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
+        cmds.radioMenuItemCollection('languageRadioMenuCollection')
+        # create a language list:
+        self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
+        # create menuItems from language list:
+        if self.langList:
+            # verify if there is a optionVar of last choosen by user in Maya system:
+            lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
+            # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
+            for idiom in self.langList:
+                cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+            # load the last language from optionVar value:
+            cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
+        else:
+            print("Error: Cannot load json language files!\n")
+            return
+        
+        # preset menu:
+        self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
+        cmds.radioMenuItemCollection('presetRadioMenuCollection')
+        # create a preset list:
+        self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
+        # create menuItems from preset list:
+        if self.presetList:
+            # verify if there is a optionVar of last choosen by user in Maya system:
+            lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
+            # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
+            for preset in self.presetList:
+                cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+            # load the last preset from optionVar value:
+            cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
+        else:
+            print("Error: Cannot load json preset files!\n")
+            return
+        
+        # create menu:
+        self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
+        cmds.menuItem('translator_MI', label='Translator', command=self.translator)
+        cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
+        # window menu:
+        self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
+        cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
+        cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
+        # help menu:
+        self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
+        cmds.menuItem('about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+        cmds.menuItem('author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
+        cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+        cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
+        cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+        cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
+        cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
+        
+        # create the main layout:
+        self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
+        # here we will populate with layout from mainUI based in the choose language.
+        
+        # call mainUI in order to populate the main layout:
+        self.mainUI()
+        
+        # check if we need to automatically check for update:
 #            self.autoCheckUpdate()
         
-        except Exception as e:
-            print("Error: dpAutoRig UI window !!!\n")
-            print("Exception:", e)
-            print(self.langDic[self.langName]['i008_errorUI'])
-            clearDPARLoadingWindow()
-            return
+#        except Exception as e:
+#            print("Error: dpAutoRig UI window !!!\n")
+#            print("Exception:", e)
+#            print(self.langDic[self.langName]['i008_errorUI'])
+#            clearDPARLoadingWindow()
+#            return
         
 
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
@@ -531,7 +530,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["editSelection2Layout"] = cmds.paneLayout("editSelection2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.langDic[self.langName]['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.langDic[self.langName]['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
-        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=utils.zeroOut, parent=self.allUIs["editSelectionFL"])
+        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectionFL"])
         
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
@@ -832,7 +831,7 @@ class DP_AutoRig_UI(object):
         jointName = cmds.textField(self.allUIs["jointNameTF"], query=True, text=True)
         if jointList:
             if jointName:
-                sortedJointList = utils.filterName(jointName, jointList, " ")
+                sortedJointList = dpUtils.filterName(jointName, jointList, " ")
             else:
                 sortedJointList = jointList
         
@@ -899,7 +898,7 @@ class DP_AutoRig_UI(object):
         geoName = cmds.textField(self.allUIs["geoNameTF"], query=True, text=True)
         if geomList:
             if geoName:
-                sortedGeoList = utils.filterName(geoName, geomList, " ")
+                sortedGeoList = dpUtils.filterName(geoName, geomList, " ")
             else:
                 sortedGeoList = geomList
         
@@ -966,7 +965,7 @@ class DP_AutoRig_UI(object):
         cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_lastPy2'], button=[btOk], defaultButton=btOk, cancelButton=btOk, dismissString=btOk)
         return
         # compare current version with GitHub master
-        rawResult = utils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
+        rawResult = dpUtils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
         
         # call Update Window about rawRsult:
         if rawResult[0] == 0:
@@ -1004,12 +1003,12 @@ class DP_AutoRig_UI(object):
             Returns a list with the found modules.
         """
         # find path where 'dpAutoRig.py' is been executed:
-        path = utils.findPath("dpAutoRig.py")
+        path = dpUtils.findPath("dpAutoRig.py")
         if not self.loadedPath:
             print("dpAutoRigPath: "+path)
             self.loadedPath = True
         # list all guide modules:
-        guideModuleList = utils.findAllModules(path, guideDir)
+        guideModuleList = dpUtils.findAllModules(path, guideDir)
         if guideModuleList:
             # change guide module list for alphabetic order:
             guideModuleList.sort()
@@ -1049,26 +1048,29 @@ class DP_AutoRig_UI(object):
         """
         # especific import command for guides storing theses guides modules in a variable:
         #guide = __import__("dpAutoRigSystem."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
 
         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
-        try:
-            guideDir = guideDir.replace("/", ".")
-            guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-            reload(guide)
-        except Exception as e:
-            print(e)
-            errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+e
-            mel.eval('warning \"'+errorString+'\";')
-            return
+#        try:
+        guideDir = guideDir.replace("/", ".")
+        print("DPAR 00 - guideDir", guideDir)
+        print("DPAR 01 - guideModule", guideModule)
+        print("DPAR 02 - layout", layout)
+        guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+        reload(guide)
+#        except Exception as e:
+#            print(e)
+#            errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+e
+#            mel.eval('warning \"'+errorString+'\";')
+#            return
 
         # getting data from guide module:
         title = self.langDic[self.langName][guide.TITLE]
         description = self.langDic[self.langName][guide.DESCRIPTION]
         icon = guide.ICON
         # find path where 'dpAutoRig.py' is been executed to get the icon:
-        path = utils.findPath("dpAutoRig.py")
+        path = dpUtils.findPath("dpAutoRig.py")
         iconDir = path+icon
         iconInfo = path+"/Icons/"+INFO_ICON
         guideName = guide.CLASS_NAME
@@ -1088,7 +1090,7 @@ class DP_AutoRig_UI(object):
                 will be stock in the rigType if we don't pass the parameter
                 https://stackoverflow.com/questions/24616757/maya-python-cmds-button-with-ui-passing-variables-and-calling-a-function
                 '''
-                cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, Base.RigType.biped), parent=moduleLayout)
+                cmds.button(label=title, height=32, command=partial(self.initGuide, guideModule, guideDir, dpBaseClass.RigType.biped), parent=moduleLayout)
             elif guideDir == SCRIPTS:
                 cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == EXTRAS:
@@ -1098,8 +1100,8 @@ class DP_AutoRig_UI(object):
         cmds.setParent('..')
     
     
-    #@utils.profiler
-    def initGuide(self, guideModule, guideDir, rigType=Base.RigType.biped, *args):
+    #@dpUtils.profiler
+    def initGuide(self, guideModule, guideDir, rigType=dpBaseClass.RigType.biped, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
@@ -1113,11 +1115,11 @@ class DP_AutoRig_UI(object):
                 # if yes, get the name after the "__":
                 namespaceList[i] = namespaceList[i].partition("__")[2]
         # send this result to findLastNumber in order to get the next moduleName +1:
-        newSuffix = utils.findLastNumber(namespaceList, BASE_NAME) + 1
+        newSuffix = dpUtils.findLastNumber(namespaceList, BASE_NAME) + 1
         # generate the current moduleName added the next new suffix:
         userSpecName = BASE_NAME + str(newSuffix)
         # especific import command for guides storing theses guides modules in a variable:
-        basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         reload(self.guide)
         # get the CLASS_NAME from guideModule:
@@ -1127,7 +1129,7 @@ class DP_AutoRig_UI(object):
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
-        self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
         return guideInstance
     
@@ -1137,7 +1139,7 @@ class DP_AutoRig_UI(object):
             Returns the guide instance initialised.
         """
         # especific import command for guides storing theses guides modules in a variable:
-        basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         reload(self.guide)
         # get the CLASS_NAME from extraModule:
@@ -1164,7 +1166,7 @@ class DP_AutoRig_UI(object):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
         # import this scripted module:
-        basePath = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         reload(guide)
         # get the CLASS_NAME from guideModule:
@@ -1183,10 +1185,10 @@ class DP_AutoRig_UI(object):
         cmds.namespace(setNamespace=":")
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find path where 'dpAutoRig.py' is been executed:
-        path = utils.findPath("dpAutoRig.py")
+        path = dpUtils.findPath("dpAutoRig.py")
         guideDir = MODULES
         # find all module names:
-        moduleNameInfo = utils.findAllModuleNames(path, guideDir)
+        moduleNameInfo = dpUtils.findAllModuleNames(path, guideDir)
         validModules = moduleNameInfo[0]
         validModuleNames = moduleNameInfo[1]
         
@@ -1209,7 +1211,7 @@ class DP_AutoRig_UI(object):
             cmds.deleteUI(self.allUIs["modulesLayoutA"])
             self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
             # load again the modules:
-            guideFolder = utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
+            guideFolder = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
             # this list will be used to rig all modules pressing the RIG button:
             for module in self.allGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
@@ -1224,16 +1226,16 @@ class DP_AutoRig_UI(object):
                     if cmds.attributeQuery("Style", node=module[2], ex=True):
                         iStyle = cmds.getAttr(module[2] + ".Style")
                         if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.biped)
+                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], dpBaseClass.RigType.biped)
                         else:
-                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.quadruped)
+                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], dpBaseClass.RigType.quadruped)
                     else:
-                        moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], Base.RigType.default)
+                        moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], dpBaseClass.RigType.default)
                 self.moduleInstancesList.append(moduleInst)
                 # reload pinGuide scriptJob:
                 self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
-        self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
     
     
@@ -1243,7 +1245,7 @@ class DP_AutoRig_UI(object):
         # get the entered text:
         enteredText = cmds.textField(self.allUIs["prefixTextField"], query=True, text=True)
         # call utils to return the normalized text:
-        prefixName = utils.normalizeText(enteredText, prefixMax=10)
+        prefixName = dpUtils.normalizeText(enteredText, prefixMax=10)
 
         # edit the prefixTextField with the prefixName:
         if len(prefixName) != 0:
@@ -1328,8 +1330,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
         infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
-        brPaypalButton = cmds.button('brlPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
-        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
+        brPaypalButton = cmds.button('brlPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(dpUtils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
+        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.langDic[self.langName]['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(dpUtils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
         # call Donate Window:
         cmds.showWindow(dpDonateWin)
     
@@ -1361,10 +1363,10 @@ class DP_AutoRig_UI(object):
                 cmds.text(self.langDic[self.langName]['i171_updateLog']+":\n", align="center", parent=updateLayout)
                 cmds.text(remoteLog, align="left", parent=updateLayout)
                 cmds.separator(height=30)
-            whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(utils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
-            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(utils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
+            whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(dpUtils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
+            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(dpUtils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
             if (int(cmds.about(version=True)[:4]) < 2019) and platform.system() == "Darwin": #Maya 2018 or older on macOS
-                upgradeSSLmacOSButton = cmds.button('upgradeSSLmacOSButton', label=self.langDic[self.langName]['i164_sslMacOS'], align="center", backgroundColor=(0.8, 0.4, 0.4), command=partial(utils.visitWebSite, SSL_MACOS), parent=updateLayout)
+                upgradeSSLmacOSButton = cmds.button('upgradeSSLmacOSButton', label=self.langDic[self.langName]['i164_sslMacOS'], align="center", backgroundColor=(0.8, 0.4, 0.4), command=partial(dpUtils.visitWebSite, SSL_MACOS), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
             installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
@@ -1426,7 +1428,7 @@ class DP_AutoRig_UI(object):
             print(self.langDic[self.langName]['i098_installing'])
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
-            dpAR_DestFolder = utils.findPath("dpAutoRig.py")
+            dpAR_DestFolder = dpUtils.findPath("dpAutoRig.py")
             
             # progress window:
             installAmount = 0
@@ -1704,7 +1706,7 @@ class DP_AutoRig_UI(object):
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
-            self.optionCtrlGrp = utils.zeroOut([self.optionCtrl])[0]
+            self.optionCtrlGrp = dpUtils.zeroOut([self.optionCtrl])[0]
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
@@ -1812,7 +1814,7 @@ class DP_AutoRig_UI(object):
         self.jobReloadUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
-        self.modulesToBeRiggedList = utils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
         self.riggedModuleDic = {}
         
         # declare a list to store all integrating information:
@@ -1850,7 +1852,7 @@ class DP_AutoRig_UI(object):
                 guideModule.checkFatherMirror()
             
             # store hierarchy from guides:
-            self.hookDic = utils.hook()
+            self.hookDic = dpUtils.hook()
             
             # get prefix:
             self.prefix = cmds.textField("prefixTextField", query=True, text=True)
@@ -1893,7 +1895,7 @@ class DP_AutoRig_UI(object):
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+self.langDic[self.langName]['i010_integrateCB']))
                 
                 # get all parent info from rigged modules:
-                self.originedFromDic = utils.getOriginedFromDic()
+                self.originedFromDic = dpUtils.getOriginedFromDic()
                 
                 # verify if is necessary organize the hierarchies for each module:
                 for guideModule in self.modulesToBeRiggedList:
@@ -2198,7 +2200,7 @@ class DP_AutoRig_UI(object):
                                                     revNode = tmp
                                         fkZeroNode = cmds.listConnections(limbIsolateFkConst + ".constraintRotateZ")[0]
                                         fkCtrl = fkZeroNode.replace("_Zero_0_Grp", "")
-                                        nodeToConst = utils.zeroOut([fkCtrl])[0]
+                                        nodeToConst = dpUtils.zeroOut([fkCtrl])[0]
                                         nodeToConst = cmds.rename(nodeToConst, fkCtrl + "_SpaceSwitch_Grp")
                                         mainCtrl = cmds.listConnections(revNode + ".inputX")[0]
                                         mainNull = sideName + mainParent +"_Null"  #Ensure the name is set to prevent unbound variable problem with inner function
@@ -2563,7 +2565,7 @@ class DP_AutoRig_UI(object):
             cmds.progressWindow(endProgress=True)
         
             #Actualise all controls (All_Grp.controlList) for this rig:
-            rigInfo.UpdateRigInfo.updateRigInfoLists()
+            dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
             #Colorize all controller in yellow as a base
             if (bColorize):
@@ -2739,7 +2741,7 @@ class DP_AutoRig_UI(object):
                     elif (args[0] == "Remove"):
                         cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
                     else:
-                        baseName = utils.extractSuffix(geomSkin)
+                        baseName = dpUtils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]

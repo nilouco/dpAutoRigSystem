@@ -10,6 +10,7 @@ import urllib
 import zipfile
 import webbrowser
 from io import StringIO
+from importlib import reload
 
 
 # UTILS functions:

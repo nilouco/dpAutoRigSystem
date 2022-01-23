@@ -1,9 +1,9 @@
 # importing libraries:
 from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 
 # global variables to this module:    
@@ -13,23 +13,23 @@ DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
 
-class Head(Base.StartClass, Layout.LayoutClass):
+class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
     
     
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
@@ -140,7 +140,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        utils.useDefaultRenderLayer()
+        dpUtils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -177,7 +177,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # re-define cvNeckLoc:
                 self.cvNeckLoc = self.guideName+"_Neck"+str(self.enteredNJoints)
                 # re-parent the children guides:
-                childrenGuideBellowList = utils.getGuideChildrenList(self.cvNeckLoc)
+                childrenGuideBellowList = dpUtils.getGuideChildrenList(self.cvNeckLoc)
                 if childrenGuideBellowList:
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvNeckLoc)
@@ -187,7 +187,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
-            Layout.LayoutClass.createPreviewMirror(self)
+            dpLayoutClass.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
     
 
@@ -196,7 +196,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
             Depends on axis and rotation done.
         """
         # declaring naming:
-        attrBaseName = utils.extractSuffix(attrCtrl)
+        attrBaseName = dpUtils.extractSuffix(attrCtrl)
         drivenGrp = attrBaseName+"_"+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c034_move']+"_Grp"
         # attribute names:
         intAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName][intAttrID].capitalize()+axis
@@ -294,7 +294,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
     
     
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -348,7 +348,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
@@ -430,17 +430,17 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 for n in range(0, self.nJoints):
-                    utils.setJointLabel(self.neckJointList[n], s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']+"_"+str(n).zfill(2))
-                utils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c024_head'])
-                utils.setJointLabel(self.upperJawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw'])
-                utils.setJointLabel(self.upperHeadJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head'])
-                utils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw'])
-                utils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c026_chin'])
-                utils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c048_chew'])
-                utils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.langDic[self.langName]['c039_lip'])
-                utils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.langDic[self.langName]['c039_lip'])
-                utils.setJointLabel(self.upperLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c039_lip'])
-                utils.setJointLabel(self.lowerLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+self.langDic[self.langName]['c039_lip'])
+                    dpUtils.setJointLabel(self.neckJointList[n], s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']+"_"+str(n).zfill(2))
+                dpUtils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c024_head'])
+                dpUtils.setJointLabel(self.upperJawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw'])
+                dpUtils.setJointLabel(self.upperHeadJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head'])
+                dpUtils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw'])
+                dpUtils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c026_chin'])
+                dpUtils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c048_chew'])
+                dpUtils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.langDic[self.langName]['c039_lip'])
+                dpUtils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.langDic[self.langName]['c039_lip'])
+                dpUtils.setJointLabel(self.upperLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c039_lip'])
+                dpUtils.setJointLabel(self.lowerLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+self.langDic[self.langName]['c039_lip'])
                 # creating controls:
                 for n in range(0, self.nJoints):
                     neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z")
@@ -479,7 +479,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.delete([self.headCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl], constructionHistory=True)
                 
                 #Setup Axis Order
-                if self.rigType == Base.RigType.quadruped:
+                if self.rigType == dpBaseClass.RigType.quadruped:
                     for n in range(0, self.nJoints):
                         cmds.setAttr(self.neckCtrlList[n]+".rotateOrder", 1)
                     cmds.setAttr(self.headCtrl+".rotateOrder", 1)
@@ -497,19 +497,19 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 for n in range(0, self.nJoints):
                     if n == 0:
-                        utils.originedFrom(objName=self.neckCtrlList[0], attrString=self.base+";"+self.neckLocList[0]+";"+self.radiusGuide)
+                        dpUtils.originedFrom(objName=self.neckCtrlList[0], attrString=self.base+";"+self.neckLocList[0]+";"+self.radiusGuide)
                     else:
-                        utils.originedFrom(objName=self.neckCtrlList[n], attrString=self.neckLocList[n])
-                utils.originedFrom(objName=self.headCtrl, attrString=self.cvHeadLoc)
-                utils.originedFrom(objName=self.upperJawCtrl, attrString=self.cvUpperJawLoc)
-                utils.originedFrom(objName=self.upperHeadCtrl, attrString=self.cvUpperHeadLoc)
-                utils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
-                utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
-                utils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
-                utils.originedFrom(objName=self.lCornerLipCtrl, attrString=self.cvLCornerLipLoc)
-                utils.originedFrom(objName=self.rCornerLipCtrl, attrString=self.cvRCornerLipLoc)
-                utils.originedFrom(objName=self.upperLipCtrl, attrString=self.cvUpperLipLoc)
-                utils.originedFrom(objName=self.lowerLipCtrl, attrString=self.cvLowerLipLoc)
+                        dpUtils.originedFrom(objName=self.neckCtrlList[n], attrString=self.neckLocList[n])
+                dpUtils.originedFrom(objName=self.headCtrl, attrString=self.cvHeadLoc)
+                dpUtils.originedFrom(objName=self.upperJawCtrl, attrString=self.cvUpperJawLoc)
+                dpUtils.originedFrom(objName=self.upperHeadCtrl, attrString=self.cvUpperHeadLoc)
+                dpUtils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
+                dpUtils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
+                dpUtils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
+                dpUtils.originedFrom(objName=self.lCornerLipCtrl, attrString=self.cvLCornerLipLoc)
+                dpUtils.originedFrom(objName=self.rCornerLipCtrl, attrString=self.cvRCornerLipLoc)
+                dpUtils.originedFrom(objName=self.upperLipCtrl, attrString=self.cvUpperLipLoc)
+                dpUtils.originedFrom(objName=self.lowerLipCtrl, attrString=self.cvLowerLipLoc)
                 
                 # temporary parentConstraints:
                 for n in range(0, self.nJoints):
@@ -536,13 +536,13 @@ class Head(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(toFlipNode+".scaleZ", -1)
 
                 # zeroOut controls:
-                self.zeroCornerLipCtrlList = utils.zeroOut([self.lCornerLipCtrl, self.rCornerLipCtrl])
+                self.zeroCornerLipCtrlList = dpUtils.zeroOut([self.lCornerLipCtrl, self.rCornerLipCtrl])
                 self.lLipGrp = cmds.group(self.lCornerLipCtrl, name=self.lCornerLipCtrl+"_Grp")
                 self.rLipGrp = cmds.group(self.rCornerLipCtrl, name=self.rCornerLipCtrl+"_Grp")
                 if not self.addFlip:
                     cmds.setAttr(self.zeroCornerLipCtrlList[1]+".scaleX", -1)
-                self.zeroNeckCtrlList = utils.zeroOut(self.neckCtrlList)
-                self.zeroCtrlList = utils.zeroOut([self.headCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl, self.upperHeadCtrl])
+                self.zeroNeckCtrlList = dpUtils.zeroOut(self.neckCtrlList)
+                self.zeroCtrlList = dpUtils.zeroOut([self.headCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl, self.upperHeadCtrl])
                 self.zeroCtrlList.extend(self.zeroCornerLipCtrlList)
                 
                 # make joints be ride by controls:
@@ -572,11 +572,11 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False))
 
                 # hide unnecessary zero out bone display:
-                utils.zeroOutJoints([self.lCornerLipJnt, self.rCornerLipJnt])
+                dpUtils.zeroOutJoints([self.lCornerLipJnt, self.rCornerLipJnt])
 
                 # head follow/isolate create interations between neck and head:
                 self.headOrientGrp = cmds.group(empty=True, name=self.headCtrl+"_Orient_Grp")
-                self.zeroHeadGrp = utils.zeroOut([self.headOrientGrp])[0]
+                self.zeroHeadGrp = dpUtils.zeroOut([self.headOrientGrp])[0]
                 cmds.parent(self.zeroHeadGrp, self.neckCtrlList[-1])
                 self.worldRef = cmds.group(empty=True, name=side+self.userGuideName+"_WorldRef_Grp")
                 self.worldRefList.append(self.worldRef)
@@ -608,7 +608,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Y", force=True)
                     cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Z", force=True)
                     cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
-                    if self.rigType == Base.RigType.quadruped:
+                    if self.rigType == dpBaseClass.RigType.quadruped:
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
                         quadrupedRotYZFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YZ_Fix_MD")
                         cmds.connectAttr(neckARMD+".outputY", quadrupedRotYZFixMD+".input1X", force=True)
@@ -680,16 +680,16 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 # articulation joint:
                 if self.addArticJoint:
                     # neckBase
-                    neckBaseJzt = utils.zeroOutJoints([self.neckJointList[0]])[0]
-                    articJntList = utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
-                    utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base'])
+                    neckBaseJzt = dpUtils.zeroOutJoints([self.neckJointList[0]])[0]
+                    articJntList = dpUtils.articulationJoint(neckBaseJzt, self.neckJointList[0])
+                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base'])
                     cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
                     self.neckJointList.insert(0, neckBaseJzt)
                     cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
                     cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
                     # headBase
-                    articJntList = utils.articulationJoint(self.neckJointList[-1], self.headJnt) #could call to create corrective joints. See parameters to implement it, please.
-                    utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base'])
+                    articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt) #could call to create corrective joints. See parameters to implement it, please.
+                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base'])
                     cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base']+"_Jar")
                 
                 # create a locator in order to avoid delete static group
@@ -733,9 +733,9 @@ class Head(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
 
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
@@ -750,7 +750,7 @@ class Head(Base.StartClass, Layout.LayoutClass):
     
     
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
-import dpBaseControlClass
-from importLib import reload
+from . import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
