@@ -37,7 +37,7 @@ class ControlClass(object):
         """
         if rgb:
             pass
-        elif (dic_colors.has_key(color)):
+        elif (color in dic_colors):
             iColorIdx = dic_colors[color]
         else:
             iColorIdx = color
