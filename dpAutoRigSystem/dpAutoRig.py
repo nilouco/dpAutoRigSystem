@@ -1011,7 +1011,7 @@ class DP_AutoRig_UI(object):
         guideModuleList = dpUtils.findAllModules(path, guideDir)
         if guideModuleList:
             # change guide module list for alphabetic order:
-            guideModuleList.sort()
+            sorted(guideModuleList)
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
@@ -1293,7 +1293,7 @@ class DP_AutoRig_UI(object):
             riggedGuideModuleList = []
             for riggedGuideModule in self.riggedModuleDic:
                 riggedGuideModuleList.append(riggedGuideModule)
-            riggedGuideModuleList.sort()
+            sorted(riggedGuideModuleList)
             for riggedGuideModule in riggedGuideModuleList:
                 moduleCustomName= self.riggedModuleDic[riggedGuideModule]
                 if moduleCustomName == None:
@@ -2188,7 +2188,7 @@ class DP_AutoRig_UI(object):
                                         #Need to sort the list to ensure that the resulat are in the same
                                         #order in Maya 2014 and Maya 2016...
                                         tempList = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])
-                                        tempList.sort()
+                                        sorted(tempList)
                                         revNode = tempList[0]
                                         if not cmds.objectType(revNode) == 'reverse':
                                             for tmp in tempList:

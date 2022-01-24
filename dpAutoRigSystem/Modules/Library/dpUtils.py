@@ -131,7 +131,7 @@ def findLastNumber(nameList, basename):
                 except ValueError:
                     pass
 
-    numberList.sort()
+    sorted(numberList)
     numberList.reverse()
 
     if numberList:
