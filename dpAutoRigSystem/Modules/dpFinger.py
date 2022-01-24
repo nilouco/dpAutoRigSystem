@@ -1,9 +1,9 @@
 # importing libraries:
 from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 # global variables to this module:
 CLASS_NAME = "Finger"
@@ -12,21 +12,21 @@ DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
 
 
-class Finger(Base.StartClass, Layout.LayoutClass):
+class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
 
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
 
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
 
@@ -77,7 +77,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        utils.useDefaultRenderLayer()
+        dpUtils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -118,7 +118,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     self.cvEndJoint = self.guideName+"_JointEnd"
                     self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
                     # re-parent the children guides:
-                    childrenGuideBellowList = utils.getGuideChildrenList(self.cvJointLoc)
+                    childrenGuideBellowList = dpUtils.getGuideChildrenList(self.cvJointLoc)
                     if childrenGuideBellowList:
                         for childGuide in childrenGuideBellowList:
                             cmds.parent(childGuide, self.cvJointLoc)
@@ -133,13 +133,13 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 # re-build the preview mirror:
-                Layout.LayoutClass.createPreviewMirror(self)
+                dpLayoutClass.LayoutClass.createPreviewMirror(self)
             cmds.select(self.moduleGrp)
         else:
             self.changeJointNumber(2)
 
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -185,7 +185,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.skinJointList = []
@@ -202,12 +202,12 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    dpUtils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     # create a control:
                     if n == 1:
                         self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
-                        utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
+                        dpUtils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
                         if s == 1:
                             if self.mirrorAxis == 'X':
@@ -243,9 +243,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                         self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         if n == self.nJoints:
-                            utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                            dpUtils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                         else:
-                            utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide)
+                            dpUtils.originedFrom(objName=self.fingerCtrl, attrString=self.guide)
                         if n == 0:
                             if self.nJoints == 2:
                                 # problably we are creating the first control to a thumb
@@ -276,7 +276,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     tempDel = cmds.parentConstraint(self.guide, self.sdkGrp, maintainOffset=False)
                     cmds.delete(tempDel)
                     # zeroOut controls:
-                    self.zeroGrp = utils.zeroOut([self.sdkGrp])
+                    self.zeroGrp = dpUtils.zeroOut([self.sdkGrp])
                     
                     # grouping:
                     if n > 0:
@@ -302,8 +302,8 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     # add articulationJoint:
                     if n > 0:
                         if self.addArticJoint:
-                            artJntList = utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            artJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            dpUtils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                             cmds.connectAttr(self.scaleCompensateCond+".outColorR", artJntList[0]+".segmentScaleCompensate", force=True)
                     cmds.select(self.jnt)
                     
@@ -378,7 +378,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
-                        utils.clearDpArAttr([fkJoint])
+                        dpUtils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
                         self.scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
                         cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_PaC")
@@ -410,7 +410,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
                     cmds.delete(cmds.parentConstraint(self.skinJointList[-1], self.ikCtrl, maintainOffset=False))
                     cmds.delete(cmds.pointConstraint(self.cvEndJoint, self.ikCtrl, maintainOffset=False))
-                    self.ikCtrlZero = utils.zeroOut([self.ikCtrl])[0]
+                    self.ikCtrlZero = dpUtils.zeroOut([self.ikCtrl])[0]
                     self.ikCtrlZeroList.append(self.ikCtrlZero)
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ikCtrlZero+".visibility", force=True)
                     for q in range(2, self.nJoints+1):
@@ -450,7 +450,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
                     if not "_JEnd" in ikJoint:
-                        utils.clearDpArAttr([ikJoint])
+                        dpUtils.clearDpArAttr([ikJoint])
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
                         self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
@@ -498,9 +498,9 @@ class Finger(Base.StartClass, Layout.LayoutClass):
                 self.scalableGrpList.append(self.toScalableHookGrp)
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
@@ -524,7 +524,7 @@ class Finger(Base.StartClass, Layout.LayoutClass):
         self.deleteModule()
 
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

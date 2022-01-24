@@ -1,8 +1,9 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from dpAutoRigSystem.Modules.Library import dpUtils as utils
-reload(utils)
+from ..Modules.Library import dpUtils
+from importlib import reload
+reload(dpUtils)
 
 # global variables to this module:    
 CLASS_NAME = "CopySkin"
@@ -78,7 +79,7 @@ class CopySkin(object):
         """
         for item in destinationList:
             # get correct naming
-            skinClusterName = utils.extractSuffix(item)
+            skinClusterName = dpUtils.extractSuffix(item)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
             # create skinCluster node

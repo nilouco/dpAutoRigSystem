@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
-import dpBaseControlClass
+from . import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m110_circle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_circle.png"
 
-dpCircleVersion = 1.1
+dpCircleVersion = 1.2
 
 class Circle(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-import dpUtils as utils
+from . import dpUtils
 import getpass
 import datetime
 
@@ -287,7 +287,7 @@ class ControlClass(object):
             # parent this ribbonPos to the ribbonGrp:
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
-            utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
+            dpUtils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
     
     
@@ -362,7 +362,7 @@ class ControlClass(object):
         return curve
 
 
-    #@utils.profiler
+    #@dpUtils.profiler
     def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
@@ -791,7 +791,7 @@ class ControlClass(object):
         return newRadius
     
     
-    #@utils.profiler
+    #@dpUtils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
         """

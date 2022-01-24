@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
-import dpBaseControlClass
+from . import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
@@ -9,7 +10,7 @@ TITLE = "m126_lens"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_lens.png"
 
-dpLensVersion = 1.1
+dpLensVersion = 1.2
 
 class Lens(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

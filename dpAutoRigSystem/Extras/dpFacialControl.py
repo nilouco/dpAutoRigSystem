@@ -5,7 +5,7 @@ import os
 import json
 from functools import partial
 import dpAutoRigSystem.Modules.Library.dpControls as dpControls
-from dpAutoRigSystem.Modules.Library import dpUtils as utils
+from dpAutoRigSystem.Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "FacialControl"
@@ -665,7 +665,7 @@ class FacialControl(object):
     def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
         """ Creates the nodes to remap values and connect it to final output (toNode) item.
         """
-        fromNodeName = utils.extractSuffix(fromNode)
+        fromNodeName = dpUtils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
         outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
         if "t" in toAttr:

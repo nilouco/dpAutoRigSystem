@@ -1,9 +1,9 @@
 # importing libraries:
 from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 # global variables to this module:
 CLASS_NAME = "Foot"
@@ -12,14 +12,14 @@ DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
 
-class Foot(Base.StartClass, Layout.LayoutClass):
+class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
 
         self.footCtrlList = []
         self.revFootCtrlGrpFinalList = []
@@ -34,11 +34,11 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         self.aScalableGrp = []
 
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
 
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # create cvJointLoc and cvLocators:
@@ -111,7 +111,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         cmds.setAttr(self.moduleGrp+".rotateY", 90)
 
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -154,7 +154,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
                 # redeclaring variables:
@@ -188,12 +188,12 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 # creating joints:
                 cmds.select(clear=True)
                 self.footJnt = cmds.joint(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_Jnt")
-                utils.setJointLabel(self.footJnt, s+jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
+                dpUtils.setJointLabel(self.footJnt, s+jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
                 self.middleFootJxt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jxt")
                 self.endJnt = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.select(clear=True)
                 self.middleFootJnt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jnt")
-                utils.setJointLabel(self.middleFootJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
+                dpUtils.setJointLabel(self.middleFootJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
                 self.endBJnt = cmds.joint(name=side+self.userGuideName+"B_JEnd", radius=0.5)
                 cmds.parent(self.middleFootJnt, self.middleFootJxt)
                 cmds.addAttr(self.footJnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -243,13 +243,13 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.RFEGrp, self.RFDCtrl)
                 
                 # reverse foot zero out groups:
-                self.RFEZero = utils.zeroOut([self.RFEGrp])[0]
-                self.RFEZeroExtra = utils.zeroOut([self.RFEZero])[0]
-                self.RFDZero = utils.zeroOut([self.RFDGrp])[0]
-                self.RFCZero = utils.zeroOut([self.RFCGrp])[0]
-                self.RFBZero = utils.zeroOut([self.RFBGrp])[0]
-                self.RFAZero = utils.zeroOut([self.RFAGrp])[0]
-                self.RFAZeroExtra = utils.zeroOut([self.RFAZero])[0]
+                self.RFEZero = dpUtils.zeroOut([self.RFEGrp])[0]
+                self.RFEZeroExtra = dpUtils.zeroOut([self.RFEZero])[0]
+                self.RFDZero = dpUtils.zeroOut([self.RFDGrp])[0]
+                self.RFCZero = dpUtils.zeroOut([self.RFCGrp])[0]
+                self.RFBZero = dpUtils.zeroOut([self.RFBGrp])[0]
+                self.RFAZero = dpUtils.zeroOut([self.RFAGrp])[0]
+                self.RFAZeroExtra = dpUtils.zeroOut([self.RFAZero])[0]
                 rfJointZeroList = [self.RFAZero, self.RFBZero, self.RFCZero, self.RFDZero, self.RFEZero]
                 
                 # fixing side rool rotation order:
@@ -280,7 +280,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.middleFootCtrl+".scaleX", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleZ", -1)
-                self.footCtrlZeroList = utils.zeroOut([self.footCtrl, self.middleFootCtrl])
+                self.footCtrlZeroList = dpUtils.zeroOut([self.footCtrl, self.middleFootCtrl])
                 self.middleFootCtrlList.append(self.middleFootCtrl)
 
                 # mount hierarchy:
@@ -320,12 +320,12 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                             cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateY", force=True)
 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
-                utils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
-                utils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
-                utils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
-                utils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
-                utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
+                dpUtils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
+                dpUtils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
+                dpUtils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
+                dpUtils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
+                dpUtils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
+                dpUtils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
                 cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll, attributeType='float', keyable=True)
@@ -452,9 +452,9 @@ class Foot(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
 
@@ -467,7 +467,7 @@ class Foot(Base.StartClass, Layout.LayoutClass):
         self.deleteModule()
 
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

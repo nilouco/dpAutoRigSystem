@@ -2,9 +2,9 @@
 from maya import cmds
 from maya import OpenMaya as om
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 
 # global variables to this module:    
@@ -14,14 +14,14 @@ DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
 
 
-class Single(Base.StartClass, Layout.LayoutClass):
+class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
         #Returned data from the dictionnary
         self.mainJisList = []
         self.aStaticGrpList = []
@@ -30,8 +30,8 @@ class Single(Base.StartClass, Layout.LayoutClass):
     
     
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
     
     
     def getHasIndirectSkin(self):
@@ -47,7 +47,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
     
     
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
@@ -109,7 +109,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
     
     
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -158,7 +158,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
@@ -170,7 +170,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
+                dpUtils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if not self.getHasIndirectSkin():
                     if self.curveDegree == 0:
@@ -194,12 +194,12 @@ class Single(Base.StartClass, Layout.LayoutClass):
                         else:
                             indirectSkinRot=(0, 0, -90)
                 self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
-                utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                dpUtils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
                 # zeroOut controls:
-                zeroOutCtrlGrp = utils.zeroOut([self.singleCtrl], offset=True)[0]
+                zeroOutCtrlGrp = dpUtils.zeroOut([self.singleCtrl], offset=True)[0]
                 # hide visibility attribute:
                 cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
                 # fixing flip mirror:
@@ -217,7 +217,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
                     cmds.select(clear=True)
                     jxtName = self.jnt.replace("_Jnt", "_Jxt")
                     jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
-                    utils.clearDpArAttr([jxt])
+                    dpUtils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
                     attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
@@ -297,9 +297,9 @@ class Single(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
@@ -328,7 +328,7 @@ class Single(Base.StartClass, Layout.LayoutClass):
     
     
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

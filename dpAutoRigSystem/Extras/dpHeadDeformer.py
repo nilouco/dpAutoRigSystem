@@ -1,8 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpControls as dpControls
-from ..Modules.Library import dpUtils as utils
+from ..Modules.Library import dpControls
+from ..Modules.Library import dpUtils
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -57,7 +57,7 @@ class HeadDeformer(object):
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
-        validName = utils.validateName(headDeformerName+"_FFDSet", "FFDSet")
+        validName = dpUtils.validateName(headDeformerName+"_FFDSet", "FFDSet")
         numbering = validName.replace(headDeformerName, "")[:-7]
         if numbering:
             headDeformerName = headDeformerName+numbering
@@ -204,7 +204,7 @@ class HeadDeformer(object):
             # create symmetry setup
             centerClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:3][0:5]", relative=True, name=centerSymmetryName+"_Cls") #[Cluster, Handle]
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
-            clustersZeroList = utils.zeroOut([centerClusterList[1], topClusterList[1]])
+            clustersZeroList = dpUtils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.delete(cmds.parentConstraint(centerClusterList[1], clustersZeroList[1]))
             clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.langDic[self.langName]["c101_symmetry"]+"_Grp")
             # arrange lattice deform points percent
@@ -212,7 +212,7 @@ class HeadDeformer(object):
             # symmetry controls
             centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90))
             topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0))
-            symmetryCtrlZeroList = utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
+            symmetryCtrlZeroList = dpUtils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
             for axis in axisList:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
                 cmds.connectAttr(centerSymmetryCtrl+".rotate"+axis, centerClusterList[1]+".rotate"+axis, force=True)
@@ -223,7 +223,7 @@ class HeadDeformer(object):
             
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
-            utils.zeroOut([arrowCtrl])
+            dpUtils.zeroOut([arrowCtrl])
             offsetGrp = cmds.group(name=headDeformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=headDeformerName+"_Data_Grp", empty=True)
             cmds.delete(cmds.parentConstraint(latticeDefList[2], arrowCtrlGrp, maintainOffset=False))
