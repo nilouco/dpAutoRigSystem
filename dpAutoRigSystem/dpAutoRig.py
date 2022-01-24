@@ -1052,18 +1052,14 @@ class DP_AutoRig_UI(object):
 
         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
-#        try:
-        guideDir = guideDir.replace("/", ".")
-        print("DPAR 00 - guideDir", guideDir)
-        print("DPAR 01 - guideModule", guideModule)
-        print("DPAR 02 - layout", layout)
-        guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        reload(guide)
-#        except Exception as e:
-#            print(e)
-#            errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+e
-#            mel.eval('warning \"'+errorString+'\";')
-#            return
+        try:
+            guideDir = guideDir.replace("/", ".")
+            guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+            reload(guide)
+        except Exception as e:
+            errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
+            mel.eval('warning \"'+errorString+'\";')
+            return
 
         # getting data from guide module:
         title = self.langDic[self.langName][guide.TITLE]

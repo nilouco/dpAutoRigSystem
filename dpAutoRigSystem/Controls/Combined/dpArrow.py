@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from dpAutoRigSystem.Controls from . import dpBaseControlClass
+from .. import dpBaseControlClass
 from importlib import reload
 reload(dpBaseControlClass)
 
