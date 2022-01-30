@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 import math
+from importlib import reload
 
 from .Library import dpUtils
 from . import dpBaseClass
@@ -862,7 +863,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
                 chainLen = upperLimbLen + lowerLimbLen
                 # ratio of placement of the middle joint
-                pvRatio = upperLimbLen / chainLen
+                pvRatio = upperLimbLen // chainLen
                 # calculate the position of the base middle locator
                 pvBasePosX = (endPos[0] - startPos[0]) * pvRatio + startPos[0]
                 pvBasePosY = (endPos[1] - startPos[1]) * pvRatio + startPos[1]
@@ -874,9 +875,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # magnitude of the vector
                 magDir = math.sqrt(cornerBasePosX**2 + cornerBasePosY**2 + cornerBasePosZ**2)
                 # normalize the vector
-                normalDirX = cornerBasePosX / magDir
-                normalDirY = cornerBasePosY / magDir
-                normalDirZ = cornerBasePosZ / magDir
+                normalDirX = cornerBasePosX // magDir
+                normalDirY = cornerBasePosY // magDir
+                normalDirZ = cornerBasePosZ // magDir
                 # calculate the poleVector position by multiplying the unitary vector by the chain length
                 pvDistX = normalDirX * chainLen
                 pvDistY = normalDirY * chainLen
@@ -1063,9 +1064,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     txElbow = cmds.xform(self.skinJointList[2], worldSpace=True, translation=True, query=True)[0]
                     txWrist = cmds.xform(self.skinJointList[3], worldSpace=True, translation=True, query=True)[0]
                     if (txWrist - txElbow) > 0:
-                        forearmDistZ = tempDist / 3
+                        forearmDistZ = tempDist // 3
                     else:
-                        forearmDistZ = -(tempDist / 3)
+                        forearmDistZ = -(tempDist // 3)
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
                     forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
@@ -1507,13 +1508,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
                     if self.addArticJoint:
-                        self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
-                        dpUtils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
-                        cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
-                        if toCornerBendList:
-                            dpUtils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
-                            cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
-                            cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                        print("DPAR - 00, self.bendGrps",self.bendGrps)
+                        if self.bendGrps:
+                            self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
+                            dpUtils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
+                            cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                            if toCornerBendList:
+                                dpUtils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
+                                cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                                cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
                 
                 # add main articulationJoint:
                 if self.addArticJoint:

@@ -363,7 +363,7 @@ class RibbonClass(object):
         cmds.select(clear=True)
         
         #create the joints that will be used to control the ribbon
-        drv_Jnt = cmds.duplicate([rb_Jnt[0], rb_Jnt[(len(rb_Jnt)-1)/2], rb_Jnt[len(rb_Jnt)-1]])
+        drv_Jnt = cmds.duplicate([rb_Jnt[0], rb_Jnt[int((len(rb_Jnt)-1)//2)], rb_Jnt[int(len(rb_Jnt)-1)]])
         dup = cmds.duplicate([drv_Jnt[0], drv_Jnt[2]])
         drv_Jnt.append(dup[0])
         drv_Jnt.append(dup[1])
