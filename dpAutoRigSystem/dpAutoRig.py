@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ###################################################################
 #
@@ -20,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.06"
+DPAR_VERSION_PY3 = "3.13.07"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
@@ -276,7 +275,7 @@ class DP_AutoRig_UI(object):
                 typeName = file.partition(".json")[0]
                 # clear the old variable content and open the json file as read:
                 content = None
-                fileDictionary = open(jsonPath + file, "r")
+                fileDictionary = open(jsonPath + file, "r", encoding='utf-8')
                 try:
                     # read the json file content and store it in a dictionary:
                     content = json.loads(fileDictionary.read())

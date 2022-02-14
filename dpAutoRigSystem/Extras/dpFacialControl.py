@@ -117,7 +117,7 @@ class FacialControl(object):
         path = os.path.dirname(__file__)
         # hack in order to avoid "\\" from os.sep, then we need to use the replace string method:
         jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
-        fileDictionary = open(jsonPath + file, "r")
+        fileDictionary = open(jsonPath + file, "r", encoding='utf-8')
         # read the json file content and store it in a dictionary:
         presetContent = json.loads(fileDictionary.read())
         # close the json file:
