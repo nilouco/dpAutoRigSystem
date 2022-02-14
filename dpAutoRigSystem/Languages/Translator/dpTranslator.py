@@ -1,12 +1,9 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # importing libraries:
 from maya import cmds
 import datetime
 import re
 
-DPT_VERSION = 1.2
+DPT_VERSION = 1.3
 
 
 LANGUAGES = "Languages"
@@ -25,7 +22,7 @@ class Translator(object):
         self.langIndexStart = 7 #after userInfo
         self.langIndex = self.langIndexStart
         self.newLangList = []
-        self.resultString = None
+        self.resultString = []
         self.validadeNoSpecialChar = re.compile('[^a-zA-Z]')
     
     
@@ -111,7 +108,7 @@ class Translator(object):
         """ Move index forward and update UI in order to get a new translated sentence.
         """
         # if finished keyLen then disable Same and Next buttons and enable Finish button
-        if self.langIndex >= self.keyLen:
+        if self.langIndex == self.keyLen:
             cmds.button(self.sameBT, edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
             cmds.button(self.nextBT, edit=True, enable=False, backgroundColor=(0.8, 0.8, 0.8))
             cmds.button(self.finishBT, edit=True, enable=True, backgroundColor=(0.1, 0.9, 1.0))
@@ -206,6 +203,7 @@ class Translator(object):
             if confirmSameLangName == self.langDic[self.langName]['i071_yes']:
                 # starting newLangList appends:
                 self.newLangList.append(self.authorName)
+                self.newLangList.append(self.langDic[self.langName]['_collaborators'])
                 self.newLangList.append(contactName)
                 self.newLangList.append(date)
                 self.newLangList.append(self.newLangName)
@@ -213,8 +211,7 @@ class Translator(object):
                 self.newLangList.append(date)
                 # fill newLangList it "" (nothing) in order to generate all list array and just update its values:
                 for i in range(self.langIndex, self.keyLen+1):
-                    self.newLangList.append(None)
-                print(self.newLangList)
+                    self.newLangList.append("empty")
                 # starting result string:
                 self.resultString = '{"_author":"'+self.authorName+'","_contact":"'+contactName+'","_date":"'+date+'","_language":"'+self.newLangName+'","_translator":"dpTranslator v'+str(DPT_VERSION)+'","_updated":"'+date+'"'
 
@@ -243,15 +240,12 @@ class Translator(object):
         """ Method to update the main UI with info from translated text, id, type, name, etc.
         """
         cmds.text(self.curIndexTxt, edit=True, label=str(self.langIndex))
-        if self.langIndex >= self.keyLen:
-            cmds.text(self.keyIDTxt, edit=True, label=self.sourceLangList[self.keyLen])
-        else:
-            cmds.text(self.keyIDTxt, edit=True, label=self.sourceLangList[self.langIndex])
+        cmds.text(self.keyIDTxt, edit=True, label=self.sourceLangList[self.langIndex])
         cmds.scrollField(self.sourceTextSF, edit=True, text=self.langDic[self.langName][self.sourceLangList[self.langIndex]])
         
-        if self.langIndex >= self.keyLen:
+        if self.langIndex == self.keyLen:
             cmds.scrollField(self.newLangTextSF, edit=True, text='')
-        elif self.newLangList[self.langIndex] == None:
+        elif self.newLangList[self.langIndex] == "empty":
             cmds.scrollField(self.newLangTextSF, edit=True, text='')
         else:
             cmds.scrollField(self.newLangTextSF, edit=True, text=self.newLangList[self.langIndex])
@@ -281,7 +275,6 @@ class Translator(object):
         # update UI elements:
         cmds.text(self.keyTypeTxt, edit=True, label=curKeyType)
         cmds.text(self.extraInfoTxt, edit=True, label=footerText)
-        
     
     
     def dpGetLangStringUI(self, *args):

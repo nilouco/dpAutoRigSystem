@@ -201,10 +201,11 @@ class StartClass(object):
                             dpAR_nameList.append(currentName)
                         if cmds.objExists(transform+".customName"):
                             currentName = cmds.getAttr(transform+".customName")
-                            if not currentName in dpAR_nameList:
-                                dpAR_nameList.append(currentName)
+                            if currentName:
+                                if not currentName in dpAR_nameList:
+                                    dpAR_nameList.append(currentName)
                     if dpAR_nameList:
-                        dpAR_nameList.sort()
+                        sorted(dpAR_nameList)
                         for currentName in dpAR_nameList:
                             if currentName == self.customName:
                                 # getting the index of the last digit in the name:
