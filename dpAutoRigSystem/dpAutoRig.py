@@ -1855,9 +1855,10 @@ class DP_AutoRig_UI(object):
                 if self.prefix[len(self.prefix)-1] != "_":
                     self.prefix = self.prefix + "_"
 
-            #Check if we need to colorize the self.ctrls
+            #Check if we need to colorize control shapes
             #Check integrate option
             bColorize = False
+            bAddAttr = False
             try:
                 bColorize = cmds.checkBox(self.allUIs["colorizeCtrlCB"], query=True, value=True)
                 integrate = cmds.checkBox(self.allUIs["integrateCB"], query=True, value=True)
@@ -1883,6 +1884,22 @@ class DP_AutoRig_UI(object):
                 # get integrated information:
                 if guideModule.integratedActionsDic:
                     self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
+            
+            #Colorize all controller in yellow as a base
+            if (bColorize):
+                aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
+                aAllCtrls = cmds.ls("*_Ctrl")
+                lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
+                rPattern = re.compile(self.langDic[self.langName]['p003_right'] + '_.*._Ctrl')
+                for pCtrl in aAllCtrls:
+                    if (lPattern.match(pCtrl)):
+                        self.ctrls.colorShape([pCtrl], "red")
+                    elif (rPattern.match(pCtrl)):
+                        self.ctrls.colorShape([pCtrl], "blue")
+                    elif (pCtrl in aBCtrl):
+                        self.ctrls.colorShape([pCtrl], "black")
+                    else:
+                        self.ctrls.colorShape([pCtrl], "yellow")
             
             if integrate == 1:
                 # Update progress window
@@ -2346,18 +2363,19 @@ class DP_AutoRig_UI(object):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
                                     cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC")
                             # changing iris and pupil color override:
-                            self.itemMirrorNameList = [""]
-                            # get itemGuideName:
-                            self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
-                            if self.itemGuideMirrorAxis != "off":
-                                self.itemMirrorNameList = self.itemGuideMirrorNameList
-                            for s, sideName in enumerate(self.itemMirrorNameList):
-                                if self.integratedTaskDic[moduleDic]['hasIris']:
-                                    irisCtrl = self.integratedTaskDic[moduleDic]['irisCtrl'][s]
-                                    self.ctrls.colorShape([irisCtrl], "cyan")
-                                if self.integratedTaskDic[moduleDic]['hasPupil']:
-                                    pupilCtrl = self.integratedTaskDic[moduleDic]['pupilCtrl'][s]
-                                    self.ctrls.colorShape([pupilCtrl], "yellow")
+                            if bColorize:
+                                self.itemMirrorNameList = [""]
+                                # get itemGuideName:
+                                self.itemGuideMirrorAxis = self.hookDic[moduleDic]['guideMirrorAxis']
+                                if self.itemGuideMirrorAxis != "off":
+                                    self.itemMirrorNameList = self.itemGuideMirrorNameList
+                                for s, sideName in enumerate(self.itemMirrorNameList):
+                                    if self.integratedTaskDic[moduleDic]['hasIris']:
+                                        irisCtrl = self.integratedTaskDic[moduleDic]['irisCtrl'][s]
+                                        self.ctrls.colorShape([irisCtrl], "cyan")
+                                    if self.integratedTaskDic[moduleDic]['hasPupil']:
+                                        pupilCtrl = self.integratedTaskDic[moduleDic]['pupilCtrl'][s]
+                                        self.ctrls.colorShape([pupilCtrl], "yellow")
                         
                         # integrate the Finger module:
                         if moduleType == FINGER:
@@ -2561,23 +2579,6 @@ class DP_AutoRig_UI(object):
         
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
-
-            #Colorize all controller in yellow as a base
-            if (bColorize):
-                aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
-                aAllCtrls = cmds.ls("*_Ctrl")
-                lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
-                rPattern = re.compile(self.langDic[self.langName]['p003_right'] + '_.*._Ctrl')
-                for pCtrl in aAllCtrls:
-                    if not cmds.getAttr(pCtrl+".overrideEnabled"):
-                        if (lPattern.match(pCtrl)):
-                            self.ctrls.colorShape([pCtrl], "red")
-                        elif (rPattern.match(pCtrl)):
-                            self.ctrls.colorShape([pCtrl], "blue")
-                        elif (pCtrl in aBCtrl):
-                            self.ctrls.colorShape([pCtrl], "black")
-                        else:
-                            self.ctrls.colorShape([pCtrl], "yellow")
 
             # Add usefull attributes for the animators
             if (bAddAttr):
