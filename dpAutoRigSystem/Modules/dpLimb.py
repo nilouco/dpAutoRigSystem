@@ -863,7 +863,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
                 chainLen = upperLimbLen + lowerLimbLen
                 # ratio of placement of the middle joint
-                pvRatio = upperLimbLen // chainLen
+                pvRatio = upperLimbLen / chainLen
                 # calculate the position of the base middle locator
                 pvBasePosX = (endPos[0] - startPos[0]) * pvRatio + startPos[0]
                 pvBasePosY = (endPos[1] - startPos[1]) * pvRatio + startPos[1]
@@ -875,9 +875,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # magnitude of the vector
                 magDir = math.sqrt(cornerBasePosX**2 + cornerBasePosY**2 + cornerBasePosZ**2)
                 # normalize the vector
-                normalDirX = cornerBasePosX // magDir
-                normalDirY = cornerBasePosY // magDir
-                normalDirZ = cornerBasePosZ // magDir
+                normalDirX = cornerBasePosX / magDir
+                normalDirY = cornerBasePosY / magDir
+                normalDirZ = cornerBasePosZ / magDir
                 # calculate the poleVector position by multiplying the unitary vector by the chain length
                 pvDistX = normalDirX * chainLen
                 pvDistY = normalDirY * chainLen
