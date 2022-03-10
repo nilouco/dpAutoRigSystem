@@ -97,7 +97,7 @@ class Renamer():
         self.previewSL = cmds.textScrollList('previewSL', width=250, enable=True, parent=previewLayout)
 
         footerLayout = cmds.columnLayout('footerLayout', adjustableColumn=True, width=100, parent=mainLayout)
-        cmds.button('runRenamerBT', label="Run GLOUBER Run!", command=self.runRenamerByUI, parent=footerLayout)
+        cmds.button('runRenamerBT', label="Run Carreto Run!", command=self.runRenamerByUI, parent=footerLayout)
 
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout(mainLayout, edit=True,
@@ -178,7 +178,14 @@ class Renamer():
             self.getInfoFromUI()
             for i, item in enumerate(self.originalList):
                 if cmds.objExists(item):
-                    previewDic[item] = item
+                    # WIP:
+                    newName = item
+                    if "|" in item:
+                        newName = item[item.rfind("|")+1:]
+                    
+
+                    previewDic[item] = newName
+                    
                     if self.addSequence:
                         previewDic[item] = self.sequenceName+str(self.start+i).zfill(self.padding)
 
