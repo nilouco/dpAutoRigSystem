@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.08"
+DPAR_VERSION_PY3 = "3.13.09"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 

@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.9"
+DPHD_VERSION = "2.10"
 
 
 class HeadDeformer(object):
@@ -147,9 +147,9 @@ class HeadDeformer(object):
                 cmds.addAttr(arrowCtrl, longName=intensityName+axis, attributeType='float', defaultValue=1)
                 cmds.setAttr(arrowCtrl+"."+intensityName+axis, edit=True, keyable=False, channelBox=True)
             cmds.addAttr(arrowCtrl, longName=expandName, attributeType='float', min=0, defaultValue=1, max=10, keyable=True)
-            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=100//(3*bBoxSize), keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=300//bBoxSize, keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=100//(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=300/bBoxSize, keyable=False)
+            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
             cmds.addAttr(arrowCtrl, longName="calibrateReduce", attributeType='float', defaultValue=100, keyable=False)
             
             # multiply divide in order to intensify influences
