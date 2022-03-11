@@ -7,24 +7,6 @@ from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
-# importing Renaud Lessard's module:
-loadedIkFkSnap = False
-try:
-    from sstk.maya.animation import sqIkFkTools
-    from sstk.libs import libSerialization
-    reload(sqIkFkTools)
-    reload(libSerialization)
-    loadedIkFkSnap = True
-except:
-    try:
-        from .Library import sqIkFkTools
-        from .Library import libSerialization
-        reload(sqIkFkTools)
-        reload(libSerialization)
-        loadedIkFkSnap = True
-    except:
-        print("Not loaded sqIkFkTools")
-        pass
 
 # global variables to this module:
 CLASS_NAME = "Limb"
@@ -863,7 +845,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
                 chainLen = upperLimbLen + lowerLimbLen
                 # ratio of placement of the middle joint
-                pvRatio = upperLimbLen // chainLen
+                pvRatio = upperLimbLen / chainLen
                 # calculate the position of the base middle locator
                 pvBasePosX = (endPos[0] - startPos[0]) * pvRatio + startPos[0]
                 pvBasePosY = (endPos[1] - startPos[1]) * pvRatio + startPos[1]
@@ -875,9 +857,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # magnitude of the vector
                 magDir = math.sqrt(cornerBasePosX**2 + cornerBasePosY**2 + cornerBasePosZ**2)
                 # normalize the vector
-                normalDirX = cornerBasePosX // magDir
-                normalDirY = cornerBasePosY // magDir
-                normalDirZ = cornerBasePosZ // magDir
+                normalDirX = cornerBasePosX / magDir
+                normalDirY = cornerBasePosY / magDir
+                normalDirZ = cornerBasePosZ / magDir
                 # calculate the poleVector position by multiplying the unitary vector by the chain length
                 pvDistX = normalDirX * chainLen
                 pvDistY = normalDirY * chainLen
@@ -1433,57 +1415,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateX", force=True)
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
-                
-                if loadedIkFkSnap:
-                    # do otherCtrlList get extraCtrlList from bendy
-                    otherCtrlList = []
-                    if self.getHasBend():
-                        if self.loadedRibbon:
-                            otherCtrlList = self.bendGrps['extraCtrlList']
-                    otherCtrlList.append(self.toParentExtremCtrl)
-                    otherCtrlList.append(self.fkCtrlList[0])
-                    # create a ghost value in order to avoid ikFkNetwork crashes without footRoll attributes:
-                    cmds.addAttr(self.worldRef, longName='footRollPlaceHolder', attributeType='long', defaultValue=0, keyable=False)
-                    # create ikFkNetwork:
-                    data = sqIkFkTools.IkFkNetwork()
-                    # initialise ikFkNetwork:
-                    if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                        data.init(
-                            self.ikExtremCtrl,
-                            self.ikCornerCtrl,
-                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3], self.ikJointList[4]],
-                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3], self.fkCtrlList[4]],
-                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
-                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
-                            otherCtrls=otherCtrlList,
-                            beforeCtrlAttr=self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'],
-                            ikShoulders=[self.ikJointList[1], self.ikACJointList[1]]
-                        )
-                    else:
-                        data.init(
-                            self.ikExtremCtrl,
-                            self.ikCornerCtrl,
-                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3]],
-                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3]],
-                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
-                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
-                            otherCtrls=otherCtrlList,
-                            beforeCtrlAttr=self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'],
-                            ikShoulders=[self.ikJointList[1], self.ikACJointList[1]]
-                        )
-                    # serialise ikFkNetwork:
-                    ikFkNet = libSerialization.export_network(data)
-                    ikFkNet = cmds.rename(ikFkNet.__melobject__(), side + self.userGuideName + "_" + str(dpAR_count) + "_IkFkNetwork")
-                    self.ikFkNetworkList.append(ikFkNet)
-                    if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                        lastIndex = len(otherCtrlList)
-                        if self.getHasBend():
-                            if self.loadedRibbon:
-                                cmds.connectAttr(self.bendGrps['ctrlList'][0] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
-                                cmds.connectAttr(self.bendGrps['ctrlList'][1] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 2) + "]", force=True)
-                                cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)
-                        elif self.limbTypeName == ARM:
-                            cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
                 
                 # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
                 # default value for 5 bend joints:

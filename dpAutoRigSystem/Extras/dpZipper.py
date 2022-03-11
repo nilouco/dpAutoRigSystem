@@ -326,7 +326,7 @@ class Zipper(object):
         self.curveLength = len(cmds.ls(selection=True, flatten=True))
         halfCurveLength = self.curveLength * 0.5
         # calculate distance position based 1.0 from our control attribute:
-        distPos = 1.0 // self.curveLength
+        distPos = 1.0 / self.curveLength
         for c, curve in enumerate([self.firstCurve, self.secondCurve]):
             baseName = dpUtils.extractSuffix(curve)
             for i in range(0, self.curveLength+1):
