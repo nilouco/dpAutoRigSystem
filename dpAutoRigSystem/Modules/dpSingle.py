@@ -26,7 +26,6 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.mainJisList = []
         self.aStaticGrpList = []
         self.aCtrlGrpList = []
-        self.detectedBug = False
     
     
     def createModuleLayout(self, *args):
@@ -152,7 +151,6 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
                 self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
                 # joint labelling:
@@ -313,13 +311,6 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-            # check mirror indirectSkin bug in Maya2018:
-            if (int(cmds.about(version=True)[:4]) == 2018):
-                if self.mirrorAxis != 'off':
-                    if self.getHasIndirectSkin():
-                        meshList = cmds.ls(selection=False, type="mesh")
-                        if meshList:
-                            self.detectedBug = True
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)
@@ -336,6 +327,5 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                                 "mainJisList"   : self.mainJisList,
                                                 "staticGrpList" : self.aStaticGrpList,
                                                 "ctrlGrpList"   : self.aCtrlGrpList,
-                                                "detectedBug"   : self.detectedBug,
                                               }
                                     }

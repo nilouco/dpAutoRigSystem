@@ -638,7 +638,7 @@ def visitWebSite(website, *args):
     webbrowser.open(website, new=2)
     
     
-def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", *args):
+def checkLoadedPlugin(pluginName, message="Not loaded plugin", *args):
     """ Check if plugin is loaded and try to load it.
         Returns True if ok (loaded)
         Returns False if not found or not loaded.
@@ -647,17 +647,10 @@ def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", 
     if not (cmds.pluginInfo(pluginName, query=True, loaded=True)):
         loadedPlugin = False
         try:
-            # Maya 2012
             cmds.loadPlugin(pluginName+".mll")
             loadedPlugin = True
         except:
-            if exceptName:
-                try:
-                    # Maya 2013 or earlier
-                    cmds.loadPlugin(exceptName+".mll")
-                    loadedPlugin = True
-                except:
-                    pass
+            pass
     if not loadedPlugin:
         print(message, pluginName)
     return loadedPlugin

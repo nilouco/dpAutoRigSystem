@@ -199,14 +199,12 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.footJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.addAttr(self.middleFootJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 cmds.select(clear=True)
-                '''
-                Deactivate the segment scale compensate on the bone to prevent scaling problem in maya 2016
-                It will prevent a double scale problem that will come from the upper parent in the rig
-                '''
-                if (int(cmds.about(version=True)[:4]) >= 2016):
-                    cmds.setAttr(self.footJnt+".segmentScaleCompensate", 0)
-                    cmds.setAttr(self.middleFootJxt+".segmentScaleCompensate", 0)
-                    cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
+                
+                #Deactivate the segment scale compensate on the bone to prevent scaling problem
+                #It will prevent a double scale problem that will come from the upper parent in the rig
+                cmds.setAttr(self.footJnt+".segmentScaleCompensate", 0)
+                cmds.setAttr(self.middleFootJxt+".segmentScaleCompensate", 0)
+                cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
                 # reverse foot controls:
                 self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)

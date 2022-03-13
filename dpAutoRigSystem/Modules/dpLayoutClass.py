@@ -443,7 +443,7 @@ class LayoutClass(object):
             stopMirrorOperation = self.checkFatherMirror()
             if not stopMirrorOperation:
                 # loading Maya matrix node (for mirror porpuses)
-                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
                     cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')

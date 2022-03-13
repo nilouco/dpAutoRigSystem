@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.11"
+DPAR_VERSION_PY3 = "3.13.12"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
@@ -127,7 +127,6 @@ DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/
 DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
-SSL_MACOS = "https://medium.com/@katopz/how-to-upgrade-openssl-8d005554401"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 MASTER_ATTR = "masterGrp"
 
@@ -172,7 +171,7 @@ class DP_AutoRig_UI(object):
         self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
         # create menuItems from language list:
         if self.langList:
-            # verify if there is a optionVar of last choosen by user in Maya system:
+            # verify if there is an optionVar of last choosen by user in Maya system:
             lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
             # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
             for idiom in self.langList:
@@ -190,7 +189,7 @@ class DP_AutoRig_UI(object):
         self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
         # create menuItems from preset list:
         if self.presetList:
-            # verify if there is a optionVar of last choosen by user in Maya system:
+            # verify if there is an optionVar of last choosen by user in Maya system:
             lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
             # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
             for preset in self.presetList:
@@ -394,7 +393,7 @@ class DP_AutoRig_UI(object):
         # option Degree:
         self.degreeOptionMenu = cmds.optionMenu("degreeOptionMenu", label='', changeCommand=self.changeOptionDegree, parent=self.allUIs["degreeLayout"])
         self.degreeOptionMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
-        # verify if there is a optionVar of last choosen by user in Maya system:
+        # verify if there is an optionVar of last choosen by user in Maya system:
         lastDegreeOption = self.checkLastOptionVar("dpAutoRigLastDegreeOption", "0 - Preset", self.degreeOptionMenuItemList)
         for degreeOption in self.degreeOptionMenuItemList:
             cmds.menuItem(label=degreeOption, parent=self.degreeOptionMenu)
@@ -1360,8 +1359,6 @@ class DP_AutoRig_UI(object):
                 cmds.separator(height=30)
             whatsChangedButton = cmds.button('whatsChangedButton', label=self.langDic[self.langName]['i117_whatsChanged'], align="center", command=partial(dpUtils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
             visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.langDic[self.langName]['i093_gotoWebSite'], align="center", command=partial(dpUtils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
-            if (int(cmds.about(version=True)[:4]) < 2019) and platform.system() == "Darwin": #Maya 2018 or older on macOS
-                upgradeSSLmacOSButton = cmds.button('upgradeSSLmacOSButton', label=self.langDic[self.langName]['i164_sslMacOS'], align="center", backgroundColor=(0.8, 0.4, 0.4), command=partial(dpUtils.visitWebSite, SSL_MACOS), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.langDic[self.langName]['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
             installButton = cmds.button('installButton', label=self.langDic[self.langName]['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
@@ -2063,7 +2060,6 @@ class DP_AutoRig_UI(object):
                                     ikHandlePointConst    = self.integratedTaskDic[fatherGuide]['ikHandlePointConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
-                                    parentConstToRFOffset = self.integratedTaskDic[fatherGuide]['parentConstToRFOffsetList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
@@ -2084,18 +2080,8 @@ class DP_AutoRig_UI(object):
                                         cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
-                                    if (int(cmds.about(version=True)[:4]) < 2016): #HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
-                                        # organize to avoid offset error in the parentConstraint with negative scale:
-                                        if cmds.getAttr(parentConstToRFOffset+".mustCorrectOffset") == 1:
-                                            for f in range(1,3):
-                                                cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateX", cmds.getAttr(parentConstToRFOffset+".fixOffsetX"))
-                                                cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateY", cmds.getAttr(parentConstToRFOffset+".fixOffsetY"))
-                                                cmds.setAttr(parentConstToRFOffset+".target["+str(f)+"].targetOffsetRotateZ", cmds.getAttr(parentConstToRFOffset+".fixOffsetZ"))
-                                    #Maya 2016 --> Scale constraint behavior
-                                    # is fixed and a single master scale constraint doesn't work anymore
-                                    if (int(cmds.about(version=True)[:4]) >= 2016):
-                                        scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                        cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
+                                    scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                    cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add float attributes and connect from ikCtrl to revFootCtrl:
@@ -2177,11 +2163,8 @@ class DP_AutoRig_UI(object):
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
 
                             for s, sideName in enumerate(self.itemMirrorNameList):
-                                #Maya 2016 --> Scale constraint behavior
-                                # is fixed and a single master scale constraint doesn't work anymore
-                                if (int(cmds.about(version=True)[:4]) >= 2016):
-                                    scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                    cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
+                                scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
 
                                 if fatherModule == SPINE:
                                     # getting limb data:
@@ -2201,8 +2184,7 @@ class DP_AutoRig_UI(object):
                                         #Ensure that the arm will follow the Chest_A Ctrl instead of the world
                                         targetList = cmds.parentConstraint(limbIsolateFkConst, query=True, targetList=True)
                                         weightList = cmds.parentConstraint(limbIsolateFkConst, query=True, weightAliasList=True)
-                                        #Need to sort the list to ensure that the resulat are in the same
-                                        #order in Maya 2014 and Maya 2016...
+                                        #Need to sort the list to ensure that the result is in the same order
                                         tempList = cmds.listConnections(limbIsolateFkConst + "." + weightList[1])
                                         sorted(tempList)
                                         revNode = tempList[0]
@@ -2273,9 +2255,8 @@ class DP_AutoRig_UI(object):
                             fixIkSpringSolverGrp = self.integratedTaskDic[moduleDic]['fixIkSpringSolverGrpList']
                             if fixIkSpringSolverGrp:
                                 cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
-                                if (int(cmds.about(version=True)[:4]) >= 2016):
-                                    for nFix in fixIkSpringSolverGrp:
-                                        cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScC")
+                                for nFix in fixIkSpringSolverGrp:
+                                    cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScC")
                             
                         # integrate the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
                         if moduleType == SPINE:
@@ -2293,11 +2274,8 @@ class DP_AutoRig_UI(object):
                                 actVVAttr = self.integratedTaskDic[moduleDic]['ActiveVolumeVariationAttrList'][s]
                                 mScaleVVAttr = self.integratedTaskDic[moduleDic]['MasterScaleVolumeVariationAttrList'][s]
                                 ikFkBlendAttr = self.integratedTaskDic[moduleDic]['IkFkBlendAttrList'][s]
-                                #Maya 2016 --> Scale constraint behavior
-                                # is fixed and a single master scale constraint doesn't work anymore
-                                if (int(cmds.about(version=True)[:4]) >= 2016):
-                                    clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                    cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC")
+                                clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC")
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
@@ -2389,14 +2367,7 @@ class DP_AutoRig_UI(object):
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ikCtrlZero = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
                                 scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
-
-                                '''
-                                Not needed in maya 2016. Scale Constraint seem to react differently with the scale compensate
-                                Release node MAYA-45759 https://download.autodesk.com/us/support/files/maya_2016/Maya%202016%20Release%20Notes_enu.htm
-                                '''
-                                if (int(cmds.about(version=True)[:4]) >= 2016):
-                                    cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
-
+                                cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                 # correct ikCtrl parent to root ctrl:
                                 cmds.parent(ikCtrlZero, self.ctrlsVisGrp, relative=True)
                                 # get father guide data:

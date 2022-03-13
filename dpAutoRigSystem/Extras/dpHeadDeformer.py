@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.10"
+DPHD_VERSION = "2.11"
 
 
 class HeadDeformer(object):
@@ -26,23 +26,7 @@ class HeadDeformer(object):
         self.headCtrl = None
         self.wellDone = True
         # call main function
-        if (int(cmds.about(version=True)[:4]) == 2020): #to be removed in Python3
-            callMessage = False
-            installedVersion = cmds.about(installedVersion=True)
-            if not "." in installedVersion:
-                callMessage = True
-            else:
-                updateVersion = int(installedVersion[installedVersion.rfind(".")+1:])
-                if not updateVersion == 4: #Py2: < 3
-                    callMessage = True
-            if callMessage:
-                dialogReturn = cmds.confirmDialog(title="Maya 2020 bug", message=self.langDic[self.langName]["b001_BugMayaHD"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
-                if dialogReturn == self.langDic[self.langName]["i174_continue"]:
-                    self.dpHeadDeformer(self)
-            else:
-                self.dpHeadDeformer(self)
-        else:
-            self.dpHeadDeformer(self)
+        self.dpHeadDeformer(self)
     
     
     def dpHeadDeformer(self, *args):
@@ -120,25 +104,6 @@ class HeadDeformer(object):
                 for axis in axisList:
                     cmds.setAttr(defHandle+".scale"+axis, 1)
             
-            # force correct rename for Maya versions before 2020:
-            if (int(cmds.about(version=True)[:4]) < 2020):
-                if cmds.objExists(twistDefList[0]+"Set"):
-                    cmds.rename(twistDefList[0]+"Set", headDeformerName+"_TwistSet")
-                    twistDefList[0] = cmds.rename(twistDefList[0], headDeformerName+"_Twist")
-                    twistDefList[1] = cmds.rename(twistDefList[1], headDeformerName+"_TwistHandle")
-                if cmds.objExists(squashDefList[0]+"Set"):
-                    cmds.rename(squashDefList[0]+"Set", headDeformerName+"_SquashSet")
-                    squashDefList[0] = cmds.rename(squashDefList[0], headDeformerName+"_Squash")
-                    squashDefList[1] = cmds.rename(squashDefList[1], headDeformerName+"_SquashHandle")
-                if cmds.objExists(sideBendDefList[0]+"Set"):
-                    cmds.rename(sideBendDefList[0]+"Set", headDeformerName+"_Side_BendSet")
-                    sideBendDefList[0] = cmds.rename(sideBendDefList[0], headDeformerName+"_Side_Bend")
-                    sideBendDefList[1] = cmds.rename(sideBendDefList[1], headDeformerName+"_Side_BendHandle")
-                if cmds.objExists(frontBendDefList[0]+"Set"):
-                    cmds.rename(frontBendDefList[0]+"Set", headDeformerName+"_Front_BendSet")
-                    frontBendDefList[0] = cmds.rename(frontBendDefList[0], headDeformerName+"_Front_Bend")
-                    frontBendDefList[1] = cmds.rename(frontBendDefList[1], headDeformerName+"_Front_BendHandle")
-                
             # arrow control curve
             arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", headDeformerName+"_Ctrl", 0.25*bBoxSize, d=0)
             

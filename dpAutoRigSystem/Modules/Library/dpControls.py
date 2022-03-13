@@ -489,8 +489,7 @@ class ControlClass(object):
         # colorize curveShapes:
         self.colorShape([circle], 'yellow')
         self.colorShape([radiusCtrl], 'cyan')
-        if (int(cmds.about(version=True)[:4]) > 2016):
-            cmds.setAttr(circle+"0Shape.lineWidth", 2)
+        cmds.setAttr(circle+"0Shape.lineWidth", 2)
         cmds.select(clear=True)
         # pinGuide:
         self.createPinGuide(circle)
