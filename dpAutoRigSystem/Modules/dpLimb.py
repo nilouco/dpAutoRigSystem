@@ -39,7 +39,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.worldRefList = []
         self.worldRefShapeList = []
         self.extremJntList = []
-        self.parentConstToRFOffsetList = []
         self.fixIkSpringSolverGrpList = []
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
@@ -1070,22 +1069,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating a group to receive the reverseFootCtrlGrp (if module integration is on):
                 self.ikFkBlendGrpToRevFoot = cmds.group(empty=True, name=side + self.userGuideName + "_IkFkBlendGrpToRevFoot_Grp")
                 self.ikFkBlendGrpToRevFootList.append(self.ikFkBlendGrpToRevFoot)
-                tempToDelToRFpc = cmds.parentConstraint(self.ikExtremCtrl, self.ikFkBlendGrpToRevFoot, maintainOffset=False)
-                cmds.delete(tempToDelToRFpc)
+                cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, self.ikFkBlendGrpToRevFoot, maintainOffset=False))
 
-                # this next parentConstraint does not calculate correctly when we use negative scale
-                # then we will use a workarround in order to set a good offset
-                parentConstToRFOffset = \
-                cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot + "_PaC")[0]
-                self.parentConstToRFOffsetList.append(parentConstToRFOffset)
+                # offset parent constraint
+                parentConstToRFOffset = cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot + "_PaC")[0]
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', parentConstToRFOffset + "." + self.fkCtrlList[len(self.fkCtrlList) - 1] + "W1", force=True)
-
-                # organize to be corriged the offset when we will apply the parentConstraint
-                # there is a bug in the Maya calculation if we use negative scale (mirrored :P)
-                cmds.addAttr(parentConstToRFOffset, longName="mustCorrectOffset", attributeType='bool', keyable=False)
-                cmds.addAttr(parentConstToRFOffset, longName="fixOffsetX", attributeType='long', keyable=False)
-                cmds.addAttr(parentConstToRFOffset, longName="fixOffsetY", attributeType='long', keyable=False)
-                cmds.addAttr(parentConstToRFOffset, longName="fixOffsetZ", attributeType='long', keyable=False)
 
                 # work with scalable extrem hand or foot:
                 cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
@@ -1117,20 +1105,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(ikScaleMD + '.outputX', uniBlend + '.color2R', force=True)
                 
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
-                    # these options are valides for Biped, Quadruped and Quadruped Spring legs
-                    if (int(cmds.about(version=True)[
-                            :4]) < 2016):  # HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
-                        if self.mirrorAxis != 'off':
-                            if s == 1:  # mirrored guide
-                                if self.limbTypeName == LEG:
-                                    for axis in self.mirrorAxis:
-                                        if axis == "X":
-                                            # must fix offset of the parentConstrain in the future when this will be integrated
-                                            cmds.setAttr(parentConstToRFOffset + ".mustCorrectOffset", 1)
-                                            cmds.setAttr(parentConstToRFOffset + ".fixOffsetX", 90)
-                                            cmds.setAttr(parentConstToRFOffset + ".fixOffsetY", 180)
-                                            cmds.setAttr(parentConstToRFOffset + ".fixOffsetZ", -90)
-
                     if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                         # fix the group for the ikSpringSolver to avoid Maya bug about rotation from masterCtrl :P
                         cmds.parent(self.ikJointList[1], world=True)
@@ -1138,7 +1112,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.fixIkSpringSolverGrpList.append(self.fixIkSpringSolverGrp)
                         cmds.setAttr(self.fixIkSpringSolverGrp + ".visibility", 0)
                         cmds.parentConstraint(self.ikJointList[0], self.ikJointList[1], maintainOffset=True, name=self.ikJointList[1] + "_PaC")
-
                     if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                         # tell main script to create parent constraint from chestA to ikCtrl for front legs
                         self.quadFrontLegList.append(self.ikExtremCtrlOrientGrp)
@@ -1257,9 +1230,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                             
                             # implementing auto rotate twist bones:
-                            # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix:
+                            # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
                             loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-                            loadedMatrixPlugin = dpUtils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                            loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
                             if loadedQuatNode and loadedMatrixPlugin:
                                 twistBoneMD = self.bendGrps['twistBoneMD']
                                 shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
@@ -1281,7 +1254,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # auto clavicle:
                 # loading Maya matrix node
                 loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
                 if loadedQuatNode and loadedMatrixPlugin:
                     # create auto clavicle group:
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
@@ -1524,7 +1497,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "worldRefShapeList": self.worldRefShapeList,
                 "limbTypeName": self.limbTypeName,
                 "extremJntList": self.extremJntList,
-                "parentConstToRFOffsetList": self.parentConstToRFOffsetList,
                 "fixIkSpringSolverGrpList": self.fixIkSpringSolverGrpList,
                 "limbStyle": self.limbStyle,
                 "quadFrontLegList": self.quadFrontLegList,

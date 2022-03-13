@@ -160,13 +160,10 @@ class RibbonClass(object):
         limbJoints.extend(downLimb['skinJointsList'])
         
         jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
-        '''
-        Deactivate the segment scale compensate on the bone to prevent scaling problem in maya 2016
-        It will prevent a double scale problem that will come from the upper parent in the rig
-        '''
-        if (int(cmds.about(version=True)[:4]) >= 2016):
-            for nBone in limbJoints:
-                cmds.setAttr(nBone+".segmentScaleCompensate", 0)
+        #Deactivate the segment scale compensate on the bone to prevent scaling problem.
+        #It will prevent a double scale problem that will come from the upper parent in the rig
+        for nBone in limbJoints:
+            cmds.setAttr(nBone+".segmentScaleCompensate", 0)
         
         # fix renaming:
         limbJoints.pop(len(upLimb['skinJointsList']))
@@ -778,7 +775,7 @@ class RibbonClass(object):
         
         # autoRotate:
         loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             upTwistBoneMD = dpUtils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
             bottomTwistBoneMD = dpUtils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bttm_TwistBone")

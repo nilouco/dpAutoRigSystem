@@ -5,12 +5,11 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2021-12-12",
+    "_updated"       : "2022-03-13",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
     "b000_BugGeneral" : "Un bug est trouvé, desolé.\n\nReviser les guides ou la version du script, s'il vous plaît.",
-  	"b001_BugMayaHD"  : "Il y a un bug dans Maya 2020!\n\nLa modification de Deformer Set confond les connexions MAYA-95404.\n\nCela signifie que les déformateurs d'entrée auront une erreur dans Channel Box,\nmais cela fonctionnera toujours.\n\nLa solution serait mettre à jour Maya pour la version 2020.3 ou plus récent, s'il vous plaît.",
 
     "c000_arm_before"        : "Clavicule",
     "c001_arm_main"          : "Epaule",
@@ -139,7 +138,7 @@
 	
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
-    "e002_decomposeMatrixNotFound" : "C'était impossible de trouver le plugin decomposeMatrix, ce n'est pas possible de faire le miroir.",
+    "e002_matrixPluginNotFound"    : "C'était impossible de trouver le plugin matrixNodes, ce n'est pas possible de faire le miroir.",
     "e003_moreThanOneGeo"          : "Ce n'est pas possible faire le SSkinning!\nDésolé.\n\nIl y a plus d'un objet\navec le même nom\ndans la liste de Geometries.\n\nEssayer utliser l'option:\nMontrer le Nom Complet,\ns'il vous plaît.\n\nVoici le problème:\n",
     "e004_objNotExist"             : "Il n'existe pas l'item listé.\n\nVoici le problème:\n",
     "e005_selectOneObj"            : "Selectionner plus d'un objet, s'il vous plaît.",
@@ -323,7 +322,7 @@
     "i161_historyMessage"  : "Peut-être que votre modèle pourrait\navoir une déformation indésirable.\n\nCela se propagera dans les cibles copiées.\nVous devez au préalable supprimer\nl'historique de votre modèle.\n\nVoulez-vous vraiment continuer?",
   	"i162_checkHistory"    : "Verifier l'histoire",
   	"i163_sameName"        : "On ne peut pas continuer parce qu'il y a d'autre node avec le même nom, désolé.",
-  	"i164_sslMacOS"        : "Comment mettre à jour l'OpenSSL (macOS)",
+  	"i164_0-0-0-0-0-0-"    : "",
   	"i165_collaborators"   : "Collaborateurs",
     "i166_collabDesc"      : "Nous avons ici une liste de\npersonnes formidables qui nous ont aidés\nà développer ce script.\n\nMerci à:",
   	"i167_donate"          : "Faire un don",

@@ -383,18 +383,9 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
                         cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_PaC")
                         cmds.scaleConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_ScC")
-                        #Not needed in Maya 2016 since we need to deactivate scale compensate on all finger bone
-                        if (int(cmds.about(version=True)[:4]) < 2016):
-                            cmds.connectAttr(fkCtrl+".scaleCompensate", fkJoint+".segmentScaleCompensate", force=True)
-                        else:
-                            cmds.setAttr(fkJoint+".segmentScaleCompensate", 0)
+                        cmds.setAttr(fkJoint+".segmentScaleCompensate", 0)
                         cmds.setAttr(fkCtrl+".rotateOrder", 1)
 
-                #Force Scale compensate to prevent scale problem in Maya 2016
-                #for nJnt in self.skinJointList:
-                #    if (int(cmds.about(version=True)[:4]) >= 2016):
-                #        cmds.setAttr(nJnt+".segmentScaleCompensate", 0)
-                
                 # ik handle
                 if self.nJoints >= 2:
                     if self.nJoints == 2:
