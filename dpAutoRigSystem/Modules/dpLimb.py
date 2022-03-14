@@ -1045,9 +1045,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     txElbow = cmds.xform(self.skinJointList[2], worldSpace=True, translation=True, query=True)[0]
                     txWrist = cmds.xform(self.skinJointList[3], worldSpace=True, translation=True, query=True)[0]
                     if (txWrist - txElbow) > 0:
-                        forearmDistZ = tempDist // 3
+                        forearmDistZ = tempDist / 3
                     else:
-                        forearmDistZ = -(tempDist // 3)
+                        forearmDistZ = -(tempDist / 3)
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
                     forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side + self.userGuideName + "_" + self.langDic[self.langName]['c030_forearm'] + "_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
