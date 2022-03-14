@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.12"
+DPAR_VERSION_PY3 = "3.13.13"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
@@ -739,7 +739,7 @@ class DP_AutoRig_UI(object):
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue != 1: #Py2: >
+            if nJointsValue != 1:
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -1978,7 +1978,7 @@ class DP_AutoRig_UI(object):
                                 # get final rigged parent node from originedFromDic:
                                 self.fatherRiggedParentNode = self.originedFromDic[self.fatherName+"_Guide_"+self.fatherGuideLoc]
                                 if self.fatherRiggedParentNode:
-                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'  #Py2: >
+                                    if len(self.fatherMirrorNameList) != 1: # tell us 'the father has mirror'
                                         if s == f:
                                             # parent them to the correct side of the father's mirror:
                                             if self.ctrlHookGrp:
@@ -2116,7 +2116,7 @@ class DP_AutoRig_UI(object):
                                 # do actions in order to make limb be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
                                 for f, floatAttr in enumerate(floatAttrList):
-                                    if f != len(floatAttrList): #Py2: <
+                                    if f != len(floatAttrList):
                                         if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
                                             if floatAttr == lvvAttr:
@@ -2480,7 +2480,7 @@ class DP_AutoRig_UI(object):
                                                         fatherB = fBSideName + self.prefix + self.fatherBGuideInstance + "_" + loadedFatherB[loadedFatherB.rfind(":")+1:]
                                                     fatherBRiggedNode = self.originedFromDic[fatherB]
                                                     if cmds.objExists(fatherBRiggedNode):
-                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror  #Py2: >
+                                                        if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
                                                             if s == fB:
                                                                 cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
                                                                 cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
@@ -2520,7 +2520,7 @@ class DP_AutoRig_UI(object):
                                 # do actions in order to make chain be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
                                 for f, floatAttr in enumerate(floatAttrList):
-                                    if f != len(floatAttrList): #Py2: <
+                                    if f != len(floatAttrList):
                                         if not cmds.objExists(self.optionCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
                                             cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
@@ -2542,7 +2542,7 @@ class DP_AutoRig_UI(object):
                             dpARType = ( 'dp'+(cmds.getAttr(transf+'.dpAR_type')) )
                             if ( dpARType == guideType ):
                                 typeCounter = typeCounter + 1
-                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):  #Py2: >
+                    if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             # Close progress window

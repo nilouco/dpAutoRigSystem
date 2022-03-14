@@ -29,7 +29,7 @@ def findEnv(key, path):
     envPath = ""
 
     if splitEnvList:
-        splitEnvList = filter(lambda x: x != "" and x != ' ' and x != None, splitEnvList)
+        splitEnvList = [x for x in splitEnvList if x != "" and x != ' ' and x != None]
         for env in splitEnvList:
             env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
             if env in dpARPath:
