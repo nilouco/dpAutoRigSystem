@@ -5,11 +5,11 @@
 #       david@djx.com.au
 #       www.djx.com.au
 #
-#	CREDITS by David Johnson:
-#		Michael Bazhutkin, I used your excellent rivet.mel for years - thanks for sharing!
-#		Mike Rhone, who said "Better than rivet:Use a follicle."
-#		Brecht Debaene, for showing me how to hook up a follicle
-#		robthebloke.org, for sharing the knowlege.
+#    CREDITS by David Johnson:
+#        Michael Bazhutkin, I used your excellent rivet.mel for years - thanks for sharing!
+#        Mike Rhone, who said "Better than rivet:Use a follicle."
+#        Brecht Debaene, for showing me how to hook up a follicle
+#        robthebloke.org, for sharing the knowlege.
 #
 ###
 
