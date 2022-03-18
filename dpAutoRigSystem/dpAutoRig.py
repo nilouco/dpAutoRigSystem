@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.13"
+DPAR_VERSION_PY3 = "3.13.14"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
@@ -2029,7 +2029,7 @@ class DP_AutoRig_UI(object):
                     # working with specific cases:
                     for moduleDic in self.integratedTaskDic:
                         moduleType = moduleDic[:moduleDic.find("__")]
-						
+                        
                         # footGuide parented in the extremGuide of the limbModule:
                         if moduleType == FOOT:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
