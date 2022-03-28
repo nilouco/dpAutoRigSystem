@@ -134,7 +134,6 @@ class FacialControl(object):
                         presetContent[storedAttr][MIDDLE] = presetContent[storedAttr].pop(sideName)
                     elif sideName == "SIDED":
                         presetContent[storedAttr][SIDED] = presetContent[storedAttr].pop(sideName)
-        print("DP 00 presetContent = ", presetContent)
         return presetContent
     
     

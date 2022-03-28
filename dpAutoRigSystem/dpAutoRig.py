@@ -19,14 +19,13 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.14"
+DPAR_VERSION_PY3 = "3.13.15"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
 
 ###################### Start: Loading.
 
-import sys
 import os
 import random
 from maya import cmds
@@ -56,40 +55,39 @@ dpARLoadingWindow()
 
 
 # importing libraries:
-#try:
-import json
-import re
-import time
-import getpass
-import urllib
-import shutil
-import zipfile
-import datetime
-import platform
-from maya import mel
-from io import StringIO
-from functools import partial
-from .Modules.Library import dpUtils
-from .Modules.Library import dpControls
-from .Modules import dpBaseClass
-from .Modules import dpLayoutClass
-from .Extras import dpUpdateRigInfo
-from .Extras import dpReorderAttr
-from .Languages.Translator import dpTranslator
-from importlib import reload
-reload(dpUtils)
-reload(dpControls)
-reload(dpUpdateRigInfo)
-reload(dpBaseClass)
-reload(dpLayoutClass)
-#except Exception as e:
-#    print("Error: importing python modules!!!\n")
-#    print(e)
-#    try:
-#        clearDPARLoadingWindow()
-#        self.jobWinClose()
-#    except:
-#        pass
+try:
+    import json
+    import re
+    import time
+    import getpass
+    import urllib.request
+    import shutil
+    import zipfile
+    import datetime
+    import io
+    from maya import mel
+    from functools import partial
+    from .Modules.Library import dpUtils
+    from .Modules.Library import dpControls
+    from .Modules import dpBaseClass
+    from .Modules import dpLayoutClass
+    from .Extras import dpUpdateRigInfo
+    from .Extras import dpReorderAttr
+    from .Languages.Translator import dpTranslator
+    from importlib import reload
+    reload(dpUtils)
+    reload(dpControls)
+    reload(dpUpdateRigInfo)
+    reload(dpBaseClass)
+    reload(dpLayoutClass)
+except Exception as e:
+    print("Error: importing python modules!!!\n")
+    print(e)
+    try:
+        clearDPARLoadingWindow()
+        self.jobWinClose()
+    except:
+        pass
 
 # declaring member variables
 ENGLISH = "English"
@@ -151,89 +149,89 @@ class DP_AutoRig_UI(object):
         self.userDefAutoCheckUpdate = 0
         
         
-#        try:
-        # store all UI elements in a dictionary:
-        self.allUIs = {}
-        self.iDeleteJobId = 0
-        self.iSelChangeJobId = 0
-        # creating User Interface (UI) Window:
-        self.deleteExistWindow()
-        dpAR_winWidth  = 305
-        dpAR_winHeight = 605
-        self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION_PY3)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
+        try:
+            # store all UI elements in a dictionary:
+            self.allUIs = {}
+            self.iDeleteJobId = 0
+            self.iSelChangeJobId = 0
+            # creating User Interface (UI) Window:
+            self.deleteExistWindow()
+            dpAR_winWidth  = 305
+            dpAR_winHeight = 605
+            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION_PY3)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
+            
+            # creating menus:
+            self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
+            # language menu:
+            self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
+            cmds.radioMenuItemCollection('languageRadioMenuCollection')
+            # create a language list:
+            self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
+            # create menuItems from language list:
+            if self.langList:
+                # verify if there is an optionVar of last choosen by user in Maya system:
+                lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
+                # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
+                for idiom in self.langList:
+                    cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                # load the last language from optionVar value:
+                cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
+            else:
+                print("Error: Cannot load json language files!\n")
+                return
+            
+            # preset menu:
+            self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
+            cmds.radioMenuItemCollection('presetRadioMenuCollection')
+            # create a preset list:
+            self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
+            # create menuItems from preset list:
+            if self.presetList:
+                # verify if there is an optionVar of last choosen by user in Maya system:
+                lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
+                # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
+                for preset in self.presetList:
+                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                # load the last preset from optionVar value:
+                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
+            else:
+                print("Error: Cannot load json preset files!\n")
+                return
+            
+            # create menu:
+            self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
+            cmds.menuItem('translator_MI', label='Translator', command=self.translator)
+            cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
+            # window menu:
+            self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
+            cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
+            cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
+            # help menu:
+            self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
+            cmds.menuItem('about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+            cmds.menuItem('author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
+            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+            cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
+            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+            cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
+            cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
+            
+            # create the main layout:
+            self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
+            # here we will populate with layout from mainUI based in the choose language.
+            
+            # call mainUI in order to populate the main layout:
+            self.mainUI()
+            
+            # check if we need to automatically check for update:
+            self.autoCheckUpdate()
         
-        # creating menus:
-        self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
-        # language menu:
-        self.allUIs["languageMenu"] = cmds.menuItem('languageMenu', label='Language', parent='settingsMenu', subMenu=True)
-        cmds.radioMenuItemCollection('languageRadioMenuCollection')
-        # create a language list:
-        self.langList, self.langDic = self.getJsonFileInfo(LANGUAGES)
-        # create menuItems from language list:
-        if self.langList:
-            # verify if there is an optionVar of last choosen by user in Maya system:
-            lastLang = self.checkLastOptionVar("dpAutoRigLastLanguage", ENGLISH, self.langList)
-            # create menuItems with the command to set the last language variable, delete languageUI and call mainUI() again when changed:
-            for idiom in self.langList:
-                cmds.menuItem(idiom+"_MI", label=idiom, radioButton=False, collection='languageRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastLanguage\"); cmds.optionVar(stringValue=(\"dpAutoRigLastLanguage\", \"'+idiom+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
-            # load the last language from optionVar value:
-            cmds.menuItem(lastLang+"_MI", edit=True, radioButton=True, collection='languageRadioMenuCollection')
-        else:
-            print("Error: Cannot load json language files!\n")
+        except Exception as e:
+            print("Error: dpAutoRig UI window !!!\n")
+            print("Exception:", e)
+            print(self.langDic[self.langName]['i008_errorUI'])
+            clearDPARLoadingWindow()
             return
-        
-        # preset menu:
-        self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
-        cmds.radioMenuItemCollection('presetRadioMenuCollection')
-        # create a preset list:
-        self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
-        # create menuItems from preset list:
-        if self.presetList:
-            # verify if there is an optionVar of last choosen by user in Maya system:
-            lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
-            # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
-            for preset in self.presetList:
-                cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
-            # load the last preset from optionVar value:
-            cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
-        else:
-            print("Error: Cannot load json preset files!\n")
-            return
-        
-        # create menu:
-        self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
-        cmds.menuItem('translator_MI', label='Translator', command=self.translator)
-        cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
-        # window menu:
-        self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
-        cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
-        cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
-        # help menu:
-        self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-        cmds.menuItem('about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
-        cmds.menuItem('author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
-        cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
-        cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
-        cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
-        cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-        cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
-        
-        # create the main layout:
-        self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
-        # here we will populate with layout from mainUI based in the choose language.
-        
-        # call mainUI in order to populate the main layout:
-        self.mainUI()
-        
-        # check if we need to automatically check for update:
-#            self.autoCheckUpdate()
-        
-#        except Exception as e:
-#            print("Error: dpAutoRig UI window !!!\n")
-#            print("Exception:", e)
-#            print(self.langDic[self.langName]['i008_errorUI'])
-#            clearDPARLoadingWindow()
-#            return
         
 
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
@@ -958,10 +956,7 @@ class DP_AutoRig_UI(object):
         """
         self.setAutoCheckUpdatePref(0)
         print("\n", self.langDic[self.langName]['i084_checkUpdate'])
-        print("\n", self.langDic[self.langName]['i127_lastPy2'])
-        btOk = self.langDic[self.langName]['i131_ok']
-        cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_lastPy2'], button=[btOk], defaultButton=btOk, cancelButton=btOk, dismissString=btOk)
-        return
+        
         # compare current version with GitHub master
         rawResult = dpUtils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
         
@@ -1412,7 +1407,6 @@ class DP_AutoRig_UI(object):
     def installUpdate(self, url, newVersion, *args):
         """ Install the last version from the given url address to download file
         """
-        repr = None
         btContinue = self.langDic[self.langName]['i174_continue']
         btCancel = self.langDic[self.langName]['i132_cancel']
         confirmAutoInstall = cmds.confirmDialog(title=self.langDic[self.langName]['i098_installing'], message=self.langDic[self.langName]['i172_updateManual'], button=[btContinue, btCancel], defaultButton=btContinue, cancelButton=btCancel, dismissString=btCancel)
@@ -1430,33 +1424,33 @@ class DP_AutoRig_UI(object):
             try:
                 # get remote file from url:
                 remoteSource = urllib.request.urlopen(url)
-                
+
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # read the downloaded Zip file stored in the RAM memory:
-                dpAR_Zip = zipfile.ZipFile(StringIO.StringIO(remoteSource.read()))
-                
+                dpAR_Zip = zipfile.ZipFile(io.BytesIO(remoteSource.read()))
+
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
-                
+
                 # list Zip file contents in order to extract them in a temporarily folder:
                 zipNameList = dpAR_Zip.namelist()
                 for fileName in zipNameList:
                     if dpAR_Folder in fileName:
                         dpAR_Zip.extract(fileName, dpAR_DestFolder)
                 dpAR_Zip.close()
-                
+
                 installAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
                 
                 # declare temporarily folder:
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
-                
+
                 # store custom presets in order to avoid overwrite them when installing the update:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
-                
+
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
                     if not "-"+dpAR_Folder+"-" in eachFolder:
@@ -1475,7 +1469,7 @@ class DP_AutoRig_UI(object):
                     # make sure we have all folders needed, otherwise, create them in the destination directory:
                     if not os.path.exists(destDir):
                         os.makedirs(destDir)
-                    
+
                     for dpAR_File in fileList:
                         sourceFile = os.path.join(sourceDir, dpAR_File).replace("\\", "/")
                         destFile = os.path.join(destDir, dpAR_File).replace("\\", "/")
@@ -1492,11 +1486,11 @@ class DP_AutoRig_UI(object):
                         
                         installAmount += 1
                         cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
-                
+
                 # delete the temporarily folder used to download and install the update:
                 folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
                 shutil.rmtree(folderToDelete)
-                
+
                 # report finished update installation:
                 self.info('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.langDic[self.langName]['i173_reloadScript']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:

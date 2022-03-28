@@ -5,11 +5,9 @@ import os
 import sys
 import re
 import cProfile
-import shutil
-import urllib
-import zipfile
+import urllib.request
 import webbrowser
-from io import StringIO
+from io import TextIOWrapper
 from importlib import reload
 
 
@@ -600,16 +598,14 @@ def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
     """
     try:
         gotRemoteFile = False
-        
         # getting dpAutoRig.py file from GitHub website using the Raw URL:
-        remoteSource = urllib.urlopen(DPAR_RAWURL)
-        remoteContents = remoteSource.readlines()
-        
+        remoteSource = urllib.request.urlopen(DPAR_RAWURL)
+        remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
         # find the line with the version and compare them:
         for line in remoteContents:
-            if "DPAR_VERSION = " in line:
+            if "DPAR_VERSION_PY3 = " in line:
                 gotRemoteFile = True
-                remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
+                remoteVersion = line[20:-2] #these magic numbers filter only the version XX.YY.ZZ
                 if remoteVersion == DPAR_VERSION:
                     # 0 - the current version is up to date
                     return [0, None, None]
