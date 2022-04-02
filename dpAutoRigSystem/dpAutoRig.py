@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.15"
+DPAR_VERSION_PY3 = "3.13.16"
 DPAR_UPDATELOG = "N401 - Migrate to Python3."
 
 
@@ -1883,14 +1883,17 @@ class DP_AutoRig_UI(object):
                 lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
                 rPattern = re.compile(self.langDic[self.langName]['p003_right'] + '_.*._Ctrl')
                 for pCtrl in aAllCtrls:
-                    if (lPattern.match(pCtrl)):
-                        self.ctrls.colorShape([pCtrl], "red")
-                    elif (rPattern.match(pCtrl)):
-                        self.ctrls.colorShape([pCtrl], "blue")
-                    elif (pCtrl in aBCtrl):
-                        self.ctrls.colorShape([pCtrl], "black")
-                    else:
-                        self.ctrls.colorShape([pCtrl], "yellow")
+                    shapeList = cmds.listRelatives(pCtrl, children=True, allDescendents=True, fullPath=True, type="shape")
+                    if shapeList:
+                        if not cmds.getAttr(shapeList[0]+".overrideEnabled"):
+                            if (lPattern.match(pCtrl)):
+                                self.ctrls.colorShape([pCtrl], "red")
+                            elif (rPattern.match(pCtrl)):
+                                self.ctrls.colorShape([pCtrl], "blue")
+                            elif (pCtrl in aBCtrl):
+                                self.ctrls.colorShape([pCtrl], "black")
+                            else:
+                                self.ctrls.colorShape([pCtrl], "yellow")
             
             if integrate == 1:
                 # Update progress window
