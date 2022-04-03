@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "3.13.16"
-DPAR_UPDATELOG = "N401 - Migrate to Python3."
+DPAR_VERSION_PY3 = "4.00.00"
+DPAR_UPDATELOG = "N401 - Migration to Python3 done."
 
 
 
