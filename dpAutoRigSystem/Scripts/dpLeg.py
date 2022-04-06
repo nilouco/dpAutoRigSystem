@@ -35,7 +35,7 @@ def Leg(dpUIinst):
         # part names:
         legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
         footName = dpUIinst.langDic[dpUIinst.langName]['c038_foot']
-        toeName = dpUIinst.langDic[dpUIinst.langName]['c013_RevFoot_D'].capitalize()
+        toeName = dpUIinst.langDic[dpUIinst.langName]['c013_revFoot_D'].capitalize()
         simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
         complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
         cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']

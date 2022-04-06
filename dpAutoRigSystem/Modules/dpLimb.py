@@ -1441,8 +1441,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
                 else: #leg
                     ikExtremCalibrationList = [
-                                            self.langDic[self.langName]['c015_RevFoot_F']+self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()+self.langDic[self.langName]['c102_angle'].capitalize(),
-                                            self.langDic[self.langName]['c015_RevFoot_F']+self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()+self.langDic[self.langName]['c103_plant'].capitalize(),
+                                            self.langDic[self.langName]['c015_revFoot_F']+self.langDic[self.langName]['c018_revFoot_roll'].capitalize()+self.langDic[self.langName]['c102_angle'].capitalize(),
+                                            self.langDic[self.langName]['c015_revFoot_F']+self.langDic[self.langName]['c018_revFoot_roll'].capitalize()+self.langDic[self.langName]['c103_plant'].capitalize(),
                                             self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()
                     ]
                 fkExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]

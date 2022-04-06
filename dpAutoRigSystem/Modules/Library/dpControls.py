@@ -944,7 +944,7 @@ class ControlClass(object):
         importCalibrationNamespace = "dpImportCalibration"
         sourceRefNodeList = []
         # get user file to import calibration from
-        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i124_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'])
+        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i196_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'])
         if not importCalibrationPath:
             return
         importCalibrationPath = next(iter(importCalibrationPath), None)
@@ -983,8 +983,8 @@ class ControlClass(object):
                 else:
                     # ask to run for all nodes:
                     mirrorAll = cmds.confirmDialog(
-                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_Mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'],
-                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i125_mirrorAll'], 
+                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'],
+                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll'], 
                                                     button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
                                                     defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
                                                     cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
@@ -1001,7 +1001,7 @@ class ControlClass(object):
                     if cmds.objExists(destinationNode):
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i126_mirrorPrefix'])
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
 
 
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
@@ -1020,7 +1020,7 @@ class ControlClass(object):
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i123_transferedCalib'], sourceItem, destinationList, attrList)
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i195_transferedCalib'], sourceItem, destinationList, attrList)
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'])
 
@@ -1042,3 +1042,18 @@ class ControlClass(object):
         """
         if cmds.objExists(nodeName+".calibrationList"):
             return list(cmds.getAttr(nodeName+".calibrationList").split(";"))
+
+    
+    def exportShape(self, nodeList=None, *args):
+        """ Export control shapes from a given list or for all nodes in the scene.
+            It will save a Maya file with the control shapes snapshots.
+            If there's no given path, it will use the current location and create the dpControlShapes directory.
+        """
+        print("merci export shape")
+
+
+    def importShape(self, nodeList=None, *args):
+        """ Import control shapes from an external loaded Maya file.
+            If not get an user defined parameter, it will use the default path as current location inside dpControlShapes directory.
+        """
+        print("merci import shape")

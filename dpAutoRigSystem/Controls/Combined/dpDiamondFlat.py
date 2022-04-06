@@ -6,7 +6,7 @@ reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "DiamondFlat"
-TITLE = "m177_DiamondFlat"
+TITLE = "m177_diamondFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamondFlat.png"
 

@@ -438,7 +438,7 @@ class Zipper(object):
         """ Main method to buid the all zipper setup.
             Uses the pre-defined and loaded curves.
         """
-        dialogRun = cmds.confirmDialog(title="Zipper", message=self.langDic[self.langName]["i120_notUndoable"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
+        dialogRun = cmds.confirmDialog(title="Zipper", message=self.langDic[self.langName]["i192_notUndoable"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
         if dialogRun == self.langDic[self.langName]["i174_continue"]:
             self.dpGetGoodToDPAR()
             if self.firstCurve and self.secondCurve:
