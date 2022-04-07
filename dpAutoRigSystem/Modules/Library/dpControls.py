@@ -1047,19 +1047,18 @@ class ControlClass(object):
 
     
     def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, *args):
-        """ Export control shapes from a given list or all dpControl transforms in the scene.
+        """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
             If publish is True, it will use the current location and create the dpShapeIO directory by default.
-            If keepSnapshot is True, it will parent dpSnapshotGrp to Wip_Grp and hide it.
+            If keepSnapshot is True, it will parent a backup dpSnapshotGrp group to Wip_Grp and hide it.
             If overrideExisting is True, it will delete the old node before create the new snapshot.
         """
         currentPath = cmds.file(query=True, sceneName=True)
         if not currentPath:
             print("Save your scene before publish its shapes, please.")
             return
-        print("currentPath = ", currentPath)
-
+        
         if not nodeList:
             nodeList = []
             allList = cmds.ls(selection=False)
@@ -1070,15 +1069,10 @@ class ControlClass(object):
         if nodeList:
             if not path:
                 if publish:
-                    print("publishing...")
                     dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
-                    print("dpFolder = ", dpFolder)
                     if not os.path.exists(dpFolder):
                         os.makedirs(dpFolder)
                     path = dpFolder+"/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
-                    print("path =", path)
-
-
                 else:
                     pathList = cmds.fileDialog2(fileMode=0, caption="Export Shapes")
                     if pathList:
@@ -1087,23 +1081,14 @@ class ControlClass(object):
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
-
-                print("savepathssssshapes here = path = ", path)
-
-
-                ###### WIP:
-
                 cmds.undoInfo(openChunk=True)
-
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
-                                
                 for item in nodeList:
                     snapshotName = item+"_Snapshot_Crv"
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
                             cmds.delete(snapshotName)
-
                     dup = cmds.duplicate(item, name=snapshotName)[0]
                     cmds.setAttr(dup+".dpControl", 0)
                     dupChildList = cmds.listRelatives(dup, allDescendents=True, children=True, fullPath=True)
@@ -1113,45 +1098,32 @@ class ControlClass(object):
                             if not cmds.objectType(childNode) == "nurbsCurve":
                                 toDeleteList.append(childNode)
                         if toDeleteList:
-                            print("toDeleteList =", toDeleteList)
                             cmds.delete(toDeleteList)
                     cmds.parent(dup, dpSnapshotGrp)
-                
-
+                # export shapes
                 if cmds.listRelatives(dpSnapshotGrp, allDescendents=True, children=True, type="nurbsCurve"):
-                    print("yes, ready to export!!!")
                     cmds.select(dpSnapshotGrp)
                     cmds.file(rename=path)
                     cmds.file(exportSelected=True, type='mayaAscii', prompt=False, force=True)
                     cmds.file(rename=currentPath)
-                    
-                    
-                    
-                    
-                    keepSnapshot = True
-                    
+                    # DEV helper keepSnapshot
                     if not cmds.objExists("WIP_Grp"): #TODO need to be refactory to get this node by masterGrp attribute
                         keepSnapshot = False
                     if keepSnapshot:
                         try:
                             cmds.parent(dpSnapshotGrp, "WIP_Grp")
                             cmds.setAttr(dpSnapshotGrp+".visibility", 0)
+                            if cmds.objExists("Backup_"+dpSnapshotGrp):
+                                cmds.delete("Backup_"+dpSnapshotGrp)
                             cmds.rename(dpSnapshotGrp, "Backup_"+dpSnapshotGrp)
                         except:
                             pass
                     else:
                         cmds.delete(dpSnapshotGrp)
                     print('Exported shapes to: {0}'.format(path))
-                
-
                 cmds.undoInfo(closeChunk=True)
-
-            
         else:
             print("Nothing was done because there aren't dpControls in the scene.")
-
-
-
 
 
     def importShape(self, nodeList=None, path=None, publish=False, *args):
