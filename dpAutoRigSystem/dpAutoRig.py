@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.01"
-DPAR_UPDATELOG = "N401 - Migration to Python3 done."
+DPAR_VERSION_PY3 = "4.00.00"
+DPAR_UPDATELOG = "N407 - No PyMEL for sqCopyPasteShape."
 
 
 
@@ -127,6 +127,8 @@ DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 MASTER_ATTR = "masterGrp"
+DPDATA = "dpData"
+DPSHAPE = "dpShape"
 
 
 class DP_AutoRig_UI(object):
@@ -147,6 +149,8 @@ class DP_AutoRig_UI(object):
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.userDefAutoCheckUpdate = 0
+        self.dpData = DPDATA
+        self.dpShape = DPSHAPE
         
         
         try:
@@ -545,9 +549,10 @@ class DP_AutoRig_UI(object):
         
         # ControlShapeIO - frameLayout:
         self.allUIs["shapeIOFL"] = cmds.frameLayout('shapeIOFL', label=self.langDic[self.langName]['m067_shape']+" "+self.langDic[self.langName]['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["shapeIO2Layout"] = cmds.paneLayout("shapeIO2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["shapeIOFL"])
-        self.allUIs["importShapeButton"] = cmds.button("importShapeButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ctrls.importShape, parent=self.allUIs["shapeIO2Layout"])
-        self.allUIs["exportShapeButton"] = cmds.button("exportShapeButton", label=self.langDic[self.langName]['i164_export'], backgroundColor=(1.0, 0.7, 0.7), height=30, command=self.ctrls.exportShape, parent=self.allUIs["shapeIO2Layout"])
+        self.allUIs["shapeIO3Layout"] = cmds.paneLayout("shapeIO3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["shapeIOFL"])
+        self.allUIs["importShapeButton"] = cmds.button("importShapeButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ctrls.importShape, parent=self.allUIs["shapeIO3Layout"])
+        self.allUIs["exportShapeButton"] = cmds.button("exportShapeButton", label=self.langDic[self.langName]['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ctrls.exportShape, parent=self.allUIs["shapeIO3Layout"])
+        self.allUIs["publishShapeButton"] = cmds.button("publishShapeButton", label=self.langDic[self.langName]['i200_publish'], backgroundColor=(1.0, 0.7, 0.7), height=30, command=partial(self.ctrls.exportShape, publish=True), parent=self.allUIs["shapeIO3Layout"])
 
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,

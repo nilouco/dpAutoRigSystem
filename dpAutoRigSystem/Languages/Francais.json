@@ -358,6 +358,7 @@
     "i197_mirrorAll"       : "Esc-que vous voulez faire le mirroir de calibrage pour tous les contrôlleurs?",
     "i198_mirrorPrefix"    : "Quel est le prefixe de mirroir à utiliser?",
     "i199_io"              : "IO",
+    "i200_publish"         : "Publier",
 
     "m001_fkLine"              : "Ligne Fk",
     "m002_fkLineDesc"          : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

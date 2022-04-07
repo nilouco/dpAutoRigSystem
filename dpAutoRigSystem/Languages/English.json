@@ -358,6 +358,7 @@
     "i197_mirrorAll"       : "Do you want to mirror calibration for all controls?",
     "i198_mirrorPrefix"    : "Which mirror prefix to use?",
     "i199_io"              : "IO",
+    "i200_publish"         : "Publish",
 
     "m001_fkLine"              : "Fk Line",
     "m002_fkLineDesc"          : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
