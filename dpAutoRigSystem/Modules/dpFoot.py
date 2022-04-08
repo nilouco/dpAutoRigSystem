@@ -170,17 +170,17 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # declaring attributes reading from dictionary:
                 ankleRFAttr = self.langDic[self.langName]['c009_leg_extrem']
-                middleRFAttr = self.langDic[self.langName]['c017_RevFoot_middle']
-                outsideRFAttr = self.langDic[self.langName]['c010_RevFoot_A']
-                insideRFAttr = self.langDic[self.langName]['c011_RevFoot_B']
-                heelRFAttr = self.langDic[self.langName]['c012_RevFoot_C']
-                toeRFAttr = self.langDic[self.langName]['c013_RevFoot_D']
-                ballRFAttr = self.langDic[self.langName]['c014_RevFoot_E']
-                footRFAttr = self.langDic[self.langName]['c015_RevFoot_F']
-                sideRFAttr = self.langDic[self.langName]['c016_RevFoot_G']
-                rfRoll = self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()
-                rfSpin = self.langDic[self.langName]['c019_RevFoot_spin'].capitalize()
-                rfTurn = self.langDic[self.langName]['c020_RevFoot_turn'].capitalize()
+                middleRFAttr = self.langDic[self.langName]['c017_revFoot_middle']
+                outsideRFAttr = self.langDic[self.langName]['c010_revFoot_A']
+                insideRFAttr = self.langDic[self.langName]['c011_revFoot_B']
+                heelRFAttr = self.langDic[self.langName]['c012_revFoot_C']
+                toeRFAttr = self.langDic[self.langName]['c013_revFoot_D']
+                ballRFAttr = self.langDic[self.langName]['c014_revFoot_E']
+                footRFAttr = self.langDic[self.langName]['c015_revFoot_F']
+                sideRFAttr = self.langDic[self.langName]['c016_revFoot_G']
+                rfRoll = self.langDic[self.langName]['c018_revFoot_roll'].capitalize()
+                rfSpin = self.langDic[self.langName]['c019_revFoot_spin'].capitalize()
+                rfTurn = self.langDic[self.langName]['c020_revFoot_turn'].capitalize()
                 rfAngle = self.langDic[self.langName]['c102_angle'].capitalize()
                 rfPlant = self.langDic[self.langName]['c103_plant'].capitalize()
                 showCtrlsAttr = self.langDic[self.langName]['c021_showControls']
@@ -268,7 +268,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
 
-                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.langDic[self.langName]['c017_RevFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
+                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.langDic[self.langName]['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)

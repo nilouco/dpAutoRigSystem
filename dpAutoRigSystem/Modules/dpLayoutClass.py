@@ -33,7 +33,7 @@ class LayoutClass(object):
         self.userName = cmds.textField('userName', annotation=self.langDic[self.langName]['m006_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
         self.colorButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         shapeSizeValue = cmds.getAttr(self.moduleGrp+'.shapeSize')
-        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shapeSize'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
+        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shape']+" "+self.langDic[self.langName]['i115_size'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
         # edit values reading from guide:
         displayAnnotationValue = cmds.getAttr(self.moduleGrp+'.displayAnnotation')
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
@@ -163,7 +163,7 @@ class LayoutClass(object):
                 
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                cmds.text(self.langDic[self.langName]['m010_Mirror'], parent=self.doubleRigColumn)
+                cmds.text(self.langDic[self.langName]['m010_mirror'], parent=self.doubleRigColumn)
                 self.mirrorMenu = cmds.optionMenu("mirrorMenu", label='', changeCommand=self.changeMirror, parent=self.doubleRigColumn)
                 mirrorMenuItemList = ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ']
                 for item in mirrorMenuItemList:

@@ -41,7 +41,7 @@ def Bike(dpUIinst):
         frontSuspensionName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['m153_suspension']
         backSuspensionName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['m153_suspension']
         seatName = dpUIinst.langDic[dpUIinst.langName]['c088_seat']
-        mirrorName = dpUIinst.langDic[dpUIinst.langName]['m010_Mirror']
+        mirrorName = dpUIinst.langDic[dpUIinst.langName]['m010_mirror']
         pedalName = dpUIinst.langDic[dpUIinst.langName]['c089_pedal']
         leftPedalName = dpUIinst.langDic[dpUIinst.langName]['p002_left']+"_"+dpUIinst.langDic[dpUIinst.langName]['c089_pedal']
         rightPedalName = dpUIinst.langDic[dpUIinst.langName]['p003_right']+"_"+dpUIinst.langDic[dpUIinst.langName]['c089_pedal']

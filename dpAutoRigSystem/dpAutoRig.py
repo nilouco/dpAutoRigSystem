@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.00"
-DPAR_UPDATELOG = "N401 - Migration to Python3 done."
+DPAR_VERSION_PY3 = "4.00.01"
+DPAR_UPDATELOG = "N407 - No PyMEL for sqCopyPasteShape.\nAdded new integrated methods to\ndpShapeIO in Control tab."
 
 
 
@@ -127,6 +127,8 @@ DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 MASTER_ATTR = "masterGrp"
+DPDATA = "dpData"
+DPSHAPE = "dpShape"
 
 
 class DP_AutoRig_UI(object):
@@ -147,6 +149,8 @@ class DP_AutoRig_UI(object):
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.userDefAutoCheckUpdate = 0
+        self.dpData = DPDATA
+        self.dpShape = DPSHAPE
         
         
         try:
@@ -529,11 +533,11 @@ class DP_AutoRig_UI(object):
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectionFL"])
         
         # calibrationControls - frameLayout:
-        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
-        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i122_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration2Layout"])
-        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i124_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration2Layout"])
-        self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.langDic[self.langName]['m010_Mirror']+" "+self.langDic[self.langName]['i121_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
+        self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["calibration3Layout"] = cmds.paneLayout("calibration3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
+        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration3Layout"])
+        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration3Layout"])
+        self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.langDic[self.langName]['m010_mirror']+" "+self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
         # mirror calibration - layout:
         self.allUIs["mirrorCalibrationLayout"] = cmds.rowColumnLayout('mirrorCalibrationLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorCalibrationFL" )
         self.allUIs["prefixT"] = cmds.text("prefixT", label=self.langDic[self.langName]['i144_prefix'], parent=self.allUIs["mirrorCalibrationLayout"])
@@ -541,8 +545,16 @@ class DP_AutoRig_UI(object):
         self.allUIs["fromPrefixTF"] = cmds.textField('fromPrefixTF', text="L_", parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["toPrefixT"] = cmds.text("toPrefixT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["toPrefixTF"] = cmds.textField('toPrefixTF', text="R_", parent=self.allUIs["mirrorCalibrationLayout"])
-        self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.langDic[self.langName]['m010_Mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ctrls.mirrorCalibration, parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ctrls.mirrorCalibration, parent=self.allUIs["mirrorCalibrationLayout"])
         
+        # ControlShapeIO - frameLayout:
+        self.allUIs["shapeIOFL"] = cmds.frameLayout('shapeIOFL', label=self.langDic[self.langName]['m067_shape']+" "+self.langDic[self.langName]['i199_io'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["shapeIO4Layout"] = cmds.paneLayout("shapeIO4Layout", configuration="vertical4", separatorThickness=2.0, parent=self.allUIs["shapeIOFL"])
+        self.allUIs["importShapeButton"] = cmds.button("importShapeButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(1.0, 0.9, 0.9), height=30, command=self.ctrls.importShape, parent=self.allUIs["shapeIO4Layout"])
+        self.allUIs["exportShapeButton"] = cmds.button("exportShapeButton", label=self.langDic[self.langName]['i164_export'], backgroundColor=(1.0, 0.8, 0.8), height=30, command=self.ctrls.exportShape, parent=self.allUIs["shapeIO4Layout"])
+        self.allUIs["rechargeShapeButton"] = cmds.button("rechargeShapeButton", label=self.langDic[self.langName]['i204_recharge'], backgroundColor=(1.0, 0.7, 0.7), height=30, command=partial(self.ctrls.importShape, recharge=True), parent=self.allUIs["shapeIO4Layout"])
+        self.allUIs["publishShapeButton"] = cmds.button("publishShapeButton", label=self.langDic[self.langName]['i200_publish'], backgroundColor=(1.0, 0.6, 0.6), height=30, command=partial(self.ctrls.exportShape, publish=True), parent=self.allUIs["shapeIO4Layout"])
+
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
                         attachForm=[(self.allUIs["controlMainLayout"], 'top', 20), (self.allUIs["controlMainLayout"], 'left', 5), (self.allUIs["controlMainLayout"], 'right', 5), (self.allUIs["controlMainLayout"], 'bottom', 5)]
@@ -2019,7 +2031,7 @@ class DP_AutoRig_UI(object):
                 
                 # prepare to show a dialog box if find a bug:
                 self.detectedBug = False
-                self.bugMessage = self.langDic[self.langName]['b000_BugGeneral']
+                self.bugMessage = self.langDic[self.langName]['b000_bugGeneral']
                 
                 # integrating modules together:
                 if self.integratedTaskDic:

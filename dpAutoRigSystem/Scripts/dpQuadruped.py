@@ -45,14 +45,14 @@ def Quadruped(dpUIinst):
         earName = dpUIinst.langDic[dpUIinst.langName]['m040_ear']
         upperTeethName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']
         upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
-        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
+        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_revFoot_G'].capitalize()
         lowerTeethName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']
         lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
-        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_RevFoot_G'].capitalize()
+        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_revFoot_G'].capitalize()
         noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
         tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']
         tailName = dpUIinst.langDic[dpUIinst.langName]['m039_tail']
-        toeName = dpUIinst.langDic[dpUIinst.langName]['c013_RevFoot_D'].capitalize()
+        toeName = dpUIinst.langDic[dpUIinst.langName]['c013_revFoot_D'].capitalize()
         frontName = dpUIinst.langDic[dpUIinst.langName]['c056_front']
         backName = dpUIinst.langDic[dpUIinst.langName]['c057_back']
         simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
