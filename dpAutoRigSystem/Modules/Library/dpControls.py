@@ -955,9 +955,9 @@ class ControlClass(object):
         refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
-            for refNode in refNodeList:
-                if cmds.objExists(refNode+".calibrationList"):
-                    sourceRefNodeList.append(refNode)
+            for item in refNodeList:
+                if cmds.objExists(item+".calibrationList"):
+                    sourceRefNodeList.append(item)
         if sourceRefNodeList:
             for sourceRefNode in sourceRefNodeList:
                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:]
@@ -1061,7 +1061,7 @@ class ControlClass(object):
         
         if not nodeList:
             nodeList = []
-            allList = cmds.ls(selection=False)
+            allList = cmds.ls(selection=False, type="transform")
             if allList:
                 for item in allList:
                     if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
@@ -1126,11 +1126,73 @@ class ControlClass(object):
             print("Nothing was done because there aren't dpControls in the scene.")
 
 
-    def importShape(self, nodeList=None, path=None, publish=False, *args):
+    def importShape(self, nodeList=None, path=None, *args):
         """ Import control shapes from an external loaded Maya file.
-            If not get an user defined parameter, it will use the default path as current location inside dpControlShapes directory.
+            If not get an user defined parameter, it will use the default path as current location inside dpShapeIO directory.
         """
+        
         print("merci import shape")
-        importShapePath = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
-        if importShapePath:
-            importShapePath = next(iter(importShapePath), None)
+        
+        importShapeNamespace = "dpImportShape"
+
+        if not nodeList:
+            nodeList = []
+            allList = cmds.ls(selection=False, type="transform")
+            if allList:
+                for item in allList:
+                    if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
+                        nodeList.append(item)
+        if nodeList:
+
+            if not path:
+                pathList = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
+                if pathList:
+                    path = pathList[0]
+            if path:
+                if not os.path.exists(path):
+                    print ("File doesn't exist: {0}".format(path))
+                else:
+                    
+                    print("coming here to importShapes!")
+                    
+                    # create a file reference:
+                    cmds.file(path, reference=True, namespace=importShapeNamespace)
+                    refNode = cmds.file(path, referenceNode=True, query=True)
+                    refNodeList = cmds.referenceQuery(refNode, nodes=True)
+                    if refNodeList:
+                        print("refNodeList =", refNodeList)
+                        for sourceRefNode in refNodeList:
+                            if cmds.objectType(sourceRefNode) == "transform":
+                                destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-13] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
+                                print("destinationNode =", destinationNode)
+                                if cmds.objExists(destinationNode):
+                                    print("destinationNode exists =", destinationNode)
+
+                                    #TODO unparent children
+
+                                    connected = None
+                                    ### WIP
+                                    destShapeList = cmds.listRelatives(destinationNode, children=True, type="nurbsCurve")
+                                    if destShapeList:
+                                        for destShape in destShapeList:
+                                            connectedList = cmds.listConnections(destShape+".visibility", source=True, destination=False, plugs=True)
+                                            if connectedList:
+                                                connected = connectedList[0]
+                                                break
+
+
+                                    self.transferShape(deleteSource=False, clearDestinationShapes=True, sourceItem=sourceRefNode, destinationList=[destinationNode], applyColor=True)
+                    
+                                    # Restore visibility connections.
+                                    if connected:
+                                        destShapeList = cmds.listRelatives(destinationNode, children=True, type="nurbsCurve")
+                                        if destShapeList:
+                                            for destShape in destShapeList:
+                                               cmds.connectAttr(connected, destShape+'.visibility', force=True)
+
+                                    #TODO restore children parent
+                    # remove referenced file:
+                    cmds.file(path, removeReference=True)
+                    print("Imported shapes: "+path)
+        else:
+            print("There aren't dpControls in the current scene to import shapes.")
