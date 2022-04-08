@@ -5,6 +5,7 @@ import os
 import getpass
 import datetime
 
+SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 
 dic_colors = {
     "yellow": 17,
@@ -604,7 +605,7 @@ class ControlClass(object):
             self.pasteAttr(destinationList)
     
     
-    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, applyColor=True, *args):
+    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, *args):
         """ Transfer control shape from sourceItem to destination list
         """
         if not sourceItem:
@@ -622,7 +623,7 @@ class ControlClass(object):
                         needKeepVis = False
                         sourceVis = None
                         dupSourceItem = cmds.duplicate(sourceItem)[0]
-                        if applyColor:
+                        if keepColor:
                             self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
                         if destShapeList:
@@ -705,7 +706,7 @@ class ControlClass(object):
                             curDegree = 1 #linear
                         cmds.setAttr(item+".degree", curDegree)
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
-                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], applyColor=True)
+                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
             cmds.select(transformList)
     
     
@@ -1046,6 +1047,19 @@ class ControlClass(object):
             return list(cmds.getAttr(nodeName+".calibrationList").split(";"))
 
     
+    def getControlList(self, *args):
+        """ List all dpControl transforms that has active .dpControl attribute.
+            Returns a list of them.
+        """
+        nodeList = []
+        allList = cmds.ls(selection=False, type="transform")
+        if allList:
+            for item in allList:
+                if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
+                    nodeList.append(item)
+        return nodeList
+
+
     def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
@@ -1056,16 +1070,11 @@ class ControlClass(object):
         """
         currentPath = cmds.file(query=True, sceneName=True)
         if not currentPath:
-            print("Save your scene before publish its shapes, please.")
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
             return
         
         if not nodeList:
-            nodeList = []
-            allList = cmds.ls(selection=False, type="transform")
-            if allList:
-                for item in allList:
-                    if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
-                        nodeList.append(item)
+            nodeList = self.getControlList()
         if nodeList:
             if not path:
                 if publish:
@@ -1085,7 +1094,7 @@ class ControlClass(object):
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
                 for item in nodeList:
-                    snapshotName = item+"_Snapshot_Crv"
+                    snapshotName = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
                             cmds.delete(snapshotName)
@@ -1123,76 +1132,49 @@ class ControlClass(object):
                     print('Exported shapes to: {0}'.format(path))
                 cmds.undoInfo(closeChunk=True)
         else:
-            print("Nothing was done because there aren't dpControls in the scene.")
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
 
 
-    def importShape(self, nodeList=None, path=None, *args):
+    def importShape(self, nodeList=None, path=None, recharge=False, *args):
         """ Import control shapes from an external loaded Maya file.
-            If not get an user defined parameter, it will use the default path as current location inside dpShapeIO directory.
+            If not get an user defined parameter for a node list, it will import all shapes.
+            If the recharge parameter is True, it will use the default path as current location inside dpShapeIO directory.
         """
-        
-        print("merci import shape")
-        
         importShapeNamespace = "dpImportShape"
-
         if not nodeList:
-            nodeList = []
-            allList = cmds.ls(selection=False, type="transform")
-            if allList:
-                for item in allList:
-                    if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
-                        nodeList.append(item)
+            nodeList = self.getControlList()
         if nodeList:
-
-            if not path:
+            if recharge:
+                currentPath = cmds.file(query=True, sceneName=True)
+                if not currentPath:
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+                    return
+                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
+                dpShapeFile = "/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
+                path = dpFolder+dpShapeFile
+                if not os.path.exists(path):
+                    print (self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+                    return
+            elif not path:
                 pathList = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
                 if pathList:
                     path = pathList[0]
             if path:
                 if not os.path.exists(path):
-                    print ("File doesn't exist: {0}".format(path))
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['e004_objNotExist']+path)
                 else:
-                    
-                    print("coming here to importShapes!")
-                    
                     # create a file reference:
                     cmds.file(path, reference=True, namespace=importShapeNamespace)
                     refNode = cmds.file(path, referenceNode=True, query=True)
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
-                        print("refNodeList =", refNodeList)
                         for sourceRefNode in refNodeList:
                             if cmds.objectType(sourceRefNode) == "transform":
-                                destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-13] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
-                                print("destinationNode =", destinationNode)
+                                destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destinationNode):
-                                    print("destinationNode exists =", destinationNode)
-
-                                    #TODO unparent children
-
-                                    connected = None
-                                    ### WIP
-                                    destShapeList = cmds.listRelatives(destinationNode, children=True, type="nurbsCurve")
-                                    if destShapeList:
-                                        for destShape in destShapeList:
-                                            connectedList = cmds.listConnections(destShape+".visibility", source=True, destination=False, plugs=True)
-                                            if connectedList:
-                                                connected = connectedList[0]
-                                                break
-
-
-                                    self.transferShape(deleteSource=False, clearDestinationShapes=True, sourceItem=sourceRefNode, destinationList=[destinationNode], applyColor=True)
-                    
-                                    # Restore visibility connections.
-                                    if connected:
-                                        destShapeList = cmds.listRelatives(destinationNode, children=True, type="nurbsCurve")
-                                        if destShapeList:
-                                            for destShape in destShapeList:
-                                               cmds.connectAttr(connected, destShape+'.visibility', force=True)
-
-                                    #TODO restore children parent
+                                    self.transferShape(deleteSource=False, clearDestinationShapes=True, sourceItem=sourceRefNode, destinationList=[destinationNode], keepColor=False)
                     # remove referenced file:
                     cmds.file(path, removeReference=True)
-                    print("Imported shapes: "+path)
+                    print("Imported shapes: {0}".format(path))
         else:
-            print("There aren't dpControls in the current scene to import shapes.")
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
