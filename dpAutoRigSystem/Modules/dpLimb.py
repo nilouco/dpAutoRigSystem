@@ -1,29 +1,12 @@
 # importing libraries:
 from maya import cmds
 import math
+from importlib import reload
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
-# importing Renaud Lessard's module:
-loadedIkFkSnap = False
-try:
-    from sstk.maya.animation import sqIkFkTools
-    from sstk.libs import libSerialization
-    reload(sqIkFkTools)
-    reload(libSerialization)
-    loadedIkFkSnap = True
-except:
-    try:
-        from Library import sqIkFkTools
-        from Library import libSerialization
-        reload(sqIkFkTools)
-        reload(libSerialization)
-        loadedIkFkSnap = True
-    except:
-        print("Not loaded sqIkFkTools")
-        pass
 
 # global variables to this module:
 CLASS_NAME = "Limb"
@@ -36,13 +19,13 @@ ARM = "Arm"
 LEG = "Leg"
 
 
-class Limb(Base.StartClass, Layout.LayoutClass):
+class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
 
         #Declare variable
         self.integratedActionsDic = {}
@@ -56,7 +39,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.worldRefList = []
         self.worldRefShapeList = []
         self.extremJntList = []
-        self.parentConstToRFOffsetList = []
         self.fixIkSpringSolverGrpList = []
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
@@ -69,8 +51,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
 
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
 
     def getHasBend(self):
         return cmds.getAttr(self.moduleGrp + ".hasBend")
@@ -87,9 +69,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         else:
             return 0
     
-    # @utils.profiler
+    # @dpUtils.profiler
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp + ".nJoints", 0)
@@ -199,7 +181,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
-        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
+        dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
         cmds.text(self.nSegmentsText, edit=True, visible=False, parent=self.segDelColumn)
         cmds.intField(self.nJointsIF, edit=True, editable=False, visible=False, parent=self.segDelColumn)
@@ -400,7 +382,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
 
 
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -444,7 +426,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 sideLower = side
@@ -532,7 +514,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 for o, skinJoint in enumerate(self.skinJointList):
                     if o < len(self.skinJointList) - 1:
                         cmds.addAttr(skinJoint, longName='dpAR_joint', attributeType='float', keyable=False)
-                        utils.setJointLabel(skinJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.jNameList[o])
+                        dpUtils.setJointLabel(skinJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.jNameList[o])
 
                 # creating Fk controls and a hierarchy group to originedFrom data:
                 self.fkCtrlList, self.origFromList = [], []
@@ -567,13 +549,13 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     origGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+jName+"_OrigFrom_Grp")
                     self.origFromList.append(origGrp)
                     if n == 0: #Clavicle/Hips
-                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
+                        dpUtils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
                     elif n == 1: #Shoulder/Leg
-                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_")+";"+self.cvMainLoc)
+                        dpUtils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_")+";"+self.cvMainLoc)
                     elif n == len(self.jNameList)-1: #Wrist/Ankle
-                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_")+";"+self.cvEndJoint+";"+self.radiusGuide)
+                        dpUtils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_")+";"+self.cvEndJoint+";"+self.radiusGuide)
                     else: #Corner
-                        utils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
+                        dpUtils.originedFrom(objName=origGrp, attrString=self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
                         if self.getHasBend():
                             toCornerBendList.append(self.cvLocList[n][self.cvLocList[n].find("__") + 1:].replace(":", "_"))
                     cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC")
@@ -589,10 +571,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                             cmds.setAttr(self.toParentExtremCtrl + ".translateX", self.ctrlRadius)
                         else:
                             cmds.setAttr(self.toParentExtremCtrl + ".translateX", -self.ctrlRadius)
-                        utils.zeroOut([self.toParentExtremCtrl])
+                        dpUtils.zeroOut([self.toParentExtremCtrl])
                         self.ctrls.setLockHide([self.toParentExtremCtrl], ['v'])
                 # zeroOut controls:
-                self.zeroFkCtrlList = utils.zeroOut(self.fkCtrlList)
+                self.zeroFkCtrlList = dpUtils.zeroOut(self.fkCtrlList)
                 self.zeroFkCtrlGrp = cmds.group(self.zeroFkCtrlList[0], self.zeroFkCtrlList[1], name=side+self.userGuideName+"_Fk_Ctrl_Grp")
                 
                 # invert scale for right side before:
@@ -681,10 +663,10 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3)
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
-                utils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
+                dpUtils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
                 # getting them zeroOut groups:
-                self.ikCornerCtrlZero = utils.zeroOut([self.ikCornerCtrl])[0]
-                self.ikExtremCtrlZero = utils.zeroOut([self.ikExtremCtrl])[0]
+                self.ikCornerCtrlZero = dpUtils.zeroOut([self.ikCornerCtrl])[0]
+                self.ikExtremCtrlZero = dpUtils.zeroOut([self.ikExtremCtrl])[0]
                 self.ikExtremCtrlZeroList.append(self.ikExtremCtrlZero)
                 # putting ikCtrls in the correct position and orientation:
                 cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikExtremCtrlZero, maintainOffset=False))
@@ -761,7 +743,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # verify the limb style:
                 if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                     # verify if the ikSpringSolver plugin is loaded, if not, then load it
-                    loadedIkSpring = utils.checkLoadedPlugin("ikSpringSolver", self.langDic[self.langName]['e013_cantLoadIkSpringSolver'])
+                    loadedIkSpring = dpUtils.checkLoadedPlugin("ikSpringSolver", self.langDic[self.langName]['e013_cantLoadIkSpringSolver'])
                     if loadedIkSpring:
                         if not cmds.objExists('ikSpringSolver'):
                             cmds.createNode('ikSpringSolver', name='ikSpringSolver')
@@ -815,7 +797,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     if s == 1:
                         cmds.setAttr(self.quadExtraCtrl+".rotateY", 180)
                         cmds.makeIdentity(self.quadExtraCtrl, rotate=True, apply=True)
-                    quadExtraCtrlZero = utils.zeroOut([self.quadExtraCtrl])[0]
+                    quadExtraCtrlZero = dpUtils.zeroOut([self.quadExtraCtrl])[0]
                     cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=False))
                     cmds.parent(quadExtraCtrlZero, ikHandleGrp)
                     cmds.parent(ikHandleExtraList[0], self.ikHandleToRFGrp)
@@ -926,7 +908,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.ikCornerCtrlZero + ".scaleX", -1)
                     cmds.setAttr(self.ikCornerCtrlZero + ".scaleY", -1)
                     cmds.setAttr(self.ikCornerCtrlZero + ".scaleZ", -1)
-                self.zeroCornerGrp = utils.zeroOut([self.cornerGrp])[0]
+                self.zeroCornerGrp = dpUtils.zeroOut([self.cornerGrp])[0]
                 self.ikPoleVectorCtrlZeroList.append(self.zeroCornerGrp)
 
                 # working with autoOrient of poleVector:
@@ -1053,7 +1035,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 if self.limbTypeName == ARM and self.getHasBend() == False:
                     # create forearm joint:
                     forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.langDic[self.langName][ 'c030_forearm']+self.jSufixList[0])[0]
-                    utils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName][ 'c030_forearm'])
+                    dpUtils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName][ 'c030_forearm'])
                     # delete its children:
                     childList = cmds.listRelatives(forearmJnt, children=True, fullPath=True)
                     cmds.delete(childList)
@@ -1087,22 +1069,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 # creating a group to receive the reverseFootCtrlGrp (if module integration is on):
                 self.ikFkBlendGrpToRevFoot = cmds.group(empty=True, name=side + self.userGuideName + "_IkFkBlendGrpToRevFoot_Grp")
                 self.ikFkBlendGrpToRevFootList.append(self.ikFkBlendGrpToRevFoot)
-                tempToDelToRFpc = cmds.parentConstraint(self.ikExtremCtrl, self.ikFkBlendGrpToRevFoot, maintainOffset=False)
-                cmds.delete(tempToDelToRFpc)
+                cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, self.ikFkBlendGrpToRevFoot, maintainOffset=False))
 
-                # this next parentConstraint does not calculate correctly when we use negative scale
-                # then we will use a workarround in order to set a good offset
-                parentConstToRFOffset = \
-                cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot + "_PaC")[0]
-                self.parentConstToRFOffsetList.append(parentConstToRFOffset)
+                # offset parent constraint
+                parentConstToRFOffset = cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot + "_PaC")[0]
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', parentConstToRFOffset + "." + self.fkCtrlList[len(self.fkCtrlList) - 1] + "W1", force=True)
-
-                # organize to be corriged the offset when we will apply the parentConstraint
-                # there is a bug in the Maya calculation if we use negative scale (mirrored :P)
-                cmds.addAttr(parentConstToRFOffset, longName="mustCorrectOffset", attributeType='bool', keyable=False)
-                cmds.addAttr(parentConstToRFOffset, longName="fixOffsetX", attributeType='long', keyable=False)
-                cmds.addAttr(parentConstToRFOffset, longName="fixOffsetY", attributeType='long', keyable=False)
-                cmds.addAttr(parentConstToRFOffset, longName="fixOffsetZ", attributeType='long', keyable=False)
 
                 # work with scalable extrem hand or foot:
                 cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
@@ -1134,20 +1105,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 cmds.connectAttr(ikScaleMD + '.outputX', uniBlend + '.color2R', force=True)
                 
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
-                    # these options are valides for Biped, Quadruped and Quadruped Spring legs
-                    if (int(cmds.about(version=True)[
-                            :4]) < 2016):  # HACK negative scale --> Autodesk fixed this problem in Maya 2016 !
-                        if self.mirrorAxis != 'off':
-                            if s == 1:  # mirrored guide
-                                if self.limbTypeName == LEG:
-                                    for axis in self.mirrorAxis:
-                                        if axis == "X":
-                                            # must fix offset of the parentConstrain in the future when this will be integrated
-                                            cmds.setAttr(parentConstToRFOffset + ".mustCorrectOffset", 1)
-                                            cmds.setAttr(parentConstToRFOffset + ".fixOffsetX", 90)
-                                            cmds.setAttr(parentConstToRFOffset + ".fixOffsetY", 180)
-                                            cmds.setAttr(parentConstToRFOffset + ".fixOffsetZ", -90)
-
                     if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                         # fix the group for the ikSpringSolver to avoid Maya bug about rotation from masterCtrl :P
                         cmds.parent(self.ikJointList[1], world=True)
@@ -1155,7 +1112,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         self.fixIkSpringSolverGrpList.append(self.fixIkSpringSolverGrp)
                         cmds.setAttr(self.fixIkSpringSolverGrp + ".visibility", 0)
                         cmds.parentConstraint(self.ikJointList[0], self.ikJointList[1], maintainOffset=True, name=self.ikJointList[1] + "_PaC")
-
                     if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                         # tell main script to create parent constraint from chestA to ikCtrl for front legs
                         self.quadFrontLegList.append(self.ikExtremCtrlOrientGrp)
@@ -1215,7 +1171,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     # (James) add bend to limb
                     if self.getHasBend():
                         try:
-                            from Library import jcRibbon
+                            from .Library import jcRibbon
                             reload(jcRibbon)
                             RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
                             self.loadedRibbon = True
@@ -1274,9 +1230,9 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                             
                             # implementing auto rotate twist bones:
-                            # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix:
-                            loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-                            loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                            # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
+                            loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+                            loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
                             if loadedQuatNode and loadedMatrixPlugin:
                                 twistBoneMD = self.bendGrps['twistBoneMD']
                                 shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
@@ -1286,7 +1242,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                                 cmds.delete(cmds.parentConstraint(self.skinJointList[1], shoulderParentLoc, mo=False))
                                 cmds.parent(shoulderParentLoc, self.skinJointList[0])
                                 cmds.parent(shoulderChildLoc, self.skinJointList[1], relative=True)
-                                utils.twistBoneMatrix(shoulderParentLoc, shoulderChildLoc, self.skinJointList[1], twistBoneMD)
+                                dpUtils.twistBoneMatrix(shoulderParentLoc, shoulderChildLoc, self.skinJointList[1], twistBoneMD)
                             
                             # fix autoRotate flipping issue:
                             upCtrl = self.bendGrps['ctrlList'][0]
@@ -1297,8 +1253,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 
                 # auto clavicle:
                 # loading Maya matrix node
-                loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-                loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
                 if loadedQuatNode and loadedMatrixPlugin:
                     # create auto clavicle group:
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
@@ -1433,57 +1389,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputZ", self.clavicleCtrlGrp+".rotateY", force=True)
                 
-                if loadedIkFkSnap:
-                    # do otherCtrlList get extraCtrlList from bendy
-                    otherCtrlList = []
-                    if self.getHasBend():
-                        if self.loadedRibbon:
-                            otherCtrlList = self.bendGrps['extraCtrlList']
-                    otherCtrlList.append(self.toParentExtremCtrl)
-                    otherCtrlList.append(self.fkCtrlList[0])
-                    # create a ghost value in order to avoid ikFkNetwork crashes without footRoll attributes:
-                    cmds.addAttr(self.worldRef, longName='footRollPlaceHolder', attributeType='long', defaultValue=0, keyable=False)
-                    # create ikFkNetwork:
-                    data = sqIkFkTools.IkFkNetwork()
-                    # initialise ikFkNetwork:
-                    if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                        data.init(
-                            self.ikExtremCtrl,
-                            self.ikCornerCtrl,
-                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3], self.ikJointList[4]],
-                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3], self.fkCtrlList[4]],
-                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
-                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
-                            otherCtrls=otherCtrlList,
-                            beforeCtrlAttr=self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'],
-                            ikShoulders=[self.ikJointList[1], self.ikACJointList[1]]
-                        )
-                    else:
-                        data.init(
-                            self.ikExtremCtrl,
-                            self.ikCornerCtrl,
-                            [self.ikJointList[1], self.ikJointList[2], self.ikJointList[3]],
-                            [self.fkCtrlList[1], self.fkCtrlList[2], self.fkCtrlList[3]],
-                            self.worldRef + '.' + sideLower + self.userGuideName + '_ikFkBlend',
-                            footRollAtts=[self.worldRef + '.footRollPlaceHolder'],
-                            otherCtrls=otherCtrlList,
-                            beforeCtrlAttr=self.fkCtrlList[0]+"."+self.langDic[self.langName]['c032_follow'],
-                            ikShoulders=[self.ikJointList[1], self.ikACJointList[1]]
-                        )
-                    # serialise ikFkNetwork:
-                    ikFkNet = libSerialization.export_network(data)
-                    ikFkNet = cmds.rename(ikFkNet.__melobject__(), side + self.userGuideName + "_" + str(dpAR_count) + "_IkFkNetwork")
-                    self.ikFkNetworkList.append(ikFkNet)
-                    if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                        lastIndex = len(otherCtrlList)
-                        if self.getHasBend():
-                            if self.loadedRibbon:
-                                cmds.connectAttr(self.bendGrps['ctrlList'][0] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
-                                cmds.connectAttr(self.bendGrps['ctrlList'][1] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 2) + "]", force=True)
-                                cmds.connectAttr(self.bendGrps['ctrlList'][2] + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 3) + "]", force=True)
-                        elif self.limbTypeName == ARM:
-                            cmds.connectAttr(forearmCtrl + ".message", ikFkNet + ".otherCtrls[" + str(lastIndex + 1) + "]", force=True)
-                
                 # arrange correct before and extrem skinning joints naming in order to be easy to skinning paint weight UI:
                 # default value for 5 bend joints:
                 beforeNumber = "00" #clavicle/hips
@@ -1507,27 +1412,28 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
                     if self.addArticJoint:
-                        self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
-                        utils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
-                        cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
-                        if toCornerBendList:
-                            utils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
-                            cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
-                            cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                        if self.bendGrps:
+                            self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
+                            dpUtils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
+                            cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                            if toCornerBendList:
+                                dpUtils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
+                                cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                                cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
                 
                 # add main articulationJoint:
                 if self.addArticJoint:
                     # shoulder / leg
-                    firstJntList = utils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
-                    utils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
+                    firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
+                    dpUtils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
                     if not self.getHasBend():
-                        cornerJntList = utils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
-                        utils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
+                        cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
+                        dpUtils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
                         cmds.rename(cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
                         if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                            cornerBJntList = utils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
-                            utils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
+                            cornerBJntList = dpUtils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
+                            dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
                 # calibration attribute:
@@ -1535,8 +1441,8 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
                 else: #leg
                     ikExtremCalibrationList = [
-                                            self.langDic[self.langName]['c015_RevFoot_F']+self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()+self.langDic[self.langName]['c102_angle'].capitalize(),
-                                            self.langDic[self.langName]['c015_RevFoot_F']+self.langDic[self.langName]['c018_RevFoot_roll'].capitalize()+self.langDic[self.langName]['c103_plant'].capitalize(),
+                                            self.langDic[self.langName]['c015_revFoot_F']+self.langDic[self.langName]['c018_revFoot_roll'].capitalize()+self.langDic[self.langName]['c102_angle'].capitalize(),
+                                            self.langDic[self.langName]['c015_revFoot_F']+self.langDic[self.langName]['c018_revFoot_roll'].capitalize()+self.langDic[self.langName]['c103_plant'].capitalize(),
                                             self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()
                     ]
                 fkExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
@@ -1552,11 +1458,11 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 self.integrateOrigFromList.append(self.origFromList)
                 
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.skinJointList[len(self.skinJointList) - 1],
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.skinJointList[len(self.skinJointList) - 1],
                               hookType='revFootExtremJointHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp + ".dpAR_name", self.userGuideName, type="string")
@@ -1575,7 +1481,7 @@ class Limb(Base.StartClass, Layout.LayoutClass):
         self.deleteModule()
 
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {
@@ -1590,7 +1496,6 @@ class Limb(Base.StartClass, Layout.LayoutClass):
                 "worldRefShapeList": self.worldRefShapeList,
                 "limbTypeName": self.limbTypeName,
                 "extremJntList": self.extremJntList,
-                "parentConstToRFOffsetList": self.parentConstToRFOffsetList,
                 "fixIkSpringSolverGrpList": self.fixIkSpringSolverGrpList,
                 "limbStyle": self.limbStyle,
                 "quadFrontLegList": self.quadFrontLegList,

@@ -5,11 +5,10 @@ import os
 import sys
 import re
 import cProfile
-import shutil
-import urllib
-import zipfile
-import StringIO
+import urllib.request
 import webbrowser
+from io import TextIOWrapper
+from importlib import reload
 
 
 # UTILS functions:
@@ -28,7 +27,7 @@ def findEnv(key, path):
     envPath = ""
 
     if splitEnvList:
-        splitEnvList = filter(lambda x: x != "" and x != ' ' and x != None, splitEnvList)
+        splitEnvList = [x for x in splitEnvList if x != "" and x != ' ' and x != None]
         for env in splitEnvList:
             env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
             if env in dpARPath:
@@ -130,7 +129,7 @@ def findLastNumber(nameList, basename):
                 except ValueError:
                     pass
 
-    numberList.sort()
+    sorted(numberList)
     numberList.reverse()
 
     if numberList:
@@ -599,16 +598,14 @@ def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
     """
     try:
         gotRemoteFile = False
-        
         # getting dpAutoRig.py file from GitHub website using the Raw URL:
-        remoteSource = urllib.urlopen(DPAR_RAWURL)
-        remoteContents = remoteSource.readlines()
-        
+        remoteSource = urllib.request.urlopen(DPAR_RAWURL)
+        remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
         # find the line with the version and compare them:
         for line in remoteContents:
-            if "DPAR_VERSION = " in line:
+            if "DPAR_VERSION_PY3 = " in line:
                 gotRemoteFile = True
-                remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
+                remoteVersion = line[20:-2] #these magic numbers filter only the version XX.YY.ZZ
                 if remoteVersion == DPAR_VERSION:
                     # 0 - the current version is up to date
                     return [0, None, None]
@@ -637,7 +634,7 @@ def visitWebSite(website, *args):
     webbrowser.open(website, new=2)
     
     
-def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", *args):
+def checkLoadedPlugin(pluginName, message="Not loaded plugin", *args):
     """ Check if plugin is loaded and try to load it.
         Returns True if ok (loaded)
         Returns False if not found or not loaded.
@@ -646,17 +643,10 @@ def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", 
     if not (cmds.pluginInfo(pluginName, query=True, loaded=True)):
         loadedPlugin = False
         try:
-            # Maya 2012
             cmds.loadPlugin(pluginName+".mll")
             loadedPlugin = True
         except:
-            if exceptName:
-                try:
-                    # Maya 2013 or earlier
-                    cmds.loadPlugin(exceptName+".mll")
-                    loadedPlugin = True
-                except:
-                    pass
+            pass
     if not loadedPlugin:
         print(message, pluginName)
     return loadedPlugin

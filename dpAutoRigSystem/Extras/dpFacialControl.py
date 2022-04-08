@@ -4,8 +4,8 @@ from maya import mel
 import os
 import json
 from functools import partial
-import dpAutoRigSystem.Modules.Library.dpControls as dpControls
-from dpAutoRigSystem.Modules.Library import dpUtils as utils
+from dpAutoRigSystem.Modules.Library import dpControls
+from dpAutoRigSystem.Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "FacialControl"
@@ -117,7 +117,7 @@ class FacialControl(object):
         path = os.path.dirname(__file__)
         # hack in order to avoid "\\" from os.sep, then we need to use the replace string method:
         jsonPath = os.path.join(path, PRESETS, "").replace("\\", "/")
-        fileDictionary = open(jsonPath + file, "r")
+        fileDictionary = open(jsonPath + file, "r", encoding='utf-8')
         # read the json file content and store it in a dictionary:
         presetContent = json.loads(fileDictionary.read())
         # close the json file:
@@ -281,13 +281,13 @@ class FacialControl(object):
         """
         connectBS, connectJnt = self.dpGetUserType()
         # creating controls:
-        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
-        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
+        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
+        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
         if self.userType == TYPE_BS:
-            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
-            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
-        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
-        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
+            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
+            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
+        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
+        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
         lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
         sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
         grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
@@ -354,17 +354,17 @@ class FacialControl(object):
         connectBS, connectJnt = self.dpGetUserType()
         
         if cmds.checkBox(self.browCB, query=True, value=True):
-            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
-            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
+            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
+            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
             if rBrowCtrlGrp:
                 cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.eyelidCB, query=True, enable=True):
             if cmds.checkBox(self.eyelidCB, query=True, value=True):
-                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
-                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
+                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
+                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
         if cmds.checkBox(self.mouthCB, query=True, value=True):
-            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl("L", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
-            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl("R", self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
+            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
+            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
             if rMouthCtrlGrp:
                 cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.lipsCB, query=True, value=True):
@@ -665,7 +665,7 @@ class FacialControl(object):
     def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
         """ Creates the nodes to remap values and connect it to final output (toNode) item.
         """
-        fromNodeName = utils.extractSuffix(fromNode)
+        fromNodeName = dpUtils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
         outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
         if "t" in toAttr:

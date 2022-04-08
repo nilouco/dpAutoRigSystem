@@ -1,15 +1,16 @@
 # importing libraries:
 from maya import cmds
-from dpAutoRigSystem.Controls import dpBaseControlClass
+from .. import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Diamond"
-TITLE = "m105_Diamond"
+TITLE = "m105_diamond"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamond.png"
 
-dpDiamondVersion = 1.3
+dpDiamondVersion = 1.4
 
 class Diamond(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

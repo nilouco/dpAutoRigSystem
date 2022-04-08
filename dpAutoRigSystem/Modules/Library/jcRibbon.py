@@ -15,8 +15,8 @@
 
 # importing libraries:
 from maya import cmds
-import dpUtils as utils
-import dpControls
+from . import dpUtils
+from . import dpControls
 
 
 class RibbonClass(object):
@@ -160,13 +160,10 @@ class RibbonClass(object):
         limbJoints.extend(downLimb['skinJointsList'])
         
         jntGrp = cmds.group(limbJoints, n=prefix+myName+'_Jnts_Grp')
-        '''
-        Deactivate the segment scale compensate on the bone to prevent scaling problem in maya 2016
-        It will prevent a double scale problem that will come from the upper parent in the rig
-        '''
-        if (int(cmds.about(version=True)[:4]) >= 2016):
-            for nBone in limbJoints:
-                cmds.setAttr(nBone+".segmentScaleCompensate", 0)
+        #Deactivate the segment scale compensate on the bone to prevent scaling problem.
+        #It will prevent a double scale problem that will come from the upper parent in the rig
+        for nBone in limbJoints:
+            cmds.setAttr(nBone+".segmentScaleCompensate", 0)
         
         # fix renaming:
         limbJoints.pop(len(upLimb['skinJointsList']))
@@ -201,7 +198,7 @@ class RibbonClass(object):
             if '_Jnt' in item:
                 # remove dpAR skin attribute
                 try:
-                    utils.clearDpArAttr([item])
+                    dpUtils.clearDpArAttr([item])
                 except:
                     pass
                 # rename joint
@@ -363,7 +360,7 @@ class RibbonClass(object):
         cmds.select(clear=True)
         
         #create the joints that will be used to control the ribbon
-        drv_Jnt = cmds.duplicate([rb_Jnt[0], rb_Jnt[(len(rb_Jnt)-1)/2], rb_Jnt[len(rb_Jnt)-1]])
+        drv_Jnt = cmds.duplicate([rb_Jnt[0], rb_Jnt[int((len(rb_Jnt)-1)//2)], rb_Jnt[int(len(rb_Jnt)-1)]])
         dup = cmds.duplicate([drv_Jnt[0], drv_Jnt[2]])
         drv_Jnt.append(dup[0])
         drv_Jnt.append(dup[1])
@@ -572,7 +569,7 @@ class RibbonClass(object):
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
-            extraCtrlZero = utils.zeroOut([extraCtrl])[0]
+            extraCtrlZero = dpUtils.zeroOut([extraCtrl])[0]
             cmds.parent(extraCtrlZero, extraCtrlGrp)
             cmds.parentConstraint(fols[i], extraCtrlZero, w=1, name=extraCtrlZero+"_PaC")
             cmds.parentConstraint(extraCtrl, jnt, w=1, name=jnt+"_PaC")
@@ -620,12 +617,12 @@ class RibbonClass(object):
                                 # flip direction to conform with left side
                                 addDir = -1 * addDir
                         cmds.setAttr(jad+".translate"+addAxis, addDir*self.ctrlRadius*0.5)
-                        utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
+                        dpUtils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
                         addCtrl = self.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree)
                         extraCtrlList.append(addCtrl)
-                        addCtrlGrp = utils.zeroOut([addCtrl])[0]
+                        addCtrlGrp = dpUtils.zeroOut([addCtrl])[0]
                         cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))
                         cmds.parentConstraint(addCtrl, jad, maintainOffset=True, name=jad+"_PaC")
                         cmds.scaleConstraint(addCtrl, jad, maintainOffset=True, name=jad+"_ScC")
@@ -777,11 +774,11 @@ class RibbonClass(object):
             retDict['twistBoneMD'] = twistBoneMD
         
         # autoRotate:
-        loadedQuatNode = utils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
-            upTwistBoneMD = utils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
-            bottomTwistBoneMD = utils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bttm_TwistBone")
+            upTwistBoneMD = dpUtils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
+            bottomTwistBoneMD = dpUtils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bttm_TwistBone")
             twistBonePMA = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")
             twistBoneInvMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
             twistBoneCnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
@@ -856,7 +853,7 @@ class RibbonClass(object):
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
+                dpUtils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the position of the first follicle
@@ -881,7 +878,7 @@ class RibbonClass(object):
                 cmds.select(cl=True)
                 jnts.append(cmds.joint(n=name+'_%02d_Jnt'%i))
                 cmds.setAttr(jnts[i]+'.jointOrient', 0, 0, 0)
-                utils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
+                dpUtils.setJointLabel(name+'_%02d_Jnt'%i, side+jointLabelAdd, 18, jointLabelName+'_%02d'%i)
                 cmds.addAttr(jnts[i], longName="dpAR_joint", attributeType='float', keyable=False)
                 cmds.select(cl=True)
                 #calculate the first follicle position

@@ -1,9 +1,9 @@
 # importing libraries:
 from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 # global variables to this module:
 CLASS_NAME = "Spine"
@@ -12,14 +12,14 @@ DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
 
-class Spine(Base.StartClass, Layout.LayoutClass):
+class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
 
         # Declare variable
         self.integratedActionsDic = {}
@@ -40,12 +40,12 @@ class Spine(Base.StartClass, Layout.LayoutClass):
 
 
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
     
     
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
-        Layout.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
+        dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # style layout:
         self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedColumn")
         cmds.text(label=self.langDic[self.langName]['m041_style'], visible=True, parent=self.styleLayout)
@@ -71,7 +71,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
 
 
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', defaultValue=1)
@@ -93,7 +93,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        utils.useDefaultRenderLayer()
+        dpUtils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -133,7 +133,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     # delete difference of nJoints:
                     for n in range(self.enteredNJoints, self.currentNJoints):
                         # re-parent the children guides:
-                        childrenGuideBellowList = utils.getGuideChildrenList(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
+                        childrenGuideBellowList = dpUtils.getGuideChildrenList(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
                         if childrenGuideBellowList:
                             for childGuide in childrenGuideBellowList:
                                 cmds.parent(childGuide, self.cvLocator)
@@ -154,14 +154,14 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
                 # re-build the preview mirror:
-                Layout.LayoutClass.createPreviewMirror(self)
+                dpLayoutClass.LayoutClass.createPreviewMirror(self)
             cmds.select(self.moduleGrp)
         else:
             self.changeJointNumber(3)
 
 
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -204,7 +204,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # naming main controls:
             hipsName  = self.langDic[self.langName]['c100_bottom']
             chestName = self.langDic[self.langName]['c099_top']
@@ -249,7 +249,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 self.aIkFkBlendAttrList.append(side+self.userGuideName+'Fk_ikFkBlend')
                 
                 # Setup axis order
-                if self.rigType == Base.RigType.quadruped:
+                if self.rigType == dpBaseClass.RigType.quadruped:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.hipsBCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.chestACtrl + ".rotateOrder", 1)
@@ -292,19 +292,19 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 cmds.parent(self.chestACtrl, self.hipsACtrl)
                 
                 # zeroOut transformations:
-                self.hipsACtrlZero, self.chestAZero, self.chestBGrp, self.hipsFkCtrlZero, self.chestFkCtrlZero = utils.zeroOut([self.hipsACtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl])
+                self.hipsACtrlZero, self.chestAZero, self.chestBGrp, self.hipsFkCtrlZero, self.chestFkCtrlZero = dpUtils.zeroOut([self.hipsACtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl])
                 self.chestBGrp = cmds.rename(self.chestBGrp, self.chestBGrp.replace("Zero", "Grp"))
-                self.chestBZero = utils.zeroOut([self.chestBGrp])[0]
+                self.chestBZero = dpUtils.zeroOut([self.chestBGrp])[0]
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['v'], l=False)
                 # modify the pivots of chest controls:
                 upPivotPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(self.nJoints-1), query=True, worldSpace=True, translation=True)
                 cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestACtrl+".scalePivot", self.chestACtrl+".rotatePivot")
                 
                 # add originedFrom attributes to hipsA, hipsB and chestB:
-                utils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
-                utils.originedFrom(objName=self.hipsBCtrl, attrString=bottomLocGuide)
-                utils.originedFrom(objName=self.chestBCtrl, attrString=topLocGuide)
-                utils.originedFrom(objName=self.chestFkCtrl, attrString=topLocGuide)
+                dpUtils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
+                dpUtils.originedFrom(objName=self.hipsBCtrl, attrString=bottomLocGuide)
+                dpUtils.originedFrom(objName=self.chestBCtrl, attrString=topLocGuide)
+                dpUtils.originedFrom(objName=self.chestFkCtrl, attrString=topLocGuide)
                 # create a simple spine ribbon:
                 returnedRibbonList = self.ctrls.createSimpleRibbon(name=side+self.userGuideName, totalJoints=(self.nJoints-1), jointLabelNumber=(s+jointLabelAdd), jointLabelName=self.userGuideName)
                 rbnNurbsPlane = returnedRibbonList[0]
@@ -420,13 +420,13 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(cmds.parentConstraint(middleLocGuide, self.middleFkCtrl, maintainOffset=False))
                     if self.currentStyle == 1: #biped
                         cmds.rotate(0, 0, 0, self.middleCtrl, self.middleFkCtrl)
-                    if self.rigType == Base.RigType.quadruped:
+                    if self.rigType == dpBaseClass.RigType.quadruped:
                         cmds.rotate(90, 0, 0, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
-                    self.middleCtrlGrp = utils.zeroOut([self.middleCtrl])[0]
+                    self.middleCtrlGrp = dpUtils.zeroOut([self.middleCtrl])[0]
                     self.middleCtrlGrp = cmds.rename(self.middleCtrlGrp, self.middleCtrlGrp.replace("Zero", "Grp"))
-                    self.middleCtrlZero = utils.zeroOut([self.middleCtrlGrp])[0]
-                    self.middleFkCtrlZero = utils.zeroOut([self.middleFkCtrl])[0]
+                    self.middleCtrlZero = dpUtils.zeroOut([self.middleCtrlGrp])[0]
+                    self.middleFkCtrlZero = dpUtils.zeroOut([self.middleFkCtrl])[0]
                     middleCluster = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(n+1)+"]", name=side+self.userGuideName+'_Middle_Cls')[1]
                     middleLocPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(n), query=True, worldSpace=True, translation=True)
                     tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
@@ -442,7 +442,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                     cmds.parent(middleCluster, clustersGrp, relative=True)
                     # add originedFrom attribute to this middle ctrl:
                     middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+str(n)+"_OrigFrom_Grp")
-                    utils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
+                    dpUtils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
                     cmds.parentConstraint(self.aRbnJointList[n], middleOrigGrp, maintainOffset=False, name=middleOrigGrp+"_PaC")
                     cmds.parent(middleOrigGrp, self.hipsACtrl)
                     # apply volumeVariation to joints in the middle ribbon setup:
@@ -500,9 +500,9 @@ class Spine(Base.StartClass, Layout.LayoutClass):
                 if hideJoints:
                     cmds.setAttr(side+self.userGuideName+"_Rbn_RibbonJoint_Grp.visibility", 0)
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.rbnControlGrp, hookType='ctrlHook')
-                utils.addHook(objName=clustersGrp, hookType='scalableHook')
-                utils.addHook(objName=self.rbnRigGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.rbnControlGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=clustersGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.rbnRigGrp, hookType='staticHook')
                 cmds.addAttr(self.rbnRigGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.rbnRigGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.rbnRigGrp+".dpAR_name", self.userGuideName, type="string")
@@ -521,7 +521,7 @@ class Spine(Base.StartClass, Layout.LayoutClass):
         self.deleteModule()
 
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

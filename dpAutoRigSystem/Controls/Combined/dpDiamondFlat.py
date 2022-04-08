@@ -1,15 +1,16 @@
 # importing libraries:
 from maya import cmds
-from dpAutoRigSystem.Controls import dpBaseControlClass
+from .. import dpBaseControlClass
+from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "DiamondFlat"
-TITLE = "m177_DiamondFlat"
+TITLE = "m177_diamondFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamondFlat.png"
 
-dpDiamondFlatVersion = 1.3
+dpDiamondFlatVersion = 1.4
 
 class DiamondFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

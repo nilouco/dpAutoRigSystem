@@ -1,8 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from dpAutoRigSystem.Modules.Library import dpControls
-from dpAutoRigSystem.Modules.Library import dpUtils as utils
+from ..Modules.Library import dpControls
+from ..Modules.Library import dpUtils
 
 
 class ControlStartClass:
@@ -163,7 +163,7 @@ class ControlStartClass:
         # getting current selection:
         destinationList = cmds.ls(selection=True, type="transform")
         # check if the given name is good or add a sequencial number on it:
-        self.cvName = utils.validateName(cvName, self.suffix)
+        self.cvName = dpUtils.validateName(cvName, self.suffix)
         self.cvID = cvID
         self.cvSize = cvSize
         self.cvDegree = cvDegree

@@ -2,9 +2,8 @@
 from maya import cmds
 from maya import mel
 
-from Library import dpControls
-from Library import dpUtils as utils
-
+from .Library import dpControls
+from .Library import dpUtils
 
 class RigType(object):
     biped = "biped"
@@ -63,7 +62,7 @@ class StartClass(object):
         """ Create the elements to Guide module in the scene, like controls, etc...
         """
         # GUIDE:
-        utils.useDefaultRenderLayer()
+        dpUtils.useDefaultRenderLayer()
         # create guide base (moduleGrp):
         guideBaseList = self.ctrls.cvBaseGuide(self.moduleGrp, r=2)
         self.moduleGrp = guideBaseList[0]
@@ -141,9 +140,9 @@ class StartClass(object):
         except:
             pass
         # delete the guide module:
-        utils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
+        dpUtils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
         # clear default 'dpAR_GuideMirror_Grp':
-        utils.clearNodeGrp()
+        dpUtils.clearNodeGrp()
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
@@ -183,7 +182,7 @@ class StartClass(object):
                 except:
                     self.enteredText = ""
             # call utils to return the normalized text:
-            self.customName = utils.normalizeText(self.enteredText, prefixMax=30)
+            self.customName = dpUtils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:
@@ -202,16 +201,17 @@ class StartClass(object):
                             dpAR_nameList.append(currentName)
                         if cmds.objExists(transform+".customName"):
                             currentName = cmds.getAttr(transform+".customName")
-                            if not currentName in dpAR_nameList:
-                                dpAR_nameList.append(currentName)
+                            if currentName:
+                                if not currentName in dpAR_nameList:
+                                    dpAR_nameList.append(currentName)
                     if dpAR_nameList:
-                        dpAR_nameList.sort()
+                        sorted(dpAR_nameList)
                         for currentName in dpAR_nameList:
                             if currentName == self.customName:
                                 # getting the index of the last digit in the name:
                                 n = len(currentName)+1
                                 hasDigit = False
-                                for i in reversed(xrange(len(currentName))):
+                                for i in reversed(range(len(currentName))):
                                     if currentName[i].isdigit():
                                         n = i
                                         hasDigit = True
@@ -252,11 +252,11 @@ class StartClass(object):
             self.ctrls.unPinGuide(self.moduleGrp)
             
             # RIG:
-            utils.useDefaultRenderLayer()
+            dpUtils.useDefaultRenderLayer()
             
             # get the radius value to controls:
             if cmds.objExists(self.radiusCtrl):
-                self.ctrlRadius = utils.getCtrlRadius(self.radiusCtrl)
+                self.ctrlRadius = dpUtils.getCtrlRadius(self.radiusCtrl)
             else:
                 self.ctrlRadius = 1
                 

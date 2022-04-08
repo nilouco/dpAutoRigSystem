@@ -3,8 +3,9 @@ from functools import partial
 
 from maya import cmds
 
-from Library import dpUtils as utils
-reload(utils)
+from .Library import dpUtils
+from importlib import reload
+reload(dpUtils)
 
 
 class LayoutClass(object):
@@ -22,7 +23,7 @@ class LayoutClass(object):
     
     
     def basicModuleLayout(self, *args):
-        """ Create a Basic Module Layout.
+        """ Create a Basic Module dpLayoutClass.
         """
         # BASIC MODULE LAYOUT:
         self.basicColumn = cmds.rowLayout(numberOfColumns=5, width=190, columnWidth5=(30, 20, 80, 20, 35), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent=self.topColumn)
@@ -32,7 +33,7 @@ class LayoutClass(object):
         self.userName = cmds.textField('userName', annotation=self.langDic[self.langName]['m006_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
         self.colorButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         shapeSizeValue = cmds.getAttr(self.moduleGrp+'.shapeSize')
-        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shapeSize'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
+        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shape']+" "+self.langDic[self.langName]['i115_size'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
         # edit values reading from guide:
         displayAnnotationValue = cmds.getAttr(self.moduleGrp+'.displayAnnotation')
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
@@ -162,7 +163,7 @@ class LayoutClass(object):
                 
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedColumn" )
-                cmds.text(self.langDic[self.langName]['m010_Mirror'], parent=self.doubleRigColumn)
+                cmds.text(self.langDic[self.langName]['m010_mirror'], parent=self.doubleRigColumn)
                 self.mirrorMenu = cmds.optionMenu("mirrorMenu", label='', changeCommand=self.changeMirror, parent=self.doubleRigColumn)
                 mirrorMenuItemList = ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ']
                 for item in mirrorMenuItemList:
@@ -395,7 +396,7 @@ class LayoutClass(object):
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            mirroredGuideFather = utils.mirroredGuideFather(self.moduleGrp)
+            mirroredGuideFather = dpUtils.mirroredGuideFather(self.moduleGrp)
             if mirroredGuideFather:
                 cmds.setAttr(self.moduleGrp+".mirrorEnable", 0)
                 # get initial values from father guide base:
@@ -442,7 +443,7 @@ class LayoutClass(object):
             stopMirrorOperation = self.checkFatherMirror()
             if not stopMirrorOperation:
                 # loading Maya matrix node (for mirror porpuses)
-                loadedMatrixPlugin = utils.checkLoadedPlugin("decomposeMatrix", "matrixNodes", self.langDic[self.langName]['e002_decomposeMatrixNotFound'])
+                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
                     cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')
@@ -482,10 +483,10 @@ class LayoutClass(object):
         
         # verify if there is not any guide module in the guideMirrorGrp and then delete it:
         self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
-        utils.clearNodeGrp(nodeGrpName=self.guideMirrorGrp, attrFind='guideBaseMirror', unparent=False)
+        dpUtils.clearNodeGrp(nodeGrpName=self.guideMirrorGrp, attrFind='guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
-        guideChildrenList = utils.getGuideChildrenList(self.moduleGrp)
+        guideChildrenList = dpUtils.getGuideChildrenList(self.moduleGrp)
         
         self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
         if self.mirrorAxis != 'off':

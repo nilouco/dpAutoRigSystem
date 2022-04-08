@@ -1,8 +1,11 @@
 # importing libraries:
 from maya import cmds
-import dpUtils as utils
+from . import dpUtils
+import os
 import getpass
 import datetime
+
+SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 
 dic_colors = {
     "yellow": 17,
@@ -37,7 +40,7 @@ class ControlClass(object):
         """
         if rgb:
             pass
-        elif (dic_colors.has_key(color)):
+        elif (color in dic_colors):
             iColorIdx = dic_colors[color]
         else:
             iColorIdx = color
@@ -287,7 +290,7 @@ class ControlClass(object):
             # parent this ribbonPos to the ribbonGrp:
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
-            utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
+            dpUtils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
     
     
@@ -362,7 +365,7 @@ class ControlClass(object):
         return curve
 
 
-    #@utils.profiler
+    #@dpUtils.profiler
     def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
@@ -489,8 +492,7 @@ class ControlClass(object):
         # colorize curveShapes:
         self.colorShape([circle], 'yellow')
         self.colorShape([radiusCtrl], 'cyan')
-        if (int(cmds.about(version=True)[:4]) > 2016):
-            cmds.setAttr(circle+"0Shape.lineWidth", 2)
+        cmds.setAttr(circle+"0Shape.lineWidth", 2)
         cmds.select(clear=True)
         # pinGuide:
         self.createPinGuide(circle)
@@ -603,7 +605,7 @@ class ControlClass(object):
             self.pasteAttr(destinationList)
     
     
-    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, applyColor=True, *args):
+    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, *args):
         """ Transfer control shape from sourceItem to destination list
         """
         if not sourceItem:
@@ -621,7 +623,7 @@ class ControlClass(object):
                         needKeepVis = False
                         sourceVis = None
                         dupSourceItem = cmds.duplicate(sourceItem)[0]
-                        if applyColor:
+                        if keepColor:
                             self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
                         if destShapeList:
@@ -704,7 +706,7 @@ class ControlClass(object):
                             curDegree = 1 #linear
                         cmds.setAttr(item+".degree", curDegree)
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
-                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], applyColor=True)
+                    self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
             cmds.select(transformList)
     
     
@@ -791,7 +793,7 @@ class ControlClass(object):
         return newRadius
     
     
-    #@utils.profiler
+    #@dpUtils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
         """
@@ -945,7 +947,7 @@ class ControlClass(object):
         importCalibrationNamespace = "dpImportCalibration"
         sourceRefNodeList = []
         # get user file to import calibration from
-        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i124_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'])
+        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i196_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'])
         if not importCalibrationPath:
             return
         importCalibrationPath = next(iter(importCalibrationPath), None)
@@ -954,9 +956,9 @@ class ControlClass(object):
         refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
-            for refNode in refNodeList:
-                if cmds.objExists(refNode+".calibrationList"):
-                    sourceRefNodeList.append(refNode)
+            for item in refNodeList:
+                if cmds.objExists(item+".calibrationList"):
+                    sourceRefNodeList.append(item)
         if sourceRefNodeList:
             for sourceRefNode in sourceRefNodeList:
                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:]
@@ -984,8 +986,8 @@ class ControlClass(object):
                 else:
                     # ask to run for all nodes:
                     mirrorAll = cmds.confirmDialog(
-                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_Mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i121_calibration'],
-                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i125_mirrorAll'], 
+                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'],
+                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll'], 
                                                     button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
                                                     defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
                                                     cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
@@ -1002,7 +1004,7 @@ class ControlClass(object):
                     if cmds.objExists(destinationNode):
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i126_mirrorPrefix'])
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
 
 
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
@@ -1021,7 +1023,7 @@ class ControlClass(object):
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i123_transferedCalib'], sourceItem, destinationList, attrList)
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i195_transferedCalib'], sourceItem, destinationList, attrList)
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'])
 
@@ -1043,3 +1045,136 @@ class ControlClass(object):
         """
         if cmds.objExists(nodeName+".calibrationList"):
             return list(cmds.getAttr(nodeName+".calibrationList").split(";"))
+
+    
+    def getControlList(self, *args):
+        """ List all dpControl transforms that has active .dpControl attribute.
+            Returns a list of them.
+        """
+        nodeList = []
+        allList = cmds.ls(selection=False, type="transform")
+        if allList:
+            for item in allList:
+                if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
+                    nodeList.append(item)
+        return nodeList
+
+
+    def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, *args):
+        """ Export control shapes from a given list or all found dpControl transforms in the scene.
+            It will save a Maya ASCII file with the control shapes snapshots.
+            If there is no given path, it will ask user where to save the file.
+            If publish is True, it will use the current location and create the dpShapeIO directory by default.
+            If keepSnapshot is True, it will parent a backup dpSnapshotGrp group to Wip_Grp and hide it.
+            If overrideExisting is True, it will delete the old node before create the new snapshot.
+        """
+        currentPath = cmds.file(query=True, sceneName=True)
+        if not currentPath:
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+            return
+        
+        if not nodeList:
+            nodeList = self.getControlList()
+        if nodeList:
+            if not path:
+                if publish:
+                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
+                    if not os.path.exists(dpFolder):
+                        os.makedirs(dpFolder)
+                    path = dpFolder+"/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
+                else:
+                    pathList = cmds.fileDialog2(fileMode=0, caption="Export Shapes")
+                    if pathList:
+                        path = pathList[0] 
+            if path:
+                # make sure we save the file as mayaAscii
+                if not path.endswith(".ma"):
+                    path = path.replace(".*", ".ma")
+                cmds.undoInfo(openChunk=True)
+                if not cmds.objExists(dpSnapshotGrp):
+                    cmds.group(name=dpSnapshotGrp, empty=True)
+                for item in nodeList:
+                    snapshotName = item+SNAPSHOT_SUFFIX
+                    if cmds.objExists(snapshotName):
+                        if overrideExisting:
+                            cmds.delete(snapshotName)
+                    dup = cmds.duplicate(item, name=snapshotName)[0]
+                    cmds.setAttr(dup+".dpControl", 0)
+                    dupChildList = cmds.listRelatives(dup, allDescendents=True, children=True, fullPath=True)
+                    if dupChildList:
+                        toDeleteList = []
+                        for childNode in dupChildList:
+                            if not cmds.objectType(childNode) == "nurbsCurve":
+                                toDeleteList.append(childNode)
+                        if toDeleteList:
+                            cmds.delete(toDeleteList)
+                    cmds.parent(dup, dpSnapshotGrp)
+                # export shapes
+                if cmds.listRelatives(dpSnapshotGrp, allDescendents=True, children=True, type="nurbsCurve"):
+                    cmds.select(dpSnapshotGrp)
+                    cmds.file(rename=path)
+                    cmds.file(exportSelected=True, type='mayaAscii', prompt=False, force=True)
+                    cmds.file(rename=currentPath)
+                    # DEV helper keepSnapshot
+                    if not cmds.objExists("WIP_Grp"): #TODO need to be refactory to get this node by masterGrp attribute
+                        keepSnapshot = False
+                    if keepSnapshot:
+                        try:
+                            cmds.parent(dpSnapshotGrp, "WIP_Grp")
+                            cmds.setAttr(dpSnapshotGrp+".visibility", 0)
+                            if cmds.objExists("Backup_"+dpSnapshotGrp):
+                                cmds.delete("Backup_"+dpSnapshotGrp)
+                            cmds.rename(dpSnapshotGrp, "Backup_"+dpSnapshotGrp)
+                        except:
+                            pass
+                    else:
+                        cmds.delete(dpSnapshotGrp)
+                    print('Exported shapes to: {0}'.format(path))
+                cmds.undoInfo(closeChunk=True)
+        else:
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+
+
+    def importShape(self, nodeList=None, path=None, recharge=False, *args):
+        """ Import control shapes from an external loaded Maya file.
+            If not get an user defined parameter for a node list, it will import all shapes.
+            If the recharge parameter is True, it will use the default path as current location inside dpShapeIO directory.
+        """
+        importShapeNamespace = "dpImportShape"
+        if not nodeList:
+            nodeList = self.getControlList()
+        if nodeList:
+            if recharge:
+                currentPath = cmds.file(query=True, sceneName=True)
+                if not currentPath:
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+                    return
+                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
+                dpShapeFile = "/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
+                path = dpFolder+dpShapeFile
+                if not os.path.exists(path):
+                    print (self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+                    return
+            elif not path:
+                pathList = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
+                if pathList:
+                    path = pathList[0]
+            if path:
+                if not os.path.exists(path):
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['e004_objNotExist']+path)
+                else:
+                    # create a file reference:
+                    cmds.file(path, reference=True, namespace=importShapeNamespace)
+                    refNode = cmds.file(path, referenceNode=True, query=True)
+                    refNodeList = cmds.referenceQuery(refNode, nodes=True)
+                    if refNodeList:
+                        for sourceRefNode in refNodeList:
+                            if cmds.objectType(sourceRefNode) == "transform":
+                                destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
+                                if cmds.objExists(destinationNode):
+                                    self.transferShape(deleteSource=False, clearDestinationShapes=True, sourceItem=sourceRefNode, destinationList=[destinationNode], keepColor=False)
+                    # remove referenced file:
+                    cmds.file(path, removeReference=True)
+                    print("Imported shapes: {0}".format(path))
+        else:
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
