@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.01"
-DPAR_UPDATELOG = "N407 - No PyMEL for sqCopyPasteShape.\nAdded new integrated methods to\ndpShapeIO in Control tab."
+DPAR_UPDATELOG = "N406 - No PyMEL for dpPoseReader.\nAlso no Qt."
 
 
 
