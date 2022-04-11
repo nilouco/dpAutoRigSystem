@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from ..Modules.Library import dpUtils
 
 
 # global variables to this module:    
@@ -20,6 +21,7 @@ class CorrectionMapper(object):
         self.presetDic = presetDic
         self.presetName = presetName
         self.correctionMapperName = self.langDic[self.langName]['m068_correctionMapper']
+        self.netSuffix = "CrMap_Net"
 
         # call main UI function
         self.dpCorrectionMapperCloseUI()
@@ -58,7 +60,16 @@ class CorrectionMapper(object):
     def dpCreateCorrectionMapper(self, name=None, *args):
         """ Create nodes to calculate the correction we want to mapper to fix.
         """
-        print("Merci God")
         if not name:
             name = cmds.textField(self.create_TF, query=True, text=True)
+            if not name:
+                name = "CorrectionMapper"
+        name = dpUtils.resolveName(name, self.netSuffix)
+        
         print("Name = ", name)
+
+        net = cmds.createNode("network", name=name)
+        cmds.addAttr(net, longName="dpNetwork", attributeType="bool")
+        cmds.addAttr(net, longName="dpCorrectionMapper", attributeType="bool")
+        cmds.setAttr(net+".dpNetwork", 1)
+        cmds.setAttr(net+".dpCorrectionMapper", 1)

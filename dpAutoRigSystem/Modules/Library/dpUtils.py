@@ -802,3 +802,18 @@ def extract_world_scale_from_matrix(obj):
     z_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 2)
 
     return [x_scale, y_scale, z_scale]
+
+
+def resolveName(name, suffix, *args):
+    """ Resolve repeated name adding number in the middle of the string.
+        Returns the resolved name.
+    """
+    name = name[0].upper()+name[1:]
+    defaultName = name
+    name = name+"_00_"+suffix
+    if cmds.objExists(name):
+        i = 1
+        while cmds.objExists(name):
+            name = defaultName+"_"+str(i).zfill(2)+"_"+suffix
+            i = i+1
+    return name
