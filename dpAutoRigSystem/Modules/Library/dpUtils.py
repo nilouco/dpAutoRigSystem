@@ -806,14 +806,17 @@ def extract_world_scale_from_matrix(obj):
 
 def resolveName(name, suffix, *args):
     """ Resolve repeated name adding number in the middle of the string.
-        Returns the resolved name.
+        Returns the resolved baseName and name (including the suffix).
     """
     name = name[0].upper()+name[1:]
-    defaultName = name
+    baseName = name
     name = name+"_00_"+suffix
     if cmds.objExists(name):
         i = 1
         while cmds.objExists(name):
-            name = defaultName+"_"+str(i).zfill(2)+"_"+suffix
+            name = baseName+"_"+str(i).zfill(2)+"_"+suffix
             i = i+1
-    return name
+        baseName = baseName+"_"+str(i-1).zfill(2)
+    else:
+        baseName = baseName+"_00"
+    return baseName, name

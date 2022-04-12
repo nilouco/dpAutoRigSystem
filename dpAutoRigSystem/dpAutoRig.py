@@ -444,7 +444,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="_Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="_Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
-        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
+        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -455,7 +455,7 @@ class DP_AutoRig_UI(object):
         selGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.langDic[self.langName]['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
-        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
+        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -847,7 +847,7 @@ class DP_AutoRig_UI(object):
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, removeAll=True)
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=sortedJointList)
         # atualize of footerB text:
-        self.atualizeSkinFooter()
+        self.actualizeSkinFooter()
         
         
     def populateGeoms(self, *args):
@@ -917,7 +917,7 @@ class DP_AutoRig_UI(object):
         else:
             cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=sortedGeoList)
         # atualize of footerB text:
-        self.atualizeSkinFooter()
+        self.actualizeSkinFooter()
     
     
     def reloadPopulatedGeoms(self, *args):
@@ -935,7 +935,7 @@ class DP_AutoRig_UI(object):
                 pass
     
     
-    def atualizeSkinFooter(self, *args):
+    def actualizeSkinFooter(self, *args):
         """ Edit the label of skin footer text.
         """
         try:
