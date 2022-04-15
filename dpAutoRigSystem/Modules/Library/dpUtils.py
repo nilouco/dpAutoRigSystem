@@ -736,21 +736,26 @@ def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1
             return jointList
 
 
-def getNodeByMessage(grpAttrName, *args):
-    """ Get connected node by All_Grp message attribute.
-        Return the found node name or False if it not found.
+def getNodeByMessage(attrName, node=None, *args):
+    """ Get connected node in the given attribute searching as message.
+        If there isn't a given node, try to use All_Grp.
+        Return the found node name or False if it wasn't found.
     """
     result = False
-    allTransformList = cmds.ls(selection=False, type="transform")
-    if allTransformList:
-        for transform in allTransformList:
-            if cmds.objExists(transform+".masterGrp"):
-                # found All_Grp
-                if cmds.objExists(transform+"."+grpAttrName):
-                    foundNodeList = cmds.listConnections(transform+"."+grpAttrName, source=True, destination=False)
-                    if foundNodeList:
-                        result = foundNodeList[0]
+    if not node:
+        # try to find All_Grp
+        allTransformList = cmds.ls(selection=False, type="transform")
+        if allTransformList:
+            for transform in allTransformList:
+                if cmds.objExists(transform+".masterGrp"):
+                    if cmds.getAttr(transform+".masterGrp") == 1:
+                        node = transform #All_Grp found
                         break
+    if node:
+        if cmds.objExists(node+"."+attrName):
+            foundNodeList = cmds.listConnections(node+"."+attrName, source=True, destination=False)
+            if foundNodeList:
+                result = foundNodeList[0]
     return result
 
 

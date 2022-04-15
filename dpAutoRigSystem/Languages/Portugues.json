@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-04-08",
+    "_updated"       : "2022-04-14",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -169,7 +169,7 @@
     "i008_errorUI"         : "Não pode carregar a janela dpAutoRig UI..., por favor tente salvar a pasta dpAutoRigSystem em um diretorio do MAYA_PATH e verifique se você não mudou nenhum arquivo.",
     "i009_hideJointsCB"    : "Esconder os joints após o Rig.",
     "i010_integrateCB"     : "Integrar todos os modulos juntos.",
-    "i011_selectedModule"  : "Editar Modulo Selecionado",
+    "i011_editSelected"    : "Editar Selecionado",
     "i012_idiomsDesc"      : "\nInformações de idiomas:\n\nEsse script tem opções de multiplas linguagens.\nBasta você escolher no menu a linguagem desejada.\nPara criar uma linguagem nova,\nvocê pode se basear nos arquivos .json\nno diretorio Languages,\nfaça uma copia renomeando para sua lingua e\nrealise a tradução dos valores (da direita) do dicionário\n(mas não mude as chaves da esquerda).\n\nOu simplesmente use o dpTranslate no menu Create.",
     "i013_info"            : "Info",
     "i014_logStart"        : "dpAutoRig - Log",
@@ -269,7 +269,7 @@
     "i108_newControl"      : "Novo controle",
     "i109_action"          : "Ação",
     "i110_transferShapes"  : "Substituir\nFormas",
-    "i111_editSelection"   : "Editar os Controles Selecionados",
+    "i111_controller"      : "Controlador",
     "i112_copyShapes"      : "Copiar\nFormas",
     "i113_addShapes"       : "Adicionar\nFormas",
     "i114_createControl"   : "Criar Controle",

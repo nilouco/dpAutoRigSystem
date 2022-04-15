@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-04-08",
+    "_updated"       : "2022-04-14",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -169,7 +169,7 @@
     "i008_errorUI"         : "Impossible de charger la fenêtre du dpAutoRig UI..., S'il vous plaît essayer d'enregistrer le dossier dpAutoRigSystem dans un dossier du MAYA_PATH et vérifier si vous n'avez pas changé quelque fichier.",
     "i009_hideJointsCB"    : "Cacher les joints après le rig.",
     "i010_integrateCB"     : "Intégrer tous les modules ensembles.",
-    "i011_selectedModule"  : "Modifier le module sélectionné",
+    "i011_editSelected"    : "Modifier le sélectionné",
     "i012_idiomsDesc"      : "\nInformation sur les idiomes:\n\nCe script a un setup multilingue.\nIl nous faut juste choisir notre langue dans le menu.\nPour créer une nouvelle langage,\nvous pouvez utiliser les fichiers .json\ndans le répertoire de Langage,\ndupliquer l'un d'eux et renommer à votre langue et\ntraduire les valeurs de le dictionnaire\n(mais ne pas modifier les valeurs des clés à la gauche).\n\nSinon, utiliser juste le dpTranslator dans le menu Create.",
     "i013_info"            : "Info",
     "i014_logStart"        : "dpAutoRig - Log",
@@ -269,7 +269,7 @@
     "i108_newControl"      : "Nouveau controlleur",
     "i109_action"          : "Action",
     "i110_transferShapes"  : "Remplacer\nde Formes",
-    "i111_editSelection"   : "Éditer les Controlleurs Sélectionnés",
+    "i111_controller"      : "Controlleur",
     "i112_copyShapes"      : "Copier\nles Formes",
     "i113_addShapes"       : "Ajouter\nde Formes",
     "i114_createControl"   : "Creer de Controlleur",
