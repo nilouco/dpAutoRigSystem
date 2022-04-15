@@ -21,6 +21,7 @@ class CorrectionMapper(object):
         self.langName = langName
         self.presetDic = presetDic
         self.presetName = presetName
+        self.ui = ui
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.correctionMapperName = self.langDic[self.langName]['m068_correctionMapper']
         self.netSuffix = "CrMap_Net"
@@ -28,12 +29,11 @@ class CorrectionMapper(object):
         self.crMapList = []
         self.net = None
 
-        self.ui = ui
         # call main UI function
         if self.ui:
             self.dpCorrectionMapperCloseUI()
             self.dpCorrectionMapperUI()
-            self.dpPopulateUI()
+            self.dpPopulateMapperNetUI()
         
 
     def dpCorrectionMapperCloseUI(self, *args):
@@ -66,11 +66,58 @@ class CorrectionMapper(object):
         self.existingMapperTSL = cmds.textScrollList('existingMapperTSL', width=20, allowMultiSelection=False, selectCommand=self.actualizeMapperEditLayout, parent=correctionMapperLayout)
         cmds.separator(style='none', height=10, width=100, parent=correctionMapperLayout)
 
-        editSelectedMapperLayout = cmds.frameLayout('editSelectedMapperLayout', label=self.langDic[self.langName]['i011_editSelected'], collapsable=True, collapse=False, parent=correctionMapperLayout)
-        selectedMapperLayout = cmds.columnLayout('selectedMapperLayout', adjustableColumn=True, parent=editSelectedMapperLayout)
+        self.editSelectedMapperLayout = cmds.frameLayout('editSelectedMapperLayout', label=self.langDic[self.langName]['i011_editSelected'], collapsable=True, collapse=False, parent=correctionMapperLayout)
         
+
+    def renameMapperNodes(self, oldName, name, *args):
+        """ List all connected nodes by message into the network and rename it using given parameters.
+        """
+        messageAttrList = []
+        attrList = cmds.listAttr(self.net)
+        for attr in attrList:
+            if cmds.getAttr(self.net+"."+attr, type=True) == "message":
+                messageAttrList.append(attr)
+        if messageAttrList:
+            for messageAttr in messageAttrList:
+                connectedNodeList = cmds.listConnections(self.net+"."+messageAttr)
+                if connectedNodeList:
+                    childrenList = cmds.listRelatives(connectedNodeList[0], children=True, allDescendents=True)
+                    cmds.rename(connectedNodeList[0], connectedNodeList[0].replace(oldName, name))
+                    if childrenList:
+                        for children in childrenList:
+                            try:
+                                cmds.rename(children, children.replace(oldName, name))
+                            except:
+                                pass
+
+
+    def changeName(self, name=None, *args):
+        """ Edit name of the current network node selected.
+            If there isn't any given name, it will try to get from the UI.
+            Returns the name result.
+        """
+        oldName = cmds.getAttr(self.net+".name")
+        if not name:
+            name = cmds.textFieldGrp(self.nameTFG, query=True, text=True)
+        if name:
+            name = dpUtils.resolveName(name, self.netSuffix)[0]
+            self.renameMapperNodes(oldName, name)
+            cmds.setAttr(self.net+".name", name, type="string")
+            self.net = cmds.rename(self.net, self.net.replace(oldName, name))
+            self.dpPopulateMapperNetUI()
+            #self.actualizeMapperEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
+        return name
+
+
+    def dpRecreateSelectedMapperUI(self, node=None, *args):
+        """ It will recreate the mapper layout for the selected network node.
+        """
         # TODO: edit selected mapper layout elements:
-        cmds.text("Name")
+
+        currentName = cmds.getAttr(self.net+".name")
+        self.selectedMapperLayout = cmds.columnLayout('selectedMapperLayout', adjustableColumn=True, parent=self.editSelectedMapperLayout)
+#        nameLayoutA = cmds.rowColumnLayout('nameLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=self.selectedMapperLayout)
+        self.nameTFG = cmds.textFieldGrp("nameTFG", label='Name', text=currentName, editable=True, changeCommand=self.changeName, parent=self.selectedMapperLayout)
         cmds.text("Axis")
         cmds.text("Extract Axis Order")
         cmds.text("Value")
@@ -85,17 +132,18 @@ class CorrectionMapper(object):
         """ TODO write description here please
         """
         #WIP
-        print ("wip to load editable field in the UI here")
-        sel = cmds.textScrollList(self.existingMapperTSL, query=True, selectItem=True)
-        cmds.select(sel)
-        self.net = sel
-        print("net selected = ", sel)
+        self.dpClearEditMapperLayout()
+        selList = cmds.textScrollList(self.existingMapperTSL, query=True, selectItem=True)
+        if selList:
+            cmds.select(selList[0])
+            self.net = selList[0]
+        self.dpRecreateSelectedMapperUI()
         
 
 
 
     
-    def dpPopulateUI(self, *args):
+    def dpPopulateMapperNetUI(self, *args):
         """ Check existing network node to populate UI.
         """
         currentNetList = cmds.ls(selection=False, type="network")
@@ -113,17 +161,30 @@ class CorrectionMapper(object):
             if self.crMapList:
                 cmds.textScrollList(self.existingMapperTSL, edit=True, removeAll=True)
                 cmds.textScrollList(self.existingMapperTSL, edit=True, append=self.crMapList)
+                cmds.textScrollList(self.existingMapperTSL, edit=True, deselectAll=True)
+                cmds.textScrollList(self.existingMapperTSL, edit=True, selectItem=self.net)
+
+
+
+    def dpClearEditMapperLayout(self, *args):
+        """ Just clean up the selected mapper layout.
+        """
+        try:
+            cmds.deleteUI(self.selectedMapperLayout)
+        except:
+            pass
+
 
 
 
     def dpCreateMapperLocator(self, name, toAttach, *args):
-        """ TODO write description here
+        """ Creates a space locator, zeroOut it to receive a parentConstraint.
+            Return the locator to use it as a reader node to the system.
         """
         if cmds.objExists(toAttach):
             loc = cmds.spaceLocator(name=name+"_Loc")[0]
             grp = dpUtils.zeroOut([loc])[0]
             cmds.parentConstraint(toAttach, grp, maintainOffset=False, name=grp+"_PaC")
-            print (dpUtils.getNodeByMessage("mapperDataGrp", self.net))
             cmds.parent(grp, dpUtils.getNodeByMessage("mapperDataGrp", self.net))
             return loc
         else:
@@ -177,8 +238,10 @@ class CorrectionMapper(object):
                     cmds.addAttr(self.net, longName="axisPositive", attributeType="bool")
                     cmds.addAttr(self.net, longName="startValue", attributeType="long")
                     cmds.addAttr(self.net, longName="endValue", attributeType="long")
-                    cmds.addAttr(self.net, longName="mapperDataGrp", attributeType="message")
-
+                    messageAttrList = ["mapperDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "extractAngleActiveMD", "smallerThanOneCnd", "overZeroCnd", "origLoc", "actionLoc"]
+                    for messageAttr in messageAttrList:
+                        cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
+                    
                     cmds.setAttr(self.net+".dpNetwork", 1)
                     cmds.setAttr(self.net+".dpCorrectionMapper", 1)
                     cmds.setAttr(self.net+".name", mapName, type="string")
@@ -190,8 +253,9 @@ class CorrectionMapper(object):
 
 
                     mapperDataGrp = cmds.group(empty=True, name=mapName+"_Grp")
-                    cmds.parent(mapperDataGrp, self.correctionMapperGrp)
                     cmds.connectAttr(mapperDataGrp+".message", self.net+".mapperDataGrp", force=True)
+                    cmds.parent(mapperDataGrp, self.correctionMapperGrp)
+                    
 
                     origLoc = self.dpCreateMapperLocator(mapName+"_Orig", origNode)
                     actionLoc = self.dpCreateMapperLocator(mapName+"_Action", actionNode)
@@ -239,17 +303,29 @@ class CorrectionMapper(object):
                     
                     
                     
+                    # serialize message attributes
+                    cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
+                    cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
+                    cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
+                    cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
+                    cmds.connectAttr(extractAngleActiveMD+".message", self.net+".extractAngleActiveMD", force=True)
+                    cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
+                    cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
+                    cmds.connectAttr(origLoc+".message", self.net+".origLoc", force=True)
+                    cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
+                    
 
-                    cmds.textScrollList(self.existingMapperTSL, edit=True, deselectAll=True)
-                    cmds.textScrollList(self.existingMapperTSL, edit=True, selectItem=self.net)
+
+                    
                     if self.ui:
-                        self.dpPopulateUI()
+                        self.dpPopulateMapperNetUI()
                         self.actualizeMapperEditLayout()
+                        
+
                     cmds.undoInfo(closeChunk=True)
                     
                     
-                    # if rotate extration option:
-                    cmds.select(extractAngleActiveMD)
+                    
 
                 else:
                     print("Select first the father node and then the child node, please")
