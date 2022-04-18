@@ -109,25 +109,92 @@ class CorrectionMapper(object):
         return name
 
 
+    def changeAxis(self, axis=None, *args):
+        """ TODO write desc
+        """
+        cmds.setAttr(self.net+".axis", self.axisMenuItemList.index(axis.upper()))
+        # get connected nodes
+        extractAngleQtE = dpUtils.getNodeByMessage("extractAngleQtE", self.net)
+        extractAngleMD = dpUtils.getNodeByMessage("extractAngleMD", self.net)
+        # clean up old unitConversion node:
+        unitConvToDelete = cmds.listConnections(extractAngleMD+".input1X", source=True, destination=False)[0]
+        cmds.disconnectAttr(unitConvToDelete+".output", extractAngleMD+".input1X")
+        cmds.delete(unitConvToDelete)
+        # make a new connection using choose axis:
+        cmds.connectAttr(extractAngleQtE+".outputRotate"+axis.upper(), extractAngleMD+".input1X", force=True)
+        
+        
+        
+    def changeAxisOrder(self, axisOrder=None, *args):
+        """ TODO write desc
+        """
+        axisOrder = self.axisOrderMenuItemList.index(axisOrder.upper())
+        cmds.setAttr(self.net+".extractAxisOrder", axisOrder)
+        # get extract angle nodes to change connections from network message attributes:
+        extractAngleDM = dpUtils.getNodeByMessage("extractAngleDM", self.net)
+        extractAngleQtE = dpUtils.getNodeByMessage("extractAngleQtE", self.net)
+        cmds.setAttr(extractAngleDM+".inputRotateOrder", axisOrder)
+        cmds.setAttr(extractAngleQtE+".inputRotateOrder", axisOrder)
+
+
+
+
+    def changeEndValue(self, value=None, *args):
+        """ TODO write desc
+        """
+        cmds.setAttr(self.net+".endValue", value)
+
+
+
     def dpRecreateSelectedMapperUI(self, node=None, *args):
         """ It will recreate the mapper layout for the selected network node.
         """
         # TODO: edit selected mapper layout elements:
 
-        currentName = cmds.getAttr(self.net+".name")
+        # name:
         self.selectedMapperLayout = cmds.columnLayout('selectedMapperLayout', adjustableColumn=True, parent=self.editSelectedMapperLayout)
 #        nameLayoutA = cmds.rowColumnLayout('nameLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=self.selectedMapperLayout)
+        currentName = cmds.getAttr(self.net+".name")
         self.nameTFG = cmds.textFieldGrp("nameTFG", label='Name', text=currentName, editable=True, changeCommand=self.changeName, parent=self.selectedMapperLayout)
-        cmds.text("Axis")
-        cmds.text("Extract Axis Order")
-        cmds.text("Value")
-        cmds.text("Start")
-        cmds.text("End")
-
-
-
-
         
+        
+        # axis:
+        self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedMapperLayout)
+        cmds.text("Axis", parent=self.axisLayout)
+        self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
+        self.axisMenuItemList = ['X', 'Y', 'Z']
+        for axis in self.axisMenuItemList:
+            cmds.menuItem(label=axis, parent=self.axisMenu)
+        currentAxis = cmds.getAttr(self.net+".axis")
+        cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
+
+
+
+        # axis order:
+        self.axisOrderLayout = cmds.rowLayout('axisOrderLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedMapperLayout)
+        cmds.text("Axis Order", parent=self.axisOrderLayout)
+        self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisOrderLayout)
+        self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
+        for axisOrder in self.axisOrderMenuItemList:
+            cmds.menuItem(label=axisOrder, parent=self.axisOrderMenu)
+        currentAxisOrder = cmds.getAttr(self.net+".extractAxisOrder")
+        cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
+
+
+        currentEndValue = cmds.getAttr(self.net+".endValue")
+        self.endValueFFG = cmds.floatFieldGrp("endValueFFG", label='End Value', numberOfFields=1, value1=currentEndValue, changeCommand=self.changeEndValue, parent=self.selectedMapperLayout)
+        
+
+
+
+#        cmds.text("Value")
+#        cmds.text("Start")
+#        cmds.text("End")
+
+
+
+
+    
     def actualizeMapperEditLayout(self, *args):
         """ TODO write description here please
         """
@@ -231,11 +298,8 @@ class CorrectionMapper(object):
                     cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
                     cmds.addAttr(self.net, longName="dpCorrectionMapper", attributeType="bool")
                     cmds.addAttr(self.net, longName="name", dataType="string")
-                    cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="+X:-X:+Y:-Y:+Z:-Z")
-                    cmds.addAttr(self.net, longName="axisName", dataType="string")
+                    cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
                     cmds.addAttr(self.net, longName="extractAxisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
-                    cmds.addAttr(self.net, longName="extractAxisOrderName", dataType="string")
-                    cmds.addAttr(self.net, longName="axisPositive", attributeType="bool")
                     cmds.addAttr(self.net, longName="startValue", attributeType="long")
                     cmds.addAttr(self.net, longName="endValue", attributeType="long")
                     messageAttrList = ["mapperDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "extractAngleActiveMD", "smallerThanOneCnd", "overZeroCnd", "origLoc", "actionLoc"]
@@ -246,9 +310,7 @@ class CorrectionMapper(object):
                     cmds.setAttr(self.net+".dpCorrectionMapper", 1)
                     cmds.setAttr(self.net+".name", mapName, type="string")
 
-                    cmds.setAttr(self.net+".axisName", "X", type="string")
-                    cmds.setAttr(self.net+".extractAxisOrderName", "XYZ", type="string")
-                    cmds.setAttr(self.net+".axisPositive", 1)
+
                     cmds.setAttr(self.net+".endValue", 180)
 
 
@@ -288,8 +350,17 @@ class CorrectionMapper(object):
 
                     
                     # setup the rotation affection
-                    cmds.connectAttr(extractAngleDM+".outputRotateY", extractAngleMD+".input1X", force=True)
-                    cmds.connectAttr(self.net+".endValue", extractAngleMD+".input2X", force=True)
+
+
+
+                    cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
+                    cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
+                    cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
+                    cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
+                    
+                    
+                    cmds.connectAttr(extractAngleQtE+".outputRotateX", extractAngleMD+".input1X", force=True) #it'll be updated when changing axis
+                    cmds.connectAttr(self.net+".endValue", extractAngleMD+".input2X", force=True) #it'll be updated when changing endValue
                     cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".firstTerm", force=True)
                     cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
                     cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
@@ -359,3 +430,5 @@ class CorrectionMapper(object):
         # refresh button/ auto refresh
         # clear create name text field?
         # delete button
+        # do we need the axis name attribute as string?
+        # use created node Quaternion to Euler
