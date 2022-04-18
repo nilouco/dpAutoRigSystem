@@ -33,7 +33,13 @@ class CorrectionMapper(object):
         if self.ui:
             self.dpCorrectionMapperCloseUI()
             self.dpCorrectionMapperUI()
-            self.dpPopulateMapperNetUI()
+            self.refreshUI()
+            
+
+    def refreshUI(self, *args):
+        self.dpPopulateMapperNetUI()
+        self.actualizeMapperEditLayout()
+
         
 
     def dpCorrectionMapperCloseUI(self, *args):
@@ -60,6 +66,7 @@ class CorrectionMapper(object):
         correctionMapperLayoutA = cmds.rowColumnLayout('correctionMapperLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=correctionMapperLayout)
         self.create_BT = cmds.button('create_BT', label=self.langDic[self.langName]['i158_create'], command=self.dpCreateCorrectionMapper, backgroundColor=(0.7, 1.0, 0.7), parent=correctionMapperLayoutA)
         self.create_TF = cmds.textField('create_TF', editable=True, parent=correctionMapperLayoutA)
+        cmds.refresh_BT = cmds.button('refresh_BT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, backgroundColor=(0.7, 7.0, 1.0), parent=correctionMapperLayoutA)
         cmds.separator(style='in', height=15, width=100, parent=correctionMapperLayout)
 
         cmds.text("Existing", align="left", height=20, font='boldLabelFont', parent=correctionMapperLayout)
@@ -98,14 +105,17 @@ class CorrectionMapper(object):
         """
         oldName = cmds.getAttr(self.net+".name")
         if not name:
-            name = cmds.textFieldGrp(self.nameTFG, query=True, text=True)
+            if self.ui:
+                name = cmds.textFieldGrp(self.nameTFG, query=True, text=True)
         if name:
             name = dpUtils.resolveName(name, self.netSuffix)[0]
             self.renameMapperNodes(oldName, name)
             cmds.setAttr(self.net+".name", name, type="string")
             self.net = cmds.rename(self.net, self.net.replace(oldName, name))
-            self.dpPopulateMapperNetUI()
-            #self.actualizeMapperEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
+            if self.ui:
+                self.dpPopulateMapperNetUI()
+                #self.actualizeMapperEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
+                cmds.textFieldGrp(self.nameTFG, label='Name', edit=True, text=name)
         return name
 
 
@@ -146,44 +156,62 @@ class CorrectionMapper(object):
 
 
 
+    def deleteCorrectionMapper(self, *args):
+        """ Just delete 2 nodes to clear this current system setup:
+            - Mapper Data Group
+            - Network Data Node
+        """
+        cmds.delete(dpUtils.getNodeByMessage("mapperDataGrp", self.net))
+        cmds.delete(self.net)
+        if self.ui:
+            self.dpPopulateMapperNetUI()
+            self.actualizeMapperEditLayout()
+
+
+
     def dpRecreateSelectedMapperUI(self, node=None, *args):
         """ It will recreate the mapper layout for the selected network node.
         """
         # TODO: edit selected mapper layout elements:
-
-        # name:
-        self.selectedMapperLayout = cmds.columnLayout('selectedMapperLayout', adjustableColumn=True, parent=self.editSelectedMapperLayout)
-#        nameLayoutA = cmds.rowColumnLayout('nameLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=self.selectedMapperLayout)
-        currentName = cmds.getAttr(self.net+".name")
-        self.nameTFG = cmds.textFieldGrp("nameTFG", label='Name', text=currentName, editable=True, changeCommand=self.changeName, parent=self.selectedMapperLayout)
         
-        
-        # axis:
-        self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedMapperLayout)
-        cmds.text("Axis", parent=self.axisLayout)
-        self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
-        self.axisMenuItemList = ['X', 'Y', 'Z']
-        for axis in self.axisMenuItemList:
-            cmds.menuItem(label=axis, parent=self.axisMenu)
-        currentAxis = cmds.getAttr(self.net+".axis")
-        cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
+        if self.net:
+            if cmds.objExists(self.net):
+                # name:
+                self.selectedMapperLayout = cmds.columnLayout('selectedMapperLayout', adjustableColumn=True, parent=self.editSelectedMapperLayout)
+    #        nameLayoutA = cmds.rowColumnLayout('nameLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=self.selectedMapperLayout)
+                currentName = cmds.getAttr(self.net+".name")
+                self.nameTFG = cmds.textFieldGrp("nameTFG", label='Name', text=currentName, editable=True, changeCommand=self.changeName, parent=self.selectedMapperLayout)
+                
+                
+                # axis:
+                self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedMapperLayout)
+                cmds.text("Axis", parent=self.axisLayout)
+                self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
+                self.axisMenuItemList = ['X', 'Y', 'Z']
+                for axis in self.axisMenuItemList:
+                    cmds.menuItem(label=axis, parent=self.axisMenu)
+                currentAxis = cmds.getAttr(self.net+".axis")
+                cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
 
 
 
-        # axis order:
-        self.axisOrderLayout = cmds.rowLayout('axisOrderLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedMapperLayout)
-        cmds.text("Axis Order", parent=self.axisOrderLayout)
-        self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisOrderLayout)
-        self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
-        for axisOrder in self.axisOrderMenuItemList:
-            cmds.menuItem(label=axisOrder, parent=self.axisOrderMenu)
-        currentAxisOrder = cmds.getAttr(self.net+".extractAxisOrder")
-        cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
+                # axis order:
+                self.axisOrderLayout = cmds.rowLayout('axisOrderLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedMapperLayout)
+                cmds.text("Axis Order", parent=self.axisOrderLayout)
+                self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisOrderLayout)
+                self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
+                for axisOrder in self.axisOrderMenuItemList:
+                    cmds.menuItem(label=axisOrder, parent=self.axisOrderMenu)
+                currentAxisOrder = cmds.getAttr(self.net+".extractAxisOrder")
+                cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
 
 
-        currentEndValue = cmds.getAttr(self.net+".endValue")
-        self.endValueFFG = cmds.floatFieldGrp("endValueFFG", label='End Value', numberOfFields=1, value1=currentEndValue, changeCommand=self.changeEndValue, parent=self.selectedMapperLayout)
-        
+                currentEndValue = cmds.getAttr(self.net+".endValue")
+                self.endValueFFG = cmds.floatFieldGrp("endValueFFG", label='End Value', numberOfFields=1, value1=currentEndValue, changeCommand=self.changeEndValue, parent=self.selectedMapperLayout)
+
+                self.delete_BT = cmds.button('delete_BT', label=self.langDic[self.langName]['m005_delete'], command=self.deleteCorrectionMapper, backgroundColor=(1.0, 0.7, 0.7), parent=self.selectedMapperLayout)
+
+
 
 
 
@@ -202,8 +230,9 @@ class CorrectionMapper(object):
         self.dpClearEditMapperLayout()
         selList = cmds.textScrollList(self.existingMapperTSL, query=True, selectItem=True)
         if selList:
-            cmds.select(selList[0])
-            self.net = selList[0]
+            if cmds.objExists(selList[0]):
+                cmds.select(selList[0])
+                self.net = selList[0]
         self.dpRecreateSelectedMapperUI()
         
 
@@ -213,6 +242,8 @@ class CorrectionMapper(object):
     def dpPopulateMapperNetUI(self, *args):
         """ Check existing network node to populate UI.
         """
+        cmds.textScrollList(self.existingMapperTSL, edit=True, deselectAll=True)
+        cmds.textScrollList(self.existingMapperTSL, edit=True, removeAll=True)
         currentNetList = cmds.ls(selection=False, type="network")
         if currentNetList:
             self.crMapList = []
@@ -226,10 +257,10 @@ class CorrectionMapper(object):
                                 
                                 self.crMapList.append(item)
             if self.crMapList:
-                cmds.textScrollList(self.existingMapperTSL, edit=True, removeAll=True)
                 cmds.textScrollList(self.existingMapperTSL, edit=True, append=self.crMapList)
-                cmds.textScrollList(self.existingMapperTSL, edit=True, deselectAll=True)
-                cmds.textScrollList(self.existingMapperTSL, edit=True, selectItem=self.net)
+                if self.net:
+                    if cmds.objExists(self.net):
+                        cmds.textScrollList(self.existingMapperTSL, edit=True, selectItem=self.net)
 
 
 
@@ -416,19 +447,12 @@ class CorrectionMapper(object):
             # load input node and attribute
             # find output blendShape node and attribute
         # receive data to process without any dialog box
-        # ui update button?
-        # ui command to change axis, extractAxisOrder
         # rename data?
-        # reconnect axis on change
-        # set axis order change
-        # set values change
-        # add Delete system itself button
         # expose network attributes in the channel box?
-        # connect all nodes by message to net container node
         # prepare code to run without any UI dependence
         # change values attributes to float
-        # refresh button/ auto refresh
         # clear create name text field?
-        # delete button
         # do we need the axis name attribute as string?
-        # use created node Quaternion to Euler
+        # delete all button?
+        # dic idioms
+        # print to MEL messages

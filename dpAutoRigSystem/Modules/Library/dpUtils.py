@@ -813,7 +813,7 @@ def resolveName(name, suffix, *args):
     """ Resolve repeated name adding number in the middle of the string.
         Returns the resolved baseName and name (including the suffix).
     """
-    name = name[0].upper()+name[1:]
+    name = name[0].upper()+name[1:].replace(" ", "_")
     baseName = name
     name = name+"_00_"+suffix
     if cmds.objExists(name):
