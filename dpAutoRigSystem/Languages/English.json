@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-04-18",
+    "_updated"       : "2022-04-19",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -369,7 +369,7 @@
     "m003_segments"             : "Segments",
     "m004_select"               : "Select",
     "m005_delete"               : "Delete",
-    "m006_customName"           : "Custom Name",
+    "m006_name"                 : "Name",
     "m007_finger"               : "Finger",
     "m008_fingerDesc"           : "Finger Module Description:\n\nThis module creates a rig for fingers.\nYou can choose the number of falanges.\n\nWhen rigged, the falange controls will be FK (forward kinematics),\nand the main control will have the attributes to\ndisplay the falange controls, and also to rotate them.\nYou can use as IK too (inverse kinematics).",
     "m009_idioms"               : "Idioms",
@@ -408,8 +408,8 @@
     "m042_default"              : "Default",
     "m043_quadSpring"           : "Quadruped Spring",
     "m044_addBend"              : "Add Bend",
-    "m045_meshConnect"          : "Mesh Connect",
-    "m046_meshConnDesc"         : "UNUSED: Quick connection between\nmeshes shapes attributes:\n\n.outMesh and .inMesh\n\nFROM: MODELS_Grp *_geoShape\nTO: render_Grp *_meshShape",
+    "m045_order"                : "Order",
+    "m046_0-0-0-0-0-0-"         : "",
     "m047_colorOver"            : "Color Override",
     "m048_coloOverDesc"         : "Show a window to change\nshape color overriding.",
     "m049_matchMesh"            : "Match Mesh",

@@ -26,10 +26,9 @@ class CorrectionManager(object):
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.correctionManagerName = self.langDic[self.langName]['m068_correctionManager']
         self.netSuffix = "Net"
-        self.correctionManagerGrp = "CorrectionManager_Grp"
+        self.correctionManagerDataGrp = "CorrectionManager_Data_Grp"
         self.netList = []
         self.net = None
-
         # call main UI function
         if self.ui:
             self.closeUI()
@@ -60,7 +59,6 @@ class CorrectionManager(object):
         correctionManager_winHeight = 300
         cmds.window('dpCorrectionManagerWindow', title=self.correctionManagerName+" "+str(DPCORRECTIONMANAGER_VERSION), widthHeight=(correctionManager_winWidth, correctionManager_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpCorrectionManagerWindow')
-        
         # create UI layout and elements:
         correctionManagerLayout = cmds.columnLayout('correctionManagerLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text("infoTxt", label=self.langDic[self.langName]['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent=correctionManagerLayout)
@@ -72,11 +70,11 @@ class CorrectionManager(object):
         cmds.text(" ", parent=refreshLayout)
         cmds.refreshBT = cmds.button('refreshBT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
-
+        # existing:
         cmds.text("existingTxt", label=self.langDic[self.langName]['m071_existing'], align="left", height=25, font='boldLabelFont', parent=correctionManagerLayout)
         self.existingNetTSL = cmds.textScrollList('existingNetTSL', width=20, allowMultiSelection=False, selectCommand=self.actualizeEditLayout, parent=correctionManagerLayout)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
-
+        # edit selected net layout:
         self.editSelectedNetLayout = cmds.frameLayout('editSelectedNetLayout', label=self.langDic[self.langName]['i011_editSelected'], collapsable=True, collapse=False, parent=correctionManagerLayout)
         
 
@@ -119,7 +117,7 @@ class CorrectionManager(object):
             if self.ui:
                 self.populateNetUI()
                 #self.actualizeEditLayout() #Bug: if we call this method here it will crash Maya! Error report: 322305477
-                cmds.textFieldGrp(self.nameTFG, label='Name', edit=True, text=name)
+                cmds.textFieldGrp(self.nameTFG, label=self.langDic[self.langName]['m006_name'], edit=True, text=name)
         return name
 
 
@@ -142,7 +140,7 @@ class CorrectionManager(object):
         """ Update the setup to set the correct axis order to extract angle.
         """
         axisOrder = self.axisOrderMenuItemList.index(axisOrder.upper())
-        cmds.setAttr(self.net+".extractAxisOrder", axisOrder)
+        cmds.setAttr(self.net+".axisOrder", axisOrder)
         # get extract angle nodes to change connections from network message attributes:
         extractAngleDM = dpUtils.getNodeByMessage("extractAngleDM", self.net)
         extractAngleQtE = dpUtils.getNodeByMessage("extractAngleQtE", self.net)
@@ -150,11 +148,11 @@ class CorrectionManager(object):
         cmds.setAttr(extractAngleQtE+".inputRotateOrder", axisOrder)
 
 
-    def changeEndValue(self, value=None, *args):
+    def changeAngle(self, value=None, *args):
         """ Update the setup to set the choose output end value.
             That means we can read the angle and output max value when the setup arrives at this angle end value.
         """
-        cmds.setAttr(self.net+".endValue", value)
+        cmds.setAttr(self.net+".angle", value)
 
 
     def deleteSetup(self, *args):
@@ -172,40 +170,34 @@ class CorrectionManager(object):
     def recreateSelectedLayout(self, node=None, *args):
         """ It will recreate the edit layout for the selected network node.
         """
-        # TODO: edit selected mapper layout elements:
-        
         if self.net:
             if cmds.objExists(self.net):
                 # name:
                 self.selectedLayout = cmds.columnLayout('selectedLayout', adjustableColumn=True, parent=self.editSelectedNetLayout)
+                self.nameLayout = cmds.rowLayout('nameLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
                 currentName = cmds.getAttr(self.net+".name")
-                self.nameTFG = cmds.textFieldGrp("nameTFG", label='Name', text=currentName, editable=True, changeCommand=self.changeName, parent=self.selectedLayout)
-                
+                self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.langDic[self.langName]['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
+                self.delete_BT = cmds.button('delete_BT', label=self.langDic[self.langName]['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
                 # axis:
-                self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedLayout)
-                cmds.text("Axis", parent=self.axisLayout)
+                self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(40, 50, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
+                cmds.text("axisTxt", label=self.langDic[self.langName]['i052_axis'], parent=self.axisLayout)
                 self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
                 self.axisMenuItemList = ['X', 'Y', 'Z']
                 for axis in self.axisMenuItemList:
                     cmds.menuItem(label=axis, parent=self.axisMenu)
                 currentAxis = cmds.getAttr(self.net+".axis")
                 cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
-
                 # axis order:
-                self.axisOrderLayout = cmds.rowLayout('axisOrderLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent=self.selectedLayout)
-                cmds.text("Axis Order", parent=self.axisOrderLayout)
-                self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisOrderLayout)
+                cmds.text("axisOrderTxt", label=self.langDic[self.langName]['i052_axis']+" "+self.langDic[self.langName]['m045_order'], parent=self.axisLayout)
+                self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisLayout)
                 self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
                 for axisOrder in self.axisOrderMenuItemList:
                     cmds.menuItem(label=axisOrder, parent=self.axisOrderMenu)
-                currentAxisOrder = cmds.getAttr(self.net+".extractAxisOrder")
+                currentAxisOrder = cmds.getAttr(self.net+".axisOrder")
                 cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
-
-                # end value:
-                currentEndValue = cmds.getAttr(self.net+".endValue")
-                self.endValueFFG = cmds.floatFieldGrp("endValueFFG", label='End Value', numberOfFields=1, value1=currentEndValue, changeCommand=self.changeEndValue, parent=self.selectedLayout)
-
-                self.delete_BT = cmds.button('delete_BT', label=self.langDic[self.langName]['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.selectedLayout)
+                # angle value:
+                currentAngle = cmds.getAttr(self.net+".angle")
+                self.angleFFG = cmds.floatFieldGrp("angleFFG", label=self.langDic[self.langName]['c102_angle'].capitalize(), numberOfFields=1, value1=currentAngle, columnWidth2=(40, 70), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeAngle, parent=self.axisLayout)
 
     
     def actualizeEditLayout(self, *args):
@@ -233,9 +225,7 @@ class CorrectionManager(object):
                     if cmds.getAttr(item+".dpNetwork") == 1:
                         if cmds.objExists(item+".dpCorrectionManager"):
                             if cmds.getAttr(item+".dpCorrectionManager") == 1:
-                                
-                                #TODO validate correctionManager node integrity
-                                
+                                #TODO validate correctionManager node integrity here
                                 self.netList.append(item)
             if self.netList:
                 cmds.textScrollList(self.existingNetTSL, edit=True, append=self.netList)
@@ -280,18 +270,17 @@ class CorrectionManager(object):
                 if len(nodeList) == 2:
                     origNode = nodeList[0]
                     actionNode = nodeList[1]
-
                     cmds.undoInfo(openChunk=True)
 
                     # main group
-                    if not cmds.objExists(self.correctionManagerGrp):
-                        self.correctionManagerGrp = cmds.group(empty=True, name=self.correctionManagerGrp)
-                        cmds.addAttr(self.correctionManagerGrp, longName="dpCorrectionManagerGrp", attributeType="bool")
-                        cmds.setAttr(self.correctionManagerGrp+".dpCorrectionManagerGrp", 1)
-                        self.ctrls.setLockHide([self.correctionManagerGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                    if not cmds.objExists(self.correctionManagerDataGrp):
+                        self.correctionManagerDataGrp = cmds.group(empty=True, name=self.correctionManagerDataGrp)
+                        cmds.addAttr(self.correctionManagerDataGrp, longName="dpCorrectionManagerDataGrp", attributeType="bool")
+                        cmds.setAttr(self.correctionManagerDataGrp+".dpCorrectionManagerDataGrp", 1)
+                        self.ctrls.setLockHide([self.correctionManagerDataGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         scalableGrp = dpUtils.getNodeByMessage("scalableGrp")
                         if scalableGrp:
-                            cmds.parent(self.correctionManagerGrp, scalableGrp)
+                            cmds.parent(self.correctionManagerDataGrp, scalableGrp)
 
                     # naming
                     if not name:
@@ -306,19 +295,19 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="dpCorrectionManager", attributeType="bool")
                     cmds.addAttr(self.net, longName="name", dataType="string")
                     cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
-                    cmds.addAttr(self.net, longName="extractAxisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
+                    cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
                     cmds.addAttr(self.net, longName="startValue", attributeType="float")
-                    cmds.addAttr(self.net, longName="endValue", attributeType="float")
+                    cmds.addAttr(self.net, longName="angle", attributeType="float")
                     messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "extractAngleActiveMD", "smallerThanOneCnd", "overZeroCnd", "originalLoc", "actionLoc"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.setAttr(self.net+".dpNetwork", 1)
                     cmds.setAttr(self.net+".dpCorrectionManager", 1)
                     cmds.setAttr(self.net+".name", correctionName, type="string")
-                    cmds.setAttr(self.net+".endValue", 180)
+                    cmds.setAttr(self.net+".angle", 180)
                     correctionDataGrp = cmds.group(empty=True, name=correctionName+"_Grp")
                     cmds.connectAttr(correctionDataGrp+".message", self.net+".correctionDataGrp", force=True)
-                    cmds.parent(correctionDataGrp, self.correctionManagerGrp)
+                    cmds.parent(correctionDataGrp, self.correctionManagerDataGrp)
                     originalLoc = self.createCorrectiveLocator(correctionName+"_Original", origNode)
                     actionLoc = self.createCorrectiveLocator(correctionName+"_Action", actionNode)
                     
@@ -348,7 +337,7 @@ class CorrectionManager(object):
                     # axis setup
                     cmds.connectAttr(extractAngleQtE+".outputRotateX", extractAngleMD+".input1X", force=True) #it'll be updated when changing axis
                     # axis order setup
-                    cmds.connectAttr(self.net+".endValue", extractAngleMD+".input2X", force=True) #it'll be updated when changing endValue
+                    cmds.connectAttr(self.net+".angle", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
                     cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".firstTerm", force=True)
                     cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
                     cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
@@ -375,19 +364,3 @@ class CorrectionManager(object):
                     mel.eval('warning \"'+self.langDic[self.langName]['m065_selOrigAction']+'\";')
             else:
                 mel.eval('warning \"'+self.langDic[self.langName]['m066_selectTwo']+'\";')
-            
-
-        #WIP:
-        
-        
-
-
-        #TODO
-        # auto connect
-            # load input node and attribute
-            # find output blendShape node and attribute
-        # expose network attributes in the channel box?
-        # prepare code to run without any UI dependence
-        # clear create name text field?
-        # delete all button?
-        # dic idioms

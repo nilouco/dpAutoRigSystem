@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-04-18",
+    "_updated"       : "2022-04-19",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -369,7 +369,7 @@
     "m003_segments"             : "Segmentos",
     "m004_select"               : "Selecionar",
     "m005_delete"               : "Apagar",
-    "m006_customName"           : "Nome Escolhido",
+    "m006_name"                 : "Nome",
     "m007_finger"               : "Dedo",
     "m008_fingerDesc"           : "Descrição do Modulo Dedo:\n\nEsse modulo cria um rig para dedos.\nVoce pode escolher o numero de falanges.\n\nQuando rigado, os controles das falanges serão FK (forward kinematics),\ne o controle principal tera atributos para\nmostrar os controles das falanges, e tambem rotaciona-las.\nVoce tambem pode usar como IK (inverse kinematics).",
     "m009_idioms"               : "Idiomas",
@@ -408,8 +408,8 @@
     "m042_default"              : "Default",
     "m043_quadSpring"           : "Quadrúpede Spring",
     "m044_addBend"              : "Adicionar Dobrador",
-    "m045_meshConnect"          : "Conecção de Mesh",
-    "m046_meshConnDesc"         : "UNUSED: Rapida conecção entre\nmeshes shapes atributos:\n\n.outMesh e .inMesh\n\nDE: MODELS_Grp *_geoShape\nPARA: render_Grp *_meshShape",
+    "m045_order"                : "Ordem",
+    "m046_0-0-0-0-0-0-"         : "",
     "m047_colorOver"            : "Sobrescrever Cores",
     "m048_coloOverDesc"         : "Mostra uma janela para\nsobrescrever as cores dos shapes.",
     "m049_matchMesh"            : "Match Mesh",

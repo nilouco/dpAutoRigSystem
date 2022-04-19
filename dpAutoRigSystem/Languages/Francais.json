@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-04-18",
+    "_updated"       : "2022-04-19",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -369,7 +369,7 @@
     "m003_segments"             : "Segments",
     "m004_select"               : "Sélectionnez",
     "m005_delete"               : "Supprimez",
-    "m006_customName"           : "Nom Personnalisé",
+    "m006_name"                 : "Nom",
     "m007_finger"               : "Doigt",
     "m008_fingerDesc"           : "Description du module Doigt:\n\nCe module crée le rig pour les doigts.\nVous pouvez choisir le nombre de phalanges.\n\nLorsque rigged, les contrôles des les phalanges seront FK (forward kinematics),\net le controle principal aura les attributs\npour afficher les commandes des les phalanges, et aussi pour les faire pivoter.\nVous pouvez utiliser comme IK aussi (inverse kinematics).",
     "m009_idioms"               : "Idiomes",
@@ -408,8 +408,8 @@
     "m042_default"              : "Default",
     "m043_quadSpring"           : "Quadrupède Spring",
     "m044_addBend"              : "Ajouter Plier",
-    "m045_meshConnect"          : "Mesh Connexion",
-    "m046_meshConnDesc"         : "UNUSED: Connexion rapide entre\nles meshes shapes attributs:\n\n.outMesh et .inMesh\n\nDE: MODELS_Grp *_geoShape\nPOUR: render_Grp *_meshShape",
+    "m045_order"                : "Ordre",
+    "m046_0-0-0-0-0-0-"         : "UNUSED: Connexion rapide entre\nles meshes shapes attributs:\n\n.outMesh et .inMesh\n\nDE: MODELS_Grp *_geoShape\nPOUR: render_Grp *_meshShape",
     "m047_colorOver"            : "Color Override",
     "m048_coloOverDesc"         : "Montre une fenêtre pour\néchanger la couleur des shapes.",
     "m049_matchMesh"            : "Match Mesh",

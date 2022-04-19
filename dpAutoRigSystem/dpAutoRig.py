@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.01"
-DPAR_UPDATELOG = "N406 - No PyMEL for dpPoseReader.\nAlso no Qt."
+DPAR_VERSION_PY3 = "4.00.02"
+DPAR_UPDATELOG = "N406 - No PyMEL for dpPoseReader.\nAlso no Qt.\nCreated a new module to replace it\nnamed dpCorrectionManager."
 
 
 
