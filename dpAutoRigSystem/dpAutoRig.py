@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.01"
-DPAR_UPDATELOG = "N407 - No PyMEL for sqCopyPasteShape.\nAdded new integrated methods to\ndpShapeIO in Control tab."
+DPAR_VERSION_PY3 = "4.00.02"
+DPAR_UPDATELOG = "N406 - No PyMEL for dpPoseReader.\nAlso no Qt.\nCreated a new module to replace it\nnamed dpCorrectionManager."
 
 
 
@@ -375,7 +375,7 @@ class DP_AutoRig_UI(object):
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
         #editSelectedModuleLayoutA - frameLayout:
-        self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.langDic[self.langName]['i011_selectedModule'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', label=self.langDic[self.langName]['i011_editSelected']+" "+self.langDic[self.langName]['i143_module'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["selectedModuleLayout"] = cmds.columnLayout('selectedModuleLayout', adjustableColumn=True, parent=self.allUIs["editSelectedModuleLayoutA"])
         
         #optionsA - frameLayout:
@@ -444,7 +444,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="_Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="_Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
-        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
+        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -455,7 +455,7 @@ class DP_AutoRig_UI(object):
         selGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.langDic[self.langName]['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
-        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.atualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
+        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
         cmds.setParent(self.allUIs["skinningTabLayout"])
         
@@ -521,16 +521,16 @@ class DP_AutoRig_UI(object):
         # here we populate the control module layout with the items from Controls folder:
         self.combinedControlModuleList = self.startGuideModules(COMBINED, "start", "combinedControlModuleLayout")
         
-        # editSeletedControls - frameLayout:
-        self.allUIs["editSelectionFL"] = cmds.frameLayout('editSelectionFL', label=self.langDic[self.langName]['i111_editSelection'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["editSelection3Layout"] = cmds.paneLayout("editSelection3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
-        self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.langDic[self.langName]['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelection3Layout"])
-        self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.langDic[self.langName]['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelection3Layout"])
-        self.allUIs["replaceShapeButton"] = cmds.button("replaceShapeButton", label=self.langDic[self.langName]['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ctrls.transferShape, True, True), parent=self.allUIs["editSelection3Layout"])
-        self.allUIs["editSelection2Layout"] = cmds.paneLayout("editSelection2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["editSelectionFL"])
+        # editSeletedController - frameLayout:
+        self.allUIs["editSelectedControllerFL"] = cmds.frameLayout('editSelectedControllerFL', label=self.langDic[self.langName]['i011_editSelected']+" "+self.langDic[self.langName]['i111_controller'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["editSelectedController3Layout"] = cmds.paneLayout("editSelectedController3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
+        self.allUIs["addShapeButton"] = cmds.button("addShapeButton", label=self.langDic[self.langName]['i113_addShapes'], backgroundColor=(1.0, 0.6, 0.7), command=partial(self.ctrls.transferShape, False, False), parent=self.allUIs["editSelectedController3Layout"])
+        self.allUIs["copyShapeButton"] = cmds.button("copyShapeButton", label=self.langDic[self.langName]['i112_copyShapes'], backgroundColor=(1.0, 0.6, 0.5), command=partial(self.ctrls.transferShape, False, True), parent=self.allUIs["editSelectedController3Layout"])
+        self.allUIs["replaceShapeButton"] = cmds.button("replaceShapeButton", label=self.langDic[self.langName]['i110_transferShapes'], backgroundColor=(1.0, 0.6, 0.3), command=partial(self.ctrls.transferShape, True, True), parent=self.allUIs["editSelectedController3Layout"])
+        self.allUIs["editSelection2Layout"] = cmds.paneLayout("editSelection2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.langDic[self.langName]['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.langDic[self.langName]['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
-        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectionFL"])
+        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.langDic[self.langName]['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
         
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
@@ -641,8 +641,8 @@ class DP_AutoRig_UI(object):
         # delete module layout:
         else:
             try:
-                cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_selectedModule'])
-                cmds.deleteUI("selectedColumn")
+                cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_editSelected']+" "+self.langDic[self.langName]['i143_module'])
+                cmds.deleteUI("selectedModuleColumn")
                 for moduleInstance in self.moduleInstancesList:
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
@@ -847,7 +847,7 @@ class DP_AutoRig_UI(object):
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, removeAll=True)
         cmds.textScrollList( self.allUIs["jntTextScrollLayout"], edit=True, append=sortedJointList)
         # atualize of footerB text:
-        self.atualizeSkinFooter()
+        self.actualizeSkinFooter()
         
         
     def populateGeoms(self, *args):
@@ -917,7 +917,7 @@ class DP_AutoRig_UI(object):
         else:
             cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], edit=True, append=sortedGeoList)
         # atualize of footerB text:
-        self.atualizeSkinFooter()
+        self.actualizeSkinFooter()
     
     
     def reloadPopulatedGeoms(self, *args):
@@ -935,7 +935,7 @@ class DP_AutoRig_UI(object):
                 pass
     
     
-    def atualizeSkinFooter(self, *args):
+    def actualizeSkinFooter(self, *args):
         """ Edit the label of skin footer text.
         """
         try:
