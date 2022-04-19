@@ -364,11 +364,11 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 dpUtils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.langDic[self.langName]['c029_middle'])
                 dpUtils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c120_tip'])
                 dpUtils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c100_bottom'])
-                dpUtils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_L_"%(n+3)+self.langDic[self.langName]['c121_side'])
-                dpUtils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_R_"%(n+3)+self.langDic[self.langName]['c121_side'])
+                dpUtils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.langDic[self.langName]['c121_side'])
+                dpUtils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.langDic[self.langName]['c121_side'])
                 if self.addNostril:
-                    dpUtils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_L_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
-                    dpUtils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_R_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
+                    dpUtils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
+                    dpUtils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
                 
                 # creating controls:
                 self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree)
