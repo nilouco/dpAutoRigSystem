@@ -11,7 +11,7 @@ TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
 
-DPCORRECTIONMANAGER_VERSION = 2.0
+DPCORRECTIONMANAGER_VERSION = 2.1
 
 
 class CorrectionManager(object):
@@ -131,9 +131,14 @@ class CorrectionManager(object):
         # clean up old unitConversion node:
         unitConvToDelete = cmds.listConnections(extractAngleMD+".input1X", source=True, destination=False)[0]
         cmds.disconnectAttr(unitConvToDelete+".output", extractAngleMD+".input1X")
+        cmds.setAttr(self.net+".inputValue", lock=False)
+        cmds.disconnectAttr(unitConvToDelete+".output", self.net+".inputValue")
         cmds.delete(unitConvToDelete)
         # make a new connection using choose axis:
         cmds.connectAttr(extractAngleQtE+".outputRotate"+axis.upper(), extractAngleMD+".input1X", force=True)
+        newUnitConv = cmds.listConnections(extractAngleMD+".input1X", source=True, destination=False)[0]
+        cmds.connectAttr(newUnitConv+".output", self.net+".inputValue", force=True)
+        cmds.setAttr(self.net+".inputValue", lock=True)
         
         
     def changeAxisOrder(self, axisOrder=None, *args):
@@ -152,7 +157,7 @@ class CorrectionManager(object):
         """ Update the setup to set the choose output end value.
             That means we can read the angle and output max value when the setup arrives at this angle end value.
         """
-        cmds.setAttr(self.net+".angle", value)
+        cmds.setAttr(self.net+".inputMax", value)
 
 
     def deleteSetup(self, *args):
@@ -196,8 +201,16 @@ class CorrectionManager(object):
                 currentAxisOrder = cmds.getAttr(self.net+".axisOrder")
                 cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
                 # angle value:
-                currentAngle = cmds.getAttr(self.net+".angle")
+                currentAngle = cmds.getAttr(self.net+".inputMax")
                 self.angleFFG = cmds.floatFieldGrp("angleFFG", label=self.langDic[self.langName]['c102_angle'].capitalize(), numberOfFields=1, value1=currentAngle, columnWidth2=(40, 70), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeAngle, parent=self.axisLayout)
+
+
+                #WIP
+
+                self.rangeLayout = cmds.columnLayout('rangeLayout', adjustableColumn=True, parent=self.selectedLayout)
+                cmds.text("Range")
+                self.inputFFG = cmds.floatFieldGrp("inputFFG", label=self.langDic[self.langName]['c102_angle'].capitalize(), numberOfFields=2, value1=0, value2=180, columnWidth2=(40, 70), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeAngle, parent=self.rangeLayout)
+                self.outputFFG = cmds.floatFieldGrp("outputFFG", label=self.langDic[self.langName]['c102_angle'].capitalize(), numberOfFields=2, value1=0, value2=1, columnWidth2=(40, 70), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeAngle, parent=self.rangeLayout)
 
     
     def actualizeEditLayout(self, *args):
@@ -294,17 +307,21 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
                     cmds.addAttr(self.net, longName="dpCorrectionManager", attributeType="bool")
                     cmds.addAttr(self.net, longName="name", dataType="string")
+                    cmds.addAttr(self.net, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
                     cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
                     cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
-                    cmds.addAttr(self.net, longName="startValue", attributeType="float")
-                    cmds.addAttr(self.net, longName="angle", attributeType="float")
-                    messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "extractAngleActiveMD", "smallerThanOneCnd", "overZeroCnd", "originalLoc", "actionLoc"]
+                    cmds.addAttr(self.net, longName="inputMin", attributeType="float", defaultValue=0)
+                    cmds.addAttr(self.net, longName="inputMax", attributeType="float", defaultValue=180)
+                    cmds.addAttr(self.net, longName="outputMin", attributeType="float", defaultValue=0)
+                    cmds.addAttr(self.net, longName="outputMax", attributeType="float", defaultValue=1)
+                    cmds.addAttr(self.net, longName="inputValue", attributeType="float")
+                    cmds.addAttr(self.net, longName="outputValue", attributeType="float")
+                    messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "intensityMD", "smallerThanOneCnd", "overZeroCnd", "originalLoc", "actionLoc"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.setAttr(self.net+".dpNetwork", 1)
                     cmds.setAttr(self.net+".dpCorrectionManager", 1)
                     cmds.setAttr(self.net+".name", correctionName, type="string")
-                    cmds.setAttr(self.net+".angle", 180)
                     correctionDataGrp = cmds.group(empty=True, name=correctionName+"_Grp")
                     cmds.connectAttr(correctionDataGrp+".message", self.net+".correctionDataGrp", force=True)
                     cmds.parent(correctionDataGrp, self.correctionManagerDataGrp)
@@ -317,7 +334,7 @@ class CorrectionManager(object):
                     extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
                     extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")
                     extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
-                    extractAngleActiveMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_Active_MD")
+                    intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
                     smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
                     overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
                     cmds.setAttr(extractAngleMD+".operation", 2)
@@ -336,21 +353,28 @@ class CorrectionManager(object):
                     cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
                     # axis setup
                     cmds.connectAttr(extractAngleQtE+".outputRotateX", extractAngleMD+".input1X", force=True) #it'll be updated when changing axis
+                    unitConv = cmds.listConnections(extractAngleMD+".input1X", source=True, destination=False)[0]
+                    cmds.setAttr(self.net+".inputValue", lock=False)
+                    cmds.connectAttr(unitConv+".output", self.net+".inputValue", force=True)
+                    cmds.setAttr(self.net+".inputValue", lock=True)
                     # axis order setup
-                    cmds.connectAttr(self.net+".angle", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
+                    cmds.connectAttr(self.net+".inputMax", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
                     cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".firstTerm", force=True)
                     cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
                     cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
                     cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
-                    # node for manual activation connection
+                    # intensity setup:
                     # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                    cmds.connectAttr(overZeroCnd+".outColorR", extractAngleActiveMD+".input1X", force=True)
+                    cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
+                    cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
+                    cmds.connectAttr(intensityMD+".outputX", self.net+".outputValue", force=True)
+                    cmds.setAttr(self.net+".outputValue", lock=True)
                     # serialize message attributes
                     cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
                     cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
                     cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
                     cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
-                    cmds.connectAttr(extractAngleActiveMD+".message", self.net+".extractAngleActiveMD", force=True)
+                    cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
                     cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
                     cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
