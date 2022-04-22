@@ -6,6 +6,7 @@ from importlib import reload
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
+from functools import partial
 
 
 # global variables to this module:
@@ -68,6 +69,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             return cmds.getAttr(self.moduleGrp+".additional")
         else:
             return 0
+
+    def getSoftIk(self):
+        return cmds.getAttr(self.moduleGrp + ".softIk")
+
     
     # @dpUtils.profiler
     def createGuide(self, *args):
@@ -88,6 +93,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".articulation", 1)
         cmds.addAttr(self.moduleGrp, longName="additional", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".additional", 0)
+        cmds.addAttr(self.moduleGrp, longName="softIk", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".softIk", 1)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
@@ -230,15 +237,18 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # align world layout:
         self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedModuleColumn")
         cmds.text(label=self.langDic[self.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
-        self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=self.setAlignWorldFalse, onc=self.setAlignWorldTrue, parent=self.alignWorldLayout)
+        self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
+
+        # softIk:
+        cmds.text(" ", parent=self.alignWorldLayout)
+        self.softIkCB = cmds.checkBox(value=self.getSoftIk(), label='Soft Ik', ofc=partial(self.setSoftIk, 0), onc=partial(self.setSoftIk, 1), parent=self.alignWorldLayout)
+
         
-    def setAlignWorldTrue(self, *args):
-        self.hasAlignWorld = True
-        cmds.setAttr(self.moduleGrp + ".alignWorld", 1)
-    
-    def setAlignWorldFalse(self, *args):
-        self.hasAlignWorld = False
-        cmds.setAttr(self.moduleGrp + ".alignWorld", 0)
+    def setAlignWorld(self, value, *args):
+        cmds.setAttr(self.moduleGrp + ".alignWorld", value)
+
+    def setSoftIk(self, value, *args):
+        cmds.setAttr(self.moduleGrp + ".softIk", value)
 
     def setBendTrue(self, *args):
         self.hasBend = True

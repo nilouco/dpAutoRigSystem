@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.04"
-DPAR_UPDATELOG = "N453 - Correction Manager range values attributes."
+DPAR_UPDATELOG = "N436 - Limb soft ik."
 
 
 
