@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.03"
-DPAR_UPDATELOG = "N372 - Nose side nostril joint label fix."
+DPAR_VERSION_PY3 = "4.00.04"
+DPAR_UPDATELOG = "N453 - Correction Manager range values attributes."
 
 
 

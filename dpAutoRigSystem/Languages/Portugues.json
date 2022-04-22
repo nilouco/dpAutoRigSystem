@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-04-19",
+    "_updated"       : "2022-04-21",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -435,7 +435,7 @@
     "m069_correctionManagerDesc": "Criar todos os nodes necessários para um Sistema de Pose. \nPrimeiro escolha o node que queremos extrair a rotação.\nSegundo, escolha o node do qual vamos extrair a rotação,\npara que cheguemos a rotação do primeiro node a partir do segundo.",
     "m070_duplicate"            : "Duplicar",
     "m071_existing"             : "Existentes",
-    "m072_0-0-0-0-0-0-0-0"      : "",
+    "m072_range"                : "Intervalo",
     "m073_single"               : "Singular",
     "m074_singleDesc"           : "Descrição do modulo Singular:\n\nEsse modulo cria um joint unico\nque pode ser usado para rigs muito simples\nou para rigs faciais com a opção Indirect Skinning estiver ligada\nse quisermos passa-la por uma target de blendShape.\nCaso a opção Holder estiver ligada, não teremos o shape do controle.",
     "m075_upperTeeth"           : "DenteSuperior",
@@ -500,8 +500,8 @@
     "m134_piramid"              : "Piramide",
     "m135_copyPasteAttr"        : "Copiar e Colar Atributos",
     "m136_copyPasteAttrDesc"    : "Copiar e Colar os atributos selecionados\n do primeiro objeto selecionado\npara os outros objetos selecionados.",
-    "m137_0-0-0-0-0"            : "",
-    "m138_0-0-0-0-0"            : "",
+    "m137_input"                : "Entrada",
+    "m138_output"               : "Saída",
     "m139_facialCtrlsAttr"      : "Controles faciais e atributos para criar:",
     "m140_tryConnectFacial"     : "Tentar conectar os atributos do controle no",
     "m141_loadBlendShape"       : "Carregar BlendShape",
