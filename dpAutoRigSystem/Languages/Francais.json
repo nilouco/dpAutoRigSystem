@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-04-19",
+    "_updated"       : "2022-04-21",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -435,7 +435,7 @@
     "m069_correctionManagerDesc": "Crée tous les noeuds nécessaire au système de lecteur de pose.\n Selectionné en premier le noeuds à partir duquel vous voulez extraire la rotation\nSelectionné en deuxième le noeud par rapport auquel on va extraire la rotation\nde manière a ce qu'on extracte la rotation du premier à partir du deuxième",
     "m070_duplicate"            : "Dupliquer",
     "m071_existing"             : "Existant",
-    "m072_0-0-0-0-0-0-0"        : "",
+    "m072_range"                : "Variation",
     "m073_single"               : "Unique",
     "m074_singleDesc"           : "Description du module Unique:\n\nCe module crée un joint unique\nqu'on peut l'utiliser pour créer des rigs très simples\nou pour rigs faciales avec l'option Indirect Skinning\nsi on veut le passer par une target de blendShape.\nSi l'option Holder est activé, on ne vas pas avoir le shape du Controlleur.",
     "m075_upperTeeth"           : "DentsAHaut",
@@ -500,8 +500,8 @@
     "m134_piramid"              : "Piramid",
     "m135_copyPasteAttr"        : "Copier et Coller des Attributes",
     "m136_copyPasteAttrDesc"    : "Copier et Coller les attributes selectinées\ndu premier objet selectionné\npour les autres objects selectinés.",
-    "m137_0-0-0-0-0"            : "",
-    "m138_0-0-0-0-0"            : "",
+    "m137_input"                : "L'entrée",
+    "m138_output"               : "La sortie",
     "m139_facialCtrlsAttr"      : "Controleurs du visage et des atributs pour creer:",
     "m140_tryConnectFacial"     : "Essayer de connecter les atributs de controleurs dans",
     "m141_loadBlendShape"       : "Charger BlendShape",
