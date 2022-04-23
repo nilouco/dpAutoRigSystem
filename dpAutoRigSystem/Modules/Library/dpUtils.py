@@ -7,6 +7,7 @@ import re
 import cProfile
 import urllib.request
 import webbrowser
+import math
 from io import TextIOWrapper
 from importlib import reload
 
@@ -825,3 +826,9 @@ def resolveName(name, suffix, *args):
     else:
         baseName = baseName+"_00"
     return baseName, name
+
+
+def magnitude(vector, *args):
+    """ Returns the square root of the sum of power 2 from a given vector.
+    """
+    return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))

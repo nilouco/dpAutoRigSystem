@@ -819,7 +819,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.ctrls.setLockHide([self.quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
                 
                 # make ikControls lead ikHandles:
-                self.ikHandlePointConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleMainList[0], maintainOffset=True, name=ikHandleMainList[0] + "_PoC")[0]
+                ikHandleExtraGrp = cmds.group(empty=True, name=ikHandleMainList[0]+"_Grp")
+                cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
+                
+                cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
+                
+                self.ikHandlePointConst = cmds.parentConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PaC")[0]
+#                cmds.parent(ikHandleMainList[0], ikHandleGrp, relative=True)
+                
+#                self.ikHandlePointConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
+#                self.ikHandlePointConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleMainList[0], maintainOffset=True, name=ikHandleMainList[0] + "_PoC")[0]
                 self.ikHandlePointConstList.append(self.ikHandlePointConst)
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikJointList[len(self.ikJointList) - 2], maintainOffset=True, name=self.ikJointList[len(self.ikJointList) - 2] + "_OrC")
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz'])
@@ -1176,7 +1185,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # Ribbon feature by James do Carmo, thanks!
                 # not using bend or ikFkSnap systems to quadruped
-                self.loadedRibbon = False
+                loadedRibbon = False
                 if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                     # (James) add bend to limb
                     if self.getHasBend():
@@ -1184,12 +1193,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             from .Library import jcRibbon
                             reload(jcRibbon)
                             RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
-                            self.loadedRibbon = True
+                            loadedRibbon = True
                         except Exception as e:
                             print(e)
                             print(self.langDic[self.langName]['e012_cantLoadRibbon'])
                         
-                        if self.loadedRibbon:
+                        if loadedRibbon:
                             num = self.getBendJoints()
                             iniJoint = side + self.userGuideName + "_" + mainName + '_Jnt'
                             corner = side + self.userGuideName + "_" + cornerName + '_Jnt'
@@ -1446,6 +1455,51 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
+
+
+
+                # WIP
+
+
+                # softIk:
+                loadedSoftIk = False
+                if self.getSoftIk():
+                    try:
+                        from .Library import dpSoftIk
+                        reload(dpSoftIk)
+                        SoftIkClass = dpSoftIk.SoftIkClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
+                        loadedSoftIk = True
+                    except Exception as e:
+                        print(e)
+                        print(self.langDic[self.langName]['e021_cantLoadSoftIk'])
+                    
+                    if loadedSoftIk:
+                        print("Nice to meet you, afffirisixixiseit")
+
+                        SoftIkClass.createSoftIk("test", self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4])
+                        
+                        # TODO:
+                        #   
+                        #   review ikHandle zeroOut group creation to be at the same place of the ikExtrem ctrl
+                        #   pass jnt shoulder and elbow joints to the softIk to plug them in the output final blendColor for stretch
+                        #   create a stretch file?
+                        #   parentConst from clavicle ctrl to start softIk locator
+                        #   do a group to softIk locators
+                        #   parent that group correctly in the Data_Grp
+                        #   resolve ik stretch if not have softIk
+                        #   use traditional stretch or change to new one?
+                        #   resolve stretchable and stretch switch attributes
+                        #   check about reverse foot changing constraint
+                        #   rename ikHandle group point constraint to parent constr
+                        #   hide softIk locators group
+                        #   verify lenght attr to stretch with softIk setup
+                        #   
+                        #
+
+
+
+
+
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
