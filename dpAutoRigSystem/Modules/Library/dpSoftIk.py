@@ -20,7 +20,7 @@
 # da = dchain - dsoft
 # dchain = sum of bone lengths
 # dsoft = user set soft distance (how far the effector should fall behind)
-# x = distance between root and ik
+# x = distance between root and ik (shoulder and wrist)
 #
 ###
 
@@ -28,6 +28,7 @@
 # importing libraries:
 from maya import cmds
 from . import dpUtils
+from . import dpControls
 
 
 class SoftIkClass(object):
@@ -41,27 +42,28 @@ class SoftIkClass(object):
         self.presetName = presetName
         self.ctrlRadius = ctrlRadius
         self.curveDegree = curveDegree
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         
         
     
 
-    def createSoftIk(self, name, ctrlName, ikhName, jointList, stretch=True, upAxis="X", primaryAxis="Z", *args):
+    def createSoftIk(self, name, ctrlName, ikhName, jointList, distBetween, stretch=False, upAxis="X", primaryAxis="Z", *args):
         """ TODO description here...
         """
         # TODO: validade input data before run the code
         
 
+        print('distBetween = ', distBetween)
+        
+
         
         
-        #lists the joints
-        joints = jointList
-        #joints = cmds.ls( sl = True , type="joint")
-        n = len(joints)
-        print("joints =", joints)
-        #gives position value for joints
-        firstPos = cmds.xform( joints[0], q = True, piv = True, ws = True )
-        lastPos = cmds.xform( joints[n - 1], q = True, piv = True, ws = True )
-        fPoints  = firstPos[0:3]
+        
+        
+        # get joints position
+#        firstPos = cmds.xform(jointList[0], query=True, pivots=True, worldSpace=True)
+        lastPos = cmds.xform(jointList[-1], query=True, pivots=True, worldSpace=True)
+#        fPoints  = firstPos[0:3]
         lPoints = lastPos[0:3]
         
         #up axis options
@@ -74,17 +76,12 @@ class SoftIkClass(object):
 
     #-----------------------------------------------------------------------------------------------------------------------------#
         #find the dchain = sum of bone lengths
-        i = 0
-        dChain = 0
-        while ( i < n - 1 ):
-            a = cmds.xform( joints[i], q = True, piv = True, ws = True )
-            b = cmds.xform( joints[ i + 1 ], q = True, piv = True, ws = True )
-            x = b[0] - a[0]
-            y = b[1] - a[1]
-            z = b[2] - a[2]
-            v = [x,y,z]
-            dChain += dpUtils.magnitude(v)
-            i += 1
+        dChain = dpUtils.jointChainLenght(jointList)
+        
+        
+        print ("dChain =", dChain)
+
+        
     #-----------------------------------------------------------------------------------------------------------------------------#
         #get the distance from 0 to the ikh
         x = lPoints[0] - gPoint[0]
@@ -100,31 +97,31 @@ class SoftIkClass(object):
             defPos = defPos * -1
     #-----------------------------------------------------------------------------------------------------------------------------#
         #create the distance node, otherwise know as x(distance between root and ik)
-        cmds.spaceLocator( n = '%s_start_dist_loc' % name )
-        cmds.xform( '%s_start_dist_loc' % name, t = fPoints, ws = True )
-        cmds.spaceLocator( n = '%s_end_dist_loc' % name )
-        cmds.xform( '%s_end_dist_loc' % name, t = lPoints, ws = True )
+
         
-        cmds.select( ctrlName, '%s_end_dist_loc' % name, r = True )
-        cmds.parentConstraint( w = 1, mo = True)
-        # cmds.select( joints[0], '%s_start_dist_loc' % name, r = True )
-        # cmds.parentConstraint( w = 1, mo = True)
         
-        cmds.createNode( 'distanceBetween', n = '%s_x_distance' % name )
-        cmds.connectAttr( '%s_start_dist_loc.translate' % name, '%s_x_distance.point1' % name )
-        cmds.connectAttr( '%s_end_dist_loc.translate' % name, '%s_x_distance.point2' % name )
     #-----------------------------------------------------------------------------------------------------------------------------#
-        #create the dSoft and softIK attributes on the controller
-        cmds.addAttr( ctrlName, ln = 'dSoft', at = "double", min = 0.001, max = 2, dv = 0.001, k = True )
-        cmds.addAttr( ctrlName, ln = 'softIK', at = "double", min = 0, max = 20, dv = 0, k = True )
-        #make softIK drive dSoft
-        cmds.setDrivenKeyframe( '%s.dSoft' % ctrlName, currentDriver = '%s.softIK' % ctrlName )
-        cmds.setAttr( '%s.softIK' % ctrlName, 20 )
-        cmds.setAttr( '%s.dSoft' % ctrlName, 2 )
-        cmds.setDrivenKeyframe( '%s.dSoft' % ctrlName, currentDriver = '%s.softIK' % ctrlName )
-        cmds.setAttr( '%s.softIK' % ctrlName, 0 )
-        #lock and hide dSoft
-        cmds.setAttr( '%s.dSoft' % ctrlName, lock = True, keyable = False, cb = False )
+        #create the dSoft and softIk attributes on the controller
+#        cmds.addAttr( ctrlName, ln = 'dSoft', at = "double", min = 0.001, max = 2, dv = 0.001, k = True )
+        cmds.addAttr( ctrlName, ln = 'softIk', at = "double", min = 0, max = 1, dv = 0, k = True )
+#        #make softIk drive dSoft
+#        cmds.setDrivenKeyframe( '%s.dSoft' % ctrlName, currentDriver = '%s.softIk' % ctrlName )
+#        cmds.setAttr( '%s.softIk' % ctrlName, 20 )
+#        cmds.setAttr( '%s.dSoft' % ctrlName, 2 )
+#        cmds.setDrivenKeyframe( '%s.dSoft' % ctrlName, currentDriver = '%s.softIk' % ctrlName )
+#        cmds.setAttr( '%s.softIk' % ctrlName, 0 )
+#        #lock and hide dSoft
+#        cmds.setAttr( '%s.dSoft' % ctrlName, lock = True, keyable = False, cb = False )
+
+        cmds.addAttr( ctrlName, ln = 'softDistance', at = "double", min = 0.001, max = 2, dv = 0.001, k = True )
+        softRmV = cmds.createNode('remapValue', name=name+"_SoftDistance_RmV")
+        cmds.setAttr(softRmV+".outputMin", 0.001)
+        cmds.setAttr(softRmV+".outputMax", 2)
+        cmds.connectAttr(ctrlName+".softIk", softRmV+".inputValue", force=True)
+        cmds.connectAttr(softRmV+".outValue", ctrlName+".softDistance", force=True)
+        self.ctrls.setLockHide([ctrlName], ['softDistance'])
+        
+
     #-----------------------------------------------------------------------------------------------------------------------------#   	
         #set up node network for soft IK
         cmds.createNode ('plusMinusAverage', n = '%s_da_pma' % name )
@@ -161,16 +158,16 @@ class SoftIkClass(object):
     #-----------------------------------------------------------------------------------------------------------------------------#   	
         #make connections
         cmds.setAttr( '%s_da_pma.input1D[0]' % name, dChain )
-        cmds.connectAttr( '%s.dSoft' % ctrlName, '%s_da_pma.input1D[1]' % name )
+        cmds.connectAttr( '%s.softDistance' % ctrlName, '%s_da_pma.input1D[1]' % name )
         
-        cmds.connectAttr( '%s_x_distance.distance' % name, '%s_x_minus_da_pma.input1D[0]' % name )
+        cmds.connectAttr( distBetween+'.distance', '%s_x_minus_da_pma.input1D[0]' % name )
         cmds.connectAttr( '%s_da_pma.output1D' % name, '%s_x_minus_da_pma.input1D[1]' % name )
         
         cmds.connectAttr( '%s_x_minus_da_pma.output1D' % name, '%s_negate_x_minus_md.input1X' % name )
         cmds.setAttr( '%s_negate_x_minus_md.input2X' % name, -1 )
         
         cmds.connectAttr( '%s_negate_x_minus_md.outputX' % name, '%s_divBy_dSoft_md.input1X' % name )
-        cmds.connectAttr( '%s.dSoft' % ctrlName, '%s_divBy_dSoft_md.input2X' % name )
+        cmds.connectAttr( '%s.softDistance' % ctrlName, '%s_divBy_dSoft_md.input2X' % name )
         
         cmds.setAttr( '%s_pow_e_md.input1X' % name, 2.718281828 )
         cmds.connectAttr( '%s_divBy_dSoft_md.outputX' % name, '%s_pow_e_md.input2X' % name )
@@ -179,20 +176,22 @@ class SoftIkClass(object):
         cmds.connectAttr( '%s_pow_e_md.outputX' % name, '%s_one_minus_pow_e_pma.input1D[1]' % name )
         
         cmds.connectAttr('%s_one_minus_pow_e_pma.output1D' % name, '%s_times_dSoft_md.input1X' % name )
-        cmds.connectAttr( '%s.dSoft' % ctrlName, '%s_times_dSoft_md.input2X' % name )
+        cmds.connectAttr( '%s.softDistance' % ctrlName, '%s_times_dSoft_md.input2X' % name )
         
         cmds.connectAttr( '%s_times_dSoft_md.outputX' % name, '%s_plus_da_pma.input1D[0]' % name )
         cmds.connectAttr( '%s_da_pma.output1D' % name, '%s_plus_da_pma.input1D[1]' % name )
         
         cmds.connectAttr( '%s_da_pma.output1D' % name, '%s_da_cond.firstTerm' % name )
-        cmds.connectAttr( '%s_x_distance.distance' % name, '%s_da_cond.secondTerm' % name )
-        cmds.connectAttr( '%s_x_distance.distance' % name, '%s_da_cond.colorIfFalseR' % name )
+        cmds.connectAttr( distBetween+'.distance', '%s_da_cond.secondTerm' % name )
+        cmds.connectAttr( distBetween+'.distance', '%s_da_cond.colorIfFalseR' % name )
         cmds.connectAttr( '%s_plus_da_pma.output1D' % name, '%s_da_cond.colorIfTrueR' % name )
         
         cmds.connectAttr( '%s_da_cond.outColorR' % name, '%s_dist_diff_pma.input1D[0]' % name )
-        cmds.connectAttr( '%s_x_distance.distance' % name, '%s_dist_diff_pma.input1D[1]' % name )
+        cmds.connectAttr( distBetween+'.distance', '%s_dist_diff_pma.input1D[1]' % name )
         
-        cmds.setAttr( '%s_defaultPos_pma.input1D[0]' % name, defPos )
+#        cmds.setAttr( '%s_defaultPos_pma.input1D[0]' % name, defPos )
+        cmds.setAttr( '%s_defaultPos_pma.input1D[0]' % name, 0 )
+
         cmds.connectAttr( '%s_dist_diff_pma.output1D' % name, '%s_defaultPos_pma.input1D[1]' % name )
         
 #        cmds.connectAttr('%s_defaultPos_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
@@ -215,13 +214,13 @@ class SoftIkClass(object):
             
             cmds.connectAttr ( '%s.stretchSwitch' % ctrlName, '%s_stretch_switch_mdl.input1' % name )
             cmds.connectAttr ( '%s_stretch_switch_mdl.output' % name, '%s_stretch_blend.blender' % name )
-            cmds.connectAttr( '%s_x_distance.distance' % name, '%s_soft_ratio_md.input1X' % name )
+            cmds.connectAttr( distBetween+'.distance', '%s_soft_ratio_md.input1X' % name )
             cmds.connectAttr( '%s_da_cond.outColorR' % name, '%s_soft_ratio_md.input2X' % name )
             cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, '%s_stretch_blend.color2G' % name )
             cmds.connectAttr( '%s_soft_ratio_md.outputX' % name, '%s_stretch_blend.color1R' % name )
             
             cmds.connectAttr('%s_stretch_blend.outputG' % name, '%s.translate%s' % (ikhName, upAxis), force = True )
             i = 0
-            while ( i < n - 1 ):
-                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (joints[i], primaryAxis), force = True )
+            while ( i < len(jointList) - 1 ):
+                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (jointList[i], primaryAxis), force = True )
                 i += 1

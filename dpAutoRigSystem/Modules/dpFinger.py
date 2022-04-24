@@ -420,7 +420,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchNormalize_MD")
                 cmds.setAttr(stretchNormMD+".operation", 2)
-                distBetweenList = self.ctrls.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
+                distBetweenList = dpUtils.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
                 cmds.connectAttr(self.ikFkRevNode+".outputX", distBetweenList[5]+"."+self.ikCtrl+"W0", force=True)
                 cmds.connectAttr(self.fingerCtrl+".ikFkBlend", distBetweenList[5]+"."+distBetweenList[4]+"W1", force=True)
                 cmds.connectAttr(distBetweenList[1]+".distance", stretchNormMD+".input1X", force=True)
