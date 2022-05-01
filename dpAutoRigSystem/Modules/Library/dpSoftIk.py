@@ -47,7 +47,7 @@ class SoftIkClass(object):
         
     
 
-    def createSoftIk(self, name, ctrlName, ikhName, jointList, distBetween, stretch=False, upAxis="X", primaryAxis="Z", *args):
+    def createSoftIk(self, name, ctrlName, ikhName, jointList, distBetween, stretch=True, upAxis="X", primaryAxis="Z", *args):
         """ TODO description here...
         """
         # TODO: validade input data before run the code
@@ -89,6 +89,7 @@ class SoftIkClass(object):
         z = lPoints[2] - gPoint[2]
         v = [x,y,z]
         defPos = dpUtils.magnitude(v)
+        print("defPos =", defPos)
         if( ( upAxis == 'X' ) and ( lastPos[0] < 0 ) ):
             defPos = defPos * -1
         if( ( upAxis == 'Y' ) and ( lastPos[1] < 0 ) ):
@@ -196,12 +197,24 @@ class SoftIkClass(object):
         
 #        cmds.connectAttr('%s_defaultPos_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
         cmds.connectAttr('%s_defaultPos_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
+
+        
+        
+        
+        #WIP:
+
+
+#        cmds.setAttr (outputBC+'.color1G', defPos)
+#        cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, outputBC+'.color2G', force=True)
+#        cmds.connectAttr(outputBC+'.outputG', '%s.translate%s' % (ikhName, upAxis), force=True)
+
+
     #-----------------------------------------------------------------------------------------------------------------------------#
         #if stretch exists, we need to do this...
         
         if( stretch == True ):
             #add attribute to switch between stretchy and non-stretchy
-            cmds.addAttr( ctrlName, ln = 'stretchSwitch', at = "double", min = 0, max = 10, dv = 10, k = True )
+#            cmds.addAttr( ctrlName, ln = 'stretchSwitch', at = "double", min = 0, max = 10, dv = 10, k = True )
             
             cmds.createNode ('multiplyDivide', n = '%s_soft_ratio_md' % name )
             cmds.createNode ('blendColors', n = '%s_stretch_blend' % name )
@@ -209,11 +222,12 @@ class SoftIkClass(object):
             
             cmds.setAttr ('%s_soft_ratio_md.operation' % name, 2 )
             cmds.setAttr ('%s_stretch_blend.color2R' % name, 1 )
-            cmds.setAttr ('%s_stretch_blend.color1G' % name, defPos )
+#            cmds.setAttr ('%s_stretch_blend.color1G' % name, defPos )
             cmds.setAttr ('%s_stretch_switch_mdl.input2' % name, 0.1 )
             
-            cmds.connectAttr ( '%s.stretchSwitch' % ctrlName, '%s_stretch_switch_mdl.input1' % name )
-            cmds.connectAttr ( '%s_stretch_switch_mdl.output' % name, '%s_stretch_blend.blender' % name )
+#            cmds.connectAttr ( '%s.stretchSwitch' % ctrlName, '%s_stretch_switch_mdl.input1' % name )
+#            cmds.connectAttr ( '%s_stretch_switch_mdl.output' % name, '%s_stretch_blend.blender' % name )
+            cmds.connectAttr ( ctrlName+'.stretchable', '%s_stretch_blend.blender' % name )
             cmds.connectAttr( distBetween+'.distance', '%s_soft_ratio_md.input1X' % name )
             cmds.connectAttr( '%s_da_cond.outColorR' % name, '%s_soft_ratio_md.input2X' % name )
             cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, '%s_stretch_blend.color2G' % name )
