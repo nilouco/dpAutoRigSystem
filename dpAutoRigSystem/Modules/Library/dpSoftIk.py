@@ -47,7 +47,7 @@ class SoftIkClass(object):
         
     
 
-    def createSoftIk(self, name, ctrlName, ikhName, jointList, distBetween, stretch=True, upAxis="X", primaryAxis="Z", *args):
+    def createSoftIk(self, name, ctrlName, ikhName, ikJointList, skinJointList, distBetween, stretch=True, upAxis="X", primaryAxis="Z", *args):
         """ TODO description here...
         """
         # TODO: validade input data before run the code
@@ -61,8 +61,8 @@ class SoftIkClass(object):
         
         
         # get joints position
-#        firstPos = cmds.xform(jointList[0], query=True, pivots=True, worldSpace=True)
-        lastPos = cmds.xform(jointList[-1], query=True, pivots=True, worldSpace=True)
+#        firstPos = cmds.xform(ikJointList[0], query=True, pivots=True, worldSpace=True)
+        lastPos = cmds.xform(ikJointList[-1], query=True, pivots=True, worldSpace=True)
 #        fPoints  = firstPos[0:3]
         lPoints = lastPos[0:3]
         
@@ -76,7 +76,7 @@ class SoftIkClass(object):
 
     #-----------------------------------------------------------------------------------------------------------------------------#
         #find the dchain = sum of bone lengths
-        dChain = dpUtils.jointChainLenght(jointList)
+        dChain = dpUtils.jointChainLenght(ikJointList)
         
         
         print ("dChain =", dChain)
@@ -235,6 +235,7 @@ class SoftIkClass(object):
             
             cmds.connectAttr('%s_stretch_blend.outputG' % name, '%s.translate%s' % (ikhName, upAxis), force = True )
             i = 0
-            while ( i < len(jointList) - 1 ):
-                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (jointList[i], primaryAxis), force = True )
+            while ( i < len(ikJointList) - 1 ):
+                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (ikJointList[i], primaryAxis), force = True )
+                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (skinJointList[i], primaryAxis), force = True )
                 i += 1

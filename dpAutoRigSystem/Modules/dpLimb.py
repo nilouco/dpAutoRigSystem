@@ -1479,7 +1479,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if loadedSoftIk:
                         print("Nice to meet you, afffirisixixiseit")
 
-                        SoftIkClass.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.distBetweenList[1])
+                        SoftIkClass.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1])
                         
                         # TODO:
                         #   
