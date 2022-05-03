@@ -378,51 +378,36 @@ def hook():
     return hookDic
 
 
-
 def distanceBet(a, b, name="temp_DistBet", keep=False):
     """ Creates a distance between node for 2 objects a and b.
         Keeps them in the scene or delete.
         Returns the distance value only in case of not keeping distBet node or
-        a list of distance value, distanceNode and two nulls used to calculate.
+        a list of distance value, distanceNode, two nulls used to calculate and the created constraint.
     """
     if cmds.objExists(a) and cmds.objExists(b):
+        # create nulls:
+        nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
+        nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
+        nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
+        cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
+        cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
+        cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
+        pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
+        # create distanceBetween node:
+        distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
+        # connect aPos to the distance between point1:
+        cmds.connectAttr(nullA+".tx", distBet+".point1X")
+        cmds.connectAttr(nullA+".ty", distBet+".point1Y")
+        cmds.connectAttr(nullA+".tz", distBet+".point1Z")
+        # connect bPos to the distance between point2:
+        cmds.connectAttr(nullB+".tx", distBet+".point2X")
+        cmds.connectAttr(nullB+".ty", distBet+".point2Y")
+        cmds.connectAttr(nullB+".tz", distBet+".point2Z")
+        dist = cmds.getAttr(distBet+".distance")
         if keep:
-            # create nulls:
-            nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
-            nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
-            nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
-            cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
-            cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
-            cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
-            pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
-            # create distanceBetween node:
-            distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
-            # connect aPos to the distance between point1:
-            cmds.connectAttr(nullA+".tx", distBet+".point1X")
-            cmds.connectAttr(nullA+".ty", distBet+".point1Y")
-            cmds.connectAttr(nullA+".tz", distBet+".point1Z")
-            # connect bPos to the distance between point2:
-            cmds.connectAttr(nullB+".tx", distBet+".point2X")
-            cmds.connectAttr(nullB+".ty", distBet+".point2Y")
-            cmds.connectAttr(nullB+".tz", distBet+".point2Z")
-            dist = cmds.getAttr(distBet+".distance")
             return [dist, distBet, nullA, nullB, nullC, pointConst]
         else:
-            # get xform datas:
-            aPos = cmds.xform(a, query=True, worldSpace=True, translation=True)
-            bPos = cmds.xform(b, query=True, worldSpace=True, translation=True)
-            # create distanceBetween node:
-            distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
-            # set aPos to the distance between point1:
-            cmds.setAttr(distBet+".point1X", aPos[0])
-            cmds.setAttr(distBet+".point1Y", aPos[1])
-            cmds.setAttr(distBet+".point1Z", aPos[2])
-            # set bPos to the distance between point2:
-            cmds.setAttr(distBet+".point2X", bPos[0])
-            cmds.setAttr(distBet+".point2Y", bPos[1])
-            cmds.setAttr(distBet+".point2Z", bPos[2])
-            dist = cmds.getAttr(distBet+".distance")
-            cmds.delete(distBet)
+            cmds.delete(distBet, nullA, nullB, nullC, pointConst)
             return [dist, None, None, None, None, None]
 
 
@@ -903,11 +888,11 @@ def magnitude(vector, *args):
     return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))
 
 
-def jointChainLenght(jointList):
-    """ Returns a sum of the joint lenghts given.
+def jointChainLength(jointList):
+    """ Returns a sum of the joint lengths given.
     """
     i = 0
-    chainLenght = 0
+    chainlength = 0
     if jointList:
         while ( i < len(jointList) - 1 ):
             if cmds.objExists(jointList[i]):
@@ -918,6 +903,6 @@ def jointChainLenght(jointList):
                     y = b[1] - a[1]
                     z = b[2] - a[2]
                     v = [x,y,z]
-                    chainLenght += magnitude(v)
+                    chainlength += magnitude(v)
             i += 1
-    return chainLenght
+    return chainlength

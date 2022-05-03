@@ -76,7 +76,7 @@ class SoftIkClass(object):
 
     #-----------------------------------------------------------------------------------------------------------------------------#
         #find the dchain = sum of bone lengths
-        dChain = dpUtils.jointChainLenght(ikJointList)
+        dChain = dpUtils.jointChainLength(ikJointList)
         
         
         print ("dChain =", dChain)
@@ -136,6 +136,8 @@ class SoftIkClass(object):
         cmds.createNode ('condition', n = '%s_da_cond' % name )
         cmds.createNode ('plusMinusAverage', n = '%s_dist_diff_pma' % name )
         cmds.createNode ('plusMinusAverage', n = '%s_defaultPos_pma' % name )
+        cmds.createNode ('multiplyDivide', n = '%s_length_md' % name )
+        cmds.createNode ('multiplyDivide', n = '%s_output_md' % name )
         
         #set operations
         cmds.setAttr ('%s_da_pma.operation' % name, 2 )
@@ -158,7 +160,11 @@ class SoftIkClass(object):
 
     #-----------------------------------------------------------------------------------------------------------------------------#   	
         #make connections
-        cmds.setAttr( '%s_da_pma.input1D[0]' % name, dChain )
+#        cmds.setAttr( '%s_da_pma.input1D[0]' % name, dChain )
+        cmds.setAttr( '%s_length_md.input1X' % name, dChain )
+        cmds.connectAttr('%s_length_md.outputX' % name, '%s_da_pma.input1D[0]' % name)
+        cmds.connectAttr('%s.length' % ctrlName, '%s_length_md.input2X' % name)
+
         cmds.connectAttr( '%s.softDistance' % ctrlName, '%s_da_pma.input1D[1]' % name )
         
         cmds.connectAttr( distBetween+'.distance', '%s_x_minus_da_pma.input1D[0]' % name )
@@ -217,25 +223,28 @@ class SoftIkClass(object):
 #            cmds.addAttr( ctrlName, ln = 'stretchSwitch', at = "double", min = 0, max = 10, dv = 10, k = True )
             
             cmds.createNode ('multiplyDivide', n = '%s_soft_ratio_md' % name )
-            cmds.createNode ('blendColors', n = '%s_stretch_blend' % name )
+            cmds.createNode ('blendColors', n = '%s_O_NODE_MASTER_stretch_blend' % name )
             cmds.createNode ('multDoubleLinear', n = '%s_stretch_switch_mdl' % name )
             
             cmds.setAttr ('%s_soft_ratio_md.operation' % name, 2 )
-            cmds.setAttr ('%s_stretch_blend.color2R' % name, 1 )
-#            cmds.setAttr ('%s_stretch_blend.color1G' % name, defPos )
+            cmds.setAttr ('%s_O_NODE_MASTER_stretch_blend.color2R' % name, 1 )
+#            cmds.setAttr ('%s_O_NODE_MASTER_stretch_blend.color1G' % name, defPos )
             cmds.setAttr ('%s_stretch_switch_mdl.input2' % name, 0.1 )
             
 #            cmds.connectAttr ( '%s.stretchSwitch' % ctrlName, '%s_stretch_switch_mdl.input1' % name )
-#            cmds.connectAttr ( '%s_stretch_switch_mdl.output' % name, '%s_stretch_blend.blender' % name )
-            cmds.connectAttr ( ctrlName+'.stretchable', '%s_stretch_blend.blender' % name )
+#            cmds.connectAttr ( '%s_stretch_switch_mdl.output' % name, '%s_O_NODE_MASTER_stretch_blend.blender' % name )
+            cmds.connectAttr ( ctrlName+'.stretchable', '%s_O_NODE_MASTER_stretch_blend.blender' % name )
             cmds.connectAttr( distBetween+'.distance', '%s_soft_ratio_md.input1X' % name )
             cmds.connectAttr( '%s_da_cond.outColorR' % name, '%s_soft_ratio_md.input2X' % name )
-            cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, '%s_stretch_blend.color2G' % name )
-            cmds.connectAttr( '%s_soft_ratio_md.outputX' % name, '%s_stretch_blend.color1R' % name )
+            cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, '%s_O_NODE_MASTER_stretch_blend.color2G' % name )
+            cmds.connectAttr( '%s_soft_ratio_md.outputX' % name, '%s_O_NODE_MASTER_stretch_blend.color1R' % name )
+
             
-            cmds.connectAttr('%s_stretch_blend.outputG' % name, '%s.translate%s' % (ikhName, upAxis), force = True )
+            cmds.connectAttr('%s_O_NODE_MASTER_stretch_blend.outputR' % name, '%s_output_md.input1X' % name)
+            cmds.connectAttr('%s.length' % ctrlName, '%s_output_md.input2X' % name)
+            cmds.connectAttr('%s_O_NODE_MASTER_stretch_blend.outputG' % name, '%s.translate%s' % (ikhName, upAxis), force = True )
             i = 0
             while ( i < len(ikJointList) - 1 ):
-                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (ikJointList[i], primaryAxis), force = True )
-                cmds.connectAttr( '%s_stretch_blend.outputR' % name, '%s.scale%s' % (skinJointList[i], primaryAxis), force = True )
+                cmds.connectAttr( '%s_output_md.outputX' % name, '%s.scale%s' % (ikJointList[i], primaryAxis), force = True )
+#                cmds.connectAttr( '%s_O_NODE_MASTER_stretch_blend.outputR' % name, '%s.scale%s' % (skinJointList[i], primaryAxis), force = True )
                 i += 1

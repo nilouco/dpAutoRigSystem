@@ -825,7 +825,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
                 cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
                 
-                self.ikHandleConst = cmds.parentConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PaC")[0]
+                self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
                 
                 
 #                self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
@@ -1483,18 +1483,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         
                         # TODO:
                         #   
-                        #   review ikHandle zeroOut group creation to be at the same place of the ikExtrem ctrl
-                        #   pass jnt shoulder and elbow joints to the softIk to plug them in the output final blendColor for stretch
                         #   create a stretch file?
-                        #   parentConst from clavicle ctrl to start softIk locator
-                        #   do a group to softIk locators
-                        #   parent that group correctly in the Data_Grp
                         #   resolve ik stretch if not have softIk
                         #   use traditional stretch or change to new one?
-                        #   resolve stretchable and stretch switch attributes
-                        #   check about reverse foot changing constraint
-                        #   rename ikHandle group point constraint to parent constr
-                        #   hide softIk locators group
+                        #   check about reverse foot changing constraint (if globalStretch is off)
                         #   verify lenght attr to stretch with softIk setup
                         #   
                         #
