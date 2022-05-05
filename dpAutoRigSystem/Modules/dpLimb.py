@@ -982,7 +982,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating attributes:
                 cmds.addAttr(self.ikExtremCtrl, longName="stretchable", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                cmds.addAttr(self.ikExtremCtrl, longName="startStretch", attributeType='float', defaultValue=1)
+#                cmds.addAttr(self.ikExtremCtrl, longName="startStretch", attributeType='float', defaultValue=1)
                 cmds.addAttr(self.ikExtremCtrl, longName=self.langDic[self.langName]['c113_length'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
 
                 # creating distance betweens, multiplyDivides and reverse nodes:
@@ -1008,45 +1008,45 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 #                cmds.connectAttr(self.stretchRev + '.outputX', self.distBetweenList[5] + "." + self.distBetweenList[4] + "W1", force=True)
 
                 # here we calculate the stretch comparing with the current distance result:
-                self.lenghtStartStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStartStretch_MD")
-                self.stretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_MD")
-                cmds.setAttr(self.stretchMultDiv + '.operation', 2)
-                cmds.connectAttr(self.distBetweenList[1] + '.distance', self.stretchMultDiv + ".input1X", force=True)
-                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c113_length'], self.lenghtStartStretchMultDiv + ".input1X", force=True)
+#                self.lenghtStartStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStartStretch_TODEL_MD")
+#                self.stretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_TODEL_MD")
+#                cmds.setAttr(self.stretchMultDiv + '.operation', 2)
+#                cmds.connectAttr(self.distBetweenList[1] + '.distance', self.stretchMultDiv + ".input1X", force=True)
+#                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c113_length'], self.lenghtStartStretchMultDiv + ".input1X", force=True)
                 
                 # calculate stretch value:
-                startStretchValue = dpUtils.distanceBet(self.ikJointList[1], self.ikJointList[2], keep=False)[0] + dpUtils.distanceBet(self.ikJointList[2], self.ikStretchExtremLoc, keep=False)[0]
-                newStartStretchValue = startStretchValue * 0.9999
-                if newStartStretchValue >= startStretchValue:
-                    newStartStretchValue = startStretchValue
-                cmds.setAttr(self.ikExtremCtrl + '.startStretch', startStretchValue, lock=True)
-                cmds.connectAttr(self.ikExtremCtrl + '.startStretch', self.lenghtStartStretchMultDiv + '.input2X', force=True)
-                cmds.connectAttr(self.lenghtStartStretchMultDiv + '.outputX', self.stretchMultDiv + '.input2X', force=True)
+#                startStretchValue = dpUtils.distanceBet(self.ikJointList[1], self.ikJointList[2], keep=False)[0] + dpUtils.distanceBet(self.ikJointList[2], self.ikStretchExtremLoc, keep=False)[0]
+#                newStartStretchValue = startStretchValue * 0.9999
+#                if newStartStretchValue >= startStretchValue:
+#                    newStartStretchValue = startStretchValue
+#                cmds.setAttr(self.ikExtremCtrl + '.startStretch', startStretchValue, lock=True)
+#                cmds.connectAttr(self.ikExtremCtrl + '.startStretch', self.lenghtStartStretchMultDiv + '.input2X', force=True)
+#                cmds.connectAttr(self.lenghtStartStretchMultDiv + '.outputX', self.stretchMultDiv + '.input2X', force=True)
 
                 # use a condition node to check what value will be used:
-                self.stretchCond = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_Cnd")
-                cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".firstTerm", force=True)
-                cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".colorIfTrueR", force=True)
-                cmds.setAttr(self.stretchCond + '.secondTerm', 1)
-                cmds.setAttr(self.stretchCond + '.operation', 2)
+#                self.stretchCond = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_TODEL_Cnd")
+#                cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".firstTerm", force=True)
+#                cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".colorIfTrueR", force=True)
+#                cmds.setAttr(self.stretchCond + '.secondTerm', 1)
+#                cmds.setAttr(self.stretchCond + '.operation', 2)
                 
                 # use a multiply divide node to conpensate length value that will be send to joints scale:
-                self.lenghtStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStretch_MD")
-                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c113_length'], self.lenghtStretchMultDiv + '.input1X', force=True)
-                cmds.connectAttr(self.stretchCond + '.outColorR', self.lenghtStretchMultDiv + '.input2X', force=True)
+#                self.lenghtStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStretch_TODEL_MD")
+#                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c113_length'], self.lenghtStretchMultDiv + '.input1X', force=True)
+#                cmds.connectAttr(self.stretchCond + '.outColorR', self.lenghtStretchMultDiv + '.input2X', force=True)
                 cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c113_length'], self.worldRef + "." + self.langDic[self.langName]['c113_length'], force=True)
                 
-                # connecting stretch output node to skinned and ik joints:
-                maxJntValue = 3 #default for biped
-                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                    maxJntValue = 4 #because we have 1 more articulation to stretch out
-                for j in range(1, maxJntValue):
-                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.skinJointList[j] + '.scaleZ', force=True)
-                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleZ', force=True)
-                    # check if we have quadruped spring solver and apply the stretch to all ik spring joint scale axis in order to avoid the Maya issue:
-                    if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleX', force=True)
-                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleY', force=True)
+#                # connecting stretch output node to skinned and ik joints:
+#                maxJntValue = 3 #default for biped
+#                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+#                    maxJntValue = 4 #because we have 1 more articulation to stretch out
+#                for j in range(1, maxJntValue):
+#                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.skinJointList[j] + '.scaleZ', force=True)
+#                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleZ', force=True)
+#                    # check if we have quadruped spring solver and apply the stretch to all ik spring joint scale axis in order to avoid the Maya issue:
+#                    if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+#                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleX', force=True)
+#                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleY', force=True)
 
                 # do ikHandle off when before is fk in order to turn off the stretch:
                 cmds.parentConstraint(self.skinJointList[0], self.distBetweenList[4], maintainOffset=True, name=self.distBetweenList[4] + "_PaC")
@@ -1139,14 +1139,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.quadFrontLegList.append(self.ikExtremCtrlOrientGrp)
 
                 # work with not stretch ik setup:
-                stretchDifMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side + self.userGuideName + "_Stretchable_Dif_MD")
-                cmds.connectAttr(self.ikExtremCtrl + ".stretchable", stretchDifMD + ".input1X", force=True)
-                cmds.connectAttr(revNode + ".outputX", stretchDifMD + ".input2X", force=True)
+                ikStretchableMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side + self.userGuideName + "_IkStretchable_MD")
+                cmds.connectAttr(self.ikExtremCtrl + ".stretchable", ikStretchableMD + ".input1X", force=True)
+                cmds.connectAttr(revNode + ".outputX", ikStretchableMD + ".input2X", force=True)
 
-                ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_ikStretchCtrl_Cnd")
+                ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_IkStretchCtrl_Cnd")
                 cmds.setAttr(ikStretchCtrlCnd + ".secondTerm", 1)
                 cmds.setAttr(ikStretchCtrlCnd + ".operation", 3)
-                cmds.connectAttr(stretchDifMD + ".outputX", ikStretchCtrlCnd + ".colorIfFalseR", force=True)
+                cmds.connectAttr(ikStretchableMD + ".outputX", ikStretchCtrlCnd + ".colorIfFalseR", force=True)
                 cmds.connectAttr(revNode + ".outputX", ikStretchCtrlCnd + ".colorIfTrueR", force=True)
                 cmds.connectAttr(self.ikExtremCtrl + ".stretchable", ikStretchCtrlCnd + ".firstTerm", force=True)
                 cmds.connectAttr(ikStretchCtrlCnd + ".outColorR", parentConstToRFOffset + "." + self.ikExtremCtrl + "W0", force=True)
@@ -1156,7 +1156,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(revNode + ".outputX", ikStretchDifPMA + ".input1D[0]", force=True)
                 cmds.connectAttr(self.ikExtremCtrl + ".stretchable", ikStretchDifPMA + ".input1D[1]", force=True)
 
-                ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_ikStretch_Cnd")
+                ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_IkStretch_Cnd")
                 cmds.setAttr(ikStretchCnd + ".operation", 3)
                 cmds.setAttr(ikStretchCnd + ".secondTerm", 1)
                 cmds.connectAttr(ikStretchDifPMA + ".output1D", ikStretchCnd + ".colorIfFalseR", force=True)
@@ -1484,10 +1484,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         # TODO:
                         #   
                         #   create a stretch file?
-                        #   resolve ik stretch if not have softIk
-                        #   use traditional stretch or change to new one?
                         #   check about reverse foot changing constraint (if globalStretch is off)
-                        #   verify lenght attr to stretch with softIk setup
                         #   
                         #
 

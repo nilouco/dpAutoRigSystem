@@ -246,5 +246,5 @@ class SoftIkClass(object):
             i = 0
             while ( i < len(ikJointList) - 1 ):
                 cmds.connectAttr( '%s_output_md.outputX' % name, '%s.scale%s' % (ikJointList[i], primaryAxis), force = True )
-#                cmds.connectAttr( '%s_O_NODE_MASTER_stretch_blend.outputR' % name, '%s.scale%s' % (skinJointList[i], primaryAxis), force = True )
+                cmds.connectAttr( '%s_O_NODE_MASTER_stretch_blend.outputR' % name, '%s.scale%s' % (skinJointList[i], primaryAxis), force = True )
                 i += 1
