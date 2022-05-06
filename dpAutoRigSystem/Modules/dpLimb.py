@@ -684,13 +684,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # fix stretch calcule to work with reverseFoot
                 self.ikStretchExtremLoc = cmds.group(empty=True, name=side + self.userGuideName + "_" + extremName + "_Ik_Loc_Grp")
                 self.ikStretchExtremLocList.append(self.ikStretchExtremLoc)
-                cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
-                cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
-
+                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    cmds.delete(cmds.parentConstraint(self.skinJointList[3], self.ikStretchExtremLoc, maintainOffset=False)) #snap to kneeB
+                else:    
+                    cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
+                
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
                 self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
                 self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
-
+                
                 # verify if user wants to apply the good mirror orientation:
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
@@ -743,6 +745,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.ikExtremCtrl+".originalRotateY", self.origRotList[1], lock=True)
                     cmds.setAttr(self.ikExtremCtrl+".originalRotateZ", self.origRotList[2], lock=True)
 
+                # to fix quadruped stretch locator after rotated ik extrem controller:
+                cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
+                
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
                 cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", self.ikCornerCtrlZero + ".visibility", force=True)
@@ -811,7 +816,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=False))
                     cmds.parent(quadExtraCtrlZero, ikHandleGrp)
                     cmds.parent(ikHandleExtraList[0], self.ikHandleToRFGrp)
-                    cmds.parent(ikHandleMainList[0], self.quadExtraCtrl)
+#                    cmds.parent(ikHandleMainList[0], self.quadExtraCtrl)
                     cmds.setAttr(ikHandleExtraList[0]+".visibility", 0)
                     cmds.addAttr(self.quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
@@ -823,7 +828,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
                 
                 cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
-                cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
+                if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    cmds.parent(ikHandleExtraGrp, self.quadExtraCtrl)
+                else:
+                    cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
                 
                 self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
                 

@@ -2066,7 +2066,7 @@ class DP_AutoRig_UI(object):
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
                                     ikHandleGrp           = self.integratedTaskDic[fatherGuide]['ikHandleGrpList'][s]
-                                    ikHandleConstList    = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
+                                    ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
