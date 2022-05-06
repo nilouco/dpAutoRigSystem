@@ -135,7 +135,7 @@ class SoftIkClass(object):
         cmds.createNode ('plusMinusAverage', n = '%s_plus_da_pma' % name )
         cmds.createNode ('condition', n = '%s_da_cond' % name )
         cmds.createNode ('plusMinusAverage', n = '%s_dist_diff_pma' % name )
-        cmds.createNode ('plusMinusAverage', n = '%s_defaultPos_pma' % name )
+#        cmds.createNode ('plusMinusAverage', n = '%s_defaultPos_pma' % name )
         cmds.createNode ('multiplyDivide', n = '%s_length_md' % name )
         cmds.createNode ('multiplyDivide', n = '%s_output_md' % name )
         
@@ -150,13 +150,13 @@ class SoftIkClass(object):
         cmds.setAttr ('%s_plus_da_pma.operation' % name, 1 )
         cmds.setAttr ('%s_da_cond.operation' % name, 5 )
         cmds.setAttr ('%s_dist_diff_pma.operation' % name, 2 )
-        cmds.setAttr ('%s_defaultPos_pma.operation' % name, 2 )
-        if( ( upAxis == 'X' ) and ( defPos > 0 ) ):
-            cmds.setAttr ('%s_defaultPos_pma.operation' % name, 1 )
-        if( upAxis == 'Y'):
-            cmds.setAttr ('%s_defaultPos_pma.operation' % name, 2 )
-        if( ( upAxis == 'Z' ) and ( defPos < 0 ) ):
-            cmds.setAttr ('%s_defaultPos_pma.operation' % name, 1 )
+#        cmds.setAttr ('%s_defaultPos_pma.operation' % name, 2 )
+#        if( ( upAxis == 'X' ) and ( defPos > 0 ) ):
+#            cmds.setAttr ('%s_defaultPos_pma.operation' % name, 1 )
+#        if( upAxis == 'Y'):
+#            cmds.setAttr ('%s_defaultPos_pma.operation' % name, 2 )
+#        if( ( upAxis == 'Z' ) and ( defPos < 0 ) ):
+#            cmds.setAttr ('%s_defaultPos_pma.operation' % name, 1 )
 
     #-----------------------------------------------------------------------------------------------------------------------------#   	
         #make connections
@@ -197,12 +197,13 @@ class SoftIkClass(object):
         cmds.connectAttr( distBetween+'.distance', '%s_dist_diff_pma.input1D[1]' % name )
         
 #        cmds.setAttr( '%s_defaultPos_pma.input1D[0]' % name, defPos )
-        cmds.setAttr( '%s_defaultPos_pma.input1D[0]' % name, 0 )
+#        cmds.setAttr( '%s_defaultPos_pma.input1D[0]' % name, 0 )
 
-        cmds.connectAttr( '%s_dist_diff_pma.output1D' % name, '%s_defaultPos_pma.input1D[1]' % name )
+#        cmds.connectAttr( '%s_dist_diff_pma.output1D' % name, '%s_defaultPos_pma.input1D[1]' % name )
         
 #        cmds.connectAttr('%s_defaultPos_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
-        cmds.connectAttr('%s_defaultPos_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
+#        cmds.connectAttr('%s_defaultPos_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
+        cmds.connectAttr('%s_dist_diff_pma.output1D' % name, '%s.translate%s' % (ikhName, upAxis) )
 
         
         
@@ -236,7 +237,8 @@ class SoftIkClass(object):
             cmds.connectAttr ( ctrlName+'.stretchable', '%s_O_NODE_MASTER_stretch_blend.blender' % name )
             cmds.connectAttr( distBetween+'.distance', '%s_soft_ratio_md.input1X' % name )
             cmds.connectAttr( '%s_da_cond.outColorR' % name, '%s_soft_ratio_md.input2X' % name )
-            cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, '%s_O_NODE_MASTER_stretch_blend.color2G' % name )
+#            cmds.connectAttr( '%s_defaultPos_pma.output1D' % name, '%s_O_NODE_MASTER_stretch_blend.color2G' % name )
+            cmds.connectAttr( '%s_dist_diff_pma.output1D' % name, '%s_O_NODE_MASTER_stretch_blend.color2G' % name )
             cmds.connectAttr( '%s_soft_ratio_md.outputX' % name, '%s_O_NODE_MASTER_stretch_blend.color1R' % name )
 
             
