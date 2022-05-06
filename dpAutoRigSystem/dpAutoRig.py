@@ -2625,7 +2625,7 @@ class DP_AutoRig_UI(object):
                                 cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
                             
                 # list desirable Option_Ctrl attributes order:
-                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', 'globalStretch', vvAttr,
+                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', vvAttr,
                 spineAttr+'_active', spineAttr, spineAttr+'1_active', spineAttr+'1', spineAttr+'2_active', spineAttr+'2',
                 limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', spineAttr+'Fk', spineAttr+'1Fk', spineAttr+'Fk2', 
                 leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
