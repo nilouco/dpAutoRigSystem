@@ -828,6 +828,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
                 self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
                 self.ikHandleConstList.append(self.ikHandleConst)
+                
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikJointList[len(self.ikJointList) - 2], maintainOffset=True, name=self.ikJointList[len(self.ikJointList) - 2] + "_OrC")
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz'])
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0] + "_PoC")[0]
@@ -1410,8 +1411,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         print(e)
                         print(self.langDic[self.langName]['e021_cantLoadSoftIk'])
                     if loadedSoftIk:
-                        SoftIkClass.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1])
-
+                        SoftIkClass.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef)
+                cmds.orientConstraint(self.ikNSJointList[2], ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp + "_OrC")[0]
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]

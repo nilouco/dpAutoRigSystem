@@ -44,7 +44,7 @@ class SoftIkClass(object):
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
 
 
-    def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, stretch=True, upAxis="X", primaryAxis="Z", *args):
+    def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, upAxis="X", primaryAxis="Z", *args):
         """ Create the softIk setup for given parameters.
             Just a general function edited from Nick Miller code.
         """
@@ -55,7 +55,7 @@ class SoftIkClass(object):
         # set up node network for softIk:
         softRmV = cmds.createNode("remapValue", name=userName+"_SoftDistance_RmV")
         daMD = cmds.createNode("plusMinusAverage", name=userName+"_DA_PMA")
-        xMinusDaPMA = cmds.createNode("plusMinusAverage", name=userName+"_X_Minus_da_PMA")
+        xMinusDaPMA = cmds.createNode("plusMinusAverage", name=userName+"_X_Minus_DA_PMA")
         negateXMinusMD = cmds.createNode("multiplyDivide", name=userName+"_Negate_X_Minus_MD")
         divByDSoftMD = cmds.createNode("multiplyDivide", name=userName+"_DivBy_DSoft_MD")
         powEMD = cmds.createNode("multiplyDivide", name=userName+"_Pow_E_MD")
@@ -66,6 +66,7 @@ class SoftIkClass(object):
         distDiffPMA = cmds.createNode("plusMinusAverage", name=userName+"_Dist_Diff_PMA")
         lengthStartMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Start_MD")
         lenghtOutputMD = cmds.createNode("multiplyDivide", name=userName+"_Length_Output_MD")
+        softIkRigScaleMD = cmds.createNode("multiplyDivide", name=userName+"_SoftIk_RigScale_MD")
         
         # set default values and operations:
         cmds.setAttr(powEMD+".input1X", 2.718281828)
@@ -108,7 +109,9 @@ class SoftIkClass(object):
         cmds.connectAttr(plusDAPMA+".output1D", daCnd+".colorIfTrueR", force=True)
         cmds.connectAttr(daCnd+".outColorR", distDiffPMA+".input1D[0]", force=True)
         cmds.connectAttr(distBetween+".distance", distDiffPMA+".input1D[1]", force=True)        
-        cmds.connectAttr(distDiffPMA+".output1D", ikhName+".translate"+upAxis, force=True)
+        cmds.connectAttr(distDiffPMA+".output1D", softIkRigScaleMD+".input1X", force=True)
+        cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+primaryAxis, force=True)
+        cmds.connectAttr(worldRef+".scaleX", softIkRigScaleMD+".input2X", force=True)
 
         self.ctrls.setLockHide([ctrlName], ["softDistance"])
 
@@ -125,7 +128,8 @@ class SoftIkClass(object):
             cmds.connectAttr(softRatioMD+".outputX", stretchBC+".color1R", force=True)
             cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
             cmds.connectAttr(ctrlName+"."+self.langDic[self.langName]["c113_length"], lenghtOutputMD+".input2X", force=True)
-            cmds.connectAttr(stretchBC+".outputG", ikhName+".translate"+upAxis, force=True)
+            cmds.connectAttr(stretchBC+".outputG", softIkRigScaleMD+".input1X", force=True)
+            cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+primaryAxis, force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
                 cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+primaryAxis, force=True)
