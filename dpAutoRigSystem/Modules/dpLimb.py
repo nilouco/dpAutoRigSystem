@@ -1412,7 +1412,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         print(self.langDic[self.langName]['e021_cantLoadSoftIk'])
                     if loadedSoftIk:
                         SoftIkClass.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef)
-                cmds.orientConstraint(self.ikNSJointList[2], ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp + "_OrC")[0]
+                        # orient ikHandle group setup:
+                        softIkOrientLoc = cmds.spaceLocator(name=side+self.userGuideName+"_SoftIk_Aim_Loc")[0]
+                        cmds.delete(cmds.parentConstraint(self.ikJointList[1], softIkOrientLoc, maintainOffset=False))
+                        cmds.parent(softIkOrientLoc, self.ikJointList[0])
+                        cmds.aimConstraint(self.ikExtremCtrl, softIkOrientLoc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=softIkOrientLoc+"_AiC")
+                        cmds.orientConstraint(softIkOrientLoc, ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
+                else:
+                    cmds.orientConstraint(self.ikNSJointList[2], ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
