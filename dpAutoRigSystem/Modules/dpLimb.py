@@ -6,6 +6,7 @@ from functools import partial
 from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
+from .Library import dpSoftIk
 
 
 # global variables to this module:
@@ -26,6 +27,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
+        self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName)
 
         #Declare variable
         self.integratedActionsDic = {}
@@ -69,10 +71,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         else:
             return 0
 
-    def getSoftIk(self):
-        return cmds.getAttr(self.moduleGrp + ".softIk")
 
-    
     # @dpUtils.profiler
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
@@ -238,16 +237,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.text(label=self.langDic[self.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
         self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
 
-        # softIk:
-        cmds.text(" ", parent=self.alignWorldLayout)
-        self.softIkCB = cmds.checkBox(value=self.getSoftIk(), label='Soft Ik', ofc=partial(self.setSoftIk, 0), onc=partial(self.setSoftIk, 1), parent=self.alignWorldLayout)
-
         
     def setAlignWorld(self, value, *args):
         cmds.setAttr(self.moduleGrp + ".alignWorld", value)
-
-    def setSoftIk(self, value, *args):
-        cmds.setAttr(self.moduleGrp + ".softIk", value)
 
     def setBendTrue(self, *args):
         self.hasBend = True
@@ -1401,43 +1393,31 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
                 # softIk:
-                loadedSoftIk = False
-                if self.getSoftIk():
-                    try:
-                        from .Library import dpSoftIk
-                        reload(dpSoftIk)
-                        SoftIkClass = dpSoftIk.SoftIkClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
-                        loadedSoftIk = True
-                    except Exception as e:
-                        print(e)
-                        print(self.langDic[self.langName]['e021_cantLoadSoftIk'])
-                    if loadedSoftIk:
-                        SoftIkClass.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef)
-                        # orient ikHandle group setup:
-                        softIkOrientLoc = cmds.spaceLocator(name=side+self.userGuideName+"_SoftIk_Aim_Loc")[0]
-                        cmds.delete(cmds.parentConstraint(self.ikJointList[1], softIkOrientLoc, maintainOffset=False))
-                        cmds.parent(softIkOrientLoc, self.ikJointList[0])
-                        cmds.aimConstraint(self.ikExtremCtrl, softIkOrientLoc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=softIkOrientLoc+"_AiC")
-                        cmds.orientConstraint(softIkOrientLoc, ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
-                        # leg with softIk on and stretchable equals to zero reverser foot issue fix:
-                        if self.limbType == LEG:
-                            rfDistBetList = dpUtils.distanceBet(self.ikNSJointList[3], self.ikExtremCtrl, name=side+self.userGuideName+"_"+kNameList[1]+"_RF_DistBet", keep=True)
-                            cmds.delete(rfDistBetList[4])
-                            cmds.parent(rfDistBetList[2:4], distBetGrp)
-                            rfSoftIkCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_SoftIk_Cnd")
-                            rfStretchableCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_Stretchable_Cnd")
-                            rfDistInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_RF_DistInv_MD")
-                            cmds.setAttr(rfDistInvMD+".input2X", -1)
-                            cmds.setAttr(rfStretchableCnd+".colorIfFalseR", 0)
-                            cmds.connectAttr(rfDistBetList[1]+".distance", rfSoftIkCnd+".colorIfFalseR", force=True)
-                            cmds.connectAttr(self.ikExtremCtrl+".softIk", rfSoftIkCnd+".firstTerm", force=True)
-                            cmds.connectAttr(rfSoftIkCnd+".outColorR", rfDistInvMD+".input1X", force=True)
-                            cmds.connectAttr(rfDistInvMD+".outputX", rfStretchableCnd+".colorIfTrueR", force=True)
-                            cmds.connectAttr(self.ikExtremCtrl+".stretchable", rfStretchableCnd+".firstTerm", force=True)
-                            cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
-                            cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
-                else:
-                    cmds.orientConstraint(self.ikNSJointList[2], ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
+                self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef)
+                # orient ikHandle group setup:
+                softIkOrientLoc = cmds.spaceLocator(name=side+self.userGuideName+"_SoftIk_Aim_Loc")[0]
+                cmds.delete(cmds.parentConstraint(self.ikJointList[1], softIkOrientLoc, maintainOffset=False))
+                cmds.parent(softIkOrientLoc, self.ikJointList[0])
+                cmds.aimConstraint(self.ikExtremCtrl, softIkOrientLoc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=softIkOrientLoc+"_AiC")
+                cmds.orientConstraint(softIkOrientLoc, ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
+                # leg with softIk on and stretchable equals to zero reverser foot issue fix:
+                if self.limbType == LEG:
+                    rfDistBetList = dpUtils.distanceBet(self.ikNSJointList[3], self.ikExtremCtrl, name=side+self.userGuideName+"_"+kNameList[1]+"_RF_DistBet", keep=True)
+                    cmds.delete(rfDistBetList[4])
+                    cmds.parent(rfDistBetList[2:4], distBetGrp)
+                    rfSoftIkCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_SoftIk_Cnd")
+                    rfStretchableCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_Stretchable_Cnd")
+                    rfDistInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_RF_DistInv_MD")
+                    cmds.setAttr(rfDistInvMD+".input2X", -1)
+                    cmds.setAttr(rfStretchableCnd+".colorIfFalseR", 0)
+                    cmds.connectAttr(rfDistBetList[1]+".distance", rfSoftIkCnd+".colorIfFalseR", force=True)
+                    cmds.connectAttr(self.ikExtremCtrl+".softIk", rfSoftIkCnd+".firstTerm", force=True)
+                    cmds.connectAttr(rfSoftIkCnd+".outColorR", rfDistInvMD+".input1X", force=True)
+                    cmds.connectAttr(rfDistInvMD+".outputX", rfStretchableCnd+".colorIfTrueR", force=True)
+                    cmds.connectAttr(self.ikExtremCtrl+".stretchable", rfStretchableCnd+".firstTerm", force=True)
+                    cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
+                    cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
+                
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]

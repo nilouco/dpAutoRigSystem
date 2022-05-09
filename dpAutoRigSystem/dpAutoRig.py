@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.04"
+DPAR_VERSION_PY3 = "4.00.05"
 DPAR_UPDATELOG = "N436 - Limb soft ik."
 
 

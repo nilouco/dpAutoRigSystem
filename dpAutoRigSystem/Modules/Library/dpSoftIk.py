@@ -32,15 +32,13 @@ from . import dpControls
 
 class SoftIkClass(object):
 
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, ctrlRadius, curveDegree, *args):
+    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.langDic = langDic
         self.langName = langName
         self.presetDic = presetDic
         self.presetName = presetName
-        self.ctrlRadius = ctrlRadius
-        self.curveDegree = curveDegree
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
 
 
@@ -110,8 +108,8 @@ class SoftIkClass(object):
         cmds.connectAttr(daCnd+".outColorR", distDiffPMA+".input1D[0]", force=True)
         cmds.connectAttr(distBetween+".distance", distDiffPMA+".input1D[1]", force=True)        
         cmds.connectAttr(distDiffPMA+".output1D", softIkRigScaleMD+".input1X", force=True)
-        cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
         cmds.connectAttr(worldRef+".scaleX", softIkRigScaleMD+".input2X", force=True)
+        cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
 
         self.ctrls.setLockHide([ctrlName], ["softDistance"])
 
@@ -129,10 +127,8 @@ class SoftIkClass(object):
             cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
             cmds.connectAttr(ctrlName+"."+self.langDic[self.langName]["c113_length"], lenghtOutputMD+".input2X", force=True)
             cmds.connectAttr(stretchBC+".outputG", softIkRigScaleMD+".input1X", force=True)
-            cmds.connectAttr(softIkRigScaleMD+".outputX", ikhName+".translate"+axis, force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):
                 cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+axis, force=True)
                 cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+axis, force=True)
-#                cmds.connectAttr(stretchBC+".outputR", skinJointList[i]+".scale"+axis, force=True)
                 i += 1
