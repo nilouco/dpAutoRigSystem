@@ -680,7 +680,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # fix stretch calcule to work with reverseFoot
                 self.ikStretchExtremLoc = cmds.group(empty=True, name=side + self.userGuideName + "_" + extremName + "_Ik_Loc_Grp")
-                self.ikStretchExtremLocList.append(self.ikStretchExtremLoc)
                 if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     cmds.delete(cmds.parentConstraint(self.skinJointList[3], self.ikStretchExtremLoc, maintainOffset=False)) #snap to kneeB
                 else:    
@@ -743,7 +742,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.ikExtremCtrl+".originalRotateZ", self.origRotList[2], lock=True)
 
                 # to fix quadruped stretch locator after rotated ik extrem controller:
-                cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
+                ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
+                cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
+                self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
@@ -1418,6 +1419,23 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.parent(softIkOrientLoc, self.ikJointList[0])
                         cmds.aimConstraint(self.ikExtremCtrl, softIkOrientLoc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=softIkOrientLoc+"_AiC")
                         cmds.orientConstraint(softIkOrientLoc, ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
+                        # leg with softIk on and stretchable equals to zero reverser foot issue fix:
+                        if self.limbType == LEG:
+                            rfDistBetList = dpUtils.distanceBet(self.ikNSJointList[3], self.ikExtremCtrl, name=side+self.userGuideName+"_"+kNameList[1]+"_RF_DistBet", keep=True)
+                            cmds.delete(rfDistBetList[4])
+                            cmds.parent(rfDistBetList[2:4], distBetGrp)
+                            rfSoftIkCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_SoftIk_Cnd")
+                            rfStretchableCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_Stretchable_Cnd")
+                            rfDistInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_RF_DistInv_MD")
+                            cmds.setAttr(rfDistInvMD+".input2X", -1)
+                            cmds.setAttr(rfStretchableCnd+".colorIfFalseR", 0)
+                            cmds.connectAttr(rfDistBetList[1]+".distance", rfSoftIkCnd+".colorIfFalseR", force=True)
+                            cmds.connectAttr(self.ikExtremCtrl+".softIk", rfSoftIkCnd+".firstTerm", force=True)
+                            cmds.connectAttr(rfSoftIkCnd+".outColorR", rfDistInvMD+".input1X", force=True)
+                            cmds.connectAttr(rfDistInvMD+".outputX", rfStretchableCnd+".colorIfTrueR", force=True)
+                            cmds.connectAttr(self.ikExtremCtrl+".stretchable", rfStretchableCnd+".firstTerm", force=True)
+                            cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
+                            cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
                 else:
                     cmds.orientConstraint(self.ikNSJointList[2], ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
                 # calibration attribute:

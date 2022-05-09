@@ -2063,7 +2063,7 @@ class DP_AutoRig_UI(object):
                                     ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
                                     middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                    fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
                                     ikHandleGrp           = self.integratedTaskDic[fatherGuide]['ikHandleGrpList'][s]
                                     ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
@@ -2079,9 +2079,7 @@ class DP_AutoRig_UI(object):
                                     cmds.cycleCheck(evaluation=True)
                                     cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
                                     cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")[0]
-                                    #cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScC")[0]
                                     if limbTypeName == LEG:
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
