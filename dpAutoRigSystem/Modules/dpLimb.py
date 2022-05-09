@@ -2,10 +2,11 @@
 from maya import cmds
 import math
 from importlib import reload
-
-from .Library import dpUtils
+from functools import partial
 from . import dpBaseClass
 from . import dpLayoutClass
+from .Library import dpUtils
+from .Library import dpSoftIk
 
 
 # global variables to this module:
@@ -26,6 +27,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
+        self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName)
 
         #Declare variable
         self.integratedActionsDic = {}
@@ -34,7 +36,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.ikExtremCtrlZeroList = []
         self.ikPoleVectorCtrlZeroList = []
         self.ikHandleToRFGrpList = []
-        self.ikHandlePointConstList = []
+        self.ikHandleConstList = []
         self.ikFkBlendGrpToRevFootList = []
         self.worldRefList = []
         self.worldRefShapeList = []
@@ -68,7 +70,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             return cmds.getAttr(self.moduleGrp+".additional")
         else:
             return 0
-    
+
+
     # @dpUtils.profiler
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
@@ -88,6 +91,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".articulation", 1)
         cmds.addAttr(self.moduleGrp, longName="additional", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".additional", 0)
+        cmds.addAttr(self.moduleGrp, longName="softIk", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".softIk", 1)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
@@ -230,15 +235,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # align world layout:
         self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedModuleColumn")
         cmds.text(label=self.langDic[self.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
-        self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=self.setAlignWorldFalse, onc=self.setAlignWorldTrue, parent=self.alignWorldLayout)
+        self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
+
         
-    def setAlignWorldTrue(self, *args):
-        self.hasAlignWorld = True
-        cmds.setAttr(self.moduleGrp + ".alignWorld", 1)
-    
-    def setAlignWorldFalse(self, *args):
-        self.hasAlignWorld = False
-        cmds.setAttr(self.moduleGrp + ".alignWorld", 0)
+    def setAlignWorld(self, value, *args):
+        cmds.setAttr(self.moduleGrp + ".alignWorld", value)
 
     def setBendTrue(self, *args):
         self.hasBend = True
@@ -613,8 +614,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side + self.userGuideName + "_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 cmds.addAttr(self.worldRef, longName=sideLower + self.userGuideName + '_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.langDic[self.langName]['c113_length'], attributeType='float', defaultValue=1)
-                if not cmds.objExists(self.worldRef + '.globalStretch'):
-                    cmds.addAttr(self.worldRef, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
                 self.worldRefShapeList.append(self.worldRefShape)
@@ -673,14 +672,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # fix stretch calcule to work with reverseFoot
                 self.ikStretchExtremLoc = cmds.group(empty=True, name=side + self.userGuideName + "_" + extremName + "_Ik_Loc_Grp")
-                self.ikStretchExtremLocList.append(self.ikStretchExtremLoc)
-                cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
-                cmds.parent(self.ikStretchExtremLoc, self.ikExtremCtrl, absolute=True)
-
+                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    cmds.delete(cmds.parentConstraint(self.skinJointList[3], self.ikStretchExtremLoc, maintainOffset=False)) #snap to kneeB
+                else:    
+                    cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
+                
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
                 self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
                 self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
-
+                
                 # verify if user wants to apply the good mirror orientation:
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
                     # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
@@ -733,6 +733,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.ikExtremCtrl+".originalRotateY", self.origRotList[1], lock=True)
                     cmds.setAttr(self.ikExtremCtrl+".originalRotateZ", self.origRotList[2], lock=True)
 
+                # to fix quadruped stretch locator after rotated ik extrem controller:
+                ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
+                cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
+                self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
+                
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
                 cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", self.ikCornerCtrlZero + ".visibility", force=True)
@@ -779,7 +784,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ikHandleToRFGrp = cmds.group(empty=True, name=side + self.userGuideName + "_IKHToRF_Grp")
                 self.ikHandleToRFGrpList.append(ikHandleGrp)
                 cmds.setAttr(self.ikHandleToRFGrp + '.visibility', 0)
-                cmds.parent(ikHandleMainList[0], self.ikHandleToRFGrp)
                 cmds.parent(self.ikHandleToRFGrp, ikHandleGrp)
                 # for ikHandle not stretch group:
                 ikHandleNotStretchGrp = cmds.group(empty=True, name=side + self.userGuideName + "_NotStretch_IKH_Grp")
@@ -801,7 +805,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, quadExtraCtrlZero, maintainOffset=False))
                     cmds.parent(quadExtraCtrlZero, ikHandleGrp)
                     cmds.parent(ikHandleExtraList[0], self.ikHandleToRFGrp)
-                    cmds.parent(ikHandleMainList[0], self.quadExtraCtrl)
                     cmds.setAttr(ikHandleExtraList[0]+".visibility", 0)
                     cmds.addAttr(self.quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
@@ -809,8 +812,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.ctrls.setLockHide([self.quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
                 
                 # make ikControls lead ikHandles:
-                self.ikHandlePointConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleMainList[0], maintainOffset=True, name=ikHandleMainList[0] + "_PoC")[0]
-                self.ikHandlePointConstList.append(self.ikHandlePointConst)
+                ikHandleExtraGrp = cmds.group(empty=True, name=ikHandleMainList[0]+"_Grp")
+                cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
+                cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
+                if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    cmds.parent(ikHandleExtraGrp, self.quadExtraCtrl)
+                else:
+                    cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
+                self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
+                self.ikHandleConstList.append(self.ikHandleConst)
+                
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikJointList[len(self.ikJointList) - 2], maintainOffset=True, name=self.ikJointList[len(self.ikJointList) - 2] + "_OrC")
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz'])
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0] + "_PoC")[0]
@@ -840,8 +851,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cornerPos = cmds.xform(self.ikJointList[2], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
                 endPos    = cmds.xform(self.ikJointList[3], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
                 # calculate distances (joint lenghts)
-                upperLimbLen = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2])[0]
-                lowerLimbLen = self.ctrls.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
+                upperLimbLen = dpUtils.distanceBet(self.ikJointList[1], self.ikJointList[2])[0]
+                lowerLimbLen = dpUtils.distanceBet(self.ikJointList[2], self.ikJointList[3])[0]
                 chainLen = upperLimbLen + lowerLimbLen
                 # ratio of placement of the middle joint
                 pvRatio = upperLimbLen / chainLen
@@ -959,74 +970,19 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
                 distBetGrp = cmds.group(empty=True, name=side + self.userGuideName + "_DistBet_Grp")
+                jointChainLengthValue = dpUtils.jointChainLength(self.ikJointList[1:4])
 
                 # creating attributes:
+                cmds.addAttr(self.ikExtremCtrl, longName="startChainLength", attributeType='float', defaultValue=jointChainLengthValue, keyable=False)
                 cmds.addAttr(self.ikExtremCtrl, longName="stretchable", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                cmds.addAttr(self.ikExtremCtrl, longName="startStretch", attributeType='float', defaultValue=1)
                 cmds.addAttr(self.ikExtremCtrl, longName=self.langDic[self.langName]['c113_length'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
+                self.ctrls.setLockHide([self.ikExtremCtrl], ['startChainLength'])
 
                 # creating distance betweens, multiplyDivides and reverse nodes:
-                self.distBetweenList = self.ctrls.distanceBet(self.ikJointList[1], self.ikStretchExtremLoc, name=side + self.userGuideName + "_" + kNameList[1] + "_DistBet", keep=True)
+                self.distBetweenList = dpUtils.distanceBet(self.ikJointList[1], self.ikStretchExtremLoc, name=side + self.userGuideName + "_" + kNameList[1] + "_DistBet", keep=True)
+                cmds.setAttr(self.distBetweenList[5] + "." + self.distBetweenList[4] + "W1", 0)
                 cmds.parent(self.distBetweenList[2], self.distBetweenList[3], self.distBetweenList[4], distBetGrp)
-
-                # stretch permited only in ik mode:
-                self.stretchIkFkMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_StretchIkFk_MD")
-                cmds.connectAttr(self.ikFkRevList[1] + '.outputX', self.stretchIkFkMultDiv + ".input1X", force=True)
-                cmds.connectAttr(self.worldRef + '.globalStretch', self.stretchIkFkMultDiv + ".input2X", force=True)
-
-                # turn On or Off the stretch using Stretchable attribute in the ikCtrl:
-                self.stretchOnOffMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_StretchOnOff_MD")
-                cmds.connectAttr(self.stretchIkFkMultDiv + '.outputX', self.stretchOnOffMultDiv + ".input1X", force=True)
-                cmds.connectAttr(self.ikExtremCtrl + '.stretchable', self.stretchOnOffMultDiv + ".input2X", force=True)
-
-                # connect values in the W0 or reverse in W1 to ikCtrl lead or not the nullC of the distanceBetween not (controling the pointConstraint):
-                self.stretchRev = cmds.createNode('reverse', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_Rev")
-                cmds.connectAttr(self.stretchOnOffMultDiv + '.outputX', self.stretchRev + ".inputX", force=True)
-                cmds.connectAttr(self.stretchOnOffMultDiv + '.outputX', self.distBetweenList[5] + "." + self.ikStretchExtremLoc + "W0", force=True)
-                cmds.connectAttr(self.stretchRev + '.outputX', self.distBetweenList[5] + "." + self.distBetweenList[4] + "W1", force=True)
-
-                # here we calculate the stretch comparing with the current distance result:
-                self.lenghtStartStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStartStretch_MD")
-                self.stretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_MD")
-                cmds.setAttr(self.stretchMultDiv + '.operation', 2)
-                cmds.connectAttr(self.distBetweenList[1] + '.distance', self.stretchMultDiv + ".input1X", force=True)
-                cmds.connectAttr(self.ikExtremCtrl+"."+self.langDic[self.langName]['c113_length'], self.lenghtStartStretchMultDiv + ".input1X", force=True)
-                
-                # calculate stretch value:
-                startStretchValue = self.ctrls.distanceBet(self.ikJointList[1], self.ikJointList[2], keep=False)[0] + self.ctrls.distanceBet(self.ikJointList[2], self.ikStretchExtremLoc, keep=False)[0]
-                newStartStretchValue = startStretchValue * 0.9999
-                if newStartStretchValue >= startStretchValue:
-                    newStartStretchValue = startStretchValue
-                cmds.setAttr(self.ikExtremCtrl + '.startStretch', startStretchValue, lock=True)
-                cmds.connectAttr(self.ikExtremCtrl + '.startStretch', self.lenghtStartStretchMultDiv + '.input2X', force=True)
-                cmds.connectAttr(self.lenghtStartStretchMultDiv + '.outputX', self.stretchMultDiv + '.input2X', force=True)
-
-                # use a condition node to check what value will be used:
-                self.stretchCond = cmds.createNode('condition', name=side + self.userGuideName + "_" + kNameList[1] + "_Stretch_Cnd")
-                cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".firstTerm", force=True)
-                cmds.connectAttr(self.stretchMultDiv + '.outputX', self.stretchCond + ".colorIfTrueR", force=True)
-                cmds.setAttr(self.stretchCond + '.secondTerm', 1)
-                cmds.setAttr(self.stretchCond + '.operation', 2)
-                
-                # use a multiply divide node to conpensate length value that will be send to joints scale:
-                self.lenghtStretchMultDiv = cmds.createNode('multiplyDivide', name=side + self.userGuideName + "_" + kNameList[1] + "_LengthStretch_MD")
-                cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c113_length'], self.lenghtStretchMultDiv + '.input1X', force=True)
-                cmds.connectAttr(self.stretchCond + '.outColorR', self.lenghtStretchMultDiv + '.input2X', force=True)
                 cmds.connectAttr(self.ikExtremCtrl + "." + self.langDic[self.langName]['c113_length'], self.worldRef + "." + self.langDic[self.langName]['c113_length'], force=True)
-                
-                # connecting stretch output node to skinned and ik joints:
-                maxJntValue = 3 #default for biped
-                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                    maxJntValue = 4 #because we have 1 more articulation to stretch out
-                for j in range(1, maxJntValue):
-                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.skinJointList[j] + '.scaleZ', force=True)
-                    cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleZ', force=True)
-                    # check if we have quadruped spring solver and apply the stretch to all ik spring joint scale axis in order to avoid the Maya issue:
-                    if self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleX', force=True)
-                        cmds.connectAttr(self.lenghtStretchMultDiv + '.outputX', self.ikJointList[j] + '.scaleY', force=True)
-
-                # do ikHandle off when before is fk in order to turn off the stretch:
                 cmds.parentConstraint(self.skinJointList[0], self.distBetweenList[4], maintainOffset=True, name=self.distBetweenList[4] + "_PaC")
 
                 # (James) if we use the ribbon controls we won't implement the forearm control
@@ -1041,7 +997,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.delete(childList)
                     cmds.parent(forearmJnt, self.skinJointList[2])
                     # move forearmJnt to correct position:
-                    tempDist = self.ctrls.distanceBet(self.skinJointList[2], self.skinJointList[3])[0]
+                    tempDist = dpUtils.distanceBet(self.skinJointList[2], self.skinJointList[3])[0]
                     txElbow = cmds.xform(self.skinJointList[2], worldSpace=True, translation=True, query=True)[0]
                     txWrist = cmds.xform(self.skinJointList[3], worldSpace=True, translation=True, query=True)[0]
                     if (txWrist - txElbow) > 0:
@@ -1117,14 +1073,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.quadFrontLegList.append(self.ikExtremCtrlOrientGrp)
 
                 # work with not stretch ik setup:
-                stretchDifMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side + self.userGuideName + "_Stretchable_Dif_MD")
-                cmds.connectAttr(self.ikExtremCtrl + ".stretchable", stretchDifMD + ".input1X", force=True)
-                cmds.connectAttr(revNode + ".outputX", stretchDifMD + ".input2X", force=True)
+                ikStretchableMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side + self.userGuideName + "_IkStretchable_MD")
+                cmds.connectAttr(self.ikExtremCtrl + ".stretchable", ikStretchableMD + ".input1X", force=True)
+                cmds.connectAttr(revNode + ".outputX", ikStretchableMD + ".input2X", force=True)
 
-                ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_ikStretchCtrl_Cnd")
+                ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_IkStretchCtrl_Cnd")
                 cmds.setAttr(ikStretchCtrlCnd + ".secondTerm", 1)
                 cmds.setAttr(ikStretchCtrlCnd + ".operation", 3)
-                cmds.connectAttr(stretchDifMD + ".outputX", ikStretchCtrlCnd + ".colorIfFalseR", force=True)
+                cmds.connectAttr(ikStretchableMD + ".outputX", ikStretchCtrlCnd + ".colorIfFalseR", force=True)
                 cmds.connectAttr(revNode + ".outputX", ikStretchCtrlCnd + ".colorIfTrueR", force=True)
                 cmds.connectAttr(self.ikExtremCtrl + ".stretchable", ikStretchCtrlCnd + ".firstTerm", force=True)
                 cmds.connectAttr(ikStretchCtrlCnd + ".outColorR", parentConstToRFOffset + "." + self.ikExtremCtrl + "W0", force=True)
@@ -1134,7 +1090,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(revNode + ".outputX", ikStretchDifPMA + ".input1D[0]", force=True)
                 cmds.connectAttr(self.ikExtremCtrl + ".stretchable", ikStretchDifPMA + ".input1D[1]", force=True)
 
-                ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_ikStretch_Cnd")
+                ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side + self.userGuideName + "_IkStretch_Cnd")
                 cmds.setAttr(ikStretchCnd + ".operation", 3)
                 cmds.setAttr(ikStretchCnd + ".secondTerm", 1)
                 cmds.connectAttr(ikStretchDifPMA + ".output1D", ikStretchCnd + ".colorIfFalseR", force=True)
@@ -1166,7 +1122,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # Ribbon feature by James do Carmo, thanks!
                 # not using bend or ikFkSnap systems to quadruped
-                self.loadedRibbon = False
+                loadedRibbon = False
                 if self.limbStyle != self.langDic[self.langName]['m037_quadruped'] and self.limbStyle != self.langDic[self.langName]['m043_quadSpring']:
                     # (James) add bend to limb
                     if self.getHasBend():
@@ -1174,12 +1130,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             from .Library import jcRibbon
                             reload(jcRibbon)
                             RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
-                            self.loadedRibbon = True
+                            loadedRibbon = True
                         except Exception as e:
                             print(e)
                             print(self.langDic[self.langName]['e012_cantLoadRibbon'])
                         
-                        if self.loadedRibbon:
+                        if loadedRibbon:
                             num = self.getBendJoints()
                             iniJoint = side + self.userGuideName + "_" + mainName + '_Jnt'
                             corner = side + self.userGuideName + "_" + cornerName + '_Jnt'
@@ -1436,6 +1392,32 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
+                # softIk:
+                self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef)
+                # orient ikHandle group setup:
+                softIkOrientLoc = cmds.spaceLocator(name=side+self.userGuideName+"_SoftIk_Aim_Loc")[0]
+                cmds.delete(cmds.parentConstraint(self.ikJointList[1], softIkOrientLoc, maintainOffset=False))
+                cmds.parent(softIkOrientLoc, self.ikJointList[0])
+                cmds.aimConstraint(self.ikExtremCtrl, softIkOrientLoc, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, 1.0, 0.0), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=softIkOrientLoc+"_AiC")
+                cmds.orientConstraint(softIkOrientLoc, ikHandleExtraGrp, maintainOffset=False, name=ikHandleGrp+"_OrC")
+                # leg with softIk on and stretchable equals to zero reverser foot issue fix:
+                if self.limbType == LEG:
+                    rfDistBetList = dpUtils.distanceBet(self.ikNSJointList[3], self.ikExtremCtrl, name=side+self.userGuideName+"_"+kNameList[1]+"_RF_DistBet", keep=True)
+                    cmds.delete(rfDistBetList[4])
+                    cmds.parent(rfDistBetList[2:4], distBetGrp)
+                    rfSoftIkCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_SoftIk_Cnd")
+                    rfStretchableCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_Stretchable_Cnd")
+                    rfDistInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_RF_DistInv_MD")
+                    cmds.setAttr(rfDistInvMD+".input2X", -1)
+                    cmds.setAttr(rfStretchableCnd+".colorIfFalseR", 0)
+                    cmds.connectAttr(rfDistBetList[1]+".distance", rfSoftIkCnd+".colorIfFalseR", force=True)
+                    cmds.connectAttr(self.ikExtremCtrl+".softIk", rfSoftIkCnd+".firstTerm", force=True)
+                    cmds.connectAttr(rfSoftIkCnd+".outColorR", rfDistInvMD+".input1X", force=True)
+                    cmds.connectAttr(rfDistInvMD+".outputX", rfStretchableCnd+".colorIfTrueR", force=True)
+                    cmds.connectAttr(self.ikExtremCtrl+".stretchable", rfStretchableCnd+".firstTerm", force=True)
+                    cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
+                    cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
+                
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
@@ -1490,7 +1472,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "ikCtrlZeroList": self.ikExtremCtrlZeroList,
                 "ikPoleVectorZeroList": self.ikPoleVectorCtrlZeroList,
                 "ikHandleGrpList": self.ikHandleToRFGrpList,
-                "ikHandlePointConstList": self.ikHandlePointConstList,
+                "ikHandleConstList": self.ikHandleConstList,
                 "ikFkBlendGrpToRevFootList": self.ikFkBlendGrpToRevFootList,
                 "worldRefList": self.worldRefList,
                 "worldRefShapeList": self.worldRefShapeList,

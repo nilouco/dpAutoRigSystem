@@ -156,7 +156,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # parent it to the lastGuide:
                     cmds.parent(self.cvTopLoc, self.guideName+"_cvTopLoc"+str(n-1), relative=True)
                     # translate new topLoc in the middle of distance of last top and middle guides:
-                    dist = self.ctrls.distanceBet(self.guideName+"_cvTopLoc"+str(n-1), self.guideName+"_cvMiddleLoc")[0]
+                    dist = dpUtils.distanceBet(self.guideName+"_cvTopLoc"+str(n-1), self.guideName+"_cvMiddleLoc")[0]
                     cmds.setAttr(self.cvTopLoc+".translateZ", (0.5*dist))
                     # create a joint to use like an arrowLine:
                     self.jGuide = cmds.joint(name=self.guideName+"_JGuideTop"+str(n), radius=0.001)

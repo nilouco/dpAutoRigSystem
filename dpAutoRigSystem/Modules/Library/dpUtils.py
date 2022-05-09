@@ -7,6 +7,7 @@ import re
 import cProfile
 import urllib.request
 import webbrowser
+import math
 from io import TextIOWrapper
 from importlib import reload
 
@@ -377,6 +378,60 @@ def hook():
     return hookDic
 
 
+def distanceBet(a, b, name="temp_DistBet", keep=False):
+    """ Creates a distance between node for 2 objects a and b.
+        Keeps them in the scene or delete.
+        Returns the distance value only in case of not keeping distBet node or
+        a list of distance value, distanceNode, two nulls used to calculate and the created constraint.
+    """
+    if cmds.objExists(a) and cmds.objExists(b):
+        # create nulls:
+        nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
+        nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
+        nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
+        cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
+        cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
+        cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
+        pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
+        # create distanceBetween node:
+        distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
+        # connect aPos to the distance between point1:
+        cmds.connectAttr(nullA+".tx", distBet+".point1X")
+        cmds.connectAttr(nullA+".ty", distBet+".point1Y")
+        cmds.connectAttr(nullA+".tz", distBet+".point1Z")
+        # connect bPos to the distance between point2:
+        cmds.connectAttr(nullB+".tx", distBet+".point2X")
+        cmds.connectAttr(nullB+".ty", distBet+".point2Y")
+        cmds.connectAttr(nullB+".tz", distBet+".point2Z")
+        dist = cmds.getAttr(distBet+".distance")
+        if keep:
+            return [dist, distBet, nullA, nullB, nullC, pointConst]
+        else:
+            cmds.delete(distBet, nullA, nullB, nullC, pointConst)
+            return [dist, None, None, None, None, None]
+
+
+def middlePoint(a, b, createLocator=False):
+    """ UNUSED...
+        Find the point location in the middle of two items.
+        Return the middle point position as a vector and a locator in that postition if wanted.
+    """
+    if cmds.objExists(a) and cmds.objExists(b):
+        # get xform datas:
+        aPos = cmds.xform(a, query=True, worldSpace=True, rotatePivot=True)
+        bPos = cmds.xform(b, query=True, worldSpace=True, rotatePivot=True)
+        # calculating the result position:
+        resultPosX = ( aPos[0] + bPos[0] )/2
+        resultPosY = ( aPos[1] + bPos[1] )/2
+        resultPosZ = ( aPos[2] + bPos[2] )/2
+        resultPos = [resultPosX, resultPosY, resultPosZ]
+        if createLocator:
+            middleLoc = cmds.spaceLocator(name=a+"_"+b+"_Middle_Loc", position=resultPos)[0]
+            cmds.xform(middleLoc, centerPivots=True)
+            return [resultPos, middleLoc]
+        return[resultPos]
+
+        
 def clearNodeGrp(nodeGrpName='dpAR_GuideMirror_Grp', attrFind='guideBaseMirror', unparent=False):
     """ Check if there is any node with the attribute attrFind in the nodeGrpName and then unparent its children and delete it.
     """
@@ -825,3 +880,29 @@ def resolveName(name, suffix, *args):
     else:
         baseName = baseName+"_00"
     return baseName, name
+
+
+def magnitude(vector, *args):
+    """ Returns the square root of the sum of power 2 from a given vector.
+    """
+    return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))
+
+
+def jointChainLength(jointList):
+    """ Returns a sum of the joint lengths given.
+    """
+    i = 0
+    chainlength = 0
+    if jointList:
+        while ( i < len(jointList) - 1 ):
+            if cmds.objExists(jointList[i]):
+                if cmds.objExists(jointList[i+1]):
+                    a = cmds.xform(jointList[i], query=True, pivots=True, worldSpace=True)
+                    b = cmds.xform(jointList[i+1], query=True, pivots=True, worldSpace=True)
+                    x = b[0] - a[0]
+                    y = b[1] - a[1]
+                    z = b[2] - a[2]
+                    v = [x,y,z]
+                    chainlength += magnitude(v)
+            i += 1
+    return chainlength

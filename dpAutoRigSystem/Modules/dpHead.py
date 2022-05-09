@@ -163,7 +163,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # parent it to the lastGuide:
                     cmds.parent(self.cvNeckLoc, self.guideName+"_Neck"+str(n-2), relative=True)
                     # translate new topLoc in the middle of distance of last top and middle guides:
-                    dist = self.ctrls.distanceBet(self.guideName+"_Neck"+str(n-1), self.guideName+"_Head")[0]
+                    dist = dpUtils.distanceBet(self.guideName+"_Neck"+str(n-1), self.guideName+"_Head")[0]
                     cmds.setAttr(self.cvNeckLoc+".translateY", (0.5*dist))
                     # create a joint to use like an arrowLine:
                     self.jGuide = cmds.joint(name=self.guideName+"_JGuideNeck"+str(n-1), radius=0.001)

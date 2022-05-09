@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.04"
-DPAR_UPDATELOG = "N453 - Correction Manager range values attributes."
+DPAR_VERSION_PY3 = "4.00.05"
+DPAR_UPDATELOG = "N436 - Limb soft ik."
 
 
 
@@ -2063,10 +2063,10 @@ class DP_AutoRig_UI(object):
                                     ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
                                     middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
-                                    fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                    fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
                                     ikCtrl                = self.integratedTaskDic[fatherGuide]['ikCtrlList'][s]
                                     ikHandleGrp           = self.integratedTaskDic[fatherGuide]['ikHandleGrpList'][s]
-                                    ikHandlePointConst    = self.integratedTaskDic[fatherGuide]['ikHandlePointConstList'][s]
+                                    ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
@@ -2075,13 +2075,11 @@ class DP_AutoRig_UI(object):
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
-                                    cmds.delete(ikHandlePointConst, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandlePointConst!
+                                    cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
                                     cmds.cycleCheck(evaluation=True)
                                     cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    #Delete the old constraint (two line before) and recreate them on the extrem joint on the limb
                                     cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")[0]
-                                    #cmds.scaleConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_ScC")[0]
                                     if limbTypeName == LEG:
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
@@ -2625,7 +2623,7 @@ class DP_AutoRig_UI(object):
                                 cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
                             
                 # list desirable Option_Ctrl attributes order:
-                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', 'globalStretch', vvAttr,
+                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', vvAttr,
                 spineAttr+'_active', spineAttr, spineAttr+'1_active', spineAttr+'1', spineAttr+'2_active', spineAttr+'2',
                 limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', spineAttr+'Fk', spineAttr+'1Fk', spineAttr+'Fk2', 
                 leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',

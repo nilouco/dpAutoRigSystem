@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-04-21",
+    "_updated"       : "2022-04-22",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -157,6 +157,7 @@
     "e018_selectBlendShape"        : "Sélectionnez un node BlendShape, une mesh ou un transform connecté pour charger, síl vous plait.",
     "e019_notFoundAllGrp"          : "Pas trouvé le groupe All_Grp pour selectionner les controleurs, désolé.",
     "e020_notFoundHeadCtrl"        : "Head Deformer a été créé, mais on n'a pas trouvé le Head_Ctrl pour parenter, désole.",
+    "e021_cantLoadSoftIk"          : "Ce n'est pas possible charger l'extention dpSoftIk pour creer le setup de softIk dans le Limb module, désolé.",
 
     "i000_guides"          : "Créer des GUIDES",
     "i001_modules"         : "Modifier des MODULES",

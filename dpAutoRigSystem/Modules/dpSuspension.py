@@ -142,7 +142,7 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
-                self.dist = self.ctrls.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
+                self.dist = dpUtils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
                 self.jointList, self.mainCtrlList, self.ctrlZeroList, self.ctrlList, self.aimLocList, self.upLocList = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
