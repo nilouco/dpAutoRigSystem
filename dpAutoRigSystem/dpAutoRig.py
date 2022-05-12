@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.05"
-DPAR_UPDATELOG = "N436 - Limb soft ik."
+DPAR_VERSION_PY3 = "4.00.06"
+DPAR_UPDATELOG = "N433 - Limb leg stretch volumeVariation fix."
 
 
 
