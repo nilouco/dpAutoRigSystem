@@ -708,31 +708,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", 90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleX", -1)
-
-                # working with world axis orientation for limb extrem ik controls
-                if self.getAlignWorld() == True:
-                    if s == 0:
-                        tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
-                        cmds.parent(tempDup, world=True)
-                        self.origRotList = cmds.xform(tempDup, query=True, ro=True, ws=True)
-                        cmds.delete(tempDup)
-                    cmds.setAttr(self.ikExtremCtrl+".rotateX", self.origRotList[0])
-                    cmds.setAttr(self.ikExtremCtrl+".rotateY", self.origRotList[1])
-                    cmds.setAttr(self.ikExtremCtrl+".rotateZ", self.origRotList[2])
-                    cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateX", 0)
-                    cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateY", 0)
-                    cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateZ", 0)
-                    cmds.setAttr(self.ikExtremCtrlZero+".rotateX", 0)
-                    cmds.setAttr(self.ikExtremCtrlZero+".rotateY", 0)
-                    cmds.setAttr(self.ikExtremCtrlZero+".rotateZ", 0)
-                    # store original rotation values for initial default pose
-                    cmds.addAttr(self.ikExtremCtrl, longName='originalRotateX', attributeType='float', keyable=True)
-                    cmds.addAttr(self.ikExtremCtrl, longName='originalRotateY', attributeType='float', keyable=True)
-                    cmds.addAttr(self.ikExtremCtrl, longName='originalRotateZ', attributeType='float', keyable=True)
-                    cmds.setAttr(self.ikExtremCtrl+".originalRotateX", self.origRotList[0], lock=True)
-                    cmds.setAttr(self.ikExtremCtrl+".originalRotateY", self.origRotList[1], lock=True)
-                    cmds.setAttr(self.ikExtremCtrl+".originalRotateZ", self.origRotList[2], lock=True)
-
+                
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
@@ -828,6 +804,26 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleACList[0], maintainOffset=True, name=ikHandleACList[0] + "_PoC")[0]
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikNSJointList[len(self.ikNSJointList) - 2], maintainOffset=True, name=self.ikNSJointList[len(self.ikNSJointList) - 2] + "_OrC")
                 
+                # working with world axis orientation for limb extrem ik controls
+                if self.getAlignWorld():
+                    originalRotateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_"+extremName+"_OriginalRotate_MD")
+                    cmds.addAttr(self.ikExtremCtrl, longName="useOriginalRotation", attributeType="float", defaultValue=1, minValue=0, maxValue=1, keyable=True)
+                    if s == 0:
+                        tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
+                        cmds.parent(tempDup, world=True)
+                        self.origRotList = cmds.xform(tempDup, query=True, rotation=True, worldSpace=True)
+                        cmds.delete(tempDup)
+                    axisList = ["X", "Y", "Z"]
+                    for a, axis in enumerate(axisList):
+                        cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotate"+axis, 0)
+                        cmds.setAttr(self.ikExtremCtrlZero+".rotate"+axis, 0)
+                        # store original rotation values for initial default pose
+                        cmds.addAttr(self.ikExtremCtrl, longName="originalRotate"+axis, attributeType="float", keyable=True)
+                        cmds.setAttr(self.ikExtremCtrl+".originalRotate"+axis, self.origRotList[a], lock=True)
+                        cmds.connectAttr(self.ikExtremCtrl+".originalRotate"+axis, originalRotateMD+".input1"+axis, force=True)
+                        cmds.connectAttr(self.ikExtremCtrl+".useOriginalRotation", originalRotateMD+".input2"+axis, force=True)
+                        cmds.connectAttr(originalRotateMD+".output"+axis, self.ikExtremCtrlGrp+".rotate"+axis, force=True)
+
                 # twist:
                 cmds.addAttr(self.ikExtremCtrl, longName='twist', attributeType='float', keyable=True)
                 if s == 0:
@@ -961,12 +957,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
                     # avoid cycle error from Maya warning:
                     cmds.cycleCheck(evaluation=False)
-                    aimConst = cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
+                    cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
                     # hack to parent constraint offset recalculation (Update button on Attribute Editor):
                     cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, edit=True, maintainOffset=True)
                     cmds.setAttr(self.quadExtraCtrl+".autoOrient", 1)
-                
+
                 # stretch system:
                 kNameList = [beforeName, self.limbType.capitalize()]
                 distBetGrp = cmds.group(empty=True, name=side + self.userGuideName + "_DistBet_Grp")

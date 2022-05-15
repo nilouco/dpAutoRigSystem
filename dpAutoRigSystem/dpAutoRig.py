@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.06"
-DPAR_UPDATELOG = "N433 - Limb leg stretch volumeVariation fix."
+DPAR_VERSION_PY3 = "4.00.07"
+DPAR_UPDATELOG = "N432 - Added original rotate toggle attribute\nto control alignWorld Limb's module feature."
 
 
 
