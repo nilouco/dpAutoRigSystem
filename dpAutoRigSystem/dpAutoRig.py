@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.07"
-DPAR_UPDATELOG = "N432 - Added original rotate toggle attribute\nto control alignWorld Limb's module feature."
+DPAR_UPDATELOG = "N466 - Limb Fk scalable in length.\nN467 - Scalable clavicle"
 
 
 

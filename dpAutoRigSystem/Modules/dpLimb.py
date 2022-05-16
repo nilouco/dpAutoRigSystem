@@ -394,6 +394,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.addArticJoint = self.getArticulation()
             # start as no having mirror:
             sideList = [""]
+            axisList = ["X", "Y", "Z"]
             # analisys the mirror module:
             self.mirrorAxis = cmds.getAttr(self.moduleGrp + ".mirrorAxis")
             if self.mirrorAxis != 'off':
@@ -580,9 +581,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # invert scale for right side before:
                 if s == 1:
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleX", -1)
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleY", -1)
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleZ", -1)
+                    cmds.setAttr(self.zeroFkCtrlList[0] + ".scaleX", -1)
+                    cmds.setAttr(self.zeroFkCtrlList[0] + ".scaleY", -1)
+                    cmds.setAttr(self.zeroFkCtrlList[0] + ".scaleZ", -1)
 
                 # working with position, orientation of joints and make an orientConstrain for Fk controls:
                 for n in range(len(self.jNameList)):
@@ -600,7 +601,13 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.parentConstraint(self.fkCtrlList[n], self.fkJointList[n], maintainOffset=True, name=side + self.userGuideName + "_" + self.jNameList[n] + "_PaC")
                     else:
                         cmds.parentConstraint(self.fkCtrlList[n], self.fkJointList[n], maintainOffset=True, name=side + self.userGuideName + "_" + self.jNameList[n] + "_Fk_PaC")
-                    self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
+                    if n == 0:
+                        clavicleJointList = [self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0]]
+                        for clavicleJoint in clavicleJointList:
+                            for axis in axisList:
+                                cmds.connectAttr(self.fkCtrlList[0]+".scale"+axis, clavicleJoint+".scale"+axis, force=True)
+                    else:
+                        self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
 
                 # puting endJoints in the correct position:
                 tempToDelE = cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False)
@@ -813,7 +820,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.parent(tempDup, world=True)
                         self.origRotList = cmds.xform(tempDup, query=True, rotation=True, worldSpace=True)
                         cmds.delete(tempDup)
-                    axisList = ["X", "Y", "Z"]
                     for a, axis in enumerate(axisList):
                         cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotate"+axis, 0)
                         cmds.setAttr(self.ikExtremCtrlZero+".rotate"+axis, 0)
