@@ -579,12 +579,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.zeroFkCtrlList = dpUtils.zeroOut(self.fkCtrlList)
                 self.zeroFkCtrlGrp = cmds.group(self.zeroFkCtrlList[0], self.zeroFkCtrlList[1], name=side+self.userGuideName+"_Fk_Ctrl_Grp")
                 
-                # invert scale for right side before:
-                if s == 1:
-                    cmds.setAttr(self.zeroFkCtrlList[0] + ".scaleX", -1)
-                    cmds.setAttr(self.zeroFkCtrlList[0] + ".scaleY", -1)
-                    cmds.setAttr(self.zeroFkCtrlList[0] + ".scaleZ", -1)
-
                 # working with position, orientation of joints and make an orientConstrain for Fk controls:
                 for n in range(len(self.jNameList)):
                     tempToDelA = cmds.parentConstraint(self.cvLocList[n], self.skinJointList[n], maintainOffset=False)
@@ -606,9 +600,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         for clavicleJoint in clavicleJointList:
                             for axis in axisList:
                                 cmds.connectAttr(self.fkCtrlList[0]+".scale"+axis, clavicleJoint+".scale"+axis, force=True)
+                    elif n == 1 or n == 2: #shoulder/elbow
+                        self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy'])
                     else:
                         self.ctrls.setLockHide([self.fkCtrlList[n]], ['sx', 'sy', 'sz'])
-
+                
                 # puting endJoints in the correct position:
                 tempToDelE = cmds.parentConstraint(self.cvEndJoint, self.skinJointList[-1], maintainOffset=False)
                 tempToDelF = cmds.parentConstraint(self.cvEndJoint, self.ikJointList[-1], maintainOffset=False)
@@ -1218,6 +1214,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
                     cmds.delete(cmds.parentConstraint(self.zeroFkCtrlList[0], self.clavicleCtrlGrp, maintainOffset=False))
                     cmds.parent(self.clavicleCtrlGrp, self.zeroFkCtrlList[0])
+                    # invert scale for right side before:
+                    if s == 1:
+                        cmds.setAttr(self.clavicleCtrlGrp + ".scaleX", -1)
+                        cmds.setAttr(self.clavicleCtrlGrp + ".scaleY", -1)
+                        cmds.setAttr(self.clavicleCtrlGrp + ".scaleZ", -1)
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     
                     # create auto clavicle attribute:
@@ -1256,7 +1257,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.aimConstraint(acIkCornerLoc, acIkAimLoc, maintainOffset=True, weight=1, aimVector=(-1, 0, 0), upVector=(0, 1, 0), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AiC")
                     else: #leg
                         cmds.aimConstraint(acIkCornerLoc, acIkAimLoc, maintainOffset=True, weight=1, aimVector=(0, -1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=acIkUpLoc, name=acIkAimLoc+"_AiC")
-
+                    
                     # fk auto clavicle setup:
                     self.ctrls.directConnect(self.fkCtrlList[1], acFkLoc, ['rx', 'ry', 'rz'])
                     # auto clavicle matrix rotate extraction:
