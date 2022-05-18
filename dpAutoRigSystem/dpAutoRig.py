@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.08"
-DPAR_UPDATELOG = "N229 - Clavicle and legHips scalable.\nN466 - Limb Fk scalable in length.\nN467 - Scalable clavicle"
+DPAR_VERSION_PY3 = "4.00.09"
+DPAR_UPDATELOG = "N439 - Deformer set node for Maya2022 FFD."
 
 
 
