@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.11"
+DPHD_VERSION = "2.12"
 
 
 class HeadDeformer(object):
@@ -41,8 +41,8 @@ class HeadDeformer(object):
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
-        validName = dpUtils.validateName(headDeformerName+"_FFDSet", "FFDSet")
-        numbering = validName.replace(headDeformerName, "")[:-7]
+        validName = dpUtils.validateName(headDeformerName+"_FFD", "FFD")
+        numbering = validName.replace(headDeformerName, "")[:-4]
         if numbering:
             headDeformerName = headDeformerName+numbering
             centerSymmetryName = centerSymmetryName+numbering
@@ -52,7 +52,7 @@ class HeadDeformer(object):
         selList = cmds.ls(selection=True)
         if selList:
             # lattice deformer
-            latticeDefList = cmds.lattice(name=headDeformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=1, objectCentered=True) #[Set, Lattice, Base]
+            latticeDefList = cmds.lattice(name=headDeformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
             latticePointsList = latticeDefList[1]+".pt[0:5][2:5][0:5]"
             
             # store initial scaleY in order to avoid lattice rotation bug on non frozen transformations
@@ -250,8 +250,12 @@ class HeadDeformer(object):
                                                 for mainShape in singleMainShapeList:
                                                     toHeadDefCtrlList.append(mainShape)
                 if toHeadDefCtrlList:
+                    useComponentTag = cmds.optionVar(query="deformationUseComponentTags")
                     for item in toHeadDefCtrlList:
-                        cmds.sets(item, include=headDeformerName+"_FFDSet")
+                        if useComponentTag:
+                            cmds.deformer(headDeformerName+"_FFD", edit=True, geometry=item)
+                        else:
+                            cmds.sets(item, include=headDeformerName+"_FFDSet")
                 cmds.parent(arrowCtrlGrp, self.headCtrl)
             else:
                 mel.eval("warning" + "\"" + self.langDic[self.langName]["e020_notFoundHeadCtrl"] + "\"" + ";")
