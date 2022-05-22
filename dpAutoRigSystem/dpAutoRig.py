@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.10"
-DPAR_UPDATELOG = "N026 - Limb poleVector follow review.\nAdded new Pin attribute."
+DPAR_UPDATELOG = "N026 - Limb poleVector follow review.\nAdded new Pin attribute.\nFixed poleVector constraint interpolation\ntype to shortest."
 
 
 
