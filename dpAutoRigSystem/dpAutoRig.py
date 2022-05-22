@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.09"
-DPAR_UPDATELOG = "N439 - Deformer set node for Maya2022 FFD."
+DPAR_VERSION_PY3 = "4.00.10"
+DPAR_UPDATELOG = "N026 - Limb poleVector follow review.\nAdded new Pin attribute."
 
 
 
@@ -2119,6 +2119,7 @@ class DP_AutoRig_UI(object):
                             ikFkNetworkList   = self.integratedTaskDic[moduleDic]['ikFkNetworkList']
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
+                            masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
@@ -2157,6 +2158,9 @@ class DP_AutoRig_UI(object):
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
                             
+                                # fix poleVector follow feature integrating with Master_Ctrl:
+                                cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
+
                             # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']
