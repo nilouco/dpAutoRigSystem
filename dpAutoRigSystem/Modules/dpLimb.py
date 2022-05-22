@@ -631,12 +631,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[1], relative=True)
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PoC")
-                fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.worldRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PaC")[0]
+                fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PaC")[0]
                 cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side + self.userGuideName + "_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], self.fkIsolateRevNode + ".inputX", force=True)
-                cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.worldRef + "W1", force=True)
+                cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.masterCtrlRef + "W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
@@ -1497,7 +1497,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": "limbManualVolume",
-                "fkIsolateConst": self.afkIsolateConst,
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList
             }
