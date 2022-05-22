@@ -50,6 +50,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.aScalableGrps = []
         self.origRotList = []
         self.bendJointList = []
+        self.masterCtrlRefList = []
 
 
     def createModuleLayout(self, *args):
@@ -620,6 +621,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
                 self.worldRefShapeList.append(self.worldRefShape)
+                # creating a group reference to follow masterCtrl:
+                self.masterCtrlRef = cmds.group(empty=True, name=side+self.userGuideName+"_MasterCtrlRef_Grp")
+                self.masterCtrlRefList.append(self.masterCtrlRef)
 
                 # parenting fkControls from 2 hierarchies (before and limb) using constraint, attention to fkIsolated shoulder:
                 # creating a shoulder_null group in order to use it as position relative and aim to self.quadExtraCtrl:
@@ -627,12 +631,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[1], relative=True)
                 cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PoC")
-                fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.worldRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PaC")[0]
+                fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PaC")[0]
                 cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side + self.userGuideName + "_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], self.fkIsolateRevNode + ".inputX", force=True)
-                cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.worldRef + "W1", force=True)
+                cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.masterCtrlRef + "W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
@@ -931,6 +935,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp + "_OrC")[0]
                     else:  # leg
                         self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("x", "z"), maintainOffset=True, name=self.cornerGrp + "_OrC")[0]
+                cmds.setAttr(self.cornerOrient+".interpType", 2) #shortest
                 self.cornerOrientRev = cmds.createNode('reverse', name=side + self.userGuideName + "_CornerOrient_Rev")
                 cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], self.cornerOrientRev + ".inputX", force=True)
                 cmds.connectAttr(self.cornerOrientRev + '.outputX', self.cornerOrient + "." + self.cornerOrientGrp + "W0", force=True)
@@ -939,10 +944,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # working with follow of poleVector:
                 self.cornerPoint = cmds.pointConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, maintainOffset=True, name=self.cornerGrp + "_PoC")[0]
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName="pin", attributeType='bool', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 self.cornerPointRev = cmds.createNode('reverse', name=side + self.userGuideName + "_CornerPoint_Rev")
                 cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_follow'], self.cornerPointRev + ".inputX", force=True)
                 cmds.connectAttr(self.cornerPointRev + '.outputX', self.cornerPoint + "." + self.cornerOrientGrp + "W0", force=True)
                 cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_follow'], self.cornerPoint + "." + self.ikExtremCtrl + "W1", force=True)
+                # make poleVectorCtrl's follow really pin from masterCtrl:
+                poleVectorPinPC = cmds.parentConstraint(self.masterCtrlRef, self.ikCornerCtrlZero, maintainOffset=True, name=self.ikCornerCtrlZero+"_PaC")[0]
+                cmds.connectAttr(self.ikCornerCtrl+'.pin', poleVectorPinPC+"."+self.masterCtrlRef+"W0", force=True)
 
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
@@ -1104,12 +1113,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # (James) not implementing the forearm control if we use ribbons (yet)
                     if self.getHasBend() == True:
                         # do not use forearm control
-                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, name=side + self.userGuideName + "_Control_Grp")
+                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side + self.userGuideName + "_Control_Grp")
                     else:
                         # use forearm control
-                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, name=side + self.userGuideName + "_Control_Grp")
+                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side + self.userGuideName + "_Control_Grp")
                 else:
-                    self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, name=side + self.userGuideName + "_Control_Grp")
+                    self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side + self.userGuideName + "_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], name=side + self.userGuideName + "_Joint_Grp")
                 self.aScalableGrps.append(self.toScalableHookGrp)
                 cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp + "_PaC")
@@ -1488,7 +1497,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": "limbManualVolume",
-                "fkIsolateConst": self.afkIsolateConst,
                 "scalableGrp": self.aScalableGrps,
+                "masterCtrlRefList": self.masterCtrlRefList
             }
         }
