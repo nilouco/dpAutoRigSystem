@@ -2,7 +2,7 @@
     "_preset"     : "Default",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-03",
-    "_updated"    : "2022-03-17",
+    "_updated"    : "2022-05-23",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -92,6 +92,8 @@
     "id_085_ChainIk"         : {"type" : "CompressedCircle", "degree" : 3},
     "id_086_ChainIkMain"     : {"type" : "Ball",             "degree" : 3},
     "id_087_ChainIkLast"     : {"type" : "Ball",             "degree" : 3},
-    "id_088_LimbAdditional"  : {"type" : "Cube",             "degree" : 1}
+    "id_088_LimbAdditional"  : {"type" : "Cube",             "degree" : 1},
+    "id_089_SpineBase"       : {"type" : "Circle",           "degree" : 3},
+    "id_090_SpineEnd"        : {"type" : "Circle",           "degree" : 3}
     
 }

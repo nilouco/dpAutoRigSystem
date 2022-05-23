@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.10"
-DPAR_UPDATELOG = "N026 - Limb poleVector follow review.\nN339 - Added new Pin attribute.\nN421 - Fixed poleVector constraint interpolation\ntype to shortest.\nChanged Limb fk follow to isolate all to Root_Ctrl."
+DPAR_UPDATELOG = "N420 - Spine sub controls to Hips and Chest."
 
 
 

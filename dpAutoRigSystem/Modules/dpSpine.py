@@ -208,6 +208,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # naming main controls:
             hipsName  = self.langDic[self.langName]['c100_bottom']
             chestName = self.langDic[self.langName]['c099_top']
+            baseName = self.langDic[self.langName]['c106_base']
+            endName = self.langDic[self.langName]['c124_end']
             if self.currentStyle == 1: #Biped
                 hipsName  = self.langDic[self.langName]['c027_hips']
                 chestName = self.langDic[self.langName]['c028_chest']
@@ -248,6 +250,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.aMScaleVolVariationAttrList.append(side+self.userGuideName+'_masterScale_'+self.langDic[self.langName]['c031_volumeVariation'])
                 self.aIkFkBlendAttrList.append(side+self.userGuideName+'Fk_ikFkBlend')
                 
+                # base and end controls:
+                self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.9*self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.endCtrl = self.ctrls.cvControl("id_090_SpineEnd", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.9*self.ctrlRadius, d=self.curveDegree, dir="+X")
+
                 # Setup axis order
                 if self.rigType == dpBaseClass.RigType.quadruped:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
