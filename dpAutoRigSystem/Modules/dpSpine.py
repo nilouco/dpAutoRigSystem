@@ -28,7 +28,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
         # List of returned data:
         self.aHipsAList = []
-        self.aChestAList = []
+        self.endList = []
         self.aVolVariationAttrList = []
         self.aActVolVariationAttrList = []
         self.aMScaleVolVariationAttrList = []
@@ -244,16 +244,16 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_masterScale_'+self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'Fk_ikFkBlend', attributeType="float", min=0, max=1, defaultValue=1, keyable=True)
                 self.aHipsAList.append(self.hipsACtrl)
-                self.aChestAList.append(self.chestACtrl)
                 self.aVolVariationAttrList.append(side+self.userGuideName+'_'+self.langDic[self.langName]['c031_volumeVariation'])
                 self.aActVolVariationAttrList.append(side+self.userGuideName+'_active_'+self.langDic[self.langName]['c031_volumeVariation'])
                 self.aMScaleVolVariationAttrList.append(side+self.userGuideName+'_masterScale_'+self.langDic[self.langName]['c031_volumeVariation'])
                 self.aIkFkBlendAttrList.append(side+self.userGuideName+'Fk_ikFkBlend')
                 
                 # base and end controls:
-                self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.9*self.ctrlRadius, d=self.curveDegree, dir="+X")
-                self.endCtrl = self.ctrls.cvControl("id_090_SpineEnd", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.9*self.ctrlRadius, d=self.curveDegree, dir="+X")
-
+                self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.endCtrl = self.ctrls.cvControl("id_090_SpineEnd", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.endList.append(self.endCtrl)
+                
                 # Setup axis order
                 if self.rigType == dpBaseClass.RigType.quadruped:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
@@ -262,8 +262,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.chestBCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.hipsFkCtrl + ".rotateOrder", 1)
                     cmds.setAttr(self.chestFkCtrl + ".rotateOrder", 1)
-                    cmds.rotate(90, 0, 0, self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl)
-                    cmds.makeIdentity(self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl, apply=True, rotate=True)
+                    cmds.setAttr(self.baseCtrl + ".rotateOrder", 1)
+                    cmds.setAttr(self.endCtrl + ".rotateOrder", 1)
+                    cmds.rotate(90, 0, 0, self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl, self.baseCtrl, self.endCtrl)
+                    cmds.makeIdentity(self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl, self,baseCtrl, self.endCtrl, apply=True, rotate=True)
                 else:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 3)
                     cmds.setAttr(self.hipsBCtrl + ".rotateOrder", 3)
@@ -271,6 +273,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.chestBCtrl + ".rotateOrder", 3)
                     cmds.setAttr(self.hipsFkCtrl + ".rotateOrder", 3)
                     cmds.setAttr(self.chestFkCtrl + ".rotateOrder", 3)
+                    cmds.setAttr(self.baseCtrl + ".rotateOrder", 3)
+                    cmds.setAttr(self.endCtrl + ".rotateOrder", 3)
                 
                 # Keep a list of ctrls we want to colorize a certain way
                 self.aInnerCtrls.append([self.hipsBCtrl, self.chestBCtrl])
@@ -301,6 +305,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.hipsACtrlZero, self.chestAZero, self.chestBGrp, self.hipsFkCtrlZero, self.chestFkCtrlZero = dpUtils.zeroOut([self.hipsACtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl])
                 self.chestBGrp = cmds.rename(self.chestBGrp, self.chestBGrp.replace("Zero", "Grp"))
                 self.chestBZero = dpUtils.zeroOut([self.chestBGrp])[0]
+                self.baseCtrlZero = dpUtils.zeroOut([self.baseCtrl])[0]
+                self.endCtrlZero = dpUtils.zeroOut([self.endCtrl])[0]
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['v'], l=False)
                 # modify the pivots of chest controls:
                 upPivotPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(self.nJoints-1), query=True, worldSpace=True, translation=True)
@@ -308,9 +314,25 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # add originedFrom attributes to hipsA, hipsB and chestB:
                 dpUtils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
-                dpUtils.originedFrom(objName=self.hipsBCtrl, attrString=bottomLocGuide)
-                dpUtils.originedFrom(objName=self.chestBCtrl, attrString=topLocGuide)
-                dpUtils.originedFrom(objName=self.chestFkCtrl, attrString=topLocGuide)
+                dpUtils.originedFrom(objName=self.baseCtrl, attrString=bottomLocGuide)
+                dpUtils.originedFrom(objName=self.endCtrl, attrString=topLocGuide)
+
+                # create base and end joints:
+                cmds.select(clear=True)
+                baseJnt = cmds.joint(name=side+self.userGuideName+"_Base_Jnt", scaleCompensate=False)
+                cmds.addAttr(baseJnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                cmds.select(clear=True)
+                endJnt = cmds.joint(name=side+self.userGuideName+"_End_Jnt", scaleCompensate=False)
+                cmds.addAttr(endJnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                # joint labelling:
+                dpUtils.setJointLabel(baseJnt, s+jointLabelAdd, 18, self.userGuideName+"_Base")
+                dpUtils.setJointLabel(endJnt, s+jointLabelAdd, 18, self.userGuideName+"_End")
+                # Base and end controllers:
+                cmds.parentConstraint(self.baseCtrl, baseJnt, maintainOffset=False, name=baseJnt+"_PaC")
+                cmds.scaleConstraint(self.baseCtrl, baseJnt, maintainOffset=True, name=baseJnt+"_ScC")
+                cmds.parentConstraint(self.endCtrl, endJnt, maintainOffset=False, name=endJnt+"_PaC")
+                cmds.scaleConstraint(self.endCtrl, endJnt, maintainOffset=True, name=endJnt+"_ScC")
+
                 # create a simple spine ribbon:
                 returnedRibbonList = self.ctrls.createSimpleRibbon(name=side+self.userGuideName, totalJoints=(self.nJoints-1), jointLabelNumber=(s+jointLabelAdd), jointLabelName=self.userGuideName)
                 rbnNurbsPlane = returnedRibbonList[0]
@@ -503,6 +525,9 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.rbnControlGrp = cmds.group(name=side+self.userGuideName+"_Control_Grp", empty=True)
                 cmds.parent(self.hipsACtrlZero, self.rbnControlGrp, relative=True)
                 cmds.parent(clustersGrp, side+self.userGuideName+"_Rbn_RibbonJoint_Grp", self.rbnControlGrp, arcLen, self.rbnRigGrp, relative=True)
+                cmds.parent(self.baseCtrlZero, self.hipsBCtrl, relative=True)
+                cmds.parent(self.endCtrlZero, self.chestBCtrl, relative=True)
+                cmds.parent(baseJnt, endJnt, self.rbnRigGrp)
                 if hideJoints:
                     cmds.setAttr(side+self.userGuideName+"_Rbn_RibbonJoint_Grp.visibility", 0)
                 # add hook attributes to be read when rigging integrated modules:
@@ -533,7 +558,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.integratedActionsDic = {
             "module": {
                 "hipsAList": self.aHipsAList,
-                "chestAList": self.aChestAList,
+                "endList": self.endList,
                 "volumeVariationAttrList": self.aVolVariationAttrList,
                 "ActiveVolumeVariationAttrList": self.aActVolVariationAttrList,
                 "MasterScaleVolumeVariationAttrList": self.aMScaleVolVariationAttrList,
