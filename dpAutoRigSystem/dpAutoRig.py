@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.10"
-DPAR_UPDATELOG = "N026 - Limb poleVector follow review.\nN339 - Added new Pin attribute.\nN421 - Fixed poleVector constraint interpolation\ntype to shortest.\nChanged Limb fk follow to isolate all to Root_Ctrl."
+DPAR_VERSION_PY3 = "4.00.11"
+DPAR_UPDATELOG = "N420 - Spine sub controls to Hips and Chest\nnamed Base and Tip controls."
 
 
 
@@ -2188,7 +2188,7 @@ class DP_AutoRig_UI(object):
                                     # getting spine data:
                                     fatherGuide = self.hookDic[moduleDic]['fatherGuide']
                                     hipsA  = self.integratedTaskDic[fatherGuide]['hipsAList'][0]
-                                    chestA = self.integratedTaskDic[fatherGuide]['chestAList'][0]
+                                    tipCtrl = self.integratedTaskDic[fatherGuide]['tipList'][0]
 
                                     cmds.parent(ikCtrlZero, self.ctrlsVisGrp, absolute=True)
                                     # verifying what part will be used, the hips or chest:
@@ -2197,7 +2197,7 @@ class DP_AutoRig_UI(object):
                                         cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
-                                        cmds.parentConstraint(chestA, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC")
+                                        cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC")
 
                                     # verify if is quadruped
                                     if limbStyle == self.langDic[self.langName]['m037_quadruped'] or limbStyle == self.langDic[self.langName]['m043_quadSpring']:
@@ -2205,11 +2205,11 @@ class DP_AutoRig_UI(object):
                                             # get extra info from limb module data:
                                             quadFrontLeg = self.integratedTaskDic[moduleDic]['quadFrontLegList'][s]
                                             ikCtrl       = self.integratedTaskDic[moduleDic]['ikCtrlList'][s]
-                                            # if quadruped, create a parent contraint from chestA to front leg:
-                                            quadChestParentConst = cmds.parentConstraint(self.rootCtrl, chestA, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
+                                            # if quadruped, create a parent contraint from tipCtrl to front leg:
+                                            quadChestParentConst = cmds.parentConstraint(self.rootCtrl, tipCtrl, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
                                             revNode = cmds.createNode('reverse', name=quadFrontLeg+"_Rev")
                                             cmds.addAttr(ikCtrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                                            cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+chestA+"W1", force=True)
+                                            cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+tipCtrl+"W1", force=True)
                                             cmds.connectAttr(ikCtrl+".followChestA", revNode+".inputX", force=True)
                                             cmds.connectAttr(revNode+".outputX", quadChestParentConst+"."+self.rootCtrl+"W0", force=True)
                             

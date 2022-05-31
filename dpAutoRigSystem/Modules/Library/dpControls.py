@@ -195,15 +195,15 @@ class ControlClass(object):
         jointList, jointGrpList = [], []
         for j in range(totalJoints+1):
             # create pointOnSurfaceInfo:
-            infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+"_POSI"+str(j))
+            infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+"_POSI"+str(j+1))
             # setting parameters worldSpace, U and V:
             cmds.connectAttr(ribbonNurbsPlaneShape + ".worldSpace[0]", infoNode + ".inputSurface")
             cmds.setAttr(infoNode + ".parameterV", ((1/float(totalJoints))*j) )
             cmds.setAttr(infoNode + ".parameterU", 0.5)
             # create and parent groups to calculate:
-            posGrp = cmds.group(n=name+"Pos"+str(j)+"_Grp", empty=True)
-            upGrp  = cmds.group(n=name+"Up"+str(j)+"_Grp", empty=True)
-            aimGrp = cmds.group(n=name+"Aim"+str(j)+"_Grp", empty=True)
+            posGrp = cmds.group(n=name+"Pos"+str(j+1)+"_Grp", empty=True)
+            upGrp  = cmds.group(n=name+"Up"+str(j+1)+"_Grp", empty=True)
+            aimGrp = cmds.group(n=name+"Aim"+str(j+1)+"_Grp", empty=True)
             cmds.parent(upGrp, aimGrp, posGrp, relative=True)
             # connect groups translations:
             cmds.connectAttr(infoNode + ".position", posGrp + ".translate", force=True)
@@ -211,19 +211,19 @@ class ControlClass(object):
             cmds.connectAttr(infoNode + ".tangentV", aimGrp + ".translate", force=True)
             # create joint:
             cmds.select(clear=True)
-            joint = cmds.joint(name=name+"_%02d_Jnt"%j)
+            joint = cmds.joint(name=name+"_%02d_Jnt"%(j+1))
             jointList.append(joint)
             cmds.addAttr(joint, longName='dpAR_joint', attributeType='float', keyable=False)
             # parent the joint to the groups:
             cmds.parent(joint, posGrp, relative=True)
-            jointGrp = cmds.group(joint, name=name+"Joint"+str(j)+"_Grp")
+            jointGrp = cmds.group(joint, name=name+"Joint"+str(j+1)+"_Grp")
             jointGrpList.append(jointGrp)
             # create aimConstraint from aimGrp to jointGrp:
             cmds.aimConstraint(aimGrp, jointGrp, offset=(0, 0, 0), weight=1, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=upGrp, n=name+"Ribbon"+str(j)+"_AiC" )
             # parent this ribbonPos to the ribbonGrp:
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
-            dpUtils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%j)
+            dpUtils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
     
     
