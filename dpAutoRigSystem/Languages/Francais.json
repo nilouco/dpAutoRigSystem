@@ -135,7 +135,6 @@
     "c121_side"              : "Cote",
     "c122_inner"             : "interieure",
     "c123_outer"             : "Exterieur",
-    "c124_end"               : "Final",
     
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",

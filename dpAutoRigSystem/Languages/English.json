@@ -135,7 +135,6 @@
     "c121_side"              : "Side",
     "c122_inner"             : "Inner",
     "c123_outer"             : "Outer",
-    "c124_end"               : "End",
     
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",

@@ -135,7 +135,6 @@
     "c121_side"              : "Lateral",
     "c122_inner"             : "Interno",
     "c123_outer"             : "Externo",
-    "c124_end"               : "Final",
 
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
