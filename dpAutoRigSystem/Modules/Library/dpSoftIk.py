@@ -45,12 +45,16 @@ class SoftIkClass(object):
     def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, axis="Z", *args):
         """ Create the softIk setup for given parameters.
             Just a general function edited from Nick Miller code.
+            Returns the softIk calibrate multiplyDivide node to receive the Option_Ctrl.rigScale output.
         """
+        softIkCalibValue = 0.2*cmds.getAttr(distBetween+".distance")
         # add the dSoft and softIk attributes on the controller:
         cmds.addAttr(ctrlName, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
+        cmds.addAttr(ctrlName, longName="softIk_"+self.langDic[self.langName]['c111_calibrate'], attributeType="double", min=0, defaultValue=softIkCalibValue, keyable=True)
         cmds.addAttr(ctrlName, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
         
         # set up node network for softIk:
+        self.calibrateMD = cmds.createNode("multiplyDivide", name=userName+"_SoftCalibrate_MD")
         softRmV = cmds.createNode("remapValue", name=userName+"_SoftDistance_RmV")
         daMD = cmds.createNode("plusMinusAverage", name=userName+"_DA_PMA")
         xMinusDaPMA = cmds.createNode("plusMinusAverage", name=userName+"_X_Minus_DA_PMA")
@@ -69,7 +73,6 @@ class SoftIkClass(object):
         # set default values and operations:
         cmds.setAttr(powEMD+".input1X", 2.718281828)
         cmds.setAttr(softRmV+".outputMin", 0.001)
-        cmds.setAttr(softRmV+".outputMax", 2)
         cmds.setAttr(negateXMinusMD+".input2X", -1)
         cmds.setAttr(oneMinusPowEPMD+".input1D[0]", 1)
         cmds.setAttr(daMD+".operation", 2) #divide
@@ -84,6 +87,8 @@ class SoftIkClass(object):
         cmds.setAttr(distDiffPMA+".operation", 2) #substract
 
         # make connections:
+        cmds.connectAttr(ctrlName+".softIk_"+self.langDic[self.langName]['c111_calibrate'], self.calibrateMD+".input1X", force=True)
+        cmds.connectAttr(self.calibrateMD+".outputX", softRmV+".outputMax", force=True)
         cmds.connectAttr(ctrlName+".softIk", softRmV+".inputValue", force=True)
         cmds.connectAttr(softRmV+".outValue", ctrlName+".softDistance", force=True)
         cmds.connectAttr(ctrlName+".startChainLength", lengthStartMD+".input1X", force=True)
@@ -132,3 +137,4 @@ class SoftIkClass(object):
                 cmds.connectAttr(lenghtOutputMD+".outputX", ikJointList[i]+".scale"+axis, force=True)
                 cmds.connectAttr(lenghtOutputMD+".outputX", skinJointList[i]+".scale"+axis, force=True)
                 i += 1
+        return self.calibrateMD

@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.11"
-DPAR_UPDATELOG = "N420 - Spine sub controls to Hips and Chest\nnamed Base and Tip controls."
+DPAR_UPDATELOG = "N469 - SoftIk calibration."
 
 
 
@@ -2120,6 +2120,10 @@ class DP_AutoRig_UI(object):
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
+                            softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList'][s]
+                            # connect Option_Ctrl RigScale_MD output to the radiusScale:
+                            if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
+                                cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList+".input2X", force=True)
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)

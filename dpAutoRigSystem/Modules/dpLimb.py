@@ -51,6 +51,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.origRotList = []
         self.bendJointList = []
         self.masterCtrlRefList = []
+        self.softIkCalibrateList = []
 
 
     def createModuleLayout(self, *args):
@@ -1405,7 +1406,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                 
                 # softIk:
-                self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef)
+                self.softIkCalibrateList.append(self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef))
                 # orient ikHandle group setup:
                 softIkOrientLoc = cmds.spaceLocator(name=side+self.userGuideName+"_SoftIk_Aim_Loc")[0]
                 cmds.delete(cmds.parentConstraint(self.ikJointList[1], softIkOrientLoc, maintainOffset=False))
@@ -1432,12 +1433,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # calibration attribute:
                 if self.limbTypeName == ARM:
-                    ikExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
+                    ikExtremCalibrationList = [
+                                            self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize(),
+                                            "softIk_"+self.langDic[self.langName]['c111_calibrate']
+                    ]
                 else: #leg
                     ikExtremCalibrationList = [
                                             self.langDic[self.langName]['c015_revFoot_F']+self.langDic[self.langName]['c018_revFoot_roll'].capitalize()+self.langDic[self.langName]['c102_angle'].capitalize(),
                                             self.langDic[self.langName]['c015_revFoot_F']+self.langDic[self.langName]['c018_revFoot_roll'].capitalize()+self.langDic[self.langName]['c103_plant'].capitalize(),
-                                            self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()
+                                            self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize(),
+                                            "softIk_"+self.langDic[self.langName]['c111_calibrate']
                     ]
                 fkExtremCalibrationList = [self.langDic[self.langName]['c040_uniformScale']+self.langDic[self.langName]['c105_multiplier'].capitalize()]
                 fkBeforeCalibrationList = [self.langDic[self.langName]['c032_follow']]
@@ -1498,6 +1503,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": "limbManualVolume",
                 "scalableGrp": self.aScalableGrps,
-                "masterCtrlRefList": self.masterCtrlRefList
+                "masterCtrlRefList": self.masterCtrlRefList,
+                "softIkCalibrateList": self.softIkCalibrateList
             }
         }
