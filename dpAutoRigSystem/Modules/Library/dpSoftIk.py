@@ -47,10 +47,10 @@ class SoftIkClass(object):
             Just a general function edited from Nick Miller code.
             Returns the softIk calibrate multiplyDivide node to receive the Option_Ctrl.rigScale output.
         """
-        softIkCalibValue = 0.2*cmds.getAttr(distBetween+".distance")
+        softIkCalibValue = 0.02*cmds.getAttr(distBetween+".distance")
         # add the dSoft and softIk attributes on the controller:
         cmds.addAttr(ctrlName, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
-        cmds.addAttr(ctrlName, longName="softIk_"+self.langDic[self.langName]['c111_calibrate'], attributeType="double", min=0, defaultValue=softIkCalibValue, keyable=True)
+        cmds.addAttr(ctrlName, longName="softIk_"+self.langDic[self.langName]['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
         cmds.addAttr(ctrlName, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
         
         # set up node network for softIk:

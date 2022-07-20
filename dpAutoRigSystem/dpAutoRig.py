@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.11"
+DPAR_VERSION_PY3 = "4.00.12"
 DPAR_UPDATELOG = "N469 - SoftIk calibration."
 
 
