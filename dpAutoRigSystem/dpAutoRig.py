@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.12"
-DPAR_UPDATELOG = "N469 - SoftIk calibration."
+DPAR_VERSION_PY3 = "4.00.13"
+DPAR_UPDATELOG = "N468 - Review constraint suffix."
 
 
 

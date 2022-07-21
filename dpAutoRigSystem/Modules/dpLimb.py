@@ -1254,10 +1254,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.delete(cmds.pointConstraint(self.fkCtrlList[1], acLocGrp, maintainOffset=False))
                     cmds.parent(acRefMainLoc, acLocGrp, self.toScalableHookGrp)
                     cmds.delete(cmds.pointConstraint(self.ikACJointList[1], acRefMainLoc, maintainOffset=False))
-                    cmds.parentConstraint(self.ikACJointList[1], acRefMainLoc, skipTranslate=["x", "y", "z"], maintainOffset=False, name=acRefMainLoc+"_PAC")
+                    cmds.parentConstraint(self.ikACJointList[1], acRefMainLoc, skipTranslate=["x", "y", "z"], maintainOffset=False, name=acRefMainLoc+"_PaC")
                     self.ctrls.directConnect(acRefMainLoc, acIkMainLoc, ['rx', 'ry', 'rz']) #shoulder rotate
                     cmds.delete(cmds.parentConstraint(self.fkCtrlList[2], acIkCornerLoc, maintainOffset=False))
-                    cmds.parentConstraint(acIkMainLoc, acIkUpLoc, maintainOffset=True, name=acIkUpLoc+"_PAC")
+                    cmds.parentConstraint(acIkMainLoc, acIkUpLoc, maintainOffset=True, name=acIkUpLoc+"_PaC")
                     
                     # aim constraint: (edited in order to point to limb corner (elbow/knee) outside of clavicle hierarchy to avoid cycle error).
                     if self.limbTypeName == ARM:
