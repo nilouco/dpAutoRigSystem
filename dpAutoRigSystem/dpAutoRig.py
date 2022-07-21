@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.13"
-DPAR_UPDATELOG = "N468 - Review constraint suffix."
+DPAR_VERSION_PY3 = "4.00.14"
+DPAR_UPDATELOG = "N481 - Prefix review."
 
 
 
@@ -1614,7 +1614,7 @@ class DP_AutoRig_UI(object):
         localTime = str( time.asctime( time.localtime(time.time()) ) )
         if masterGrpList:
             # validate master (All_Grp) node
-            # If it doesn't work, the user need to clean it's scene to avoid duplicated names, for the moment.
+            # If it doesn't work, the user need to clean the current scene to avoid duplicated names, for the moment.
             for nodeGrp in masterGrpList:
                 if self.validateMasterGrp(nodeGrp):
                     self.masterGrp = nodeGrp
@@ -1638,6 +1638,8 @@ class DP_AutoRig_UI(object):
             # rig info to be updated:
             cmds.addAttr(self.masterGrp, longName="geometryList", dataType="string")
             cmds.addAttr(self.masterGrp, longName="controlList", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="prefix", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="name", dataType="string")
             # setting All_Grp data
             cmds.setAttr(self.masterGrp+"."+MASTER_ATTR, True)
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
@@ -1646,16 +1648,16 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.masterGrp+".language", self.langName, type="string")
             cmds.setAttr(self.masterGrp+".preset", self.presetName, type="string")
             cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
+            cmds.setAttr(self.masterGrp+".prefix", self.prefix, type="string")
+            cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
-            cmds.addAttr(self.masterGrp, longName="name", dataType="string")
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
-        cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
 
         #Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
@@ -1672,7 +1674,7 @@ class DP_AutoRig_UI(object):
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
-            if self.masterGrp == sAllGrp:
+            if self.masterGrp == self.prefix+sAllGrp:
                 cmds.parent(self.modelsGrp, self.ctrlsGrp, self.dataGrp, self.renderGrp, self.proxyGrp, self.fxGrp, self.masterGrp)
                 cmds.parent(self.staticGrp, self.scalableGrp, self.blendShapesGrp, self.wipGrp, self.dataGrp)
         cmds.select(None)
