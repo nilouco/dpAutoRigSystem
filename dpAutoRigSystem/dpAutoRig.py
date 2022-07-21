@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.14"
-DPAR_UPDATELOG = "N481 - Prefix review."
+DPAR_VERSION_PY3 = "4.00.15"
+DPAR_UPDATELOG = "N442 - Wheel Main Scale Constraint Fix"
 
 
 
