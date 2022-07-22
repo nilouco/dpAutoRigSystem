@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.15"
-DPAR_UPDATELOG = "N442 - Wheel Main Scale Constraint Fix"
+DPAR_VERSION_PY3 = "4.00.16"
+DPAR_UPDATELOG = "N483 - Fixed saving optionVar to autoUpdate."
 
 
 
@@ -966,7 +966,6 @@ class DP_AutoRig_UI(object):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        self.setAutoCheckUpdatePref(0)
         print("\n", self.langDic[self.langName]['i084_checkUpdate'])
         
         # compare current version with GitHub master
