@@ -11,7 +11,7 @@ TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
 
-DPCORRECTIONMANAGER_VERSION = 2.1
+DPCORRECTIONMANAGER_VERSION = 2.2
 
 
 class CorrectionManager(object):
@@ -71,7 +71,7 @@ class CorrectionManager(object):
         radioLayout = cmds.columnLayout("radioLayout", parent=refreshLayout)
         self.correctTypeCollection = cmds.radioCollection("correctTypeCollection", parent=radioLayout)
         typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation="Angle", collection=self.correctTypeCollection)
-        typeDistance = cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation="Distance", collection=self.correctTypeCollection)
+        cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation="Distance", collection=self.correctTypeCollection)
         cmds.radioCollection(self.correctTypeCollection, edit=True, select=typeAngle)
         cmds.refreshBT = cmds.button('refreshBT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
@@ -103,6 +103,31 @@ class CorrectionManager(object):
                                 cmds.rename(children, children.replace(oldName, name))
                             except:
                                 pass
+
+
+    def getDistance(self, *args):
+        """ TODO write description
+
+
+
+        """
+        if cmds.getAttr(self.net+".type") == "Distance":
+            distBet = cmds.listConnections(self.net+".distanceBet")[0]
+            if distBet:
+                return cmds.getAttr(distBet+".distance")
+
+
+
+
+
+    def readDistance(self, *args):
+        """ TODO write description
+
+
+
+        """
+        currentDist = self.getDistance()
+        cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(currentDist))
 
 
     def changeName(self, name=None, *args):
@@ -186,6 +211,10 @@ class CorrectionManager(object):
             self.actualizeEditLayout()
 
 
+    
+
+
+
     def recreateSelectedLayout(self, node=None, *args):
         """ It will recreate the edit layout for the selected network node.
         """
@@ -197,23 +226,28 @@ class CorrectionManager(object):
                 currentName = cmds.getAttr(self.net+".name")
                 self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.langDic[self.langName]['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
                 self.delete_BT = cmds.button('delete_BT', label=self.langDic[self.langName]['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
-                # axis:
-                self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(40, 50, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
-                cmds.text("axisTxt", label=self.langDic[self.langName]['i052_axis'], parent=self.axisLayout)
-                self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
-                self.axisMenuItemList = ['X', 'Y', 'Z']
-                for axis in self.axisMenuItemList:
-                    cmds.menuItem(label=axis, parent=self.axisMenu)
-                currentAxis = cmds.getAttr(self.net+".axis")
-                cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
-                # axis order:
-                cmds.text("axisOrderTxt", label=self.langDic[self.langName]['i052_axis']+" "+self.langDic[self.langName]['m045_order'], parent=self.axisLayout)
-                self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisLayout)
-                self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
-                for axisOrder in self.axisOrderMenuItemList:
-                    cmds.menuItem(label=axisOrder, parent=self.axisOrderMenu)
-                currentAxisOrder = cmds.getAttr(self.net+".axisOrder")
-                cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
+                if cmds.getAttr(self.net+".type") == "Angle":
+                    # axis:
+                    self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(40, 50, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
+                    cmds.text("axisTxt", label=self.langDic[self.langName]['i052_axis'], parent=self.axisLayout)
+                    self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
+                    self.axisMenuItemList = ['X', 'Y', 'Z']
+                    for axis in self.axisMenuItemList:
+                        cmds.menuItem(label=axis, parent=self.axisMenu)
+                    currentAxis = cmds.getAttr(self.net+".axis")
+                    cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
+                    # axis order:
+                    cmds.text("axisOrderTxt", label=self.langDic[self.langName]['i052_axis']+" "+self.langDic[self.langName]['m045_order'], parent=self.axisLayout)
+                    self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisLayout)
+                    self.axisOrderMenuItemList = ['XYZ', 'YZX', 'ZXY', 'XZY', 'YXZ', 'ZYX']
+                    for axisOrder in self.axisOrderMenuItemList:
+                        cmds.menuItem(label=axisOrder, parent=self.axisOrderMenu)
+                    currentAxisOrder = cmds.getAttr(self.net+".axisOrder")
+                    cmds.optionMenu(self.axisOrderMenu, edit=True, value=self.axisOrderMenuItemList[currentAxisOrder])
+                else: #Distance
+                    self.distanceLayout = cmds.columnLayout('distanceLayout', adjustableColumn=True, height=30, parent=self.selectedLayout)
+                    currentDistance = self.getDistance()
+                    self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.langDic[self.langName]['m182_distance'], text=str(currentDistance), buttonLabel=self.langDic[self.langName]['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 150), (3, 80)], parent=self.distanceLayout)
                 # input and output values:
                 currentInputMin = cmds.getAttr(self.net+".inputMin")
                 currentInputMax = cmds.getAttr(self.net+".inputMax")
@@ -339,7 +373,7 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="inputMax", attributeType="float", defaultValue=90)
                     cmds.addAttr(self.net, longName="outputMin", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputMax", attributeType="float", defaultValue=1)
-                    messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "intensityMD", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR", "originalLoc", "actionLoc"]
+                    messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "intensityMD", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR", "originalLoc", "actionLoc", "distanceBet"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.addAttr(self.net, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
@@ -424,12 +458,22 @@ class CorrectionManager(object):
                         
                         print("Merci distance --- WIP")
 
-
+                        # create distanceBetween node:
+                        distBet = cmds.createNode("distanceBetween", name=correctionName+"_Distance_DB")
+                        cmds.connectAttr(originalLoc+".worldPosition.worldPositionX", distBet+".point1X")
+                        cmds.connectAttr(originalLoc+".worldPosition.worldPositionY", distBet+".point1Y")
+                        cmds.connectAttr(originalLoc+".worldPosition.worldPositionZ", distBet+".point1Z")
+                        cmds.connectAttr(actionLoc+".worldPosition.worldPositionX", distBet+".point2X")
+                        cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distBet+".point2Y")
+                        cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distBet+".point2Z")
                         
+                        
+                        dist = cmds.getAttr(distBet+".distance")
+
+                        print("dist =", dist)
 
 
-
-
+                        cmds.connectAttr(distBet+".message", self.net+".distanceBet")
 
 
                     # update UI                    

@@ -550,6 +550,7 @@
     "m180_additional"           : "Additional",
     "m181_refresh"              : "Refresh",
     "m182_distance"             : "Distance",
+    "m183_readValue"            : "Read value",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

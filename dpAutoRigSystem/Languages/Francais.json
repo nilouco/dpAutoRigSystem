@@ -550,6 +550,7 @@
     "m180_additional"           : "Additionnel",
     "m181_refresh"              : "Recharger",
     "m182_distance"             : "Distance",
+    "m183_readValue"            : "Lire la valeur",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

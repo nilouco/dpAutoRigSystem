@@ -550,6 +550,7 @@
     "m180_additional"           : "Adicional",
     "m181_refresh"              : "Atualizar",
     "m182_distance"             : "Distância",
+    "m183_readValue"            : "Ler o valor",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
