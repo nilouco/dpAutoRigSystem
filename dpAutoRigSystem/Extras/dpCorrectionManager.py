@@ -69,10 +69,10 @@ class CorrectionManager(object):
         refreshLayout = cmds.rowColumnLayout('refreshLayoutA', numberOfColumns=3, columnWidth=[(1, 50), (2, 250), (3, 80)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 10), (2, 'left', 0), (3, 'both', 10)], parent=correctionManagerLayout)
         cmds.text(self.langDic[self.langName]['i138_type'], parent=refreshLayout)
         radioLayout = cmds.columnLayout("radioLayout", parent=refreshLayout)
-        cmds.radioCollection("correctTypeCollection", parent=radioLayout)
-        typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation="Angle", collection="correctTypeCollection")
-        typeDistance = cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation="Distance", collection="correctTypeCollection")
-        cmds.radioCollection("correctTypeCollection", edit=True, select=typeAngle)
+        self.correctTypeCollection = cmds.radioCollection("correctTypeCollection", parent=radioLayout)
+        typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation="Angle", collection=self.correctTypeCollection)
+        typeDistance = cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation="Distance", collection=self.correctTypeCollection)
+        cmds.radioCollection(self.correctTypeCollection, edit=True, select=typeAngle)
         cmds.refreshBT = cmds.button('refreshBT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
         # existing:
@@ -287,7 +287,7 @@ class CorrectionManager(object):
             mel.eval('warning \"'+toAttach+' '+self.langDic[self.langName]['i061_notExists']+'\";')
 
 
-    def createCorrectionManager(self, nodeList=None, name=None, *args):
+    def createCorrectionManager(self, nodeList=None, name=None, correctType=None, *args):
         """ Create nodes to calculate the correction we want to mapper to fix.
         """
         # loading Maya matrix node
@@ -319,11 +319,19 @@ class CorrectionManager(object):
                             name = "Correction"
                     correctionName, name = dpUtils.resolveName(name, self.netSuffix)
                     
+                    # type
+                    if not correctType:
+                        typeSelectedRadioButton = cmds.radioCollection(self.correctTypeCollection, query=True, select=True)
+                        correctType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
+                        if not correctType:
+                            correctType = "Angle"
+
                     # create the container of the system data using a network node
                     self.net = cmds.createNode("network", name=name)
                     cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
                     cmds.addAttr(self.net, longName="dpCorrectionManager", attributeType="bool")
                     cmds.addAttr(self.net, longName="name", dataType="string")
+                    cmds.addAttr(self.net, longName="type", dataType="string")
                     cmds.addAttr(self.net, longName="inputValue", attributeType="float")
                     cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
                     cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
@@ -339,75 +347,91 @@ class CorrectionManager(object):
                     cmds.setAttr(self.net+".dpNetwork", 1)
                     cmds.setAttr(self.net+".dpCorrectionManager", 1)
                     cmds.setAttr(self.net+".name", correctionName, type="string")
+                    cmds.setAttr(self.net+".type", correctType, type="string")
                     correctionDataGrp = cmds.group(empty=True, name=correctionName+"_Grp")
                     cmds.connectAttr(correctionDataGrp+".message", self.net+".correctionDataGrp", force=True)
                     cmds.parent(correctionDataGrp, self.correctionManagerDataGrp)
                     originalLoc = self.createCorrectiveLocator(correctionName+"_Original", origNode)
                     actionLoc = self.createCorrectiveLocator(correctionName+"_Action", actionNode)
-                    
-                    # if rotate extration option:
-                    # write a new dpUtils function to generate these matrix nodes here:
-                    extractAngleMM = cmds.createNode("multMatrix", name=correctionName+"_ExtractAngle_MM")
-                    extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
-                    extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")
-                    extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
-                    intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
-                    smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
-                    overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
-                    inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
-                    outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
-                    cmds.setAttr(extractAngleMD+".operation", 2)
-                    cmds.setAttr(smallerThanOneCnd+".operation", 5) #less or equal
-                    cmds.setAttr(smallerThanOneCnd+".secondTerm", 1)
-                    cmds.setAttr(overZeroCnd+".secondTerm", 0)
-                    cmds.setAttr(overZeroCnd+".colorIfFalseR", 0)
-                    cmds.setAttr(overZeroCnd+".operation", 3) #greater or equal
-                    cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
-                    cmds.connectAttr(originalLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
-                    cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
-                    # setup the rotation affection
-                    cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
-                    cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
-                    cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
-                    cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
-                    # axis setup
-                    cmds.connectAttr(self.net+".inputMin", inputRmV+".inputMin", force=True)
-                    cmds.connectAttr(self.net+".inputMax", inputRmV+".inputMax", force=True)
-                    cmds.connectAttr(self.net+".inputMax", inputRmV+".outputMax", force=True)
-                    cmds.connectAttr(inputRmV+".outValue", extractAngleMD+".input1X", force=True)
-                    cmds.connectAttr(extractAngleQtE+".outputRotateX", inputRmV+".inputValue", force=True) #it'll be updated when changing axis
-                    unitConv = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
-                    cmds.setAttr(self.net+".inputValue", lock=False)
-                    cmds.connectAttr(unitConv+".output", self.net+".inputValue", force=True)
-                    cmds.setAttr(self.net+".inputValue", lock=True)
-                    # axis order setup
-                    cmds.connectAttr(self.net+".inputMax", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
-                    cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".firstTerm", force=True)
-                    cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
-                    cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
-                    cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
-                    # intensity setup:
-                    cmds.setAttr(outputSR+".oldMaxX", 1)
-                    cmds.connectAttr(self.net+".outputMin", outputSR+".minX", force=True)
-                    cmds.connectAttr(self.net+".outputMax", outputSR+".maxX", force=True)
-                    cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
-                    cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
-                    cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
-                    # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                    cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
-                    cmds.setAttr(self.net+".outputValue", lock=True)
-                    # serialize message attributes
-                    cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
-                    cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
-                    cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
-                    cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
-                    cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
-                    cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
-                    cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
+                    # serialize locators
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
-                    cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
-                    cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
+                    
+                    # if rotate extration option:
+                    if correctType == "Angle":
+                        # write a new dpUtils function to generate these matrix nodes here:
+                        extractAngleMM = cmds.createNode("multMatrix", name=correctionName+"_ExtractAngle_MM")
+                        extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
+                        extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")
+                        extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
+                        intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
+                        smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
+                        overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
+                        inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
+                        outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
+                        cmds.setAttr(extractAngleMD+".operation", 2)
+                        cmds.setAttr(smallerThanOneCnd+".operation", 5) #less or equal
+                        cmds.setAttr(smallerThanOneCnd+".secondTerm", 1)
+                        cmds.setAttr(overZeroCnd+".secondTerm", 0)
+                        cmds.setAttr(overZeroCnd+".colorIfFalseR", 0)
+                        cmds.setAttr(overZeroCnd+".operation", 3) #greater or equal
+                        cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
+                        cmds.connectAttr(originalLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
+                        cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
+                        # setup the rotation affection
+                        cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
+                        cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
+                        # axis setup
+                        cmds.connectAttr(self.net+".inputMin", inputRmV+".inputMin", force=True)
+                        cmds.connectAttr(self.net+".inputMax", inputRmV+".inputMax", force=True)
+                        cmds.connectAttr(self.net+".inputMax", inputRmV+".outputMax", force=True)
+                        cmds.connectAttr(inputRmV+".outValue", extractAngleMD+".input1X", force=True)
+                        cmds.connectAttr(extractAngleQtE+".outputRotateX", inputRmV+".inputValue", force=True) #it'll be updated when changing axis
+                        unitConv = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
+                        cmds.setAttr(self.net+".inputValue", lock=False)
+                        cmds.connectAttr(unitConv+".output", self.net+".inputValue", force=True)
+                        cmds.setAttr(self.net+".inputValue", lock=True)
+                        # axis order setup
+                        cmds.connectAttr(self.net+".inputMax", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
+                        cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".firstTerm", force=True)
+                        cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
+                        cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
+                        cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
+                        # intensity setup:
+                        cmds.setAttr(outputSR+".oldMaxX", 1)
+                        cmds.connectAttr(self.net+".outputMin", outputSR+".minX", force=True)
+                        cmds.connectAttr(self.net+".outputMax", outputSR+".maxX", force=True)
+                        cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
+                        cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
+                        cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
+                        # TODO create a way to avoid manual connection here, maybe using the UI new tab?
+                        cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
+                        cmds.setAttr(self.net+".outputValue", lock=True)
+                        # serialize message attributes
+                        cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
+                        cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
+                        cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
+                        cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
+                        cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
+                        cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
+                        cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
+                        cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
+                        cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
+                    else: #Distance
+                        
+                        
+                        print("Merci distance --- WIP")
+
+
+                        
+
+
+
+
+
+
                     # update UI                    
                     if self.ui:
                         self.populateNetUI()
