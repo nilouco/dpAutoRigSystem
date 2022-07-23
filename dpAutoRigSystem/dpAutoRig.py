@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.17"
-DPAR_UPDATELOG = "N473 - BendGrps quadruped issue fixed.\nNow we have ribbons for all quadruped types."
+DPAR_UPDATELOG = "N454 - Correct by distance."
 
 
 
