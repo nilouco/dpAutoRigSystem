@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.19"
-DPAR_UPDATELOG = "N354 - Neck autoRotate calculation.
+DPAR_UPDATELOG = "N354 - Neck autoRotate calculation."
 
 
 
