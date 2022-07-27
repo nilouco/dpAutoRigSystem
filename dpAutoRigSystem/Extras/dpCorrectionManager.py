@@ -15,6 +15,9 @@ ICON = "/Icons/dp_correctionManager.png"
 
 DPCORRECTIONMANAGER_VERSION = 2.2
 
+ANGLE = "Angle"
+DISTANCE = "Distance"
+
 
 class CorrectionManager(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, ui=True, *args, **kwargs):
@@ -72,10 +75,10 @@ class CorrectionManager(object):
         cmds.text(self.langDic[self.langName]['i138_type'], parent=refreshLayout)
         radioLayout = cmds.columnLayout("radioLayout", parent=refreshLayout)
         self.correctTypeCollection = cmds.radioCollection("correctTypeCollection", parent=radioLayout)
-        typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation="Angle", collection=self.correctTypeCollection)
-        cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation="Distance", collection=self.correctTypeCollection)
+        typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation=ANGLE, collection=self.correctTypeCollection)
+        cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation=DISTANCE, collection=self.correctTypeCollection)
         cmds.radioCollection(self.correctTypeCollection, edit=True, select=typeAngle)
-        self.rivetCB = cmds.checkBox('rivetCB', label="Rivet them", parent=refreshLayout)
+        self.rivetCB = cmds.checkBox('rivetCB', label="Rivet", parent=refreshLayout)
         cmds.refreshBT = cmds.button('refreshBT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
         # existing:
@@ -109,25 +112,16 @@ class CorrectionManager(object):
 
 
     def getDistance(self, *args):
-        """ TODO write description
-
-
-
+        """ Returns the distance value read from the distance between node.
         """
-        if cmds.getAttr(self.net+".type") == "Distance":
+        if cmds.getAttr(self.net+".type") == DISTANCE:
             distBet = cmds.listConnections(self.net+".distanceBet")[0]
             if distBet:
                 return cmds.getAttr(distBet+".distance")
 
 
-
-
-
     def readDistance(self, *args):
-        """ TODO write description
-
-
-
+        """ Update the UI text field with the current distance.
         """
         currentDist = self.getDistance()
         cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(currentDist))
@@ -214,10 +208,6 @@ class CorrectionManager(object):
             self.actualizeEditLayout()
 
 
-    
-
-
-
     def recreateSelectedLayout(self, node=None, *args):
         """ It will recreate the edit layout for the selected network node.
         """
@@ -229,7 +219,7 @@ class CorrectionManager(object):
                 currentName = cmds.getAttr(self.net+".name")
                 self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.langDic[self.langName]['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
                 self.delete_BT = cmds.button('delete_BT', label=self.langDic[self.langName]['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
-                if cmds.getAttr(self.net+".type") == "Angle":
+                if cmds.getAttr(self.net+".type") == ANGLE:
                     # axis:
                     self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(40, 50, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
                     cmds.text("axisTxt", label=self.langDic[self.langName]['i052_axis'], parent=self.axisLayout)
@@ -308,7 +298,7 @@ class CorrectionManager(object):
             pass
 
 
-    def createCorrectiveLocator(self, name, toAttach, toRivet=None, *args):
+    def createCorrectiveLocator(self, name, toAttach, toRivet=False, *args):
         """ Creates a space locator, zeroOut it to receive a parentConstraint.
             Return the locator to use it as a reader node to the system.
         """
@@ -364,7 +354,7 @@ class CorrectionManager(object):
                         typeSelectedRadioButton = cmds.radioCollection(self.correctTypeCollection, query=True, select=True)
                         correctType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
                         if not correctType:
-                            correctType = "Angle"
+                            correctType = ANGLE
 
                     # rivet
                     if fromUI:
@@ -404,7 +394,7 @@ class CorrectionManager(object):
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
                     
                     # if rotate extration option:
-                    if correctType == "Angle":
+                    if correctType == ANGLE:
                         # write a new dpUtils function to generate these matrix nodes here:
                         extractAngleMM = cmds.createNode("multMatrix", name=correctionName+"_ExtractAngle_MM")
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
