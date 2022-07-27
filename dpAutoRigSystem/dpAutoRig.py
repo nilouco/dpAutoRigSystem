@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.14"
-DPAR_UPDATELOG = "N481 - Prefix review."
+DPAR_VERSION_PY3 = "4.00.19"
+DPAR_UPDATELOG = "N354 - Neck autoRotate calculation."
 
 
 
