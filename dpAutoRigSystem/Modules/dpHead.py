@@ -162,9 +162,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.cvNeckLoc+".nJoint", n)
                     # parent it to the lastGuide:
                     cmds.parent(self.cvNeckLoc, self.guideName+"_Neck"+str(n-2), relative=True)
-                    # translate new topLoc in the middle of distance of last top and middle guides:
-                    dist = dpUtils.distanceBet(self.guideName+"_Neck"+str(n-1), self.guideName+"_Head")[0]
-                    cmds.setAttr(self.cvNeckLoc+".translateY", (0.5*dist))
                     # create a joint to use like an arrowLine:
                     self.jGuide = cmds.joint(name=self.guideName+"_JGuideNeck"+str(n-1), radius=0.001)
                     cmds.setAttr(self.jGuide+".template", 1)
@@ -184,6 +181,13 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete difference of nJoints:
                 cmds.delete(self.guideName+"_Neck"+str(self.enteredNJoints))
                 cmds.delete(self.guideName+"_JGuideNeck"+str(self.enteredNJoints))
+            # get the length of the neck to position segments.
+            dist = dpUtils.distanceBet(self.guideName+"_Neck0", self.guideName+"_Head")[0]
+            # translateY to input on each cvLocator
+            distBt = dist/(self.enteredNJoints)
+            for n in range(1, self.enteredNJoints):
+                # translate the locators to the calculated position:
+                cmds.setAttr(self.guideName+"_Neck"+str(n)+".translateY", distBt)
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
@@ -291,7 +295,14 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(self.jawCtrl+"."+calibOutputAttrName, jawOutputRmV+".inputMax", force=True)
             cmds.connectAttr(jawOutputRmV+".outValue", self.jawCtrl+"."+outputAttrName, force=True)
             cmds.setAttr(self.jawCtrl+"."+outputAttrName, lock=True)
-    
+
+
+    def autoRotateCalc(self, n, *args):
+        if n == 0:
+            return (2**(1/self.nJoints))-1
+        else:
+            return (2**(n/self.nJoints))-(1-(1/self.nJoints))
+
     
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
@@ -598,7 +609,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.neckPivot = cmds.xform(self.neckCtrlList[n], query=True, worldSpace=True, translation=True)
                     self.neckOrientGrp = cmds.group(self.neckCtrlList[n], name=self.neckCtrlList[n]+"_Orient_Grp")
                     cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
-                    cmds.addAttr(self.neckCtrlList[n], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=(0.15*(n+1)), keyable=True)
+                    cmds.addAttr(self.neckCtrlList[n], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=self.autoRotateCalc(n), keyable=True)
                     neckARMDName = self.langDic[self.langName]['c047_autoRotate'][0].capitalize()+self.langDic[self.langName]['c047_autoRotate'][1:]
                     neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_MD")
                     cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)

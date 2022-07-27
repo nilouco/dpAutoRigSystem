@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.18"
-DPAR_UPDATELOG = "N457-set-minimum-rigscale"
+DPAR_VERSION_PY3 = "4.00.19"
+DPAR_UPDATELOG = "N354 - Neck autoRotate calculation.
 
 
 
