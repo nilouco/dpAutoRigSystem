@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.00.19"
-DPAR_UPDATELOG = "N354 - Neck autoRotate calculation."
+DPAR_UPDATELOG = "N354 - Neck autoRotate calculation.
 
 
 
@@ -966,7 +966,6 @@ class DP_AutoRig_UI(object):
         """ Check if there's an update for this current script version.
             Output the result in a window.
         """
-        self.setAutoCheckUpdatePref(0)
         print("\n", self.langDic[self.langName]['i084_checkUpdate'])
         
         # compare current version with GitHub master
@@ -2122,10 +2121,7 @@ class DP_AutoRig_UI(object):
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
-                            softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList'][s]
-                            # connect Option_Ctrl RigScale_MD output to the radiusScale:
-                            if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
-                                cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList+".input2X", force=True)
+                            softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList']
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:
                                 floatAttrList = cmds.listAttr(worldRef, visible=True, scalar=True, keyable=True, userDefined=True)
@@ -2146,6 +2142,9 @@ class DP_AutoRig_UI(object):
                                 for bendAttr in bendAttrList:
                                     if cmds.objExists(self.optionCtrl+"."+bendAttr):
                                         cmds.setAttr(self.optionCtrl+"."+bendAttr, keyable=False, channelBox=True)
+                                # connect Option_Ctrl RigScale_MD output to the radiusScale:
+                                if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
+                                    cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
                                 
                                 # update ikFkNetwork:
                                 if ikFkNetworkList:
