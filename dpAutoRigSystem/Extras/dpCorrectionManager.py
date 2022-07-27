@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from functools import partial
+from . import dpRivet
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 
@@ -63,16 +65,17 @@ class CorrectionManager(object):
         correctionManagerLayout = cmds.columnLayout('correctionManagerLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text("infoTxt", label=self.langDic[self.langName]['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent=correctionManagerLayout)
         correctionManagerLayoutA = cmds.rowColumnLayout('correctionManagerLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=correctionManagerLayout)
-        self.createBT = cmds.button('createBT', label=self.langDic[self.langName]['i158_create'], command=self.createCorrectionManager, backgroundColor=(0.7, 1.0, 0.7), parent=correctionManagerLayoutA)
+        self.createBT = cmds.button('createBT', label=self.langDic[self.langName]['i158_create'], command=partial(self.createCorrectionManager, fromUI=True), backgroundColor=(0.7, 1.0, 0.7), parent=correctionManagerLayoutA)
         self.createTF = cmds.textField('createTF', editable=True, parent=correctionManagerLayoutA)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
-        refreshLayout = cmds.rowColumnLayout('refreshLayoutA', numberOfColumns=3, columnWidth=[(1, 50), (2, 250), (3, 80)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 10), (2, 'left', 0), (3, 'both', 10)], parent=correctionManagerLayout)
+        refreshLayout = cmds.rowColumnLayout('refreshLayoutA', numberOfColumns=4, columnWidth=[(1, 50), (2, 150), (2, 100), (3, 80)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'both', 10), (2, 'left', 0), (3, 'left', 10), (4, 'left', 90)], parent=correctionManagerLayout)
         cmds.text(self.langDic[self.langName]['i138_type'], parent=refreshLayout)
         radioLayout = cmds.columnLayout("radioLayout", parent=refreshLayout)
         self.correctTypeCollection = cmds.radioCollection("correctTypeCollection", parent=radioLayout)
         typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation="Angle", collection=self.correctTypeCollection)
         cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation="Distance", collection=self.correctTypeCollection)
         cmds.radioCollection(self.correctTypeCollection, edit=True, select=typeAngle)
+        self.rivetCB = cmds.checkBox('rivetCB', label="Rivet them", parent=refreshLayout)
         cmds.refreshBT = cmds.button('refreshBT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
         # existing:
@@ -305,7 +308,7 @@ class CorrectionManager(object):
             pass
 
 
-    def createCorrectiveLocator(self, name, toAttach, *args):
+    def createCorrectiveLocator(self, name, toAttach, toRivet=None, *args):
         """ Creates a space locator, zeroOut it to receive a parentConstraint.
             Return the locator to use it as a reader node to the system.
         """
@@ -314,22 +317,25 @@ class CorrectionManager(object):
             cmds.addAttr(loc, longName="inputNode", attributeType="message")
             cmds.connectAttr(toAttach+".message", loc+".inputNode", force=True)
             grp = dpUtils.zeroOut([loc])[0]
-            cmds.parentConstraint(toAttach, grp, maintainOffset=False, name=grp+"_PaC")
+            if toRivet:
+                self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, useOffset=False)
+            else:
+                cmds.parentConstraint(toAttach, grp, maintainOffset=False, name=grp+"_PaC")
             cmds.parent(grp, dpUtils.getNodeByMessage("correctionDataGrp", self.net))
             return loc
         else:
             mel.eval('warning \"'+toAttach+' '+self.langDic[self.langName]['i061_notExists']+'\";')
 
 
-    def createCorrectionManager(self, nodeList=None, name=None, correctType=None, *args):
-        """ Create nodes to calculate the correction we want to mapper to fix.
+    def createCorrectionManager(self, nodeList=None, name=None, correctType=None, toRivet=False, fromUI=False, *args):
+        """ Create nodes to calculate the correction we want to mapper fix.
         """
         # loading Maya matrix node
         loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
         loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             if not nodeList:
-                nodeList = cmds.ls(selection=True)
+                nodeList = cmds.ls(selection=True, flatten=True)
             if nodeList:
                 if len(nodeList) == 2:
                     origNode = nodeList[0]
@@ -360,6 +366,12 @@ class CorrectionManager(object):
                         if not correctType:
                             correctType = "Angle"
 
+                    # rivet
+                    if fromUI:
+                        toRivet = cmds.checkBox(self.rivetCB, query=True, value=True)
+                    if toRivet:
+                        self.dpRivetInst = dpRivet.Rivet(self.dpUIinst, self.langDic, self.langName, False)
+
                     # create the container of the system data using a network node
                     self.net = cmds.createNode("network", name=name)
                     cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
@@ -385,8 +397,8 @@ class CorrectionManager(object):
                     correctionDataGrp = cmds.group(empty=True, name=correctionName+"_Grp")
                     cmds.connectAttr(correctionDataGrp+".message", self.net+".correctionDataGrp", force=True)
                     cmds.parent(correctionDataGrp, self.correctionManagerDataGrp)
-                    originalLoc = self.createCorrectiveLocator(correctionName+"_Original", origNode)
-                    actionLoc = self.createCorrectiveLocator(correctionName+"_Action", actionNode)
+                    originalLoc = self.createCorrectiveLocator(correctionName+"_Original", origNode, toRivet)
+                    actionLoc = self.createCorrectiveLocator(correctionName+"_Action", actionNode, toRivet)
                     # serialize locators
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
@@ -466,13 +478,6 @@ class CorrectionManager(object):
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionX", distBet+".point2X")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distBet+".point2Y")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distBet+".point2Z")
-                        
-                        
-                        dist = cmds.getAttr(distBet+".distance")
-
-                        print("dist =", dist)
-
-
                         cmds.connectAttr(distBet+".message", self.net+".distanceBet")
 
 
