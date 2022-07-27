@@ -613,13 +613,13 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # specular control:
                     self.eyeSpecCtrl = self.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.userGuideName+"_Spec_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     cmds.delete(cmds.parentConstraint(self.guide, self.eyeSpecCtrl, maintainOffset=False))
-                    eyeSpecZeroGrp = dpUtils.zeroOut([self.eyeSpecCtrl])
+                    eyeSpecZeroGrp = dpUtils.zeroOut([self.eyeSpecCtrl])[0]
                     cmds.parent(eyeSpecZeroGrp, self.baseEyeCtrl)
                     cmds.parentConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=False, name=self.eyeSpecJnt+"_PaC")
                     cmds.scaleConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=True, name=self.eyeSpecJnt+"_ScC")
                     # specular follow subcontrol
                     cmds.addAttr(self.eyeSpecCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
-                    followSPC = cmds.parentConstraint(self.fkEyeSubCtrl, self.baseEyeCtrl, eyeSpecZeroGrp, maintainOffset=True, name=self.fkEyeSubCtrl+"_PaC")[0]
+                    followSPC = cmds.parentConstraint(self.fkEyeSubCtrl, self.baseEyeCtrl, eyeSpecZeroGrp, maintainOffset=True, name=eyeSpecZeroGrp+"_PaC")[0]
                     eyeSpecFollowRev = cmds.createNode('reverse', name=side+self.userGuideName+"_Spec_Follow_Rev")
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.langDic[self.langName]['c032_follow'], followSPC+"."+self.fkEyeSubCtrl+"W0", force=True)
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.langDic[self.langName]['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
