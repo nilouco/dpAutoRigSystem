@@ -51,7 +51,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName=PUPIL, attributeType='bool')
         cmds.setAttr(self.moduleGrp+"."+PUPIL, 1)
         cmds.addAttr(self.moduleGrp, longName=SPEC, attributeType='bool')
-        cmds.setAttr(self.moduleGrp+"."+SPEC, 1)
+        cmds.setAttr(self.moduleGrp+"."+SPEC, 0)
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # main joint (center of eye globe)
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
@@ -617,7 +617,14 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(eyeSpecZeroGrp, self.baseEyeCtrl)
                     cmds.parentConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=False, name=self.eyeSpecJnt+"_PaC")
                     cmds.scaleConstraint(self.eyeSpecCtrl, self.eyeSpecJnt, maintainOffset=True, name=self.eyeSpecJnt+"_ScC")
-                    
+                    # specular follow subcontrol
+                    cmds.addAttr(self.eyeSpecCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
+                    followSPC = cmds.parentConstraint(self.fkEyeSubCtrl, self.baseEyeCtrl, eyeSpecZeroGrp, maintainOffset=True, name=self.fkEyeSubCtrl+"_PaC")[0]
+                    eyeSpecFollowRev = cmds.createNode('reverse', name=side+self.userGuideName+"_Spec_Follow_Rev")
+                    cmds.connectAttr(self.eyeSpecCtrl+"."+self.langDic[self.langName]['c032_follow'], followSPC+"."+self.fkEyeSubCtrl+"W0", force=True)
+                    cmds.connectAttr(self.eyeSpecCtrl+"."+self.langDic[self.langName]['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
+                    cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
+
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):
                     # declare eyelid guides:
