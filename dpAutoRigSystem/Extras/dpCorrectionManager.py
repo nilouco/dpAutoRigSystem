@@ -184,16 +184,16 @@ class CorrectionManager(object):
         """ Update the setup to set the choose input min and max values.
             That means we can read the angle or distance in this given range.
         """
-        cmds.setAttr(self.net+".inputMin", minValue)
-        cmds.setAttr(self.net+".inputMax", maxValue)
+        cmds.setAttr(self.net+".inputStart", minValue)
+        cmds.setAttr(self.net+".inputEnd", maxValue)
 
 
     def changeOutputValues(self, minValue=None, maxValue=None, *args):
         """ Update the setup to set the choose output min and max values.
             That means we can output the final value in this given range.
         """
-        cmds.setAttr(self.net+".outputMin", minValue)
-        cmds.setAttr(self.net+".outputMax", maxValue)
+        cmds.setAttr(self.net+".outputStart", minValue)
+        cmds.setAttr(self.net+".outputEnd", maxValue)
 
 
     def deleteSetup(self, *args):
@@ -242,17 +242,17 @@ class CorrectionManager(object):
                     currentDistance = self.getDistance()
                     self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.langDic[self.langName]['m182_distance'], text=str(currentDistance), buttonLabel=self.langDic[self.langName]['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 150), (3, 80)], parent=self.distanceLayout)
                 # input and output values:
-                currentInputMin = cmds.getAttr(self.net+".inputMin")
-                currentInputMax = cmds.getAttr(self.net+".inputMax")
-                currentOutputMin = cmds.getAttr(self.net+".outputMin")
-                currentOutputMax = cmds.getAttr(self.net+".outputMax")
+                currentInputStart = cmds.getAttr(self.net+".inputStart")
+                currentInputEnd = cmds.getAttr(self.net+".inputEnd")
+                currentOutputStart = cmds.getAttr(self.net+".outputStart")
+                currentOutputEnd = cmds.getAttr(self.net+".outputEnd")
                 rangeLayout = cmds.columnLayout('rangeLayout', adjustableColumn=True, columnAlign="right", parent=self.selectedLayout)
                 rangeLabelLayout = cmds.rowLayout('rangeLabelLayout', numberOfColumns=3, adjustableColumn=1, columnWidth=[(1, 10), (2, 58), (3, 80)], columnAttach=[(1, "right", 0), (2, "right", 20), (3, "right", 30)], parent=rangeLayout)
-                cmds.text("Range", label=self.langDic[self.langName]['m072_range'], align="right", parent=rangeLabelLayout)
-                cmds.text("Min", align="right", parent=rangeLabelLayout)
-                cmds.text("Max", align="right", parent=rangeLabelLayout)
-                cmds.floatFieldGrp("inputFFG", label=self.langDic[self.langName]['m137_input'], numberOfFields=2, value1=currentInputMin, value2=currentInputMax, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeInputValues, parent=rangeLayout)
-                cmds.floatFieldGrp("outputFFG", label=self.langDic[self.langName]['m138_output'], numberOfFields=2, value1=currentOutputMin, value2=currentOutputMax, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeOutputValues, parent=rangeLayout)
+                cmds.text(self.langDic[self.langName]['m072_range'], label=self.langDic[self.langName]['m072_range'], align="right", parent=rangeLabelLayout)
+                cmds.text(self.langDic[self.langName]['c110_start'], align="right", parent=rangeLabelLayout)
+                cmds.text(self.langDic[self.langName]['m184_end'], align="right", parent=rangeLabelLayout)
+                cmds.floatFieldGrp("inputFFG", label=self.langDic[self.langName]['m137_input'], numberOfFields=2, value1=currentInputStart, value2=currentInputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeInputValues, parent=rangeLayout)
+                cmds.floatFieldGrp("outputFFG", label=self.langDic[self.langName]['m138_output'], numberOfFields=2, value1=currentOutputStart, value2=currentOutputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeOutputValues, parent=rangeLayout)
 
     
     def actualizeEditLayout(self, *args):
@@ -371,10 +371,10 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="inputValue", attributeType="float")
                     cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
                     cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
-                    cmds.addAttr(self.net, longName="inputMin", attributeType="float", defaultValue=0)
-                    cmds.addAttr(self.net, longName="inputMax", attributeType="float", defaultValue=90)
-                    cmds.addAttr(self.net, longName="outputMin", attributeType="float", defaultValue=0)
-                    cmds.addAttr(self.net, longName="outputMax", attributeType="float", defaultValue=1)
+                    cmds.addAttr(self.net, longName="inputStart", attributeType="float", defaultValue=0)
+                    cmds.addAttr(self.net, longName="inputEnd", attributeType="float", defaultValue=90)
+                    cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
+                    cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "intensityMD", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR", "originalLoc", "actionLoc", "distanceBet"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
@@ -393,6 +393,27 @@ class CorrectionManager(object):
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
                     
+                    # create general nodes:
+                    intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
+                    inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
+                    outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
+                    # set general values and connections:
+                    cmds.setAttr(outputSR+".oldMaxX", 1)
+                    cmds.connectAttr(self.net+".inputStart", inputRmV+".inputMin", force=True)
+                    cmds.connectAttr(self.net+".inputEnd", inputRmV+".inputMax", force=True)
+                    cmds.connectAttr(self.net+".inputEnd", inputRmV+".outputMax", force=True)
+                    cmds.connectAttr(self.net+".outputStart", outputSR+".minX", force=True)
+                    cmds.connectAttr(self.net+".outputEnd", outputSR+".maxX", force=True)
+                    cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
+                    cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
+                    # TODO create a way to avoid manual connection here, maybe using the UI new tab?
+                    cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
+                    cmds.setAttr(self.net+".outputValue", lock=True)
+                    # serialize general nodes:
+                    cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
+                    cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
+                    cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
+
                     # if rotate extration option:
                     if correctType == ANGLE:
                         # write a new dpUtils function to generate these matrix nodes here:
@@ -400,11 +421,8 @@ class CorrectionManager(object):
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
                         extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")
                         extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
-                        intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
                         smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
                         overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
-                        inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
-                        outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
                         cmds.setAttr(extractAngleMD+".operation", 2)
                         cmds.setAttr(smallerThanOneCnd+".operation", 5) #less or equal
                         cmds.setAttr(smallerThanOneCnd+".secondTerm", 1)
@@ -420,9 +438,6 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
                         cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
                         # axis setup
-                        cmds.connectAttr(self.net+".inputMin", inputRmV+".inputMin", force=True)
-                        cmds.connectAttr(self.net+".inputMax", inputRmV+".inputMax", force=True)
-                        cmds.connectAttr(self.net+".inputMax", inputRmV+".outputMax", force=True)
                         cmds.connectAttr(inputRmV+".outValue", extractAngleMD+".input1X", force=True)
                         cmds.connectAttr(extractAngleQtE+".outputRotateX", inputRmV+".inputValue", force=True) #it'll be updated when changing axis
                         unitConv = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
@@ -430,31 +445,21 @@ class CorrectionManager(object):
                         cmds.connectAttr(unitConv+".output", self.net+".inputValue", force=True)
                         cmds.setAttr(self.net+".inputValue", lock=True)
                         # axis order setup
-                        cmds.connectAttr(self.net+".inputMax", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
+                        cmds.connectAttr(self.net+".inputEnd", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
                         cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".firstTerm", force=True)
                         cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
                         # intensity setup:
-                        cmds.setAttr(outputSR+".oldMaxX", 1)
-                        cmds.connectAttr(self.net+".outputMin", outputSR+".minX", force=True)
-                        cmds.connectAttr(self.net+".outputMax", outputSR+".maxX", force=True)
                         cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
-                        cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
-                        cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
-                        # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                        cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
-                        cmds.setAttr(self.net+".outputValue", lock=True)
                         # serialize message attributes
                         cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
                         cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
                         cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
                         cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
-                        cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
                         cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
-                        cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
-                        cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
+                        
                     else: #Distance
                         
                         
