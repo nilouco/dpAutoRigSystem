@@ -298,10 +298,13 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
 
     def autoRotateCalc(self, n, *args):
-        if n == 0:
-            return (2**(1/self.nJoints))-1
+        if self.nJoints < 7:
+            return 0.15*(n+1)
         else:
-            return (2**(n/self.nJoints))-(1-(1/self.nJoints))
+            if n == 0:
+                return (2**(1/self.nJoints))-1
+            else:
+                return (2**(n/self.nJoints))-(1-(1/self.nJoints))
 
     
     def rigModule(self, *args):
