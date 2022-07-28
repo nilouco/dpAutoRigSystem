@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.21"
-DPAR_UPDATELOG = "N354 - Neck autoRotate calculation" 
+DPAR_VERSION_PY3 = "4.00.22"
+DPAR_UPDATELOG = "N379-nostril-rotation" 
 
 
 
