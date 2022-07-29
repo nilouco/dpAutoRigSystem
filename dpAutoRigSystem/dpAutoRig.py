@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.20"
-DPAR_UPDATELOG = "N352 - Eye specular off by default\nN434 - Eye specular follow attribute" 
+DPAR_VERSION_PY3 = "4.00.23"
+DPAR_UPDATELOG = "N435 - Eye specular scale" 
 
 
 
