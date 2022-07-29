@@ -396,28 +396,11 @@ class CorrectionManager(object):
                     # serialize locators
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
-                    
-                    # create general nodes:
+                    # create intensity node:
                     intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
-                    inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
-                    outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
-                    # set general values and connections:
-                    cmds.setAttr(outputSR+".oldMaxX", 1)
-                    cmds.connectAttr(self.net+".inputStart", inputRmV+".inputMin", force=True)
-                    cmds.connectAttr(self.net+".inputEnd", inputRmV+".inputMax", force=True)
-                    cmds.connectAttr(self.net+".inputEnd", inputRmV+".outputMax", force=True)
-                    cmds.connectAttr(self.net+".outputStart", outputSR+".minX", force=True)
-                    cmds.connectAttr(self.net+".outputEnd", outputSR+".maxX", force=True)
-                    cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
-                    cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
-                    # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                    cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
-                    cmds.setAttr(self.net+".outputValue", lock=True)
-                    # serialize general nodes:
                     cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
-                    cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
-                    cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
-
+                    cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
+                    
                     # if rotate extration option:
                     if correctType == ANGLE:
                         # write a new dpUtils function to generate these matrix nodes here:
@@ -427,6 +410,8 @@ class CorrectionManager(object):
                         extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
                         smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
                         overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
+                        inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
+                        outputSR = cmds.createNode("setRange", name=correctionName+"_Output_SR")
                         cmds.setAttr(extractAngleMD+".operation", 2)
                         cmds.setAttr(smallerThanOneCnd+".operation", 5) #less or equal
                         cmds.setAttr(smallerThanOneCnd+".secondTerm", 1)
@@ -436,6 +421,14 @@ class CorrectionManager(object):
                         cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
                         cmds.connectAttr(originalLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
                         cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
+                        # set general values and connections:
+                        cmds.setAttr(outputSR+".oldMaxX", 1)
+                        cmds.connectAttr(self.net+".inputStart", inputRmV+".inputMin", force=True)
+                        cmds.connectAttr(self.net+".inputEnd", inputRmV+".inputMax", force=True)
+                        cmds.connectAttr(self.net+".inputEnd", inputRmV+".outputMax", force=True)
+                        cmds.connectAttr(self.net+".outputStart", outputSR+".minX", force=True)
+                        cmds.connectAttr(self.net+".outputEnd", outputSR+".maxX", force=True)
+
                         # setup the rotation affection
                         cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
                         cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
@@ -456,6 +449,10 @@ class CorrectionManager(object):
                         cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
                         # intensity setup:
                         cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
+                        cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
+                        # TODO create a way to avoid manual connection here, maybe using the UI new tab?
+                        cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
+                        cmds.setAttr(self.net+".outputValue", lock=True)
                         # serialize message attributes
                         cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
                         cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
@@ -463,12 +460,14 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
                         cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
+                        cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
+                        cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
                         
                     else: #Distance
                         
                         
                         print("Merci distance --- WIP")
-
+                        outputRmV = cmds.createNode("remapValue", name=correctionName+"_Output_RmV")
                         # create distanceBetween node:
                         distBet = cmds.createNode("distanceBetween", name=correctionName+"_Distance_DB")
                         # connect locators source position values
@@ -483,8 +482,22 @@ class CorrectionManager(object):
                         cmds.setAttr(self.net+".inputValue", lock=False)
                         cmds.connectAttr(distBet+".distance", self.net+".inputValue")
                         cmds.setAttr(self.net+".inputValue", lock=True)
-                        cmds.connectAttr(distBet+".distance", inputRmV+".inputValue")
-                        cmds.connectAttr(inputRmV+".outValue", intensityMD+".input1X")
+
+
+                        cmds.connectAttr(self.net+".inputStart", outputRmV+".inputMin")
+                        cmds.connectAttr(self.net+".inputEnd", outputRmV+".inputMax")
+                        cmds.connectAttr(self.net+".outputStart", outputRmV+".outputMin")
+                        cmds.connectAttr(self.net+".outputEnd", outputRmV+".outputMax")
+
+
+
+                        cmds.connectAttr(distBet+".distance", outputRmV+".inputValue")
+                        cmds.connectAttr(outputRmV+".outValue", intensityMD+".input1X")
+
+                        # TODO create a way to avoid manual connection here, maybe using the UI new tab?
+                        cmds.connectAttr(intensityMD+".outputX", self.net+".outputValue", force=True)
+                        cmds.setAttr(self.net+".outputValue", lock=True)
+                        
 
                     # update UI                    
                     if self.ui:
