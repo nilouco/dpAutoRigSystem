@@ -18,9 +18,8 @@
 ###################################################################
 
 
-# current version:
 DPAR_VERSION_PY3 = "4.00.23"
-DPAR_UPDATELOG = "N435 - Eye specular scale" 
+DPAR_UPDATELOG = "N435 - Eye specular scale"
 
 
 
