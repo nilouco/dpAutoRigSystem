@@ -123,8 +123,9 @@ class CorrectionManager(object):
     def readDistance(self, *args):
         """ Update the UI text field with the current distance.
         """
-        currentDist = self.getDistance()
-        cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(currentDist))
+        if cmds.getAttr(self.net+".type") == DISTANCE:
+            currentDist = self.getDistance()
+            cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(currentDist))
 
 
     def changeName(self, name=None, *args):
@@ -151,33 +152,30 @@ class CorrectionManager(object):
     def changeAxis(self, axis=None, *args):
         """ Update the setup to read the correct axis to extract angle.
         """
-        cmds.setAttr(self.net+".axis", self.axisMenuItemList.index(axis.upper()))
-        # get connected nodes
-        extractAngleQtE = dpUtils.getNodeByMessage("extractAngleQtE", self.net)
-        inputRmV = dpUtils.getNodeByMessage("inputRmV", self.net)
-        # clean up old unitConversion node:
-        unitConvToDelete = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
-        cmds.disconnectAttr(unitConvToDelete+".output", inputRmV+".inputValue")
-        cmds.setAttr(self.net+".inputValue", lock=False)
-        cmds.disconnectAttr(unitConvToDelete+".output", self.net+".inputValue")
-        cmds.delete(unitConvToDelete)
-        # make a new connection using choose axis:
-        cmds.connectAttr(extractAngleQtE+".outputRotate"+axis.upper(), inputRmV+".inputValue", force=True)
-        newUnitConv = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
-        cmds.connectAttr(newUnitConv+".output", self.net+".inputValue", force=True)
-        cmds.setAttr(self.net+".inputValue", lock=True)
+        if cmds.getAttr(self.net+".type") == ANGLE:
+            cmds.setAttr(self.net+".axis", self.axisMenuItemList.index(axis.upper()))
+            # get connected nodes
+            extractAngleQtE = dpUtils.getNodeByMessage("extractAngleQtE", self.net)
+            inputRmV = dpUtils.getNodeByMessage("inputRmV", self.net)
+            # clean up old unitConversion node:
+            unitConvToDelete = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
+            cmds.disconnectAttr(unitConvToDelete+".output", inputRmV+".inputValue")
+            cmds.setAttr(self.net+".inputValue", lock=False)
+            cmds.disconnectAttr(unitConvToDelete+".output", self.net+".inputValue")
+            cmds.delete(unitConvToDelete)
+            # make a new connection using choose axis:
+            cmds.connectAttr(extractAngleQtE+".outputRotate"+axis.upper(), inputRmV+".inputValue", force=True)
+            newUnitConv = cmds.listConnections(inputRmV+".inputValue", source=True, destination=False)[0]
+            cmds.connectAttr(newUnitConv+".output", self.net+".inputValue", force=True)
+            cmds.setAttr(self.net+".inputValue", lock=True)
         
         
     def changeAxisOrder(self, axisOrder=None, *args):
         """ Update the setup to set the correct axis order to extract angle.
         """
-        axisOrder = self.axisOrderMenuItemList.index(axisOrder.upper())
-        cmds.setAttr(self.net+".axisOrder", axisOrder)
-        # get extract angle nodes to change connections from network message attributes:
-        extractAngleDM = dpUtils.getNodeByMessage("extractAngleDM", self.net)
-        extractAngleQtE = dpUtils.getNodeByMessage("extractAngleQtE", self.net)
-        cmds.setAttr(extractAngleDM+".inputRotateOrder", axisOrder)
-        cmds.setAttr(extractAngleQtE+".inputRotateOrder", axisOrder)
+        if cmds.getAttr(self.net+".type") == ANGLE:
+            axisOrder = self.axisOrderMenuItemList.index(axisOrder.upper())
+            cmds.setAttr(self.net+".axisOrder", axisOrder)
 
 
     def changeInputValues(self, minValue=None, maxValue=None, *args):
@@ -379,7 +377,10 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="inputEnd", attributeType="float", defaultValue=90)
                     cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
-                    messageAttrList = ["correctionDataGrp", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "intensityMD", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR", "originalLoc", "actionLoc", "distanceBet"]
+                    # add serialization attributes
+                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR"]
+                    if correctType == DISTANCE:
+                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "outputRmV", "distanceBet"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.addAttr(self.net, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
@@ -388,21 +389,22 @@ class CorrectionManager(object):
                     cmds.setAttr(self.net+".dpCorrectionManager", 1)
                     cmds.setAttr(self.net+".name", correctionName, type="string")
                     cmds.setAttr(self.net+".type", correctType, type="string")
+                    # setup group
                     correctionDataGrp = cmds.group(empty=True, name=correctionName+"_Grp")
-                    cmds.connectAttr(correctionDataGrp+".message", self.net+".correctionDataGrp", force=True)
                     cmds.parent(correctionDataGrp, self.correctionManagerDataGrp)
+                    cmds.connectAttr(correctionDataGrp+".message", self.net+".correctionDataGrp", force=True)
                     originalLoc = self.createCorrectiveLocator(correctionName+"_Original", origNode, toRivet)
                     actionLoc = self.createCorrectiveLocator(correctionName+"_Action", actionNode, toRivet)
-                    # serialize locators
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
+                    
                     # create intensity node:
                     intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
                     cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
                     cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
                     
                     # if rotate extration option:
-                    if correctType == ANGLE:
+                    if correctType == ANGLE:                        
                         # write a new dpUtils function to generate these matrix nodes here:
                         extractAngleMM = cmds.createNode("multMatrix", name=correctionName+"_ExtractAngle_MM")
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
@@ -428,7 +430,6 @@ class CorrectionManager(object):
                         cmds.connectAttr(self.net+".inputEnd", inputRmV+".outputMax", force=True)
                         cmds.connectAttr(self.net+".outputStart", outputSR+".minX", force=True)
                         cmds.connectAttr(self.net+".outputEnd", outputSR+".maxX", force=True)
-
                         # setup the rotation affection
                         cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
                         cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
@@ -447,13 +448,15 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleMD+".outputX", smallerThanOneCnd+".colorIfTrueR", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".firstTerm", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
+                        cmds.connectAttr(self.net+".axisOrder", extractAngleDM+".inputRotateOrder", force=True)
+                        cmds.connectAttr(self.net+".axisOrder", extractAngleQtE+".inputRotateOrder", force=True)
                         # intensity setup:
                         cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
                         cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
                         cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
                         cmds.setAttr(self.net+".outputValue", lock=True)
-                        # serialize message attributes
+                        # serialize angle nodes
                         cmds.connectAttr(extractAngleMM+".message", self.net+".extractAngleMM", force=True)
                         cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
                         cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
@@ -464,40 +467,33 @@ class CorrectionManager(object):
                         cmds.connectAttr(outputSR+".message", self.net+".outputSR", force=True)
                         
                     else: #Distance
-                        
-                        
-                        print("Merci distance --- WIP")
                         outputRmV = cmds.createNode("remapValue", name=correctionName+"_Output_RmV")
-                        # create distanceBetween node:
                         distBet = cmds.createNode("distanceBetween", name=correctionName+"_Distance_DB")
-                        # connect locators source position values
+                        # connect locators source position values to extract distance from them
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionX", distBet+".point1X")
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionY", distBet+".point1Y")
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionZ", distBet+".point1Z")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionX", distBet+".point2X")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distBet+".point2Y")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distBet+".point2Z")
-                        cmds.connectAttr(distBet+".message", self.net+".distanceBet")
                         # setup distance input and output connections
                         cmds.setAttr(self.net+".inputValue", lock=False)
                         cmds.connectAttr(distBet+".distance", self.net+".inputValue")
                         cmds.setAttr(self.net+".inputValue", lock=True)
-
-
                         cmds.connectAttr(self.net+".inputStart", outputRmV+".inputMin")
                         cmds.connectAttr(self.net+".inputEnd", outputRmV+".inputMax")
                         cmds.connectAttr(self.net+".outputStart", outputRmV+".outputMin")
                         cmds.connectAttr(self.net+".outputEnd", outputRmV+".outputMax")
-
-
-
                         cmds.connectAttr(distBet+".distance", outputRmV+".inputValue")
                         cmds.connectAttr(outputRmV+".outValue", intensityMD+".input1X")
-
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
                         cmds.connectAttr(intensityMD+".outputX", self.net+".outputValue", force=True)
                         cmds.setAttr(self.net+".outputValue", lock=True)
-                        
+                        # serialize distance nodes
+                        cmds.connectAttr(distBet+".message", self.net+".distanceBet")
+                        cmds.connectAttr(outputRmV+".message", self.net+".outputRmV")
+                    
+                    
 
                     # update UI                    
                     if self.ui:
