@@ -219,6 +219,10 @@ class CorrectionManager(object):
                 currentName = cmds.getAttr(self.net+".name")
                 self.nameTFG = cmds.textFieldGrp("nameTFG", label=self.langDic[self.langName]['m006_name'], text=currentName, editable=True, columnWidth2=(40, 180), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.nameLayout)
                 self.delete_BT = cmds.button('delete_BT', label=self.langDic[self.langName]['m005_delete'], command=self.deleteSetup, backgroundColor=(1.0, 0.7, 0.7), parent=self.nameLayout)
+                # type:
+                self.typeLayout = cmds.rowLayout('typeLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
+                currentType = cmds.getAttr(self.net+".type")
+                self.typeTFG = cmds.textFieldGrp("typeTFG", label=self.langDic[self.langName]['i138_type'], text=currentType, editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.typeLayout)
                 if cmds.getAttr(self.net+".type") == ANGLE:
                     # axis:
                     self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(40, 50, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
@@ -467,6 +471,7 @@ class CorrectionManager(object):
 
                         # create distanceBetween node:
                         distBet = cmds.createNode("distanceBetween", name=correctionName+"_Distance_DB")
+                        # connect locators source position values
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionX", distBet+".point1X")
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionY", distBet+".point1Y")
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionZ", distBet+".point1Z")
@@ -474,7 +479,12 @@ class CorrectionManager(object):
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distBet+".point2Y")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distBet+".point2Z")
                         cmds.connectAttr(distBet+".message", self.net+".distanceBet")
-
+                        # setup distance input and output connections
+                        cmds.setAttr(self.net+".inputValue", lock=False)
+                        cmds.connectAttr(distBet+".distance", self.net+".inputValue")
+                        cmds.setAttr(self.net+".inputValue", lock=True)
+                        cmds.connectAttr(distBet+".distance", inputRmV+".inputValue")
+                        cmds.connectAttr(inputRmV+".outValue", intensityMD+".input1X")
 
                     # update UI                    
                     if self.ui:
