@@ -150,10 +150,9 @@ class CorrectionManager(object):
 
 
     def changeAxis(self, axis=None, *args):
-        """ Update the setup to read the correct axis to extract angle.
+        """ Update the setup to read the correct axis to extract angle or decompose distance vector.
         """
-        if cmds.getAttr(self.net+".type") == ANGLE:
-            cmds.setAttr(self.net+".axis", self.axisMenuItemList.index(axis.upper()))
+        cmds.setAttr(self.net+".axis", self.axisMenuItemList.index(axis.upper()))
         
         
     def changeAxisOrder(self, axisOrder=None, *args):
@@ -177,6 +176,13 @@ class CorrectionManager(object):
         """
         cmds.setAttr(self.net+".outputStart", minValue)
         cmds.setAttr(self.net+".outputEnd", maxValue)
+
+
+    def changeDecompose(self, value=None, *args):
+        """ Update the decompose boolean attribute using the value comming from the UI checkBox.
+        """
+        cmds.setAttr(self.net+".decompose", value)
+        cmds.optionMenu(self.axisMenu, edit=True, enable=value)
 
 
     def deleteSetup(self, *args):
@@ -206,16 +212,17 @@ class CorrectionManager(object):
                 self.typeLayout = cmds.rowLayout('typeLayout', numberOfColumns=2, columnWidth2=(220, 50), columnAlign=[(1, 'left'), (2, 'right')], adjustableColumn=1, columnAttach=[(1, 'right', 50), (2, 'right', 2)], height=30, parent=self.selectedLayout)
                 currentType = cmds.getAttr(self.net+".type")
                 self.typeTFG = cmds.textFieldGrp("typeTFG", label=self.langDic[self.langName]['i138_type'], text=currentType, editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.typeLayout)
+                # axis:
+                self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(85, 80, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'right', 2), (2, 'right', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
+                if cmds.getAttr(self.net+".type") == DISTANCE:
+                    self.decomposeCB = cmds.checkBox("decomposeCB", label=self.langDic[self.langName]['m185_decompose'], value=cmds.getAttr(self.net+".decompose"), changeCommand=self.changeDecompose, parent=self.axisLayout)
+                self.axisMenu = cmds.optionMenu("axisMenu", label=self.langDic[self.langName]['i052_axis'], changeCommand=self.changeAxis, parent=self.axisLayout)
+                self.axisMenuItemList = ['X', 'Y', 'Z']
+                for axis in self.axisMenuItemList:
+                    cmds.menuItem(label=axis, parent=self.axisMenu)
+                currentAxis = cmds.getAttr(self.net+".axis")
+                cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
                 if cmds.getAttr(self.net+".type") == ANGLE:
-                    # axis:
-                    self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(40, 50, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
-                    cmds.text("axisTxt", label=self.langDic[self.langName]['i052_axis'], parent=self.axisLayout)
-                    self.axisMenu = cmds.optionMenu("axisMenu", label='', changeCommand=self.changeAxis, parent=self.axisLayout)
-                    self.axisMenuItemList = ['X', 'Y', 'Z']
-                    for axis in self.axisMenuItemList:
-                        cmds.menuItem(label=axis, parent=self.axisMenu)
-                    currentAxis = cmds.getAttr(self.net+".axis")
-                    cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
                     # axis order:
                     cmds.text("axisOrderTxt", label=self.langDic[self.langName]['i052_axis']+" "+self.langDic[self.langName]['m045_order'], parent=self.axisLayout)
                     self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisLayout)
@@ -228,6 +235,9 @@ class CorrectionManager(object):
                     self.distanceLayout = cmds.columnLayout('distanceLayout', adjustableColumn=True, height=30, parent=self.selectedLayout)
                     currentDistance = self.getDistance()
                     self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.langDic[self.langName]['m182_distance'], text=str(round(currentDistance, 4)), buttonLabel=self.langDic[self.langName]['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 60), (3, 80)], parent=self.distanceLayout)
+                    if not cmds.getAttr(self.net+".decompose"):
+                        cmds.optionMenu(self.axisMenu, edit=True, enable=False)
+
                 # input and output values:
                 currentInputStart = cmds.getAttr(self.net+".inputStart")
                 currentInputEnd = cmds.getAttr(self.net+".inputEnd")
@@ -356,6 +366,7 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="name", dataType="string")
                     cmds.addAttr(self.net, longName="type", dataType="string")
                     cmds.addAttr(self.net, longName="inputValue", attributeType="float")
+                    cmds.addAttr(self.net, longName="decompose", attributeType="bool", defaultValue=0)
                     cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
                     cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
                     cmds.addAttr(self.net, longName="inputStart", attributeType="float", defaultValue=0)
@@ -363,9 +374,9 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     # add serialization attributes
-                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR"]
+                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR"]
                     if correctType == DISTANCE:
-                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "outputRmV", "distanceBet"]
+                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.addAttr(self.net, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
@@ -427,7 +438,6 @@ class CorrectionManager(object):
                         cmds.connectAttr(self.net+".axis", angleAxisXCnd+".firstTerm", force=True)
                         cmds.connectAttr(self.net+".axis", angleAxisYZCnd+".firstTerm", force=True)
                         cmds.connectAttr(inputRmV+".outValue", extractAngleMD+".input1X", force=True)
-                        cmds.connectAttr(extractAngleQtE+".outputRotateX", inputRmV+".inputValue", force=True)
                         cmds.connectAttr(extractAngleQtE+".outputRotateX", angleAxisXCnd+".colorIfTrueR", force=True)
                         cmds.connectAttr(extractAngleQtE+".outputRotateY", angleAxisYZCnd+".colorIfTrueR", force=True)
                         cmds.connectAttr(extractAngleQtE+".outputRotateZ", angleAxisYZCnd+".colorIfFalseR", force=True)
@@ -454,6 +464,8 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
                         cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
                         cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
+                        cmds.connectAttr(angleAxisXCnd+".message", self.net+".angleAxisXCnd", force=True)
+                        cmds.connectAttr(angleAxisYZCnd+".message", self.net+".angleAxisYZCnd", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
                         cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
                         cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
@@ -462,6 +474,10 @@ class CorrectionManager(object):
                     else: #Distance
                         outputRmV = cmds.createNode("remapValue", name=correctionName+"_Output_RmV")
                         distBet = cmds.createNode("distanceBetween", name=correctionName+"_Distance_DB")
+                        distanceAxisExtractPMA = cmds.createNode("plusMinusAverage", name=correctionName+"_DistanceAxisExtract_PMA")
+                        distanceAllCnd = cmds.createNode("condition", name=correctionName+"_ExtractDistance_Cnd")
+                        distanceAxisXCnd = cmds.createNode("condition", name=correctionName+"_ExtractDistance_AxisX_Cnd")
+                        distanceAxisYZCnd = cmds.createNode("condition", name=correctionName+"_ExtractDistance_AxisYZ_Cnd")
                         # connect locators source position values to extract distance from them
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionX", distBet+".point1X")
                         cmds.connectAttr(originalLoc+".worldPosition.worldPositionY", distBet+".point1Y")
@@ -470,21 +486,45 @@ class CorrectionManager(object):
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distBet+".point2Y")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distBet+".point2Z")
                         # setup distance input and output connections
-                        cmds.setAttr(self.net+".inputValue", lock=False)
-                        cmds.connectAttr(distBet+".distance", self.net+".inputValue")
-                        cmds.setAttr(self.net+".inputValue", lock=True)
-                        cmds.connectAttr(self.net+".inputStart", outputRmV+".inputMin")
-                        cmds.connectAttr(self.net+".inputEnd", outputRmV+".inputMax")
-                        cmds.connectAttr(self.net+".outputStart", outputRmV+".outputMin")
-                        cmds.connectAttr(self.net+".outputEnd", outputRmV+".outputMax")
-                        cmds.connectAttr(distBet+".distance", outputRmV+".inputValue")
-                        cmds.connectAttr(outputRmV+".outValue", intensityMD+".input1X")
+                        cmds.connectAttr(outputRmV+".outValue", intensityMD+".input1X", force=True)
+                        cmds.connectAttr(self.net+".inputStart", outputRmV+".inputMin", force=True)
+                        cmds.connectAttr(self.net+".inputEnd", outputRmV+".inputMax", force=True)
+                        cmds.connectAttr(self.net+".outputStart", outputRmV+".outputMin", force=True)
+                        cmds.connectAttr(self.net+".outputEnd", outputRmV+".outputMax", force=True)
+                        # set default distance input values
+                        cmds.setAttr(self.net+".inputStart", 10)
+                        cmds.setAttr(self.net+".inputEnd", 0)
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
                         cmds.connectAttr(intensityMD+".outputX", self.net+".outputValue", force=True)
                         cmds.setAttr(self.net+".outputValue", lock=True)
+                        # extract axis by decomposing distance vector:
+                        cmds.setAttr(distanceAxisExtractPMA+".operation", 2) #Substract
+                        cmds.setAttr(distanceAxisYZCnd+".secondTerm", 1) #Y
+                        cmds.connectAttr(originalLoc+".worldPosition.worldPositionX", distanceAxisExtractPMA+".input3D[0].input3Dx", force=True)
+                        cmds.connectAttr(originalLoc+".worldPosition.worldPositionY", distanceAxisExtractPMA+".input3D[0].input3Dy", force=True)
+                        cmds.connectAttr(originalLoc+".worldPosition.worldPositionZ", distanceAxisExtractPMA+".input3D[0].input3Dz", force=True)
+                        cmds.connectAttr(actionLoc+".worldPosition.worldPositionX", distanceAxisExtractPMA+".input3D[1].input3Dx", force=True)
+                        cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distanceAxisExtractPMA+".input3D[1].input3Dy", force=True)
+                        cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distanceAxisExtractPMA+".input3D[1].input3Dz", force=True)
+                        cmds.connectAttr(self.net+".decompose", distanceAllCnd+".firstTerm", force=True)
+                        cmds.connectAttr(self.net+".axis", distanceAxisXCnd+".firstTerm", force=True)
+                        cmds.connectAttr(self.net+".axis", distanceAxisYZCnd+".firstTerm", force=True)
+                        cmds.connectAttr(distBet+".distance", distanceAllCnd+".colorIfTrueR", force=True)
+                        cmds.connectAttr(distanceAxisXCnd+".outColorR", distanceAllCnd+".colorIfFalseR", force=True)
+                        cmds.connectAttr(distanceAxisExtractPMA+".output3Dx", distanceAxisXCnd+".colorIfTrueR", force=True)
+                        cmds.connectAttr(distanceAxisYZCnd+".outColorR", distanceAxisXCnd+".colorIfFalseR", force=True)
+                        cmds.connectAttr(distanceAxisExtractPMA+".output3Dy", distanceAxisYZCnd+".colorIfTrueR", force=True)
+                        cmds.connectAttr(distanceAxisExtractPMA+".output3Dz", distanceAxisYZCnd+".colorIfFalseR", force=True)
+                        cmds.connectAttr(distanceAllCnd+".outColorR", outputRmV+".inputValue", force=True)
+                        cmds.connectAttr(distanceAllCnd+".outColorR", self.net+".inputValue", force=True)
+                        cmds.setAttr(self.net+".inputValue", lock=True)
                         # serialize distance nodes
-                        cmds.connectAttr(distBet+".message", self.net+".distanceBet")
-                        cmds.connectAttr(outputRmV+".message", self.net+".outputRmV")
+                        cmds.connectAttr(distBet+".message", self.net+".distanceBet", force=True)
+                        cmds.connectAttr(outputRmV+".message", self.net+".outputRmV", force=True)
+                        cmds.connectAttr(distanceAxisExtractPMA+".message", self.net+".distanceAxisExtractPMA", force=True)
+                        cmds.connectAttr(distanceAllCnd+".message", self.net+".distanceAllCnd", force=True)
+                        cmds.connectAttr(distanceAxisXCnd+".message", self.net+".distanceAxisXCnd", force=True)
+                        cmds.connectAttr(distanceAxisYZCnd+".message", self.net+".distanceAxisYZCnd", force=True)
 
                     # update UI                    
                     if self.ui:
