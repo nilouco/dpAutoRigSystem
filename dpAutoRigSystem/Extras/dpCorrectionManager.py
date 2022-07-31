@@ -125,7 +125,7 @@ class CorrectionManager(object):
         """
         if cmds.getAttr(self.net+".type") == DISTANCE:
             currentDist = self.getDistance()
-            cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(currentDist))
+            cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(round(currentDist, 4)))
 
 
     def changeName(self, name=None, *args):
@@ -242,7 +242,7 @@ class CorrectionManager(object):
                 else: #Distance
                     self.distanceLayout = cmds.columnLayout('distanceLayout', adjustableColumn=True, height=30, parent=self.selectedLayout)
                     currentDistance = self.getDistance()
-                    self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.langDic[self.langName]['m182_distance'], text=str(currentDistance), buttonLabel=self.langDic[self.langName]['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 150), (3, 80)], parent=self.distanceLayout)
+                    self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.langDic[self.langName]['m182_distance'], text=str(round(currentDistance, 4)), buttonLabel=self.langDic[self.langName]['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 60), (3, 80)], parent=self.distanceLayout)
                 # input and output values:
                 currentInputStart = cmds.getAttr(self.net+".inputStart")
                 currentInputEnd = cmds.getAttr(self.net+".inputEnd")
