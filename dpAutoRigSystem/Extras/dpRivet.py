@@ -270,6 +270,7 @@ class Rivet(object):
     
     def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
         """ Create the Rivet setup.
+            Returns follicle node.
         """
         # declaring variables
         self.shapeToAttachList = None
@@ -482,3 +483,4 @@ class Rivet(object):
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
         cmds.select(clear=True)
+        return folTransf

@@ -186,12 +186,25 @@ class CorrectionManager(object):
 
 
     def deleteSetup(self, *args):
-        """ Just delete 2 nodes to clear this current system setup:
+        """ Just delete these nodes to clear this current system setup:
+            - Rivets if exists
+            - Rivet_Grp if exists and empty
             - Correction Data Group
             - Network Data Node
+            - Correction Manager Data Group if empty
         """
+        netAttrList = cmds.listAttr(self.net)
+        if netAttrList:
+            for netAttr in netAttrList:
+                if "Rivet" in netAttr:
+                    cmds.delete(dpUtils.getNodeByMessage(netAttr, self.net))
+        if cmds.objExists("Rivet_Grp"):
+            if not cmds.listRelatives("Rivet_Grp", allDescendents=True, children=True):
+                cmds.delete("Rivet_Grp")
         cmds.delete(dpUtils.getNodeByMessage("correctionDataGrp", self.net))
         cmds.delete(self.net)
+        if not cmds.listRelatives(self.correctionManagerDataGrp, allDescendents=True, children=True):
+            cmds.delete(self.correctionManagerDataGrp)
         if self.ui:
             self.populateNetUI()
             self.actualizeEditLayout()
@@ -237,7 +250,6 @@ class CorrectionManager(object):
                     self.distanceTFBG = cmds.textFieldButtonGrp("distanceTFBG", label=self.langDic[self.langName]['m182_distance'], text=str(round(currentDistance, 4)), buttonLabel=self.langDic[self.langName]['m183_readValue'], buttonCommand=self.readDistance, columnAlign=[(1, "left"), (2, "left"), (3, "left")], columnWidth=[(1, 50), (2, 60), (3, 80)], parent=self.distanceLayout)
                     if not cmds.getAttr(self.net+".decompose"):
                         cmds.optionMenu(self.axisMenu, edit=True, enable=False)
-
                 # input and output values:
                 currentInputStart = cmds.getAttr(self.net+".inputStart")
                 currentInputEnd = cmds.getAttr(self.net+".inputEnd")
@@ -305,7 +317,9 @@ class CorrectionManager(object):
             cmds.connectAttr(toAttach+".message", loc+".inputNode", force=True)
             grp = dpUtils.zeroOut([loc])[0]
             if toRivet:
-                self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, useOffset=False)
+                rivetNode = self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, useOffset=False)
+                cmds.addAttr(self.net, longName=toAttach+"_Rivet", attributeType="message")
+                cmds.connectAttr(rivetNode+".message", self.net+"."+toAttach+"_Rivet", force=True)
             else:
                 cmds.parentConstraint(toAttach, grp, maintainOffset=False, name=grp+"_PaC")
             cmds.parent(grp, dpUtils.getNodeByMessage("correctionDataGrp", self.net))
