@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.22"
-DPAR_UPDATELOG = "N379-nostril-rotation" 
+DPAR_VERSION_PY3 = "4.00.23"
+DPAR_UPDATELOG = "N454 - Correct by distance."
 
 
 
