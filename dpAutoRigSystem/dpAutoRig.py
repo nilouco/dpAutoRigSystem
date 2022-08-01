@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.24"
+DPAR_VERSION_PY3 = "4.00.23"
 DPAR_UPDATELOG = "N454 - Correct by distance."
 
 

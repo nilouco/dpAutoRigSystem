@@ -342,7 +342,7 @@ class ControlClass(object):
         r = self.dpCheckLinearUnit(r)
         curve = self.cvControl(ctrlType, ctrlName, r, d, dir, rot)
         # edit a minime curve:
-        cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True)
+        cmds.addAttr(curve, longName="rigScale", attributeType='float', defaultValue=1, keyable=True, minValue=0.001)
         cmds.addAttr(curve, longName="rigScaleMultiplier", attributeType='float', defaultValue=1, keyable=False)
         
         # create Option_Ctrl Text:
