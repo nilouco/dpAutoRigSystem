@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.24"
-DPAR_UPDATELOG = "N160-lipcorner-rotate."
+DPAR_VERSION_PY3 = "4.00.25"
+DPAR_UPDATELOG = "N486 - Add skin influence error.\nFixed this issue for Maya2022."
 
 
 
@@ -2639,7 +2639,7 @@ class DP_AutoRig_UI(object):
                     return False
         return True
     
-    def skinFromUI(self, *args):
+    def skinFromUI(self, mode=None, *args):
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
         # get joints to be skinned:
@@ -2649,11 +2649,12 @@ class DP_AutoRig_UI(object):
         
         # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
         jointSkinList, jointNotExistingList = [], []
-        for item in uiJointSkinList:
-            if cmds.objExists(item):
-                jointSkinList.append(item)
-            else:
-                jointNotExistingList.append(item)
+        if uiJointSkinList:
+            for item in uiJointSkinList:
+                if cmds.objExists(item):
+                    jointSkinList.append(item)
+                else:
+                    jointNotExistingList.append(item)
         if jointNotExistingList:
             notExistingJointMessage = self.langDic[self.langName]['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.langDic[self.langName]['i070_continueSkin']
             btYes = self.langDic[self.langName]['i071_yes']
@@ -2671,11 +2672,11 @@ class DP_AutoRig_UI(object):
         if self.validateGeoList(geomSkinList):
             if jointSkinList and geomSkinList:
                 for geomSkin in geomSkinList:
-                    if (args[0] == "Add"):
-                        cmds.skinCluster(geomSkin, edit=True, ai=jointSkinList, toSelectedBones=True, removeUnusedInfluence=False, lockWeights=True, wt=0.0)
-                    elif (args[0] == "Remove"):
-                        cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
-                    else:
+                    if (mode == "Add"):
+                        cmds.skinCluster(geomSkin, edit=True, addInfluence=jointSkinList, toSelectedBones=True, lockWeights=True, weight=0.0)
+                    elif (mode == "Remove"):
+                        cmds.skinCluster(geomSkin, edit=True, removeInfluence=jointSkinList, toSelectedBones=True)
+                    else: # None = create a new skinCluster node
                         baseName = dpUtils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
