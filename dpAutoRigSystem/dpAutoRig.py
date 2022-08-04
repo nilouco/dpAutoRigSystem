@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.25"
-DPAR_UPDATELOG = "N486 - Add skin influence error.\nFixed this issue for Maya2022."
+DPAR_VERSION_PY3 = "4.00.26"
+DPAR_UPDATELOG = "N487 - Fixed sort module instance\nnamespace issue using list.sort()\ninstead of sorted(list)."
 
 
 
@@ -1015,7 +1015,7 @@ class DP_AutoRig_UI(object):
         guideModuleList = dpUtils.findAllModules(path, guideDir)
         if guideModuleList:
             # change guide module list for alphabetic order:
-            sorted(guideModuleList)
+            guideModuleList.sort()
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
@@ -1297,7 +1297,7 @@ class DP_AutoRig_UI(object):
             riggedGuideModuleList = []
             for riggedGuideModule in self.riggedModuleDic:
                 riggedGuideModuleList.append(riggedGuideModule)
-            sorted(riggedGuideModuleList)
+            riggedGuideModuleList.sort()
             for riggedGuideModule in riggedGuideModuleList:
                 moduleCustomName= self.riggedModuleDic[riggedGuideModule]
                 if moduleCustomName == None:
