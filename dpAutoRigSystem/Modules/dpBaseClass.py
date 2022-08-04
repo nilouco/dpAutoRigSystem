@@ -205,7 +205,7 @@ class StartClass(object):
                                 if not currentName in dpAR_nameList:
                                     dpAR_nameList.append(currentName)
                     if dpAR_nameList:
-                        sorted(dpAR_nameList)
+                        dpAR_nameList.sort()
                         for currentName in dpAR_nameList:
                             if currentName == self.customName:
                                 # getting the index of the last digit in the name:
