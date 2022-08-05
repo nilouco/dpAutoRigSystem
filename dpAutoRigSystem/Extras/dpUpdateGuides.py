@@ -3,10 +3,9 @@ from ..Modules.Library import dpUtils
 
 class UpdateGuides(object):
 
-    def __init__(self, dpUIinst, *args, **kwargs):
+    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # defining variables
         self.dpUIinst = dpUIinst
-        
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
         self.currentDpArVersion = dpUIinst.dpARVersion
@@ -24,8 +23,13 @@ class UpdateGuides(object):
             self.getGuidesToUpdateData()
         else:
             print('There is no guides in the scene')
-        # Open the UI
-        self.updateGuidesUI()
+        if ui:
+            # Open the UI
+            self.updateGuidesUI()
+        elif len(self.guidesDictionary) > 0:
+            # In case of ui = False, update existing outdated guides.
+            self.doUpdate()
+
 
     def summaryUI(self):
         newData = self.listNewAttr()
