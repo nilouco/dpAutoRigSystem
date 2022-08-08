@@ -1,6 +1,16 @@
 from maya import cmds
 from ..Modules.Library import dpUtils
 
+
+# global variables to this module:    
+CLASS_NAME = "UpdateGuides"
+TITLE = "m186_updateGuides"
+DESCRIPTION = "m187_updateGuidesDesc"
+ICON = "/Icons/dp_updateGuides.png"
+
+DPUG_VERSION = "1.0"
+
+
 class UpdateGuides(object):
 
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
