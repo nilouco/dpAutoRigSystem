@@ -16,6 +16,7 @@ class UpdateGuides(object):
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # defining variables
         self.dpUIinst = dpUIinst
+        self.ui = ui
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
         self.currentDpArVersion = dpUIinst.dpARVersion
@@ -410,7 +411,8 @@ class UpdateGuides(object):
 
 
     def doUpdate(self, *args):
-        cmds.deleteUI('updateGuidesWindow', window=True)
+        if self.ui:
+            cmds.deleteUI('updateGuidesWindow', window=True)
         # Starts progress bar feedback
         cmds.progressWindow(title='Operation Progress', progress=0, maxValue=7, status='Renaming old guides')
         # Rename guides to discard as *_OLD
