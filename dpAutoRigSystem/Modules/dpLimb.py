@@ -664,10 +664,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                 if self.limbTypeName == ARM:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2) #zxy
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3) #xzy
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 dpUtils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
@@ -688,6 +688,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
                 self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
                 self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
+                # adjust rotate orders:
+                cmds.setAttr(self.ikExtremCtrlGrp+".rotateOrder", cmds.getAttr(self.ikExtremCtrl+".rotateOrder"))
+                cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateOrder", cmds.getAttr(self.ikExtremCtrl+".rotateOrder"))
                 
                 # verify if user wants to apply the good mirror orientation:
                 if self.limbStyle != self.langDic[self.langName]['m042_default']:
@@ -698,13 +701,13 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 if self.limbTypeName == ARM:
                                     # original guide
                                     if s == 0:
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", -90)
+                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", -90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
                                     # mirrored guide
                                     else:
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", -90)
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", 90)
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleX", -1)
+                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", -90)
+                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", 90)
+                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleZ", -1)
                                 # leg type
                                 else:
                                     # original guide
@@ -820,6 +823,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
                         cmds.parent(tempDup, world=True)
                         self.origRotList = cmds.xform(tempDup, query=True, rotation=True, worldSpace=True)
+                        print("origRotList =", self.origRotList)
                         cmds.delete(tempDup)
                     for a, axis in enumerate(axisList):
                         cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotate"+axis, 0)
