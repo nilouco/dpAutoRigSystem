@@ -130,11 +130,11 @@ def findLastNumber(nameList, basename):
                 except ValueError:
                     pass
 
-    sorted(numberList)
+    # sorted(numberList) doesn't work properly as expected after 5 elements.
+    numberList.sort()
     numberList.reverse()
-
     if numberList:
-        # get the greather valuer (first):
+        # get the greather value (first item):
         existValue = numberList[0]
 
     # work with created guides in the scene:

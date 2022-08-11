@@ -29,10 +29,10 @@ ICON = "/Icons/dp_rivet.png"
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DPRV_VERSION = "1.2"
+DPRV_VERSION = "1.3"
 
 class Rivet(object):
-    def __init__(self, dpUIinst, langDic, langName, *args, **kwargs):
+    def __init__(self, dpUIinst, langDic, langName, ui=True, *args, **kwargs):
         # declaring variables
         self.langDic = langDic
         self.langName = langName
@@ -41,9 +41,10 @@ class Rivet(object):
         self.meshNode = None
         self.selectedUVSet = None
         # call main function
-        self.dpRivetUI(self)
-        # try to fill UI items from selection
-        self.dpFillUI(self)
+        if ui:
+            self.dpRivetUI(self)
+            # try to fill UI items from selection
+            self.dpFillUI(self)
     
     
     def dpRivetUI(self, *args):
@@ -267,8 +268,9 @@ class Rivet(object):
                     cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
         """ Create the Rivet setup.
+            Returns follicle node.
         """
         # declaring variables
         self.shapeToAttachList = None
@@ -400,8 +402,11 @@ class Rivet(object):
                 uvSetList = cmds.polyUVSet(dupShape, query=True, allUVSets=True)
                 if len(uvSetList) > 1:
                     if not uvSetList[0] == uvSetName:
-                        # change uvSet order because closestPointOnMesh uses the default uv set
-                        cmds.polyUVSet(dupShape, copy=True, uvSet=uvSetName, newUVSet=uvSetList[0])
+                        try:
+                            # change uvSet order because closestPointOnMesh uses the default uv set
+                            cmds.polyUVSet(dupShape, copy=True, uvSet=uvSetName, newUVSet=uvSetList[0])
+                        except:
+                            uvSetName = uvSetList[0]
                         
                 # closest point on mesh node:
                 self.cpNode = cmds.createNode("closestPointOnMesh", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
@@ -456,11 +461,11 @@ class Rivet(object):
                 
                 # attach follicle and rivet using constraint:
                 if attachTranslate and attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC")
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC")
                 elif attachTranslate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))
                 elif attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))
                 
                 # try to integrate to dpAutoRigSystem in order to keep the Rig as scalable:
                 if self.masterCtrl:
@@ -478,3 +483,4 @@ class Rivet(object):
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
         cmds.select(clear=True)
+        return folTransf

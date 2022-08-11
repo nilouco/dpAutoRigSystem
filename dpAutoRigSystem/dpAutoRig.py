@@ -18,7 +18,6 @@
 ###################################################################
 
 
-# current version:
 DPAR_VERSION_PY3 = "4.00.28"
 DPAR_UPDATELOG = "N435 - Added new control for Eye specular scale" 
 
@@ -1015,7 +1014,7 @@ class DP_AutoRig_UI(object):
         guideModuleList = dpUtils.findAllModules(path, guideDir)
         if guideModuleList:
             # change guide module list for alphabetic order:
-            sorted(guideModuleList)
+            guideModuleList.sort()
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
@@ -1297,7 +1296,7 @@ class DP_AutoRig_UI(object):
             riggedGuideModuleList = []
             for riggedGuideModule in self.riggedModuleDic:
                 riggedGuideModuleList.append(riggedGuideModule)
-            sorted(riggedGuideModuleList)
+            riggedGuideModuleList.sort()
             for riggedGuideModule in riggedGuideModuleList:
                 moduleCustomName= self.riggedModuleDic[riggedGuideModule]
                 if moduleCustomName == None:
@@ -2639,7 +2638,7 @@ class DP_AutoRig_UI(object):
                     return False
         return True
     
-    def skinFromUI(self, *args):
+    def skinFromUI(self, mode=None, *args):
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
         # get joints to be skinned:
@@ -2649,11 +2648,12 @@ class DP_AutoRig_UI(object):
         
         # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
         jointSkinList, jointNotExistingList = [], []
-        for item in uiJointSkinList:
-            if cmds.objExists(item):
-                jointSkinList.append(item)
-            else:
-                jointNotExistingList.append(item)
+        if uiJointSkinList:
+            for item in uiJointSkinList:
+                if cmds.objExists(item):
+                    jointSkinList.append(item)
+                else:
+                    jointNotExistingList.append(item)
         if jointNotExistingList:
             notExistingJointMessage = self.langDic[self.langName]['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.langDic[self.langName]['i070_continueSkin']
             btYes = self.langDic[self.langName]['i071_yes']
@@ -2671,11 +2671,11 @@ class DP_AutoRig_UI(object):
         if self.validateGeoList(geomSkinList):
             if jointSkinList and geomSkinList:
                 for geomSkin in geomSkinList:
-                    if (args[0] == "Add"):
-                        cmds.skinCluster(geomSkin, edit=True, ai=jointSkinList, toSelectedBones=True, removeUnusedInfluence=False, lockWeights=True, wt=0.0)
-                    elif (args[0] == "Remove"):
-                        cmds.skinCluster(geomSkin, edit=True, ri=jointSkinList, toSelectedBones=True)
-                    else:
+                    if (mode == "Add"):
+                        cmds.skinCluster(geomSkin, edit=True, addInfluence=jointSkinList, toSelectedBones=True, lockWeights=True, weight=0.0)
+                    elif (mode == "Remove"):
+                        cmds.skinCluster(geomSkin, edit=True, removeInfluence=jointSkinList, toSelectedBones=True)
+                    else: # None = create a new skinCluster node
                         baseName = dpUtils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:

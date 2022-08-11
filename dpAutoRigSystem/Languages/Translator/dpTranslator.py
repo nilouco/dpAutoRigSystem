@@ -17,7 +17,7 @@ class Translator(object):
         self.langDic = langDic
         self.langName = langName
         self.translatorString = "dpAutoRigSystem - "+self.langDic[self.langName]['t000_translator']
-        self.sourceLangList = sorted(self.langDic[self.langName])
+        self.sourceLangList = self.langDic[self.langName].sort()
         self.keyLen = len(self.sourceLangList) - 1
         self.langIndexStart = 7 #after userInfo
         self.langIndex = self.langIndexStart
