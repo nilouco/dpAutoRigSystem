@@ -72,6 +72,7 @@ def Leg(dpUIinst):
             cmds.setAttr(legBaseGuide+".translateY", 10)
             cmds.setAttr(legBaseGuide+".rotateX", 0)
             cmds.setAttr(legLimbInstance.radiusCtrl+".translateX", 1.5)
+            legLimbInstance.changeStyle(dpUIinst.langDic[dpUIinst.langName]['m026_biped'])
             
             # edit location of leg ankle guide:
             cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)

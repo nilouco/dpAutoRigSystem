@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.26"
-DPAR_UPDATELOG = "N487 - Fixed sort module instance\nnamespace issue using list.sort()\ninstead of sorted(list)."
+DPAR_VERSION_PY3 = "4.00.27"
+DPAR_UPDATELOG = "N475 - Fixed Limb extrem rotation issue."
 
 
 

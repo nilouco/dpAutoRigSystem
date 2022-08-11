@@ -384,6 +384,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
 
 
+    def getOriginalRotate(self, ctrl, *args):
+        """ Use a temporary node to extract the world space rotation and returns it.
+        """
+        tempDup = cmds.duplicate(ctrl)[0]
+        cmds.parent(tempDup, world=True)
+        originalRotateList = cmds.xform(tempDup, query=True, rotation=True, worldSpace=True)
+        cmds.delete(tempDup)
+        return originalRotateList
+
+
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -664,10 +674,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                 if self.limbTypeName == ARM:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 2) #zxy
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3)
+                    cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3) #xzy
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 dpUtils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
@@ -688,31 +698,30 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # fixing ikControl group to get a good mirror orientation more animator friendly:
                 self.ikExtremCtrlGrp = cmds.group(self.ikExtremCtrl, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Grp")
                 self.ikExtremCtrlOrientGrp = cmds.group(self.ikExtremCtrlGrp, name=side + self.userGuideName + "_" + extremName + "_Ik_Ctrl_Orient_Grp")
-                
+                # adjust rotate orders:
+                cmds.setAttr(self.ikExtremCtrlGrp+".rotateOrder", cmds.getAttr(self.ikExtremCtrl+".rotateOrder"))
+                cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotateOrder", cmds.getAttr(self.ikExtremCtrl+".rotateOrder"))
+
+                # orient ik controls properly:
+                if s == 0 or self.limbTypeName == ARM:
+                    cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", -90)
+                    cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
+
                 # verify if user wants to apply the good mirror orientation:
-                if self.limbStyle != self.langDic[self.langName]['m042_default']:
-                    # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
-                    if self.mirrorAxis != 'off':
-                        for axis in self.mirrorAxis:
-                            if axis == "X":
-                                if self.limbTypeName == ARM:
-                                    # original guide
-                                    if s == 0:
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", -90)
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
-                                    # mirrored guide
-                                    else:
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", -90)
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", 90)
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleX", -1)
-                                # leg type
-                                else:
-                                    # original guide
-                                    if s == 0:
+                if s == 1:
+                    if self.limbStyle != self.langDic[self.langName]['m042_default']:
+                        # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
+                        if self.mirrorAxis != 'off':
+                            for axis in self.mirrorAxis:
+                                if axis == "X":
+                                    if self.limbTypeName == ARM:
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", -90)
-                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
-                                    # mirrored guide
-                                    else:
+                                        cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateY", 90)
+                                        if self.getAlignWorld():
+                                            cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleX", -1)
+                                        else:
+                                            cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleZ", -1)
+                                    else: #leg
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateX", 90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".rotateZ", -90)
                                         cmds.setAttr(self.ikExtremCtrlOrientGrp + ".scaleX", -1)
@@ -795,6 +804,26 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", quadExtraCtrlZero + ".visibility", force=True)
                     self.ctrls.setLockHide([self.quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
                 
+                # working with world axis orientation for limb extrem ik controls
+                if self.getAlignWorld():
+                    originalRotateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_"+extremName+"_OriginalRotate_MD")
+                    cmds.addAttr(self.ikExtremCtrl, longName="useOriginalRotation", attributeType="float", defaultValue=1, minValue=0, maxValue=1, keyable=True)
+                    if s == 0:
+                        self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
+                    elif self.limbStyle == self.langDic[self.langName]['m042_default']:
+                        if self.limbTypeName == ARM:
+                            # get right side to alignWorld. It'll be a little glitch, but it seems be accordilly with the mirror using arm default setting. Recommended use biped limbStyle instead.
+                            self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
+                    for a, axis in enumerate(axisList):
+                        cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotate"+axis, 0)
+                        cmds.setAttr(self.ikExtremCtrlZero+".rotate"+axis, 0)
+                        # store original rotation values for initial default pose
+                        cmds.addAttr(self.ikExtremCtrl, longName="originalRotate"+axis, attributeType="float", keyable=True)
+                        cmds.setAttr(self.ikExtremCtrl+".originalRotate"+axis, self.origRotList[a], lock=True)
+                        cmds.connectAttr(self.ikExtremCtrl+".originalRotate"+axis, originalRotateMD+".input1"+axis, force=True)
+                        cmds.connectAttr(self.ikExtremCtrl+".useOriginalRotation", originalRotateMD+".input2"+axis, force=True)
+                        cmds.connectAttr(originalRotateMD+".output"+axis, self.ikExtremCtrlGrp+".rotate"+axis, force=True)
+
                 # make ikControls lead ikHandles:
                 ikHandleExtraGrp = cmds.group(empty=True, name=ikHandleMainList[0]+"_Grp")
                 cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
@@ -811,25 +840,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0] + "_PoC")[0]
                 cmds.pointConstraint(self.ikExtremCtrl, ikHandleACList[0], maintainOffset=True, name=ikHandleACList[0] + "_PoC")[0]
                 cmds.orientConstraint(self.ikExtremCtrl, self.ikNSJointList[len(self.ikNSJointList) - 2], maintainOffset=True, name=self.ikNSJointList[len(self.ikNSJointList) - 2] + "_OrC")
-                
-                # working with world axis orientation for limb extrem ik controls
-                if self.getAlignWorld():
-                    originalRotateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_"+extremName+"_OriginalRotate_MD")
-                    cmds.addAttr(self.ikExtremCtrl, longName="useOriginalRotation", attributeType="float", defaultValue=1, minValue=0, maxValue=1, keyable=True)
-                    if s == 0:
-                        tempDup = cmds.duplicate(self.ikExtremCtrl)[0]
-                        cmds.parent(tempDup, world=True)
-                        self.origRotList = cmds.xform(tempDup, query=True, rotation=True, worldSpace=True)
-                        cmds.delete(tempDup)
-                    for a, axis in enumerate(axisList):
-                        cmds.setAttr(self.ikExtremCtrlOrientGrp+".rotate"+axis, 0)
-                        cmds.setAttr(self.ikExtremCtrlZero+".rotate"+axis, 0)
-                        # store original rotation values for initial default pose
-                        cmds.addAttr(self.ikExtremCtrl, longName="originalRotate"+axis, attributeType="float", keyable=True)
-                        cmds.setAttr(self.ikExtremCtrl+".originalRotate"+axis, self.origRotList[a], lock=True)
-                        cmds.connectAttr(self.ikExtremCtrl+".originalRotate"+axis, originalRotateMD+".input1"+axis, force=True)
-                        cmds.connectAttr(self.ikExtremCtrl+".useOriginalRotation", originalRotateMD+".input2"+axis, force=True)
-                        cmds.connectAttr(originalRotateMD+".output"+axis, self.ikExtremCtrlGrp+".rotate"+axis, force=True)
 
                 # twist:
                 cmds.addAttr(self.ikExtremCtrl, longName='twist', attributeType='float', keyable=True)

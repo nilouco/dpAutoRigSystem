@@ -60,6 +60,7 @@ def Arm(dpUIinst):
         cmds.setAttr(armBaseGuide+".displayAnnotation", 0)
         cmds.setAttr(armLimbInstance.cvExtremLoc+".translateZ", 7)
         cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
+        armLimbInstance.changeStyle(dpUIinst.langDic[dpUIinst.langName]['m026_biped'])
         
         # Update progress window
         progressAmount += 1
