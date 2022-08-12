@@ -43,43 +43,54 @@ class UpdateGuides(object):
 
 
     def summaryUI(self):
+        self.closeExistWin('updateSummary')
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
-        cmds.columnLayout('updateSummaryBaseColumn', adjustableColumn=1, rowSpacing=10, parent='updateSummary')
+        cmds.columnLayout('updateSummaryBaseColumn', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
+        cmds.text(label=str(len(self.updateData))+' guides updated with success. Thanks!', align='center', height=30, parent='updateSummaryBaseColumn')
         if newData:
-            cmds.rowColumnLayout('updateSummaryLayoutBase', numberOfColumns=2, columnSpacing=[(1, 0), (2,20)], parent='updateSummaryBaseColumn')
-            cmds.text(label='Guide', align='center', parent='updateSummaryLayoutBase')
-            cmds.text(label='New Attribute', align='center', parent='updateSummaryLayoutBase')
+            cmds.text(label='New attributes found:', align='center', parent='updateSummaryBaseColumn')
+            cmds.rowColumnLayout('updateSummaryLayoutBase', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent='updateSummaryBaseColumn')
+            cmds.text(label='Guide', align='center', font='boldLabelFont', height=30, parent='updateSummaryLayoutBase')
+            cmds.text(label='New Attribute', align='center', font='boldLabelFont', height=30, parent='updateSummaryLayoutBase')
             for guide in newData:
                 for newAttr in newData[guide]:
                     cmds.text(label=guide, align='left', parent='updateSummaryLayoutBase')
-                    cmds.text(label=newAttr, align='left', parent='updateSummaryLayoutBase')
+                    cmds.text(label=newAttr, align='center', parent='updateSummaryLayoutBase')
         else:
-            cmds.text(label='There is no new attributes in the updated guides.', align='left', parent='updateSummaryBaseColumn')
-        
-        cmds.button(label='Delete Old Guides', command=self.doDelete, backgroundColor=(1.0, 0.0, 0.0), parent='updateSummaryBaseColumn')
-        cmds.showWindow( 'updateSummary' )
+            cmds.text(label='Everything worked well.\nWe recommend delete old guides.', align='left', parent='updateSummaryBaseColumn')
+        cmds.separator(style='none', height=10, parent='updateSummaryBaseColumn')
+        cmds.button(label='Delete Old Guides', command=self.doDelete, backgroundColor=(1.0, 0.6, 0.4), parent='updateSummaryBaseColumn')
+        cmds.separator(style='none', height=10, parent='updateSummaryBaseColumn')
+        cmds.showWindow('updateSummary')
 
+    def closeExistWin(self, winName, *args):
+        """ Close existing window.
+        """
+        if cmds.window(winName, query=True, exists=True):
+            cmds.deleteUI(winName, window=True)
 
     def updateGuidesUI(self):
+        self.closeExistWin('updateGuidesWindow')
         cmds.window('updateGuidesWindow', title="Guides Info")
-        cmds.columnLayout('updateGuidesBaseColumn', adjustableColumn=1, rowSpacing=10, parent='updateGuidesWindow')
-        cmds.text(label='Current DPAR Version '+str(self.currentDpArVersion), align='left', parent='updateGuidesBaseColumn')
+        cmds.columnLayout('updateGuidesBaseColumn', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
+        cmds.text(label='Current DPAR Version '+str(self.currentDpArVersion), height=30, align="center", parent='updateGuidesBaseColumn')
         if len(self.updateData) > 0:
-            cmds.rowColumnLayout('updateGuidesLayoutBase', numberOfColumns=3, columnSpacing=[(1, 0), (2,20), (3,20)], parent='updateGuidesBaseColumn')
-            cmds.text(label='Transform', align='center', parent='updateGuidesLayoutBase')
-            cmds.text(label='Custom Name', align='center', parent='updateGuidesLayoutBase')
-            cmds.text(label='Version', align='center', parent='updateGuidesLayoutBase')
+            cmds.rowColumnLayout('updateGuidesLayoutBase', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent='updateGuidesBaseColumn')
+            cmds.text(label='Transform', align='center', font='boldLabelFont', height=30, parent='updateGuidesLayoutBase')
+            cmds.text(label='Name', align='center', font='boldLabelFont', parent='updateGuidesLayoutBase')
+            cmds.text(label='Version', align='center', font='boldLabelFont', parent='updateGuidesLayoutBase')
             for guide in self.updateData:
                 cmds.text(label=guide, align='left', parent='updateGuidesLayoutBase')
-                cmds.text(label=self.updateData[guide]['attributes']['customName'], align='left', parent='updateGuidesLayoutBase')
+                cmds.text(label=self.updateData[guide]['attributes']['customName'], align='center', parent='updateGuidesLayoutBase')
                 cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent='updateGuidesLayoutBase')
-            
-            cmds.button(label='Update Guides', command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.6), parent='updateGuidesBaseColumn')
+            cmds.separator(style='none', height=10, parent='updateGuidesLayoutBase')
+            cmds.button(label='Update Guides', command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent='updateGuidesBaseColumn')
         else:
             cmds.text(label='There is no guides to update.', align='left', parent='updateGuidesBaseColumn')
-
-        cmds.showWindow( 'updateGuidesWindow' )
+        cmds.separator(style='none', height=10, parent='updateGuidesBaseColumn')
+        cmds.window('updateGuidesWindow', edit=True, height=1)
+        cmds.showWindow('updateGuidesWindow')
 
     def setProgressBar(self, progressAmount, status):
         cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
@@ -414,10 +425,10 @@ class UpdateGuides(object):
         if self.ui:
             cmds.deleteUI('updateGuidesWindow', window=True)
         # Starts progress bar feedback
-        cmds.progressWindow(title='Operation Progress', progress=0, maxValue=7, status='Renaming old guides')
+        cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status='Renaming old guides')
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
-        self.setProgressBar(1, 'Creating guides')
+        self.setProgressBar(1, 'Creating new guides')
         # Create the new base guides to replace the old ones
         self.createNewGuides()
         self.setProgressBar(2, 'Setting attributes')

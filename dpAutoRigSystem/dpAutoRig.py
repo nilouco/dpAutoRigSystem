@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.23"
-DPAR_UPDATELOG = "N454 - Correct by distance."
+DPAR_VERSION_PY3 = "4.00.29"
+DPAR_UPDATELOG = "N496 - Added a new tool to\nupdate old version guides."
 
 
 
