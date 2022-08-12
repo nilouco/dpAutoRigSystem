@@ -422,8 +422,7 @@ class UpdateGuides(object):
 
 
     def doUpdate(self, *args):
-        if self.ui:
-            cmds.deleteUI('updateGuidesWindow', window=True)
+        self.closeExistWin('updateGuidesWindow')
         # Starts progress bar feedback
         cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status='Renaming old guides')
         # Rename guides to discard as *_OLD
