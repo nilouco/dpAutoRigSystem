@@ -134,6 +134,12 @@ class UpdateGuides(object):
             return self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']
         else:
             return self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']
+
+    def translateSpineStyleValue(self, enumValue):
+        if enumValue == 1:
+            return self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped']
+        else:
+            return self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']
     
     def translateLimbTypeValue(self, enumValue):
         if enumValue == 1:
@@ -192,14 +198,17 @@ class UpdateGuides(object):
             self.setAttrStrValue(dpGuide, attr, value)
             
     def setGuideAttributes(self, dpGuide, attr, value):
-        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'rigType', 'dpARVersion']
+        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion']
         if attr not in ignoreList:
             if attr == 'nJoints':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.changeJointNumber(value)
             elif attr == 'style':
                 currentInstance = self.getNewGuideInstance(dpGuide)
-                expectedValue = self.translateLimbStyleValue(value)
+                if currentInstance.guideModuleName == 'Limb':
+                    expectedValue = self.translateLimbStyleValue(value)
+                else:
+                    expectedValue = self.translateSpineStyleValue(value)
                 currentInstance.changeStyle(expectedValue)
             elif attr == 'type':
                 currentInstance = self.getNewGuideInstance(dpGuide)
@@ -211,6 +220,10 @@ class UpdateGuides(object):
             elif attr == 'mirrorName':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.changeMirrorName(value)
+            elif attr == 'rigType':
+                currentInstance = self.getNewGuideInstance(dpGuide)
+                currentInstance.rigType = value
+                self.setAttrStrValue(dpGuide, attr, value)
             # EYE ATTRIBUTES
             elif attr == 'eyelid':
                 self.setEyelidGuideAttribute(dpGuide, value)
