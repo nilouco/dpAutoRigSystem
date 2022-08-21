@@ -34,7 +34,7 @@ class UpdateGuides(object):
             self.getGuidesToUpdateData()
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound'])
-        if ui:
+        if self.ui:
             # Open the UI
             self.updateGuidesUI()
         elif len(self.guidesDictionary) > 0:
@@ -43,6 +43,8 @@ class UpdateGuides(object):
 
 
     def summaryUI(self):
+        """ Update Guides Summary UI for log info.
+        """
         self.closeExistWin('updateSummary')
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
@@ -73,6 +75,8 @@ class UpdateGuides(object):
 
 
     def updateGuidesUI(self):
+        """ Main Update Guides UI.
+        """
         self.closeExistWin('updateGuidesWindow')
         cmds.window('updateGuidesWindow', title="Guides Info")
         updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
@@ -96,7 +100,8 @@ class UpdateGuides(object):
 
 
     def setProgressBar(self, progressAmount, status):
-        cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
+        if self.ui:
+            cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
     
 
     # Remove objects different from transform and nurbscurbe from list.
@@ -261,7 +266,8 @@ class UpdateGuides(object):
                 self.checkSetNewGuideToAttr(dpGuide, attr, value)
             else:
                 self.setAttrValue(dpGuide, attr, value)
-            cmds.refresh()
+            if self.ui:
+                cmds.refresh()
     
 
     # Return a list of attributes, keyable and userDefined
@@ -294,7 +300,7 @@ class UpdateGuides(object):
 
     # Scan a dictionary for old guides and gather data needed to update them.
     def getGuidesToUpdateData(self):
-
+        self.dpUIinst.populateCreatedGuideModules()
         instancedModulesStrList = list(map(str, self.dpUIinst.modulesToBeRiggedList))
 
         for baseGuide in self.guidesDictionary:
@@ -335,7 +341,8 @@ class UpdateGuides(object):
             self.updateData[guide]['newGuide'] = currentNewGuide.moduleGrp
             self.updateData[guide]['guideModuleName'] = guideType
             self.newGuidesInstanceList.append(currentNewGuide)
-            cmds.refresh()
+            if self.ui:
+                cmds.refresh()
 
 
     def renameOldGuides(self):
@@ -366,7 +373,8 @@ class UpdateGuides(object):
                     cmds.parent(self.updateData[guide]['newGuide'], newParentFinal)
                 except:
                     print(self.dpUIinst.langDic[self.dpUIinst.langName]['m196_parentNotFound']+' '+self.updateData[guide]['newGuide'])
-            cmds.refresh()
+            if self.ui:
+                cmds.refresh()
 
 
     def parentRetainGuides(self):
@@ -461,21 +469,21 @@ class UpdateGuides(object):
 
 
     def doDelete(self, *args):
-        cmds.deleteUI('updateSummary', window=True)
+        self.closeExistWin('updateSummary')
         for guide in self.updateData:
             try:
                 cmds.parent(guide, world=True)
             except Exception as e:
                 print(e)
         cmds.delete(*self.updateData.keys())
-
         self.dpUIinst.jobReloadUI()
 
 
     def doUpdate(self, *args):
         self.closeExistWin('updateGuidesWindow')
-        # Starts progress bar feedback
-        cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m198_renameOldGuides'])
+        if self.ui:
+            # Starts progress bar feedback
+            cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m198_renameOldGuides'])
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
         self.setProgressBar(1, self.dpUIinst.langDic[self.dpUIinst.langName]['m199_creatingNewGuides'])
@@ -497,8 +505,11 @@ class UpdateGuides(object):
         # After all new guides parented and set, reparent old ones that will be used.
         self.parentRetainGuides()
         cmds.select(clear=True)
-        self.setProgressBar(7, self.dpUIinst.langDic[self.dpUIinst.langName]['m204_finish'])
-        # Ends progress bar feedback
-        cmds.progressWindow(endProgress=True)
-        # Calls for summary window
-        self.summaryUI()
+        if self.ui:
+            self.setProgressBar(7, self.dpUIinst.langDic[self.dpUIinst.langName]['m204_finish'])
+            # Ends progress bar feedback
+            cmds.progressWindow(endProgress=True)
+            # Calls for summary window
+            self.summaryUI()
+        else:
+            self.doDelete()
