@@ -557,7 +557,7 @@
     "m186_updateGuides"         : "Atualizar Guias",
     "m187_updateGuidesDesc"     : "Verifica por versões antigas de guias e\ntenta atualiza-las por novas.",
     "m188_noGuidesToUpdate"     : "Não tem guias para atualizar.",
-    "m189_guidesUpdatedSuccess" : "guias atualizadas com sucess. Obrigado!",
+    "m189_guidesUpdatedSuccess" : "guias atualizadas com sucesso. Obrigado!",
     "m190_newAttrFound"         : "Novos atributos encontrados:",
     "m191_newAttr"              : "Novo Atributo",
     "m192_askOldGuides"         : "Atualização realizada sem problemas.\nRecomendamos deletar as guias antigas.",
@@ -573,6 +573,7 @@
     "m202_setTranforms"         : "Configurando transforms",
     "m203_setChildGuides"       : "Configurando guias filhas",
     "m204_finish"               : "Finalizar",
+    "m205_version"              : "Versão",
     
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",

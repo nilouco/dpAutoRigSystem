@@ -573,6 +573,7 @@
     "m202_setTranforms"         : "Setting transforms",
     "m203_setChildGuides"       : "Setting child guides",
     "m204_finish"               : "Finish",
+    "m205_version"              : "Version",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

@@ -573,6 +573,7 @@
     "m202_setTranforms"         : "Définition des transforms",
     "m203_setChildGuides"       : "Définition des guides enfants",
     "m204_finish"               : "Finir",
+    "m205_version"              : "Vérsion",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

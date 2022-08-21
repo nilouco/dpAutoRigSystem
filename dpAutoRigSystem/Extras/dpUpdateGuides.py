@@ -84,15 +84,15 @@ class UpdateGuides(object):
         cmds.text(label='DPAR '+self.dpUIinst.langDic[self.dpUIinst.langName]['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
         if len(self.updateData) > 0:
             updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesCL)
-            cmds.text(label='Transform', align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
-            cmds.text(label='Name', align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-            cmds.text(label='Version', align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
             for guide in self.updateData:
                 cmds.text(label=guide, align='left', parent=updateGuidesBaseRCL)
                 cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent=updateGuidesBaseRCL)
                 cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent=updateGuidesBaseRCL)
             cmds.separator(style='none', height=10, parent=updateGuidesBaseRCL)
-            cmds.button(label='Update Guides', command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
+            cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
         else:
             cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
         cmds.separator(style='none', height=10, parent=updateGuidesCL)
@@ -105,23 +105,27 @@ class UpdateGuides(object):
             cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
     
 
-    # Remove objects different from transform and nurbscurbe from list.
     def filterNotNurbsCurveAndTransform(self, mayaObjList):
-        returList = []
+        """ Remove objects different from transform and nurbsCurve from list.
+            Returns cleaned list.
+        """
+        resultList = []
         for obj in mayaObjList:
             objType = cmds.objectType(obj)
             if objType == 'nurbsCurve' or objType == 'transform':
-                returList.append(obj)
-        return returList
+                resultList.append(obj)
+        return resultList
     
 
-    # Remove _Ant(Anotations) items from list of transforms
     def filterAnotation(self, dpArTransformsList):
-        returList = []
+        """ Remove _Ant(Anotations) items from list of transforms.
+            Return cleaned list.
+        """
+        resultList = []
         for obj in dpArTransformsList:
             if not '_Ant' in obj:
-                returList.append(obj)
-        return returList
+                resultList.append(obj)
+        return resultList
 
 
     def getAttrValue(self, dpGuide, attr):
@@ -222,6 +226,9 @@ class UpdateGuides(object):
             
 
     def setGuideAttributes(self, dpGuide, attr, value):
+        """ Verify if we have specific attribute cases to work with each kind of module guides.
+            Ignore known attributes.
+        """
         ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion']
         if attr not in ignoreList:
             if attr == 'nJoints':
@@ -271,8 +278,9 @@ class UpdateGuides(object):
                 cmds.refresh()
     
 
-    # Return a list of attributes, keyable and userDefined
     def listKeyUserAttr(self, objWithAttr):
+        """ Return a list of attributes, keyable and userDefined
+        """
         returnList = []
         keyable = cmds.listAttr(objWithAttr, keyable=True)
         if keyable:
@@ -299,8 +307,9 @@ class UpdateGuides(object):
         return childrenList
 
 
-    # Scan a dictionary for old guides and gather data needed to update them.
     def getGuidesToUpdateData(self):
+        """ Scan a dictionary for old guides and gather data needed to update them.
+        """
         self.dpUIinst.populateCreatedGuideModules()
         instancedModulesStrList = list(map(str, self.dpUIinst.modulesToBeRiggedList))
 
@@ -427,8 +436,9 @@ class UpdateGuides(object):
         return filteredList
     
 
-    # Set all attributes from children with same BaseGuide to avoid double set
     def setChildrenGuides(self):
+        """ Set all attributes from children with same BaseGuide to avoid double set.
+        """
         for guide in self.updateData:
             newGuideChildrenList = self.listChildren(self.updateData[guide]['newGuide'])
             newGuideChildrenList = self.filterChildrenFromAnotherBase(newGuideChildrenList, self.updateData[guide]['newGuide'])
@@ -441,8 +451,10 @@ class UpdateGuides(object):
                     self.copyAttrFromGuides(newChild, self.updateData[guide]['children'][guide.split(':')[0]+':'+newGuideChildrenOnlyList[i]]['attributes'])
     
 
-    # List new attributes from created guides for possible input.
     def listNewAttr(self):
+        """ List new attributes from created guides for possible input.
+            Returns new data dictionary if it exists.
+        """
         newDataDic = {}
         for guide in self.updateData:
             oldGuideSet = set(self.updateData[guide]['attributes'])
@@ -484,6 +496,8 @@ class UpdateGuides(object):
 
 
     def doUpdate(self, *args):
+        """ Main method to update the guides in the scene.
+        """
         self.closeExistWin('updateGuidesWindow')
         if self.ui:
             # Starts progress bar feedback
