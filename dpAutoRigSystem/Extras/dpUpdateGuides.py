@@ -82,7 +82,7 @@ class UpdateGuides(object):
             cmds.text(label='Version', align='center', font='boldLabelFont', parent='updateGuidesLayoutBase')
             for guide in self.updateData:
                 cmds.text(label=guide, align='left', parent='updateGuidesLayoutBase')
-                cmds.text(label=self.updateData[guide]['attributes']['customName'], align='center', parent='updateGuidesLayoutBase')
+                cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent='updateGuidesLayoutBase')
                 cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent='updateGuidesLayoutBase')
             cmds.separator(style='none', height=10, parent='updateGuidesLayoutBase')
             cmds.button(label='Update Guides', command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent='updateGuidesBaseColumn')
