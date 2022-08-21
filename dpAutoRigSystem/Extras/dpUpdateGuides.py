@@ -1,4 +1,5 @@
 from maya import cmds
+from maya import mel
 from ..Modules.Library import dpUtils
 
 
@@ -33,7 +34,7 @@ class UpdateGuides(object):
             # Get all info nedeed and store in updateData dictionary
             self.getGuidesToUpdateData()
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound'])
+            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound']+'\\n\";')
         if self.ui:
             # Open the UI
             self.updateGuidesUI()
@@ -167,14 +168,14 @@ class UpdateGuides(object):
         try:
             cmds.setAttr(dpGuide+'.'+attr, value)
         except:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['m195_couldNotBeSet']+' '+dpGuide+'.'+attr)
+            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
 
 
     def setAttrStrValue(self, dpGuide, attr, value):
         try:
             cmds.setAttr(dpGuide+'.'+attr, value, type='string')
         except:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['m195_couldNotBeSet']+' '+dpGuide+'.'+attr)
+            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
     
 
     def setEyelidGuideAttribute(self, dpGuide, value):
@@ -372,7 +373,7 @@ class UpdateGuides(object):
                 try:
                     cmds.parent(self.updateData[guide]['newGuide'], newParentFinal)
                 except:
-                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['m196_parentNotFound']+' '+self.updateData[guide]['newGuide'])
+                    mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
             if self.ui:
                 cmds.refresh()
 
@@ -386,7 +387,7 @@ class UpdateGuides(object):
                     try:
                         cmds.parent(retainGuide, newParentFinal, 1)
                     except:
-                        print(self.dpUIinst.langDic[self.dpUIinst.langName]['m197_notPossibleParent']+' '+retainGuide)
+                        mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
     
 
     def sendTransformsToListEnd(self, elementList):
@@ -475,7 +476,10 @@ class UpdateGuides(object):
                 cmds.parent(guide, world=True)
             except Exception as e:
                 print(e)
-        cmds.delete(*self.updateData.keys())
+        try:
+            cmds.delete(*self.updateData.keys())
+        except:
+            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound']+'\\n\";')
         self.dpUIinst.jobReloadUI()
 
 
