@@ -18,9 +18,8 @@
 ###################################################################
 
 
-# current version:
-DPAR_VERSION_PY3 = "4.00.27"
-DPAR_UPDATELOG = "N475 - Fixed Limb extrem rotation issue."
+DPAR_VERSION_PY3 = "4.00.28"
+DPAR_UPDATELOG = "N435 - Added new control for Eye specular scale" 
 
 
 

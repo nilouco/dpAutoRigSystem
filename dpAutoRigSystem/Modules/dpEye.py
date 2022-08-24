@@ -100,6 +100,11 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvPupilLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_PupilLoc", r=0.12, d=1, guide=True)
         cmds.parent(self.cvPupilLoc, self.cvJointLoc)
         cmds.setAttr(self.cvPupilLoc+".tz", 0.3)
+        # specular guide
+        self.cvSpecularLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_SpecularLoc", r=0.12, d=1, guide=True)
+        cmds.parent(self.cvSpecularLoc, self.cvJointLoc)
+        cmds.setAttr(self.cvSpecularLoc+".tz", 1)
+        cmds.setAttr(self.cvSpecularLoc+".visibility", 0)
         # hierarchy mounting
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jUpperEyelid, self.jLowerEyelid, self.jEyelid)
@@ -133,9 +138,11 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def changeSpecular(self, *args):
         """ Set the attribute value for specular.
         """
+        self.cvSpecularLoc = self.guideName+"_SpecularLoc"
         cmds.setAttr(self.moduleGrp+".specular", cmds.checkBox(self.specCB, query=True, value=True))
+        cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox(self.specCB, query=True, value=False))
         
-        
+
     def changeIris(self, *args):
         """ Set the attribute value for iris.
         """
@@ -512,6 +519,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.guide = side+self.userGuideName+"_Guide_JointLoc1"
                 self.cvEndJointZero = side+self.userGuideName+"_Guide_JointEnd_Grp"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                self.cvSpecularLoc = side+self.userGuideName+"_Guide_SpecularLoc"
                 # create a joint:
                 self.jxt = cmds.joint(name=side+self.userGuideName+"_1_Jxt", scaleCompensate=False)
                 self.subJnt = cmds.joint(name=side+self.userGuideName+"_1_Sub_Jxt", scaleCompensate=False)
@@ -537,7 +545,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
                         cmds.setAttr(eyeZeroList[0]+".scaleX", -1)
                         cmds.setAttr(eyeZeroList[0]+".scaleY", -1)
-                        cmds.setAttr(eyeZeroList[0]+".scaleZ", -1)
+                        cmds.setAttr(eyeZeroList[0]+".scaleZ", -1)                        
                 cmds.parent(eyeZeroList[1], self.baseEyeCtrl)
                 
                 # hide visibility attribute:
@@ -606,9 +614,14 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.eyeSpecJnt = cmds.joint(name=side+self.userGuideName+"Specular_1_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.eyeSpecJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     dpUtils.setJointLabel(self.eyeSpecJnt, s+jointLabelAdd, 18, self.userGuideName+"Specular_1")
+                    # specular joint scale:
+                    self.eyeSpecScaleJnt = cmds.joint(name=side+self.userGuideName+"Specular_2_Jnt", scaleCompensate=False)
+                    cmds.addAttr(self.eyeSpecScaleJnt, longName='dpAR_joint', attributeType='float', keyable=False)
+                    dpUtils.setJointLabel(self.eyeSpecScaleJnt, s+jointLabelAdd, 18, self.userGuideName+"Specular_2")
+                    cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", 1)
                     # create endSpecular joint:
                     self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_JEnd", radius=0.5)
-                    cmds.setAttr(self.endSpecJoint+".translateZ", 1)
+                    cmds.setAttr(self.endSpecJoint+".translateZ", 0.2)
                     cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)
                     # specular control:
                     self.eyeSpecCtrl = self.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.userGuideName+"_Spec_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
@@ -624,6 +637,43 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.langDic[self.langName]['c032_follow'], followSPC+"."+self.fkEyeSubCtrl+"W0", force=True)
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.langDic[self.langName]['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
                     cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
+                    # specular scale control:
+                    self.eyeSpecScaleCtrl = self.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.userGuideName+"_SpecScale_Ctrl", r=0.2*self.ctrlRadius, d=self.curveDegree)
+                    cmds.delete(cmds.parentConstraint(self.cvSpecularLoc, self.eyeSpecScaleCtrl, maintainOffset=False))
+                    eyeSpecScaleZeroGrp = dpUtils.zeroOut([self.eyeSpecScaleCtrl])
+                    cmds.parent(eyeSpecScaleZeroGrp, self.eyeSpecCtrl)
+                    cmds.parentConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=False, name=self.eyeSpecScaleJnt+"_PaC")
+                    cmds.scaleConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=True, name=self.eyeSpecScaleJnt+"_ScC")
+                    # fixing flip mirror:
+                    if s == 1:
+                        if self.mirrorAxis == "X":
+                            currentTX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateX")
+                            currentTX = currentTX*(-1)
+                            currentRY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateY")
+                            currentRY = currentRY*(-1)
+                            currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
+                            currentRZ = currentRZ*(-1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateX", currentTX)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateY", currentRY)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
+                        if self.mirrorAxis == "Y":
+                            currentTY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateY")
+                            currentTY = currentTY*(-1)
+                            currentRX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateX")
+                            currentRX = currentRX*(-1)
+                            currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
+                            currentRZ = currentRZ*(-1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateX", currentRX)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateY", currentTY)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
+                        if self.mirrorAxis == "Z":
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
 
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):

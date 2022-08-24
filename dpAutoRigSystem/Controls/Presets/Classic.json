@@ -94,5 +94,6 @@
     "id_087_ChainIkLast"     : {"type" : "Ball",             "degree" : 3},
     "id_088_LimbAdditional"  : {"type" : "Cube",             "degree" : 1},
     "id_089_SpineBase"       : {"type" : "Circle",           "degree" : 3},
-    "id_090_SpineTip"        : {"type" : "Circle",           "degree" : 3}
+    "id_090_SpineTip"        : {"type" : "Circle",           "degree" : 3},
+    "id_091_EyeSpecScale"    : {"type" : "Ball",             "degree" : 3}
 }
