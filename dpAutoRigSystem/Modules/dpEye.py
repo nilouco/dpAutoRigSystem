@@ -646,35 +646,34 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.scaleConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=True, name=self.eyeSpecScaleJnt+"_ScC")
                     # fixing flip mirror:
                     if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 1 or 0:
-                            if self.mirrorAxis == "X":
-                                currentTX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateX")
-                                currentTX = currentTX*(-1)
-                                currentRY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateY")
-                                currentRY = currentRY*(-1)
-                                currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
-                                currentRZ = currentRZ*(-1)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateX", currentTX)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateY", currentRY)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
-                            if self.mirrorAxis == "Y":
-                                currentTY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateY")
-                                currentTY = currentTY*(-1)
-                                currentRX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateX")
-                                currentRX = currentRX*(-1)
-                                currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
-                                currentRZ = currentRZ*(-1)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateX", currentRX)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateY", currentTY)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
-                            if self.mirrorAxis == "Z":
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
-                                cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
+                        if self.mirrorAxis == "X":
+                            currentTX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateX")
+                            currentTX = currentTX*(-1)
+                            currentRY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateY")
+                            currentRY = currentRY*(-1)
+                            currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
+                            currentRZ = currentRZ*(-1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateX", currentTX)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateY", currentRY)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
+                        if self.mirrorAxis == "Y":
+                            currentTY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateY")
+                            currentTY = currentTY*(-1)
+                            currentRX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateX")
+                            currentRX = currentRX*(-1)
+                            currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
+                            currentRZ = currentRZ*(-1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateX", currentRX)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateY", currentTY)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
+                        if self.mirrorAxis == "Z":
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
+                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
 
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):
