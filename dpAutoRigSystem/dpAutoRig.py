@@ -18,8 +18,9 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.00.28"
-DPAR_UPDATELOG = "N435 - Added new control for Eye specular scale" 
+# current version:
+DPAR_VERSION_PY3 = "4.00.29"
+DPAR_UPDATELOG = "N496 - Added a new tool to\nupdate old version guides."
 
 
 
@@ -1826,9 +1827,13 @@ class DP_AutoRig_UI(object):
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
                 if not guideVersion == DPAR_VERSION_PY3:
                     btYes = self.langDic[self.langName]['i071_yes']
+                    btUpdateGuides = self.langDic[self.langName]['m186_updateGuides']
                     btNo = self.langDic[self.langName]['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
                     if userChoose == btNo:
+                        return
+                    elif userChoose == btUpdateGuides:
+                        self.initExtraModule("dpUpdateGuides", EXTRAS)
                         return
                     else:
                         break
