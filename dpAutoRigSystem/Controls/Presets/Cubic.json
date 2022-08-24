@@ -93,7 +93,7 @@
     "id_086_ChainIkMain"     : {"type" : "Cube", "degree" : 1},
     "id_087_ChainIkLast"     : {"type" : "Cube", "degree" : 1},
     "id_088_LimbAdditional"  : {"type" : "Cube", "degree" : 1},
-    "id_089_SpineBase"       : {"type" : "Cube", "degree" : 3},
-    "id_090_SpineTip"        : {"type" : "Cube", "degree" : 3}
-    
+    "id_089_SpineBase"       : {"type" : "Cube", "degree" : 1},
+    "id_090_SpineTip"        : {"type" : "Cube", "degree" : 1},
+    "id_091_EyeSpecScale"    : {"type" : "Cube", "degree" : 1}
 }
