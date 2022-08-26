@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.29"
-DPAR_UPDATELOG = "N496 - Added a new tool to\nupdate old version guides."
+DPAR_VERSION_PY3 = "4.00.30"
+DPAR_UPDATELOG = "N501 - Attribute defaultValue Leg/Foot issue fix."
 
 
 
@@ -2101,14 +2101,16 @@ class DP_AutoRig_UI(object):
                                     for floatAttr in floatAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
-                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+floatAttr, query=True, defaultValue=True)
+                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True, defaultValue=defValue)
                                             cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
                                     intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
                                     for intAttr in intAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+intAttr):
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
-                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=1)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+intAttr, query=True, defaultValue=True)
+                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=defValue)
                                             cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
                                             cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
                                     if ikFkNetworkList:

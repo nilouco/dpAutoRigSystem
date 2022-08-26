@@ -503,8 +503,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.hasPupil = False
             # create the main control:
             self.eyeCtrl = self.ctrls.cvControl("id_010_EyeLookAtMain", self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Ctrl", r=(2.25*self.ctrlRadius), d=self.curveDegree)
-            cmds.addAttr(self.eyeCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1)
-            cmds.setAttr(self.eyeCtrl+"."+self.langDic[self.langName]['c032_follow'], 1)
+            cmds.addAttr(self.eyeCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
             cmds.delete(cmds.parentConstraint(sideList[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
             if self.mirrorAxis != 'off':
                 cmds.setAttr(self.eyeCtrl+".translate"+self.mirrorAxis, 0)
