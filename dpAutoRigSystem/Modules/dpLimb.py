@@ -829,9 +829,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
                 cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                    cmds.parent(ikHandleExtraGrp, self.quadExtraCtrl)
+                    cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, self.quadExtraCtrl)
+                    print("Good morning here")
+                #elif self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                #    cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, ikHandleGrp)
                 else:
-                    cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
+                    cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, self.ikHandleToRFGrp)
                 self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
                 self.ikHandleConstList.append(self.ikHandleConst)
                 

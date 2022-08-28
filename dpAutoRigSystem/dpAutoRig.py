@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.30"
-DPAR_UPDATELOG = "N501 - Attribute defaultValue Leg/Foot issue fix."
+DPAR_VERSION_PY3 = "4.00.31"
+DPAR_UPDATELOG = "N500 - Quadruped Limb stretch issue fixed."
 
 
 
@@ -2089,7 +2089,7 @@ class DP_AutoRig_UI(object):
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
                                         cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
-                                        cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
+#                                        cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
