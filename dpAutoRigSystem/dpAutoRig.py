@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.27"
-DPAR_UPDATELOG = "N475 - Fixed Limb extrem rotation issue."
+DPAR_VERSION_PY3 = "4.00.32"
+DPAR_UPDATELOG = "N470 - Fixed module name replace."
 
 
 
