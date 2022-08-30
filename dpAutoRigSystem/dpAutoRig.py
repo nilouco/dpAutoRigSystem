@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.31"
-DPAR_UPDATELOG = "N472 - Rivet UI closes after apply."
+DPAR_VERSION_PY3 = "4.00.32"
+DPAR_UPDATELOG = "N470 - Fixed module name replace."
 
 
 
