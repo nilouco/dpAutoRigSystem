@@ -1827,9 +1827,13 @@ class DP_AutoRig_UI(object):
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
                 if not guideVersion == DPAR_VERSION_PY3:
                     btYes = self.langDic[self.langName]['i071_yes']
+                    btUpdateGuides = self.langDic[self.langName]['m186_updateGuides']
                     btNo = self.langDic[self.langName]['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.langDic[self.langName]['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
                     if userChoose == btNo:
+                        return
+                    elif userChoose == btUpdateGuides:
+                        self.initExtraModule("dpUpdateGuides", EXTRAS)
                         return
                     else:
                         break
@@ -2097,14 +2101,16 @@ class DP_AutoRig_UI(object):
                                     for floatAttr in floatAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
-                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+floatAttr, query=True, defaultValue=True)
+                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True, defaultValue=defValue)
                                             cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
                                     intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
                                     for intAttr in intAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+intAttr):
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
-                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=1)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+intAttr, query=True, defaultValue=True)
+                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=defValue)
                                             cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
                                             cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
                                     if ikFkNetworkList:
