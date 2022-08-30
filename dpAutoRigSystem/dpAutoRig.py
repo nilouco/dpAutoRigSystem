@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.30"
-DPAR_UPDATELOG = "N501 - Attribute defaultValue Leg/Foot issue fix."
+DPAR_VERSION_PY3 = "4.00.31"
+DPAR_UPDATELOG = "N472 - Rivet UI closes after apply."
 
 
 
