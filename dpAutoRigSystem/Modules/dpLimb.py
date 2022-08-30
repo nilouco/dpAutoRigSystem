@@ -44,7 +44,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.fixIkSpringSolverGrpList = []
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
-        self.ikStretchExtremLocList = []
         self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
@@ -729,7 +728,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
-                self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
@@ -828,13 +826,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 ikHandleExtraGrp = cmds.group(empty=True, name=ikHandleMainList[0]+"_Grp")
                 cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
                 cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
+                cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, self.quadExtraCtrl)
-                    print("Good morning here")
-                #elif self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
-                #    cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, ikHandleGrp)
-                else:
-                    cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, self.ikHandleToRFGrp)
+                elif self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                    cmds.parent(ikStretchExtremLocZero, self.ikHandleToRFGrp)
+                    cmds.parentConstraint(ikHandleExtraGrp, ikStretchExtremLocZero, skipRotate=("x", "y", "z"), maintainOffset=True, name=ikStretchExtremLocZero+"_PaC")
                 self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
                 self.ikHandleConstList.append(self.ikHandleConst)
                 
@@ -1511,7 +1508,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "limbStyle": self.limbStyle,
                 "quadFrontLegList": self.quadFrontLegList,
                 "integrateOrigFromList": self.integrateOrigFromList,
-                "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": "limbManualVolume",
                 "scalableGrp": self.aScalableGrps,
