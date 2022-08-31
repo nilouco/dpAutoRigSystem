@@ -181,6 +181,7 @@ class StartClass(object):
                     self.enteredText = cmds.textField(self.userName, query=True, text=True)
                 except:
                     self.enteredText = ""
+            self.enteredText = self.enteredText.replace(" ", "_")
             # call utils to return the normalized text:
             self.customName = dpUtils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:

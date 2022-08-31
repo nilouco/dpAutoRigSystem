@@ -42,17 +42,20 @@ class Rivet(object):
         self.selectedUVSet = None
         # call main function
         if ui:
-            self.dpRivetUI(self)
+            self.dpRivetUI()
             # try to fill UI items from selection
-            self.dpFillUI(self)
+            self.dpFillUI()
+
+    def dpCloseRivetUi(self, *args):
+        if cmds.window('dpRivetWindow', query=True, exists=True):
+            cmds.deleteUI('dpRivetWindow', window=True)
     
     
     def dpRivetUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpRivetUI Window:
-        if cmds.window('dpRivetWindow', query=True, exists=True):
-            cmds.deleteUI('dpRivetWindow', window=True)
+        self.dpCloseRivetUi()
         rivet_winWidth  = 305
         rivet_winHeight = 470
         dpRivetWin = cmds.window('dpRivetWindow', title=self.langDic[self.langName]["m083_rivet"]+" "+DPRV_VERSION, widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -124,6 +127,7 @@ class Rivet(object):
         
         # call run function to create Rivet setup using UI values
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, RIVET_GRP, True)
+        self.dpCloseRivetUi()
     
     
     def dpSelectUVSetWin(self, uvSetList, *args):
