@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.32"
-DPAR_UPDATELOG = "N470 - Fixed module name replace."
+DPAR_VERSION_PY3 = "4.00.33"
+DPAR_UPDATELOG = "N500 - Quadruped Limb stretch issue fixed."
 
 
 
@@ -2065,7 +2065,6 @@ class DP_AutoRig_UI(object):
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
                                     scaleConst        = self.integratedTaskDic[moduleDic]['scaleConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
-                                    ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
                                     middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
                                     fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
@@ -2074,7 +2073,6 @@ class DP_AutoRig_UI(object):
                                     ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
-                                    ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
@@ -2089,7 +2087,6 @@ class DP_AutoRig_UI(object):
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
                                         cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
-                                        cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
