@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.33"
-DPAR_UPDATELOG = "N500 - Quadruped Limb stretch issue fixed."
+DPAR_VERSION_PY3 = "4.00.34"
+DPAR_UPDATELOG = "N497 - Fixed duplicated Limb module."
 
 
 
@@ -749,7 +749,7 @@ class DP_AutoRig_UI(object):
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue != 1:
+            if nJointsValue > 0:
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -763,6 +763,24 @@ class DP_AutoRig_UI(object):
             toSetAttrList.remove(dispAnnotAttr)
             currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
             newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
+        
+        
+        
+        # TODO: change to unify style and type attributes
+        
+        if cmds.objExists(selectedItem+".type"):
+            typeValue = cmds.getAttr(selectedItem+'.type')
+            newGuideInstance.changeType(typeValue)
+            print("updated TYPE")
+            cmds.refresh()
+            
+        if cmds.objExists(selectedItem+".style"):
+            styleValue = cmds.getAttr(selectedItem+'.style')
+            newGuideInstance.changeStyle(styleValue)
+            print("updated STYLE")
+            cmds.refresh()
+        
+
         
         # get and set transformations
         childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")

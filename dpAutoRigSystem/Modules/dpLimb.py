@@ -77,8 +77,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp + ".nJoints", 0)
         cmds.addAttr(self.moduleGrp, longName="type", attributeType='enum', enumName=self.langDic[self.langName]['m028_arm'] + ':' + self.langDic[self.langName]['m030_leg'])
         cmds.setAttr(self.moduleGrp + ".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="hasBend", attributeType='bool')
@@ -144,7 +142,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem + "_PaC")
 
         # align cornerLocs:
-        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")[0]
 
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -189,9 +187,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
-        cmds.text(self.nSegmentsText, edit=True, visible=False, parent=self.segDelColumn)
-        cmds.intField(self.nJointsIF, edit=True, editable=False, visible=False, parent=self.segDelColumn)
-
         self.typeLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedModuleColumn")
         cmds.text(self.langDic[self.langName]['m021_type'], parent=self.typeLayout)
         self.typeMenu = cmds.optionMenu("typeMenu", label='', changeCommand=self.changeType, parent=self.typeLayout)
@@ -302,6 +297,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvExtremLoc = self.guideName + "_Extrem"
         self.cvEndJoint = self.guideName + "_JointEnd"
         self.cvUpVectorLoc = self.guideName + "_CornerUpVector"
+        self.cornerAIC = self.cornerGrp + "_AiC"
+
+        dpUtils.unlockAttr([self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc, self.cvEndJoint, self.cvUpVectorLoc, self.cornerAIC])
 
         # reset translations:
         translateAttrList = ['tx', 'ty', 'tz']
@@ -325,7 +323,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
             cmds.delete(self.cornerAIC)
-            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")[0]
             self.setLockCornerAttr(ARM)
 
         # for Leg type:
@@ -343,7 +341,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.cvUpVectorLoc + ".translateX", 10)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
             cmds.delete(self.cornerAIC)
-            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")[0]
             self.setLockCornerAttr(LEG)
 
         # reset rotations:
@@ -376,8 +374,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cornerAttrList = ['ty', 'rx', 'rz'] #leg
         for attr in trAttrList:
             if attr in cornerAttrList:
-                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=True)
-                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=True)
+                cmds.setAttr(self.cvCornerLoc+"."+attr, 0, lock=True)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, 0, lock=True)
             else:
                 cmds.setAttr(self.cvCornerLoc+"."+attr, lock=False)
                 cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
