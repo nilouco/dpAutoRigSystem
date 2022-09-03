@@ -264,25 +264,26 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         self.cvCornerBLoc = self.guideName + "_CornerB"
         # for Default style:
-        if style == self.langDic[self.langName]['m042_default']:
+        if style == self.langDic[self.langName]['m042_default'] or style == 0:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 0)
             cmds.setAttr(self.moduleGrp + ".style", 0)
         # for Biped style:
-        if style == self.langDic[self.langName]['m026_biped']:
+        if style == self.langDic[self.langName]['m026_biped'] or style == 1:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 0)
             cmds.setAttr(self.moduleGrp + ".style", 1)
         # for Quadruped style:
-        if style == self.langDic[self.langName]['m037_quadruped']:
+        if style == self.langDic[self.langName]['m037_quadruped'] or style == 2:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 2)
         # for Quadruped Spring style:
-        if style == self.langDic[self.langName]['m043_quadSpring']:
+        if style == self.langDic[self.langName]['m043_quadSpring'] or style == 3:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 3)
         # for Quadruped Extra style:
-        if style == self.langDic[self.langName]['m155_quadrupedExtra']:
+        if style == self.langDic[self.langName]['m155_quadrupedExtra'] or style == 4:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 4)
+        
 
     def changeType(self, type, *args):
         """ This function will modify the names of the rigged module to Arm or Leg options
@@ -310,7 +311,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(guideNode + "." + tAttr, 0)
 
         # for Arm type:
-        if type == self.langDic[self.langName]['m028_arm']:
+        if type == self.langDic[self.langName]['m028_arm'] or type == 0:
             cmds.setAttr(self.moduleGrp + ".type", 0)
             cmds.setAttr(self.cvBeforeLoc + ".translateX", -1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -4)
@@ -327,7 +328,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.setLockCornerAttr(ARM)
 
         # for Leg type:
-        elif type == self.langDic[self.langName]['m030_leg']:
+        elif type == self.langDic[self.langName]['m030_leg'] or type == 1:
             cmds.setAttr(self.moduleGrp + ".type", 1)
             cmds.setAttr(self.cvBeforeLoc + ".translateY", 1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -2)
@@ -346,6 +347,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
         # reset rotations:
         self.reOrientGuide()
+
 
     def reOrientGuide(self, *args):
         """ This function reOrient guides orientations, creating temporary aimConstraints for them.
