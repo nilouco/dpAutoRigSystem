@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.33"
-DPAR_UPDATELOG = "N500 - Quadruped Limb stretch issue fixed."
+DPAR_VERSION_PY3 = "4.00.34"
+DPAR_UPDATELOG = "N497 - Fixed duplicated Limb module."
 
 
 
@@ -692,7 +692,7 @@ class DP_AutoRig_UI(object):
             cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
-            # close and reload dpAR UI in order to avoide Maya crash
+            # close and reload dpAR UI in order to avoid Maya crash
             self.jobReloadUI()
             
     
@@ -749,7 +749,7 @@ class DP_AutoRig_UI(object):
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue != 1:
+            if nJointsValue > 0:
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -764,6 +764,14 @@ class DP_AutoRig_UI(object):
             currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
             newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
         
+        # TODO: change to unify style and type attributes        
+        if cmds.objExists(selectedItem+".type"):
+            typeValue = cmds.getAttr(selectedItem+'.type')
+            newGuideInstance.changeType(typeValue)
+        if cmds.objExists(selectedItem+".style"):
+            styleValue = cmds.getAttr(selectedItem+'.style')
+            newGuideInstance.changeStyle(styleValue)
+        
         # get and set transformations
         childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
         if childrenList:
@@ -772,9 +780,14 @@ class DP_AutoRig_UI(object):
                     newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
                     for transfAttr in transformAttrList:
                         try:
+                            isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
+                            cmds.setAttr(newChild+"."+transfAttr, lock=False)
                             cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
+                            if isLocked:
+                                cmds.setAttr(newChild+"."+transfAttr, lock=True)
                         except:
                             pass
+        
         # set transformation for Guide_Base
         for transfAttr in transformAttrList:
             cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
