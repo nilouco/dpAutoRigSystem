@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.34"
-DPAR_UPDATELOG = "N497 - Fixed duplicated Limb module."
+DPAR_VERSION_PY3 = "4.01.00"
+DPAR_UPDATELOG = "Release 2022-09-04"
 
 
 
