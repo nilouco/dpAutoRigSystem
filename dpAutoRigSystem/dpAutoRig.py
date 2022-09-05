@@ -1113,7 +1113,7 @@ class DP_AutoRig_UI(object):
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(controlInstance)
         else:
-            moduleLayout = cmds.rowLayout(numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
+            moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
             cmds.image(i=iconDir, width=32, parent=moduleLayout)
 
             if guideDir == MODULES:
@@ -1128,6 +1128,8 @@ class DP_AutoRig_UI(object):
             elif guideDir == EXTRAS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == VALIDATOR:
+                validatorInstance = self.initExtraModule(guideModule, guideDir)
+                cmds.checkBox(label=title, changeCommand=validatorInstance.merci)
                 cmds.button(label=title, height=32, width=200, command=partial(self.initValidatorModule, guideModule, guideDir), parent=moduleLayout)
             
             cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)

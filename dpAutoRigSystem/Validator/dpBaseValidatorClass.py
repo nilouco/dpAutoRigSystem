@@ -13,6 +13,8 @@ class ValidatorStartClass:
         self.dpUIinst = dpUIinst
         self.langDic = langDic
         self.langName = langName
+        self.presetDic = presetDic
+        self.presetName = presetName
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION

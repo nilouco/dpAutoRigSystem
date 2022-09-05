@@ -5,14 +5,14 @@ from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "ArrowFlat"
+CLASS_NAME = "ValidInTest"
 TITLE = "m112_arrowFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrowFlat.png"
 
 dpValidInTestVersion = 0.1
 
-class dpValidInTest(dpBaseValidatorClass.ValidatorStartClass):
+class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -22,4 +22,7 @@ class dpValidInTest(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
     
-    
+    def merci(self, value, *args):
+        print("carretor")
+        print("Value =", value)
+        
