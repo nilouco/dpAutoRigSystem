@@ -146,6 +146,7 @@ class DP_AutoRig_UI(object):
         self.loadedControls = False
         self.loadedCombined = False
         self.loadedExtras = False
+        self.loadedValidator = False
         self.controlInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
@@ -582,8 +583,7 @@ class DP_AutoRig_UI(object):
         # validatorMainLayout - scrollLayout:
         self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
         self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
-#        self.validatorModuleList = self.startGuideModules(VALIDATOR, "start", "validatorLayout")
-        cmds.text("merci", parent=self.allUIs["validatorLayout"])
+        self.validatorModuleList = self.startGuideModules(VALIDATOR, "start", "validatorLayout")
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1073,6 +1073,9 @@ class DP_AutoRig_UI(object):
             if guideDir == EXTRAS and not self.loadedExtras:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedExtras = True
+            if guideDir == VALIDATOR and not self.loadedValidator:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedloadedValidator = True
         return guideModuleList
     
     
@@ -1124,6 +1127,8 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == EXTRAS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
+            elif guideDir == VALIDATOR:
+                cmds.button(label=title, height=32, width=200, command=partial(self.initValidatorModule, guideModule, guideDir), parent=moduleLayout)
             
             cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
@@ -1177,7 +1182,14 @@ class DP_AutoRig_UI(object):
         guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName)
         return guideInstance
     
-    
+
+    def initValidatorModule(self, guideModule, guideDir, *args):
+        """ Call initExtraModule because it's the same code.
+        """
+        guideInstance = self.initExtraModule(guideModule, guideDir)
+        return guideInstance
+
+
     def initControlModule(self, guideModule, guideDir, *args):
         """ Call initExtraModule because it's the same code.
         """

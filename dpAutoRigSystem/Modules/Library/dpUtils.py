@@ -90,7 +90,7 @@ def findAllModules(path, dir):
     # removing "__init__":
     for file in allPyFilesList:
         #Ensure base class are skipped
-        if file != "dpBaseClass" and file != "dpLayoutClass" and file != "dpBaseControlClass":
+        if file != "dpBaseClass" and file != "dpLayoutClass" and file != "dpBaseControlClass" and file != "dpBaseValidatorClass":
             moduleList.append(file)
     return moduleList
 
