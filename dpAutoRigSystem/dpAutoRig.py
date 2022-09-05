@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.01.00"
-DPAR_UPDATELOG = "Release 2022-09-04"
+DPAR_UPDATELOG = "N512 - Validator."
 
 
 
@@ -98,6 +98,7 @@ COMBINED = "Controls/Combined"
 PRESETS = "Controls/Presets"
 EXTRAS = "Extras"
 LANGUAGES = "Languages"
+VALIDATOR = "Validator"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -576,8 +577,23 @@ class DP_AutoRig_UI(object):
         
         # --
         
+        # interface of Validator tab - formLayout:
+        self.allUIs["validatorTabLayout"] = cmds.formLayout('validatorTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # validatorMainLayout - scrollLayout:
+        self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
+        self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
+#        self.validatorModuleList = self.startGuideModules(VALIDATOR, "start", "validatorLayout")
+        cmds.text("merci", parent=self.allUIs["validatorLayout"])
+        
+        # edit formLayout in order to get a good scalable window:
+        cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5)]
+                        )
+        
+        # --
+
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra')) )
+        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], 'Validator')) )
         cmds.select(clear=True)
 
     
