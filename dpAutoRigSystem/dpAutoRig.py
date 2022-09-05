@@ -148,6 +148,7 @@ class DP_AutoRig_UI(object):
         self.loadedExtras = False
         self.loadedValidator = False
         self.controlInstanceList = []
+        self.validatorInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.userDefAutoCheckUpdate = 0
@@ -583,7 +584,9 @@ class DP_AutoRig_UI(object):
         # validatorMainLayout - scrollLayout:
         self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
         self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
+        cmds.text("before validator modules here")
         self.validatorModuleList = self.startGuideModules(VALIDATOR, "start", "validatorLayout")
+        cmds.text("after validator modules here", align="left")
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1113,8 +1116,12 @@ class DP_AutoRig_UI(object):
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(controlInstance)
         else:
-            moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
-            cmds.image(i=iconDir, width=32, parent=moduleLayout)
+            if guideDir == VALIDATOR:
+                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
+            else:
+                moduleLayout = cmds.rowLayout(numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
+            
+            cmds.image(image=iconDir, width=32, parent=moduleLayout)
 
             if guideDir == MODULES:
                 '''
@@ -1129,10 +1136,15 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == VALIDATOR:
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
-                cmds.checkBox(label=title, changeCommand=validatorInstance.merci)
-                cmds.button(label=title, height=32, width=200, command=partial(self.initValidatorModule, guideModule, guideDir), parent=moduleLayout)
-            
-            cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+                validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
+                verifyBT = cmds.button(label=self.langDic[self.langName]["m206_verify"], width=40, command=validatorInstance.runVerify, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                fixBT = cmds.button(label=self.langDic[self.langName]["c052_fix"].capitalize(), width=40, command=validatorInstance.runFix, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                validatorInstance.validatorCB = validatorCB
+                validatorInstance.verifyBT = verifyBT
+                validatorInstance.fixBT = fixBT
+                self.validatorInstanceList.append(validatorInstance)
+
+            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     

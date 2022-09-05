@@ -20,7 +20,13 @@ class ValidatorStartClass:
         self.description = DESCRIPTION
         self.icon = ICON
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-    
+        self.active = True
+        self.validatorCB = None
+        self.verifyBT = None
+        self.fixBT = None
+        self.verifiedStatus = None
+        self.fixedStatus = None
+
     
     def somethingHereMethod(self, cvName='', *args):
         """ WHITE DESCRIPTION HERE
@@ -28,5 +34,12 @@ class ValidatorStartClass:
         # do something
         print("merci")
     
+    
+
+    def changeActive(self, value, *args):
+        self.active = value
+        cmds.button(self.verifyBT, edit=True, enable=value)
+        cmds.button(self.fixBT, edit=True, enable=value)
+
     
     
