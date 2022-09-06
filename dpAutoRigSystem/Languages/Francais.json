@@ -365,6 +365,7 @@
     "i203_noFolderFile"    : "Ce n'est pas trouvé le dossier ou le fichier pour travailler avec, désolé.",
     "i204_recharge"        : "Récharger",
     "i205_guide"           : "Guide",
+    "i206_removeNamespace" : "Trouvé des guides importés. Souhaitez-vous supprimer l'espace de noms?",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
