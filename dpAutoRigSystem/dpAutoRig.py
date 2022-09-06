@@ -99,6 +99,8 @@ PRESETS = "Controls/Presets"
 EXTRAS = "Extras"
 LANGUAGES = "Languages"
 VALIDATOR = "Validator"
+CHECKIN = "Validator/CheckIn"
+CHECKOUT = "Validator/CheckOut"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -146,9 +148,11 @@ class DP_AutoRig_UI(object):
         self.loadedControls = False
         self.loadedCombined = False
         self.loadedExtras = False
-        self.loadedValidator = False
+        self.loadedCheckIn = False
+        self.loadedCheckOut = False
         self.controlInstanceList = []
-        self.validatorInstanceList = []
+        self.checkInInstanceList = []
+        self.checkOutInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.userDefAutoCheckUpdate = 0
@@ -537,9 +541,9 @@ class DP_AutoRig_UI(object):
         
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["calibration3Layout"] = cmds.paneLayout("calibration3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
-        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration3Layout"])
-        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration3Layout"])
+        self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
+        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration2Layout"])
+        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration2Layout"])
         self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.langDic[self.langName]['m010_mirror']+" "+self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
         # mirror calibration - layout:
         self.allUIs["mirrorCalibrationLayout"] = cmds.rowColumnLayout('mirrorCalibrationLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorCalibrationFL" )
@@ -584,9 +588,37 @@ class DP_AutoRig_UI(object):
         # validatorMainLayout - scrollLayout:
         self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
         self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
-        cmds.text("before validator modules here")
-        self.validatorModuleList = self.startGuideModules(VALIDATOR, "start", "validatorLayout")
-        cmds.text("after validator modules here", align="left")
+        self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label="CHECK-IN", collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+        
+        self.validatorModuleList = self.startGuideModules(CHECKIN, "start", "validatorCheckInLayout")
+        cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
+        cmds.checkBox(label="All check-in", value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
+        self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
+        cmds.button(label="VERIFY All check-in", command=partial(self.runSelectedValidators, self.checkInInstanceList, "verify"), parent=self.allUIs["selectedCheckIn2Layout"])
+        cmds.button(label="FIX All check-in", command=partial(self.runSelectedValidators, self.checkInInstanceList, "fix"), parent=self.allUIs["selectedCheckIn2Layout"])
+        
+        
+        
+        
+
+
+
+
+
+        cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+        self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label="CHECK-OUT", collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+                
+        self.validatorModuleList = self.startGuideModules(CHECKOUT, "start", "validatorCheckOutLayout")
+        cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
+        cmds.checkBox(label="All check-out", value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
+        self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
+        cmds.button(label="VERIFY", command=partial(self.runSelectedValidators, self.checkOutInstanceList, "verify"), parent=self.allUIs["selectedCheckOut2Layout"])
+        cmds.button(label="FIX", command=partial(self.runSelectedValidators, self.checkOutInstanceList, "fix"), parent=self.allUIs["selectedCheckOut2Layout"])
+
+
+
+
+
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1076,9 +1108,12 @@ class DP_AutoRig_UI(object):
             if guideDir == EXTRAS and not self.loadedExtras:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedExtras = True
-            if guideDir == VALIDATOR and not self.loadedValidator:
+            if guideDir == CHECKIN and not self.loadedCheckIn:
                 print(guideDir+" : "+str(guideModuleList))
-                self.loadedloadedValidator = True
+                self.loadedCheckIn = True
+            if guideDir == CHECKOUT and not self.loadedCheckOut:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedCheckOut = True
         return guideModuleList
     
     
@@ -1116,11 +1151,7 @@ class DP_AutoRig_UI(object):
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(controlInstance)
         else:
-            if guideDir == VALIDATOR:
-                moduleLayout = cmds.rowLayout(numberOfColumns=6, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
-            else:
-                moduleLayout = cmds.rowLayout(numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
-            
+            moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
             cmds.image(image=iconDir, width=32, parent=moduleLayout)
 
             if guideDir == MODULES:
@@ -1134,7 +1165,7 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == EXTRAS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == VALIDATOR:
+            elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", "."):
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
                 validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
                 verifyBT = cmds.button(label=self.langDic[self.langName]["m206_verify"], width=40, command=validatorInstance.runVerify, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
@@ -1142,7 +1173,10 @@ class DP_AutoRig_UI(object):
                 validatorInstance.validatorCB = validatorCB
                 validatorInstance.verifyBT = verifyBT
                 validatorInstance.fixBT = fixBT
-                self.validatorInstanceList.append(validatorInstance)
+                if guideDir == CHECKIN.replace("/", "."):
+                    self.checkInInstanceList.append(validatorInstance)
+                else:
+                    self.checkOutInstanceList.append(validatorInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
@@ -1305,6 +1339,47 @@ class DP_AutoRig_UI(object):
         # edit the prefixTextField with the prefixName:
         if len(prefixName) != 0:
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
+
+
+
+
+
+
+
+    def changeActiveAllValidators(self, validatorInstList, value, *args):
+        """ TODO: WRITE DESCRIPTION HERE
+        """
+        print("value = ", value)
+        print("tenqil =", validatorInstList)
+        
+        if validatorInstList:
+            print("instList = ", validatorInstList)
+            for validatorInst in validatorInstList:
+                validatorInst.changeActive(value)
+        
+
+    def runSelectedValidators(self, validatorInstList, mode, *args):
+        """ TODO: WRITE DESCRIPTION HERE
+        """
+        checked = False
+        if validatorInstList:
+            for validatorInst in validatorInstList:
+                if validatorInst.active:
+                    checked = True
+                    if mode == "verify":
+                        validatorInst.runVerify()
+                    elif mode == "fix":
+                        validatorInst.runFix()
+                    
+        if checked:
+            print("Finished CHeckedk ....", mode)
+        else:
+            print("Nothing selected to check............", mode)
+
+
+
+
+
 
 
     def info(self, title, description, text, align, width, height, *args):

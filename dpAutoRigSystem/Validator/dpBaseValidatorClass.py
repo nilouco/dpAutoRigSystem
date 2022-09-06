@@ -38,8 +38,14 @@ class ValidatorStartClass:
 
     def changeActive(self, value, *args):
         self.active = value
-        cmds.button(self.verifyBT, edit=True, enable=value)
-        cmds.button(self.fixBT, edit=True, enable=value)
+        
+        #WIP
+        ui = True
+        if ui:
+
+            cmds.checkBox(self.validatorCB, edit=True, value=value)
+            cmds.button(self.verifyBT, edit=True, enable=value)
+            cmds.button(self.fixBT, edit=True, enable=value)
 
     
     
