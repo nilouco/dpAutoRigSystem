@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-09-05",
+    "_updated"       : "2022-09-06",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -365,6 +365,12 @@
     "i203_noFolderFile"    : "Ce n'est pas trouvé le dossier ou le fichier pour travailler avec, désolé.",
     "i204_recharge"        : "Récharger",
     "i205_guide"           : "Guide",
+    "i206_checked"         : "Cochée",
+    "i207_notMarked"       : "Rien de marqué à voir, désolé.",
+    "i208_checkin"         : "voir-entrée",
+    "i209_checkout"        : "voir-sortie",
+    "i210_verify"          : "Vérifier",
+    "i211_all"             : "tous",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

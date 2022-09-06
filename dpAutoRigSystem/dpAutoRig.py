@@ -588,37 +588,23 @@ class DP_AutoRig_UI(object):
         # validatorMainLayout - scrollLayout:
         self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
         self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
-        self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label="CHECK-IN", collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-        
+        self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label=self.langDic[self.langName]['i208_checkin'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+        # check-in
         self.validatorModuleList = self.startGuideModules(CHECKIN, "start", "validatorCheckInLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
-        cmds.checkBox(label="All check-in", value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
+        cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i208_checkin'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
-        cmds.button(label="VERIFY All check-in", command=partial(self.runSelectedValidators, self.checkInInstanceList, "verify"), parent=self.allUIs["selectedCheckIn2Layout"])
-        cmds.button(label="FIX All check-in", command=partial(self.runSelectedValidators, self.checkInInstanceList, "fix"), parent=self.allUIs["selectedCheckIn2Layout"])
-        
-        
-        
-        
-
-
-
-
-
+        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, "verify"), parent=self.allUIs["selectedCheckIn2Layout"])
+        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, "fix"), parent=self.allUIs["selectedCheckIn2Layout"])
         cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
-        self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label="CHECK-OUT", collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-                
+        # check-out
+        self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.langDic[self.langName]['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
         self.validatorModuleList = self.startGuideModules(CHECKOUT, "start", "validatorCheckOutLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
-        cmds.checkBox(label="All check-out", value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
+        cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
-        cmds.button(label="VERIFY", command=partial(self.runSelectedValidators, self.checkOutInstanceList, "verify"), parent=self.allUIs["selectedCheckOut2Layout"])
-        cmds.button(label="FIX", command=partial(self.runSelectedValidators, self.checkOutInstanceList, "fix"), parent=self.allUIs["selectedCheckOut2Layout"])
-
-
-
-
-
+        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, "verify"), parent=self.allUIs["selectedCheckOut2Layout"])
+        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, "fix"), parent=self.allUIs["selectedCheckOut2Layout"])
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1168,8 +1154,8 @@ class DP_AutoRig_UI(object):
             elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", "."):
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
                 validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
-                verifyBT = cmds.button(label=self.langDic[self.langName]["m206_verify"], width=40, command=validatorInstance.runVerify, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                fixBT = cmds.button(label=self.langDic[self.langName]["c052_fix"].capitalize(), width=40, command=validatorInstance.runFix, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                verifyBT = cmds.button(label=self.langDic[self.langName]["i210_verify"], width=45, command=validatorInstance.runVerify, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                fixBT = cmds.button(label=self.langDic[self.langName]["c052_fix"].capitalize(), width=45, command=validatorInstance.runFix, backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 validatorInstance.validatorCB = validatorCB
                 validatorInstance.verifyBT = verifyBT
                 validatorInstance.fixBT = fixBT
@@ -1341,45 +1327,33 @@ class DP_AutoRig_UI(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-
-
-
-
-
     def changeActiveAllValidators(self, validatorInstList, value, *args):
-        """ TODO: WRITE DESCRIPTION HERE
+        """ Set all validator instances active attribute as True or False.
         """
-        print("value = ", value)
-        print("tenqil =", validatorInstList)
-        
         if validatorInstList:
-            print("instList = ", validatorInstList)
             for validatorInst in validatorInstList:
                 validatorInst.changeActive(value)
         
 
     def runSelectedValidators(self, validatorInstList, mode, *args):
-        """ TODO: WRITE DESCRIPTION HERE
+        """ Run the code for each active validator instance.
+            mode =  "verify"
+                    "fix"
         """
-        checked = False
+        checkedList = []
         if validatorInstList:
             for validatorInst in validatorInstList:
                 if validatorInst.active:
-                    checked = True
                     if mode == "verify":
                         validatorInst.runVerify()
+                        checkedList.append(validatorInst.guideModuleName)
                     elif mode == "fix":
                         validatorInst.runFix()
-                    
-        if checked:
-            print("Finished CHeckedk ....", mode)
+                        checkedList.append(validatorInst.guideModuleName)
+        if checkedList:
+            print(self.langDic[self.langName]['i206_checked'], mode, checkedList)
         else:
-            print("Nothing selected to check............", mode)
-
-
-
-
-
+            print(self.langDic[self.langName]['i207_notMarked'])
 
 
     def info(self, title, description, text, align, width, height, *args):
