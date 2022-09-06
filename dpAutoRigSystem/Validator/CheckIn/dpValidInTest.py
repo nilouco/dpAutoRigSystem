@@ -21,17 +21,35 @@ class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["ICON"] = ICON
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
-    
-    
 
     def runVerify(self, *args):
-        print("HERE IN OBJ Logistica Verify", CLASS_NAME)
-        
+        ''' Main method to verify this validator instructions.
+        '''
+        self.checked = False
+        self.okVerified = False
+        # WIP
+        #TODO
+        # ### put code here...
+
+        # if well done
         self.checked = True
-        dpBaseValidatorClass.ValidatorStartClass.runVerify(self)
-        print("GOOOD... here by code!")
+        self.okVerified = False
+        
+        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
+
 
     def runFix(self, *args):
-        print("Logistica fix")
-
+        ''' Main method to fix this validator instructions.
+        '''
+        self.checked = False
+        self.okFixed = False
+        # WIP
+        #TODO
+        
+        # if well done
+        self.checked = True
+        self.okFixed = True
+        
+        print("Running Fix...")
+        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
     
