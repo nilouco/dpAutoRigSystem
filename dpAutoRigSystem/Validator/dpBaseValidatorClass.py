@@ -28,8 +28,12 @@ class ValidatorStartClass:
         self.validatorCB = None
         self.verifyBT = None
         self.fixBT = None
+
         self.verifiedStatus = None
         self.fixedStatus = None
+
+        self.ui = True
+        self.checked = False
 
     
     def somethingHereMethod(self, cvName='', *args):

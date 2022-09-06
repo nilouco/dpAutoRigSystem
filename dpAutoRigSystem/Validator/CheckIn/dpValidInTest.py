@@ -26,9 +26,10 @@ class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
 
     def runVerify(self, *args):
         print("HERE IN OBJ Logistica Verify", CLASS_NAME)
-        self.ui = True
+        
         self.checked = True
         dpBaseValidatorClass.ValidatorStartClass.runVerify(self)
+        print("GOOOD... here by code!")
 
     def runFix(self, *args):
         print("Logistica fix")
