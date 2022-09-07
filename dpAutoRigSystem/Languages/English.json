@@ -598,5 +598,9 @@
     "t006_startTranslator" : "Start Translation",
     "t007_writeText"       : "Please, write the translated text here\nor click Same button in order to use the text above.",
     "t008_finishMessage"   : "Thank you very much for your help!\nIt's really appreciated.",
-    "t009_finishButton"    : "Translate this last sentence\nthen click Finish button, please."
+    "t009_finishButton"    : "Translate this last sentence\nthen click Finish button, please.",
+
+    "v000_validatorHeader" : "Validator Log",
+    "v001_test"            : "Test pCube1",
+    "v002_testDesc"        : "Check if there's\na pCube1 in the scene."
 }

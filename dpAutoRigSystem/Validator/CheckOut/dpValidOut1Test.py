@@ -24,7 +24,7 @@ class ValidOut1Test(dpBaseValidatorClass.ValidatorStartClass):
     
     
 
-    def runVerify(self, *args):
+    def runValidator(self, *args):
         print("Logistica Verify", CLASS_NAME)
 
     def runFix(self, *args):

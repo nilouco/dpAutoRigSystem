@@ -6,9 +6,9 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "ValidInTest"
-TITLE = "m112_arrowFlat"
-DESCRIPTION = "m099_cvControlDesc"
-ICON = "/Icons/dp_arrowFlat.png"
+TITLE = "v001_test"
+DESCRIPTION = "v002_testDesc"
+ICON = "/Icons/dp_validatorTest.png"
 
 dpValidInTestVersion = 0.1
 
@@ -22,34 +22,67 @@ class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 
-    def runVerify(self, *args):
-        ''' Main method to verify this validator instructions.
-        '''
-        self.checked = False
-        self.okVerified = False
+    
+
+
+
+    def runValidator(self, verifyMode=True, objList=None, verbose=False, *args):
+        """ Main method to process this validator instructions.
+            It's in verify mode by default.
+            If verifyMode parameter is False, it'll run in fix mode.
+        """
+        #self.verbose = verbose
+        self.verbose = True
+
+        self.verifyMode = verifyMode
+        
+        self.checkedObjList = []
+        self.foundIssueList = []
+
+        
+        
+        
+        if objList:
+            varList = objList
+        else:
+            varList = cmds.ls(selection=False, type='transform')
+        if varList:
+            for item in varList:
+                self.checkedObjList.append(item)
+                if self.verifyMode:
+                    if 'pCube1' in varList:
+                        self.foundIssueList.append(False)
+                    else:
+                        self.foundIssueList.append(True)
+                else: #fix
+                    if not cmds.objExists('pCube1'):
+                        try:
+                            cmds.polyCube()
+                            self.foundIssueList.append(False)
+                            print("Fixed pCube1")
+                        except:
+                            self.foundIssueList.append(True)
+                            print("some fix error")
+                    else:
+                        self.foundIssueList.append(False)
+                    
+        
+        
         # WIP
         #TODO
         # ### put code here...
 
         # if well done
-        self.checked = True
-        self.okVerified = False
         
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
+        
+        
+        self.finishValidation()
 
 
-    def runFix(self, *args):
-        ''' Main method to fix this validator instructions.
-        '''
-        self.checked = False
-        self.okFixed = False
-        # WIP
-        #TODO
-        
-        # if well done
-        self.checked = True
-        self.okFixed = True
-        
-        print("Running Fix...")
+
+
+    def finishValidation(self, *args):
+        """ Call main base methods to finish the validation of this class.
+        """
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-    
+        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
