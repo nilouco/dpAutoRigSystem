@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.00"
-DPAR_UPDATELOG = "Release 2022-09-04"
+DPAR_VERSION_PY3 = "4.01.01"
+DPAR_UPDATELOG = "N368 Model version attribute."
 
 
 
@@ -1664,6 +1664,8 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
+            # add model version:
+            cmds.addAttr(self.masterGrp, longName="modelVersion", dataType="string")
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
