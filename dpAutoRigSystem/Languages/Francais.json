@@ -365,7 +365,7 @@
     "i203_noFolderFile"    : "Ce n'est pas trouvé le dossier ou le fichier pour travailler avec, désolé.",
     "i204_recharge"        : "Récharger",
     "i205_guide"           : "Guide",
-    "i206_removeNamespace" : "Trouvé des guides importés. Souhaitez-vous supprimer l'espace de noms?",
+    "i206_removeNamespace" : "Trouvé des guide(s) importé(s). Souhaitez-vous supprimer l'espace de nom(s)?",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -575,6 +575,7 @@
     "m203_setChildGuides"       : "Définition des guides enfants",
     "m204_finish"               : "Finir",
     "m205_version"              : "Vérsion",
+    "m206_mergeNamespace"       : "Namespace des importé guides fusionné avec Root",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",

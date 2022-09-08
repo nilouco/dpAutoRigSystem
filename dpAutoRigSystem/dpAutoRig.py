@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.00.29"
-DPAR_UPDATELOG = "N496 - Added a new tool to\nupdate old version guides."
+DPAR_VERSION_PY3 = "4.01.01"
+DPAR_UPDATELOG = "N464 - Added feature to verify if\nthere are imported guides in the scene."
 
 
 
@@ -2695,81 +2695,10 @@ class DP_AutoRig_UI(object):
     ###################### End: Skinning.
 
 
-    def renameImportedGuidesDuplicated(self, *args):
-        ''' This scriptJob will check if the guide has "__Imported" as suffix, and rename correctly calling funcion editUserName
-        '''
-
-        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
-        print (len(self.modulesToBeRiggedList))
-        allList = cmds.ls(selection=False, type="transform")
-        guidesNameList = []
-        if allList:
-            for item in allList:
-                if cmds.objExists(item+".guideBase"):
-                    guidesNameList.append(item)
-        
-        print (guidesNameList, self.localGuides)
-        for idx in range(len(guidesNameList)):
-            if guidesNameList[idx] not in self.localGuides:
-                print (guidesNameList[idx])
-                cmds.setAttr()
-                self.modulesToBeRiggedList[idx].editUserName(self.modulesToBeRiggedList[idx].customName)
-   
-
-        # allList = cmds.ls(selection=False, type="transform")
-        # importedGuideToRenameList = []
-        # if allList:
-        #     for item in allList:
-        #         if cmds.objExists(item+".customName"):
-        #             guideCustomName = cmds.getAttr(item+".customName") 
-        #             if importName in guideCustomName:
-        #                 importedGuideToRenameList.append(item)
-        #                 print (item)
-        # ### Não está pegando o index correto. Está renomeando as guides antigas por enquanto
-        # modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
-        # guidesNameList = list(map(lambda guideModule : guideModule.moduleGrp, self.modulesToBeRiggedList))
-        
-        
-        
-        # for idx in range(len(importedGuideToRenameList)):
-        #     currentGuideInstanceIdx = guidesNameList.index(importedGuideToRenameList[idx])
-        #     print (currentGuideInstanceIdx, importedGuideToRenameList[idx])
-        #     importedCustomName = cmds.getAttr(importedGuideToRenameList[idx]+".customName")
-        #     importedCustomName = importedCustomName.split("__Imported")[0]
-        #     print (importedCustomName)
-        #     modulesToBeRiggedList[currentGuideInstanceIdx].editUserName(importedCustomName)
-
-      
-    def renameGuideBeforeImport(self, *args):
-        ''' This scriptJob will get all guides, and check which it's imported to add "__Imported" as suffix.
-        '''
-        allList = cmds.ls(selection=False, type="transform")
-        self.importedGuidesList = []
-        localCustomNameList = []
-        importedCustomNameList = []
-        importName = "__Imported"
-        if allList:
-            for item in allList:
-                if cmds.objExists(item+".guideBase"):
-                    if cmds.getAttr(item+".guideBase") == 1:
-                        # Check if's local guide:
-                        if item.count(":") == 1:
-                            localCustomName = cmds.getAttr(item+".customName")
-                            localCustomNameList.append(localCustomName)
-                        # Check if's imported guide:
-                        elif item.count(":") > 1:
-                            importedCustomName = cmds.getAttr(item+".customName")
-                            importedCustomNameList.append(importedCustomName)
-                            self.importedGuidesList.append(item)
-        for idx in range(len(self.importedGuidesList)):
-            if importedCustomNameList[idx] in localCustomNameList:
-                cmds.setAttr(self.importedGuidesList[idx]+".customName", importedCustomNameList[idx]+importName, type="string")
-   
-
     def checkImportedGuides(self, *args):
         """ This scriptJob will check if there's dpGuides imported to the scene and ask if the user wants to delete the namespace.
         """
-        # Check all namespaces and if it's dpAR guide:
+        # check all namespaces and if it's dpAR guide:
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaceList:
@@ -2780,12 +2709,12 @@ class DP_AutoRig_UI(object):
                         if name.find("_dpAR_") > 0:
                             dpGuidesImportedList.append(name)
             if dpGuidesImportedList:
-                # Open dialog to confirm merge namespaces:
+                # open dialog to confirm merge namespaces:
                 result = cmds.confirmDialog( title=self.langDic[self.langName]['i205_guide'], message=self.langDic[self.langName]['i206_removeNamespace'], 
                 button=[self.langDic[self.langName]['i071_yes'],self.langDic[self.langName]['i072_no']], defaultButton=self.langDic[self.langName]['i071_yes'], 
                 cancelButton=self.langDic[self.langName]['i072_no'], dismissString=self.langDic[self.langName]['i072_no'] )
                 if result == self.langDic[self.langName]['i071_yes']:
-                    # Get root and child namespaces and separate into two lists:
+                    # get root and child namespaces and separate into two lists:
                     rootNamespaceList = []
                     self.guidesNamespaceList = []
                     for guide in dpGuidesImportedList:
@@ -2793,20 +2722,26 @@ class DP_AutoRig_UI(object):
                         rootNamespaceList.append(splitName[0])
                         self.guidesNamespaceList.append(splitName[1])
                         print (f"Imported DP Guides: {splitName[1]}")
-                    # Merge duplicated Father's name root:    
+                    # get local guides list
+                    localGuidesList = list(map(lambda guideModule : guideModule.moduleGrp, self.modulesToBeRiggedList))
+                    # merge duplicated Father's name root:    
                     rootNamespaceList = list(set(rootNamespaceList))
-                    # Rename guides before delete namespace:
-                    # Remover rename before
-                    # self.renameGuideBeforeImport()
-                    self.localGuides = list(map(lambda guideModule : guideModule.moduleGrp, self.modulesToBeRiggedList))
-                    # Merge namespace with Root
+                    # merge namespace with Root
                     for name in rootNamespaceList:
                         cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True )
                         print(f"Namespace merged with root: {name}")
-                    mel.eval('print \"dpAR: '+"Guides namespace merged with root"+'\\n\";')
-                    # Rename custom name if duplicated with local guides, remove "__Imported":
-                    
-                    self.jobReloadUI()
-                    self.renameImportedGuidesDuplicated()
-                else:
-                    print ("Sem Carretos")
+                    # populate all guides after import and create a list with all guides:
+                    self.populateCreatedGuideModules()
+                    allList = cmds.ls(selection=False, type="transform")
+                    guidesNameList = []
+                    if allList:
+                        for item in allList:
+                            if cmds.objExists(item+".guideBase"):
+                                if cmds.getAttr(item+".guideBase") == 1:
+                                    guidesNameList.append(item)
+                    # rename imported guides instances to void duplicated names:
+                    for idx in range(len(guidesNameList)):
+                        if guidesNameList[idx] not in localGuidesList:
+                            guideCustomName = cmds.getAttr(guidesNameList[idx]+".customName")
+                            self.modulesToBeRiggedList[idx].editUserName(guideCustomName)
+                    mel.eval('print \"dpAR: '+self.langDic[self.langName]["m206_mergeNamespace"]+'\\n\";')

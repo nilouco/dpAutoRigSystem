@@ -365,7 +365,7 @@
     "i203_noFolderFile"    : "Not found folder or file to work with, sorry.",
     "i204_recharge"        : "Recharge",
     "i205_guide"           : "Guide",
-    "i206_removeNamespace" : "Found imported guides. Would you like to delete the namespace?",
+    "i206_removeNamespace" : "Found imported guide(s). Would you like to delete the namespace(s)?",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -575,6 +575,8 @@
     "m203_setChildGuides"       : "Setting child guides",
     "m204_finish"               : "Finish",
     "m205_version"              : "Version",
+    "m206_mergeNamespace"       : "Imported guides namespace merged with root",
+
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
