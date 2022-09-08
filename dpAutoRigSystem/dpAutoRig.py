@@ -1340,16 +1340,28 @@ class DP_AutoRig_UI(object):
             verifyMode = True for verify
                        = False for fix
         """
-        checkedList = []
+        validationResultData = {}
+        logText = ""
         if validatorInstList:
             for validatorInst in validatorInstList:
                 if validatorInst.active:
-                    validatorInst.runValidator(verifyMode)
-                    checkedList.append(validatorInst.guideModuleName)
-        if checkedList:
-            print(self.langDic[self.langName]['i206_checked'], verifyMode, checkedList)
+                    validatorInst.verbose = False
+                    validationResultData[validatorInst.guideModuleName] = validatorInst.runValidator(verifyMode)
+                    validatorInst.verbose = True
+        if validationResultData:
+            dataList = list(validationResultData.keys())
+            dataList.sort()
+            for i, dataItem in enumerate(dataList):
+                logText += validationResultData[dataItem]["logText"]
+                if i != len(dataList)-1:
+                    logText += "\n"
+            heightSize = len(dataList)
         else:
-            print(self.langDic[self.langName]['i207_notMarked'])
+            logText += "\n"+self.langDic[self.langName]['i207_notMarked']
+            heightSize = 2
+        logText = str(time.asctime(time.localtime(time.time())))+"\n"+logText
+        self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
+        print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
 
 
     def info(self, title, description, text, align, width, height, *args):

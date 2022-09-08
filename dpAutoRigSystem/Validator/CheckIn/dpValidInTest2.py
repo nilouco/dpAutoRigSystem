@@ -5,14 +5,14 @@ from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "ValidInTest"
+CLASS_NAME = "ValidInTest2"
 TITLE = "v001_test"
 DESCRIPTION = "v002_testDesc"
 ICON = "/Icons/dp_validatorTest.png"
 
-dpValidInTest_Version = 0.1
+dpValidInTest2_Version = 0.1
 
-class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
+class ValidInTest2(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME

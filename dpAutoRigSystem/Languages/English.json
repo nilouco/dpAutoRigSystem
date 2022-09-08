@@ -600,7 +600,12 @@
     "t008_finishMessage"   : "Thank you very much for your help!\nIt's really appreciated.",
     "t009_finishButton"    : "Translate this last sentence\nthen click Finish button, please.",
 
-    "v000_validatorHeader" : "Validator Log",
-    "v001_test"            : "Test pCube1",
-    "v002_testDesc"        : "Check if there's\na pCube1 in the scene."
+    "v000_validator"       : "Validator",
+    "v001_test"            : "Test _Mesh",
+    "v002_testDesc"        : "Check if there's\na _Mesh suffix.",
+    "v003_mode"            : "Mode",
+    "v004_fixed"           : "Fixed",
+    "v005_cantFix"         : "Can't fix",
+    "v006_foundIssue"      : "Found issue",
+    "v007_allOk"           : "Everything is ok, thanks!"
 }
