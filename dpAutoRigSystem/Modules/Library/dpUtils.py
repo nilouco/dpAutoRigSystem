@@ -85,12 +85,13 @@ def findAllModules(path, dir):
     """ Find all modules in the directory.
         Return a list of all module names (without '.py' extension).
     """
+    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate"]
     allPyFilesList = findAllFiles(path, dir, ".py")
     moduleList = []
     # removing "__init__":
     for file in allPyFilesList:
         #Ensure base class are skipped
-        if file != "dpBaseClass" and file != "dpLayoutClass" and file != "dpBaseControlClass" and file != "dpBaseValidatorClass":
+        if not file in baseClassList:
             moduleList.append(file)
     return moduleList
 

@@ -5,14 +5,14 @@ from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "ValidInTest"
-TITLE = "v001_test"
-DESCRIPTION = "v002_testDesc"
-ICON = "/Icons/dp_validatorTest.png"
+CLASS_NAME = "ValidatorInTest"
+TITLE = "v001_template"
+DESCRIPTION = "v002_templateDesc"
+ICON = "/Icons/dp_validatorTemplate.png"
 
-dpValidInTest_Version = 0.1
+dpValidatorInTest_Version = 0.1
 
-class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
+class ValidatorInTest(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -26,7 +26,11 @@ class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
         """ Main method to process this validator instructions.
             It's in verify mode by default.
             If verifyMode parameter is False, it'll run in fix mode.
-            Returns dataLog with the validation result.
+            Returns dataLog with the validation result as:
+                - checkedObjList = node list of checked items
+                - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
+                - resultOkList = True if well done, False if we got an error
+                - messageList = reported text
         """
         # starting
         self.verifyMode = verifyMode
@@ -49,7 +53,7 @@ class ValidInTest(dpBaseValidatorClass.ValidatorStartClass):
                         try:
                             #WIP: (index to fix error OMG!)
                             parentNode = cmds.listRelatives(item, parent=True)[0] # change index here to test
-                            #
+                            #raise Exception("Carreto trombado na pista")
                             cmds.rename(parentNode, parentNode+"_Mesh")
                             self.resultOkList.append(True)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
