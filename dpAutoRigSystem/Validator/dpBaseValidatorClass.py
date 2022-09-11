@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
+from ..Modules.Library import dpUtils
 import time
+import getpass
 
 
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
@@ -120,11 +122,9 @@ class ValidatorStartClass:
         if self.messageList:
             for msg in self.messageList:
                 logText += "\n"+msg
-        # verbose call info window
-        if self.verbose:
-            self.dpUIinst.info('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['v000_validator']+"\n"+thisTime+"\n"+logText)
         # dataLog
+        self.dataLogDic["user"] = getpass.getuser()
+        self.dataLogDic["time"] = thisTime
         self.dataLogDic["validator"] = self.guideModuleName
         self.dataLogDic["name"] = self.title
         self.dataLogDic["mode"] = checkText
@@ -133,5 +133,9 @@ class ValidatorStartClass:
         self.dataLogDic["resultOkList"] = self.resultOkList
         self.dataLogDic["messageList"] = self.messageList
         self.dataLogDic["logText"] = logText
-        self.dataLogDic["time"] = thisTime
-        
+        # verbose call info window
+        if self.verbose:
+            self.dpUIinst.info('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
+            print("\n-------------\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['v000_validator']+"\n"+thisTime+"\n"+logText)
+            if not dpUtils.exportLogDicToJson(self.dataLogDic):
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])

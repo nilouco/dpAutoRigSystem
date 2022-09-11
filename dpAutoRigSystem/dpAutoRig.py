@@ -132,6 +132,7 @@ DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
 DPSHAPE = "dpShape"
+DPLOG = "dpLog"
 
 
 class DP_AutoRig_UI(object):
@@ -1359,9 +1360,12 @@ class DP_AutoRig_UI(object):
         else:
             logText += "\n"+self.langDic[self.langName]['i207_notMarked']
             heightSize = 2
-        logText = str(time.asctime(time.localtime(time.time())))+"\n"+logText
+        thisTime = str(time.asctime(time.localtime(time.time())))
+        logText = thisTime+"\n"+logText
         self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
         print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
+        if not dpUtils.exportLogDicToJson(validationResultData, name="test"):
+            print(self.langDic[self.langName]['i201_saveScene'])
 
 
     def info(self, title, description, text, align, width, height, *args):

@@ -8,6 +8,8 @@ import cProfile
 import urllib.request
 import webbrowser
 import math
+import json
+import time
 from io import TextIOWrapper
 from importlib import reload
 
@@ -915,3 +917,26 @@ def unlockAttr(nodeList):
         if cmds.objExists(node):
             for attr in attrList:
                 cmds.setAttr(node+"."+attr, lock=False)
+
+
+def exportLogDicToJson(dic, name=None, path=None, subFolder="dpData/dpLog"):
+    """ Save to path the given dictionary as a json file.
+    """
+    currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.gmtime())
+    if not path:
+        path = cmds.file(query=True, sceneName=True)
+        if not path:
+            return False
+        dpFolder = path[:path.rfind("/")+1]
+        if subFolder:
+            dpFolder = dpFolder+subFolder
+        if not os.path.exists(dpFolder):
+            os.makedirs(dpFolder)
+        if not name:
+            name = path[path.rfind("/")+1:]
+        pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
+    print("\nLog file", pathFile)
+    outFile = open(pathFile, "w") 
+    json.dump(dic, outFile, indent = 4) 
+    outFile.close() 
+    return pathFile
