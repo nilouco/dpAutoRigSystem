@@ -36,13 +36,21 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
+        
+
         # -- validator code -- beginning
         if objList:
             toCheckList = objList
         else:
             toCheckList = cmds.ls(selection=False, type='mesh')
         if toCheckList:
+            progressAmount = 0
+            maxProcess = len(toCheckList)
             for item in toCheckList:
+                if self.verbose:
+                    # Update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                 parentNode = cmds.listRelatives(item, parent=True)[0]
                 self.checkedObjList.append(parentNode)
                 if not '_Mesh' in item:
@@ -65,6 +73,8 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
                     self.resultOkList.append(True)
         # -- validator code -- end
 
+
+
         # finishing
         self.finishValidation()
         return self.dataLogDic
@@ -81,3 +91,4 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
         """
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
+        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

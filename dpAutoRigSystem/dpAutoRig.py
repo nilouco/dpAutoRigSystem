@@ -1345,8 +1345,13 @@ class DP_AutoRig_UI(object):
         validationResultData = {}
         logText = ""
         if validatorInstList:
+            progressAmount = 0
+            maxProcess = len(validatorInstList)
+            cmds.progressWindow(title="dpValidator", progress=progressAmount, status='dpValidator: 0%', isInterruptable=False)
             for validatorInst in validatorInstList:
                 if validatorInst.active:
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(validatorInst.guideModuleName+': '+repr(progressAmount)))
                     validatorInst.verbose = False
                     validationResultData[validatorInst.guideModuleName] = validatorInst.runValidator(verifyMode)
                     validatorInst.verbose = True
@@ -1367,6 +1372,7 @@ class DP_AutoRig_UI(object):
         print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
         if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
             print(self.langDic[self.langName]['i201_saveScene'])
+        cmds.progressWindow(endProgress=True)
 
 
     def info(self, title, description, text, align, width, height, *args):

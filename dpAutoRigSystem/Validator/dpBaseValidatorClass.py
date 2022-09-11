@@ -58,7 +58,10 @@ class ValidatorStartClass:
         # close info log window if it exists
         if cmds.window('dpInfoWindow', query=True, exists=True):
             cmds.deleteUI('dpInfoWindow', window=True)
-    
+        if self.verbose:
+            # Starting progress window
+            cmds.progressWindow(title="dpValidator", progress=0, status=self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': 0%', isInterruptable=False)
+
 
     def updateButtonColors(self, *args):
         """ Update button background colors if using UI.
@@ -139,3 +142,8 @@ class ValidatorStartClass:
             print("\n-------------\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['v000_validator']+"\n"+thisTime+"\n"+logText)
             if not dpUtils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+
+
+    def endProgressBar(self, *args):
+        if self.verbose:
+            cmds.progressWindow(endProgress=True)
