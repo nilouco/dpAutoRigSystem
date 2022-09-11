@@ -137,5 +137,5 @@ class ValidatorStartClass:
         if self.verbose:
             self.dpUIinst.info('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['v000_validator']+"\n"+thisTime+"\n"+logText)
-            if not dpUtils.exportLogDicToJson(self.dataLogDic):
+            if not dpUtils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])

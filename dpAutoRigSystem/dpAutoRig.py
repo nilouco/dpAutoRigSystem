@@ -159,6 +159,7 @@ class DP_AutoRig_UI(object):
         self.userDefAutoCheckUpdate = 0
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
+        self.dpLog = DPLOG
         
         
         try:
@@ -1364,7 +1365,7 @@ class DP_AutoRig_UI(object):
         logText = thisTime+"\n"+logText
         self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
         print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
-        if not dpUtils.exportLogDicToJson(validationResultData, name="test"):
+        if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
             print(self.langDic[self.langName]['i201_saveScene'])
 
 
