@@ -18,9 +18,8 @@
 ###################################################################
 
 
-# current version:
-DPAR_VERSION_PY3 = "4.01.00"
-DPAR_UPDATELOG = "Release 2022-09-04"
+DPAR_VERSION_PY3 = "4.01.01"
+DPAR_UPDATELOG = "N464 - Added feature to verify if\nthere are imported guides in the scene."
 
 
 
@@ -230,6 +229,7 @@ class DP_AutoRig_UI(object):
             # check if we need to automatically check for update:
             self.autoCheckUpdate()
         
+
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
             print("Exception:", e)
@@ -587,7 +587,8 @@ class DP_AutoRig_UI(object):
         from maya import cmds
         cmds.select(clear=True)
         cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
-    
+        self.checkImportedGuides()
+  
     
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
@@ -1251,7 +1252,58 @@ class DP_AutoRig_UI(object):
         self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
     
+
+    def checkImportedGuides(self, *args):
+        """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
+        """
+        # check all namespaces and if it's dpAR guide:
+        cmds.namespace(setNamespace=':')
+        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
+        if namespaceList:
+            dpGuidesImportedList = []
+            for name in namespaceList:
+                if name != "UI" and name != "shared":
+                    if name.count(":") > 0:
+                        if name.find("_dpAR_") > 0:
+                            dpGuidesImportedList.append(name)
+            if dpGuidesImportedList:
+                yesTxt = self.langDic[self.langName]['i071_yes']
+                noTxt = self.langDic[self.langName]['i072_no']
+                # open dialog to confirm merge namespaces:
+                result = cmds.confirmDialog(title=self.langDic[self.langName]['i205_guide'], message=self.langDic[self.langName]['i206_removeNamespace'], 
+                                            button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
+                if result == yesTxt:
+                    # get root and child namespaces and separate into two lists:
+                    rootNamespaceList = []
+                    self.guidesNamespaceList = []
+                    for guide in dpGuidesImportedList:
+                        splitName = guide.split(":")
+                        rootNamespaceList.append(splitName[0])
+                        self.guidesNamespaceList.append(splitName[1])
+                    # get local guides list
+                    localGuidesList = list(map(lambda guideModule : guideModule.moduleGrp, self.modulesToBeRiggedList))
+                    # merge duplicated Father's name root:    
+                    rootNamespaceList = list(set(rootNamespaceList))
+                    # merge namespace with Root
+                    for name in rootNamespaceList:
+                        cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True )
+                        print(f"{self.langDic[self.langName]['m206_mergeNamespace']}: {name}")
+                    # populate all guides after import and create a list with all guides:
+                    self.populateCreatedGuideModules()
+                    allList = cmds.ls(selection=False, type="transform")
+                    guidesNameList = []
+                    if allList:
+                        for item in allList:
+                            if cmds.objExists(item+".guideBase"):
+                                if cmds.getAttr(item+".guideBase") == 1:
+                                    guidesNameList.append(item)
+                    # rename imported guides instances to avoid duplicated names:
+                    for idx in range(len(guidesNameList)):
+                        if guidesNameList[idx] not in localGuidesList:
+                            guideCustomName = cmds.getAttr(guidesNameList[idx]+".customName")
+                            self.modulesToBeRiggedList[idx].editUserName(guideCustomName)
     
+
     def setPrefix(self, *args):
         """ Get the text entered in the textField and change it to normal.
         """
