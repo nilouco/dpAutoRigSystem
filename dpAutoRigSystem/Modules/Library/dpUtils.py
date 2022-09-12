@@ -906,3 +906,11 @@ def jointChainLength(jointList):
                     chainlength += magnitude(v)
             i += 1
     return chainlength
+
+
+def unlockAttr(nodeList):
+    attrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
+    for node in nodeList:
+        if cmds.objExists(node):
+            for attr in attrList:
+                cmds.setAttr(node+"."+attr, lock=False)

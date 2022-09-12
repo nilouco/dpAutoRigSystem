@@ -44,7 +44,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.fixIkSpringSolverGrpList = []
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
-        self.ikStretchExtremLocList = []
         self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
@@ -78,8 +77,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
-        cmds.setAttr(self.moduleGrp + ".nJoints", 0)
         cmds.addAttr(self.moduleGrp, longName="type", attributeType='enum', enumName=self.langDic[self.langName]['m028_arm'] + ':' + self.langDic[self.langName]['m030_leg'])
         cmds.setAttr(self.moduleGrp + ".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="hasBend", attributeType='bool')
@@ -145,7 +142,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem + "_PaC")
 
         # align cornerLocs:
-        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+        self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")[0]
 
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
@@ -190,9 +187,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
-        cmds.text(self.nSegmentsText, edit=True, visible=False, parent=self.segDelColumn)
-        cmds.intField(self.nJointsIF, edit=True, editable=False, visible=False, parent=self.segDelColumn)
-
         self.typeLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedModuleColumn")
         cmds.text(self.langDic[self.langName]['m021_type'], parent=self.typeLayout)
         self.typeMenu = cmds.optionMenu("typeMenu", label='', changeCommand=self.changeType, parent=self.typeLayout)
@@ -270,25 +264,26 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         self.cvCornerBLoc = self.guideName + "_CornerB"
         # for Default style:
-        if style == self.langDic[self.langName]['m042_default']:
+        if style == self.langDic[self.langName]['m042_default'] or style == 0:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 0)
             cmds.setAttr(self.moduleGrp + ".style", 0)
         # for Biped style:
-        if style == self.langDic[self.langName]['m026_biped']:
+        if style == self.langDic[self.langName]['m026_biped'] or style == 1:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 0)
             cmds.setAttr(self.moduleGrp + ".style", 1)
         # for Quadruped style:
-        if style == self.langDic[self.langName]['m037_quadruped']:
+        if style == self.langDic[self.langName]['m037_quadruped'] or style == 2:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 2)
         # for Quadruped Spring style:
-        if style == self.langDic[self.langName]['m043_quadSpring']:
+        if style == self.langDic[self.langName]['m043_quadSpring'] or style == 3:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 3)
         # for Quadruped Extra style:
-        if style == self.langDic[self.langName]['m155_quadrupedExtra']:
+        if style == self.langDic[self.langName]['m155_quadrupedExtra'] or style == 4:
             cmds.setAttr(self.cvCornerBLoc + ".visibility", 1)
             cmds.setAttr(self.moduleGrp + ".style", 4)
+        
 
     def changeType(self, type, *args):
         """ This function will modify the names of the rigged module to Arm or Leg options
@@ -303,6 +298,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvExtremLoc = self.guideName + "_Extrem"
         self.cvEndJoint = self.guideName + "_JointEnd"
         self.cvUpVectorLoc = self.guideName + "_CornerUpVector"
+        self.cornerAIC = self.cornerGrp + "_AiC"
+
+        dpUtils.unlockAttr([self.cvBeforeLoc, self.cvMainLoc, self.cornerGrp, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc, self.cvEndJoint, self.cvUpVectorLoc, self.cornerAIC])
 
         # reset translations:
         translateAttrList = ['tx', 'ty', 'tz']
@@ -313,7 +311,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(guideNode + "." + tAttr, 0)
 
         # for Arm type:
-        if type == self.langDic[self.langName]['m028_arm']:
+        if type == self.langDic[self.langName]['m028_arm'] or type == 0:
             cmds.setAttr(self.moduleGrp + ".type", 0)
             cmds.setAttr(self.cvBeforeLoc + ".translateX", -1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -4)
@@ -326,11 +324,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.moduleGrp + ".rotateZ", 90)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", -10)
             cmds.delete(self.cornerAIC)
-            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")[0]
             self.setLockCornerAttr(ARM)
 
         # for Leg type:
-        elif type == self.langDic[self.langName]['m030_leg']:
+        elif type == self.langDic[self.langName]['m030_leg'] or type == 1:
             cmds.setAttr(self.moduleGrp + ".type", 1)
             cmds.setAttr(self.cvBeforeLoc + ".translateY", 1)
             cmds.setAttr(self.cvBeforeLoc + ".translateZ", -2)
@@ -344,11 +342,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.cvUpVectorLoc + ".translateX", 10)
             cmds.setAttr(self.cvUpVectorLoc + ".translateY", 0.75)
             cmds.delete(self.cornerAIC)
-            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")
+            self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp + "_AiC")[0]
             self.setLockCornerAttr(LEG)
 
         # reset rotations:
         self.reOrientGuide()
+
 
     def reOrientGuide(self, *args):
         """ This function reOrient guides orientations, creating temporary aimConstraints for them.
@@ -377,8 +376,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cornerAttrList = ['ty', 'rx', 'rz'] #leg
         for attr in trAttrList:
             if attr in cornerAttrList:
-                cmds.setAttr(self.cvCornerLoc+"."+attr, lock=True)
-                cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=True)
+                cmds.setAttr(self.cvCornerLoc+"."+attr, 0, lock=True)
+                cmds.setAttr(self.cvCornerBLoc+"."+attr, 0, lock=True)
             else:
                 cmds.setAttr(self.cvCornerLoc+"."+attr, lock=False)
                 cmds.setAttr(self.cvCornerBLoc+"."+attr, lock=False)
@@ -729,7 +728,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
-                self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
@@ -828,10 +826,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 ikHandleExtraGrp = cmds.group(empty=True, name=ikHandleMainList[0]+"_Grp")
                 cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
                 cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
+                cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                    cmds.parent(ikHandleExtraGrp, self.quadExtraCtrl)
-                else:
-                    cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
+                    cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, self.quadExtraCtrl)
+                elif self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
+                    cmds.parent(ikStretchExtremLocZero, self.ikHandleToRFGrp)
+                    cmds.parentConstraint(ikHandleExtraGrp, ikStretchExtremLocZero, skipRotate=("x", "y", "z"), maintainOffset=True, name=ikStretchExtremLocZero+"_PaC")
                 self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp + "_PoC")[0]
                 self.ikHandleConstList.append(self.ikHandleConst)
                 
@@ -912,8 +912,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(annotation + '.template', 1)
                 cmds.setAttr(annotLoc + '.visibility', 0)
                 # set annotation visibility as a display option attribute:
-                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='bool', keyable=True)
-                cmds.setAttr(self.ikCornerCtrl + ".displayAnnotation", 1)
+                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='bool', keyable=True, defaultValue=True)
                 cmds.connectAttr(self.ikCornerCtrl + ".displayAnnotation", annotation + ".visibility", force=True)
 
                 # prepare groups to rotate and translate automatically:
@@ -939,6 +938,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                 if self.limbTypeName == ARM:
                     cmds.setAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], 0)
+                    cmds.addAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], edit=True, defaultValue=0)
                 if self.limbStyle == self.langDic[self.langName]['m042_default']:
                     self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp + "_OrC")[0]
                 else:  # biped, quadruped, quadSpring
@@ -966,7 +966,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                    cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, keyable=True)
+                    cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, defaultValue=1, keyable=True)
                     cmds.setAttr(self.quadExtraCtrl+".autoOrient", 0)
                     quadExtraRotNull = cmds.group(name=self.quadExtraCtrl+"_AutoOrient_Null", empty=True)
                     cmds.delete(cmds.parentConstraint(self.quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
@@ -1508,7 +1508,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "limbStyle": self.limbStyle,
                 "quadFrontLegList": self.quadFrontLegList,
                 "integrateOrigFromList": self.integrateOrigFromList,
-                "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": "limbManualVolume",
                 "scalableGrp": self.aScalableGrps,

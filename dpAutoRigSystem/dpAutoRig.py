@@ -18,7 +18,6 @@
 ###################################################################
 
 
-# current version:
 DPAR_VERSION_PY3 = "4.01.01"
 DPAR_UPDATELOG = "N464 - Added feature to verify if\nthere are imported guides in the scene."
 
@@ -694,7 +693,7 @@ class DP_AutoRig_UI(object):
             cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
-            # close and reload dpAR UI in order to avoide Maya crash
+            # close and reload dpAR UI in order to avoid Maya crash
             self.jobReloadUI()
             
     
@@ -751,7 +750,7 @@ class DP_AutoRig_UI(object):
         if cmds.objExists(selectedItem+"."+nSegmentsAttr):
             toSetAttrList.remove(nSegmentsAttr)
             nJointsValue = cmds.getAttr(selectedItem+'.'+nSegmentsAttr)
-            if nJointsValue != 1:
+            if nJointsValue > 0:
                 newGuideInstance.changeJointNumber(nJointsValue)
         if cmds.objExists(selectedItem+"."+customNameAttr):
             customNameValue = cmds.getAttr(selectedItem+'.'+customNameAttr)
@@ -766,6 +765,14 @@ class DP_AutoRig_UI(object):
             currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
             newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
         
+        # TODO: change to unify style and type attributes        
+        if cmds.objExists(selectedItem+".type"):
+            typeValue = cmds.getAttr(selectedItem+'.type')
+            newGuideInstance.changeType(typeValue)
+        if cmds.objExists(selectedItem+".style"):
+            styleValue = cmds.getAttr(selectedItem+'.style')
+            newGuideInstance.changeStyle(styleValue)
+        
         # get and set transformations
         childrenList = cmds.listRelatives(selectedItem, children=True, allDescendents=True, fullPath=True, type="transform")
         if childrenList:
@@ -774,9 +781,14 @@ class DP_AutoRig_UI(object):
                     newChild = newGuideNamespace+":"+child[child.rfind("|")+1:]
                     for transfAttr in transformAttrList:
                         try:
+                            isLocked = cmds.getAttr(child+"."+transfAttr, lock=True)
+                            cmds.setAttr(newChild+"."+transfAttr, lock=False)
                             cmds.setAttr(newChild+"."+transfAttr, cmds.getAttr(child+"."+transfAttr))
+                            if isLocked:
+                                cmds.setAttr(newChild+"."+transfAttr, lock=True)
                         except:
                             pass
+        
         # set transformation for Guide_Base
         for transfAttr in transformAttrList:
             cmds.setAttr(newGuideName+"."+transfAttr, cmds.getAttr(selectedItem+"."+transfAttr))
@@ -2118,7 +2130,6 @@ class DP_AutoRig_UI(object):
                                     parentConst       = self.integratedTaskDic[moduleDic]['parentConstList'][s]
                                     scaleConst        = self.integratedTaskDic[moduleDic]['scaleConstList'][s]
                                     footJnt           = self.integratedTaskDic[moduleDic]['footJntList'][s]
-                                    ballRFList        = self.integratedTaskDic[moduleDic]['ballRFList'][s]
                                     middleFootCtrl    = self.integratedTaskDic[moduleDic]['middleFootCtrlList'][s]
                                     # getting limb data:
                                     fatherGuide           = self.hookDic[moduleDic]['fatherGuide']
@@ -2127,7 +2138,6 @@ class DP_AutoRig_UI(object):
                                     ikHandleConstList     = self.integratedTaskDic[fatherGuide]['ikHandleConstList'][s]
                                     ikFkBlendGrpToRevFoot = self.integratedTaskDic[fatherGuide]['ikFkBlendGrpToRevFootList'][s]
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
-                                    ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
@@ -2142,7 +2152,6 @@ class DP_AutoRig_UI(object):
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
                                         cmds.connectAttr(extremJnt+".scaleZ", footJnt+".scaleZ", force=True)
-                                        cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
@@ -2154,14 +2163,16 @@ class DP_AutoRig_UI(object):
                                     for floatAttr in floatAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+floatAttr):
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
-                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+floatAttr, query=True, defaultValue=True)
+                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True, defaultValue=defValue)
                                             cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
                                             cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
                                     intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
                                     for intAttr in intAttrList:
                                         if not cmds.objExists(ikCtrl+'.'+intAttr):
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
-                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=1)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+intAttr, query=True, defaultValue=True)
+                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=defValue)
                                             cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
                                             cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
                                     if ikFkNetworkList:
