@@ -607,5 +607,6 @@
     "v004_fixed"           : "Fixed",
     "v005_cantFix"         : "Can't fix",
     "v006_foundIssue"      : "Found issue",
-    "v007_allOk"           : "Everything is ok, thanks!"
+    "v007_allOk"           : "Everything is ok, thanks!",
+    "v008_test"            : "Test"
 }

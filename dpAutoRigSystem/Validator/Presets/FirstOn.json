@@ -1,0 +1,9 @@
+{
+    "_preset"     : "AllOn",
+    "_author"     : "Danilo Pinheiro",
+    "_date"       : "2022-09-12",
+    "_updated"    : "2022-09-12",
+
+    "ValidatorInTest"    : true,
+    "ValidatorInTest2"   : false
+}
