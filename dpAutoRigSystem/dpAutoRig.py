@@ -213,40 +213,23 @@ class DP_AutoRig_UI(object):
                 print("Error: Cannot load json preset files!\n")
                 return
 
-
-
-
-
-
-            # WIP ...........
-
             # validator preset menu:
             self.allUIs["validatorPresetMenu"] = cmds.menuItem('validatorPresetMenu', label='Validator Preset', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
-            # create a preset list:
+            # create a validator preset list:
             self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
-            # create menuItems from preset list:
+            self.loadValidatorPreset()
+            # create menuItems from validator preset list:
             if self.validatorPresetList:
-                # verify if there is an optionVar of last choosen by user in Maya system:
-#                lastValidatorPreset = self.checkLastOptionVar("dpAutoRigLastValidatorPreset", "AllOn", self.validatorPresetList)
-                # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
+                # create menuItems with the validator presets
                 for validatorPreset in self.validatorPresetList:
-                    cmds.menuItem( validatorPreset+"_MI", label=validatorPreset, radioButton=False, collection='validatorPresetRadioMenuCollection', command=self.updateValidatorPreset)
-                # load the last preset from optionVar value:
-#                cmds.menuItem(lastValidatorPreset+"_MI", edit=True, radioButton=True, collection='validatorPresetRadioMenuCollection', parent='validatorPresetMenu')
+                    cmds.menuItem( validatorPreset+"_MI", label=validatorPreset, radioButton=False, collection='validatorPresetRadioMenuCollection', command=self.setValidatorPreset)
+                # load the first validator preset, expected to be the pipeline studio item if it exists:
+                cmds.menuItem(self.validatorPresetList[0]+"_MI", edit=True, radioButton=True, collection='validatorPresetRadioMenuCollection', parent='validatorPresetMenu')
             else:
-                print("Error: Cannot load json preset files!\n")
+                print("Error: Cannot load json validator preset files!\n")
                 return
             
-
-
-
-
-
-
-
-
-
             # create menu:
             self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
             cmds.menuItem('translator_MI', label='Translator', command=self.translator)
@@ -645,73 +628,18 @@ class DP_AutoRig_UI(object):
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
         cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
         cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
-        # load preset
-        self.loadValidatorPreset(self.validatorCheckInModuleList)
 
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
                         attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5)]
                         )
-        
+        self.setValidatorPreset()
+
         # --
 
         # call tabLayouts:
         cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], 'Validator')) )
         cmds.select(clear=True)
-
-
-
-    # WIP----
-    
-    def loadValidatorPreset(self, moduleList, *args):
-        #self.validList, self.validDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
-        #print("self.validList =", self.validList)
-        #print("self.validDic =", self.validDic)
-        print("moduleList = ", moduleList)
-        # try to find a pipeline preset
-        filePath = cmds.file(query=True, sceneName=True)
-        if filePath:
-            if PIPELINE_DRIVE in filePath:
-                studioName = filePath.split(PIPELINE_DRIVE)[1]
-                studioName = studioName[:studioName.find("/")]
-                studioPath = PIPELINE_DRIVE+studioName+"/"
-                studioPreset, studioPresetDic = self.getJsonFileInfo(studioPath, True)
-                print ("studioPreset = ", studioPreset)
-                print ("studioPresetDic = ", studioPresetDic)
-                print ("validatorPresetDic = ", self.validatorPresetDic)
-                self.validatorPresetDic = self.validatorPresetDic | studioPresetDic
-                print ("validatorPresetDic = ", self.validatorPresetDic)
-
-
-# TODO
-#                cmds.menuItem( studioPreset[0]+"_MI", label=studioPreset[0], radioButton=False, collection='validatorPresetRadioMenuCollection', command=self.updateValidatorPreset)
-                # load the last preset from optionVar value:
-#                cmds.menuItem(lastValidatorPreset+"_MI", edit=True, radioButton=True, collection='validatorPresetRadioMenuCollection', parent='validatorPresetMenu')
-
-
-
-
-    
-    def updateValidatorPreset(self, *args):
-        self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
-        for presetKey in self.validatorPresetDic[self.validatorPresetName]:
-            for validatorModule in self.checkInInstanceList:
-                if presetKey == validatorModule.guideModuleName:
-                    validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     def jobReloadUI(self, *args):
@@ -1421,6 +1349,27 @@ class DP_AutoRig_UI(object):
         # edit the prefixTextField with the prefixName:
         if len(prefixName) != 0:
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
+
+
+    def loadValidatorPreset(self, *args):
+        # try to find a pipeline preset
+        filePath = cmds.file(query=True, sceneName=True)
+        if filePath:
+            if PIPELINE_DRIVE in filePath:
+                studioName = filePath.split(PIPELINE_DRIVE)[1]
+                studioName = studioName[:studioName.find("/")]
+                studioPath = PIPELINE_DRIVE+studioName+"/"
+                studioPreset, studioPresetDic = self.getJsonFileInfo(studioPath, True)
+                self.validatorPresetList.insert(0, studioPreset[0])
+                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+
+    
+    def setValidatorPreset(self, *args):
+        self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
+        for presetKey in self.validatorPresetDic[self.validatorPresetName]:
+            for validatorModule in self.checkInInstanceList:
+                if presetKey == validatorModule.guideModuleName:
+                    validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
 
 
     def changeActiveAllValidators(self, validatorInstList, value, *args):
