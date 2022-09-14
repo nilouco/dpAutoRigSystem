@@ -212,7 +212,7 @@ class DP_AutoRig_UI(object):
             else:
                 print("Error: Cannot load json preset files!\n")
                 return
-
+            
             # validator preset menu:
             self.allUIs["validatorPresetMenu"] = cmds.menuItem('validatorPresetMenu', label='Validator Preset', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
@@ -1372,8 +1372,9 @@ class DP_AutoRig_UI(object):
                 studioName = studioName[:studioName.find("/")]
                 studioPath = PIPELINE_DRIVE+studioName+"/"
                 studioPreset, studioPresetDic = self.getJsonFileInfo(studioPath, True)
-                self.validatorPresetList.insert(0, studioPreset[0])
-                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+                if studioPreset:
+                    self.validatorPresetList.insert(0, studioPreset[0])
+                    self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
 
     
     def setValidatorPreset(self, *args):
