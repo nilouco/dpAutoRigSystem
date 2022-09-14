@@ -95,7 +95,7 @@ MODULES = "Modules"
 SCRIPTS = "Scripts"
 CONTROLS = "Controls"
 COMBINED = "Controls/Combined"
-PRESETS = "Controls/Presets"
+CONTROLS_PRESETS = "Controls/Presets"
 EXTRAS = "Extras"
 LANGUAGES = "Languages"
 VALIDATOR = "Validator"
@@ -196,10 +196,10 @@ class DP_AutoRig_UI(object):
                 return
             
             # preset menu:
-            self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
+            self.allUIs["controlsPresetMenu"] = cmds.menuItem('controlsPresetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('presetRadioMenuCollection')
             # create a preset list:
-            self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
+            self.presetList, self.presetDic = self.getJsonFileInfo(CONTROLS_PRESETS)
             # create menuItems from preset list:
             if self.presetList:
                 # verify if there is an optionVar of last choosen by user in Maya system:
@@ -208,7 +208,7 @@ class DP_AutoRig_UI(object):
                 for preset in self.presetList:
                     cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI())\", lowestPriority=True)')
                 # load the last preset from optionVar value:
-                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
+                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='controlsPresetMenu')
             else:
                 print("Error: Cannot load json preset files!\n")
                 return
@@ -233,7 +233,8 @@ class DP_AutoRig_UI(object):
             # create menu:
             self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
             cmds.menuItem('translator_MI', label='Translator', command=self.translator)
-            cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
+            cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "control", CONTROLS_PRESETS, True))
+            cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
             # window menu:
             self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
             cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
@@ -740,17 +741,28 @@ class DP_AutoRig_UI(object):
         self.translatorInst.dpTranslatorMain()
         
         
-    def createPreset(self, *args):
+    def createPreset(self, type="controls", presetDir=CONTROLS_PRESETS, setOptionVar=True, *args):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
-        newPresetString = self.ctrls.dpCreatePreset()
+        if type == "controls":
+            newPresetString = self.ctrls.dpCreatePreset()
+        elif type == "validator":
+            
+            
+            
+            # WIP - TODO: create a new method to validator preset new new...
+            newPresetString = self.ctrls.dpCreatePreset()
+
+
+            
         if newPresetString:
             # create json file:
-            resultDic = self.createJsonFile(newPresetString, PRESETS, '_preset')
+            resultDic = self.createJsonFile(newPresetString, presetDir, '_preset')
             # set this new preset as userDefined preset:
             self.presetName = resultDic['_preset']
-            cmds.optionVar(remove="dpAutoRigLastPreset")
-            cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
+            if setOptionVar:
+                cmds.optionVar(remove="dpAutoRigLastPreset")
+                cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
@@ -1626,7 +1638,7 @@ class DP_AutoRig_UI(object):
 
                 # store custom presets in order to avoid overwrite them when installing the update:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CONTROLS_PRESETS, dpAR_TempDir+"/"+CONTROLS_PRESETS)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
