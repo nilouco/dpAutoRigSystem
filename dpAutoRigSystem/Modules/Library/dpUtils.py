@@ -10,6 +10,8 @@ import webbrowser
 import math
 import json
 import time
+import getpass
+import datetime
 from io import TextIOWrapper
 from importlib import reload
 
@@ -940,3 +942,29 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
     json.dump(dic, outFile, indent=4)
     outFile.close()
     return pathFile
+
+
+def dpCreateValidatorPreset(dpUIinst):
+    """ Creates a json file as a Validator Preset and returns it.
+    """
+    resultString = None
+    validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList
+    if validatorsList:
+        resultDialog = cmds.promptDialog(
+                                            title=dpUIinst.langDic[dpUIinst.langName]['i129_createPreset'],
+                                            message=dpUIinst.langDic[dpUIinst.langName]['i130_presetName'],
+                                            button=[dpUIinst.langDic[dpUIinst.langName]['i131_ok'], dpUIinst.langDic[dpUIinst.langName]['i132_cancel']],
+                                            defaultButton=dpUIinst.langDic[dpUIinst.langName]['i131_ok'],
+                                            cancelButton=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'],
+                                            dismissString=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'])
+        if resultDialog == dpUIinst.langDic[dpUIinst.langName]['i131_ok']:
+            resultName = cmds.promptDialog(query=True, text=True)
+            resultName = resultName[0].upper()+resultName[1:]
+            author = getpass.getuser()
+            date = str(datetime.datetime.now().date())
+            resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+            # add validators and its current active values
+            for validator in validatorsList:
+                resultString += ',"'+validator.guideModuleName+'" : '+str(validator.active).lower()
+            resultString += "}"
+    return resultString

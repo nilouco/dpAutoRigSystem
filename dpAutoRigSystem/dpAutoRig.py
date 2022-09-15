@@ -233,7 +233,7 @@ class DP_AutoRig_UI(object):
             # create menu:
             self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
             cmds.menuItem('translator_MI', label='Translator', command=self.translator)
-            cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "control", CONTROLS_PRESETS, True))
+            cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "controls", CONTROLS_PRESETS, True))
             cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
             # window menu:
             self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
@@ -745,16 +745,9 @@ class DP_AutoRig_UI(object):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
         if type == "controls":
-            newPresetString = self.ctrls.dpCreatePreset()
+            newPresetString = self.ctrls.dpCreateControlsPreset()
         elif type == "validator":
-            
-            
-            
-            # WIP - TODO: create a new method to validator preset new new...
-            newPresetString = self.ctrls.dpCreatePreset()
-
-
-            
+            newPresetString = dpUtils.dpCreateValidatorPreset(self)
         if newPresetString:
             # create json file:
             resultDic = self.createJsonFile(newPresetString, presetDir, '_preset')
