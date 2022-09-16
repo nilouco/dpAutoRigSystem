@@ -2,7 +2,7 @@
     "_preset"     : "Classic",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-05",
-    "_updated"    : "2022-05-24",
+    "_updated"    : "2022-09-16",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -43,7 +43,7 @@
     "id_036_LimbWorldRef"    : {"type" : "Circle",           "degree" : 1},
     "id_037_LimbForearm"     : {"type" : "Circle",           "degree" : 1},
     "id_038_RibbonBend"      : {"type" : "Circle",           "degree" : 1},
-    "id_039_RibbonCorner"    : {"type" : "Plus",             "degree" : 1},
+    "id_039_RibbonCorner"    : {"type" : "PlusOpen",         "degree" : 1},
     "id_040_RibbonExtra"     : {"type" : "Square",           "degree" : 1},
     "id_041_SpineHipsA"      : {"type" : "Cube",             "degree" : 1},
     "id_042_SpineHipsB"      : {"type" : "Circle",           "degree" : 1},

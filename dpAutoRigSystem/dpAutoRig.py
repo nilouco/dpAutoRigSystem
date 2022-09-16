@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.01.02"
-DPAR_UPDATELOG = "WIP N519 - Create control plusOpen shape."
+DPAR_UPDATELOG = "N519 - Created control plusOpen shape and \n replaced previous RibbonCorner."
 
 
 
