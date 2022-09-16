@@ -65,6 +65,7 @@ try:
     import zipfile
     import datetime
     import io
+    import sys
     from maya import mel
     from functools import partial
     from .Modules.Library import dpUtils
@@ -153,15 +154,19 @@ class DP_AutoRig_UI(object):
         self.loadedExtras = False
         self.loadedCheckIn = False
         self.loadedCheckOut = False
+        self.loadedAddOns = False
         self.controlInstanceList = []
         self.checkInInstanceList = []
         self.checkOutInstanceList = []
+        self.checkAddOnsInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.userDefAutoCheckUpdate = 0
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
         self.dpLog = DPLOG
+        self.studioName = None
+        self.studioPath = None
         
         
         try:
@@ -629,6 +634,16 @@ class DP_AutoRig_UI(object):
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
         cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
         cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
+        # pipeline
+        if self.getValidatorsAddOns():
+            cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+            self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+            self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath)
+            cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
+            cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
+            self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
+            cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+            cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
 
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1081,12 +1096,13 @@ class DP_AutoRig_UI(object):
     
     
     # Start working with Guide Modules:
-    def startGuideModules(self, guideDir, action, layout, checkModuleList=None):
+    def startGuideModules(self, guideDir, action, layout, checkModuleList=None, path=None):
         """ Find and return the modules in the directory 'Modules'.
             Returns a list with the found modules.
         """
-        # find path where 'dpAutoRig.py' is been executed:
-        path = dpUtils.findPath("dpAutoRig.py")
+        if not path:
+            # find path where 'dpAutoRig.py' is been executed:
+            path = dpUtils.findPath("dpAutoRig.py")
         if not self.loadedPath:
             print("dpAutoRigPath: "+path)
             self.loadedPath = True
@@ -1098,7 +1114,7 @@ class DP_AutoRig_UI(object):
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
-                    self.createGuideButton(guideModule, guideDir, layout)
+                    self.createGuideButton(guideModule, guideDir, layout, path)
             elif action == "check":
                 notFoundModuleList = []
                 # verify the list if exists all elements in the folder:
@@ -1107,6 +1123,8 @@ class DP_AutoRig_UI(object):
                         if not checkModule in guideModuleList:
                             notFoundModuleList.append(checkModule)
                 return notFoundModuleList
+            elif action == "exists":
+                return guideModuleList
             # avoid print again the same message:
             if guideDir == MODULES and not self.loadedModules:
                 print(guideDir+" : "+str(guideModuleList))
@@ -1129,10 +1147,13 @@ class DP_AutoRig_UI(object):
             if guideDir == CHECKOUT and not self.loadedCheckOut:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckOut = True
+            if guideDir == "" and not self.loadedAddOns:
+                print(path+" : "+str(guideModuleList))
+                self.loadedAddOns = True
         return guideModuleList
     
     
-    def createGuideButton(self, guideModule, guideDir, layout):
+    def createGuideButton(self, guideModule, guideDir, layout, path=None):
         """ Create a guideButton for guideModule in the respective colMiddleLeftA guidesLayout.
         """
         # especific import command for guides storing theses guides modules in a variable:
@@ -1142,9 +1163,14 @@ class DP_AutoRig_UI(object):
         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
         try:
-            guideDir = guideDir.replace("/", ".")
-            guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-            reload(guide)
+            if guideDir:
+                guideDir = guideDir.replace("/", ".")
+                guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+                reload(guide)
+            else:
+                sys.path.append(path)
+                guide = __import__(guideModule, {}, {}, [guideModule])
+                reload(guide)
         except Exception as e:
             errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
             mel.eval('warning \"'+errorString+'\";')
@@ -1180,8 +1206,11 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == EXTRAS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-            elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", "."):
-                validatorInstance = self.initExtraModule(guideModule, guideDir)
+            elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
+                if guideDir:
+                    validatorInstance = self.initExtraModule(guideModule, guideDir)
+                else:
+                    validatorInstance = self.initValidatorModule(guideModule, path)
                 validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
                 verifyBT = cmds.button(label=self.langDic[self.langName]["i210_verify"], width=45, command=partial(validatorInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 fixBT = cmds.button(label=self.langDic[self.langName]["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
@@ -1190,8 +1219,10 @@ class DP_AutoRig_UI(object):
                 validatorInstance.fixBT = fixBT
                 if guideDir == CHECKIN.replace("/", "."):
                     self.checkInInstanceList.append(validatorInstance)
-                else:
+                elif guideDir == CHECKOUT.replace("/", "."):
                     self.checkOutInstanceList.append(validatorInstance)
+                else: #addOns
+                    self.checkAddOnsInstanceList.append(validatorInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
@@ -1246,10 +1277,17 @@ class DP_AutoRig_UI(object):
         return guideInstance
     
 
-    def initValidatorModule(self, guideModule, guideDir, *args):
-        """ Call initExtraModule because it's the same code.
+    def initValidatorModule(self, guideModule, path, *args):
+        """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
+            Returns the guide instance initialised.
         """
-        guideInstance = self.initExtraModule(guideModule, guideDir)
+        # especific import command for guides storing theses guides modules in a variable:
+        self.guide = __import__(guideModule, {}, {}, [guideModule])
+        reload(self.guide)
+        # get the CLASS_NAME from extraModule:
+        guideClass = getattr(self.guide, self.guide.CLASS_NAME)
+        # initialize this extraModule as an Instance:
+        guideInstance = guideClass(self)
         return guideInstance
 
 
@@ -1356,18 +1394,32 @@ class DP_AutoRig_UI(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-    def loadValidatorPreset(self, *args):
-        # try to find a pipeline preset
+    def getPipelineStudioName(self, *args):
+        # try to find a pipeline structure
         filePath = cmds.file(query=True, sceneName=True)
         if filePath:
             if PIPELINE_DRIVE in filePath:
-                studioName = filePath.split(PIPELINE_DRIVE)[1]
-                studioName = studioName[:studioName.find("/")]
-                studioPath = PIPELINE_DRIVE+studioName+"/"
-                studioPreset, studioPresetDic = self.getJsonFileInfo(studioPath, True)
-                if studioPreset:
-                    self.validatorPresetList.insert(0, studioPreset[0])
-                    self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+                self.studioName = filePath.split(PIPELINE_DRIVE)[1]
+                self.studioName = self.studioName[:self.studioName.find("/")]
+                self.studioPath = PIPELINE_DRIVE+self.studioName
+                return self.studioName, self.studioPath
+
+
+    def getValidatorsAddOns(self, *args):
+        self.getPipelineStudioName()
+        if self.studioName:
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath)
+            return self.validatorAddOnsModuleList
+
+
+    def loadValidatorPreset(self, *args):
+        self.getPipelineStudioName()
+        if self.studioName:
+            self.studioPath += "/"
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath, True)
+            if studioPreset:
+                self.validatorPresetList.insert(0, studioPreset[0])
+                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
 
     
     def setValidatorPreset(self, *args):
