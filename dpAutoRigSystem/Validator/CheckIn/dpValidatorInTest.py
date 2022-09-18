@@ -10,7 +10,7 @@ TITLE = "v001_template"
 DESCRIPTION = "v002_templateDesc"
 ICON = "/Icons/dp_validatorTemplate.png"
 
-dpValidatorInTest_Version = 0.1
+dpValidatorInTest_Version = 1.0
 
 class ValidatorInTest(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -38,7 +38,8 @@ class ValidatorInTest(dpBaseValidatorClass.ValidatorStartClass):
         
         
 
-        # -- validator code -- beginning
+        # ---
+        # --- validator code --- beginning
         if objList:
             toCheckList = objList
         else:
@@ -71,7 +72,8 @@ class ValidatorInTest(dpBaseValidatorClass.ValidatorStartClass):
                 else:
                     self.foundIssueList.append(False)
                     self.resultOkList.append(True)
-        # -- validator code -- end
+        # --- validator code --- end
+        # ---
 
 
 

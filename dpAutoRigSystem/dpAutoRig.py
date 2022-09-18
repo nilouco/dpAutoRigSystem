@@ -1394,14 +1394,14 @@ class DP_AutoRig_UI(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-    def getPipelineStudioName(self, *args):
+    def getPipelineStudioName(self, pipelineDrive=PIPELINE_DRIVE, *args):
         # try to find a pipeline structure
         filePath = cmds.file(query=True, sceneName=True)
         if filePath:
-            if PIPELINE_DRIVE in filePath:
-                self.studioName = filePath.split(PIPELINE_DRIVE)[1]
+            if pipelineDrive in filePath:
+                self.studioName = filePath.split(pipelineDrive)[1]
                 self.studioName = self.studioName[:self.studioName.find("/")]
-                self.studioPath = PIPELINE_DRIVE+self.studioName
+                self.studioPath = pipelineDrive+self.studioName
                 return self.studioName, self.studioPath
 
 
