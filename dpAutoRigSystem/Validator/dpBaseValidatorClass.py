@@ -20,7 +20,7 @@ class ValidatorStartClass:
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
-        #self.icon = ICON
+        self.icon = ICON
         self.ui = ui
         self.verbose = verbose
         self.active = True

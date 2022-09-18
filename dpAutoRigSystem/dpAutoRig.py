@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.00"
+DPAR_VERSION_PY3 = "4.01.04"
 DPAR_UPDATELOG = "N512 - Validator."
 
 
@@ -1180,10 +1180,11 @@ class DP_AutoRig_UI(object):
         title = self.langDic[self.langName][guide.TITLE]
         description = self.langDic[self.langName][guide.DESCRIPTION]
         icon = guide.ICON
-        # find path where 'dpAutoRig.py' is been executed to get the icon:
-        path = dpUtils.findPath("dpAutoRig.py")
+        if guideDir:
+            # find path where 'dpAutoRig.py' is been executed to get the icon:
+            path = dpUtils.findPath("dpAutoRig.py")
         iconDir = path+icon
-        iconInfo = path+"/Icons/"+INFO_ICON
+        iconInfo = dpUtils.findPath("dpAutoRig.py")+"/Icons/"+INFO_ICON
         guideName = guide.CLASS_NAME
         
         # creating a basic layout for guide buttons:
@@ -1424,10 +1425,12 @@ class DP_AutoRig_UI(object):
     
     def setValidatorPreset(self, *args):
         self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
-        for presetKey in self.validatorPresetDic[self.validatorPresetName]:
-            for validatorModule in self.checkInInstanceList:
-                if presetKey == validatorModule.guideModuleName:
-                    validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
+        checkInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList
+        if checkInstanceList:
+            for presetKey in self.validatorPresetDic[self.validatorPresetName]:
+                for validatorModule in checkInstanceList:
+                    if presetKey == validatorModule.guideModuleName:
+                        validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
 
 
     def changeActiveAllValidators(self, validatorInstList, value, *args):

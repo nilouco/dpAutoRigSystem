@@ -948,7 +948,7 @@ def dpCreateValidatorPreset(dpUIinst):
     """ Creates a json file as a Validator Preset and returns it.
     """
     resultString = None
-    validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList
+    validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList + dpUIinst.checkAddOnsInstanceList
     if validatorsList:
         resultDialog = cmds.promptDialog(
                                             title=dpUIinst.langDic[dpUIinst.langName]['i129_createPreset'],
