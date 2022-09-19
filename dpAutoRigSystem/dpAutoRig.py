@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.01"
+DPAR_VERSION_PY3 = "4.01.03"
 DPAR_UPDATELOG = "N368 Model version attribute."
 
 
