@@ -1665,7 +1665,7 @@ class DP_AutoRig_UI(object):
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
             # add model version:
-            cmds.addAttr(self.masterGrp, longName="modelVersion", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long")
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
