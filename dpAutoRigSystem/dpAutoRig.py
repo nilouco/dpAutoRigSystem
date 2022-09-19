@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.01.01"
-DPAR_UPDATELOG = "N464 - Added feature to verify if\nthere are imported guides in the scene."
+DPAR_VERSION_PY3 = "4.01.02"
+DPAR_UPDATELOG = "N519 - Created control plusOpen shape and \n replaced previous RibbonCorner."
 
 
 
