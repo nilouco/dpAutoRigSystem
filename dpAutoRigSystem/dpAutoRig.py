@@ -18,8 +18,9 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.01.02"
-DPAR_UPDATELOG = "N519 - Created control plusOpen shape and \n replaced previous RibbonCorner."
+# current version:
+DPAR_VERSION_PY3 = "4.01.03"
+DPAR_UPDATELOG = "N368 Model version attribute."
 
 
 
@@ -1716,6 +1717,8 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
+            # add model version:
+            cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
