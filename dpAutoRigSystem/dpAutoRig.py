@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.04"
-DPAR_UPDATELOG = "N512 - Validator."
+DPAR_VERSION_PY3 = "4.01.05"
+DPAR_UPDATELOG = "N512 - Validator.\nA new base system to further check modules."
 
 
 

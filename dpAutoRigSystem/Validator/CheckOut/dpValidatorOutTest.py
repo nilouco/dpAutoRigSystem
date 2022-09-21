@@ -81,3 +81,4 @@ class ValidatorOutTest(dpBaseValidatorClass.ValidatorStartClass):
         """
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
+        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
