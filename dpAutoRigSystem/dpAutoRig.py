@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.03"
-DPAR_UPDATELOG = "N368 Model version attribute."
+DPAR_VERSION_PY3 = "4.01.04"
+DPAR_UPDATELOG = "N520 Add star control curve."
 
 
 
