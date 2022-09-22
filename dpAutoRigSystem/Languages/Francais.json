@@ -366,6 +366,13 @@
     "i204_recharge"        : "Récharger",
     "i205_guide"           : "Guide",
     "i206_removeNamespace" : "Trouvé des guides importées. Souhaitez-vous supprimer le namespace?",
+    "i207_notMarked"       : "Rien de marqué à voir, désolé.",
+    "i208_checkin"         : "voir-entrée",
+    "i209_checkout"        : "voir-sortie",
+    "i210_verify"          : "Vérifier",
+    "i211_all"             : "tous",
+    "i212_addOns"          : "compliments",
+    "i213_checked"         : "Cochée",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -596,5 +603,14 @@
     "t006_startTranslator" : "Commencer la Traduction",
     "t007_writeText"       : "Veuillez écrire le texte traduit ici\nou cliquez sur le Même bouton pour utiliser le texte ci-dessus.",
     "t008_finishMessage"   : "Merci beaucoup pour votre aide!\nC'est vraiment apprecié.",
-    "t009_finishButton"    : "Traduisez cette dernière phrase\npuis cliquez sur le bouton Terminer, s'il vous plaît"
+    "t009_finishButton"    : "Traduisez cette dernière phrase\npuis cliquez sur le bouton Terminer, s'il vous plaît",
+
+    "v000_validator"       : "Validateur",
+    "v001_template"        : "Template à tester _Mesh",
+    "v002_templateDesc"    : "Template description à tester s'il y a de\nsuffixe _Mesh.",
+    "v003_mode"            : "Mode",
+    "v004_fixed"           : "Fixé",
+    "v005_cantFix"         : "Ne peut pas réparer",
+    "v006_foundIssue"      : "Problème trouvé",
+    "v007_allOk"           : "Ça marche, merci!"
 }

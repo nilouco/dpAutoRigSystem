@@ -642,7 +642,7 @@ class ControlClass(object):
             cmds.select(transformList)
     
     
-    def dpCreatePreset(self, *args):
+    def dpCreateControlsPreset(self, *args):
         """ Creates a json file as a Control Preset and returns it.
         """
         resultString = None

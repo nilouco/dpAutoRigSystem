@@ -366,6 +366,13 @@
     "i204_recharge"        : "Recarregar",
     "i205_guide"           : "Guia",
     "i206_removeNamespace" : "Encontrado guias importadas. Gostaria de deletar o namespace?",
+    "i207_notMarked"       : "Nada marcado para checar, desculpe.",
+    "i208_checkin"         : "checar-entrada",
+    "i209_checkout"        : "checar-saída",
+    "i210_verify"          : "Verificar",
+    "i211_all"             : "todos",
+    "i212_addOns"          : "complementos",
+    "i213_checked"         : "Checado",
 
     "m001_fkLine"               : "Linha Fk",
     "m002_fkLineDesc"           : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -596,5 +603,14 @@
     "t006_startTranslator" : "Começar a Tradução",
     "t007_writeText"       : "Escreva o texto traduzido aqui\nou clique no mesmo botão para usar o texto acima.",
     "t008_finishMessage"   : "Muito obrigado por sua ajuda!\nAgradecemos muito mesmo.",
-    "t009_finishButton"    : "Traduza esta última frase\ne clique sobre o botão Terminar, por favor."
+    "t009_finishButton"    : "Traduza esta última frase\ne clique sobre o botão Terminar, por favor.",
+
+    "v000_validator"       : "Validador",
+    "v001_template"        : "Template para testar _Mesh",
+    "v002_templateDesc"    : "Template descrição para ver se tem\nsufixo _Mesh.",
+    "v003_mode"            : "Modo",
+    "v004_fixed"           : "Corrigido",
+    "v005_cantFix"         : "Não corrigido",
+    "v006_foundIssue"      : "Encontrado problema",
+    "v007_allOk"           : "Tudo ok, obrigado!"
 }
