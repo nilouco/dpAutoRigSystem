@@ -13,7 +13,7 @@ TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
 
-DPCORRECTIONMANAGER_VERSION = 2.2
+DPCORRECTIONMANAGER_VERSION = 2.3
 
 ANGLE = "Angle"
 DISTANCE = "Distance"
@@ -30,6 +30,8 @@ class CorrectionManager(object):
         self.ui = ui
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.correctionManagerName = self.langDic[self.langName]['m068_correctionManager']
+        self.angleName = ANGLE
+        self.distanceName = DISTANCE
         self.netSuffix = "Net"
         self.correctionManagerDataGrp = "CorrectionManager_Data_Grp"
         self.netList = []
@@ -75,8 +77,8 @@ class CorrectionManager(object):
         cmds.text(self.langDic[self.langName]['i138_type'], parent=refreshLayout)
         radioLayout = cmds.columnLayout("radioLayout", parent=refreshLayout)
         self.correctTypeCollection = cmds.radioCollection("correctTypeCollection", parent=radioLayout)
-        typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation=ANGLE, collection=self.correctTypeCollection)
-        cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation=DISTANCE, collection=self.correctTypeCollection)
+        typeAngle = cmds.radioButton(label=self.langDic[self.langName]['c102_angle'].capitalize(), annotation=self.angleName, collection=self.correctTypeCollection)
+        cmds.radioButton(label=self.langDic[self.langName]['m182_distance'], annotation=self.distanceName, collection=self.correctTypeCollection)
         cmds.radioCollection(self.correctTypeCollection, edit=True, select=typeAngle)
         self.rivetCB = cmds.checkBox('rivetCB', label="Rivet", parent=refreshLayout)
         cmds.refreshBT = cmds.button('refreshBT', label=self.langDic[self.langName]['m181_refresh'], command=self.refreshUI, parent=refreshLayout)
@@ -114,7 +116,7 @@ class CorrectionManager(object):
     def getDistance(self, *args):
         """ Returns the distance value read from the distance between node.
         """
-        if cmds.getAttr(self.net+".type") == DISTANCE:
+        if cmds.getAttr(self.net+".type") == self.distanceName:
             distBet = cmds.listConnections(self.net+".distanceBet")[0]
             if distBet:
                 return cmds.getAttr(distBet+".distance")
@@ -123,7 +125,7 @@ class CorrectionManager(object):
     def readDistance(self, *args):
         """ Update the UI text field with the current distance.
         """
-        if cmds.getAttr(self.net+".type") == DISTANCE:
+        if cmds.getAttr(self.net+".type") == self.distanceName:
             currentDist = self.getDistance()
             cmds.textFieldButtonGrp("distanceTFBG", edit=True, text=str(round(currentDist, 4)))
 
@@ -158,7 +160,7 @@ class CorrectionManager(object):
     def changeAxisOrder(self, axisOrder=None, *args):
         """ Update the setup to set the correct axis order to extract angle.
         """
-        if cmds.getAttr(self.net+".type") == ANGLE:
+        if cmds.getAttr(self.net+".type") == self.angleName:
             cmds.setAttr(self.net+".axisOrder", self.axisOrderMenuItemList.index(axisOrder.upper()))
 
 
@@ -227,7 +229,7 @@ class CorrectionManager(object):
                 self.typeTFG = cmds.textFieldGrp("typeTFG", label=self.langDic[self.langName]['i138_type'], text=currentType, editable=False, columnWidth2=(40, 100), columnAttach=[(1, 'right', 2), (2, 'left', 2)], adjustableColumn2=2, changeCommand=self.changeName, parent=self.typeLayout)
                 # axis:
                 self.axisLayout = cmds.rowLayout('axisLayout', numberOfColumns=5, columnWidth5=(85, 80, 80, 50, 10), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right'), (4, 'left'), (5, 'left')], adjustableColumn=5, columnAttach=[(1, 'right', 2), (2, 'right', 2), (3, 'right', 2), (4, 'left', 2), (5, 'left', 10)], height=30, parent=self.selectedLayout)
-                if cmds.getAttr(self.net+".type") == DISTANCE:
+                if cmds.getAttr(self.net+".type") == self.distanceName:
                     self.decomposeCB = cmds.checkBox("decomposeCB", label=self.langDic[self.langName]['m185_decompose'], value=cmds.getAttr(self.net+".decompose"), changeCommand=self.changeDecompose, parent=self.axisLayout)
                 self.axisMenu = cmds.optionMenu("axisMenu", label=self.langDic[self.langName]['i052_axis'], changeCommand=self.changeAxis, parent=self.axisLayout)
                 self.axisMenuItemList = ['X', 'Y', 'Z']
@@ -235,7 +237,7 @@ class CorrectionManager(object):
                     cmds.menuItem(label=axis, parent=self.axisMenu)
                 currentAxis = cmds.getAttr(self.net+".axis")
                 cmds.optionMenu(self.axisMenu, edit=True, value=self.axisMenuItemList[currentAxis])
-                if cmds.getAttr(self.net+".type") == ANGLE:
+                if cmds.getAttr(self.net+".type") == self.angleName:
                     # axis order:
                     cmds.text("axisOrderTxt", label=self.langDic[self.langName]['i052_axis']+" "+self.langDic[self.langName]['m045_order'], parent=self.axisLayout)
                     self.axisOrderMenu = cmds.optionMenu("axisOrderMenu", label='', changeCommand=self.changeAxisOrder, parent=self.axisLayout)
@@ -330,6 +332,7 @@ class CorrectionManager(object):
 
     def createCorrectionManager(self, nodeList=None, name=None, correctType=None, toRivet=False, fromUI=False, *args):
         """ Create nodes to calculate the correction we want to mapper fix.
+            Returns the created network node.
         """
         # loading Maya matrix node
         loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
@@ -352,6 +355,7 @@ class CorrectionManager(object):
                         scalableGrp = dpUtils.getNodeByMessage("scalableGrp")
                         if scalableGrp:
                             cmds.parent(self.correctionManagerDataGrp, scalableGrp)
+                        cmds.setAttr(self.correctionManagerDataGrp+".visibility", 0)
 
                     # naming
                     if not name:
@@ -365,7 +369,7 @@ class CorrectionManager(object):
                         typeSelectedRadioButton = cmds.radioCollection(self.correctTypeCollection, query=True, select=True)
                         correctType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
                         if not correctType:
-                            correctType = ANGLE
+                            correctType = self.angleName
 
                     # rivet
                     if fromUI:
@@ -389,7 +393,7 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     # add serialization attributes
                     messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR"]
-                    if correctType == DISTANCE:
+                    if correctType == self.distanceName:
                         messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
@@ -414,7 +418,7 @@ class CorrectionManager(object):
                     cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
                     
                     # if rotate extration option:
-                    if correctType == ANGLE:                        
+                    if correctType == self.angleName:                        
                         # write a new dpUtils function to generate these matrix nodes here:
                         extractAngleMM = cmds.createNode("multMatrix", name=correctionName+"_ExtractAngle_MM")
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
@@ -549,3 +553,4 @@ class CorrectionManager(object):
                     mel.eval('warning \"'+self.langDic[self.langName]['m065_selOrigAction']+'\";')
             else:
                 mel.eval('warning \"'+self.langDic[self.langName]['m066_selectTwo']+'\";')
+        return self.net

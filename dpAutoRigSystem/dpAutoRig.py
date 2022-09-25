@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.05"
-DPAR_UPDATELOG = "N512 - Validator.\nA new base system to further check modules."
+DPAR_VERSION_PY3 = "4.01.06"
+DPAR_UPDATELOG = "N023 - Limb auto corner correction.\nCalling CorrectionManager to create the\ncorrective network for elbow/knee articulation."
 
 
 
