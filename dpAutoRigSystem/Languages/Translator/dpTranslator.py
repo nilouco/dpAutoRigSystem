@@ -2,7 +2,6 @@
 from maya import cmds
 import datetime
 import re
-from collections import OrderedDict
 
 
 DPT_VERSION = 1.4
