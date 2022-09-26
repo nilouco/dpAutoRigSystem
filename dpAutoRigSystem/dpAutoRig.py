@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.06"
-DPAR_UPDATELOG = "N023 - Limb auto corner correction.\nCalling CorrectionManager to create the\ncorrective network for elbow/knee articulation."
+DPAR_VERSION_PY3 = "4.01.07"
+DPAR_UPDATELOG = "N516 - Translator fixed dictionary sort error."
 
 
 
