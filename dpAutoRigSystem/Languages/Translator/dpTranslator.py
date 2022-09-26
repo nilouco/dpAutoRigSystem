@@ -2,8 +2,10 @@
 from maya import cmds
 import datetime
 import re
+from collections import OrderedDict
 
-DPT_VERSION = 1.3
+
+DPT_VERSION = 1.4
 
 
 LANGUAGES = "Languages"
@@ -17,7 +19,7 @@ class Translator(object):
         self.langDic = langDic
         self.langName = langName
         self.translatorString = "dpAutoRigSystem - "+self.langDic[self.langName]['t000_translator']
-        self.sourceLangList = self.langDic[self.langName].sort()
+        self.sourceLangList = list(self.langDic[self.langName])
         self.keyLen = len(self.sourceLangList) - 1
         self.langIndexStart = 7 #after userInfo
         self.langIndex = self.langIndexStart
@@ -271,6 +273,8 @@ class Translator(object):
             curKeyType = self.langDic[self.langName]['i144_prefix']
         elif self.sourceLangList[self.langIndex].startswith("t"):
             curKeyType = self.langDic[self.langName]['t000_translator']
+        elif self.sourceLangList[self.langIndex].startswith("v"):
+            curKeyType = self.langDic[self.langName]['v000_validator']
         
         # update UI elements:
         cmds.text(self.keyTypeTxt, edit=True, label=curKeyType)
