@@ -1426,7 +1426,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # add main articulationJoint:
                 if self.addArticJoint:
                     # shoulder / leg
-                    firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
+                    firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 1) #could call to create corrective joints. See parameters to implement it, please.
                     dpUtils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
                     if not self.getHasBend():
