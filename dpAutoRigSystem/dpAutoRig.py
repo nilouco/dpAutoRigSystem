@@ -475,7 +475,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.langDic[self.langName]['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
         dpARJoints  = cmds.radioButton( label=self.langDic[self.langName]['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
-        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0), (4, 'left', 0)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
