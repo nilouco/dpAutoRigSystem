@@ -1110,3 +1110,38 @@ class ControlClass(object):
                     print("Imported shapes: {0}".format(path))
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+
+
+    def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_CorrectiveJoint', radius=1, degree=3, *args):
+        jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree)
+        jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
+        jcrGrp1 = dpUtils.zeroOut([jcrGrp0])[0]
+        cmds.delete(cmds.parentConstraint(jcrName, jcrGrp1, maintainOffset=False))
+        cmds.parentConstraint(cmds.listRelatives(jcrName, parent=True)[0], jcrGrp1, maintainOffset=True, name=jcrGrp1+"_PaC")
+        cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
+        cmds.scaleConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_ScC")
+        cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
+
+        # TODO: need to find the good correctiveNet here... just using ElbowCorrectNet into ShoulderJcrCtrl to test proporse at the moment!
+        cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
+       
+        attrList = ["T", "R", "S"]
+        axisList = ["X", "Y", "Z"]
+        for attr in attrList:
+            
+            for axis in axisList:
+                remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
+                cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
+                cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
+                cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
+                
+                # add calibrate attributes:
+                defValue = 0
+                if attr == "S":
+                    defValue = 1
+                    cmds.setAttr(remapV+".outputMin", 1)
+                cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=defValue)
+                cmds.connectAttr(remapV+".outValue", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
+                cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
+                cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
+        return jcrCtrl, jcrGrp1

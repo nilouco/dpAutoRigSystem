@@ -1426,9 +1426,30 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # add main articulationJoint:
                 if self.addArticJoint:
                     # shoulder / leg
-                    firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 1) #could call to create corrective joints. See parameters to implement it, please.
+                    firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(1,1,1), (3,4,5)]) #could call to create corrective joints. See parameters to implement it, please.
                     dpUtils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
+                    if self.addCorrective:
+                        dpUtils.setJointLabel(firstJntList[1], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_0_"+mainName)
+                        #dpUtils.setJointLabel(firstJntList[2], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_1_"+mainName)
+                    
+                    
+                        jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(firstJntList[1], self.correctiveNet, radius=self.ctrlRadius*0.3)
+                        cmds.parent(jcrGrp, self.toCtrlHookGrp)
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        #self.ctrls.createCorrectiveJointCtrl(firstJntList[2], radius=self.ctrlRadius*0.3)
+
+                        
+
+
+
+
                     if not self.getHasBend():
                         cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
                         dpUtils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
