@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.04"
-DPAR_UPDATELOG = "N520 Add star control curve."
+DPAR_VERSION_PY3 = "4.01.08"
+DPAR_UPDATELOG = "N522 Add PinSide control curve."
 
 
 
