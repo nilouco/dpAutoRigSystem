@@ -2,7 +2,7 @@
     "_preset"     : "Default",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-03",
-    "_updated"    : "2022-09-27",
+    "_updated"    : "2022-09-29",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -96,6 +96,6 @@
     "id_089_SpineBase"       : {"type" : "Circle",           "degree" : 3},
     "id_090_SpineTip"        : {"type" : "Circle",           "degree" : 3},
     "id_091_EyeSpecScale"    : {"type" : "Ball",             "degree" : 3},
-    "id_092_CorrectiveJoint" : {"type" : "Ball",             "degree" : 3}
+    "id_092_Correctives"     : {"type" : "Ball",             "degree" : 3}
     
 }

@@ -18,6 +18,7 @@ dic_colors = {
     "white": 16,
     "black": 1,
     "gray": 3,
+    "bonina": [0.38, 0, 0.15],
     "none": 0,
 }
 
@@ -39,7 +40,8 @@ class ControlClass(object):
         """ Create a color override for all shapes from the objList.
         """
         if rgb:
-            pass
+            if (color in dic_colors):
+                color = dic_colors[color]
         elif (color in dic_colors):
             iColorIdx = dic_colors[color]
         else:
@@ -264,7 +266,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -284,6 +286,8 @@ class ControlClass(object):
         if controlInstance:
             # create curve
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
+            if corrective:
+                self.addCorrectiveAttrs(curve)
             return curve
 
 
@@ -1112,8 +1116,8 @@ class ControlClass(object):
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
 
 
-    def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_CorrectiveJoint', radius=1, degree=3, *args):
-        jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree)
+    def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
+        jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
         jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
         jcrGrp1 = dpUtils.zeroOut([jcrGrp0])[0]
         cmds.delete(cmds.parentConstraint(jcrName, jcrGrp1, maintainOffset=False))
@@ -1121,8 +1125,6 @@ class ControlClass(object):
         cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
         cmds.scaleConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_ScC")
         cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
-
-        # TODO: need to find the good correctiveNet here... just using ElbowCorrectNet into ShoulderJcrCtrl to test proporse at the moment!
         cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
        
         attrList = ["T", "R", "S"]
@@ -1145,3 +1147,13 @@ class ControlClass(object):
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
         return jcrCtrl, jcrGrp1
+
+    
+    def addCorrectiveAttrs(self, ctrlName, *args):
+        """ Add and set attributes to this control curve be used as a corrective controller.
+        """
+        # create an attribute to be used as editMode by module:
+        cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=True, defaultValue=False)
+        # colorize curveShapes:
+        self.colorShape([ctrlName], 'bonina', rgb=True)
+        
