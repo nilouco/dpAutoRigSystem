@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.07"
-DPAR_UPDATELOG = "N516 - Translator fixed dictionary sort error."
+DPAR_VERSION_PY3 = "4.01.08"
+DPAR_UPDATELOG = "N522 Add PinSide control curve."
 
 
 
