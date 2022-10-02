@@ -296,18 +296,21 @@ class StartClass(object):
         self.integratedActionsDic = {}
         
         
-    # Gets:
+    # Getters:
     #
     def getArticulation(self, *args):
         return cmds.getAttr(self.moduleGrp+".articulation")
 
     def getModuleAttr(self, moduleAttr, *args):
         return cmds.getAttr(self.moduleGrp + "." + moduleAttr)
+
     
-    # Sets:
+    # Setters:
     #
     def setArticulation(self, value, *args):
         self.addArticJoint = value
         cmds.setAttr(self.moduleGrp + ".articulation", value)
     
-    
+    def setCorrective(self, value, *args):
+        self.addCorrective = value
+        cmds.setAttr(self.moduleGrp + ".corrective", value)

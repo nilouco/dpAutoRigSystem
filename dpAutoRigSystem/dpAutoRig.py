@@ -65,6 +65,7 @@ try:
     import zipfile
     import datetime
     import io
+    import sys
     from maya import mel
     from functools import partial
     from .Modules.Library import dpUtils
@@ -95,9 +96,14 @@ MODULES = "Modules"
 SCRIPTS = "Scripts"
 CONTROLS = "Controls"
 COMBINED = "Controls/Combined"
-PRESETS = "Controls/Presets"
+CONTROLS_PRESETS = "Controls/Presets"
 EXTRAS = "Extras"
 LANGUAGES = "Languages"
+VALIDATOR = "Validator"
+CHECKIN = "Validator/CheckIn"
+CHECKOUT = "Validator/CheckOut"
+VALIDATOR_PRESETS = "Validator/Presets"
+PIPELINE_DRIVE = "R:/"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -129,6 +135,7 @@ DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
 DPSHAPE = "dpShape"
+DPLOG = "dpLog"
 
 
 class DP_AutoRig_UI(object):
@@ -145,12 +152,21 @@ class DP_AutoRig_UI(object):
         self.loadedControls = False
         self.loadedCombined = False
         self.loadedExtras = False
+        self.loadedCheckIn = False
+        self.loadedCheckOut = False
+        self.loadedAddOns = False
         self.controlInstanceList = []
+        self.checkInInstanceList = []
+        self.checkOutInstanceList = []
+        self.checkAddOnsInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.userDefAutoCheckUpdate = 0
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
+        self.dpLog = DPLOG
+        self.studioName = None
+        self.studioPath = None
         
         
         try:
@@ -185,27 +201,45 @@ class DP_AutoRig_UI(object):
                 return
             
             # preset menu:
-            self.allUIs["presetMenu"] = cmds.menuItem('presetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
+            self.allUIs["controlsPresetMenu"] = cmds.menuItem('controlsPresetMenu', label='Controls Preset', parent='settingsMenu', subMenu=True)
             cmds.radioMenuItemCollection('presetRadioMenuCollection')
             # create a preset list:
-            self.presetList, self.presetDic = self.getJsonFileInfo(PRESETS)
+            self.presetList, self.presetDic = self.getJsonFileInfo(CONTROLS_PRESETS)
             # create menuItems from preset list:
             if self.presetList:
                 # verify if there is an optionVar of last choosen by user in Maya system:
                 lastPreset = self.checkLastOptionVar("dpAutoRigLastPreset", "Default", self.presetList)
                 # create menuItems with the command to set the last preset variable, delete languageUI and call mainUI() again when changed:
                 for preset in self.presetList:
-                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI()\", lowestPriority=True)')
+                    cmds.menuItem( preset+"_MI", label=preset, radioButton=False, collection='presetRadioMenuCollection', command='from maya import cmds; cmds.optionVar(remove=\"dpAutoRigLastPreset\"); cmds.optionVar(stringValue=(\"dpAutoRigLastPreset\", \"'+preset+'\")); cmds.evalDeferred(\"import sys; sys.modules[\'dpAutoRigSystem.dpAutoRig\'].DP_AutoRig_UI())\", lowestPriority=True)')
                 # load the last preset from optionVar value:
-                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='presetMenu')
+                cmds.menuItem(lastPreset+"_MI", edit=True, radioButton=True, collection='presetRadioMenuCollection', parent='controlsPresetMenu')
             else:
                 print("Error: Cannot load json preset files!\n")
+                return
+            
+            # validator preset menu:
+            self.allUIs["validatorPresetMenu"] = cmds.menuItem('validatorPresetMenu', label='Validator Preset', parent='settingsMenu', subMenu=True)
+            cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
+            # create a validator preset list:
+            self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
+            self.loadValidatorPreset()
+            # create menuItems from validator preset list:
+            if self.validatorPresetList:
+                # create menuItems with the validator presets
+                for validatorPreset in self.validatorPresetList:
+                    cmds.menuItem( validatorPreset+"_MI", label=validatorPreset, radioButton=False, collection='validatorPresetRadioMenuCollection', command=self.setValidatorPreset)
+                # load the first validator preset, expected to be the pipeline studio item if it exists:
+                cmds.menuItem(self.validatorPresetList[0]+"_MI", edit=True, radioButton=True, collection='validatorPresetRadioMenuCollection', parent='validatorPresetMenu')
+            else:
+                print("Error: Cannot load json validator preset files!\n")
                 return
             
             # create menu:
             self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
             cmds.menuItem('translator_MI', label='Translator', command=self.translator)
-            cmds.menuItem('preset_MI', label='Preset', command=self.createPreset)
+            cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "controls", CONTROLS_PRESETS, True))
+            cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
             # window menu:
             self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
             cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
@@ -256,7 +290,7 @@ class DP_AutoRig_UI(object):
             cmds.deleteUI('dpAutoRigSystem', control=True)
     
     
-    def getJsonFileInfo(self, dir):
+    def getJsonFileInfo(self, dir, absolute=False):
         """ Find all json files in the given path and get contents used for each file.
             Create a dictionary with dictionaries of all file found.
             Return a list with the name of the found files.
@@ -264,10 +298,12 @@ class DP_AutoRig_UI(object):
         # declare the resulted list:
         resultList = []
         resultDic = {}
-        # find path where 'dpAutoRig.py' is been executed:
-        path = os.path.dirname(__file__)
-        # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
-        jsonPath = os.path.join(path, dir, "").replace("\\", "/")
+        jsonPath = dir
+        if not absolute:
+            # find path where 'dpAutoRig.py' is been executed:
+            path = os.path.dirname(__file__)
+            # hack in order to avoid "\\" from os.sep, them we need to use the replace string method:
+            jsonPath = os.path.join(path, dir, "").replace("\\", "/")
         # list all files in this directory:
         allFileList = os.listdir(jsonPath)
         for file in allFileList:
@@ -331,7 +367,7 @@ class DP_AutoRig_UI(object):
         # get current language choose UI from menu:
         self.langName = self.getCurrentMenuValue(self.langList)
         # get current preset choose UI from menu:
-        self.presetName = self.getCurrentMenuValue(self.presetList)            
+        self.presetName = self.getCurrentMenuValue(self.presetList)
         
         # initialize dpControls:
         self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
@@ -535,9 +571,9 @@ class DP_AutoRig_UI(object):
         
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["calibration3Layout"] = cmds.paneLayout("calibration3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
-        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration3Layout"])
-        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration3Layout"])
+        self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
+        self.allUIs["transferCalibrationButton"] = cmds.button("transferCalibrationButton", label=self.langDic[self.langName]['i194_transfer'], backgroundColor=(0.5, 1.0, 1.0), height=30, command=self.ctrls.transferCalibration, parent=self.allUIs["calibration2Layout"])
+        self.allUIs["importCalibrationButton"] = cmds.button("importCalibrationButton", label=self.langDic[self.langName]['i196_import'], backgroundColor=(0.5, 0.8, 1.0), height=30, command=self.ctrls.importCalibration, parent=self.allUIs["calibration2Layout"])
         self.allUIs["mirrorCalibrationFL"] = cmds.frameLayout('mirrorCalibrationFL', label=self.langDic[self.langName]['m010_mirror']+" "+self.langDic[self.langName]['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["calibrationFL"])
         # mirror calibration - layout:
         self.allUIs["mirrorCalibrationLayout"] = cmds.rowColumnLayout('mirrorCalibrationLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorCalibrationFL" )
@@ -577,11 +613,52 @@ class DP_AutoRig_UI(object):
         
         # --
         
+        # interface of Validator tab - formLayout:
+        self.allUIs["validatorTabLayout"] = cmds.formLayout('validatorTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # validatorMainLayout - scrollLayout:
+        self.allUIs["validatorMainLayout"] = cmds.scrollLayout("validatorMainLayout", parent=self.allUIs["validatorTabLayout"])
+        self.allUIs["validatorLayout"] = cmds.columnLayout("validatorLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["validatorMainLayout"])
+        self.allUIs["validatorCheckInLayout"] = cmds.frameLayout('validatorCheckInLayout', label=self.langDic[self.langName]['i208_checkin'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+        # check-in
+        self.validatorCheckInModuleList = self.startGuideModules(CHECKIN, "start", "validatorCheckInLayout")
+        cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
+        cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i208_checkin'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
+        self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
+        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, False), parent=self.allUIs["selectedCheckIn2Layout"])
+        cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+        # check-out
+        self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.langDic[self.langName]['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+        self.validatorCheckOutModuleList = self.startGuideModules(CHECKOUT, "start", "validatorCheckOutLayout")
+        cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
+        cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
+        self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
+        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
+        # pipeline
+        if self.getValidatorsAddOns():
+            cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+            self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+            self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath)
+            cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
+            cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
+            self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
+            cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+            cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
+
+        # edit formLayout in order to get a good scalable window:
+        cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5)]
+                        )
+        self.setValidatorPreset()
+
+        # --
+
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra')) )
+        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], 'Validator')) )
         cmds.select(clear=True)
 
-    
+
     def jobReloadUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
@@ -681,17 +758,21 @@ class DP_AutoRig_UI(object):
         self.translatorInst.dpTranslatorMain()
         
         
-    def createPreset(self, *args):
+    def createPreset(self, type="controls", presetDir=CONTROLS_PRESETS, setOptionVar=True, *args):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
-        newPresetString = self.ctrls.dpCreatePreset()
+        if type == "controls":
+            newPresetString = self.ctrls.dpCreateControlsPreset()
+        elif type == "validator":
+            newPresetString = dpUtils.dpCreateValidatorPreset(self)
         if newPresetString:
             # create json file:
-            resultDic = self.createJsonFile(newPresetString, PRESETS, '_preset')
+            resultDic = self.createJsonFile(newPresetString, presetDir, '_preset')
             # set this new preset as userDefined preset:
             self.presetName = resultDic['_preset']
-            cmds.optionVar(remove="dpAutoRigLastPreset")
-            cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
+            if setOptionVar:
+                cmds.optionVar(remove="dpAutoRigLastPreset")
+                cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
@@ -1017,12 +1098,13 @@ class DP_AutoRig_UI(object):
     
     
     # Start working with Guide Modules:
-    def startGuideModules(self, guideDir, action, layout, checkModuleList=None):
+    def startGuideModules(self, guideDir, action, layout, checkModuleList=None, path=None):
         """ Find and return the modules in the directory 'Modules'.
             Returns a list with the found modules.
         """
-        # find path where 'dpAutoRig.py' is been executed:
-        path = dpUtils.findPath("dpAutoRig.py")
+        if not path:
+            # find path where 'dpAutoRig.py' is been executed:
+            path = dpUtils.findPath("dpAutoRig.py")
         if not self.loadedPath:
             print("dpAutoRigPath: "+path)
             self.loadedPath = True
@@ -1034,7 +1116,7 @@ class DP_AutoRig_UI(object):
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
-                    self.createGuideButton(guideModule, guideDir, layout)
+                    self.createGuideButton(guideModule, guideDir, layout, path)
             elif action == "check":
                 notFoundModuleList = []
                 # verify the list if exists all elements in the folder:
@@ -1043,6 +1125,8 @@ class DP_AutoRig_UI(object):
                         if not checkModule in guideModuleList:
                             notFoundModuleList.append(checkModule)
                 return notFoundModuleList
+            elif action == "exists":
+                return guideModuleList
             # avoid print again the same message:
             if guideDir == MODULES and not self.loadedModules:
                 print(guideDir+" : "+str(guideModuleList))
@@ -1059,10 +1143,19 @@ class DP_AutoRig_UI(object):
             if guideDir == EXTRAS and not self.loadedExtras:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedExtras = True
+            if guideDir == CHECKIN and not self.loadedCheckIn:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedCheckIn = True
+            if guideDir == CHECKOUT and not self.loadedCheckOut:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedCheckOut = True
+            if guideDir == "" and not self.loadedAddOns:
+                print(path+" : "+str(guideModuleList))
+                self.loadedAddOns = True
         return guideModuleList
     
     
-    def createGuideButton(self, guideModule, guideDir, layout):
+    def createGuideButton(self, guideModule, guideDir, layout, path=None):
         """ Create a guideButton for guideModule in the respective colMiddleLeftA guidesLayout.
         """
         # especific import command for guides storing theses guides modules in a variable:
@@ -1072,9 +1165,14 @@ class DP_AutoRig_UI(object):
         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
         try:
-            guideDir = guideDir.replace("/", ".")
-            guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
-            reload(guide)
+            if guideDir:
+                guideDir = guideDir.replace("/", ".")
+                guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+                reload(guide)
+            else:
+                sys.path.append(path)
+                guide = __import__(guideModule, {}, {}, [guideModule])
+                reload(guide)
         except Exception as e:
             errorString = self.langDic[self.langName]['e017_loadingExtension']+" "+guideModule+" : "+str(e.args)
             mel.eval('warning \"'+errorString+'\";')
@@ -1084,10 +1182,11 @@ class DP_AutoRig_UI(object):
         title = self.langDic[self.langName][guide.TITLE]
         description = self.langDic[self.langName][guide.DESCRIPTION]
         icon = guide.ICON
-        # find path where 'dpAutoRig.py' is been executed to get the icon:
-        path = dpUtils.findPath("dpAutoRig.py")
+        if guideDir:
+            # find path where 'dpAutoRig.py' is been executed to get the icon:
+            path = dpUtils.findPath("dpAutoRig.py")
         iconDir = path+icon
-        iconInfo = path+"/Icons/"+INFO_ICON
+        iconInfo = dpUtils.findPath("dpAutoRig.py")+"/Icons/"+INFO_ICON
         guideName = guide.CLASS_NAME
         
         # creating a basic layout for guide buttons:
@@ -1096,8 +1195,8 @@ class DP_AutoRig_UI(object):
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(controlInstance)
         else:
-            moduleLayout = cmds.rowLayout(numberOfColumns=3, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=(1, 'left'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs[layout])
-            cmds.image(i=iconDir, width=32, parent=moduleLayout)
+            moduleLayout = cmds.rowLayout(numberOfColumns=5, columnWidth3=(32, 55, 17), height=32, adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'left', 2)], parent=self.allUIs[layout])
+            cmds.image(image=iconDir, width=32, parent=moduleLayout)
 
             if guideDir == MODULES:
                 '''
@@ -1110,8 +1209,25 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, command=partial(self.execScriptedGuide, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == EXTRAS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
-            
-            cmds.iconTextButton(i=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+            elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
+                if guideDir:
+                    validatorInstance = self.initExtraModule(guideModule, guideDir)
+                else:
+                    validatorInstance = self.initValidatorModule(guideModule, path)
+                validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
+                verifyBT = cmds.button(label=self.langDic[self.langName]["i210_verify"], width=45, command=partial(validatorInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                fixBT = cmds.button(label=self.langDic[self.langName]["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                validatorInstance.validatorCB = validatorCB
+                validatorInstance.verifyBT = verifyBT
+                validatorInstance.fixBT = fixBT
+                if guideDir == CHECKIN.replace("/", "."):
+                    self.checkInInstanceList.append(validatorInstance)
+                elif guideDir == CHECKOUT.replace("/", "."):
+                    self.checkOutInstanceList.append(validatorInstance)
+                else: #addOns
+                    self.checkAddOnsInstanceList.append(validatorInstance)
+
+            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     
@@ -1163,7 +1279,21 @@ class DP_AutoRig_UI(object):
         guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName)
         return guideInstance
     
-    
+
+    def initValidatorModule(self, guideModule, path, *args):
+        """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
+            Returns the guide instance initialised.
+        """
+        # especific import command for guides storing theses guides modules in a variable:
+        self.guide = __import__(guideModule, {}, {}, [guideModule])
+        reload(self.guide)
+        # get the CLASS_NAME from extraModule:
+        guideClass = getattr(self.guide, self.guide.CLASS_NAME)
+        # initialize this extraModule as an Instance:
+        guideInstance = guideClass(self)
+        return guideInstance
+
+
     def initControlModule(self, guideModule, guideDir, *args):
         """ Call initExtraModule because it's the same code.
         """
@@ -1316,6 +1446,90 @@ class DP_AutoRig_UI(object):
         # edit the prefixTextField with the prefixName:
         if len(prefixName) != 0:
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
+
+
+    def getPipelineStudioName(self, pipelineDrive=PIPELINE_DRIVE, *args):
+        # try to find a pipeline structure
+        filePath = cmds.file(query=True, sceneName=True)
+        if filePath:
+            if pipelineDrive in filePath:
+                self.studioName = filePath.split(pipelineDrive)[1]
+                self.studioName = self.studioName[:self.studioName.find("/")]
+                self.studioPath = pipelineDrive+self.studioName
+                return self.studioName, self.studioPath
+
+
+    def getValidatorsAddOns(self, *args):
+        self.getPipelineStudioName()
+        if self.studioName:
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath)
+            return self.validatorAddOnsModuleList
+
+
+    def loadValidatorPreset(self, *args):
+        self.getPipelineStudioName()
+        if self.studioName:
+            self.studioPath += "/"
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath, True)
+            if studioPreset:
+                self.validatorPresetList.insert(0, studioPreset[0])
+                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+
+    
+    def setValidatorPreset(self, *args):
+        self.validatorPresetName = self.getCurrentMenuValue(self.validatorPresetList)
+        checkInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList
+        if checkInstanceList:
+            for presetKey in self.validatorPresetDic[self.validatorPresetName]:
+                for validatorModule in checkInstanceList:
+                    if presetKey == validatorModule.guideModuleName:
+                        validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
+
+
+    def changeActiveAllValidators(self, validatorInstList, value, *args):
+        """ Set all validator instances active attribute as True or False.
+        """
+        if validatorInstList:
+            for validatorInst in validatorInstList:
+                validatorInst.changeActive(value)
+        
+
+    def runSelectedValidators(self, validatorInstList, verifyMode, *args):
+        """ Run the code for each active validator instance.
+            verifyMode = True for verify
+                       = False for fix
+        """
+        validationResultData = {}
+        logText = ""
+        if validatorInstList:
+            progressAmount = 0
+            maxProcess = len(validatorInstList)
+            cmds.progressWindow(title="dpValidator", progress=progressAmount, status='dpValidator: 0%', isInterruptable=False)
+            for validatorInst in validatorInstList:
+                if validatorInst.active:
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(validatorInst.guideModuleName+': '+repr(progressAmount)))
+                    validatorInst.verbose = False
+                    validationResultData[validatorInst.guideModuleName] = validatorInst.runValidator(verifyMode)
+                    validatorInst.verbose = True
+        if validationResultData:
+            dataList = list(validationResultData.keys())
+            dataList.sort()
+            for i, dataItem in enumerate(dataList):
+                logText += validationResultData[dataItem]["logText"]
+                if i != len(dataList)-1:
+                    logText += "\n"
+            heightSize = len(dataList)
+        else:
+            logText += "\n"+self.langDic[self.langName]['i207_notMarked']
+            heightSize = 2
+        thisTime = str(time.asctime(time.localtime(time.time())))
+        logText = thisTime+"\n"+logText
+        self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
+        print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
+        if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
+            print(self.langDic[self.langName]['i201_saveScene'])
+        cmds.progressWindow(endProgress=True)
 
 
     def info(self, title, description, text, align, width, height, *args):
@@ -1526,7 +1740,7 @@ class DP_AutoRig_UI(object):
 
                 # store custom presets in order to avoid overwrite them when installing the update:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
-                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+PRESETS, dpAR_TempDir+"/"+PRESETS)
+                self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CONTROLS_PRESETS, dpAR_TempDir+"/"+CONTROLS_PRESETS)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:

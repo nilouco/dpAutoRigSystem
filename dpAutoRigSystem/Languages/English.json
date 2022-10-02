@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-09-29",
+    "_updated"       : "2022-10-02",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -135,6 +135,7 @@
     "c121_side"              : "Side",
     "c122_inner"             : "Inner",
     "c123_outer"             : "Outer",
+    "c124_corrective"        : "corrective",
     
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",
@@ -366,6 +367,13 @@
     "i204_recharge"        : "Recharge",
     "i205_guide"           : "Guide",
     "i206_removeNamespace" : "Found imported guide. Would you like to delete the namespace?",
+    "i207_notMarked"       : "Nothing marked to check, sorry.",
+    "i208_checkin"         : "check-in",
+    "i209_checkout"        : "check-out",
+    "i210_verify"          : "Verify",
+    "i211_all"             : "all",
+    "i212_addOns"          : "add-ons",
+    "i213_checked"         : "Checked",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -597,5 +605,15 @@
     "t006_startTranslator" : "Start Translation",
     "t007_writeText"       : "Please, write the translated text here\nor click Same button in order to use the text above.",
     "t008_finishMessage"   : "Thank you very much for your help!\nIt's really appreciated.",
-    "t009_finishButton"    : "Translate this last sentence\nthen click Finish button, please."
+    "t009_finishButton"    : "Translate this last sentence\nthen click Finish button, please.",
+
+    "v000_validator"       : "Validator",
+    "v001_template"        : "Template to test _Mesh",
+    "v002_templateDesc"    : "Template description to check if there's\na _Mesh suffix.",
+    "v003_mode"            : "Mode",
+    "v004_fixed"           : "Fixed",
+    "v005_cantFix"         : "Can't fix",
+    "v006_foundIssue"      : "Found issue",
+    "v007_allOk"           : "Everything is ok, thanks!",
+    "v008_test"            : "Test"
 }

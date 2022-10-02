@@ -7,6 +7,7 @@ from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
 from .Library import dpSoftIk
+from ..Extras import dpCorrectionManager
 
 
 # global variables to this module:
@@ -28,6 +29,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
         self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName)
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, False)
 
         #Declare variable
         self.integratedActionsDic = {}
@@ -92,6 +94,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".additional", 0)
         cmds.addAttr(self.moduleGrp, longName="softIk", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".softIk", 1)
+        cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".corrective", 1)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
@@ -403,6 +407,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
+            # corrective network:
+            self.addCorrective = self.getModuleAttr("corrective")
             # start as no having mirror:
             sideList = [""]
             axisList = ["X", "Y", "Z"]
@@ -677,7 +683,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                     cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3) #xzy
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True);
+                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 dpUtils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
                 # getting them zeroOut groups:
@@ -1398,6 +1404,24 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 dpUtils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
                                 cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
                                 cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
+                
+                # corner corrective network:
+                if self.addCorrective:
+                    self.correctiveCtrl = self.toParentExtremCtrl
+                    if self.getHasBend():
+                        self.correctiveCtrl = self.bendGrps['ctrlList'][2]
+                    if not cmds.objExists(self.correctiveCtrl+"."+self.langDic[self.langName]['c124_corrective']):
+                        cmds.addAttr(self.correctiveCtrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                    self.correctiveNet = self.correctionManager.createCorrectionManager([self.skinJointList[1], self.skinJointList[2]], name=side+self.userGuideName+"_"+self.jNameList[2], correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
+                    cmds.connectAttr(self.correctiveCtrl+"."+self.langDic[self.langName]['c124_corrective'], self.correctiveNet+".intensity", force=True)
+                    if self.limbType == LEG:
+                        cmds.setAttr(self.correctiveNet+".axis", 1) #Y
+                        cmds.setAttr(self.correctiveNet+".axisOrder", 1) #YZX
+                    correctionNetInputValue = cmds.getAttr(self.correctiveNet+".inputValue")
+                    cmds.setAttr(self.correctiveNet+".inputStart", correctionNetInputValue) #offset default position
+                    cmds.setAttr(self.correctiveNet+".inputEnd", correctionNetInputValue-90)
+                    if correctionNetInputValue > 0:
+                        cmds.setAttr(self.correctiveNet+".inputEnd", correctionNetInputValue+90)
                 
                 # add main articulationJoint:
                 if self.addArticJoint:

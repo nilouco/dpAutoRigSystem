@@ -8,6 +8,10 @@ import cProfile
 import urllib.request
 import webbrowser
 import math
+import json
+import time
+import getpass
+import datetime
 from io import TextIOWrapper
 from importlib import reload
 
@@ -85,12 +89,13 @@ def findAllModules(path, dir):
     """ Find all modules in the directory.
         Return a list of all module names (without '.py' extension).
     """
+    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate"]
     allPyFilesList = findAllFiles(path, dir, ".py")
     moduleList = []
     # removing "__init__":
     for file in allPyFilesList:
         #Ensure base class are skipped
-        if file != "dpBaseClass" and file != "dpLayoutClass" and file != "dpBaseControlClass":
+        if not file in baseClassList:
             moduleList.append(file)
     return moduleList
 
@@ -914,3 +919,52 @@ def unlockAttr(nodeList):
         if cmds.objExists(node):
             for attr in attrList:
                 cmds.setAttr(node+"."+attr, lock=False)
+
+
+def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
+    """ Save to path the given dictionary as a json file.
+    """
+    currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    if not path:
+        path = cmds.file(query=True, sceneName=True)
+        if not path:
+            return False
+        dpFolder = path[:path.rfind("/")]
+        if subFolder:
+            dpFolder = dpFolder+"/"+subFolder
+        if not os.path.exists(dpFolder):
+            os.makedirs(dpFolder)
+        if not name:
+            name = path[path.rfind("/")+1:path.rfind(".")]
+        pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
+    print("\nLog file", pathFile)
+    outFile = open(pathFile, "w")
+    json.dump(dic, outFile, indent=4)
+    outFile.close()
+    return pathFile
+
+
+def dpCreateValidatorPreset(dpUIinst):
+    """ Creates a json file as a Validator Preset and returns it.
+    """
+    resultString = None
+    validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList + dpUIinst.checkAddOnsInstanceList
+    if validatorsList:
+        resultDialog = cmds.promptDialog(
+                                            title=dpUIinst.langDic[dpUIinst.langName]['i129_createPreset'],
+                                            message=dpUIinst.langDic[dpUIinst.langName]['i130_presetName'],
+                                            button=[dpUIinst.langDic[dpUIinst.langName]['i131_ok'], dpUIinst.langDic[dpUIinst.langName]['i132_cancel']],
+                                            defaultButton=dpUIinst.langDic[dpUIinst.langName]['i131_ok'],
+                                            cancelButton=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'],
+                                            dismissString=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'])
+        if resultDialog == dpUIinst.langDic[dpUIinst.langName]['i131_ok']:
+            resultName = cmds.promptDialog(query=True, text=True)
+            resultName = resultName[0].upper()+resultName[1:]
+            author = getpass.getuser()
+            date = str(datetime.datetime.now().date())
+            resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+            # add validators and its current active values
+            for validator in validatorsList:
+                resultString += ',"'+validator.guideModuleName+'" : '+str(validator.active).lower()
+            resultString += "}"
+    return resultString

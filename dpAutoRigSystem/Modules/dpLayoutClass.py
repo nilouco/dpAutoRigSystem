@@ -137,6 +137,7 @@ class LayoutClass(object):
                 self.fatherBExists = cmds.objExists(self.moduleGrp+".fatherB")
                 self.articulationExists = cmds.objExists(self.moduleGrp+".articulation")
                 self.nostrilExists = cmds.objExists(self.moduleGrp+".nostril")
+                self.correctiveExists = cmds.objExists(self.moduleGrp+".corrective")
                 
                 # UI
                 # edit label of frame layout:
@@ -326,6 +327,13 @@ class LayoutClass(object):
                     cmds.text(" ", parent=self.articLayout)
                     nostrilValue = cmds.getAttr(self.moduleGrp+".nostril")
                     self.nostrilCB = cmds.checkBox(label=self.langDic[self.langName]['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
+
+                # create corrective layout:
+                if self.correctiveExists:
+                    self.correctiveLayout = cmds.rowLayout('correctiveLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    cmds.text(self.langDic[self.langName]['c124_corrective'].capitalize(), parent=self.correctiveLayout)
+                    correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
+                    self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
                 
             except:
                 pass
@@ -462,6 +470,12 @@ class LayoutClass(object):
         """ Set the attribute value for articulation.
         """
         cmds.setAttr(self.moduleGrp+".articulation", cmds.checkBox(self.articCB, query=True, value=True))
+
+
+    def changeCorrective(self, *args):
+        """ Set the attribute value for corrective.
+        """
+        cmds.setAttr(self.moduleGrp+".corrective", cmds.checkBox(self.correctiveCB, query=True, value=True))
     
     
     def changeDegree(self, item, *args):
