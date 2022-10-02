@@ -1117,6 +1117,12 @@ class ControlClass(object):
 
 
     def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
+        """ Create a corrective joint controller.
+            Connect setup nodes and add calibration attributes to it.
+            Returns the corrective controller and its highest zero out group.
+        """
+        calibrateAttrList = ["T", "R", "S"]
+        calibrateAxisList = ["X", "Y", "Z"]
         toCalibrationList = []
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
         jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
@@ -1127,18 +1133,12 @@ class ControlClass(object):
         cmds.scaleConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_ScC")
         cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
         cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
-       
-        attrList = ["T", "R", "S"]
-        axisList = ["X", "Y", "Z"]
-        for attr in attrList:
-            
-            for axis in axisList:
+        for attr in calibrateAttrList:
+            for axis in calibrateAxisList:
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
                 cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
                 cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
-
-                
                 # add calibrate attributes:
                 defValue = 0
                 if attr == "S":
@@ -1148,16 +1148,16 @@ class ControlClass(object):
                 cmds.connectAttr(remapV+".outValue", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
-
         self.setCalibrationAttr(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
-
+    
     
     def addCorrectiveAttrs(self, ctrlName, *args):
         """ Add and set attributes to this control curve be used as a corrective controller.
         """
         # create an attribute to be used as editMode by module:
-        cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=True, defaultValue=False)
+        cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=False, defaultValue=False)
+        cmds.setAttr(ctrlName+".editMode", channelBox=True)
         # colorize curveShapes:
         self.createCorrectiveMode(ctrlName)
 
@@ -1199,16 +1199,17 @@ class ControlClass(object):
         """ Remove corrective controller editMode setup.
             Calculate the results of transformations to set the calibration attributes.
         """
-        transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
+        calibrateAttrList = ["T", "R", "S"]
+        calibrateAxisList = ["X", "Y", "Z"]
         if cmds.objExists(ctrlName):
-            for transfAttr in transformAttrList:
-                print(transfAttr)
-                
-                
-                # WIP:
-                # calculate calibration results and set them here :)
-
-
-        #self.createCorrectiveMode(ctrlName)
-
-                        
+            for attr in calibrateAttrList:
+                for axis in calibrateAxisList:
+                    oldValue = cmds.getAttr(ctrlName+".calibrate"+attr+axis)
+                    newValue = cmds.getAttr(ctrlName+"."+attr.lower()+axis.lower())
+                    resultValue = oldValue + newValue
+                    if attr == "S":
+                        resultValue = resultValue-1
+                        cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 1) #scale
+                    else:
+                        cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 0) #translate, rotate
+                    cmds.setAttr(ctrlName+".calibrate"+attr+axis, resultValue)
