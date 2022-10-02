@@ -276,8 +276,9 @@ class DP_AutoRig_UI(object):
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
-
+        
         #print self.pDockCtrl
+        self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
         
 

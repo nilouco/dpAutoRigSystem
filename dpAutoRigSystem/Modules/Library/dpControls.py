@@ -1155,5 +1155,56 @@ class ControlClass(object):
         # create an attribute to be used as editMode by module:
         cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=True, defaultValue=False)
         # colorize curveShapes:
-        self.colorShape([ctrlName], 'bonina', rgb=True)
-        
+        self.createCorrectiveMode(ctrlName)
+
+
+    def createCorrectiveMode(self, ctrlName, *args):
+        """ Create a scriptJob to read this attribute change.
+        """
+        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=True, compressUndo=True)
+        if cmds.getAttr(ctrlName+".editMode"):
+            self.colorShape([ctrlName], 'bonina', rgb=True)
+    
+    
+    def jobCorrectiveEditMode(self, ctrlName, *args):
+        """ Edit mode to corrective control by scriptJob.
+        """
+        if cmds.objExists(ctrlName+".editMode"):
+            editModeValue = cmds.getAttr(ctrlName+".editMode")
+            if editModeValue:
+                self.colorShape([ctrlName], 'bonina', rgb=True)
+            else:
+                shapeList = cmds.listRelatives(ctrlName, shapes=True, children=True, fullPath=True)
+                if shapeList:
+                    for shapeNode in shapeList:
+                        cmds.setAttr(shapeNode+".overrideRGBColors", 0)
+                self.setCorrectiveCalibration(ctrlName)
+    
+    
+    def startCorrectiveEditMode(self, *args):
+        """ Reload editMode job for existing corrective controllers.
+        """
+        transformList = cmds.ls(selection=False, type="transform")
+        if transformList:
+            for transformNode in transformList:
+                if cmds.objExists(transformNode+".editMode"):
+                    self.createCorrectiveMode(transformNode)
+    
+    
+    def setCorrectiveCalibration(self, ctrlName, *args):
+        """ Remove corrective controller editMode setup.
+            Calculate the results of transformations to set the calibration attributes.
+        """
+        transformAttrList = ["tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz", "v"]
+        if cmds.objExists(ctrlName):
+            for transfAttr in transformAttrList:
+                print(transfAttr)
+                
+                
+                # WIP:
+                # calculate calibration results and set them here :)
+
+
+        #self.createCorrectiveMode(ctrlName)
+
+                        
