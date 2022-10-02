@@ -1117,6 +1117,7 @@ class ControlClass(object):
 
 
     def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
+        toCalibrationList = []
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
         jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
         jcrGrp1 = dpUtils.zeroOut([jcrGrp0])[0]
@@ -1136,6 +1137,7 @@ class ControlClass(object):
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
                 cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
                 cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
+
                 
                 # add calibrate attributes:
                 defValue = 0
@@ -1145,7 +1147,9 @@ class ControlClass(object):
                 cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=defValue)
                 cmds.connectAttr(remapV+".outValue", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
-                cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
+                toCalibrationList.append("calibrate"+attr+axis)
+
+        self.setCalibrationAttr(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
 
     
