@@ -37,7 +37,7 @@ class RibbonClass(object):
         self.limbLengthAttr   = self.langDic[self.langName]['c113_length']
         
         
-    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, *args):
+    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
@@ -99,6 +99,22 @@ class RibbonClass(object):
             cmds.addAttr(self.cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
             cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
             cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
+            if side == 1:
+                cmds.setAttr(self.cornerJnt+".rotateX", 180)
+                cmds.setAttr(self.cornerJnt+".scaleX", -1)
+            if addCorrect:
+                for i in range(0, jcrNumber):
+                    cmds.select(self.cornerJnt)
+                    jcr = cmds.joint(name=self.cornerJnt[:self.cornerJnt.rfind("_")+1]+str(i)+"_Jcr")
+                    cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+                    if jcrPosList:
+                        cmds.setAttr(jcr+".translateX", jcrPosList[i][0])
+                        cmds.setAttr(jcr+".translateY", jcrPosList[i][1])
+                        cmds.setAttr(jcr+".translateZ", jcrPosList[i][2])
+                    if jcrRotList:
+                        cmds.setAttr(jcr+".rotateX", jcrRotList[i][0])
+                        cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
+                        cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
         
         if arm:
             upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
