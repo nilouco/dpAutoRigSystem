@@ -578,7 +578,7 @@
     "m206_mergeNamespace"       : "Namespaces das guias importadas mescaladas com Root",
     "m207_plusOpen"             : "Mais Aberto",
     "m208_starFlat"             : "Estrela Plana",
-	"m209_pinSide"              : "Pinos Laterais",
+    "m209_pinSide"              : "Pinos Laterais",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

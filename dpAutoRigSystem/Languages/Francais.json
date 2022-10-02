@@ -578,7 +578,7 @@
     "m206_mergeNamespace"       : "Les namespaces des guides importées sont mergés dans le Root",
     "m207_plusOpen"             : "Plus Ouvert",
     "m208_starFlat"             : "Étoile Plat",
-	"m209_pinSide"              : "Côté broche",
+    "m209_pinSide"              : "Côté broche",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
