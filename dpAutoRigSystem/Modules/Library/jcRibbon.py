@@ -99,9 +99,16 @@ class RibbonClass(object):
             cmds.addAttr(self.cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
             cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
             cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
-            if side == 1:
+            if not arm:
                 cmds.setAttr(self.cornerJnt+".rotateX", 180)
-                cmds.setAttr(self.cornerJnt+".scaleX", -1)
+                cmds.setAttr(self.cornerJnt+".rotateZ", 90)
+            if side == 1:
+                if arm:
+                    cmds.setAttr(self.cornerJnt+".rotateX", 180)
+                    cmds.setAttr(self.cornerJnt+".scaleX", -1)
+                else:
+                    cmds.setAttr(self.cornerJnt+".rotateX", 0)
+                    cmds.setAttr(self.cornerJnt+".rotateZ", -90)
             if addCorrect:
                 for i in range(0, jcrNumber):
                     cmds.select(self.cornerJnt)

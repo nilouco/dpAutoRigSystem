@@ -1185,7 +1185,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         if self.limbTypeName == ARM:
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         else:
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective)
+                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
                         
                         cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
@@ -1402,6 +1402,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             dpUtils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
                             jar = cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
                             self.cornerJntList.append(jar)
+                            if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                                if self.langDic[self.langName]['c056_front'] in self.userGuideName:
+                                    if s == 0:
+                                        cmds.setAttr(jar+".rotateX", 0)
+                                    else:
+                                        cmds.setAttr(jar+".rotateX", 180)
                             if self.addCorrective:
                                 jcrList = cmds.listRelatives(jar)
                                 if jcrList:
@@ -1439,13 +1445,13 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         
 
                         # shoulder / leg
-                        firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(1,1,1), (3,4,5)])
+                        firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1])#, 2, [(1,1,1), (3,4,5)])
                     else:
                         firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1])
                     dpUtils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
-                    if self.addCorrective:
-                        dpUtils.setJointLabel(firstJntList[1], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_0_"+mainName)
+                    #if self.addCorrective:
+                    #    dpUtils.setJointLabel(firstJntList[1], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_0_"+mainName)
                         #dpUtils.setJointLabel(firstJntList[2], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_1_"+mainName)
 
                         
@@ -1471,7 +1477,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             if s == 0:
                                 cornerCalibratePresetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
                             else:
-                                cornerCalibratePresetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":0.6, "calibrateRY":-45}, {"calibrateTX":0.4, "calibrateTZ":-0.8, "calibrateRY":-65}, {"calibrateTX":-0.3, "calibrateTZ":-0.8, "calibrateRY":65}]
+                                if self.limbType == ARM:
+                                    cornerCalibratePresetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":0.6, "calibrateRY":-45}, {"calibrateTX":0.4, "calibrateTZ":-0.8, "calibrateRY":-65}, {"calibrateTX":-0.3, "calibrateTZ":-0.8, "calibrateRY":65}]
+                                else: #leg
+                                    cornerCalibratePresetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
                             for i, jcr in enumerate(self.cornerJntList):
                                 if not i == 0: #exclude jar in the index 0
                                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(self.cornerJntList[i], self.cornerCorrectiveNet, radius=self.ctrlRadius*0.3)
@@ -1567,6 +1576,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
+
 
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)
