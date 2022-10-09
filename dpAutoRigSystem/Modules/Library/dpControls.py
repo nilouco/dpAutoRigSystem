@@ -1212,18 +1212,14 @@ class ControlClass(object):
         calibrateAttrList = ["T", "R", "S"]
         calibrateAxisList = ["X", "Y", "Z"]
         if cmds.objExists(ctrlName):
-#            print("here MERCI")
-#            dupTemp = cmds.duplicate(ctrlName, name=ctrlName+"_TEMP")
-#            cmds.parent(dupTemp, world=True)
+            dupTemp = cmds.duplicate(ctrlName, name=ctrlName+"_TEMP")[0]
+            cmds.parent(dupTemp, ctrlName+"_Zero_1_Grp")
             for attr in calibrateAttrList:
                 for axis in calibrateAxisList:
-                    oldValue = cmds.getAttr(ctrlName+".calibrate"+attr+axis)
-                    newValue = cmds.getAttr(ctrlName+"."+attr.lower()+axis.lower())
-                    resultValue = oldValue + newValue
+                    newValue = cmds.getAttr(dupTemp+"."+attr.lower()+axis.lower())
                     if attr == "S":
-                        resultValue = resultValue-1
                         cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 1) #scale
                     else:
                         cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 0) #translate, rotate
-                    cmds.setAttr(ctrlName+".calibrate"+attr+axis, resultValue)
-#            cmds.delete(dupTemp)
+                    cmds.setAttr(ctrlName+".calibrate"+attr+axis, newValue)
+            cmds.delete(dupTemp)
