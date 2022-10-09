@@ -345,7 +345,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     for child in childrenIkList:
                         if not cmds.objectType(child) == "joint":
                             cmds.delete(child)
-                        if child.endswith("_Jar"):
+                        if child.endswith("_Jax"):
                             cmds.delete(child)
                 jointIkList = cmds.listRelatives(dupIk, children=True, allDescendents=True, fullPath=True)
                 for jointNode in jointIkList:
@@ -363,7 +363,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     for child in childrenFkList:
                         if not cmds.objectType(child) == "joint":
                             cmds.delete(child)
-                        if child.endswith("_Jar"):
+                        if child.endswith("_Jax"):
                             cmds.delete(child)
                 jointFkList = cmds.listRelatives(dupFk, children=True, allDescendents=True, fullPath=True)
                 for jointNode in jointFkList:

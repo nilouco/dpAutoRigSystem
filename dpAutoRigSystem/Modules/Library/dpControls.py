@@ -1223,3 +1223,4 @@ class ControlClass(object):
                         cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 0) #translate, rotate
                     cmds.setAttr(ctrlName+".calibrate"+attr+axis, newValue)
             cmds.delete(dupTemp)
+            cmds.select(ctrlName)

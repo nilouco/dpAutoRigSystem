@@ -774,14 +774,16 @@ def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcr
     jointList = []
     if fatherNode and brotherNode:
         if cmds.objExists(fatherNode) and cmds.objExists(brotherNode):
+            jaxName = brotherNode[:brotherNode.rfind("_")]+"_Jax"
             jarName = brotherNode[:brotherNode.rfind("_")]+"_Jar"
             cmds.select(clear=True)
+            jax = cmds.joint(name=jaxName, scaleCompensate=False, radius=0.5*jarRadius)
             jar = cmds.joint(name=jarName, scaleCompensate=False, radius=jarRadius)
             cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
-            cmds.delete(cmds.parentConstraint(brotherNode, jar, maintainOffset=0))
+            cmds.delete(cmds.parentConstraint(brotherNode, jax, maintainOffset=0))
             cmds.setAttr(jar+".segmentScaleCompensate", 0)
-            cmds.parent(jar, fatherNode)
-            cmds.makeIdentity(jar, apply=True)
+            cmds.parent(jax, fatherNode)
+            cmds.makeIdentity(jax, apply=True)
             jointList.append(jar)
             for i in range(0, jcrNumber):
                 cmds.select(jar)
@@ -796,11 +798,11 @@ def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcr
                     cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
                     cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
                 jointList.append(jcr)
-            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PoC")[0]
-            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrC")[0]
+            cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
+            oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
             cmds.setAttr(oc+".interpType", 2) #Shortest
             if doScale:
-                cmds.scaleConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_ScC")
+                cmds.scaleConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_ScC")
             return jointList
 
 
