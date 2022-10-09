@@ -2335,6 +2335,18 @@ class DP_AutoRig_UI(object):
                     for moduleDic in self.integratedTaskDic:
                         moduleType = moduleDic[:moduleDic.find("__")]
                         
+                        # display corrective controls by Option_Ctrl attribute:
+                        try:
+                            correctiveGrpList = self.integratedTaskDic[moduleDic]['correctiveCtrlGrpList']
+                            if correctiveGrpList:
+                                if not cmds.objExists(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']):
+                                    cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['c124_corrective'], min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                                    cmds.setAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective'], channelBox=True)
+                                for correctiveGrp in correctiveGrpList:
+                                    cmds.connectAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveGrp+".visibility", force=True)
+                        except:
+                            pass
+
                         # footGuide parented in the extremGuide of the limbModule:
                         if moduleType == FOOT:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
@@ -2794,7 +2806,7 @@ class DP_AutoRig_UI(object):
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
-                
+
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0

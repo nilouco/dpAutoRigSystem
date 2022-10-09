@@ -53,6 +53,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.bendJointList = []
         self.masterCtrlRefList = []
         self.softIkCalibrateList = []
+        self.correctiveCtrlGrpList = []
 
 
     def createModuleLayout(self, *args):
@@ -1442,7 +1443,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # add main articulationJoint:
                 if self.addArticJoint:
                     if self.addCorrective:
-                        
+                        self.correctiveCtrlsGrp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
+                        self.correctiveCtrlGrpList.append(self.correctiveCtrlsGrp)
+                        cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
 
                         # shoulder / leg
                         firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1])#, 2, [(1,1,1), (3,4,5)])
@@ -1484,7 +1487,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             for i, jcr in enumerate(self.cornerJntList):
                                 if not i == 0: #exclude jar in the index 0
                                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(self.cornerJntList[i], self.cornerCorrectiveNet, radius=self.ctrlRadius*0.3)
-                                    cmds.parent(jcrGrp, self.toCtrlHookGrp)
+                                    cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                                     # preset calibration
                                     for calibrateAttr in cornerCalibratePresetList[i].keys():
                                         cmds.setAttr(jcrCtrl+"."+calibrateAttr, cornerCalibratePresetList[i][calibrateAttr])
@@ -1602,6 +1605,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "limbManualVolume": "limbManualVolume",
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
-                "softIkCalibrateList": self.softIkCalibrateList
+                "softIkCalibrateList": self.softIkCalibrateList,
+                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
             }
         }
