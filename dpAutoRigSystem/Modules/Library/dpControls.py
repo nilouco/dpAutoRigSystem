@@ -1158,13 +1158,23 @@ class ControlClass(object):
         # create an attribute to be used as editMode by module:
         cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=False, defaultValue=False)
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
-        # colorize curveShapes:
-        self.createCorrectiveMode(ctrlName)
 
+
+    def deleteOldCorrectiveJobs(self, ctrlName, *args):
+        """ Try to find an existing script job already running for this corrective controller and kill it.
+        """
+        jobList = cmds.scriptJob(listJobs=True)
+        if jobList:
+            for job in jobList:
+                if ctrlName in job:
+                    jobNumber = int(job[:job.find(":")])
+                    cmds.scriptJob(kill=jobNumber, force=True)
+                    
 
     def createCorrectiveMode(self, ctrlName, *args):
         """ Create a scriptJob to read this attribute change.
         """
+        self.deleteOldCorrectiveJobs(ctrlName)
         cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=True, compressUndo=True)
         if cmds.getAttr(ctrlName+".editMode"):
             self.colorShape([ctrlName], 'bonina', rgb=True)
@@ -1202,6 +1212,9 @@ class ControlClass(object):
         calibrateAttrList = ["T", "R", "S"]
         calibrateAxisList = ["X", "Y", "Z"]
         if cmds.objExists(ctrlName):
+#            print("here MERCI")
+#            dupTemp = cmds.duplicate(ctrlName, name=ctrlName+"_TEMP")
+#            cmds.parent(dupTemp, world=True)
             for attr in calibrateAttrList:
                 for axis in calibrateAxisList:
                     oldValue = cmds.getAttr(ctrlName+".calibrate"+attr+axis)
@@ -1213,3 +1226,4 @@ class ControlClass(object):
                     else:
                         cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 0) #translate, rotate
                     cmds.setAttr(ctrlName+".calibrate"+attr+axis, resultValue)
+#            cmds.delete(dupTemp)
