@@ -2339,11 +2339,11 @@ class DP_AutoRig_UI(object):
                         try:
                             correctiveGrpList = self.integratedTaskDic[moduleDic]['correctiveCtrlGrpList']
                             if correctiveGrpList:
-                                if not cmds.objExists(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']):
-                                    cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['c124_corrective'], min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                    cmds.setAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective'], channelBox=True)
+                                if not cmds.objExists(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls"):
+                                    cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                    cmds.setAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls", channelBox=True)
                                 for correctiveGrp in correctiveGrpList:
-                                    cmds.connectAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveGrp+".visibility", force=True)
+                                    cmds.connectAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls", correctiveGrp+".visibility", force=True)
                         except:
                             pass
 
