@@ -2000,8 +2000,9 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
-            cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool")
-            cmds.setAttr(self.rigScaleMD+".dpRigScale", True)
+            cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool", defaultValue=True)
+            cmds.addAttr(self.optionCtrl, longName="dpRigScaleNode", attributeType="message")
+            cmds.connectAttr(self.rigScaleMD+".message", self.optionCtrl+".dpRigScaleNode", force=True)
             cmds.connectAttr(self.optionCtrl+".rigScale", self.rigScaleMD+".input1X", force=True)
             cmds.connectAttr(self.optionCtrl+".rigScaleMultiplier", self.rigScaleMD+".input2X", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleX", force=True)
