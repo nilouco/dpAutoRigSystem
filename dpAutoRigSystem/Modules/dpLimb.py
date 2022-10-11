@@ -398,6 +398,71 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         return originalRotateList
 
 
+    def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
+        """ Create tne correction manager network node and returns it.
+        """
+        if not cmds.objExists(ctrl+"."+self.langDic[self.langName]['c124_corrective']):
+            cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        # corrective network node
+        correctiveNet = self.correctionManager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
+        cmds.connectAttr(ctrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveNet+".intensity", force=True)
+        cmds.setAttr(correctiveNet+".axis", axis)
+        cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
+        if isLeg:
+            cmds.setAttr(correctiveNet+".axisOrder", legList[2])
+        correctionNetInputValue = cmds.getAttr(correctiveNet+".inputValue")
+        cmds.setAttr(correctiveNet+".inputStart", correctionNetInputValue) #offset default position
+        cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+inputEndValue)
+        if isLeg:
+            cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+legList[0])
+            correctiveNet = self.correctionManager.changeName(legList[1])+"_Net"
+        return correctiveNet
+
+    
+    def getCaibratePresetList(self, s, isLeg, first, main, extrem, *args):
+        """
+        """
+        presetList = None
+        if first: #clavicle/hips
+            if isLeg:
+                
+                if s == 0:
+                    print("merci")
+            #else:
+
+        elif main: #shoulder/leg
+            if isLeg:
+                if s == 0:
+                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
+                else:
+                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":-1.0, "calibrateRY":-30}]
+            else:
+                if s == 0:
+                    presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
+                else:
+                    presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":-1.0, "calibrateRY":-30}]
+#        elif extrem: #wrist/ankle
+
+
+        return presetList
+
+
+
+    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, *args):
+        """ Create corrective joints controllers.
+        """
+        if jcrList:
+            for i, jcr in enumerate(jcrList):
+                if not i == 0: #exclude jar in the index 0
+                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(i))
+                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.3)
+                    cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
+                    # preset calibration
+                    for calibrateAttr in calibratePresetList[i].keys():
+                        cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
+        
+
+
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -1434,7 +1499,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.cornerCorrectiveNet+".axis", 1) #Y
                     cmds.setAttr(self.cornerCorrectiveNet+".axisOrder", 1) #YZX
                     self.cornerCorrectiveNet = self.correctionManager.changeName(side+self.userGuideName+"_"+self.jNameList[2]+"_RY_Neg")+"_Net"
-                    print("self.cornerCorrectiveNet =", self.cornerCorrectiveNet)
                 correctionNetInputValue = cmds.getAttr(self.cornerCorrectiveNet+".inputValue")
                 cmds.setAttr(self.cornerCorrectiveNet+".inputStart", correctionNetInputValue) #offset default position
                 cmds.setAttr(self.cornerCorrectiveNet+".inputEnd", correctionNetInputValue-110)
@@ -1449,60 +1513,50 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.correctiveCtrlGrpList.append(self.correctiveCtrlsGrp)
                         cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
 
+                        isLeg = False
+                        jarYValue = 0.3
+                        if self.limbType == LEG:
+                            isLeg = True
+                            jarYValue = -0.3
+
+                        # Roll, Yaw, Pitch
+                        # Hour/AntiHour, Left/Right, Up/Down
                         # shoulder / leg
-                        self.mainCorrectiveNetList = [None]
-                        if not cmds.objExists(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c124_corrective']):
-                            cmds.addAttr(self.fkCtrlList[0], longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                        # shoulder / leg RX network
-                        mainRXCorrectiveNet = self.correctionManager.createCorrectionManager([self.skinJointList[0], self.skinJointList[1]], name=side+self.userGuideName+"_"+self.jNameList[1]+"_RX_Neg", correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
-                        cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c124_corrective'], mainRXCorrectiveNet+".intensity", force=True)
-                        correctionNetInputValue = cmds.getAttr(mainRXCorrectiveNet+".inputValue")
-                        cmds.setAttr(mainRXCorrectiveNet+".inputStart", correctionNetInputValue) #offset default position
-                        cmds.setAttr(mainRXCorrectiveNet+".inputEnd", correctionNetInputValue-90)
-                        if self.limbTypeName == LEG:
-                            cmds.setAttr(mainRXCorrectiveNet+".inputEnd", correctionNetInputValue+90)
-                            mainRXCorrectiveNet = self.correctionManager.changeName(side+self.userGuideName+"_"+self.jNameList[1]+"_RX_Pos")+"_Net"
-                        self.mainCorrectiveNetList.append(mainRXCorrectiveNet)
-                        # shoulder / leg RY network
-                        mainRYCorrectiveNet = self.correctionManager.createCorrectionManager([self.skinJointList[0], self.skinJointList[1]], name=side+self.userGuideName+"_"+self.jNameList[1]+"_RY_Pos", correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
-                        self.mainCorrectiveNetList.append(mainRYCorrectiveNet)
-                        cmds.connectAttr(self.fkCtrlList[0]+"."+self.langDic[self.langName]['c124_corrective'], mainRYCorrectiveNet+".intensity", force=True)
-                        cmds.setAttr(mainRYCorrectiveNet+".axis", 1) #Y
-                        cmds.setAttr(mainRYCorrectiveNet+".axisOrder", 1) #YZX
-                        if self.limbTypeName == LEG:
-                            cmds.setAttr(mainRYCorrectiveNet+".axisOrder", 4) #YXZ
-                        correctionNetInputValue = cmds.getAttr(mainRYCorrectiveNet+".inputValue")
-                        cmds.setAttr(mainRYCorrectiveNet+".inputStart", correctionNetInputValue) #offset default position
-                        cmds.setAttr(mainRYCorrectiveNet+".inputEnd", correctionNetInputValue+45)
-                        if self.limbTypeName == LEG:
-                            cmds.setAttr(mainRYCorrectiveNet+".inputEnd", correctionNetInputValue+90)
-                        # shoulder / leg articulation and corrective joints
-                        if self.limbType == ARM:
-                            if s == 0:
-                                mainCalibratePresetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
-                            else:
-                                mainCalibratePresetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":-1.0, "calibrateRY":-30}]
-                        else: #leg
-                            if s == 0:
-                                mainCalibratePresetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
-                            else: #leg
-                                mainCalibratePresetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":-1.0, "calibrateRY":-30}]
-                        if self.limbTypeName == ARM:
-                            firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(0, 0.3*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
-                        else:
-                            firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(0, -0.3*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
-                        if firstJntList:
-                            for i, jcr in enumerate(firstJntList):
-                                if not i == 0: #exclude jar in the index 0
-                                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName+"_"+str(i))
-                                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(firstJntList[i], self.mainCorrectiveNetList[i], radius=self.ctrlRadius*0.3)
-                                    cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
-                                    # preset calibration
-                                    for calibrateAttr in mainCalibratePresetList[i].keys():
-                                        cmds.setAttr(jcrCtrl+"."+calibrateAttr, mainCalibratePresetList[i][calibrateAttr])
+                        mainCorrectiveNetList = [None]
+                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.skinJointList[0], self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_Pitch_Up", 0, 0, -90, isLeg, [90, side+self.userGuideName+"_"+self.jNameList[1]+"_Pitch_Down", 0]))
+                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.skinJointList[0], self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_Yaw_Right", 1, 1, 45, isLeg, [90, side+self.userGuideName+"_"+self.jNameList[1]+"_Pitch_Down", 4]))
+                        mainCalibratePresetList = self.getCaibratePresetList(s, isLeg, False, True, False)
+                        firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(0, jarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
+                        self.setupJcrControls(firstJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList)
                         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                         # wrist / ankle
-                        
+
+                   
+
+
+
+
+
+
+
+
+
 
 
 
