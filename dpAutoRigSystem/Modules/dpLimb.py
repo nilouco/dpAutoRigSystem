@@ -403,7 +403,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         presetList = None
         if first: #clavicle/hips
-            presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":1.0, "calibrateRX":-30}]
+            presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":1.0, "calibrateRY":-30}]
         elif main: #shoulder/leg
             if isLeg:
                 if s == 0:
@@ -1488,7 +1488,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         
                         # clavicle / hips
                         beforeCorrectiveNetList = [None]
-                        beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 30, isLeg, [-30, side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1]))
+                        beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [-60, side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1]))
                         beforeCalibratePresetList = self.getCalibratePresetList(s, isLeg, True, False, False, False)
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
                         self.setupJcrControls(beforeJntList, s, jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList)
@@ -1571,8 +1571,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
                     if s == 1:
-                        cmds.setAttr(mainJntList[0]+".rotateX", 180)
-                        cmds.setAttr(mainJntList[0]+".scaleX", -1)
+                        for jar in [beforeJntList[0], mainJntList[0]]:
+                            cmds.setAttr(jar+".rotateX", 180)
+                            cmds.setAttr(jar+".scaleX", -1)
+                    dpUtils.setJointLabel(beforeJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+beforeName)
                     dpUtils.setJointLabel(mainJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     cmds.rename(mainJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
                     

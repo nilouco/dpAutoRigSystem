@@ -239,6 +239,12 @@ class StartClass(object):
 
     def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
         """ Create the correction manager network node and returns it.
+            legList = [
+                        0 = inputValue,
+                        1 = rename,
+                        2 = axis,
+                        3 = axisOrder
+                    ]
         """
         if not cmds.objExists(ctrl+"."+self.langDic[self.langName]['c124_corrective']):
             cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
