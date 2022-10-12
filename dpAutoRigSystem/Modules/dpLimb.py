@@ -403,7 +403,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         presetList = None
         if first: #clavicle/hips
-            presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":1.0, "calibrateRY":-30}]
+            if s ==  0:
+                presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
+            else:
+                presetList = [{}, {"calibrateTX":-1.0, "calibrateTZ":0.5, "calibrateRY":30}]
         elif main: #shoulder/leg
             if isLeg:
                 if s == 0:
@@ -1488,7 +1491,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         
                         # clavicle / hips
                         beforeCorrectiveNetList = [None]
-                        beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [-60, side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1]))
+                        beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [60, side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1]))
                         beforeCalibratePresetList = self.getCalibratePresetList(s, isLeg, True, False, False, False)
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
                         self.setupJcrControls(beforeJntList, s, jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList)

@@ -777,17 +777,19 @@ def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcr
             jaxName = brotherNode[:brotherNode.rfind("_")]+"_Jax"
             jarName = brotherNode[:brotherNode.rfind("_")]+"_Jar"
             cmds.select(clear=True)
-            jax = cmds.joint(name=jaxName, scaleCompensate=False, radius=0.5*jarRadius)
-            jar = cmds.joint(name=jarName, scaleCompensate=False, radius=jarRadius)
+            jax = cmds.joint(name=jaxName, radius=0.5*jarRadius)
+            jar = cmds.joint(name=jarName, radius=jarRadius)
             cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
             cmds.delete(cmds.parentConstraint(brotherNode, jax, maintainOffset=0))
-            cmds.setAttr(jar+".segmentScaleCompensate", 0)
             cmds.parent(jax, fatherNode)
             cmds.makeIdentity(jax, apply=True)
+            cmds.setAttr(jax+".segmentScaleCompensate", 0)
+            cmds.setAttr(jar+".segmentScaleCompensate", 0)
             jointList.append(jar)
             for i in range(0, jcrNumber):
                 cmds.select(jar)
                 jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
+                cmds.setAttr(jcr+".segmentScaleCompensate", 0)
                 cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
                 if jcrPosList:
                     cmds.setAttr(jcr+".translateX", jcrPosList[i][0]*dist)

@@ -167,6 +167,7 @@ class DP_AutoRig_UI(object):
         self.dpLog = DPLOG
         self.studioName = None
         self.studioPath = None
+        self.optionCtrl = None
         
         
         try:
@@ -780,7 +781,7 @@ class DP_AutoRig_UI(object):
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
             self.jobReloadUI()
-            
+    
     
     def setupDuplicatedGuide(self, selectedItem, *args):
         """ This method will create a new module instance for a duplicated guide found.
@@ -1868,7 +1869,7 @@ class DP_AutoRig_UI(object):
         Generic function to create base controller
         TODO maybe move it to utils?
     '''
-    def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree = 1, iSection = 8):
+    def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree=1):
         nCtrl = sCtrlName
         self.ctrlCreated = False
         if not cmds.objExists(self.masterGrp+"."+sAttrName):
@@ -1991,7 +1992,7 @@ class DP_AutoRig_UI(object):
         #Control Setup
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
-        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13), iSection=4)
+        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
@@ -2002,13 +2003,16 @@ class DP_AutoRig_UI(object):
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
             cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool", defaultValue=True)
             cmds.addAttr(self.optionCtrl, longName="dpRigScaleNode", attributeType="message")
+            cmds.addAttr(self.optionCtrl, longName="rigScaleOutput", attributeType="float", defaultValue=1)
             cmds.connectAttr(self.rigScaleMD+".message", self.optionCtrl+".dpRigScaleNode", force=True)
             cmds.connectAttr(self.optionCtrl+".rigScale", self.rigScaleMD+".input1X", force=True)
             cmds.connectAttr(self.optionCtrl+".rigScaleMultiplier", self.rigScaleMD+".input2X", force=True)
+            cmds.connectAttr(self.rigScaleMD+".outputX", self.optionCtrl+".rigScaleOutput", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleX", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleY", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleZ", force=True)
             self.ctrls.setLockHide([self.masterCtrl], ['sx', 'sy', 'sz'])
+            self.ctrls.setLockHide([self.optionCtrl], ['rigScaleOutput'])
             self.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
             self.ctrls.setCalibrationAttr(self.optionCtrl, ['rigScaleMultiplier'])
             cmds.parent(self.rootCtrl, self.masterCtrl)
@@ -2899,7 +2903,7 @@ class DP_AutoRig_UI(object):
                 leftAttr+legAttr, rightAttr+legAttr, leftAttr+legAttr+frontAttr, rightAttr+legAttr+frontAttr, leftAttr+legAttr+backAttr, rightAttr+legAttr+backAttr,
                 armAttr+'1', legAttr+'1', leftAttr+armAttr+'1', rightAttr+armAttr+'1', leftAttr+legAttr+'1', rightAttr+legAttr+'1',
                 leftAttr+legAttr+frontAttr+'1', rightAttr+legAttr+frontAttr+'1', leftAttr+legAttr+backAttr+'1', rightAttr+legAttr+backAttr+'1',
-                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr]
+                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
