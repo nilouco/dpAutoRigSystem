@@ -13,7 +13,7 @@ TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
 
-DPCORRECTIONMANAGER_VERSION = 2.3
+DPCORRECTIONMANAGER_VERSION = 2.4
 
 ANGLE = "Angle"
 DISTANCE = "Distance"
@@ -345,7 +345,7 @@ class CorrectionManager(object):
                     origNode = nodeList[0]
                     actionNode = nodeList[1]
                     cmds.undoInfo(openChunk=True)
-
+                    
                     # main group
                     if not cmds.objExists(self.correctionManagerDataGrp):
                         self.correctionManagerDataGrp = cmds.group(empty=True, name=self.correctionManagerDataGrp)

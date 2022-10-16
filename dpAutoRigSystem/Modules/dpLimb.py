@@ -399,7 +399,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
     
     def getCalibratePresetList(self, s, isLeg, first, main, corner, extrem, *args):
-        """
+        """ TODO write Description here
         """
         presetList = None
         if first: #clavicle/hips
@@ -1245,7 +1245,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                         # correct joint skin naming:
                         for jntIndex in range(1, len(self.skinJointList) - 2):
-                            self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
+                            if not "B_" in self.skinJointList[jntIndex]: #avoid quadruped kneeB renaming
+                                self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                         
                         # implementing auto rotate twist bones:
                         # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
