@@ -1136,16 +1136,24 @@ class ControlClass(object):
         for attr in calibrateAttrList:
             for axis in calibrateAxisList:
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
+                intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
                 cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
                 cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
+                cmds.connectAttr(jcrCtrl+".intensity", intensityMD+".input1X", force=True)
+                cmds.connectAttr(remapV+".outValue", intensityMD+".input2X", force=True)
                 # add calibrate attributes:
-                defValue = 0
                 if attr == "S":
-                    defValue = 1
+                    scaleClp = cmds.createNode("clamp", name=jcrName.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
+                    cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
                     cmds.setAttr(remapV+".outputMin", 1)
-                cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=defValue)
-                cmds.connectAttr(remapV+".outValue", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
+                    cmds.setAttr(scaleClp+".minR", 1)
+                    cmds.setAttr(scaleClp+".maxR", 1000)
+                    cmds.connectAttr(intensityMD+".outputX", scaleClp+".inputR", force=True)
+                    cmds.connectAttr(scaleClp+".outputR", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
+                else:
+                    cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
+                    cmds.connectAttr(intensityMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
         self.setCalibrationAttr(jcrCtrl, toCalibrationList)
@@ -1155,6 +1163,7 @@ class ControlClass(object):
     def addCorrectiveAttrs(self, ctrlName, *args):
         """ Add and set attributes to this control curve be used as a corrective controller.
         """
+        cmds.addAttr(ctrlName, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # create an attribute to be used as editMode by module:
         cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=False, defaultValue=False)
         cmds.setAttr(ctrlName+".editMode", channelBox=True)

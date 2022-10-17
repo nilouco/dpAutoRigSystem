@@ -240,28 +240,32 @@ class StartClass(object):
     def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
         """ Create the correction manager network node and returns it.
             legList = [
-                        0 = inputValue,
-                        1 = rename,
-                        2 = axis,
-                        3 = axisOrder
+                        0 = rename,
+                        1 = axis,
+                        2 = axisOrder
+                        3 = inputValue,
                     ]
         """
         if not cmds.objExists(ctrl+"."+self.langDic[self.langName]['c124_corrective']):
             cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # corrective network node
         correctiveNet = self.correctionManager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
-        cmds.connectAttr(ctrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveNet+".intensity", force=True)
+        cmds.connectAttr(ctrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveNet+".corrective", force=True)
         cmds.setAttr(correctiveNet+".axis", axis)
         cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
         if isLeg:
-            cmds.setAttr(correctiveNet+".axis", legList[2])
-            cmds.setAttr(correctiveNet+".axisOrder", legList[3])
+            cmds.setAttr(correctiveNet+".axis", legList[1])
+            cmds.setAttr(correctiveNet+".axisOrder", legList[2])
         correctionNetInputValue = cmds.getAttr(correctiveNet+".inputValue")
+        if correctionNetInputValue+inputEndValue == 0:
+            inputEndValue += 1
         cmds.setAttr(correctiveNet+".inputStart", correctionNetInputValue) #offset default position
         cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+inputEndValue)
         if isLeg:
-            cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+legList[0])
-            correctiveNet = self.correctionManager.changeName(legList[1])+"_Net"
+            if correctionNetInputValue+legList[3] == 0:
+                legList[3] += 1
+            cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+legList[3])
+            correctiveNet = self.correctionManager.changeName(legList[0])+"_Net"
         return correctiveNet
 
 
