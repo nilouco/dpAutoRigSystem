@@ -469,7 +469,9 @@ class LayoutClass(object):
     def changeArticulation(self, *args):
         """ Set the attribute value for articulation.
         """
-        cmds.setAttr(self.moduleGrp+".articulation", cmds.checkBox(self.articCB, query=True, value=True))
+        articulationValue = cmds.checkBox(self.articCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".articulation", articulationValue)
+        cmds.checkBox(self.correctiveCB, edit=True, enable=articulationValue)
 
 
     def changeCorrective(self, *args):

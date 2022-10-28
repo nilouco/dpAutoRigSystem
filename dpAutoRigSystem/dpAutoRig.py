@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.08"
-DPAR_UPDATELOG = "N522 Add PinSide control curve."
+DPAR_VERSION_PY3 = "4.01.09"
+DPAR_UPDATELOG = "N167 - Corrective joints for Limbs."
 
 
 
@@ -167,6 +167,7 @@ class DP_AutoRig_UI(object):
         self.dpLog = DPLOG
         self.studioName = None
         self.studioPath = None
+        self.optionCtrl = None
         
         
         try:
@@ -276,8 +277,9 @@ class DP_AutoRig_UI(object):
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
-
+        
         #print self.pDockCtrl
+        self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
         
 
@@ -475,11 +477,12 @@ class DP_AutoRig_UI(object):
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.langDic[self.langName]['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
         dpARJoints  = cmds.radioButton( label=self.langDic[self.langName]['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
-        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0), (3, 'left', 0), (4, 'left', 0)], parent=self.allUIs["colSkinLeftA"])
-        self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="_Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
-        self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="_Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
-        self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="_Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
-        self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="_Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
+        self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JcrCB"] = cmds.checkBox('_JcrCB', label="Jcr", annotation="Skinned Corrective Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
+        self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
@@ -491,6 +494,7 @@ class DP_AutoRig_UI(object):
         allGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
         selGeoms   = cmds.radioButton( label=self.langDic[self.langName]['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.langDic[self.langName]['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
+        cmds.separator(style="none", height=19, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
@@ -777,7 +781,7 @@ class DP_AutoRig_UI(object):
             self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.langDic[self.langName]['i134_rememberPublish']+'\n\n'+self.langDic[self.langName]['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
             self.jobReloadUI()
-            
+    
     
     def setupDuplicatedGuide(self, selectedItem, *args):
         """ This method will create a new module instance for a duplicated guide found.
@@ -904,31 +908,37 @@ class DP_AutoRig_UI(object):
         if chooseJnt == "allJoints":
             jointList = allJointList
             cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=False)
-            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=False)
             cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=False)
             cmds.checkBox(self.allUIs["_JadCB"], edit=True, enable=False)
+            cmds.checkBox(self.allUIs["_JcrCB"], edit=True, enable=False)
+            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=False)
         elif chooseJnt == "dpARJoints":
             cmds.checkBox(self.allUIs["_JntCB"], edit=True, enable=True)
-            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=True)
             cmds.checkBox(self.allUIs["_JarCB"], edit=True, enable=True)
             cmds.checkBox(self.allUIs["_JadCB"], edit=True, enable=True)
+            cmds.checkBox(self.allUIs["_JcrCB"], edit=True, enable=True)
+            cmds.checkBox(self.allUIs["_JisCB"], edit=True, enable=True)
             displayJnt = cmds.checkBox(self.allUIs["_JntCB"], query=True, value=True)
-            displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
             displayJar = cmds.checkBox(self.allUIs["_JarCB"], query=True, value=True)
             displayJad = cmds.checkBox(self.allUIs["_JadCB"], query=True, value=True)
+            displayJcr = cmds.checkBox(self.allUIs["_JcrCB"], query=True, value=True)
+            displayJis = cmds.checkBox(self.allUIs["_JisCB"], query=True, value=True)
             for jointNode in allJointList:
                 if cmds.objExists(jointNode+'.'+BASE_NAME+'joint'):
                     if displayJnt:
                         if jointNode.endswith("_Jnt"):
-                            jointList.append(jointNode)
-                    if displayJis:
-                        if jointNode.endswith("_Jis"):
                             jointList.append(jointNode)
                     if displayJar:
                         if jointNode.endswith("_Jar"):
                             jointList.append(jointNode)
                     if displayJad:
                         if jointNode.endswith("_Jad"):
+                            jointList.append(jointNode)
+                    if displayJcr:
+                        if jointNode.endswith("_Jcr"):
+                            jointList.append(jointNode)
+                    if displayJis:
+                        if jointNode.endswith("_Jis"):
                             jointList.append(jointNode)
         
         # sort joints by name filter:
@@ -1859,7 +1869,7 @@ class DP_AutoRig_UI(object):
         Generic function to create base controller
         TODO maybe move it to utils?
     '''
-    def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree = 1, iSection = 8):
+    def getBaseCtrl(self, sCtrlType, sAttrName, sCtrlName, fRadius, iDegree=1):
         nCtrl = sCtrlName
         self.ctrlCreated = False
         if not cmds.objExists(self.masterGrp+"."+sAttrName):
@@ -1982,7 +1992,7 @@ class DP_AutoRig_UI(object):
         #Control Setup
         fMasterRadius = self.ctrls.dpCheckLinearUnit(10)
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
-        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13), iSection=4)
+        self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
@@ -1991,14 +2001,18 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
-            cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool")
-            cmds.setAttr(self.rigScaleMD+".dpRigScale", True)
+            cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool", defaultValue=True)
+            cmds.addAttr(self.optionCtrl, longName="dpRigScaleNode", attributeType="message")
+            cmds.addAttr(self.optionCtrl, longName="rigScaleOutput", attributeType="float", defaultValue=1)
+            cmds.connectAttr(self.rigScaleMD+".message", self.optionCtrl+".dpRigScaleNode", force=True)
             cmds.connectAttr(self.optionCtrl+".rigScale", self.rigScaleMD+".input1X", force=True)
             cmds.connectAttr(self.optionCtrl+".rigScaleMultiplier", self.rigScaleMD+".input2X", force=True)
+            cmds.connectAttr(self.rigScaleMD+".outputX", self.optionCtrl+".rigScaleOutput", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleX", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleY", force=True)
             cmds.connectAttr(self.rigScaleMD+".outputX", self.masterCtrl+".scaleZ", force=True)
             self.ctrls.setLockHide([self.masterCtrl], ['sx', 'sy', 'sz'])
+            self.ctrls.setLockHide([self.optionCtrl], ['rigScaleOutput'])
             self.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
             self.ctrls.setCalibrationAttr(self.optionCtrl, ['rigScaleMultiplier'])
             cmds.parent(self.rootCtrl, self.masterCtrl)
@@ -2326,6 +2340,18 @@ class DP_AutoRig_UI(object):
                     for moduleDic in self.integratedTaskDic:
                         moduleType = moduleDic[:moduleDic.find("__")]
                         
+                        # display corrective controls by Option_Ctrl attribute:
+                        try:
+                            correctiveGrpList = self.integratedTaskDic[moduleDic]['correctiveCtrlGrpList']
+                            if correctiveGrpList:
+                                if not cmds.objExists(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls"):
+                                    cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                                    cmds.setAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls", channelBox=True)
+                                for correctiveGrp in correctiveGrpList:
+                                    cmds.connectAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls", correctiveGrp+".visibility", force=True)
+                        except:
+                            pass
+
                         # footGuide parented in the extremGuide of the limbModule:
                         if moduleType == FOOT:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
@@ -2785,7 +2811,7 @@ class DP_AutoRig_UI(object):
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
-                
+
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:
                     typeCounter = 0
@@ -2877,7 +2903,7 @@ class DP_AutoRig_UI(object):
                 leftAttr+legAttr, rightAttr+legAttr, leftAttr+legAttr+frontAttr, rightAttr+legAttr+frontAttr, leftAttr+legAttr+backAttr, rightAttr+legAttr+backAttr,
                 armAttr+'1', legAttr+'1', leftAttr+armAttr+'1', rightAttr+armAttr+'1', leftAttr+legAttr+'1', rightAttr+legAttr+'1',
                 leftAttr+legAttr+frontAttr+'1', rightAttr+legAttr+frontAttr+'1', leftAttr+legAttr+backAttr+'1', rightAttr+legAttr+backAttr+'1',
-                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr]
+                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 

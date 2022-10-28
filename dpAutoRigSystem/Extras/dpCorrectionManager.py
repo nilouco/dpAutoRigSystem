@@ -13,7 +13,7 @@ TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
 
-DPCORRECTIONMANAGER_VERSION = 2.3
+DPCORRECTIONMANAGER_VERSION = 2.4
 
 ANGLE = "Angle"
 DISTANCE = "Distance"
@@ -345,7 +345,7 @@ class CorrectionManager(object):
                     origNode = nodeList[0]
                     actionNode = nodeList[1]
                     cmds.undoInfo(openChunk=True)
-
+                    
                     # main group
                     if not cmds.objExists(self.correctionManagerDataGrp):
                         self.correctionManagerDataGrp = cmds.group(empty=True, name=self.correctionManagerDataGrp)
@@ -392,12 +392,16 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     # add serialization attributes
-                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR"]
+                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR", "scaleMD"]
                     if correctType == self.distanceName:
-                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "intensityMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd"]
+                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "scaleMD"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
-                    cmds.addAttr(self.net, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
+                    cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
+                    optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
+                    if optionCtrl:
+                        cmds.connectAttr(optionCtrl+".rigScaleOutput", self.net+".inputRigScale", force=True)
+                    cmds.addAttr(self.net, longName="corrective", attributeType="float", minValue=0, defaultValue=1, maxValue=1)
                     cmds.addAttr(self.net, longName="outputValue", attributeType="float")
                     cmds.setAttr(self.net+".dpNetwork", 1)
                     cmds.setAttr(self.net+".dpCorrectionManager", 1)
@@ -411,11 +415,15 @@ class CorrectionManager(object):
                     actionLoc = self.createCorrectiveLocator(correctionName+"_Action", actionNode, toRivet)
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
-                    
-                    # create intensity node:
-                    intensityMD = cmds.createNode("multiplyDivide", name=correctionName+"_Instensity_MD")
-                    cmds.connectAttr(intensityMD+".message", self.net+".intensityMD", force=True)
-                    cmds.connectAttr(self.net+".intensity", intensityMD+".input2X", force=True)
+
+                    # create corrective and rigScale nodes:
+                    correctiveMD = cmds.createNode("multiplyDivide", name=correctionName+"_Corrective_MD")
+                    cmds.connectAttr(correctiveMD+".message", self.net+".correctiveMD", force=True)
+                    cmds.connectAttr(self.net+".corrective", correctiveMD+".input2X", force=True)
+                    scaleMD = cmds.createNode("multiplyDivide", name=correctionName+"_RigScale_MD")
+                    cmds.connectAttr(scaleMD+".message", self.net+".scaleMD", force=True)
+                    cmds.connectAttr(self.net+".inputRigScale", scaleMD+".input2X", force=True)
+                    cmds.connectAttr(self.net+".inputRigScale", scaleMD+".input2Y", force=True)
                     
                     # if rotate extration option:
                     if correctType == self.angleName:                        
@@ -471,9 +479,9 @@ class CorrectionManager(object):
                         cmds.connectAttr(smallerThanOneCnd+".outColorR", overZeroCnd+".colorIfTrueR", force=True)
                         cmds.connectAttr(self.net+".axisOrder", extractAngleDM+".inputRotateOrder", force=True)
                         cmds.connectAttr(self.net+".axisOrder", extractAngleQtE+".inputRotateOrder", force=True)
-                        # intensity setup:
-                        cmds.connectAttr(overZeroCnd+".outColorR", intensityMD+".input1X", force=True)
-                        cmds.connectAttr(intensityMD+".outputX", outputSR+".valueX", force=True)
+                        # corrective setup:
+                        cmds.connectAttr(overZeroCnd+".outColorR", correctiveMD+".input1X", force=True)
+                        cmds.connectAttr(correctiveMD+".outputX", outputSR+".valueX", force=True)
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
                         cmds.connectAttr(outputSR+".outValueX", self.net+".outputValue", force=True)
                         cmds.setAttr(self.net+".outputValue", lock=True)
@@ -504,16 +512,18 @@ class CorrectionManager(object):
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionY", distBet+".point2Y")
                         cmds.connectAttr(actionLoc+".worldPosition.worldPositionZ", distBet+".point2Z")
                         # setup distance input and output connections
-                        cmds.connectAttr(outputRmV+".outValue", intensityMD+".input1X", force=True)
-                        cmds.connectAttr(self.net+".inputStart", outputRmV+".inputMin", force=True)
-                        cmds.connectAttr(self.net+".inputEnd", outputRmV+".inputMax", force=True)
+                        cmds.connectAttr(outputRmV+".outValue", correctiveMD+".input1X", force=True)
+                        cmds.connectAttr(self.net+".inputStart", scaleMD+".input1X", force=True)
+                        cmds.connectAttr(scaleMD+".outputX", outputRmV+".inputMin", force=True)
+                        cmds.connectAttr(self.net+".inputEnd", scaleMD+".input1Y", force=True)
+                        cmds.connectAttr(scaleMD+".outputY", outputRmV+".inputMax", force=True)
                         cmds.connectAttr(self.net+".outputStart", outputRmV+".outputMin", force=True)
                         cmds.connectAttr(self.net+".outputEnd", outputRmV+".outputMax", force=True)
                         # set default distance input values
                         cmds.setAttr(self.net+".inputStart", 10)
                         cmds.setAttr(self.net+".inputEnd", 0)
                         # TODO create a way to avoid manual connection here, maybe using the UI new tab?
-                        cmds.connectAttr(intensityMD+".outputX", self.net+".outputValue", force=True)
+                        cmds.connectAttr(correctiveMD+".outputX", self.net+".outputValue", force=True)
                         cmds.setAttr(self.net+".outputValue", lock=True)
                         # extract axis by decomposing distance vector:
                         cmds.setAttr(distanceAxisExtractPMA+".operation", 2) #Substract

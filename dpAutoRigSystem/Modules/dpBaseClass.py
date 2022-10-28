@@ -236,6 +236,52 @@ class StartClass(object):
                 # set userGuideName:
                 self.userGuideName = self.customName
     
+
+    def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
+        """ Create the correction manager network node and returns it.
+            legList = [
+                        0 = rename,
+                        1 = axis,
+                        2 = axisOrder
+                        3 = inputValue,
+                    ]
+        """
+        if not cmds.objExists(ctrl+"."+self.langDic[self.langName]['c124_corrective']):
+            cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        # corrective network node
+        correctiveNet = self.correctionManager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
+        cmds.connectAttr(ctrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveNet+".corrective", force=True)
+        cmds.setAttr(correctiveNet+".axis", axis)
+        cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
+        if isLeg:
+            cmds.setAttr(correctiveNet+".axis", legList[1])
+            cmds.setAttr(correctiveNet+".axisOrder", legList[2])
+        correctionNetInputValue = cmds.getAttr(correctiveNet+".inputValue")
+        if correctionNetInputValue+inputEndValue == 0:
+            inputEndValue += 1
+        cmds.setAttr(correctiveNet+".inputStart", correctionNetInputValue) #offset default position
+        cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+inputEndValue)
+        if isLeg:
+            if correctionNetInputValue+legList[3] == 0:
+                legList[3] += 1
+            cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+legList[3])
+            correctiveNet = self.correctionManager.changeName(legList[0])+"_Net"
+        return correctiveNet
+
+
+    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, *args):
+        """ Create corrective joints controllers.
+        """
+        if jcrList:
+            for i, jcr in enumerate(jcrList):
+                if not i == 0: #exclude jar in the index 0
+                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(i))
+                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.3)
+                    cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
+                    # preset calibration
+                    for calibrateAttr in calibratePresetList[i].keys():
+                        cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
+
     
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.

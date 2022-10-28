@@ -53,6 +53,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.bendJointList = []
         self.masterCtrlRefList = []
         self.softIkCalibrateList = []
+        self.correctiveCtrlGrpList = []
 
 
     def createModuleLayout(self, *args):
@@ -95,7 +96,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="softIk", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".softIk", 1)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".corrective", 1)
+        cmds.setAttr(self.moduleGrp+".corrective", 0)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName + "_Before", r=0.3, d=1, guide=True)
@@ -395,6 +396,59 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         originalRotateList = cmds.xform(tempDup, query=True, rotation=True, worldSpace=True)
         cmds.delete(tempDup)
         return originalRotateList
+
+    
+    def getCalibratePresetList(self, s, isLeg, first, main, corner, kneeB, extrem, *args):
+        """ Returns the calibration preset list for the asked limb joint.
+        """
+        presetList = None
+        if first: #clavicle/hips
+            if s ==  0:
+                presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
+            else:
+                presetList = [{}, {"calibrateTX":-1.0, "calibrateTZ":0.5, "calibrateRY":30}]
+        elif main: #shoulder/leg
+            if isLeg:
+                if s == 0:
+                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
+                else:
+                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":-1.0, "calibrateRY":-30}]
+            else:
+                if s == 0:
+                    presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
+                else:
+                    presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":-1.0, "calibrateRY":-30}]
+        elif corner: #elbow/knee
+            if s == 0:
+                if isLeg:
+                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+                else:
+                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            else:
+                if isLeg:
+                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+                else:
+                    if self.getHasBend():
+                        presetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":0.6, "calibrateRY":-45}, {"calibrateTX":0.4, "calibrateTZ":-0.8, "calibrateRY":-65}, {"calibrateTX":-0.3, "calibrateTZ":-0.8, "calibrateRY":65}]
+                    else:
+                        presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+        elif kneeB: #kneeB
+            if s == 0:
+                if self.langDic[self.langName]['c057_back'] in self.userGuideName:
+                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":0.4, "calibrateTZ":0.8, "calibrateRY":65}, {"calibrateTX":-0.3, "calibrateTZ":0.8, "calibrateRY":-65}]
+                else:
+                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            else:
+                if self.langDic[self.langName]['c057_back'] in self.userGuideName:
+                    presetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+                else:
+                    presetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":0.4, "calibrateTZ":0.8, "calibrateRY":65}, {"calibrateTX":-0.3, "calibrateTZ":0.8, "calibrateRY":-65}]
+        elif extrem: #wrist/ankle
+            if s == 0:
+                presetList = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
+            else:
+                presetList = [{}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
+        return presetList
 
 
     def rigModule(self, *args):
@@ -1136,7 +1190,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side + self.userGuideName + "_Control_Grp")
                 else:
                     self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side + self.userGuideName + "_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], name=side + self.userGuideName + "_Joint_Grp")
+                self.toScalableHookGrp = cmds.group(name=side + self.userGuideName + "_Joint_Grp", empty=True)
+                cmds.delete(cmds.parentConstraint(self.skinJointList[0], self.toScalableHookGrp, maintainOffset=False))
+                cmds.parent(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], self.toScalableHookGrp)
                 self.aScalableGrps.append(self.toScalableHookGrp)
                 cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp + "_PaC")
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, ikHandleGrp, ikHandleNotStretchGrp, ikHandleACGrp, name=side + self.userGuideName + "_Grp")
@@ -1183,9 +1239,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                         if self.limbTypeName == ARM:
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional)
+                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         else:
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional)
+                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
                         
                         cmds.parent(self.bendGrps['ctrlsGrp'], self.toCtrlHookGrp)
@@ -1206,7 +1262,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                         # correct joint skin naming:
                         for jntIndex in range(1, len(self.skinJointList) - 2):
-                            self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
+                            if not "B_" in self.skinJointList[jntIndex]: #avoid quadruped kneeB renaming
+                                self.skinJointList[jntIndex] = self.skinJointList[jntIndex].replace("_Jnt", "_Jxt")
                         
                         # implementing auto rotate twist bones:
                         # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
@@ -1396,48 +1453,168 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.skinJointList[0] = cmds.rename(self.skinJointList[0], side+self.userGuideName+"_"+beforeNumber+"_"+beforeName+self.jSufixList[0])
                     self.skinJointList[-2] = cmds.rename(self.skinJointList[-2], side+self.userGuideName+"_"+extremNumber+"_"+extremName+self.jSufixList[0])
                     if self.addArticJoint:
+                        self.cornerJntList = []
                         if self.bendGrps:
                             self.bendJointList = cmds.listRelatives(self.bendGrps['jntGrp'])
                             dpUtils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
-                            cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                            jar = cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
+                            self.cornerJntList.append(jar)
+                            if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                                if self.langDic[self.langName]['c056_front'] in self.userGuideName:
+                                        if s == 0:
+                                            cmds.setAttr(self.cornerJntList[0]+".rotateX", 0)
+                                        else:
+                                            cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
+                            if self.addCorrective:
+                                jcrList = cmds.listRelatives(self.cornerJntList[0], children=True, allDescendents=True)
+                                if jcrList:
+                                    for j, jcr in enumerate(jcrList):
+                                        dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_"+str(j))
+                                        renamedJcr = cmds.rename(jcr, side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_"+str(j)+"_Jcr")
+                                        self.cornerJntList.append(renamedJcr)
                             if toCornerBendList:
                                 dpUtils.originedFrom(objName=self.bendGrps['ctrlList'][2], attrString=";".join(toCornerBendList))
                                 cmds.delete(side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
                                 cmds.parentConstraint(self.bendGrps['ctrlList'][2], side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp", maintainOffset=True, name=side+self.userGuideName+"_"+cornerName+"_OrigFrom_Grp_PaC")
-                
+                else:
+                    if self.addCorrective:
+                        self.cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2], 3, [(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                    else:
+                        self.cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2])
+                    # fixing jar rotations
+                    if s == 0:
+                        if self.limbType == ARM:
+                            cmds.setAttr(self.cornerJntList[0]+".rotateY", -90)
+                            cmds.setAttr(self.cornerJntList[0]+".rotateZ", -90)
+                        else:
+                            cmds.setAttr(self.cornerJntList[0]+".rotateY", 90)
+                            if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                                if self.langDic[self.langName]['c056_front'] in self.userGuideName:
+                                    cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
+                                else:
+                                    cmds.setAttr(self.cornerJntList[0]+".rotateX", 0)
+                                cmds.setAttr(self.cornerJntList[0]+".rotateZ", 180)
+                            else:
+                                cmds.setAttr(self.cornerJntList[0]+".rotateX", -90)
+                                cmds.setAttr(self.cornerJntList[0]+".rotateZ", 90)
+                    else:
+                        if self.limbType == ARM:
+                            cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
+                            cmds.setAttr(self.cornerJntList[0]+".rotateY", 90)
+                            cmds.setAttr(self.cornerJntList[0]+".rotateZ", 90)
+                        else:
+                            cmds.setAttr(self.cornerJntList[0]+".rotateY", -90)
+                            if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                                cmds.setAttr(self.cornerJntList[0]+".rotateZ", 180)
+                                if self.langDic[self.langName]['c056_front'] in self.userGuideName:
+                                    cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
+                            else:
+                                cmds.setAttr(self.cornerJntList[0]+".rotateX", 90)
+                                cmds.setAttr(self.cornerJntList[0]+".rotateZ", 90)
+
+                # corrective variables:
+                isLeg = False
+                mainJarYValue = 0.3
+                mainAxisOrder = 0
+                if self.limbType == LEG:
+                    isLeg = True
+                    mainJarYValue = -0.3
+                    mainAxisOrder = 3
+                # Roll, Yaw, Pitch
+                # Hour/AntiHour, Left/Right, Up/Down
+
                 # corner corrective network:
-                if self.addCorrective:
-                    self.correctiveCtrl = self.toParentExtremCtrl
-                    if self.getHasBend():
-                        self.correctiveCtrl = self.bendGrps['ctrlList'][2]
-                    if not cmds.objExists(self.correctiveCtrl+"."+self.langDic[self.langName]['c124_corrective']):
-                        cmds.addAttr(self.correctiveCtrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                    self.correctiveNet = self.correctionManager.createCorrectionManager([self.skinJointList[1], self.skinJointList[2]], name=side+self.userGuideName+"_"+self.jNameList[2], correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
-                    cmds.connectAttr(self.correctiveCtrl+"."+self.langDic[self.langName]['c124_corrective'], self.correctiveNet+".intensity", force=True)
-                    if self.limbType == LEG:
-                        cmds.setAttr(self.correctiveNet+".axis", 1) #Y
-                        cmds.setAttr(self.correctiveNet+".axisOrder", 1) #YZX
-                    correctionNetInputValue = cmds.getAttr(self.correctiveNet+".inputValue")
-                    cmds.setAttr(self.correctiveNet+".inputStart", correctionNetInputValue) #offset default position
-                    cmds.setAttr(self.correctiveNet+".inputEnd", correctionNetInputValue-90)
-                    if correctionNetInputValue > 0:
-                        cmds.setAttr(self.correctiveNet+".inputEnd", correctionNetInputValue+90)
-                
+                self.correctiveCtrl = self.toParentExtremCtrl
+                if self.getHasBend():
+                    self.correctiveCtrl = self.bendGrps['ctrlList'][2]
+                self.cornerCorrectiveNet = self.setupCorrectiveNet(self.correctiveCtrl, self.skinJointList[1], self.skinJointList[2], side+self.userGuideName+"_"+self.jNameList[2]+"_YawRight", 0, 0, -110, isLeg, [side+self.userGuideName+"_"+self.jNameList[2]+"_YawLeft", 1, 1, -110])
+                correctionNetInputValue = cmds.getAttr(self.cornerCorrectiveNet+".inputValue")
+                if correctionNetInputValue > 0:
+                    cmds.setAttr(self.cornerCorrectiveNet+".inputEnd", correctionNetInputValue+110)
+
                 # add main articulationJoint:
                 if self.addArticJoint:
-                    # shoulder / leg
-                    firstJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1]) #could call to create corrective joints. See parameters to implement it, please.
-                    dpUtils.setJointLabel(firstJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
-                    cmds.rename(firstJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
-                    if not self.getHasBend():
-                        cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
-                        dpUtils.setJointLabel(cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
-                        cmds.rename(cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
+                    if self.addCorrective:
+                        # corrective controls group
+                        self.correctiveCtrlsGrp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
+                        self.correctiveCtrlGrpList.append(self.correctiveCtrlsGrp)
+                        cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
+                        
+                        # clavicle / hips
+                        beforeCorrectiveNetList = [None]
+                        beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60]))
+                        beforeCalibratePresetList = self.getCalibratePresetList(s, isLeg, True, False, False, False, False)
+                        beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
+                        self.setupJcrControls(beforeJntList, s, jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList)
+
+                        # shoulder / leg
+                        mainCorrectiveNetList = [None]
+                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.skinJointList[0], self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
+                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.skinJointList[0], self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
+                        mainCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
+                        mainJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(0, mainJarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
+                        self.setupJcrControls(mainJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList)
+                        
+                        # elbow / knee
+                        cornerCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
+                        cornerCorrectiveNetList = [None, self.cornerCorrectiveNet, self.cornerCorrectiveNet, self.cornerCorrectiveNet]
+                        self.setupJcrControls(self.cornerJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList)
+
+                        # quadruped kneeB
                         if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                            cornerBJntList = dpUtils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False) #could call to create corrective joints. See parameters to implement it, please.
+                            kneeBCorrectiveNetList = [None]
+                            if self.langDic[self.langName]['c056_front'] in self.userGuideName:
+                                kneeBCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-4], self.skinJointList[-3], side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchUp", 1, 1, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchUp", 1, 1, -80]))
+                            else:
+                                kneeBCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-4], self.skinJointList[-3], side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80]))
+                            kneeBCorrectiveNetList.append(kneeBCorrectiveNetList[1])
+                            kneeBCorrectiveNetList.append(kneeBCorrectiveNetList[1])
+                            kneeBCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
+                            kneeBJntList = dpUtils.articulationJoint(self.skinJointList[-4], self.skinJointList[-3], 3, [(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                            self.setupJcrControls(kneeBJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerBName, kneeBCorrectiveNetList, kneeBCalibratePresetList)
+                            # fix quadruped front and back jar rotation
+                            cmds.setAttr(kneeBJntList[0]+".rotateY", -90)
+                            if self.langDic[self.langName]['c056_front'] in self.userGuideName:
+                                if s == 1:
+                                    cmds.setAttr(kneeBJntList[0]+".rotateX", 180)
+                                    cmds.setAttr(kneeBJntList[0]+".scaleX", -1)
+                            elif self.langDic[self.langName]['c057_back'] in self.userGuideName:
+                                if s == 0:
+                                    cmds.setAttr(kneeBJntList[0]+".rotateX", 180)
+                                    cmds.setAttr(kneeBJntList[0]+".scaleX", -1)
+                        
+                        # wrist / ankle
+                        extremCorrectiveNetList = [None]
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
+                        extremCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
+                        extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
+                        self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList)
+
+                    else:
+                        beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
+                        mainJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1])
+                        if not self.cornerJntList:
+                            self.cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False)
+                        extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2])
+                        dpUtils.setJointLabel(self.cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
+                        cmds.rename(self.cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
+                        if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                            cornerBJntList = dpUtils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False)
                             dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
-                
+                    if s == 1:
+                        for jar in [beforeJntList[0], mainJntList[0], extremJntList[0]]:
+                            cmds.setAttr(jar+".rotateX", 180)
+                            cmds.setAttr(jar+".scaleX", -1)
+                    dpUtils.setJointLabel(beforeJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+beforeName)
+                    dpUtils.setJointLabel(mainJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
+                    dpUtils.setJointLabel(extremJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+extremNumber+"_"+extremName)
+                    cmds.rename(mainJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
+                    cmds.rename(extremJntList[0], side+self.userGuideName+"_"+extremNumber+"_"+extremName+"_Jar")
+                    
                 # softIk:
                 self.softIkCalibrateList.append(self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef))
                 # orient ikHandle group setup:
@@ -1512,6 +1689,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
 
+
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
@@ -1536,6 +1714,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "limbManualVolume": "limbManualVolume",
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
-                "softIkCalibrateList": self.softIkCalibrateList
+                "softIkCalibrateList": self.softIkCalibrateList,
+                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
             }
         }

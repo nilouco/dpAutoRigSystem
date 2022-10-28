@@ -18,6 +18,7 @@ dic_colors = {
     "white": 16,
     "black": 1,
     "gray": 3,
+    "bonina": [0.38, 0, 0.15],
     "none": 0,
 }
 
@@ -39,7 +40,8 @@ class ControlClass(object):
         """ Create a color override for all shapes from the objList.
         """
         if rgb:
-            pass
+            if (color in dic_colors):
+                color = dic_colors[color]
         elif (color in dic_colors):
             iColorIdx = dic_colors[color]
         else:
@@ -264,7 +266,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -284,6 +286,8 @@ class ControlClass(object):
         if controlInstance:
             # create curve
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
+            if corrective:
+                self.addCorrectiveAttrs(curve)
             return curve
 
 
@@ -1110,3 +1114,122 @@ class ControlClass(object):
                     print("Imported shapes: {0}".format(path))
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+
+
+    def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
+        """ Create a corrective joint controller.
+            Connect setup nodes and add calibration attributes to it.
+            Returns the corrective controller and its highest zero out group.
+        """
+        calibrateAttrList = ["T", "R", "S"]
+        calibrateAxisList = ["X", "Y", "Z"]
+        toCalibrationList = []
+        jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
+        jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
+        jcrGrp1 = dpUtils.zeroOut([jcrGrp0])[0]
+        cmds.delete(cmds.parentConstraint(jcrName, jcrGrp1, maintainOffset=False))
+        cmds.parentConstraint(cmds.listRelatives(jcrName, parent=True)[0], jcrGrp1, maintainOffset=True, name=jcrGrp1+"_PaC")
+        cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
+        cmds.scaleConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_ScC")
+        cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
+        cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
+        for attr in calibrateAttrList:
+            for axis in calibrateAxisList:
+                remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
+                intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
+                cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
+                cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
+                cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
+                cmds.connectAttr(jcrCtrl+".intensity", intensityMD+".input1X", force=True)
+                cmds.connectAttr(remapV+".outValue", intensityMD+".input2X", force=True)
+                # add calibrate attributes:
+                if attr == "S":
+                    scaleClp = cmds.createNode("clamp", name=jcrName.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
+                    cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
+                    cmds.setAttr(remapV+".outputMin", 1)
+                    cmds.setAttr(scaleClp+".minR", 1)
+                    cmds.setAttr(scaleClp+".maxR", 1000)
+                    cmds.connectAttr(intensityMD+".outputX", scaleClp+".inputR", force=True)
+                    cmds.connectAttr(scaleClp+".outputR", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
+                else:
+                    cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
+                    cmds.connectAttr(intensityMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
+                cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
+                toCalibrationList.append("calibrate"+attr+axis)
+        self.setCalibrationAttr(jcrCtrl, toCalibrationList)
+        return jcrCtrl, jcrGrp1
+    
+    
+    def addCorrectiveAttrs(self, ctrlName, *args):
+        """ Add and set attributes to this control curve be used as a corrective controller.
+        """
+        cmds.addAttr(ctrlName, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        # create an attribute to be used as editMode by module:
+        cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=False, defaultValue=False)
+        cmds.setAttr(ctrlName+".editMode", channelBox=True)
+
+
+    def deleteOldCorrectiveJobs(self, ctrlName, *args):
+        """ Try to find an existing script job already running for this corrective controller and kill it.
+        """
+        jobList = cmds.scriptJob(listJobs=True)
+        if jobList:
+            for job in jobList:
+                if ctrlName in job:
+                    jobNumber = int(job[:job.find(":")])
+                    cmds.scriptJob(kill=jobNumber, force=True)
+                    
+
+    def createCorrectiveMode(self, ctrlName, *args):
+        """ Create a scriptJob to read this attribute change.
+        """
+        self.deleteOldCorrectiveJobs(ctrlName)
+        cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=True, compressUndo=True)
+        if cmds.getAttr(ctrlName+".editMode"):
+            self.colorShape([ctrlName], 'bonina', rgb=True)
+    
+    
+    def jobCorrectiveEditMode(self, ctrlName, *args):
+        """ Edit mode to corrective control by scriptJob.
+        """
+        if cmds.objExists(ctrlName+".editMode"):
+            editModeValue = cmds.getAttr(ctrlName+".editMode")
+            if editModeValue:
+                self.colorShape([ctrlName], 'bonina', rgb=True)
+            else:
+                shapeList = cmds.listRelatives(ctrlName, shapes=True, children=True, fullPath=True)
+                if shapeList:
+                    for shapeNode in shapeList:
+                        cmds.setAttr(shapeNode+".overrideRGBColors", 0)
+                self.setCorrectiveCalibration(ctrlName)
+    
+    
+    def startCorrectiveEditMode(self, *args):
+        """ Reload editMode job for existing corrective controllers.
+        """
+        transformList = cmds.ls(selection=False, type="transform")
+        if transformList:
+            for transformNode in transformList:
+                if cmds.objExists(transformNode+".editMode"):
+                    self.createCorrectiveMode(transformNode)
+    
+    
+    def setCorrectiveCalibration(self, ctrlName, *args):
+        """ Remove corrective controller editMode setup.
+            Calculate the results of transformations to set the calibration attributes.
+        """
+        calibrateAttrList = ["T", "R", "S"]
+        calibrateAxisList = ["X", "Y", "Z"]
+        if cmds.objExists(ctrlName):
+            dupTemp = cmds.duplicate(ctrlName, name=ctrlName+"_TEMP")[0]
+            cmds.parent(dupTemp, ctrlName+"_Zero_1_Grp")
+            for attr in calibrateAttrList:
+                for axis in calibrateAxisList:
+                    newValue = cmds.getAttr(dupTemp+"."+attr.lower()+axis.lower())
+                    if attr == "S":
+                        cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 1) #scale
+                    else:
+                        cmds.setAttr(ctrlName+"."+attr.lower()+axis.lower(), 0) #translate, rotate
+                    cmds.setAttr(ctrlName+".calibrate"+attr+axis, newValue)
+            cmds.delete(dupTemp)
+            cmds.select(ctrlName)

@@ -765,34 +765,46 @@ def validateName(nodeName, suffix=None, *args):
     return nodeName
 
 
-def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1.5, doScale=True, *args):
+def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcrRotList=None, dist=1, jarRadius=1.5, doScale=True, *args):
     """ Create a simple joint to help skinning with a half rotation value.
         Receives the number of corrective joints to be created. Zero by default.
+        Place these corrective joints with the given vector list.
         Returns the created joint list.
     """
     jointList = []
     if fatherNode and brotherNode:
         if cmds.objExists(fatherNode) and cmds.objExists(brotherNode):
+            jaxName = brotherNode[:brotherNode.rfind("_")]+"_Jax"
             jarName = brotherNode[:brotherNode.rfind("_")]+"_Jar"
             cmds.select(clear=True)
-            jar = cmds.joint(name=jarName, scaleCompensate=False, radius=jarRadius)
+            jax = cmds.joint(name=jaxName, radius=0.5*jarRadius)
+            jar = cmds.joint(name=jarName, radius=jarRadius)
             cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
-            jointList.append(jar)
-            for i in range(0, corrNumber):
-                jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
-                cmds.setAttr(jcr+".translateX", ((i+1)*dist))
-                cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
-                cmds.select(jar)
-                jointList.append(jcr)
-            cmds.delete(cmds.parentConstraint(brotherNode, jar, maintainOffset=0))
-            cmds.makeIdentity(jar, apply=True)
+            cmds.delete(cmds.parentConstraint(brotherNode, jax, maintainOffset=0))
+            cmds.parent(jax, fatherNode)
+            cmds.makeIdentity(jax, apply=True)
+            cmds.setAttr(jax+".segmentScaleCompensate", 0)
             cmds.setAttr(jar+".segmentScaleCompensate", 0)
-            cmds.parent(jar, fatherNode)
-            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PoC")[0]
-            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrC")[0]
+            jointList.append(jar)
+            for i in range(0, jcrNumber):
+                cmds.select(jar)
+                jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
+                cmds.setAttr(jcr+".segmentScaleCompensate", 0)
+                cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+                if jcrPosList:
+                    cmds.setAttr(jcr+".translateX", jcrPosList[i][0]*dist)
+                    cmds.setAttr(jcr+".translateY", jcrPosList[i][1]*dist)
+                    cmds.setAttr(jcr+".translateZ", jcrPosList[i][2]*dist)
+                if jcrRotList:
+                    cmds.setAttr(jcr+".rotateX", jcrRotList[i][0])
+                    cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
+                    cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
+                jointList.append(jcr)
+            cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
+            oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
             cmds.setAttr(oc+".interpType", 2) #Shortest
             if doScale:
-                cmds.scaleConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_ScC")
+                cmds.scaleConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_ScC")
             return jointList
 
 
