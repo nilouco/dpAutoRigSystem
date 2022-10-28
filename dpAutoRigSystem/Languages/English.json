@@ -586,6 +586,7 @@
     "m206_mergeNamespace"       : "Imported guides namespace merged with root",
     "m207_plusOpen"             : "Plus Open",
     "m208_starFlat"             : "Star Flat",
+    "m209_pinSide"              : "Pin Side",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
