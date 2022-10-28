@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.07"
-DPAR_UPDATELOG = "N167 - Corrective joints."
+DPAR_VERSION_PY3 = "4.01.09"
+DPAR_UPDATELOG = "N167 - Corrective joints for Limbs."
 
 
 
@@ -2345,7 +2345,7 @@ class DP_AutoRig_UI(object):
                             correctiveGrpList = self.integratedTaskDic[moduleDic]['correctiveCtrlGrpList']
                             if correctiveGrpList:
                                 if not cmds.objExists(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls"):
-                                    cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                    cmds.addAttr(self.optionCtrl, longName=self.langDic[self.langName]['c124_corrective']+"Ctrls", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
                                     cmds.setAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls", channelBox=True)
                                 for correctiveGrp in correctiveGrpList:
                                     cmds.connectAttr(self.optionCtrl+"."+self.langDic[self.langName]['c124_corrective']+"Ctrls", correctiveGrp+".visibility", force=True)
