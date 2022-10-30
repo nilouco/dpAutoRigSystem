@@ -4,6 +4,7 @@ from maya import mel
 
 from .Library import dpControls
 from .Library import dpUtils
+from ..Extras import dpCorrectionManager
 
 class RigType(object):
     biped = "biped"
@@ -37,6 +38,8 @@ class StartClass(object):
         self.annotation = self.moduleGrp+"_Ant"
         # calling dpControls:
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName, self.moduleGrp)
+        # starting correctionManater:
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, False)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -276,7 +279,7 @@ class StartClass(object):
             for i, jcr in enumerate(jcrList):
                 if not i == 0: #exclude jar in the index 0
                     dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(i))
-                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.3)
+                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
                     for calibrateAttr in calibratePresetList[i].keys():
