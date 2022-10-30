@@ -21,6 +21,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
+        # declare variables
+        self.correctiveCtrlGrpList = []
     
     
     def createModuleLayout(self, *args):
@@ -38,6 +40,9 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
+        cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".corrective", 0)
+
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
         self.cvHeadLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Head", r=0.4, d=1, guide=True)
@@ -306,6 +311,20 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(jawOutputRmV+".outValue", self.jawCtrl+"."+outputAttrName, force=True)
             cmds.setAttr(self.jawCtrl+"."+outputAttrName, lock=True)
 
+    
+    def getCalibratePresetList(self, s, *args):
+        """ Returns the calibration preset list for neck and head joints.
+        """
+        presetList = None
+        if s == 0:
+            presetList = [{}, {"calibrateTX":1}, {"calibrateTX":-1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
+        else:
+            if self.addFlip:
+                presetList = [{}, {"calibrateTX":-1}, {"calibrateTX":1}, {"calibrateTZ":-1}, {"calibrateTZ":1}]
+            else:
+                presetList = [{}, {"calibrateTX":1}, {"calibrateTX":-1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
+        return presetList
+
 
     def autoRotateCalc(self, n, *args):
         if self.nJoints < 7:
@@ -328,6 +347,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
+            self.addCorrective = self.getModuleAttr("corrective")
             # declare lists to store names and attributes:
             self.worldRefList, self.upperCtrlList = [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
@@ -705,15 +725,57 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if self.addArticJoint:
                     # neckBase
                     neckBaseJzt = dpUtils.zeroOutJoints([self.neckJointList[0]])[0]
-                    articJntList = dpUtils.articulationJoint(neckBaseJzt, self.neckJointList[0])
-                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base'])
-                    cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
+                    if self.addCorrective:
+                        # corrective controls group
+                        self.correctiveCtrlsGrp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
+                        self.correctiveCtrlGrpList.append(self.correctiveCtrlsGrp)
+                        neckHeadCalibratePresetList = self.getCalibratePresetList(s)
+                        
+                        # neck corrective
+                        for n in range(0, self.nJoints):
+                            if n == 0:
+                                fatherJoint = neckBaseJzt
+                            else:
+                                fatherJoint = self.neckJointList[n-1]
+                            correctiveNetList = [None]
+                            correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_YawRight", 2, 2, -80))
+                            correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_YawLeft", 2, 2, 80))
+                            correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchUp", 0, 0, 80))
+                            correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchDown", 0, 0, -80))
+                            
+                            articJntList = dpUtils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
+                            self.setupJcrControls(articJntList, s, jointLabelAdd, neckCtrlBaseName+"_"+str(n), correctiveNetList, neckHeadCalibratePresetList)
+                            if s == 1:
+                                if self.addFlip:
+                                    cmds.setAttr(articJntList[0]+".scaleX", -1)
+                                    cmds.setAttr(articJntList[0]+".scaleY", -1)
+                                    cmds.setAttr(articJntList[0]+".scaleZ", -1)
+                            dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']+"_"+str(n)+"_Jar")
+
+                        # head corrective
+                        headCorrectiveNetList = [None]
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_YawRight", 2, 2, -80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_YawLeft", 2, 2, 80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_PitchUp", 0, 0, 80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_PitchDown", 0, 0, -80))
+                        headCalibratePresetList = self.getCalibratePresetList(s)
+                        articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
+                        self.setupJcrControls(articJntList, s, jointLabelAdd, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head'], headCorrectiveNetList, headCalibratePresetList)
+                        if s == 1:
+                            if self.addFlip:
+                                cmds.setAttr(articJntList[0]+".scaleX", -1)
+                                cmds.setAttr(articJntList[0]+".scaleY", -1)
+                                cmds.setAttr(articJntList[0]+".scaleZ", -1)
+                    else:
+                        articJntList = dpUtils.articulationJoint(neckBaseJzt, self.neckJointList[0])
+                        dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
+                        cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
+                        articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt)
+                    
                     self.neckJointList.insert(0, neckBaseJzt)
                     cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
                     cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
-                    # headBase
-                    articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt) #could call to create corrective joints. See parameters to implement it, please.
-                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base'])
+                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base']+"_Jar")
                     cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base']+"_Jar")
                 
                 # create a locator in order to avoid delete static group
@@ -747,6 +809,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.zeroNeckCtrlList[0], self.zeroCtrlList[2], self.zeroCtrlList[8], self.zeroCtrlList[9], name=side+self.userGuideName+"_Control_Grp")
+                if self.addCorrective:
+                    cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
                 self.toScalableHookGrp = cmds.group(self.neckJointList[0], name=side+self.userGuideName+"_Joint_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.worldRef, name=side+self.userGuideName+"_Grp")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
@@ -784,5 +848,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                                 "ctrlList"         : self.aCtrls,
                                                 "lCtrls"           : self.aLCtrls,
                                                 "rCtrls"           : self.aRCtrls,
+                                                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
                                               }
                                     }

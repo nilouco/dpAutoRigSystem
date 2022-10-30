@@ -1131,7 +1131,9 @@ class ControlClass(object):
         cmds.parentConstraint(cmds.listRelatives(jcrName, parent=True)[0], jcrGrp1, maintainOffset=True, name=jcrGrp1+"_PaC")
         cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
         cmds.scaleConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_ScC")
+        cmds.addAttr(jcrCtrl, longName="correctiveNetwork", attributeType="message")
         cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
+        cmds.connectAttr(correctiveNet+".message", jcrCtrl+".correctiveNetwork", force=True)
         cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
         for attr in calibrateAttrList:
             for axis in calibrateAxisList:

@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.09"
-DPAR_UPDATELOG = "N167 - Corrective joints for Limbs."
+DPAR_VERSION_PY3 = "4.01.10"
+DPAR_UPDATELOG = "N539 - Corrective joints for Head."
 
 
 
