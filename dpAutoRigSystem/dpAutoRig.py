@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.10"
-DPAR_UPDATELOG = "N539 - Corrective joints for Head."
+DPAR_VERSION_PY3 = "4.01.11"
+DPAR_UPDATELOG = "N545 - Limb autoClavicle follow issue."
 
 
 
