@@ -696,14 +696,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.masterCtrlRefList.append(self.masterCtrlRef)
 
                 # parenting fkControls from 2 hierarchies (before and limb) using constraint, attention to fkIsolated shoulder:
-                # creating a shoulder_null group in order to use it as position relative and aim to self.quadExtraCtrl:
-                self.shoulderNullGrp = cmds.group(empty=True, name=self.skinJointList[1] + "_Null")
-                cmds.parent(self.shoulderNullGrp, self.skinJointList[1], relative=True)
-                cmds.parent(self.shoulderNullGrp, self.skinJointList[0], relative=False)
-                cmds.pointConstraint(self.shoulderNullGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PoC")
-                fkIsolateParentConst = cmds.parentConstraint(self.shoulderNullGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PaC")[0]
+                # creating a shoulder_ref group in order to use it as position relative, joint articulation origin and aim constraint target to self.quadExtraCtrl:
+                self.shoulderRefGrp = cmds.group(empty=True, name=self.skinJointList[1] + "_Ref_Grp")
+                cmds.parent(self.shoulderRefGrp, self.skinJointList[1], relative=True)
+                cmds.parent(self.shoulderRefGrp, self.skinJointList[0], relative=False)
+                cmds.pointConstraint(self.shoulderRefGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PoC")
+                fkIsolateParentConst = cmds.parentConstraint(self.shoulderRefGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1] + "_PaC")[0]
                 cmds.addAttr(self.fkCtrlList[1], longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], fkIsolateParentConst + "." + self.shoulderNullGrp + "W0", force=True)
+                cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], fkIsolateParentConst + "." + self.shoulderRefGrp + "W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side + self.userGuideName + "_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1] + '.' + self.langDic[self.langName]['c032_follow'], self.fkIsolateRevNode + ".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode + '.outputX', fkIsolateParentConst + "." + self.masterCtrlRef + "W1", force=True)
@@ -1039,7 +1039,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientConst+"."+quadExtraRotNull+"W1", force=True)
                     # avoid cycle error from Maya warning:
                     cmds.cycleCheck(evaluation=False)
-                    cmds.aimConstraint(self.shoulderNullGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
+                    cmds.aimConstraint(self.shoulderRefGrp, quadExtraRotNull, aimVector=(0, 1, 0), upVector=(0, 0, 1), worldUpType="object", worldUpObject=self.ikCornerCtrl, name=quadExtraCtrlZero+"_AiC")[0]
                     cmds.cycleCheck(evaluation=True)
                     # hack to parent constraint offset recalculation (Update button on Attribute Editor):
                     cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, edit=True, maintainOffset=True)
@@ -1191,7 +1191,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 else:
                     self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side + self.userGuideName + "_Control_Grp")
                 self.toScalableHookGrp = cmds.group(name=side + self.userGuideName + "_Joint_Grp", empty=True)
-                cmds.delete(cmds.parentConstraint(self.skinJointList[0], self.toScalableHookGrp, maintainOffset=False))
                 cmds.parent(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], self.toScalableHookGrp)
                 self.aScalableGrps.append(self.toScalableHookGrp)
                 cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp + "_PaC")
@@ -1549,10 +1548,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                         # shoulder / leg
                         mainCorrectiveNetList = [None]
-                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.skinJointList[0], self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
-                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.skinJointList[0], self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
+                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
+                        mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
                         mainCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
-                        mainJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1], 2, [(0, mainJarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
+                        mainJntList = dpUtils.articulationJoint(self.shoulderRefGrp, self.skinJointList[1], 2, [(0, mainJarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
                         self.setupJcrControls(mainJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList)
                         
                         # elbow / knee
