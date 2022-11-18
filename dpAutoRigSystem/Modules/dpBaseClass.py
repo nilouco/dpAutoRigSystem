@@ -272,8 +272,8 @@ class StartClass(object):
         return correctiveNet
 
 
-    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, *args):
-        """ Create corrective joints controllers.
+    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, invertList, *args):
+        """ Create corrective joint controllers.
         """
         if jcrList:
             for i, jcr in enumerate(jcrList):
@@ -282,8 +282,13 @@ class StartClass(object):
                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
-                    for calibrateAttr in calibratePresetList[i].keys():
+                    print("calibratePresetList = ", calibratePresetList)
+                    for c, calibrateAttr in enumerate(calibratePresetList[i].keys()):
                         cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
+                        invertAttr = calibrateAttr.replace("calibrate", "invert")
+                        cmds.setAttr(jcrCtrl+"."+invertAttr, invertList[c])
+                        # TODO set default value
+                        # cmds.addAttr(jcrCtrl, longName=invertAttr, edit=True, defaultValue=invertList[c])
 
     
     def rigModule(self, *args):

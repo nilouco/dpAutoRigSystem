@@ -1135,8 +1135,8 @@ class ControlClass(object):
         cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
         cmds.connectAttr(correctiveNet+".message", jcrCtrl+".correctiveNetwork", force=True)
         cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
-        for attr in calibrateAttrList:
-            for axis in calibrateAxisList:
+        for i, attr in enumerate(calibrateAttrList):
+            for j, axis in enumerate(calibrateAxisList):
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
                 intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
@@ -1154,8 +1154,16 @@ class ControlClass(object):
                     cmds.connectAttr(intensityMD+".outputX", scaleClp+".inputR", force=True)
                     cmds.connectAttr(scaleClp+".outputR", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 else:
+                    invertMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_MD"))
+                    invertCnd = cmds.createNode("condition", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_Cnd"))
+                    cmds.setAttr(invertCnd+".secondTerm", 1)
+                    cmds.setAttr(invertCnd+".colorIfTrueR", -1)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
-                    cmds.connectAttr(intensityMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
+                    cmds.addAttr(jcrCtrl, longName="invert"+attr+axis, attributeType="bool", defaultValue=0)
+                    cmds.connectAttr(intensityMD+".outputX", invertMD+".input1X", force=True)
+                    cmds.connectAttr(invertCnd+".outColorR", invertMD+".input2X", force=True)
+                    cmds.connectAttr(jcrCtrl+".invert"+attr+axis, invertCnd+".firstTerm", force=True)
+                    cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
         self.setCalibrationAttr(jcrCtrl, toCalibrationList)
