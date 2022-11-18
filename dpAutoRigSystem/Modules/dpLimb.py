@@ -402,19 +402,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """ Returns the calibration preset and invert lists for the asked limb joint.
         """
         presetList = None
-        invertList = [0, 0, 0, 0, 0, 0]
+        invertList = None
         if first: #clavicle/hips
             presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
-            
             if s ==  1:
-                invertList = [1, 0, 0, 0, 1, 0]
-#                presetList = [{}, {"calibrateTX":-1.0, "calibrateTZ":0.5, "calibrateRY":30}]
-            
+                invertList = [[], ["invertTX", "invertRY"]]
         elif main: #shoulder/leg
             if isLeg:
-                if s == 0:
-                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
-                else:
+                presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
+                if s == 1:
+                    invertList = [0, 0, 0, 0, 0, 0]
                     presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":-1.0, "calibrateRY":-30}]
             else:
                 if s == 0:
@@ -1553,14 +1550,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         mainCorrectiveNetList = [None]
                         mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
                         mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
-#                        mainCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
+#                        mainCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
 #                        mainJntList = dpUtils.articulationJoint(self.shoulderRefGrp, self.skinJointList[1], 2, [(0, mainJarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
-#                        self.setupJcrControls(mainJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList)
+#                        self.setupJcrControls(mainJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList, invertList)
                         
                         # elbow / knee
-#                        cornerCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
+#                        cornerCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
 #                        cornerCorrectiveNetList = [None, self.cornerCorrectiveNet, self.cornerCorrectiveNet, self.cornerCorrectiveNet]
-#                        self.setupJcrControls(self.cornerJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList)
+#                        self.setupJcrControls(self.cornerJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, invertList)
 
                         # quadruped kneeB
                         if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
@@ -1571,9 +1568,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 kneeBCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-4], self.skinJointList[-3], side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80]))
                             kneeBCorrectiveNetList.append(kneeBCorrectiveNetList[1])
                             kneeBCorrectiveNetList.append(kneeBCorrectiveNetList[1])
-#                            kneeBCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
+#                            kneeBCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
 #                            kneeBJntList = dpUtils.articulationJoint(self.skinJointList[-4], self.skinJointList[-3], 3, [(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
-#                            self.setupJcrControls(kneeBJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerBName, kneeBCorrectiveNetList, kneeBCalibratePresetList)
+#                            self.setupJcrControls(kneeBJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerBName, kneeBCorrectiveNetList, kneeBCalibratePresetList, invertList)
                             # fix quadruped front and back jar rotation
 #                            cmds.setAttr(kneeBJntList[0]+".rotateY", -90)
 #                            if self.langDic[self.langName]['c056_front'] in self.userGuideName:
@@ -1591,9 +1588,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
- #                       extremCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
+ #                       extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
  #                       extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
- #                       self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList)
+ #                       self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
 
 #                    else:
 #                        beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])

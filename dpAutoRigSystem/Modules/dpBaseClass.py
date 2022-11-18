@@ -282,13 +282,13 @@ class StartClass(object):
                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
-                    print("calibratePresetList = ", calibratePresetList)
                     for c, calibrateAttr in enumerate(calibratePresetList[i].keys()):
                         cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
-                        invertAttr = calibrateAttr.replace("calibrate", "invert")
-                        cmds.setAttr(jcrCtrl+"."+invertAttr, invertList[c])
-                        # TODO set default value
-                        # cmds.addAttr(jcrCtrl, longName=invertAttr, edit=True, defaultValue=invertList[c])
+                        if invertList:
+                            invertAttr = calibrateAttr.replace("calibrate", "invert")
+                            if invertAttr in invertList[i]:
+                                cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
+                                cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
 
     
     def rigModule(self, *args):
