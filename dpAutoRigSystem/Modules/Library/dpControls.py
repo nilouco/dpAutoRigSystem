@@ -886,13 +886,18 @@ class ControlClass(object):
         importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i196_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'])
         if not importCalibrationPath:
             return
+        progressAmount = 0
+        cmds.progressWindow(title=importCalibrationNamespace, progress=progressAmount, status='0% - '+self.dpUIinst.langDic[self.dpUIinst.langName]['i214_refFile'], isInterruptable=False)
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
         refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
+            maxProcess = len(refNodeList)
             for item in refNodeList:
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(repr(progressAmount)+' - '+self.dpUIinst.langDic[self.dpUIinst.langName]['i215_setAttr']))
                 if cmds.objExists(item+".calibrationList"):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
@@ -902,6 +907,7 @@ class ControlClass(object):
                     self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
         # remove referenced file:
         cmds.file(importCalibrationPath, removeReference=True)
+        cmds.progressWindow(endProgress=True)
         print("dpImportCalibrationPath: "+importCalibrationPath)
         
 
