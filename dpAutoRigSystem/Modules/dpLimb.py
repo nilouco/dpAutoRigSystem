@@ -426,15 +426,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         elif kneeB: #kneeB
             presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
             if self.langDic[self.langName]['c057_back'] in self.userGuideName:
-                invertList = [[], [], ["invertTX", "invertRY"], ["invertTX", "invertRY"]]
+                invertList = [[], [], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
             if s == 1:
-                invertList = [[], ["invertTX", "invertRY"], ["invertTX", "invertRY"], ["invertTX", "invertRY"]]
+                invertList = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
                 if self.langDic[self.langName]['c057_back'] in self.userGuideName:
-                    invertList = [[], ["invertTX", "invertRY"], [], []]
+                    invertList = [[], [], [], []]
         elif extrem: #wrist/ankle
             presetList = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
             if s == 1:
-                invertList = [[], ["invertTX", "invertRY"], ["invertTX", "invertRY"], [], []]
+                invertList = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
         return presetList, invertList
 
 
