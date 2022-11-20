@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.11"
-DPAR_UPDATELOG = "N545 - Limb autoClavicle follow issue."
+DPAR_VERSION_PY3 = "4.01.12"
+DPAR_UPDATELOG = "N550 - Fixed joints corrective mirror calibration."
 
 
 

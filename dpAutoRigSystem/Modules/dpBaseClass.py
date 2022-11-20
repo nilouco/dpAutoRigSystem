@@ -272,18 +272,46 @@ class StartClass(object):
         return correctiveNet
 
 
-    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, *args):
-        """ Create corrective joints controllers.
+    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, invertList, mirrorList=None, *args):
+        """ Create corrective joint controllers.
         """
         if jcrList:
+            l = 0
+            sDefault = s
+            mirrorPrefixList = [self.langDic[self.langName]['p002_left'], self.langDic[self.langName]['p003_right']]
             for i, jcr in enumerate(jcrList):
                 if not i == 0: #exclude jar in the index 0
-                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(i))
+                    # logic to mirror calibration setup for left and right sides of a centered module like neck/head
+                    m = i
+                    if mirrorList:
+                        if mirrorList[i]:
+                            s += 1
+                            if l == 0:
+                                oldJcr = jcr
+                                jcr = cmds.rename(jcr, mirrorPrefixList[l]+"_"+jcr)
+                            else:
+                                jcr = cmds.rename(jcr, mirrorPrefixList[l]+"_"+oldJcr)
+                                m -= 1
+                            jcrList[i] = jcr
+                            l += 1
+                        else:
+                            m = i
+                            s = sDefault
+                    else:
+                        s = sDefault
+                    # add joint label, create controller, zeroOut
+                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(m))
                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
                     for calibrateAttr in calibratePresetList[i].keys():
                         cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
+                    if invertList:
+                        for n, invertAttrList in enumerate(invertList):
+                            if not n == 0:
+                                for invertAttr in invertAttrList:
+                                    cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
+                                    cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
 
     
     def rigModule(self, *args):

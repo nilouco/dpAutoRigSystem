@@ -399,56 +399,43 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
     
     def getCalibratePresetList(self, s, isLeg, first, main, corner, kneeB, extrem, *args):
-        """ Returns the calibration preset list for the asked limb joint.
+        """ Returns the calibration preset and invert lists for the asked limb joint.
         """
         presetList = None
+        invertList = None
         if first: #clavicle/hips
-            if s ==  0:
-                presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
-            else:
-                presetList = [{}, {"calibrateTX":-1.0, "calibrateTZ":0.5, "calibrateRY":30}]
+            presetList = [{}, {"calibrateTX":1.0, "calibrateTZ":0.5, "calibrateRY":-30}]
+            if s ==  1:
+                invertList = [[], ["invertTX", "invertRY"]]
         elif main: #shoulder/leg
             if isLeg:
-                if s == 0:
-                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
-                else:
-                    presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":-1.0, "calibrateRY":-30}]
+                presetList = [{}, {"calibrateTY":-0.5, "calibrateTZ":-0.4, "calibrateRX":30}, {"calibrateTX":1.0, "calibrateRY":30}]
             else:
-                if s == 0:
-                    presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
-                else:
-                    presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":-1.0, "calibrateRY":-30}]
+                presetList = [{}, {"calibrateTY":0.5, "calibrateTZ":0.2}, {"calibrateTX":1.0, "calibrateRY":30}]
+            if s == 1:
+                invertList = [[], [], ["invertTX", "invertRY"]]
         elif corner: #elbow/knee
-            if s == 0:
-                if isLeg:
-                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
-                else:
-                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
-            else:
-                if isLeg:
-                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
-                else:
+            presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            if not isLeg:
+                invertList = [[], ["invertRY"], [], []]
+                if s == 1:
                     if self.getHasBend():
-                        presetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":0.6, "calibrateRY":-45}, {"calibrateTX":0.4, "calibrateTZ":-0.8, "calibrateRY":-65}, {"calibrateTX":-0.3, "calibrateTZ":-0.8, "calibrateRY":65}]
+                        invertList = [[], ["invertTX", "invertTZ", "invertRY"], ["invertTX", "invertTZ"], ["invertTX", "invertTZ"]]
                     else:
-                        presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+                        invertList = [[], ["invertRY"], [], []]
         elif kneeB: #kneeB
-            if s == 0:
+            presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
+            if self.langDic[self.langName]['c057_back'] in self.userGuideName:
+                invertList = [[], [], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
+            if s == 1:
+                invertList = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
                 if self.langDic[self.langName]['c057_back'] in self.userGuideName:
-                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":0.4, "calibrateTZ":0.8, "calibrateRY":65}, {"calibrateTX":-0.3, "calibrateTZ":0.8, "calibrateRY":-65}]
-                else:
-                    presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
-            else:
-                if self.langDic[self.langName]['c057_back'] in self.userGuideName:
-                    presetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
-                else:
-                    presetList = [{}, {"calibrateTX":-0.1, "calibrateTZ":-0.6, "calibrateRY":45}, {"calibrateTX":0.4, "calibrateTZ":0.8, "calibrateRY":65}, {"calibrateTX":-0.3, "calibrateTZ":0.8, "calibrateRY":-65}]
+                    invertList = [[], [], [], []]
         elif extrem: #wrist/ankle
-            if s == 0:
-                presetList = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
-            else:
-                presetList = [{}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
-        return presetList
+            presetList = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
+            if s == 1:
+                invertList = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
+        return presetList, invertList
 
 
     def rigModule(self, *args):
@@ -1542,22 +1529,24 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         # clavicle / hips
                         beforeCorrectiveNetList = [None]
                         beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60]))
-                        beforeCalibratePresetList = self.getCalibratePresetList(s, isLeg, True, False, False, False, False)
-                        beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
-                        self.setupJcrControls(beforeJntList, s, jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList)
+                        beforeCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, True, False, False, False, False)
+                        beforeJxt = cmds.duplicate(self.skinJointList[0], name=side+self.userGuideName+"_"+jName+"_Jxt")[0]
+                        cmds.delete(cmds.listRelatives(beforeJxt, children=True, allDescendents=True, fullPath=True))
+                        beforeJntList = dpUtils.articulationJoint(beforeJxt, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
+                        self.setupJcrControls(beforeJntList, s, jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList, invertList)
 
                         # shoulder / leg
                         mainCorrectiveNetList = [None]
                         mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_PitchUp", 0, mainAxisOrder, -91, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_PitchDown", 0, mainAxisOrder, 91]))
                         mainCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.shoulderRefGrp, self.skinJointList[1], side+self.userGuideName+"_"+self.jNameList[1]+"_YawRight", 1, 1, 46, isLeg, [side+self.userGuideName+"_"+self.jNameList[1]+"_YawLeft", 1, 4, 91]))
-                        mainCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
+                        mainCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, True, False, False, False)
                         mainJntList = dpUtils.articulationJoint(self.shoulderRefGrp, self.skinJointList[1], 2, [(0, mainJarYValue*self.ctrlRadius, 0), (0.3*self.ctrlRadius, 0, 0)])
-                        self.setupJcrControls(mainJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList)
+                        self.setupJcrControls(mainJntList, s, jointLabelAdd, self.userGuideName+"_"+firstNumber+"_"+mainName, mainCorrectiveNetList, mainCalibratePresetList, invertList)
                         
                         # elbow / knee
-                        cornerCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
+                        cornerCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, True, False, False)
                         cornerCorrectiveNetList = [None, self.cornerCorrectiveNet, self.cornerCorrectiveNet, self.cornerCorrectiveNet]
-                        self.setupJcrControls(self.cornerJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList)
+                        self.setupJcrControls(self.cornerJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, invertList)
 
                         # quadruped kneeB
                         if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
@@ -1568,9 +1557,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 kneeBCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-4], self.skinJointList[-3], side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80]))
                             kneeBCorrectiveNetList.append(kneeBCorrectiveNetList[1])
                             kneeBCorrectiveNetList.append(kneeBCorrectiveNetList[1])
-                            kneeBCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
+                            kneeBCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, True, False)
                             kneeBJntList = dpUtils.articulationJoint(self.skinJointList[-4], self.skinJointList[-3], 3, [(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
-                            self.setupJcrControls(kneeBJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerBName, kneeBCorrectiveNetList, kneeBCalibratePresetList)
+                            self.setupJcrControls(kneeBJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerBName, kneeBCorrectiveNetList, kneeBCalibratePresetList, invertList)
                             # fix quadruped front and back jar rotation
                             cmds.setAttr(kneeBJntList[0]+".rotateY", -90)
                             if self.langDic[self.langName]['c056_front'] in self.userGuideName:
@@ -1588,9 +1577,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
-                        extremCalibratePresetList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
+                        extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
                         extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
-                        self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList)
+                        self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
@@ -1613,7 +1602,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     dpUtils.setJointLabel(extremJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+extremNumber+"_"+extremName)
                     cmds.rename(mainJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
                     cmds.rename(extremJntList[0], side+self.userGuideName+"_"+extremNumber+"_"+extremName+"_Jar")
-                    
+
                 # softIk:
                 self.softIkCalibrateList.append(self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef))
                 # orient ikHandle group setup:
