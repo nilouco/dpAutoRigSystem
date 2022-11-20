@@ -315,8 +315,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def getCalibratePresetList(self, s, *args):
         """ Returns the calibration preset and invert lists for neck and head joints.
         """
-        invertList = None
-        presetList = [{}, {"calibrateTX":1}, {"calibrateTX":-1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
+        invertList = [[], [], ["invertTX"], [], []]
+        presetList = [{}, {"calibrateTX":1}, {"calibrateTX":1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
         if s == 1:
             if self.addFlip:
                 invertList = [[], ["invertTX"], ["invertTX"], ["invertTZ"], ["invertTZ"]]
@@ -741,7 +741,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchDown", 0, 0, -80))
                             
                             articJntList = dpUtils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
-                            self.setupJcrControls(articJntList, s, jointLabelAdd, neckCtrlBaseName+"_"+str(n), correctiveNetList, neckHeadCalibratePresetList, invertList)
+                            self.setupJcrControls(articJntList, s, jointLabelAdd, neckCtrlBaseName+"_"+str(n), correctiveNetList, neckHeadCalibratePresetList, invertList, [False, True, True, False, False])
                             if s == 1:
                                 if self.addFlip:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
@@ -757,7 +757,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         headCorrectiveNetList.append(self.setupCorrectiveNet(self.headCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_PitchDown", 0, 0, -80))
                         headCalibratePresetList, invertList = self.getCalibratePresetList(s)
                         articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
-                        self.setupJcrControls(articJntList, s, jointLabelAdd, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList)
+                        self.setupJcrControls(articJntList, s, jointLabelAdd, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList, [False, True, True, False, False])
                         if s == 1:
                             if self.addFlip:
                                 cmds.setAttr(articJntList[0]+".scaleX", -1)

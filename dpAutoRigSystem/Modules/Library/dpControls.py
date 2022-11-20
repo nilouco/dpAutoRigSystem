@@ -1135,8 +1135,8 @@ class ControlClass(object):
         cmds.addAttr(jcrCtrl, longName="inputValue", attributeType="float", defaultValue=0)
         cmds.connectAttr(correctiveNet+".message", jcrCtrl+".correctiveNetwork", force=True)
         cmds.connectAttr(correctiveNet+".outputValue", jcrCtrl+".inputValue", force=True)
-        for i, attr in enumerate(calibrateAttrList):
-            for j, axis in enumerate(calibrateAxisList):
+        for attr in calibrateAttrList:
+            for axis in calibrateAxisList:
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
                 intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
