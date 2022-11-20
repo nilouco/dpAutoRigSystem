@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.14"
-DPAR_UPDATELOG = "N366 - Import calibration progress window."
+DPAR_VERSION_PY3 = "4.01.15"
+DPAR_UPDATELOG = "N551 - Fixed Chain building issue."
 
 
 
