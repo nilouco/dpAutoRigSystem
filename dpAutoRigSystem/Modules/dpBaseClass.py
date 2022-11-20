@@ -307,11 +307,11 @@ class StartClass(object):
                     for calibrateAttr in calibratePresetList[i].keys():
                         cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
                     if invertList:
-                        for n, invertAttrList in enumerate(invertList):
-                            if not n == 0:
-                                for invertAttr in invertAttrList:
-                                    cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
-                                    cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
+                        invertAttrList = invertList[i]
+                        if invertAttrList:
+                            for invertAttr in invertAttrList:
+                                cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
+                                cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
 
     
     def rigModule(self, *args):

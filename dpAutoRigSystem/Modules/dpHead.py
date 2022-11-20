@@ -315,7 +315,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def getCalibratePresetList(self, s, *args):
         """ Returns the calibration preset and invert lists for neck and head joints.
         """
-        invertList = [[], [], ["invertTX"], [], []]
+        invertList = [[], [], ["invertTX", "invertRY", "invertRZ"], [], []]
         presetList = [{}, {"calibrateTX":1}, {"calibrateTX":1}, {"calibrateTZ":1}, {"calibrateTZ":-1}]
         if s == 1:
             if self.addFlip:
