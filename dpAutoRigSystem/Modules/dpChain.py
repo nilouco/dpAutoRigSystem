@@ -455,18 +455,19 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     ikCtrl = self.ctrls.cvControl("id_085_ChainIk", ctrlName=side+self.userGuideName+"_Ik_"+str(c)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                     self.ikCtrlList.append(ikCtrl)
                     cmds.delete(cmds.parentConstraint(clusterNode, ikCtrl, maintainOffset=False))
-                    cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
                     ikCtrlZero = dpUtils.zeroOut([ikCtrl])[0]
                     self.ikCtrlZeroList.append(ikCtrlZero)
                     cmds.parent(ikCtrlZero, self.ikCtrlMain)
                     cmds.rotate(0, 0, 0, ikCtrlZero)
+                    cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
+
                     if c == 4: #last
                         cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
                         self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_Last_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
                         self.ctrls.colorShape([self.ikCtrlLast], 'cyan')
-                        cmds.delete(cmds.parentConstraint(clusterNode, self.ikCtrlLast, maintainOffset=False))
+                        cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
                         ikCtrlLastZero = dpUtils.zeroOut([self.ikCtrlLast])[0]
                         cmds.parent(ikCtrlLastZero, self.ikCtrlMain)
                         cmds.parent(ikCtrlZero, self.ikCtrlLast)
@@ -483,7 +484,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     else: #first
                         cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
-
+                
                 # ik controls position:
                 cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")
                 cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlLast, self.ikCtrlZeroList[2], maintainOffset=True, name=self.ikCtrlZeroList[2]+"_PoC")
@@ -507,7 +508,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.setupAimConst(self.ikCtrlList[1], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[1], -1, False)
                     self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], 1, False)
                     cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, -1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
-
+                
                 self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
                 # ik stretch:
