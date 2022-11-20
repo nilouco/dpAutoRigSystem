@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.12"
-DPAR_UPDATELOG = "N550 - Fixed joints corrective mirror calibration."
+DPAR_VERSION_PY3 = "4.01.13"
+DPAR_UPDATELOG = "N544 - Adjusted corrective joints calibration\nby guide radius."
 
 
 
