@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.13"
-DPAR_UPDATELOG = "N544 - Adjusted corrective joints calibration\nby guide radius."
+DPAR_VERSION_PY3 = "4.01.14"
+DPAR_UPDATELOG = "N366 - Import calibration progress window."
 
 
 
