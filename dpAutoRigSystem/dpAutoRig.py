@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.15"
-DPAR_UPDATELOG = "N551 - Fixed Chain building issue."
+DPAR_VERSION_PY3 = "4.01.16"
+DPAR_UPDATELOG = "N535 - Deleting corrective manager network.\nFixed to work well for corrupted data too,\nlike deleted rig setup or optimized scene file."
 
 
 
