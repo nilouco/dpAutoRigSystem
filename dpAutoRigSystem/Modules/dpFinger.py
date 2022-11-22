@@ -146,8 +146,10 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def getCalibratePresetList(self, s, *args):
         """ Returns the calibration preset and invert lists for finger joints.
         """
-        invertList =  [[], ["invertTX"]]
+        invertList = None
         presetList = [{}, {"calibrateTX":1}]
+        if s == 1:
+           invertList = [[], ["invertTX"]]
         return presetList, invertList
 
 
