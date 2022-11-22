@@ -20,20 +20,23 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
+        self.correctiveCtrlGrpList = []
+
 
     def createModuleLayout(self, *args):
         dpBaseClass.StartClass.createModuleLayout(self)
         dpLayoutClass.LayoutClass.basicModuleLayout(self)
 
+
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
-
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
-        
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
+        cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".corrective", 0)
 
         self.cvJointLoc1 = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -73,6 +76,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # transform cvLocs in order to put as a good finger guide:
         cmds.setAttr(self.moduleGrp+".rotateX", 90)
         cmds.setAttr(self.moduleGrp+".rotateZ", 90)
+
 
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
@@ -138,6 +142,15 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         else:
             self.changeJointNumber(2)
 
+
+    def getCalibratePresetList(self, s, *args):
+        """ Returns the calibration preset and invert lists for finger joints.
+        """
+        invertList =  [[], ["invertTX"]]
+        presetList = [{}, {"calibrateTX":1}]
+        return presetList, invertList
+
+
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -148,6 +161,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
+            self.addCorrective = self.getModuleAttr("corrective")
             # declaring lists to send information for integration:
             self.scalableGrpList, self.ikCtrlZeroList = [], []
             # start as no having mirror:
@@ -190,6 +204,12 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             for s, side in enumerate(sideList):
                 self.skinJointList = []
                 self.base = side+self.userGuideName+'_Guide_Base'
+                if self.addArticJoint:
+                    if self.addCorrective:
+                        # corrective controls group
+                        self.correctiveCtrlsGrp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
+                        self.correctiveCtrlGrpList.append(self.correctiveCtrlsGrp)
+                        phalangeCalibratePresetList, invertList = self.getCalibratePresetList(s)
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 for n in range(0, self.nJoints+1):
@@ -302,9 +322,19 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # add articulationJoint:
                     if n > 0:
                         if self.addArticJoint:
-                            artJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            dpUtils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
-                            cmds.connectAttr(self.scaleCompensateCond+".outColorR", artJntList[0]+".segmentScaleCompensate", force=True)
+                            if self.addCorrective:
+                                correctiveNetList = [None]
+                                correctiveNetList.append(self.setupCorrectiveNet(side+self.userGuideName+"_01_Ctrl", self.skinJointList[n-1], self.skinJointList[n], side+self.userGuideName+"_"+str(n)+"_PitchDown", 1, 1, -90))
+                                articJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.ctrlRadius, 0, 0)])
+                                self.setupJcrControls(articJntList, s, jointLabelAdd, self.userGuideName+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
+                                if s == 1:
+                                    cmds.setAttr(articJntList[0]+".scaleX", -1)
+                                    cmds.setAttr(articJntList[0]+".scaleY", -1)
+                                    cmds.setAttr(articJntList[0]+".scaleZ", -1)
+                            else:
+                                articJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt)
+                                dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                                cmds.connectAttr(self.scaleCompensateCond+".outColorR", articJntList[0]+".segmentScaleCompensate", force=True)
                     cmds.select(self.jnt)
                     
                     if n == self.nJoints:
@@ -485,7 +515,8 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 else:
                     self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_00_SDK_Zero_0_Grp", side+self.userGuideName+"_01_SDK_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
                     self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_00_Jnt", name=side+self.userGuideName+"_Joint_Grp")
-
+                if self.addCorrective:
+                    cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
                 self.scalableGrpList.append(self.toScalableHookGrp)
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
                 # add hook attributes to be read when rigging integrated modules:
@@ -514,6 +545,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
 
+
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
@@ -522,5 +554,6 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             "module": {
                 "scalableGrpList": self.scalableGrpList,
                 "ikCtrlZeroList": self.ikCtrlZeroList,
+                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
             }
         }
