@@ -792,11 +792,10 @@ class ControlClass(object):
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                 cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
-                if cmds.getAttr(ctrlName+".pinGuide"):
-                    self.setPinnedGuideColor(ctrlName, True, "red")
+                self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
     
     
-    def setPinnedGuideColor(self, ctrlName, status, color, *args):
+    def setPinnedGuideColor(self, ctrlName, status, color="red", *args):
         """ Set the color override for pinned guide shapes.
         """
         cmds.setAttr(ctrlName+".overrideEnabled", status)
@@ -826,20 +825,17 @@ class ControlClass(object):
             pcName = ctrlName+"_PinGuide_PaC"
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
             if pinValue:
-                if not cmds.objExists(pcName):
-                    if cmds.objExists(self.dpUIinst.tempGrp):
+                if cmds.objExists(self.dpUIinst.tempGrp):
+                    if not cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True):
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
-                        cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)
-                        self.setPinnedGuideColor(ctrlName, True, "red")
+                        pc = cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)[0]
+                        cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
             else:
-                pConstList = cmds.listRelatives(ctrlName, children=True, type="parentConstraint")
-                if pConstList:
-                    for pConst in pConstList:
-                        if "PinGuide" in pConst:
-                            cmds.delete(pConst)
-                self.setPinnedGuideColor(ctrlName, False, "red")
-            
+                pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
+                if pcNodeList:
+                    cmds.delete(pcNodeList[0])
+            self.setPinnedGuideColor(ctrlName, pinValue)
             for attr in transformAttrList:
                 cmds.setAttr(ctrlName+"."+attr, lock=pinValue)
             cmds.namespace(set=":")
@@ -860,22 +856,12 @@ class ControlClass(object):
     
     def unPinGuide(self, guideBase, *args):
         """ Remove pinGuide setup.
+            We expect to have the scriptJob running here to clean-up the pin setup.
         """
-        if cmds.objExists(guideBase):
-            pcName = guideBase+"_PinGuide_PaC"
-            if cmds.objExists(pcName):
-                cmds.delete(pcName)
-            childrenList = cmds.listRelatives(guideBase, children=True, allDescendents=True, fullPath=True, type="transform")
-            if childrenList:
-                for childNode in childrenList:
-                    if cmds.objExists(childNode+".pinGuide"):
-                        cmds.setAttr(childNode+".pinGuide", 0)
-                        self.jobPinGuide(childNode)
-            if cmds.objExists(guideBase+".pinGuide"):
-                cmds.setAttr(guideBase+".pinGuide", 0)
-                self.createPinGuide(guideBase)
+        if cmds.objExists(guideBase+".pinGuide"):
+            cmds.setAttr(guideBase+".pinGuide", 0)
 
-
+    
     def importCalibration(self, *args):
         """ Import calibration from a referenced file.
             Transfer calibration for same nodes by name using calibrationList attribute.
