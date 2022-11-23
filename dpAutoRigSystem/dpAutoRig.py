@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.17"
-DPAR_UPDATELOG = "N538 Finger corrective joints."
+DPAR_VERSION_PY3 = "4.01.18"
+DPAR_UPDATELOG = "N250 Force remove constraint for unPinnedGuide.\nMapped guidePin constraint node by message."
 
 
 
@@ -2087,7 +2087,7 @@ class DP_AutoRig_UI(object):
 
     
     def unPinAllGuides(self, *args):
-        """ Force to un pin all guides.
+        """ Brute force to un pin all guides.
             Useful to clean up guides before start the rigAll process.
         """
         pConstList = cmds.ls(selection=False, type="parentConstraint")
