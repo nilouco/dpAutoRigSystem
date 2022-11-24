@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.18"
-DPAR_UPDATELOG = "N250 Force remove constraint for unPinnedGuide.\nMapped guidePin constraint node by message."
+DPAR_VERSION_PY3 = "4.01.19"
+DPAR_UPDATELOG = "N206 PinGuide locked attributes."
 
 
 
