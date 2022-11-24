@@ -827,9 +827,9 @@ class ControlClass(object):
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
             pcName = ctrlName+"_PinGuide_PaC"
             if pinValue:
-                self.storeLockedList(ctrlName)
                 if cmds.objExists(self.dpUIinst.tempGrp):
                     if not cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True):
+                        self.storeLockedList(ctrlName)
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
                         for attr in transformAttrList:
@@ -844,7 +844,7 @@ class ControlClass(object):
                     cmds.delete(pcNodeList[0])
                     for attr in transformAttrList:
                         cmds.setAttr(ctrlName+"."+attr, lock=False)
-                self.restoreLockedList(ctrlName)
+                    self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)
             cmds.namespace(set=":")
     
@@ -874,11 +874,12 @@ class ControlClass(object):
         """ Store a string of a list of found locked attributes.
         """
         lockedAttrStr = ""
-        if cmds.objExists(ctrlName+".lockedList"):
-            lockedAttrList = cmds.listAttr(ctrlName, locked=True)
-            if lockedAttrList:
-                lockedAttrStr = ';'.join(str(e) for e in lockedAttrList)
-            cmds.setAttr(ctrlName+".lockedList", lockedAttrStr, type="string")
+        if not cmds.objExists(ctrlName+".lockedList"):
+            cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
+        lockedAttrList = cmds.listAttr(ctrlName, locked=True)
+        if lockedAttrList:
+            lockedAttrStr = ';'.join(str(e) for e in lockedAttrList)
+        cmds.setAttr(ctrlName+".lockedList", lockedAttrStr, type="string")
 
 
     def restoreLockedList(self, ctrlName, *args):
