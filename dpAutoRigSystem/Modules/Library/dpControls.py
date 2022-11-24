@@ -791,6 +791,7 @@ class ControlClass(object):
                     cmds.addAttr(ctrlName, longName="pinGuide", attributeType='bool')
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
+                    cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
                 cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
                 self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
     
@@ -822,22 +823,29 @@ class ControlClass(object):
                     nameSpaceName = ctrlName[ctrlName.rfind("|")+1:ctrlName.rfind(":")]
                 else:
                     nameSpaceName = ctrlName[:ctrlName.rfind(":")]
-            pcName = ctrlName+"_PinGuide_PaC"
+            # work with locked attributes
             pinValue = cmds.getAttr(ctrlName+".pinGuide")
+            pcName = ctrlName+"_PinGuide_PaC"
             if pinValue:
+                self.storeLockedList(ctrlName)
                 if cmds.objExists(self.dpUIinst.tempGrp):
                     if not cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True):
                         if nameSpaceName:
                             cmds.namespace(set=nameSpaceName)
+                        for attr in transformAttrList:
+                            cmds.setAttr(ctrlName+"."+attr, lock=False)
                         pc = cmds.parentConstraint(self.dpUIinst.tempGrp, ctrlName, maintainOffset=True, name=pcName)[0]
                         cmds.connectAttr(pc+".message", ctrlName+".pinGuideConstraint")
+                        for attr in transformAttrList:
+                            cmds.setAttr(ctrlName+"."+attr, lock=True)
             else:
                 pcNodeList = cmds.listConnections(ctrlName+".pinGuideConstraint", destination=False, source=True)
                 if pcNodeList:
                     cmds.delete(pcNodeList[0])
+                    for attr in transformAttrList:
+                        cmds.setAttr(ctrlName+"."+attr, lock=False)
+                self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)
-            for attr in transformAttrList:
-                cmds.setAttr(ctrlName+"."+attr, lock=pinValue)
             cmds.namespace(set=":")
     
     
@@ -861,7 +869,30 @@ class ControlClass(object):
         if cmds.objExists(guideBase+".pinGuide"):
             cmds.setAttr(guideBase+".pinGuide", 0)
 
-    
+
+    def storeLockedList(self, ctrlName, *args):
+        """ Store a string of a list of found locked attributes.
+        """
+        lockedAttrStr = ""
+        if cmds.objExists(ctrlName+".lockedList"):
+            lockedAttrList = cmds.listAttr(ctrlName, locked=True)
+            if lockedAttrList:
+                lockedAttrStr = ';'.join(str(e) for e in lockedAttrList)
+            cmds.setAttr(ctrlName+".lockedList", lockedAttrStr, type="string")
+
+
+    def restoreLockedList(self, ctrlName, *args):
+        """ Lock again the stored attributes.
+        """
+        if cmds.objExists(ctrlName+".lockedList"):
+            lockedAttr = cmds.getAttr(ctrlName+".lockedList")
+            if lockedAttr:
+                lockedAttrList = lockedAttr.split(";")
+                if lockedAttrList:
+                    for attr in lockedAttrList:
+                        cmds.setAttr(ctrlName+"."+attr, lock=True)
+
+
     def importCalibration(self, *args):
         """ Import calibration from a referenced file.
             Transfer calibration for same nodes by name using calibrationList attribute.
