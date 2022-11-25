@@ -366,6 +366,15 @@ class StartClass(object):
                 self.userGuideName = prefix + self.userGuideName
             cmds.select(clear=True)
     
+
+    def hookSetup(self, *args):
+        """ Add message attributes to map hooked groups for the rigged module.
+        """
+        cmds.addAttr(self.toStaticHookGrp, longName="controlHookGrp", attributeType="message")
+        cmds.addAttr(self.toStaticHookGrp, longName="scalableHookGrp", attributeType="message")
+        cmds.connectAttr(self.toCtrlHookGrp+".message", self.toStaticHookGrp+".controlHookGrp", force=True)
+        cmds.connectAttr(self.toScalableHookGrp+".message", self.toStaticHookGrp+".scalableHookGrp", force=True)
+
     
     def integratingInfo(self, *args):
         """ This method just create this dictionary in order to build information of module integration.

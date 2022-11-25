@@ -518,7 +518,7 @@ def getModulesToBeRigged(instanceList):
             guideNamespaceName = guideModule.guideNamespace
             if guideNamespaceName in allNamespaceList:
                 userGuideName = guideModule.userGuideName
-                if not cmds.objExists(userGuideName+'_Grp'):
+                if not cmds.objExists(userGuideName+'_Static_Grp'):
                     modulesToBeRiggedList.append(guideModule)
     return modulesToBeRiggedList
 

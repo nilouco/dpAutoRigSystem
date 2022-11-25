@@ -411,8 +411,8 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(zeroGrpList[2], name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.centerJoint, self.mainJoint, defGrp, name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder, name=side+self.userGuideName+"_Grp")
+                self.toScalableHookGrp = cmds.group(self.centerJoint, self.mainJoint, defGrp, name=side+self.userGuideName+"_Scalable_Grp")
+                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder, name=side+self.userGuideName+"_Static_Grp")
                 # add hook attributes to be read when rigging integrated modules:
                 dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
@@ -425,6 +425,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 self.ctrlHookGrpList.append(self.toCtrlHookGrp)
+                self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):

@@ -808,8 +808,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.toCtrlHookGrp     = cmds.group(self.zeroNeckCtrlList[0], self.zeroCtrlList[2], self.zeroCtrlList[8], self.zeroCtrlList[9], name=side+self.userGuideName+"_Control_Grp")
                 if self.addCorrective:
                     cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
-                self.toScalableHookGrp = cmds.group(self.neckJointList[0], name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.worldRef, name=side+self.userGuideName+"_Grp")
+                self.toScalableHookGrp = cmds.group(self.neckJointList[0], name=side+self.userGuideName+"_Scalable_Grp")
+                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.worldRef, name=side+self.userGuideName+"_Static_Grp")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
@@ -821,10 +821,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
                 dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-
+                self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
-                
+
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
             # finalize this rig:

@@ -376,11 +376,11 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parentConstraint(self.hipsBCtrl, downCluster, maintainOffset=True, name=downCluster+"_PaC")
                 cmds.parentConstraint(self.chestBCtrl, upCluster, maintainOffset=True, name=upCluster+"_PaC")
                 # organize a group of clusters:
-                clustersGrp = cmds.group(name=side+self.userGuideName+"_Rbn_Clusters_Grp", empty=True)
-                self.aClusterGrp.append(clustersGrp)
+                self.toScalableHookGrp = cmds.group(name=side+self.userGuideName+"_Scalable_Grp", empty=True)
+                self.aClusterGrp.append(self.toScalableHookGrp)
                 if hideJoints:
-                    cmds.setAttr(clustersGrp+".visibility", 0)
-                cmds.parent(downCluster, upCluster, clustersGrp, relative=True)
+                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
+                cmds.parent(downCluster, upCluster, self.toScalableHookGrp, relative=True)
                 # make ribbon joints groups scalable:
                 middleScaleYMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_MiddleScaleY_MD")
                 cmds.setAttr(middleScaleYMD+".operation", 2)
@@ -389,10 +389,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
                         scaleGrp = cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
-                        cmds.scaleConstraint(clustersGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
+                        cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
                         cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
                     else:
-                        cmds.scaleConstraint(clustersGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
+                        cmds.scaleConstraint(self.toScalableHookGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
                 if scaleGrp:
                     cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
                 # calculate the distance to volumeVariation:
@@ -469,7 +469,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     nParentValue = (n) / float(self.nJoints-1)
                     cmds.setAttr(self.parentConst+"."+self.hipsBCtrl+"W0", 1-nParentValue)
                     cmds.setAttr(self.parentConst+"."+self.chestBCtrl+"W1", nParentValue)
-                    cmds.parent(middleCluster, clustersGrp, relative=True)
+                    cmds.parent(middleCluster, self.toScalableHookGrp, relative=True)
                     # add originedFrom attribute to this middle ctrl:
                     middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+str(n)+"_OrigFrom_Grp")
                     dpUtils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
@@ -523,24 +523,25 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 currentVV = cmds.getAttr(rbnMD+'.outputX')
                 cmds.setAttr(rbnVVMD+'.input1X', currentVV)
                 # organize groups:
-                self.rbnRigGrp = cmds.group(name=side+self.userGuideName+"_Grp", empty=True)
-                self.rbnControlGrp = cmds.group(name=side+self.userGuideName+"_Control_Grp", empty=True)
-                cmds.parent(self.hipsACtrlZero, self.rbnControlGrp, relative=True)
-                cmds.parent(clustersGrp, side+self.userGuideName+"_Rbn_RibbonJoint_Grp", self.rbnControlGrp, arcLen, self.rbnRigGrp, relative=True)
-                cmds.parent(baseJnt, tipJnt, self.rbnRigGrp)
+                self.toStaticHookGrp = cmds.group(name=side+self.userGuideName+"_Static_Grp", empty=True)
+                self.toCtrlHookGrp = cmds.group(name=side+self.userGuideName+"_Control_Grp", empty=True)
+                cmds.parent(self.hipsACtrlZero, self.toCtrlHookGrp, relative=True)
+                cmds.parent(self.toScalableHookGrp, side+self.userGuideName+"_Rbn_RibbonJoint_Grp", self.toCtrlHookGrp, arcLen, self.toStaticHookGrp, relative=True)
+                cmds.parent(baseJnt, tipJnt, self.toStaticHookGrp)
                 if hideJoints:
                     cmds.setAttr(side+self.userGuideName+"_Rbn_RibbonJoint_Grp.visibility", 0)
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.rbnControlGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=clustersGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.rbnRigGrp, hookType='staticHook')
-                cmds.addAttr(self.rbnRigGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.rbnRigGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.rbnRigGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.rbnRigGrp+".dpAR_type", CLASS_NAME, type="string")
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
+                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
+                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
+                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
                 # add module type counter value
-                cmds.addAttr(self.rbnRigGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.rbnRigGrp+'.dpAR_count', dpAR_count)
+                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
+                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                self.hookSetup()
                 # lockHide scale of up and down controls:
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['sx', 'sy', 'sz'])
                 # delete duplicated group for side (mirror):

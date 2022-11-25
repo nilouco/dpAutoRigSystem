@@ -730,8 +730,8 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(eyeZeroList[0], name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.jxt, self.eyeScaleGrp, name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
+                self.toScalableHookGrp = cmds.group(self.jxt, self.eyeScaleGrp, name=side+self.userGuideName+"_Scalable_Grp")
+                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
                 if s == 0:
                     cmds.parent(self.eyeGrp, self.toCtrlHookGrp)
                     cmds.parent(self.upLocGrp, self.toScalableHookGrp)
@@ -751,6 +751,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # add module type counter value
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):

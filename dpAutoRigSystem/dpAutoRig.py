@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.19"
-DPAR_UPDATELOG = "N206 PinGuide locked attributes."
+DPAR_VERSION_PY3 = "4.01.20"
+DPAR_UPDATELOG = "N428 Group naming of module data.\nChanged to _Static_Grp and _Scalable_Grp\nto avoid naming conflict."
 
 
 
@@ -2240,10 +2240,10 @@ class DP_AutoRig_UI(object):
                             self.itemGuideName = sideName + self.prefix + self.itemGuideInstance
                         
                         # get hook groups info:
-                        self.itemRiggedGrp = self.itemGuideName + "_Grp"
+                        self.itemRiggedGrp = self.itemGuideName+"_Static_Grp"
                         self.staticHookGrp = self.itemRiggedGrp
-                        self.ctrlHookGrp = ""
-                        self.scalableHookGrp = ""
+                        self.ctrlHookGrp = cmds.listConnections(self.itemRiggedGrp+".controlHookGrp", destination=False, source=True)[0]
+                        self.scalableHookGrp = cmds.listConnections(self.itemRiggedGrp+".scalableHookGrp", destination=False, source=True)[0]
                         self.rootHookGrp = ""
                         riggedChildList = cmds.listRelatives(self.itemRiggedGrp, children=True, type='transform')
                         if riggedChildList:
@@ -2258,8 +2258,8 @@ class DP_AutoRig_UI(object):
                                     self.rootHookGrp = child
                         
                         # get guideModule hierarchy data:
-                        self.fatherGuide  = self.hookDic[guideModule.moduleGrp]['fatherGuide']
-                        self.parentNode   = self.hookDic[guideModule.moduleGrp]['parentNode']
+                        self.fatherGuide = self.hookDic[guideModule.moduleGrp]['fatherGuide']
+                        self.parentNode  = self.hookDic[guideModule.moduleGrp]['parentNode']
                         
                         # get father info:
                         if self.fatherGuide:
