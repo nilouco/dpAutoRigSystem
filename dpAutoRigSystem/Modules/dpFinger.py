@@ -511,16 +511,16 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # create a masterModuleGrp to be checked if this rig exists:
                     self.toCtrlHookGrp = cmds.group(self.ikCtrlZero, side+self.userGuideName+"_00_SDK_Zero_0_Grp", side+self.userGuideName+"_01_SDK_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
                     if self.nJoints == 2:
-                        self.toScalableHookGrp = cmds.group(self.skinJointList[0], ikBaseJoint, fkBaseJoint, ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side+self.userGuideName+"_Joint_Grp")
+                        self.toScalableHookGrp = cmds.group(self.skinJointList[0], ikBaseJoint, fkBaseJoint, ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side+self.userGuideName+"_Scalable_Grp")
                     else:
-                        self.toScalableHookGrp = cmds.group(self.skinJointList[0], ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side+self.userGuideName+"_Joint_Grp")
+                        self.toScalableHookGrp = cmds.group(self.skinJointList[0], ikHandleGrp, distBetweenList[2], distBetweenList[3], distBetweenList[4], name=side+self.userGuideName+"_Scalable_Grp")
                 else:
                     self.toCtrlHookGrp = cmds.group(side+self.userGuideName+"_00_SDK_Zero_0_Grp", side+self.userGuideName+"_01_SDK_Zero_0_Grp", name=side+self.userGuideName+"_Control_Grp")
-                    self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_00_Jnt", name=side+self.userGuideName+"_Joint_Grp")
+                    self.toScalableHookGrp = cmds.group(side+self.userGuideName+"_00_Jnt", name=side+self.userGuideName+"_Scalable_Grp")
                 if self.addCorrective:
                     cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
                 self.scalableGrpList.append(self.toScalableHookGrp)
-                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
+                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
                 # add hook attributes to be read when rigging integrated modules:
                 dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
                 dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
@@ -532,6 +532,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # add module type counter value
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                self.hookSetup()
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
