@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.20"
-DPAR_UPDATELOG = "N428 Group naming of module data.\nChanged to _Static_Grp and _Scalable_Grp\nto avoid naming conflict."
+DPAR_VERSION_PY3 = "4.01.21"
+DPAR_UPDATELOG = "N581 WIP_Grp Cleaner."
 
 
 
