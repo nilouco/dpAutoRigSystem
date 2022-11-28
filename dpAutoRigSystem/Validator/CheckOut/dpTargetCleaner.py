@@ -1,19 +1,18 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "WIPCleaner"
-TITLE = "v009_wipCleaner"
-DESCRIPTION = "v010_wipCleanerDesc"
-ICON = "/Icons/dp_wipCleaner.png"
+CLASS_NAME = "TargetCleaner"
+TITLE = "v012_targetCleaner"
+DESCRIPTION = "v013_targetCleanerDesc"
+ICON = "/Icons/dp_targetCleaner.png"
 
-dpWIPCleaner_Version = 1.0
+dpTargetCleaner_Version = 1.0
 
-class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
+class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -41,43 +40,38 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
 
         # ---
         # --- validator code --- beginning
-        wipGrp = None
         if objList:
-            wipGrp = objList
+            toCheckList = objList
         else:
-            wipGrp = dpUtils.getNodeByMessage("wipGrp")
-            if not wipGrp:
-                if cmds.objExists("WIP_Grp"):
-                    wipGrp = "WIP_Grp"
-        if wipGrp:
+            toCheckList = cmds.ls(selection=False, type='mesh')
+        if toCheckList:
             progressAmount = 0
-            maxProcess = len(wipGrp)
-            if self.verbose:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-            self.checkedObjList.append(wipGrp)
-            wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
-            if wipChildrenList:
-                self.foundIssueList.append(True)
-                if self.verifyMode:
-                    self.resultOkList.append(False)
-                else: #fix    
-                    try:
-                        cmds.delete(wipChildrenList)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+wipGrp)
-                    except:
+            maxProcess = len(toCheckList)
+            for item in toCheckList:
+                if self.verbose:
+                    # Update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                parentNode = cmds.listRelatives(item, parent=True)[0]
+                self.checkedObjList.append(parentNode)
+                if not '_Mesh' in item:
+                    self.foundIssueList.append(True)
+                    if self.verifyMode:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+wipGrp)
-            else:
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
-        else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(True)
-            self.resultOkList.append(False)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v011_notWIP'])
+                    else: #fix
+                        try:
+                            #WIP: (index to fix error OMG!)
+                            parentNode = cmds.listRelatives(item, parent=True)[0] # change index here to test
+                            #raise Exception("Carreto trombado na pista")
+                            cmds.rename(parentNode, parentNode+"_Mesh")
+                            self.resultOkList.append(True)
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
+                        except:
+                            self.resultOkList.append(False)
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
+                else:
+                    self.foundIssueList.append(False)
+                    self.resultOkList.append(True)
         # --- validator code --- end
         # ---
 
