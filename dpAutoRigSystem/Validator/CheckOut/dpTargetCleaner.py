@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
+from ...Modules.Library import dpUtils
 from importlib import reload
 reload(dpBaseValidatorClass)
 
@@ -43,16 +44,53 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
+            #toCheckList = cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=True)
             toCheckList = cmds.ls(selection=False, type='mesh')
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
+            # get exception list to keep nodes in the scene
+            exceptionList = []
+            renderGrp = dpUtils.getNodeByMessage("renderGrp")
+            if renderGrp:
+                renderNodeList = cmds.listRelatives(renderGrp, allDescendents=True, children=True, type="transform", fullPath=True)
+                if renderNodeList:
+                    exceptionList += renderNodeList
+            
+            for item in toCheckList:
+                #outputList = cmds.listConnections(item, source=True, destination=False)
+                #print("outputList =", item, outputList)
+
+#                histList = cmds.listHistory(item)
+#                print ("item, histList ===", item, histList)
+#                for histNode in histList:
+#                    print(cmds.objectType(histNode))
+
+                defList = cmds.findDeformers(item)
+                print (item, defList)
+                if defList:
+                    for deformerNode in defList:
+                        print("def type =", cmds.objectType(deformerNode))
+
+
+            print("exceptionList ===", exceptionList)
+
+
             for item in toCheckList:
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-                parentNode = cmds.listRelatives(item, parent=True)[0]
+                
+                #WIP
+                if not item in exceptionList:
+                    print("to clean up node:", item)
+
+
+
+
+                
+                parentNode = item
                 self.checkedObjList.append(parentNode)
                 if not '_Mesh' in item:
                     self.foundIssueList.append(True)
@@ -72,6 +110,11 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 else:
                     self.foundIssueList.append(False)
                     self.resultOkList.append(True)
+        else:
+            self.checkedObjList.append("")
+            self.foundIssueList.append(True)
+            self.resultOkList.append(False)
+            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
 

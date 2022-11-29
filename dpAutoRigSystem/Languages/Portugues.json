@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-11-28",
+    "_updated"       : "2022-11-29",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -621,5 +621,6 @@
     "v010_wipCleanerDesc"    : "Verifica se tem algum node filho do\nWIP_Grp e deleta eles se tiver.",
     "v011_notWIP"            : "Não encontrado o WIP_Grp para limpa-lo, desculpe.",
     "v012_targetCleaner"     : "BlendShape target limpador",
-    "v013_targetCleanerDesc" : "Verifica se tem targets primárias de blendShape\ne limpa-as.\nIrá deletar as não conectadas ou não deformadas."
+    "v013_targetCleanerDesc" : "Verifica se tem targets primárias de blendShape\ne limpa-as.\nIrá deletar as não conectadas ou não deformadas.",
+    "v014_notFoundNodes"     : "Não encontrado nodes para continuar, desculpe."
 }

@@ -72,6 +72,11 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
                 else:
                     self.foundIssueList.append(False)
                     self.resultOkList.append(True)
+        else:
+            self.checkedObjList.append("")
+            self.foundIssueList.append(True)
+            self.resultOkList.append(False)
+            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
 
