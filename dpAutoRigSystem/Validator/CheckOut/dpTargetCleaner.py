@@ -44,13 +44,15 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            #toCheckList = cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=True)
-            toCheckList = cmds.ls(selection=False, type='mesh')
+            toCheckList = list(set(cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=True)))
+            print("toCheckList = ", toCheckList)
+#            toCheckList = cmds.ls(selection=False, type='mesh')
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
             # get exception list to keep nodes in the scene
             exceptionList = []
+            deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             renderGrp = dpUtils.getNodeByMessage("renderGrp")
             if renderGrp:
                 renderNodeList = cmds.listRelatives(renderGrp, allDescendents=True, children=True, type="transform", fullPath=True)
@@ -58,34 +60,45 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     exceptionList += renderNodeList
             
             for item in toCheckList:
-                #outputList = cmds.listConnections(item, source=True, destination=False)
-                #print("outputList =", item, outputList)
-
-#                histList = cmds.listHistory(item)
-#                print ("item, histList ===", item, histList)
-#                for histNode in histList:
-#                    print(cmds.objectType(histNode))
-
-                defList = cmds.findDeformers(item)
-                print (item, defList)
-                if defList:
-                    for deformerNode in defList:
-                        print("def type =", cmds.objectType(deformerNode))
-
-
-            print("exceptionList ===", exceptionList)
-
-
-            for item in toCheckList:
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                if cmds.objExists(item):
+                    needToKeepIt = False
+
+                    #outputList = cmds.listConnections(item, source=True, destination=False)
+                    #print("outputList =", item, outputList)
+
+    #                histList = cmds.listHistory(item)
+    #                print ("item, histList ===", item, histList)
+    #                for histNode in histList:
+    #                    print(cmds.objectType(histNode))
+
+                    defList = cmds.findDeformers(item)
+                    print ("defList ======", item, defList)
+                    if defList:
+                        for deformerNode in defList:
+#                            print("def type =", cmds.objectType(deformerNode))
+                            if cmds.objectType(deformerNode) in deformersToKeepList:
+                                needToKeepIt = True
+                        if not needToKeepIt:
+#                            print("here not needToKeepIt", item)
+                            if not item in exceptionList:
+                                cmds.delete(item)
+#                                print("here, after deleted....", item)
+#                        print("result =", item, needToKeepIt)
+
+                    else:
+                        if not item in exceptionList:
+                            # TODO need to dont remove wrap deformer setup meshes!!!
+                            cmds.delete(item)
+#                    print("exceptionList ===", exceptionList)
+
+
+            
                 
                 #WIP
-                if not item in exceptionList:
-                    print("to clean up node:", item)
-
 
 
 
