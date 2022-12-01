@@ -44,9 +44,7 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            toCheckList = list(set(cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=True)))
-            print("toCheckList = ", toCheckList)
-#            toCheckList = cmds.ls(selection=False, type='mesh')
+            toCheckList = list(set(cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=False)))
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
@@ -55,10 +53,10 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             renderGrp = dpUtils.getNodeByMessage("renderGrp")
             if renderGrp:
-                renderNodeList = cmds.listRelatives(renderGrp, allDescendents=True, children=True, type="transform", fullPath=True)
+                renderNodeList = cmds.listRelatives(renderGrp, allDescendents=True, children=True, type="transform", fullPath=False)
                 if renderNodeList:
                     exceptionList += renderNodeList
-            
+            toKeep = []
             for item in toCheckList:
                 if self.verbose:
                     # Update progress window
@@ -76,29 +74,54 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     #                    print(cmds.objectType(histNode))
 
                     defList = cmds.findDeformers(item)
-                    print ("defList ======", item, defList)
+#                    print ("defList ======", item, defList)
                     if defList:
                         for deformerNode in defList:
 #                            print("def type =", cmds.objectType(deformerNode))
                             if cmds.objectType(deformerNode) in deformersToKeepList:
-                                needToKeepIt = True
-                        if not needToKeepIt:
-#                            print("here not needToKeepIt", item)
-                            if not item in exceptionList:
-                                cmds.delete(item)
+                                if not item in exceptionList:
+                                    exceptionList.append(item)
+
+                                if cmds.objectType(deformerNode) == "wrap":
+
+                                    #print("foundWrap here", item)
+                                    basePointConnectedList = cmds.listConnections(deformerNode+".basePoints", source=True, destination=False)
+                                    #print("WRAP Basepoints", basePointConnectedList)
+                                    if basePointConnectedList:
+                                        exceptionList.append(basePointConnectedList[0])#cmds.listRelatives(basePointConnectedList[0], type="transform", parent=True, fullPath=True)[0])
+                                    diverPointConnectedList = cmds.listConnections(deformerNode+".driverPoints", source=True, destination=False)
+                                    print("WRAP driverPoints", diverPointConnectedList)
+                                    if diverPointConnectedList:
+                                        exceptionList.append(diverPointConnectedList[0])#[0], type="transform", parent=True, fullPath=True)[0])
+                                    #basePoints
+                                    #driverPoints
+                        #if not needToKeepIt:
+#                       #     print("here not needToKeepIt", item)
+                        #    if not item in exceptionList:
+                        #        cmds.delete(item)
 #                                print("here, after deleted....", item)
+                        #if needTo:
+                        #    toKeep.append(item)
 #                        print("result =", item, needToKeepIt)
 
-                    else:
-                        if not item in exceptionList:
-                            # TODO need to dont remove wrap deformer setup meshes!!!
-                            cmds.delete(item)
-#                    print("exceptionList ===", exceptionList)
+                    #else:
+                    #    if not item in exceptionList:
+                    #        # TODO need to dont remove wrap deformer setup meshes!!!
+                    #        cmds.delete(item)
+                    #        print("DELETED :::::", item)
 
 
             
-                
+                #print("toKeep         ", toKeep)
+                #print("toCheckListMesh", toCheckListMesh)
+
                 #WIP
+            print("exceptionList = ", exceptionList)
+            for item in toCheckList:
+                if not item in exceptionList:
+                    if cmds.objExists(item):
+                        cmds.delete(item)
+                        print("Deleted item:", item)
 
 
 
