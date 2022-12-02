@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.21"
-DPAR_UPDATELOG = "N581 WIP_Grp Cleaner."
+DPAR_VERSION_PY3 = "4.01.22"
+DPAR_UPDATELOG = "N582 BlendShape targets cleaner."
 
 
 

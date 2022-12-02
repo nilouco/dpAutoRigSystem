@@ -9,7 +9,7 @@ reload(dpBaseValidatorClass)
 CLASS_NAME = "WIPCleaner"
 TITLE = "v009_wipCleaner"
 DESCRIPTION = "v010_wipCleanerDesc"
-ICON = "/Icons/dp_WIPCleaner.png"
+ICON = "/Icons/dp_wipCleaner.png"
 
 dpWIPCleaner_Version = 1.0
 
