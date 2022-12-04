@@ -46,6 +46,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.fixIkSpringSolverGrpList = []
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
+        self.ikStretchExtremLocList = []
         self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
@@ -775,6 +776,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
+                if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
+                    self.ikStretchExtremLocList.append(None)                    
+                else:
+                    self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
@@ -1699,6 +1704,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "limbStyle": self.limbStyle,
                 "quadFrontLegList": self.quadFrontLegList,
                 "integrateOrigFromList": self.integrateOrigFromList,
+                "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": "limbManualVolume",
                 "scalableGrp": self.aScalableGrps,
