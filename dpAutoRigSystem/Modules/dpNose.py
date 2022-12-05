@@ -39,7 +39,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 1)
+        cmds.setAttr(self.moduleGrp+".articulation", 0)
         cmds.addAttr(self.moduleGrp, longName="nostril", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".nostril", 1)
         # create cvJointLoc and cvLocators:
@@ -318,6 +318,8 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         if self.addArticJoint:
                             artJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
                             dpUtils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
+                            cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
                 
                 # declaring guides:

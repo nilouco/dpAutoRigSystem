@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.23"
+DPAR_VERSION_PY3 = "4.01.24"
 DPAR_UPDATELOG = "N552 - Limb scaleCompensate issue fixed."
 
 
@@ -2446,6 +2446,8 @@ class DP_AutoRig_UI(object):
                                             currentValue = cmds.getAttr(worldRef+'.'+floatAttr)
                                             if floatAttr == lvvAttr:
                                                 cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), defaultValue=currentValue, keyable=True)
+                                                # TODO fix or remove Limb manual volume variation attribute
+                                                cmds.setAttr(self.optionCtrl+"."+floatAttr, channelBox=False, keyable=False)
                                             else:
                                                 cmds.addAttr(self.optionCtrl, longName=floatAttr, attributeType=cmds.getAttr(worldRef+"."+floatAttr, type=True), minValue=0, maxValue=1, defaultValue=currentValue, keyable=True)
                                         cmds.connectAttr(self.optionCtrl+'.'+floatAttr, worldRef+'.'+floatAttr, force=True)

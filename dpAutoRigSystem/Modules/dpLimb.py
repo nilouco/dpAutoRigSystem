@@ -1706,7 +1706,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "integrateOrigFromList": self.integrateOrigFromList,
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
-                "limbManualVolume": "limbManualVolume",
+                "limbManualVolume": self.langDic[self.langName]['m019_limb'].lower()+"Manual_"+self.langDic[self.langName]['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
                 "softIkCalibrateList": self.softIkCalibrateList,
