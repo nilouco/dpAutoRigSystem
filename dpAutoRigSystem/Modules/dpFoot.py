@@ -28,6 +28,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.parentConstList = []
         self.scaleConstList = []
         self.footJntList = []
+        self.ballRFList = []
         self.middleFootCtrlList = []
         self.reverseFootAttrList = []
         self.aScalableGrp = []
@@ -219,6 +220,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.RFDGrp = cmds.group(self.RFDCtrl, name=self.RFDCtrl+"_Grp")
                 self.RFEGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Grp")
                 rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp]
+                self.ballRFList.append(self.RFEGrp)
                 
                 # putting groups in the correct place:
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footJnt, maintainOffset=False)
@@ -475,6 +477,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "parentConstList": self.parentConstList,
                 "scaleConstList": self.scaleConstList,
                 "footJntList": self.footJntList,
+                "ballRFList": self.ballRFList,
                 "middleFootCtrlList": self.middleFootCtrlList,
                 "reverseFootAttrList": self.reverseFootAttrList,
                 "scalableGrp": self.aScalableGrp,
