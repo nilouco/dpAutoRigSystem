@@ -96,8 +96,8 @@ class RibbonClass(object):
             cmds.select(clear=True)
             self.cornerJxt = cmds.joint(name=prefix+myName+'_Corner_Jxt', scaleCompensate=False)
             self.cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt', scaleCompensate=False, radius=1.5)
-            cmds.setAttr(self.cornerJxt+".segmentScaleCompensate", 0)
-            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 0)
+            cmds.setAttr(self.cornerJxt+".segmentScaleCompensate", 1)
+            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 1)
             cmds.addAttr(self.cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
             cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
             cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
@@ -681,10 +681,7 @@ class RibbonClass(object):
                 cmds.connectAttr(worldRef+"."+self.limbMinVVAttr, rbScaleClp+".minR")
                 cmds.setAttr(rbScaleClp+".maxR", 1000000)
                 cmds.connectAttr(rbScaleClp+".outputR", rbBlendCB+".color1.color1R", force=True)
-                if limbArm:
-                    cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleY", force=True)
-                else:
-                    cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleX", force=True)
+                cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleY", force=True)
                 cmds.connectAttr(rbBlendCB+".output.outputR", self.cornerJnt+".scaleZ", force=True)
         
         locatorsGrp = cmds.group(bttm_Loc[0], top_Loc[0], mid_Loc[0], bttm_Loc[3], top_Loc[3], n=name+'_Loc_Grp')

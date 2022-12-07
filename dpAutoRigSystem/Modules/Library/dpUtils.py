@@ -784,7 +784,7 @@ def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcr
             cmds.parent(jax, fatherNode)
             cmds.makeIdentity(jax, apply=True)
             cmds.setAttr(jax+".segmentScaleCompensate", 0)
-            cmds.setAttr(jar+".segmentScaleCompensate", 0)
+            cmds.setAttr(jar+".segmentScaleCompensate", 1)
             jointList.append(jar)
             for i in range(0, jcrNumber):
                 cmds.select(jar)

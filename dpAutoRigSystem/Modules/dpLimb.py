@@ -1452,10 +1452,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             self.cornerJntList.append(jar)
                             if self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring'] or self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                                 if self.langDic[self.langName]['c056_front'] in self.userGuideName:
-                                        if s == 0:
-                                            cmds.setAttr(self.cornerJntList[0]+".rotateX", 0)
-                                        else:
-                                            cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
+                                    if s == 0:
+                                        cmds.setAttr(self.cornerJntList[0]+".rotateX", 0)
+                                    else:
+                                        cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
                             if self.addCorrective:
                                 jcrList = cmds.listRelatives(self.cornerJntList[0], children=True, allDescendents=True)
                                 if jcrList:
@@ -1706,7 +1706,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "integrateOrigFromList": self.integrateOrigFromList,
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
-                "limbManualVolume": "limbManualVolume",
+                "limbManualVolume": self.langDic[self.langName]['m019_limb'].lower()+"Manual_"+self.langDic[self.langName]['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
                 "softIkCalibrateList": self.softIkCalibrateList,
