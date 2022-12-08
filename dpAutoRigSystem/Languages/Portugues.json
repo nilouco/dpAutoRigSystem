@@ -622,5 +622,7 @@
     "v011_notWIP"            : "Não encontrado o WIP_Grp para limpa-lo, desculpe.",
     "v012_targetCleaner"     : "BlendShape target limpador",
     "v013_targetCleanerDesc" : "Verifica se tem targets primárias de blendShape\ne limpa-as.\nIrá deletar as geometrias não conectadas ou não deformadas.",
-    "v014_notFoundNodes"     : "Não encontrado nodes para continuar, desculpe."
+    "v014_notFoundNodes"     : "Não encontrado nodes para continuar, desculpe.",
+    "v015_allFreeze"         : "Tudo Congelado",
+    "v016_allFreezeDesc"     : "Verifique se todas as geometrias têm transformações congeladas, translação, rotação com os valores em zero e escala com os valores em um, caso contrário, tente aplicá-las."
 }
