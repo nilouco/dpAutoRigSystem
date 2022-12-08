@@ -8,7 +8,7 @@ reload(dpBaseValidatorClass)
 CLASS_NAME = 'ValidatorAllFreeze'
 TITLE = 'v015_allFreeze'
 DESCRIPTION = 'v016_allFreezeDesc'
-ICON = '/Icons/dp_validatorTemplate.png'
+ICON = '/Icons/dp_validatorFt.png'
 
 dpValidatorAllFreeze_Version = 1.0
 
@@ -50,16 +50,16 @@ class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
             unlocked = True
             for attr in attrList:
                 if animCurvesList:
-                    if not obj+'_'+attr in animCurvesList:
-                        cmds.setAttr(obj+'.'+attr, lock=False)
-                    else:
+                    if obj+'_'+attr in animCurvesList:
                         unlocked = False
+                    else:
+                        cmds.setAttr(obj+'.'+attr, lock=False)
                 else:
-                    cmds.setAttr(obj+'.'+attrList, lock=False)
+                    cmds.setAttr(obj+'.'+attr, lock=False)
             return unlocked
 
         def canotFreezeMsg(obj):
-            self.msgList.append('Cannot Freeze Transformations for: ' + obj+', maybe it has animation.')
+            self.messageList.append('Cannot Freeze Transformations for: ' + obj+'.')
 
         allObjectList = []
         toFixList = []
@@ -74,8 +74,7 @@ class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
             oneAttrList = ['scaleX', 'scaleY', 'scaleZ']
             camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
             # excluing cameras
-            allValidObjs = filter(
-                lambda obj: obj not in camerasList, allObjectList)
+            allValidObjs = filter(lambda obj: obj not in camerasList, allObjectList)
             for idx, obj in enumerate(allValidObjs):
                 if cmds.objExists(obj):
                     # run for translates and rotates
@@ -84,31 +83,32 @@ class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
                     scaleFreezed = objFreezed(obj, oneAttrList, 1)
                 self.checkedObjList.append(obj)
                 if translateAndRotateFreezed and scaleFreezed:
-                    self.foundList.append(False)
-                    self.resultOkList.append(False)
+                    self.foundIssueList.append(False)
+                    self.resultOkList.append(True)
                 else:
-                    self.foundList.append(True)
+                    self.foundIssueList.append(True)
                     self.resultOkList.append(False)
-                    self.msgList.append('Found Transformation for: '+obj)
+                    self.messageList.append('Found Transformation for: '+obj)
                     toFixList.append((obj, idx))
             if self.verifyMode == False and len(toFixList) > 0:
-                try:
-                    for obj in toFixList:
-                        unlocked = unlockAttributes(obj[0], zeroAttrList)
-                        unlocked = unlockAttributes(obj[0], oneAttrList)
+                
+                for obj in toFixList:
+                    unlocked = unlockAttributes(obj[0], zeroAttrList)
+                    unlocked = unlockAttributes(obj[0], oneAttrList)
 
-                        if unlocked:
-                            cmds.makeIdentity(
-                                obj[0], apply=True, translate=True, rotate=True, scale=True)
+                    if unlocked:
+                        try:
+                            cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
                             if objFreezed(obj[0], zeroAttrList, 0) and objFreezed(obj[0], oneAttrList, 1):
+                                self.foundIssueList[obj[1]] = False
                                 self.resultOkList[obj[1]] = True
-                                self.msgList.append('Freezed Transformations for: '+obj)
+                                self.messageList.append('Freezed Transformations for: '+obj[0])
                             else:
-                                raise Exception('Freeze failed')
-                        else:
-                            canotFreezeMsg(obj)
-                except:
-                    canotFreezeMsg(obj)
+                                raise Exception('Freeze Failed')
+                        except:
+                            canotFreezeMsg(obj[0])
+                    else:
+                        canotFreezeMsg(obj[0])
 
         # --- validator code --- end
         # ---
