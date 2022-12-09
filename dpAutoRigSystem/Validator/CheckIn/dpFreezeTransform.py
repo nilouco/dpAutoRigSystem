@@ -5,15 +5,15 @@ from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:
-CLASS_NAME = 'ValidatorAllFreeze'
+CLASS_NAME = 'FreezeTransform'
 TITLE = 'v015_allFreeze'
 DESCRIPTION = 'v016_allFreezeDesc'
 ICON = '/Icons/dp_validatorFt.png'
 
-dpValidatorAllFreeze_Version = 1.0
+dpFreezeTransform_Version = 1.0
 
 
-class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
+class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs['CLASS_NAME'] = CLASS_NAME
@@ -40,42 +40,37 @@ class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
         # --- validator code --- beginning
 
         def objFreezed(obj, attrList, compValue):
-            freezed = True
             for attr in attrList:
                 if cmds.getAttr(obj+'.'+attr) != compValue:
-                    freezed = False
-            return freezed
+                    return False
+            return True
 
         def unlockAttributes(obj, attrList):
-            unlocked = True
             for attr in attrList:
                 if animCurvesList:
                     if obj+'_'+attr in animCurvesList:
-                        unlocked = False
+                        return False
                     else:
                         cmds.setAttr(obj+'.'+attr, lock=False)
                 else:
                     cmds.setAttr(obj+'.'+attr, lock=False)
-            return unlocked
+            return True
 
-        def canotFreezeMsg(obj):
-            self.messageList.append('Cannot Freeze Transformations for: ' + obj+'.')
+        def canNotFreezeMsg(obj):
+            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v017_freezeError'] + obj+'.')
 
         allObjectList = []
         toFixList = []
         if objList:
             allObjectList = filter(lambda obj: cmds.objectType(obj) == 'transform', objList)
         if len(allObjectList) == 0:
-            allObjectList = cmds.ls(selection=False, type='transform', long=True)
+            allObjectList = cmds.ls(selection=False, cameras=False, type='transform', long=True)
         # analisys transformations
         if len(allObjectList) > 0:
             animCurvesList = cmds.ls(type='animCurve')
             zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
             oneAttrList = ['scaleX', 'scaleY', 'scaleZ']
-            camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
-            # excluing cameras
-            allValidObjs = filter(lambda obj: obj not in camerasList, allObjectList)
-            for idx, obj in enumerate(allValidObjs):
+            for idx, obj in enumerate(allObjectList):
                 if cmds.objExists(obj):
                     # run for translates and rotates
                     translateAndRotateFreezed = objFreezed(obj, zeroAttrList, 0)
@@ -88,7 +83,7 @@ class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
                 else:
                     self.foundIssueList.append(True)
                     self.resultOkList.append(False)
-                    self.messageList.append('Found Transformation for: '+obj)
+                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v018_foundTransform']+obj)
                     toFixList.append((obj, idx))
             if self.verifyMode == False and len(toFixList) > 0:
                 
@@ -102,13 +97,13 @@ class ValidatorAllFreeze(dpBaseValidatorClass.ValidatorStartClass):
                             if objFreezed(obj[0], zeroAttrList, 0) and objFreezed(obj[0], oneAttrList, 1):
                                 self.foundIssueList[obj[1]] = False
                                 self.resultOkList[obj[1]] = True
-                                self.messageList.append('Freezed Transformations for: '+obj[0])
+                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_freezedTransform']+obj[0])
                             else:
                                 raise Exception('Freeze Failed')
                         except:
-                            canotFreezeMsg(obj[0])
+                            canNotFreezeMsg(obj[0])
                     else:
-                        canotFreezeMsg(obj[0])
+                        canNotFreezeMsg(obj[0])
 
         # --- validator code --- end
         # ---

@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.24"
-DPAR_UPDATELOG = "N552 - Limb scaleCompensate issue fixed."
+DPAR_VERSION_PY3 = "4.01.25"
+DPAR_UPDATELOG = "N571 - Added validador module that checks if meshes are not frozen when imported from modeling."
 
 
 

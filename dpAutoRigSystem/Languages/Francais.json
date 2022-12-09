@@ -624,5 +624,8 @@
     "v013_targetCleanerDesc" : "Vérifiez s'il y a des targets de\nblendShapes primaires pour les nettoyer.\nIl supprimera les geometries non connectées ou non déformées.",
     "v014_notFoundNodes"     : "Pas trouvé des nodes pour continuer, désolé.",
     "v015_allFreeze"         : "Tout Congelé",
-    "v016_allFreezeDesc"     : "Vérifiez que toutes les géométries ont des transformations figées, une translation, une rotation avec des valeurs à zéro et une mise à l'échelle avec des valeurs à un, sinon essayez de les appliquer."
+    "v016_allFreezeDesc"     : "Vérifiez que toutes les géométries ont des transformations figées, une translation, une rotation avec des valeurs à zéro et une mise à l'échelle avec des valeurs à un, sinon essayez de les appliquer.",
+    "v017_freezeError"       : "Il n'était pas possible d'appliquer la transformée de gel en: ",
+    "v018_foundTransform"    : "Trouvé des transformations pour: ",
+    "v019_freezedTransform"  : "Transformations de gel appliquées à: "
 }

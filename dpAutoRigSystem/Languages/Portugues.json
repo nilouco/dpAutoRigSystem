@@ -624,5 +624,8 @@
     "v013_targetCleanerDesc" : "Verifica se tem targets primárias de blendShape\ne limpa-as.\nIrá deletar as geometrias não conectadas ou não deformadas.",
     "v014_notFoundNodes"     : "Não encontrado nodes para continuar, desculpe.",
     "v015_allFreeze"         : "Tudo Congelado",
-    "v016_allFreezeDesc"     : "Verifique se todas as geometrias têm transformações congeladas, translação, rotação com os valores em zero e escala com os valores em um, caso contrário, tente aplicá-las."
+    "v016_allFreezeDesc"     : "Verifique se todas as geometrias têm transformações congeladas, translação, rotação com os valores em zero e escala com os valores em um, caso contrário, tenta aplicá-las.",
+    "v017_freezeError"       : "Não foi possível aplicar freeze transform para: ",
+    "v018_foundTransform"    : "Encontradas transformações para: ",
+    "v019_freezedTransform"  : "Freeze transformations aplicadas para: "
 }
