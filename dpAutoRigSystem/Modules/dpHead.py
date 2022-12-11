@@ -491,7 +491,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.parent(neckCtrl, self.neckCtrlList[-1])
                     self.neckCtrlList.append(neckCtrl)
                 self.headCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headCtrlName, r=(self.ctrlRadius * 2.5), d=self.curveDegree)
-                self.headSubCtrl = self.ctrls.cvControl("id_023_HeadHead", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree)
+                self.headSubCtrl = self.ctrls.cvControl("id_093_HeadSub", ctrlName=headSubCtrlName, r=(self.ctrlRadius * 2.2), d=self.curveDegree)
                 self.upperJawCtrl = self.ctrls.cvControl("id_069_HeadUpperJaw", ctrlName=upperJawCtrlName, r=self.ctrlRadius, d=self.curveDegree)
                 self.upperHeadCtrl = self.ctrls.cvControl("id_081_HeadUpperHead", ctrlName=upperHeadCtrlName, r=self.ctrlRadius, d=self.curveDegree)
                 self.jawCtrl = self.ctrls.cvControl("id_024_HeadJaw", ctrlName=jawCtrlName, r=self.ctrlRadius, d=self.curveDegree)
