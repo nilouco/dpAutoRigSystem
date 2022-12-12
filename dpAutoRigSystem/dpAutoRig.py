@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.25"
-DPAR_UPDATELOG = "N546 - Head sub controller."
+DPAR_VERSION_PY3 = "4.01.26"
+DPAR_UPDATELOG = "N596 - Limb alignWorld attribute.\nChanged the old useOriginalRotate\nto a more logical name."
 
 
 
