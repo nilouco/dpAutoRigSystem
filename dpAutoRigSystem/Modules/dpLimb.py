@@ -857,7 +857,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # working with world axis orientation for limb extrem ik controls
                 if self.getAlignWorld():
                     originalRotateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_"+extremName+"_OriginalRotate_MD")
-                    cmds.addAttr(self.ikExtremCtrl, longName="useOriginalRotation", attributeType="float", defaultValue=1, minValue=0, maxValue=1, keyable=True)
+                    alignWorldRev = cmds.createNode("reverse", name=side+self.userGuideName+"_"+extremName+"_AlighWorld_Rev")
+                    cmds.addAttr(self.ikExtremCtrl, longName="alignWorld", attributeType="float", defaultValue=0, minValue=0, maxValue=1, keyable=True)
+                    cmds.connectAttr(self.ikExtremCtrl+".alignWorld", alignWorldRev+".inputX", force=True)
                     if s == 0:
                         self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
                     elif self.limbStyle == self.langDic[self.langName]['m042_default']:
@@ -871,7 +873,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.addAttr(self.ikExtremCtrl, longName="originalRotate"+axis, attributeType="float", keyable=True)
                         cmds.setAttr(self.ikExtremCtrl+".originalRotate"+axis, self.origRotList[a], lock=True)
                         cmds.connectAttr(self.ikExtremCtrl+".originalRotate"+axis, originalRotateMD+".input1"+axis, force=True)
-                        cmds.connectAttr(self.ikExtremCtrl+".useOriginalRotation", originalRotateMD+".input2"+axis, force=True)
+                        cmds.connectAttr(alignWorldRev+".outputX", originalRotateMD+".input2"+axis, force=True)
                         cmds.connectAttr(originalRotateMD+".output"+axis, self.ikExtremCtrlGrp+".rotate"+axis, force=True)
 
                 # make ikControls lead ikHandles:
