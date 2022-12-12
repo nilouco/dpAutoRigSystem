@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.24"
-DPAR_UPDATELOG = "N552 - Limb scaleCompensate issue fixed."
+DPAR_VERSION_PY3 = "4.01.25"
+DPAR_UPDATELOG = "N546 - Head sub controller."
 
 
 
@@ -2591,6 +2591,7 @@ class DP_AutoRig_UI(object):
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
                                 if bColorize:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
+                                    self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][s], "red")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][s], "blue")
                         

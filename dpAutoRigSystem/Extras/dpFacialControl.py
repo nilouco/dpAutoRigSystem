@@ -140,7 +140,7 @@ class FacialControl(object):
     def dpGetHeadCtrl(self, *args):
         """ Find and return the headCtrl if it exists in the scene.
         """
-        headCtrlList = self.ctrls.getControlNodeById("id_023_HeadHead")
+        headCtrlList = self.ctrls.getControlNodeById("id_093_HeadSub")
         if headCtrlList:
             return headCtrlList[0]
     
