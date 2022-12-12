@@ -11,7 +11,7 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.12"
+DPHD_VERSION = "2.13"
 
 
 class HeadDeformer(object):
@@ -208,7 +208,7 @@ class HeadDeformer(object):
             
             # try to integrate to Head_Head_Ctrl
             allTransformList = cmds.ls(selection=False, type="transform")
-            headCtrlList = self.ctrls.getControlNodeById("id_023_HeadHead")
+            headCtrlList = self.ctrls.getControlNodeById("id_093_HeadSub")
             if headCtrlList:
                 if len(headCtrlList) > 1:
                     mel.eval("warning" + "\"" + self.langDic[self.langName]["i075_moreOne"] + " Head control.\"" + ";")

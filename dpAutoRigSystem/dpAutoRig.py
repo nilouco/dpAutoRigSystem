@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.24"
+DPAR_VERSION_PY3 = "4.01.25"
 DPAR_UPDATELOG = "N546 - Head sub controller."
 
 
