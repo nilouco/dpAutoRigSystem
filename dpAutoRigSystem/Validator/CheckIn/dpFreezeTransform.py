@@ -63,6 +63,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         toFixList = []
         if objList:
             allObjectList = filter(lambda obj: cmds.objectType(obj) == 'transform', objList)
+            allObjectList = list(allObjectList)
         if len(allObjectList) == 0:
             allObjectList = cmds.ls(selection=False, cameras=False, type='transform', long=True)
         # analisys transformations
@@ -70,7 +71,9 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
             animCurvesList = cmds.ls(type='animCurve')
             zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
             oneAttrList = ['scaleX', 'scaleY', 'scaleZ']
-            for idx, obj in enumerate(allObjectList):
+            camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
+            allValidObjs = filter(lambda obj: obj not in camerasList, allObjectList)
+            for idx, obj in enumerate(allValidObjs):
                 if cmds.objExists(obj):
                     # run for translates and rotates
                     translateAndRotateFreezed = objFreezed(obj, zeroAttrList, 0)
