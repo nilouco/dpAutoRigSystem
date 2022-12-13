@@ -6,11 +6,11 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:
 CLASS_NAME = 'FreezeTransform'
-TITLE = 'v015_allFreeze'
-DESCRIPTION = 'v016_allFreezeDesc'
-ICON = '/Icons/dp_validatorFt.png'
+TITLE = 'v015_freezeTransform'
+DESCRIPTION = 'v016_freezeTranformDesc'
+ICON = '/Icons/dp_freezeTransform.png'
 
-dpFreezeTransform_Version = 1.0
+dpFreezeTransform_Version = 1.1
 
 
 class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
@@ -39,7 +39,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         # ---
         # --- validator code --- beginning
 
-        def objFreezed(obj, attrList, compValue):
+        def checkFrozenObject(obj, attrList, compValue):
             for attr in attrList:
                 if cmds.getAttr(obj+'.'+attr) != compValue:
                     return False
@@ -76,9 +76,9 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
             for idx, obj in enumerate(allValidObjs):
                 if cmds.objExists(obj):
                     # run for translates and rotates
-                    translateAndRotateFreezed = objFreezed(obj, zeroAttrList, 0)
+                    translateAndRotateFreezed = checkFrozenObject(obj, zeroAttrList, 0)
                     # run for scales
-                    scaleFreezed = objFreezed(obj, oneAttrList, 1)
+                    scaleFreezed = checkFrozenObject(obj, oneAttrList, 1)
                 self.checkedObjList.append(obj)
                 if translateAndRotateFreezed and scaleFreezed:
                     self.foundIssueList.append(False)
@@ -97,12 +97,12 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
                     if unlocked:
                         try:
                             cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
-                            if objFreezed(obj[0], zeroAttrList, 0) and objFreezed(obj[0], oneAttrList, 1):
+                            if checkFrozenObject(obj[0], zeroAttrList, 0) and checkFrozenObject(obj[0], oneAttrList, 1):
                                 self.foundIssueList[obj[1]] = False
                                 self.resultOkList[obj[1]] = True
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_freezedTransform']+obj[0])
+                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_frozenTransform']+obj[0])
                             else:
-                                raise Exception('Freeze Failed')
+                                raise Exception('Freeze Tranform Failed')
                         except:
                             canNotFreezeMsg(obj[0])
                     else:

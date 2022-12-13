@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.01.25"
-DPAR_UPDATELOG = "N571 - Added validador module that checks if meshes are not frozen when imported from modeling."
+DPAR_UPDATELOG = "N571 - Added validador module that checks if\nmeshes are not frozen when imported from modeling."
 
 
 
