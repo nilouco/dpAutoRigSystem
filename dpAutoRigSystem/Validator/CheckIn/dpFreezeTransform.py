@@ -10,7 +10,7 @@ TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 ICON = '/Icons/dp_freezeTransform.png'
 
-dpFreezeTransform_Version = 1.3
+dpFreezeTransform_Version = 1.4
 
 
 class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
@@ -95,19 +95,16 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
                         toFixList.append((obj, idx))
             if not self.verifyMode and len(toFixList) > 0: #one item to fix
                 for obj in toFixList:
-                    if unlockAttributes(obj[0], zeroAttrList):
-                        if unlockAttributes(obj[0], oneAttrList):
-                            try:
-                                cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
-                                if checkFrozenObject(obj[0], zeroAttrList, 0) and checkFrozenObject(obj[0], oneAttrList, 1):
-                                    self.foundIssueList[obj[1]] = False
-                                    self.resultOkList[obj[1]] = True
-                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_frozenTransform']+obj[0])
-                                else:
-                                    raise Exception('Freeze Tranform Failed')
-                            except:
-                                canNotFreezeMsg(obj[0])
-                        else:
+                    if unlockAttributes(obj[0], zeroAttrList) and unlockAttributes(obj[0], oneAttrList):
+                        try:
+                            cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
+                            if checkFrozenObject(obj[0], zeroAttrList, 0) and checkFrozenObject(obj[0], oneAttrList, 1):
+                                self.foundIssueList[obj[1]] = False
+                                self.resultOkList[obj[1]] = True
+                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_frozenTransform']+obj[0])
+                            else:
+                                raise Exception('Freeze Tranform Failed')
+                        except:
                             canNotFreezeMsg(obj[0])
                     else:
                         canNotFreezeMsg(obj[0])
