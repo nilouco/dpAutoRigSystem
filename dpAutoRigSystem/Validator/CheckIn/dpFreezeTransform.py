@@ -10,7 +10,7 @@ TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 ICON = '/Icons/dp_freezeTransform.png'
 
-dpFreezeTransform_Version = 1.1
+dpFreezeTransform_Version = 1.3
 
 
 class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
@@ -47,8 +47,8 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
 
         def unlockAttributes(obj, attrList):
             for attr in attrList:
-                if animCurvesList:
-                    if obj+'_'+attr in animCurvesList:
+                if self.animCurvesList:
+                    if obj+'_'+attr in self.animCurvesList:
                         return False
                     else:
                         cmds.setAttr(obj+'.'+attr, lock=False)
@@ -62,48 +62,52 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         allObjectList = []
         toFixList = []
         if objList:
-            allObjectList = filter(lambda obj: cmds.objectType(obj) == 'transform', objList)
-            allObjectList = list(allObjectList)
+            allObjectList = list(filter(lambda obj: cmds.objectType(obj) == 'transform', objList))
         if len(allObjectList) == 0:
-            allObjectList = cmds.ls(selection=False, cameras=False, type='transform', long=True)
+            allObjectList = cmds.ls(selection=False, type='transform', long=True)
         # analisys transformations
         if len(allObjectList) > 0:
-            animCurvesList = cmds.ls(type='animCurve')
+            progressAmount = 0
+            maxProcess = len(allObjectList)
+            self.animCurvesList = cmds.ls(type='animCurve')
             zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
             oneAttrList = ['scaleX', 'scaleY', 'scaleZ']
             camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
-            allValidObjs = filter(lambda obj: obj not in camerasList, allObjectList)
+            allValidObjs = list(filter(lambda obj: obj not in camerasList, allObjectList))
             for idx, obj in enumerate(allValidObjs):
+                if self.verbose:
+                    # Update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                 if cmds.objExists(obj):
                     # run for translates and rotates
-                    translateAndRotateFreezed = checkFrozenObject(obj, zeroAttrList, 0)
+                    frozenTR = checkFrozenObject(obj, zeroAttrList, 0)
                     # run for scales
-                    scaleFreezed = checkFrozenObject(obj, oneAttrList, 1)
-                self.checkedObjList.append(obj)
-                if translateAndRotateFreezed and scaleFreezed:
-                    self.foundIssueList.append(False)
-                    self.resultOkList.append(True)
-                else:
-                    self.foundIssueList.append(True)
-                    self.resultOkList.append(False)
-                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v018_foundTransform']+obj)
-                    toFixList.append((obj, idx))
-            if self.verifyMode == False and len(toFixList) > 0:
-                
+                    frozenS = checkFrozenObject(obj, oneAttrList, 1)
+                    self.checkedObjList.append(obj)
+                    if frozenTR and frozenS:
+                        self.foundIssueList.append(False)
+                        self.resultOkList.append(True)
+                    else:
+                        self.foundIssueList.append(True)
+                        self.resultOkList.append(False)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v018_foundTransform']+obj)
+                        toFixList.append((obj, idx))
+            if not self.verifyMode and len(toFixList) > 0: #one item to fix
                 for obj in toFixList:
-                    unlocked = unlockAttributes(obj[0], zeroAttrList)
-                    unlocked = unlockAttributes(obj[0], oneAttrList)
-
-                    if unlocked:
-                        try:
-                            cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
-                            if checkFrozenObject(obj[0], zeroAttrList, 0) and checkFrozenObject(obj[0], oneAttrList, 1):
-                                self.foundIssueList[obj[1]] = False
-                                self.resultOkList[obj[1]] = True
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_frozenTransform']+obj[0])
-                            else:
-                                raise Exception('Freeze Tranform Failed')
-                        except:
+                    if unlockAttributes(obj[0], zeroAttrList):
+                        if unlockAttributes(obj[0], oneAttrList):
+                            try:
+                                cmds.makeIdentity(obj[0], apply=True, translate=True, rotate=True, scale=True)
+                                if checkFrozenObject(obj[0], zeroAttrList, 0) and checkFrozenObject(obj[0], oneAttrList, 1):
+                                    self.foundIssueList[obj[1]] = False
+                                    self.resultOkList[obj[1]] = True
+                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_frozenTransform']+obj[0])
+                                else:
+                                    raise Exception('Freeze Tranform Failed')
+                            except:
+                                canNotFreezeMsg(obj[0])
+                        else:
                             canNotFreezeMsg(obj[0])
                     else:
                         canNotFreezeMsg(obj[0])
