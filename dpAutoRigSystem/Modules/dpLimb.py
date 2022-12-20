@@ -674,7 +674,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side + self.userGuideName + "_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                cmds.addAttr(self.worldRef, longName=sideLower + self.userGuideName + '_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.worldRef, longName=sideLower + self.userGuideName + 'Fk_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.langDic[self.langName]['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
@@ -701,15 +701,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ikFkRevList = []
                 for n in range(len(self.jNameList)):
                     if n > 0:
-                        parentConst = cmds.parentConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=side + self.userGuideName + "_" + self.jNameList[n] + "_IkFkBlend_PaC")[0]
+                        parentConst = cmds.parentConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=side+self.userGuideName+"_"+self.jNameList[n]+"_IkFkBlend_PaC")[0]
                         if n == 1:
-                            revNode = cmds.createNode('reverse', name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev")
-                            cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', revNode + ".inputX", force=True)
+                            revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev")
+                            cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', revNode + ".inputX", force=True)
                         else:
                             revNode = side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev"
                         self.ikFkRevList.append(revNode)
                         # connecting ikFkBlend using the reverse node:
-                        cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', parentConst + "." + self.fkJointList[n] + "W1", force=True)
+                        cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + 'Fk_ikFkBlend', parentConst + "." + self.fkJointList[n] + "W1", force=True)
                         cmds.connectAttr(revNode + '.outputX', parentConst + "." + self.ikJointList[n] + "W0", force=True)
                 # organize the ikFkBlend from before to limb:
                 cmds.parentConstraint(self.fkCtrlList[0], self.ikJointList[0], maintainOffset=True, name=self.ikJointList[0] + "_PaC")
@@ -782,7 +782,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
-                cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
+                cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + 'Fk_ikFkBlend', self.zeroFkCtrlList[1] + ".visibility", force=True)
                 cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", self.ikCornerCtrlZero + ".visibility", force=True)
                 cmds.connectAttr(side + self.userGuideName + "_" + self.limbType.capitalize() + "_Rev" + ".outputX", self.ikExtremCtrlZero + ".visibility", force=True)
                 self.ctrls.setLockHide([self.ikCornerCtrl, self.ikExtremCtrl], ['v'], l=False)
@@ -1101,7 +1101,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # offset parent constraint
                 parentConstToRFOffset = cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot + "_PaC")[0]
-                cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', parentConstToRFOffset + "." + self.fkCtrlList[len(self.fkCtrlList) - 1] + "W1", force=True)
+                cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + 'Fk_ikFkBlend', parentConstToRFOffset + "." + self.fkCtrlList[len(self.fkCtrlList) - 1] + "W1", force=True)
 
                 # work with scalable extrem hand or foot:
                 cmds.addAttr(self.fkCtrlList[-1], ln=self.langDic[self.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
@@ -1128,7 +1128,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleZ", force=True)
-                cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + '_ikFkBlend', uniBlend+".blender", force=True)
+                cmds.connectAttr(self.worldRef + "." + sideLower + self.userGuideName + 'Fk_ikFkBlend', uniBlend+".blender", force=True)
                 cmds.connectAttr(fkScaleMD + '.outputX', uniBlend + '.color1R', force=True)
                 cmds.connectAttr(ikScaleMD + '.outputX', uniBlend + '.color2R', force=True)
                 
@@ -1400,8 +1400,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateX", acBC+".color2R", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateY", acBC+".color2G", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateZ", acBC+".color2B", force=True)
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"_ikFkBlend", acBC+".blender", force=True)
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"_ikFkBlend", acInvBC+".blender", force=True)
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", acBC+".blender", force=True)
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", acInvBC+".blender", force=True)
                     cmds.connectAttr(acBC+".output.outputR", acInvMD+".input1X", force=True)
                     cmds.connectAttr(acBC+".output.outputG", acInvMD+".input1Y", force=True)
                     cmds.connectAttr(acBC+".output.outputB", acInvMD+".input1Z", force=True)
