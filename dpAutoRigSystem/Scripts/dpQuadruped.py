@@ -37,7 +37,6 @@ def Quadruped(dpUIinst):
         quadrupedStyleName = dpUIinst.langDic[dpUIinst.langName]['m155_quadrupedExtra']
         # part names:
         spineName = dpUIinst.langDic[dpUIinst.langName]['m011_spine']
-        neckName = dpUIinst.langDic[dpUIinst.langName]['c023_neck']
         headName = dpUIinst.langDic[dpUIinst.langName]['c024_head']
         eyeName = dpUIinst.langDic[dpUIinst.langName]['c036_eye']
         legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
@@ -59,6 +58,8 @@ def Quadruped(dpUIinst):
         complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
         cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']
         userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
+        breathName = dpUIinst.langDic[dpUIinst.langName]['c095_breath']
+        bellyName = dpUIinst.langDic[dpUIinst.langName]['c096_belly']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -67,7 +68,7 @@ def Quadruped(dpUIinst):
             if userDetail == simple:
                 maxProcess = 8
             else:
-                maxProcess = 20
+                maxProcess = 22
                 
             # Starting progress window
             progressAmount = 0
@@ -616,7 +617,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe2BackInstance.moduleGrp+".flip", 1)
                 toe2BackInstance.displayAnnotation(0)
                 
-                # parent toe1 guide to foot middle guide:
+                # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
                 
                 # Update progress window
@@ -641,7 +642,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(toe3BackInstance.moduleGrp+".flip", 1)
                 toe3BackInstance.displayAnnotation(0)
                 
-                # parent toe1 guide to foot middle guide:
+                # parent toe3 guide to foot middle guide:
                 cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
                 
                 # Update progress window
@@ -668,6 +669,39 @@ def Quadruped(dpUIinst):
                 
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+
+                # Update progress window
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+breathName))
+                
+                # create breath module instance:
+                breathInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                # change name to breath:
+                breathInstance.editUserName(breathName)
+                # editing breath base guide informations:
+                cmds.setAttr(breathInstance.radiusCtrl+".translateX", 0.8)
+                cmds.setAttr(breathInstance.moduleGrp+".translateY", 7)
+                cmds.setAttr(breathInstance.moduleGrp+".translateZ", 4)
+                
+                # parent breath guide to spine chest guide:
+                cmds.parent(breathInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
+
+                # Update progress window
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+bellyName))
+                
+                # create belly module instance:
+                bellyInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                # change name to belly:
+                bellyInstance.editUserName(bellyName)
+                # editing belly base guide informations:
+                cmds.setAttr(bellyInstance.radiusCtrl+".translateX", 0.8)
+                cmds.setAttr(bellyInstance.moduleGrp+".translateY", 8.5)
+                cmds.setAttr(bellyInstance.moduleGrp+".translateZ", -3.5)
+                
+                # parent breath guide to spine chest guide:
+                cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+                
             
             # Close progress window
             cmds.progressWindow(endProgress=True)
