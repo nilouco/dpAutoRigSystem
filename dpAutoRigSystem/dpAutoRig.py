@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.29"
-DPAR_UPDATELOG = "N549 - Added Quadruped extra controllers:\nBreath\nBelly."
+DPAR_VERSION_PY3 = "4.01.30"
+DPAR_UPDATELOG = "N530 - Correction Manager interpolation option."
 
 
 
