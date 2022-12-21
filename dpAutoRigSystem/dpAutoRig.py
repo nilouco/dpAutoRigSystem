@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.28"
-DPAR_UPDATELOG = "N604 - Changed Option_Ctrl ikFkBlend attributes\nto have Fk at the name end."
+DPAR_VERSION_PY3 = "4.01.29"
+DPAR_UPDATELOG = "N549 - Added Quadruped extra controllers:\nBreath\nBelly."
 
 
 
