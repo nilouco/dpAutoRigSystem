@@ -13,7 +13,7 @@ TITLE = "m068_correctionManager"
 DESCRIPTION = "m069_correctionManagerDesc"
 ICON = "/Icons/dp_correctionManager.png"
 
-DPCORRECTIONMANAGER_VERSION = 2.4
+DPCORRECTIONMANAGER_VERSION = 2.5
 
 ANGLE = "Angle"
 DISTANCE = "Distance"
@@ -187,6 +187,17 @@ class CorrectionManager(object):
         cmds.optionMenu(self.axisMenu, edit=True, enable=value)
 
 
+    def changeInterpolation(self, interp=None, *args):
+        """ Just set the interpolation method of the remapValue to this given argument.
+        """
+        if interp == "Linear":
+            cmds.setAttr(self.net+".interpolation", 0)
+        elif interp == "Smooth":
+            cmds.setAttr(self.net+".interpolation", 1)
+        else: #Spline
+            cmds.setAttr(self.net+".interpolation", 2)
+
+
     def deleteSetup(self, *args):
         """ Just delete these nodes to clear this current system setup:
             - Rivets if exists
@@ -267,11 +278,20 @@ class CorrectionManager(object):
                 currentInputEnd = cmds.getAttr(self.net+".inputEnd")
                 currentOutputStart = cmds.getAttr(self.net+".outputStart")
                 currentOutputEnd = cmds.getAttr(self.net+".outputEnd")
+                # interpolation:
+                self.interpolationLayout = cmds.columnLayout('interpolationLayout', adjustableColumn=False, columnAlign="left", parent=self.selectedLayout)
+                self.interpMenu = cmds.optionMenu("interpMenu", label=self.langDic[self.langName]['m210_interpolation'], changeCommand=self.changeInterpolation, parent=self.interpolationLayout)
+                self.interpMenuItemList = ['Linear', 'Smooth', 'Spline']
+                for interp in self.interpMenuItemList:
+                    cmds.menuItem(label=interp, parent=self.interpMenu)
+                currentInterp = cmds.getAttr(self.net+".interpolation")
+                cmds.optionMenu(self.interpMenu, edit=True, value=self.interpMenuItemList[currentInterp])
+                # range:
                 rangeLayout = cmds.columnLayout('rangeLayout', adjustableColumn=True, columnAlign="right", parent=self.selectedLayout)
                 rangeLabelLayout = cmds.rowLayout('rangeLabelLayout', numberOfColumns=3, adjustableColumn=1, columnWidth=[(1, 10), (2, 58), (3, 80)], columnAttach=[(1, "right", 0), (2, "right", 20), (3, "right", 30)], parent=rangeLayout)
-                cmds.text(self.langDic[self.langName]['m072_range'], label=self.langDic[self.langName]['m072_range'], align="right", parent=rangeLabelLayout)
-                cmds.text(self.langDic[self.langName]['c110_start'], align="right", parent=rangeLabelLayout)
-                cmds.text(self.langDic[self.langName]['m184_end'], align="right", parent=rangeLabelLayout)
+                cmds.text("rangeTxt", label=self.langDic[self.langName]['m072_range'], align="right", parent=rangeLabelLayout)
+                cmds.text("startTxt", label=self.langDic[self.langName]['c110_start'], align="right", parent=rangeLabelLayout)
+                cmds.text("endTxt", label=self.langDic[self.langName]['m184_end'], align="right", parent=rangeLabelLayout)
                 cmds.floatFieldGrp("inputFFG", label=self.langDic[self.langName]['m137_input'], numberOfFields=2, value1=currentInputStart, value2=currentInputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeInputValues, parent=rangeLayout)
                 cmds.floatFieldGrp("outputFFG", label=self.langDic[self.langName]['m138_output'], numberOfFields=2, value1=currentOutputStart, value2=currentOutputEnd, columnWidth3=(40, 70, 70), columnAttach=[(1, 'right', 5), (2, 'left', 2), (3, 'left', 0)], adjustableColumn3=1, changeCommand=self.changeOutputValues, parent=rangeLayout)
 
@@ -394,6 +414,7 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="name", dataType="string")
                     cmds.addAttr(self.net, longName="type", dataType="string")
                     cmds.addAttr(self.net, longName="inputValue", attributeType="float")
+                    cmds.addAttr(self.net, longName="interpolation", attributeType='enum', enumName="Linear:Smooth:Spline")
                     cmds.addAttr(self.net, longName="decompose", attributeType="bool", defaultValue=0)
                     cmds.addAttr(self.net, longName="axis", attributeType='enum', enumName="X:Y:Z")
                     cmds.addAttr(self.net, longName="axisOrder", attributeType='enum', enumName="XYZ:YZX:ZXY:XZY:YXZ:ZYX")
@@ -402,9 +423,9 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     # add serialization attributes
-                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "inputRmV", "outputSR", "distanceScaleMD"]
+                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
                     if correctType == self.distanceName:
-                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "distanceScaleMD"]
+                        messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
                     for messageAttr in messageAttrList:
                         cmds.addAttr(self.net, longName=messageAttr, attributeType="message")
                     cmds.addAttr(self.net, longName="inputRigScale", attributeType="float", defaultValue=1)
@@ -426,10 +447,14 @@ class CorrectionManager(object):
                     cmds.connectAttr(originalLoc+".message", self.net+".originalLoc", force=True)
                     cmds.connectAttr(actionLoc+".message", self.net+".actionLoc", force=True)
 
-                    # create corrective and rigScale nodes:
+                    # create corrective, interpolation and rigScale nodes:
                     correctiveMD = cmds.createNode("multiplyDivide", name=correctionName+"_Corrective_MD")
+                    interpolationPMA = cmds.createNode("plusMinusAverage", name=correctionName+"_Interpolation_PMA")
                     cmds.connectAttr(correctiveMD+".message", self.net+".correctiveMD", force=True)
+                    cmds.connectAttr(interpolationPMA+".message", self.net+".interpolationPMA", force=True)
                     cmds.connectAttr(self.net+".corrective", correctiveMD+".input2X", force=True)
+                    cmds.connectAttr(self.net+".interpolation", interpolationPMA+".input1D[0]", force=True)
+                    cmds.setAttr(interpolationPMA+".input1D[1]", 1)
                     
                     # if rotate extration option:
                     if correctType == self.angleName:                        
@@ -461,6 +486,7 @@ class CorrectionManager(object):
                         cmds.connectAttr(self.net+".inputEnd", inputRmV+".outputMax", force=True)
                         cmds.connectAttr(self.net+".outputStart", outputSR+".minX", force=True)
                         cmds.connectAttr(self.net+".outputEnd", outputSR+".maxX", force=True)
+                        cmds.connectAttr(interpolationPMA+".output1D", inputRmV+".value[0].value_Interp", force=True)
                         # setup the rotation affection
                         cmds.connectAttr(extractAngleDM+".outputQuatX", extractAngleQtE+".inputQuatX", force=True)
                         cmds.connectAttr(extractAngleDM+".outputQuatY", extractAngleQtE+".inputQuatY", force=True)
@@ -529,6 +555,7 @@ class CorrectionManager(object):
                         cmds.connectAttr(distanceScaleMD+".outputY", outputRmV+".inputMax", force=True)
                         cmds.connectAttr(self.net+".outputStart", outputRmV+".outputMin", force=True)
                         cmds.connectAttr(self.net+".outputEnd", outputRmV+".outputMax", force=True)
+                        cmds.connectAttr(interpolationPMA+".output1D", outputRmV+".value[0].value_Interp", force=True)
                         # set default distance input values
                         cmds.setAttr(self.net+".inputStart", 10)
                         cmds.setAttr(self.net+".inputEnd", 0)
