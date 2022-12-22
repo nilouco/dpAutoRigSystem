@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.30"
-DPAR_UPDATELOG = "N530 - Correction Manager interpolation option."
+DPAR_VERSION_PY3 = "4.01.31"
+DPAR_UPDATELOG = "N606 - LimbSpaceSwith module to\nreplace AddHandFollow."
 
 
 
@@ -2915,7 +2915,7 @@ class DP_AutoRig_UI(object):
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
             #Try add hand follow (space switch attribute) on bipeds:
-            self.initExtraModule("dpAddHandFollow", EXTRAS)
+            self.initExtraModule("dpLimbSpaceSwitch", EXTRAS)
             
             # show dialogBox if detected a bug:
             if integrate == 1:
