@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.31"
-DPAR_UPDATELOG = "N606 - LimbSpaceSwith module to\nreplace AddHandFollow."
+DPAR_VERSION_PY3 = "4.01.32"
+DPAR_UPDATELOG = "N258 - Fixed reverseFoot stretch knee issue."
 
 
 
