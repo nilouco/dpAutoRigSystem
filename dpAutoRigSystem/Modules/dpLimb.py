@@ -725,7 +725,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                     cmds.setAttr(self.ikExtremCtrl + ".rotateOrder", 3) #xzy
-                cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 dpUtils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
                 # getting them zeroOut groups:
@@ -949,12 +948,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.move(pvPosX, pvPosY, pvPosZ, self.ikCornerCtrlZero, objectSpace=False, worldSpaceDistance=True)
 
                 # create poleVector constraint:
-                poleVectorConstA = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PVC")
-                poleVectorConstB = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleNotStretchList[0], weight=1.0, name=ikHandleNotStretchList[0] + "_PVC")
-                poleVectorConstC = cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleACList[0], weight=1.0, name=ikHandleACList[0] + "_PVC")
-                cmds.connectAttr(self.ikCornerCtrl + '.'+self.langDic[self.langName]['c118_active'], poleVectorConstA[0] + "." + self.ikCornerCtrl + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.'+self.langDic[self.langName]['c118_active'], poleVectorConstB[0] + "." + self.ikCornerCtrl + "W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl + '.'+self.langDic[self.langName]['c118_active'], poleVectorConstC[0] + "." + self.ikCornerCtrl + "W0", force=True)
+                cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleMainList[0], weight=1.0, name=ikHandleMainList[0] + "_PVC")
+                cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleNotStretchList[0], weight=1.0, name=ikHandleNotStretchList[0] + "_PVC")
+                cmds.poleVectorConstraint(self.ikCornerCtrl, ikHandleACList[0], weight=1.0, name=ikHandleACList[0] + "_PVC")
 
                 # create annotation:
                 annotLoc = cmds.spaceLocator(name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_Ant_Loc", position=(0, 0, 0))[0]
@@ -966,16 +962,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(annotation + '.template', 1)
                 cmds.setAttr(annotLoc + '.visibility', 0)
                 # set annotation visibility as a display option attribute:
-                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='bool', keyable=True, defaultValue=True)
-                cmds.connectAttr(self.ikCornerCtrl + ".displayAnnotation", annotation + ".visibility", force=True)
+                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='bool', keyable=False, defaultValue=True)
+                cmds.setAttr(self.ikCornerCtrl+".displayAnnotation", channelBox=True)
+                cmds.connectAttr(self.ikCornerCtrl+".displayAnnotation", annotation+".visibility", force=True)
 
                 # prepare groups to rotate and translate automatically:
                 self.ctrls.setLockHide([self.ikCornerCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 self.cornerGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_PoleVector_Grp", absolute=True)
                 self.cornerOrientGrp = cmds.group(empty=True, name=side + self.userGuideName + "_" + self.limbType.capitalize() + "_PoleVectorOrient_Grp", absolute=True)
-                tempToDelA = cmds.parentConstraint(self.ikExtremCtrl, self.cornerGrp, maintainOffset=False)
-                tempToDelB = cmds.parentConstraint(self.ikExtremCtrl, self.cornerOrientGrp, maintainOffset=False)
-                cmds.delete(tempToDelA, tempToDelB)
+                cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, self.cornerGrp, maintainOffset=False))
+                cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, self.cornerOrientGrp, maintainOffset=False))
                 cmds.parent(self.ikCornerCtrlZero, self.cornerGrp, absolute=True)
                 # set a good orientation for the poleVector ctrl
                 cmds.setAttr(self.ikCornerCtrlZero + ".rotateX", 0)
@@ -1007,9 +1003,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c033_autoOrient'], self.cornerOrient + "." + self.ikExtremCtrl + "W1", force=True)
 
                 # working with follow of poleVector:
-                self.cornerPoint = cmds.pointConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, maintainOffset=True, name=self.cornerGrp + "_PoC")[0]
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.addAttr(self.ikCornerCtrl, longName="pin", attributeType='bool', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                self.cornerPoint = cmds.pointConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, maintainOffset=True, name=self.cornerGrp + "_PoC")[0]
                 self.cornerPointRev = cmds.createNode('reverse', name=side + self.userGuideName + "_CornerPoint_Rev")
                 cmds.connectAttr(self.ikCornerCtrl + '.' + self.langDic[self.langName]['c032_follow'], self.cornerPointRev + ".inputX", force=True)
                 cmds.connectAttr(self.cornerPointRev + '.outputX', self.cornerPoint + "." + self.cornerOrientGrp + "W0", force=True)

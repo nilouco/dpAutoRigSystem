@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.01.32"
-DPAR_UPDATELOG = "N258 - Fixed reverseFoot stretch knee issue."
+DPAR_UPDATELOG = "N612 - Limb poleVector behavior."
 
 
 
