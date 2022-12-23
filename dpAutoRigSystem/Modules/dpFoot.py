@@ -212,6 +212,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
                 self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
                 self.RFECtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, rot=(0, 90, 0))
+                self.ballRFList.append(self.RFECtrl)
                 
                 # reverse foot groups:
                 self.RFAGrp = cmds.group(self.RFACtrl, name=self.RFACtrl+"_Grp")
@@ -220,7 +221,6 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.RFDGrp = cmds.group(self.RFDCtrl, name=self.RFDCtrl+"_Grp")
                 self.RFEGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Grp")
                 rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp]
-                self.ballRFList.append(self.RFEGrp)
                 
                 # putting groups in the correct place:
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footJnt, maintainOffset=False)
