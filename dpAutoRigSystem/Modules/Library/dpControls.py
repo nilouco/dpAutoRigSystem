@@ -1267,3 +1267,12 @@ class ControlClass(object):
                     cmds.setAttr(ctrlName+".calibrate"+attr+axis, newValue)
             cmds.delete(dupTemp)
             cmds.select(ctrlName)
+
+
+    def displayRotateOrderAttr(self, ctrlList, *args):
+        """ Set display a non keyable rotateOrder attribute in the channelBox.
+        """
+        if ctrlList:
+            for ctrl in ctrlList:
+                if cmds.objExists(ctrl+".rotateOrder"):
+                    cmds.setAttr(ctrl+".rotateOrder", keyable=False, channelBox=True)
