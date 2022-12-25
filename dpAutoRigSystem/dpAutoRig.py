@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.34"
-DPAR_UPDATELOG = "N164 - Display rotateOrder attribute."
+DPAR_VERSION_PY3 = "4.01.35"
+DPAR_UPDATELOG = "N027 - Limb ik extrem sub controller\nfor wrist/ankle."
 
 
 

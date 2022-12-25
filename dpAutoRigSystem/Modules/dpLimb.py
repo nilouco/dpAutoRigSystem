@@ -722,14 +722,22 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating ik controls:
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
+                self.ikExtremSubCtrl = self.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
+                self.ctrls.setLockHide([self.ikExtremSubCtrl], ["tx", "ty", "tz", "sx", "sy", "sz", "v"])
+                self.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
+                cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
+                
                 if self.limbTypeName == ARM:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 2) #zxy
+                    cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 2) #zxy
                 else:
                     self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 3) #xzy
+                    cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 3) #xzy
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
                 dpUtils.originedFrom(objName=self.ikCornerCtrl, attrString=side+self.userGuideName+"_Guide_CornerUpVector")
+
                 # getting them zeroOut groups:
                 self.ikCornerCtrlZero = dpUtils.zeroOut([self.ikCornerCtrl])[0]
                 self.ikExtremCtrlZero = dpUtils.zeroOut([self.ikExtremCtrl])[0]
@@ -787,7 +795,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', self.zeroFkCtrlList[1]+".visibility", force=True)
                 cmds.connectAttr(side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"+".outputX", self.ikCornerCtrlZero+".visibility", force=True)
                 cmds.connectAttr(side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"+".outputX", self.ikExtremCtrlZero+".visibility", force=True)
-                self.ctrls.setLockHide([self.ikCornerCtrl, self.ikExtremCtrl], ['v'], l=False)
+                self.ctrls.setLockHide([self.ikCornerCtrl], ['v'], l=False)
+                self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz', 'v'])
 
                 # creating ikHandles:
                 # verify the limb style:
@@ -888,14 +897,13 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 elif self.limbStyle == self.langDic[self.langName]['m037_quadruped'] or self.limbStyle == self.langDic[self.langName]['m043_quadSpring']:
                     cmds.parent(ikStretchExtremLocZero, self.ikHandleToRFGrp)
                     cmds.parentConstraint(ikHandleExtraGrp, ikStretchExtremLocZero, skipRotate=("x", "y", "z"), maintainOffset=True, name=ikStretchExtremLocZero+"_PaC")
-                self.ikHandleConst = cmds.pointConstraint(self.ikExtremCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp+"_PoC")[0]
+                self.ikHandleConst = cmds.pointConstraint(self.ikExtremSubCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp+"_PoC")[0]
                 self.ikHandleConstList.append(self.ikHandleConst)
                 
-                cmds.orientConstraint(self.ikExtremCtrl, self.ikJointList[len(self.ikJointList) - 2], maintainOffset=True, name=self.ikJointList[len(self.ikJointList) - 2]+"_OrC")
-                self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz'])
-                cmds.pointConstraint(self.ikExtremCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0]+"_PoC")[0]
-                cmds.pointConstraint(self.ikExtremCtrl, ikHandleACList[0], maintainOffset=True, name=ikHandleACList[0]+"_PoC")[0]
-                cmds.orientConstraint(self.ikExtremCtrl, self.ikNSJointList[len(self.ikNSJointList) - 2], maintainOffset=True, name=self.ikNSJointList[len(self.ikNSJointList) - 2]+"_OrC")
+                cmds.orientConstraint(self.ikExtremSubCtrl, self.ikJointList[len(self.ikJointList) - 2], maintainOffset=True, name=self.ikJointList[len(self.ikJointList) - 2]+"_OrC")
+                cmds.pointConstraint(self.ikExtremSubCtrl, ikHandleNotStretchList[0], maintainOffset=True, name=ikHandleNotStretchList[0]+"_PoC")[0]
+                cmds.pointConstraint(self.ikExtremSubCtrl, ikHandleACList[0], maintainOffset=True, name=ikHandleACList[0]+"_PoC")[0]
+                cmds.orientConstraint(self.ikExtremSubCtrl, self.ikNSJointList[len(self.ikNSJointList) - 2], maintainOffset=True, name=self.ikNSJointList[len(self.ikNSJointList) - 2]+"_OrC")
 
                 # twist:
                 cmds.addAttr(self.ikExtremCtrl, longName='twist', attributeType='float', keyable=True)
@@ -997,7 +1005,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if pvPosZ < 0:
                     cmds.setAttr(poleVectorUpLoc+".translateZ", -self.ctrlRadius)
                 cmds.delete(cmds.pointConstraint(self.cvMainLoc, poleVectorAimLoc, maintainOffset=False))
-                cmds.pointConstraint(self.ikExtremCtrl, poleVectorUpLocGrp, maintainOffset=False, name=poleVectorUpLocGrp+"_PaC")
+                cmds.pointConstraint(self.ikExtremSubCtrl, poleVectorUpLocGrp, maintainOffset=False, name=poleVectorUpLocGrp+"_PaC")
                 
                 # working with autoOrient of poleVector:
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
@@ -1010,7 +1018,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], upLocOrientRev+".inputX", force=True)
                 cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], upLocOrientConst+"."+self.ikExtremCtrl+"W0", force=True)
                 cmds.connectAttr(upLocOrientRev+'.outputX', upLocOrientConst+"."+self.rootCtrlRef+"W1", force=True)
-                cmds.aimConstraint(self.ikExtremCtrl, poleVectorAimLoc, worldUpType="object", worldUpObject=poleVectorUpLoc, aimVector=(0, 0, 1), upVector=(1, 0, 0), maintainOffset=False, name=poleVectorUpLoc+"_AiC")
+                cmds.aimConstraint(self.ikExtremSubCtrl, poleVectorAimLoc, worldUpType="object", worldUpObject=poleVectorUpLoc, aimVector=(0, 0, 1), upVector=(1, 0, 0), maintainOffset=False, name=poleVectorUpLoc+"_AiC")
                 cmds.parentConstraint(poleVectorAimLoc, self.cornerGrp, maintainOffset=True, name=self.cornerGrp+"_PaC")
 
                 # make poleVectorCtrl's follow really pin from masterCtrl:
@@ -1100,7 +1108,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, self.ikFkBlendGrpToRevFoot, maintainOffset=False))
 
                 # offset parent constraint
-                parentConstToRFOffset = cmds.parentConstraint(self.ikExtremCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot+"_PaC")[0]
+                parentConstToRFOffset = cmds.parentConstraint(self.ikExtremSubCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot+"_PaC")[0]
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
 
                 # work with scalable extrem hand or foot:
@@ -1155,7 +1163,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(ikStretchableMD+".outputX", ikStretchCtrlCnd+".colorIfFalseR", force=True)
                 cmds.connectAttr(revNode+".outputX", ikStretchCtrlCnd+".colorIfTrueR", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchCtrlCnd+".firstTerm", force=True)
-                cmds.connectAttr(ikStretchCtrlCnd+".outColorR", parentConstToRFOffset+"."+self.ikExtremCtrl+"W0", force=True)
+                cmds.connectAttr(ikStretchCtrlCnd+".outColorR", parentConstToRFOffset+"."+self.ikExtremSubCtrl+"W0", force=True)
 
                 ikStretchDifPMA = cmds.shadingNode('plusMinusAverage', asUtility=True, name=side+self.userGuideName+"_Stretch_Dif_PMA")
                 cmds.setAttr(ikStretchDifPMA+".operation", 2)

@@ -1276,3 +1276,14 @@ class ControlClass(object):
             for ctrl in ctrlList:
                 if cmds.objExists(ctrl+".rotateOrder"):
                     cmds.setAttr(ctrl+".rotateOrder", keyable=False, channelBox=True)
+
+
+    def setSubControlDisplay(self, ctrl, subCtrl, defValue, *args):
+        """ Set the shapes visibility of sub control.
+        """
+        cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="bool", defaultValue=defValue)
+        cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
+        subShapeList = cmds.listRelatives(subCtrl, children=True, type="shape")
+        if subShapeList:
+            for subShapeNode in subShapeList:
+                cmds.connectAttr(ctrl+".subControlDisplay", subShapeNode+".visibility", force=True)
