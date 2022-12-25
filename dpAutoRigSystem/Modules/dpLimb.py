@@ -992,6 +992,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 poleVectorUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+cornerName+"_Ik_Up_Loc")[0]
                 poleVectorUpLocGrp = cmds.group(poleVectorUpLoc, name=poleVectorUpLoc+"_Grp")
                 poleVectorLocatorsGrp = cmds.group(poleVectorAimLoc, poleVectorUpLocGrp, name=side+self.userGuideName+"_"+cornerName+"_Ik_Loc_Grp")
+                cmds.setAttr(poleVectorLocatorsGrp+".visibility", 0)
                 cmds.setAttr(poleVectorUpLoc+".translateZ", self.ctrlRadius)
                 if pvPosZ < 0:
                     cmds.setAttr(poleVectorUpLoc+".translateZ", -self.ctrlRadius)
@@ -1003,7 +1004,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if self.limbTypeName == ARM:
                     cmds.setAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], 0)
                     cmds.addAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], edit=True, defaultValue=0)
-                upLocOrientConst = cmds.orientConstraint(self.ikExtremCtrl, self.rootCtrlRef, poleVectorUpLocGrp, maintainOffset=True, name=poleVectorUpLocGrp+"_OrC")[0]
+                upLocOrientConst = cmds.parentConstraint(self.ikExtremCtrl, self.rootCtrlRef, poleVectorUpLocGrp, skipTranslate=["x", "y", "z"], maintainOffset=True, name=poleVectorUpLocGrp+"_OrC")[0]
                 cmds.setAttr(upLocOrientConst+".interpType", 2) #shortest
                 upLocOrientRev = cmds.createNode('reverse', name=side+self.userGuideName+"_UpLocOrient_Rev")
                 cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], upLocOrientRev+".inputX", force=True)

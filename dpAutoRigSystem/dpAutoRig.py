@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.32"
+DPAR_VERSION_PY3 = "4.01.33"
 DPAR_UPDATELOG = "N612 - Limb poleVector behavior."
 
 
