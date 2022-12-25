@@ -53,6 +53,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.origRotList = []
         self.bendJointList = []
         self.masterCtrlRefList = []
+        self.rootCtrlRefList = []
         self.softIkCalibrateList = []
         self.correctiveCtrlGrpList = []
 
@@ -679,9 +680,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
                 self.worldRefShapeList.append(self.worldRefShape)
-                # creating a group reference to follow masterCtrl:
+                # creating a group reference to follow masterCtrl and rootCtrl:
                 self.masterCtrlRef = cmds.group(empty=True, name=side+self.userGuideName+"_MasterCtrlRef_Grp")
                 self.masterCtrlRefList.append(self.masterCtrlRef)
+                self.rootCtrlRef = cmds.group(empty=True, name=side+self.userGuideName+"_RootCtrlRef_Grp")
+                self.rootCtrlRefList.append(self.rootCtrlRef)
 
                 # parenting fkControls from 2 hierarchies (before and limb) using constraint, attention to fkIsolated shoulder:
                 # creating a shoulder_ref group in order to use it as position relative, joint articulation origin and aim constraint target to self.quadExtraCtrl:
@@ -984,49 +987,36 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.zeroCornerGrp = dpUtils.zeroOut([self.cornerGrp])[0]
                 self.ikPoleVectorCtrlZeroList.append(self.zeroCornerGrp)
 
+                # working with follow behavior of the poleVector:
+                poleVectorAimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+cornerName+"_Ik_Aim_Loc")[0]
+                poleVectorUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+cornerName+"_Ik_Up_Loc")[0]
+                poleVectorUpLocGrp = cmds.group(poleVectorUpLoc, name=poleVectorUpLoc+"_Grp")
+                poleVectorLocatorsGrp = cmds.group(poleVectorAimLoc, poleVectorUpLocGrp, name=side+self.userGuideName+"_"+cornerName+"_Ik_Loc_Grp")
+                cmds.setAttr(poleVectorUpLoc+".translateZ", self.ctrlRadius)
+                if pvPosZ < 0:
+                    cmds.setAttr(poleVectorUpLoc+".translateZ", -self.ctrlRadius)
+                cmds.delete(cmds.pointConstraint(self.cvMainLoc, poleVectorAimLoc, maintainOffset=False))
+                cmds.pointConstraint(self.ikExtremCtrl, poleVectorUpLocGrp, maintainOffset=False, name=poleVectorUpLocGrp+"_PaC")
+                
                 # working with autoOrient of poleVector:
                 cmds.addAttr(self.ikCornerCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                 if self.limbTypeName == ARM:
                     cmds.setAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], 0)
                     cmds.addAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], edit=True, defaultValue=0)
-                if self.limbStyle == self.langDic[self.langName]['m042_default']:
-                    self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp+"_OrC")[0]
-                else:  # biped, quadruped, quadSpring
-                    if self.limbTypeName == ARM:
-                        self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("y", "z"), maintainOffset=True, name=self.cornerGrp+"_OrC")[0]
-                    else:  # leg
-                        self.cornerOrient = cmds.orientConstraint(self.cornerOrientGrp, self.ikExtremCtrl, self.cornerGrp, skip=("x", "z"), maintainOffset=True, name=self.cornerGrp+"_OrC")[0]
-                cmds.setAttr(self.cornerOrient+".interpType", 2) #shortest
-                self.cornerOrientRev = cmds.createNode('reverse', name=side+self.userGuideName+"_CornerOrient_Rev")
-                cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], self.cornerOrientRev+".inputX", force=True)
-                cmds.connectAttr(self.cornerOrientRev+'.outputX', self.cornerOrient+"."+self.cornerOrientGrp+"W0", force=True)
-                cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], self.cornerOrient+"."+self.ikExtremCtrl+"W1", force=True)
-
-                # working with follow behavior of the poleVector:
-                poleVectorAimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+cornerName+"_Ik_Aim_Loc")
-                poleVectorUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+cornerName+"_Ik_Up_Loc")
-                
-                ##### WIP:
-                #
-                # aimLoc position, aimConst from ikCtrl to aimLoc, parentConst(skip rot) from limbCtrlGrp to aimLoc
-                # uplocGrp (pivot to ikCtrl), orientConstr from ikCtrl and rootCtrl to upLocGrp
-                # pointConst from ikCtrl to upLocGrp
-                # connect autoRotate from polevector to orientConst.ikCtrlW0 and new reverseNode
-                # connect reversenode output to orientConstra.rootCtrlW1
-                # parentConstraint from aimLoc to poleVectGrp
-                # organize parenting locator nodes to Data_Grp
-                #
-
-
-
-
-
+                upLocOrientConst = cmds.orientConstraint(self.ikExtremCtrl, self.rootCtrlRef, poleVectorUpLocGrp, maintainOffset=True, name=poleVectorUpLocGrp+"_OrC")[0]
+                cmds.setAttr(upLocOrientConst+".interpType", 2) #shortest
+                upLocOrientRev = cmds.createNode('reverse', name=side+self.userGuideName+"_UpLocOrient_Rev")
+                cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], upLocOrientRev+".inputX", force=True)
+                cmds.connectAttr(self.ikCornerCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], upLocOrientConst+"."+self.ikExtremCtrl+"W0", force=True)
+                cmds.connectAttr(upLocOrientRev+'.outputX', upLocOrientConst+"."+self.rootCtrlRef+"W1", force=True)
+                cmds.aimConstraint(self.ikExtremCtrl, poleVectorAimLoc, worldUpType="object", worldUpObject=poleVectorUpLoc, aimVector=(0, 0, 1), upVector=(1, 0, 0), maintainOffset=False, name=poleVectorUpLoc+"_AiC")
+                cmds.parentConstraint(poleVectorAimLoc, self.cornerGrp, maintainOffset=True, name=self.cornerGrp+"_PaC")
 
                 # make poleVectorCtrl's follow really pin from masterCtrl:
                 cmds.addAttr(self.ikCornerCtrl, longName="pin", attributeType='bool', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 poleVectorPinPC = cmds.parentConstraint(self.masterCtrlRef, self.ikCornerCtrlZero, maintainOffset=True, name=self.ikCornerCtrlZero+"_PaC")[0]
                 cmds.connectAttr(self.ikCornerCtrl+'.pin', poleVectorPinPC+"."+self.masterCtrlRef+"W0", force=True)
-
+                
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
                     cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, defaultValue=1, keyable=True)
@@ -1187,19 +1177,23 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # (James) not implementing the forearm control if we use ribbons (yet)
                     if self.getHasBend() == True:
                         # do not use forearm control
-                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side+self.userGuideName+"_Control_Grp")
+                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef, name=side+self.userGuideName+"_Control_Grp")
                     else:
                         # use forearm control
-                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side+self.userGuideName+"_Control_Grp")
+                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef, name=side+self.userGuideName+"_Control_Grp")
                 else:
-                    self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, name=side+self.userGuideName+"_Control_Grp")
+                    self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(name=side+self.userGuideName+"_Scalable_Grp", empty=True)
                 cmds.parent(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], self.toScalableHookGrp)
                 self.aScalableGrps.append(self.toScalableHookGrp)
                 cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp+"_PaC")
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, ikHandleGrp, ikHandleNotStretchGrp, ikHandleACGrp, name=side+self.userGuideName+"_Static_Grp")
 
-                # clean-up before joint not used to autoClavicle:
+                # arrange poleVector locators hierarchy
+                cmds.parent(poleVectorLocatorsGrp, self.toStaticHookGrp)
+                cmds.parentConstraint(self.toCtrlHookGrp, poleVectorAimLoc, skipRotate=["x", "y", "z"], maintainOffset=True, name=poleVectorAimLoc+"_PaC")
+                
+                # clean-up before joint, it isn't used to autoClavicle:
                 cmds.delete(self.ikACJointList[0])
 
                 # Ribbon feature by James do Carmo, thanks!
@@ -1720,6 +1714,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "limbManualVolume": self.langDic[self.langName]['m019_limb'].lower()+"Manual_"+self.langDic[self.langName]['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
+                "rootCtrlRefList": self.rootCtrlRefList,
                 "softIkCalibrateList": self.softIkCalibrateList,
                 "correctiveCtrlGrpList": self.correctiveCtrlGrpList
             }
