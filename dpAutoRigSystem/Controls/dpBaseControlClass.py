@@ -97,6 +97,7 @@ class ControlStartClass:
         cvCurve = cmds.curve(name=cvName, point=cvPointList, degree=cvDegree, knot=cvKnot, periodic=cvPeriodic)
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
         self.ctrls.renameShape([cvCurve])
+        self.ctrls.displayRotateOrderAttr([cvCurve])
         return cvCurve
     
     

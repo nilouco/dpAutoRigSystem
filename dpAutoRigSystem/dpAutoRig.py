@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.33"
-DPAR_UPDATELOG = "N612 - Limb poleVector behavior."
+DPAR_VERSION_PY3 = "4.01.34"
+DPAR_UPDATELOG = "N164 - Display rotateOrder attribute."
 
 
 
