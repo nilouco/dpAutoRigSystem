@@ -506,6 +506,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.aLCtrls.append([self.lCornerLipCtrl])
                 self.aRCtrls.append([self.rCornerLipCtrl])
                 self.aInnerCtrls.append([self.headSubCtrl])
+                self.ctrls.setSubControlDisplay(self.headCtrl, self.headSubCtrl, 1)
                 
                 # optimize control CV shapes:
                 tempHeadCluster = cmds.cluster(self.headCtrl, self.headSubCtrl)[1]
@@ -791,11 +792,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # hiding visibility attributes:
                 self.ctrls.setLockHide([self.headCtrl, self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl], ['v'], l=False)
                 self.ctrls.setLockHide(self.neckCtrlList, ['v'], l=False)
-
-                # headSubCtrl display
-                cmds.addAttr(self.headCtrl, longName="subControlDisplay", attributeType="bool", defaultValue=1)
-                cmds.connectAttr(self.headCtrl+".subControlDisplay", cmds.listRelatives(self.headSubCtrl, children=True, type="shape")[0]+".visibility", force=True)
-                cmds.setAttr(self.headCtrl+".subControlDisplay", channelBox=True)
 
                 # arrange controllers hierarchy
                 cmds.parent(self.zeroCtrlList[-1], self.zeroCtrlList[1], self.headCtrl, absolute=True) #headSubCtrl
