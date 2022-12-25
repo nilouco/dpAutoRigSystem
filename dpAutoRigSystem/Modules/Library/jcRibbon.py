@@ -366,10 +366,10 @@ class RibbonClass(object):
         cmds.parent(top_Loc[2], top_Loc[0], relative=True)
         cmds.parent(top_Loc[3], top_Loc[0], relative=True)
         #create the locators for the end of the ribbon
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Pos_Loc')[0])
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Aim_Loc')[0])
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Up_Loc')[0])
-        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bttm_Rot0_Loc')[0])
+        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Pos_Loc')[0])
+        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Aim_Loc')[0])
+        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Up_Loc')[0])
+        bttm_Loc.append(cmds.spaceLocator(name=name+'_Bottom_Rot0_Loc')[0])
         #parent correctly the bottom locators
         cmds.parent(bttm_Loc[1], bttm_Loc[0], relative=True)
         cmds.parent(bttm_Loc[2], bttm_Loc[0], relative=True)
@@ -394,10 +394,10 @@ class RibbonClass(object):
             cmds.joint(jnt, e=True, oj='none', ch=True, zso=True);
             cmds.setAttr(jnt+'.radius', cmds.getAttr(jnt+'.radius')+0.5)
         #rename created joints
-        drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bttm_Jxt')
+        drv_Jnt[0] = cmds.rename(drv_Jnt[0], name+'_Drv_Bottom_Jxt')
         drv_Jnt[1] = cmds.rename(drv_Jnt[1], name+'_Drv_Mid_Jxt')
         drv_Jnt[2] = cmds.rename(drv_Jnt[2], name+'_Drv_Top_Jxt')
-        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bttm_JEnd')
+        drv_Jnt[3] = cmds.rename(drv_Jnt[3], name+'_Drv_Bottom_JEnd')
         drv_Jnt[4] = cmds.rename(drv_Jnt[4], name+'_Drv_Top_JEnd')
         
         #place joints correctly accordaly with the user options choose
@@ -665,7 +665,7 @@ class RibbonClass(object):
                 rbProportionMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Proportion_MD"))
                 rbIntensityMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Intensity_MD"))
                 rbAddScalePMA = cmds.createNode("plusMinusAverage", name=self.elbowctrlCtrl.replace("_Ctrl", "_AddScale_PMA"))
-                rbLengthMD = cmds.createNode("multiplyDivide", name=extraName+"_Length_MD")
+                rbLengthMD = cmds.createNode("multiplyDivide", name=self.elbowctrlCtrl.replace("_Ctrl", "_Length_MD"))
                 rbScaleClp = cmds.createNode("clamp", name=self.elbowctrlCtrl.replace("_Ctrl", "_Scale_Clp"))
                 rbBlendCB = cmds.createNode("blendColors", name=self.elbowctrlCtrl.replace("_Ctrl", "_BC"))
                 cmds.connectAttr(worldRef+"."+self.limbVVAttr, rbBlendCB+".blender", force=True)
@@ -803,7 +803,7 @@ class RibbonClass(object):
         loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             upTwistBoneMD = dpUtils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
-            bottomTwistBoneMD = dpUtils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bttm_TwistBone")
+            bottomTwistBoneMD = dpUtils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")
             twistBonePMA = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")
             twistBoneInvMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
             twistBoneCnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
