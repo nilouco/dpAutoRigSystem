@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.32"
-DPAR_UPDATELOG = "N258 - Fixed reverseFoot stretch knee issue."
+DPAR_VERSION_PY3 = "4.01.33"
+DPAR_UPDATELOG = "N612 - Limb poleVector behavior."
 
 
 
@@ -2436,6 +2436,7 @@ class DP_AutoRig_UI(object):
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
+                            rootCtrlRefList = self.integratedTaskDic[moduleDic]['rootCtrlRefList']
                             softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList']
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:
@@ -2480,8 +2481,9 @@ class DP_AutoRig_UI(object):
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
                             
-                                # fix poleVector follow feature integrating with Master_Ctrl:
+                                # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
+                                cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC")
 
                             # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
