@@ -124,9 +124,9 @@ class FacialControl(object):
         fileDictionary.close()
         if presetContent:
             # rebuild dictionary using object variables:
-            for storedAttr in presetContent:
-                for sideName in presetContent[storedAttr]:
-                    for toNodeName in presetContent[storedAttr][sideName]:
+            for storedAttr in list(presetContent):
+                for sideName in list(presetContent[storedAttr]):
+                    for toNodeName in list(presetContent[storedAttr][sideName]):
                         for i, item in enumerate(self.tweaksNameStrList):
                             if toNodeName == item:
                                 presetContent[storedAttr][sideName][self.tweaksNameList[i]] = presetContent[storedAttr][sideName].pop(toNodeName)
