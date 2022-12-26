@@ -347,7 +347,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.addFlip = self.getModuleAttr("flip")
             self.addCorrective = self.getModuleAttr("corrective")
             # declare lists to store names and attributes:
-            self.worldRefList, self.upperCtrlList = [], []
+            self.worldRefList, self.upperCtrlList, self.upperJawCtrlList = [], [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # start as no having mirror:
             sideList = [""]
@@ -507,6 +507,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.aRCtrls.append([self.rCornerLipCtrl])
                 self.aInnerCtrls.append([self.headSubCtrl])
                 self.ctrls.setSubControlDisplay(self.headCtrl, self.headSubCtrl, 1)
+                self.upperJawCtrlList.append(self.upperJawCtrl)
                 
                 # optimize control CV shapes:
                 tempHeadCluster = cmds.cluster(self.headCtrl, self.headSubCtrl)[1]
@@ -860,12 +861,13 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         self.integratedActionsDic = {
                                     "module": {
-                                                "worldRefList"     : self.worldRefList,
-                                                "upperCtrlList"    : self.upperCtrlList,
-                                                "ctrlList"         : self.aCtrls,
-                                                "InnerCtrls"       : self.aInnerCtrls,
-                                                "lCtrls"           : self.aLCtrls,
-                                                "rCtrls"           : self.aRCtrls,
-                                                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
+                                                "worldRefList"         : self.worldRefList,
+                                                "upperCtrlList"        : self.upperCtrlList,
+                                                "ctrlList"             : self.aCtrls,
+                                                "InnerCtrls"           : self.aInnerCtrls,
+                                                "lCtrls"               : self.aLCtrls,
+                                                "rCtrls"               : self.aRCtrls,
+                                                "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
+                                                "upperJawCtrlList"     : self.upperJawCtrlList
                                               }
                                     }

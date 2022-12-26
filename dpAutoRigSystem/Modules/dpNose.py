@@ -215,6 +215,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
             # declare lists to store names and attributes:
+            self.ctrlHookGrpList, self.mainCtrlList = [], []
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # check if need to add nostril:
             self.addNostril = self.getModuleAttr("nostril")
@@ -298,6 +299,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
                     if n == 0:
+                        self.mainCtrlList.append(self.noseCtrl)
                         dpUtils.originedFrom(objName=self.noseCtrl, attrString=self.base+";"+self.cvTopLoc+";"+self.radiusGuide)
                         self.ctrlZeroGrp = self.zeroOutCtrlGrp
                     else:
@@ -489,6 +491,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Scalable_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
+                self.ctrlHookGrpList.append(self.toCtrlHookGrp)
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
@@ -523,8 +526,10 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         self.integratedActionsDic = {
                                     "module": {
-                                                "ctrlList" : self.aCtrls,
-                                                "lCtrls"   : self.aLCtrls,
-                                                "rCtrls"   : self.aRCtrls,
+                                                "ctrlList"        : self.aCtrls,
+                                                "lCtrls"          : self.aLCtrls,
+                                                "rCtrls"          : self.aRCtrls,
+                                                "ctrlHookGrpList" : self.ctrlHookGrpList,
+                                                "mainCtrlList"    : self.mainCtrlList
                                               }
                                     }

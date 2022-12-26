@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.38"
-DPAR_UPDATELOG = "N343 - Head's upper lip follows\nlower lip controller."
+DPAR_VERSION_PY3 = "4.01.39"
+DPAR_UPDATELOG = "N316 - Nose space switch."
 
 
 
@@ -2798,6 +2798,19 @@ class DP_AutoRig_UI(object):
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][0], "yellow")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['lCtrls'][0], "red")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['rCtrls'][0], "blue")
+                            fatherModule   = self.hookDic[moduleDic]['fatherModule']
+                            if fatherModule == HEAD:
+                                fatherGuide = self.hookDic[moduleDic]['fatherGuide']
+                                upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
+                                upperJawCtrl = self.integratedTaskDic[fatherGuide]['upperJawCtrlList'][0]
+                                ctrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][0]
+                                mainCtrl = self.integratedTaskDic[moduleDic]['mainCtrlList'][0]
+                                cmds.addAttr(mainCtrl, longName="spaceSwitch", attributeType="enum", en="Upper Jaw:Upper Head", keyable=True)
+                                revNode = cmds.createNode("reverse", name="Nose_SpaceSwitch_Rev")
+                                pac = cmds.parentConstraint(upperJawCtrl, upperCtrl, ctrlGrp, maintainOffset=True, name=ctrlGrp+"_PaC")[0]
+                                cmds.connectAttr(mainCtrl+".spaceSwitch", pac+"."+upperCtrl+"W1", force=True)
+                                cmds.connectAttr(mainCtrl+".spaceSwitch", revNode+".inputX", force=True)
+                                cmds.connectAttr(revNode+".outputX", pac+"."+upperJawCtrl+"W0", force=True)
                         
                         # worldRef of chain controlled by optionCtrl:
                         if moduleType == CHAIN:
