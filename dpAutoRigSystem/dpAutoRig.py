@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.36"
-DPAR_UPDATELOG = "N600 - Review stretch naming."
+DPAR_VERSION_PY3 = "4.01.37"
+DPAR_UPDATELOG = "N310 - Review ik effector naming."
 
 
 
