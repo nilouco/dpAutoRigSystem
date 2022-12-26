@@ -707,6 +707,14 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.lowerLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y", 0)
                 cmds.setAttr(self.lowerLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 2)
                 
+                # upper lip follows lower lip:
+                cmds.addAttr(self.upperLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                upperLipConst = cmds.parentConstraint(self.upperJawCtrl, self.lowerLipCtrl, self.zeroCtrlList[5], maintainOffset=True, name=self.zeroCtrlList[5]+"_PaC")[0]
+                upperLipRev = cmds.createNode("reverse", name=self.zeroCtrlList[5]+"_Follow_Rev")
+                cmds.connectAttr(self.upperLipCtrl+"."+self.langDic[self.langName]['c032_follow'], upperLipRev+".inputX", force=True)
+                cmds.connectAttr(self.upperLipCtrl+"."+self.langDic[self.langName]['c032_follow'], upperLipConst+"."+self.lowerLipCtrl+"W1", force=True)
+                cmds.connectAttr(upperLipRev+".outputX", upperLipConst+"."+self.upperJawCtrl+"W0", force=True)
+
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperJawCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_PaC")[0]
                 cmds.setAttr(lLipParentConst+".interpType", 2)
