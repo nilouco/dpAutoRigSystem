@@ -747,5 +747,79 @@
                                                     "rx" : [0, -23.0]
                                                     }
                         }
-              }
+              },
+"UpperLipBack" : {
+                     "MIDDLE" : {
+                                 "upperLipMiddleName" : {
+                                                             "ty" : [0, -0.3],
+                                                             "tz" : [0, -0.5],
+                                                             "rx" : [0, 23]
+                                                             }
+                               },
+                     "SIDED" : {
+                                 "upperLipName1" : {
+                                                         "ty" : [0, -0.1],
+                                                         "tz" : [0, -0.3],
+                                                         "rx" : [0, 10]
+                                                         },
+                                 "upperLipName2" : {
+                                                         "tz" : [0, -0.1]
+                                                         }
+                             }
+                   },
+"UpperLipFront" : {
+                     "MIDDLE" : {
+                                 "upperLipMiddleName" : {
+                                                             "tz" : [0, 1.5],
+                                                             "rx" : [0, -15]
+                                                             }
+                               },
+                     "SIDED" : {
+                                 "upperLipName1" : {
+                                                         "tz" : [0, 0.7],
+                                                         "rx" : [0, -11]
+                                                         },
+                                 "upperLipName2" : {
+                                                         "tz" : [0, 0.3],
+                                                         "rx" : [0, -4.7]
+                                                         }
+                             }
+                   },
+"LowerLipBack" : {
+                     "MIDDLE" : {
+                                 "lowerLipMiddleName" : {
+                                                             "ty" : [0, 0.3],
+                                                             "tz" : [0, -0.5],
+                                                             "rx" : [0, -23]
+                                                             }
+                               },
+                     "SIDED" : {
+                                 "lowerLipName1" : {
+                                                         "ty" : [0, 0.1],
+                                                         "tz" : [0, -0.3],
+                                                         "rx" : [0, -10]
+                                                         },
+                                 "lowerLipName2" : {
+                                                         "tz" : [0, -0.1]
+                                                         }
+                             }
+                   },
+"LowerLipFront" : {
+                     "MIDDLE" : {
+                                 "lowerLipMiddleName" : {
+                                                             "tz" : [0, 1.5],
+                                                             "rx" : [0, 15]
+                                                             }
+                               },
+                     "SIDED" : {
+                                 "lowerLipName1" : {
+                                                         "tz" : [0, 0.7],
+                                                         "rx" : [0, 11]
+                                                         },
+                                 "lowerLipName2" : {
+                                                         "tz" : [0, 0.3],
+                                                         "rx" : [0, 4.7]
+                                                         }
+                             }
+                   }
 }

@@ -20,8 +20,8 @@ BROW_TGTLIST = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
 EYELID_TGTLIST = [None, None, "EyelidsClose", "EyelidsOpen"]
 MOUTH_TGTLIST = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
 LIPS_TGTLIST = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
-SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None]
-GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None]
+SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"]
+GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"]
 FACE_TGTLIST = ["L_Puff", "R_Puff", "Pucker", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
 TYPE_BS = "typeBS"
 TYPE_JOINTS = "typeJoints"
@@ -30,7 +30,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.13"
+DPFC_VERSION = "1.14"
 
 
 class FacialControl(object):
@@ -124,9 +124,9 @@ class FacialControl(object):
         fileDictionary.close()
         if presetContent:
             # rebuild dictionary using object variables:
-            for storedAttr in presetContent:
-                for sideName in presetContent[storedAttr]:
-                    for toNodeName in presetContent[storedAttr][sideName]:
+            for storedAttr in list(presetContent):
+                for sideName in list(presetContent[storedAttr]):
+                    for toNodeName in list(presetContent[storedAttr][sideName]):
                         for i, item in enumerate(self.tweaksNameStrList):
                             if toNodeName == item:
                                 presetContent[storedAttr][sideName][self.tweaksNameList[i]] = presetContent[storedAttr][sideName].pop(toNodeName)
@@ -289,8 +289,8 @@ class FacialControl(object):
         lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
         rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
         lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
-        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
         faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, True, connectBS, connectJnt, "cyan")
         
         # placing control groups:
@@ -320,6 +320,7 @@ class FacialControl(object):
             cmds.setAttr(sneerCtrlGrp+".translateZ", 13)
         if grimaceCtrlGrp:
             cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
+            cmds.setAttr(grimaceCtrlGrp+".scaleZ", -1)
             cmds.setAttr(grimaceCtrlGrp+".translateY", 0.5)
             cmds.setAttr(grimaceCtrlGrp+".translateZ", 13)
         if faceCtrlGrp:
