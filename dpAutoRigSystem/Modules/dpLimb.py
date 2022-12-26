@@ -828,9 +828,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     ikHandleACList = cmds.ikHandle(name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_AC_IKH", startJoint=self.ikACJointList[1], endEffector=self.ikACJointList[len(self.ikACJointList) - 2], solver='ikRPsolver')
 
                 # renaming effectors:
-                cmds.rename(ikHandleMainList[1], ikHandleMainList[0].capitalize()+"_Eff")
-                cmds.rename(ikHandleNotStretchList[1], ikHandleNotStretchList[0].capitalize()+"_Eff")
-                cmds.rename(ikHandleACList[1], ikHandleACList[0].capitalize()+"_Eff")
+                cmds.rename(ikHandleMainList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_Eff")
+                cmds.rename(ikHandleNotStretchList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_NotStretch_Eff")
+                cmds.rename(ikHandleACList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_AC_Eff")
 
                 # creating ikHandle groups:
                 cmds.setAttr(ikHandleMainList[0]+'.visibility', 0)
@@ -850,7 +850,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # setup quadruped extra control:
                 if self.limbStyle == self.langDic[self.langName]['m155_quadrupedExtra']:
-                    cmds.rename(ikHandleExtraList[1], ikHandleExtraList[0].capitalize()+"_Eff")
+                    cmds.rename(ikHandleExtraList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_Extra_Eff")
                     self.quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z")
                     if s == 1:
                         cmds.setAttr(self.quadExtraCtrl+".rotateY", 180)
