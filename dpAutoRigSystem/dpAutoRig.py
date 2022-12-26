@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.39"
-DPAR_UPDATELOG = "N316 - Nose space switch."
+DPAR_VERSION_PY3 = "4.01.40"
+DPAR_UPDATELOG = "N345 - Sneer/Grimace Z axis."
 
 
 
