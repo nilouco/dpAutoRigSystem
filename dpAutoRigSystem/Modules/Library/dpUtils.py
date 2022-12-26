@@ -89,7 +89,7 @@ def findAllModules(path, dir):
     """ Find all modules in the directory.
         Return a list of all module names (without '.py' extension).
     """
-    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate"]
+    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate", "dpPublisher"]
     allPyFilesList = findAllFiles(path, dir, ".py")
     moduleList = []
     # removing "__init__":

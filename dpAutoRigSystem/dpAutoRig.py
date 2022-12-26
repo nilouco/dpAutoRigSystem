@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.01.40"
-DPAR_UPDATELOG = "N345 - Sneer/Grimace Z axis."
+DPAR_UPDATELOG = "N124 Publisher."
 
 
 
@@ -75,12 +75,14 @@ try:
     from .Extras import dpUpdateRigInfo
     from .Extras import dpReorderAttr
     from .Languages.Translator import dpTranslator
+    from .Validator import dpPublisher
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
     reload(dpUpdateRigInfo)
     reload(dpBaseClass)
     reload(dpLayoutClass)
+    reload(dpPublisher)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -639,7 +641,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
         cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
         cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
-        # pipeline
+        # pipeline check-addons
         if self.getValidatorsAddOns():
             cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
             self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
@@ -649,10 +651,15 @@ class DP_AutoRig_UI(object):
             self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
             cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
             cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
-
+        # publisher
+        self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
+        cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
+        self.allUIs["publishButton"] = cmds.button("publishButton", label=self.langDic[self.langName]['i216_publish'], annotation=self.langDic[self.langName]['i217_publishDesc'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.loadPublisher, parent=self.allUIs["footerPublish"])
+        cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5)]
+                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
+                        attachNone=[(self.allUIs["footerPublish"], 'top')]
                         )
         self.setValidatorPreset()
 
@@ -3020,3 +3027,17 @@ class DP_AutoRig_UI(object):
             print(self.langDic[self.langName]['i029_skinNothing'])
 
     ###################### End: Skinning.
+
+    
+    ###################### Start: Publisher.
+
+    def loadPublisher(self, *args):
+        """ Load the publisher UI.
+        """
+        print("calling PUBLISHER here, merci")
+        dpPublisherInst = dpPublisher.Publisher(self)
+        dpPublisherInst.main()
+
+
+
+    ###################### End: Publisher.
