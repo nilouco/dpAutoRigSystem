@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.37"
-DPAR_UPDATELOG = "N310 - Review ik effector naming."
+DPAR_VERSION_PY3 = "4.01.38"
+DPAR_UPDATELOG = "N343 - Head's upper lip follows\nlower lip controller."
 
 
 
