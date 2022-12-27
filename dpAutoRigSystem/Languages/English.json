@@ -424,7 +424,7 @@
     "m043_quadSpring"           : "Quadruped Spring",
     "m044_addBend"              : "Add Bend",
     "m045_order"                : "Order",
-    "m046_0-0-0-0-0-0-"         : "",
+    "m046_publisher"            : "Publisher",
     "m047_colorOver"            : "Color Override",
     "m048_coloOverDesc"         : "Show a window to change\nshape color overriding.",
     "m049_matchMesh"            : "Match Mesh",

@@ -1,142 +1,83 @@
 # importing libraries:
 from maya import cmds
+from functools import partial
 from ..Modules.Library import dpUtils
 
+
+DPPUBLISHER_VERSION = 1.0
 
 
 class Publisher(object):
     def __init__(self, dpUIinst, ui=True, verbose=True):
-        """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
+        """ Initialize the module class loading variables.
         """
         # defining variables:
         self.dpUIinst = dpUIinst
+        self.langDic = dpUIinst.langDic
+        self.langName = dpUIinst.langName
         self.ui = ui
         self.verbose = verbose
-        self.active = True
-        self.validatorCB = None
-        self.verifyBT = None
-        self.fixBT = None
-        # returned lists
-        self.checkedObjList = []
-        self.foundIssueList = []
-        self.resultOkList = []
-        self.messageList = []
-        self.dataLogDic = {}
+        self.publisherName = self.langDic[self.langName]['m046_publisher']
 
-    def main(self, *args):
+
+    def mainUI(self, *args):
+        """ This is the main method to load the Publisher UI.
         """
-        """
+
         print ("running well here, teingquil!")
+        
+        
+        #WIP
+        self.ui = True
+        self.closeUI()
+        
+        # window
+        publisher_winWidth  = 380
+        publisher_winHeight = 300
+        cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(DPPUBLISHER_VERSION), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.showWindow('dpPublisherWindow')
+        # create UI layout and elements:
+        publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
+        publisherLayoutA = cmds.rowColumnLayout('publisherLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=publisherLayout)
+        self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), backgroundColor=(0.75, 0.75, 0.75), parent=publisherLayoutA)
+        
+        self.createTF = cmds.textField('createTF', editable=True, parent=publisherLayoutA)
+        cmds.text("infoTxt", label=self.langDic[self.langName]['i217_publishDesc'], align="left", height=30, font='boldLabelFont', parent=publisherLayout)
+        cmds.separator(style='none', height=10, width=100, parent=publisherLayout)
+        
+        # comments
+        # file path
+        # file name
+        # version
+        # ignore validation checkBox
+        # diagnose?
+        # verbose = see log (none, simple or complete)
+        # 
 
-    def changeActive(self, value, *args):
-        """ Set active attribute to given value.
-            If there's an UI it will work to update the checkBox and buttons.
+
+
+
+    def closeUI(self, *args):
+        """ Delete existing Publisher window if it exists.
         """
-        self.active = value
-        if self.ui:
-            cmds.checkBox(self.validatorCB, edit=True, value=value)
-            cmds.button(self.verifyBT, edit=True, enable=value)
-            cmds.button(self.fixBT, edit=True, enable=value)
-
-
-    def cleanUpToStart(self, *args):
-        """ Just redeclare variables and close openned window to run the code properly.
-        """
-        # redeclare variables
-        self.checkedObjList = []
-        self.foundIssueList = []
-        self.resultOkList = []
-        self.messageList = []
-        self.dataLogDic = {}
-        # close info log window if it exists
-        if cmds.window('dpInfoWindow', query=True, exists=True):
-            cmds.deleteUI('dpInfoWindow', window=True)
-        if self.verbose:
-            # Starting progress window
-            cmds.progressWindow(title="dpValidator", progress=0, status=self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': 0%', isInterruptable=False)
-
-
-    def updateButtonColors(self, *args):
-        """ Update button background colors if using UI.
-        """
-        if self.ui:
-            if self.checkedObjList:
-                if self.verifyMode:
-                    if True in self.foundIssueList:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=ISSUE_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=WARNING_COLOR)
-                    else:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                else: #fix
-                    if False in self.resultOkList:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=WARNING_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=ISSUE_COLOR)
-                    else:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
-            else:
-                if self.verifyMode:
-                    cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
-                    cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                else: #fix
-                    cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                    cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
+        if cmds.window('dpPublisherWindow', query=True, exists=True):
+            cmds.deleteUI('dpPublisherWindow', window=True)
     
 
-    def reportLog(self, *args):
-        """ Prepare the log output text and data dictionary for this checked validator.
+    def runPublishing(self, fromUI, verbose, *args):
         """
-        thisTime = str(time.asctime(time.localtime(time.time())))
-        # texts
-        nameText = self.dpUIinst.langDic[self.dpUIinst.langName]['m006_name']
-        titleText = self.dpUIinst.langDic[self.dpUIinst.langName][self.title]
-        modeText = self.dpUIinst.langDic[self.dpUIinst.langName]['v003_mode']
-        fixText = self.dpUIinst.langDic[self.dpUIinst.langName]['c052_fix'].upper()
-        vefiryText = self.dpUIinst.langDic[self.dpUIinst.langName]['i210_verify'].upper()
-        foundIssueText = self.dpUIinst.langDic[self.dpUIinst.langName]['v006_foundIssue']
-        everythingOkText = self.dpUIinst.langDic[self.dpUIinst.langName]['v007_allOk']
-        # header
-        logText = "\n"+nameText+": "+titleText+"\n"
-        # mode
-        logText += modeText+": "
-        checkText = fixText
-        if self.verifyMode:
-            checkText = vefiryText
-        logText += checkText+"\n"
-        # issues
-        if True in self.foundIssueList:
-            logText += foundIssueText+":\n"
-            for i, item in enumerate(self.foundIssueList):
-                if item == True:
-                    logText += self.checkedObjList[i]
-                    if i != len(self.checkedObjList)-1:
-                        logText += "\n"
-        else:
-            logText += everythingOkText
-        # messages
-        if self.messageList:
-            for msg in self.messageList:
-                logText += "\n"+msg
-        # dataLog
-        self.dataLogDic["user"] = getpass.getuser()
-        self.dataLogDic["time"] = thisTime
-        self.dataLogDic["validator"] = self.guideModuleName
-        self.dataLogDic["name"] = self.title
-        self.dataLogDic["mode"] = checkText
-        self.dataLogDic["checkedObjList"] = self.checkedObjList
-        self.dataLogDic["foundIssueList"] = self.foundIssueList
-        self.dataLogDic["resultOkList"] = self.resultOkList
-        self.dataLogDic["messageList"] = self.messageList
-        self.dataLogDic["logText"] = logText
-        # verbose call info window
-        if self.verbose:
-            self.dpUIinst.info('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['v000_validator']+"\n"+thisTime+"\n"+logText)
-            if not dpUtils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+        """
+        print("running publishing forever young! fromUI=", fromUI)
 
-
-    def endProgressBar(self, *args):
-        if self.verbose:
-            cmds.progressWindow(endProgress=True)
+        toCheckValidatorList = [self.dpUIinst.checkInInstanceList, self.dpUIinst.checkOutInstanceList, self.dpUIinst.checkAddOnsInstanceList]
+        for validatorList in toCheckValidatorList:
+            if validatorList:
+    #            validationResultData = self.dpUIinst.runSelectedValidators(validatorList, True, verbose, True)
+                validationResultData = self.dpUIinst.runSelectedValidators(validatorList, True, False, True)
+                print("validationResultData", validationResultData)
+                if validationResultData:
+                    if not validationResultData[0]:
+                        if validationResultData[1]:
+                            print("found error in some checked validator:", validatorList[validationResultData[1]].guideModuleName)
+                        cmds.progressWindow(endProgress=True)
+                        break

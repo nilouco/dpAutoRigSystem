@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.0
+dpTargetCleaner_Version = 1.1
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -46,7 +46,10 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            toCheckList = list(set(cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=False)))
+            toCheckList = None
+            meshList = cmds.ls(selection=False, type='mesh')
+            if meshList:
+                toCheckList = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)

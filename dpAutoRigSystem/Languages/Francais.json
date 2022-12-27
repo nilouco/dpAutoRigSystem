@@ -424,7 +424,7 @@
     "m043_quadSpring"           : "Quadrupède Spring",
     "m044_addBend"              : "Ajouter Plier",
     "m045_order"                : "Ordre",
-    "m046_0-0-0-0-0-0-"         : "UNUSED: Connexion rapide entre\nles meshes shapes attributs:\n\n.outMesh et .inMesh\n\nDE: MODELS_Grp *_geoShape\nPOUR: render_Grp *_meshShape",
+    "m046_publisher"            : "Publisher",
     "m047_colorOver"            : "Color Override",
     "m048_coloOverDesc"         : "Montre une fenêtre pour\néchanger la couleur des shapes.",
     "m049_matchMesh"            : "Match Mesh",
