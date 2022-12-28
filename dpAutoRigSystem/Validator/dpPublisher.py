@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from functools import partial
 from ..Modules.Library import dpUtils
 
@@ -23,14 +24,12 @@ class Publisher(object):
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-
-        print ("running well here, teingquil!")
-        
         
         #WIP
         self.ui = True
         self.closeUI()
         
+
         # window
         publisher_winWidth  = 380
         publisher_winHeight = 300
@@ -52,7 +51,7 @@ class Publisher(object):
         # ignore validation checkBox
         # diagnose?
         # verbose = see log (none, simple or complete)
-        # 
+        # fromUI ?
 
 
 
@@ -65,19 +64,26 @@ class Publisher(object):
     
 
     def runPublishing(self, fromUI, verbose, *args):
+        """ Start the publishing process running the checked validators.
         """
-        """
-        print("running publishing forever young! fromUI=", fromUI)
-
+        foundIssue = False
         toCheckValidatorList = [self.dpUIinst.checkInInstanceList, self.dpUIinst.checkOutInstanceList, self.dpUIinst.checkAddOnsInstanceList]
         for validatorList in toCheckValidatorList:
             if validatorList:
-    #            validationResultData = self.dpUIinst.runSelectedValidators(validatorList, True, verbose, True)
-                validationResultData = self.dpUIinst.runSelectedValidators(validatorList, True, False, True)
-                print("validationResultData", validationResultData)
-                if validationResultData:
-                    if not validationResultData[0]:
-                        if validationResultData[1]:
-                            print("found error in some checked validator:", validatorList[validationResultData[1]].guideModuleName)
-                        cmds.progressWindow(endProgress=True)
-                        break
+                validationResultDataList = self.dpUIinst.runSelectedValidators(validatorList, True, False, True)
+                if validationResultDataList[1]: #found issue
+                    stoppedMessage = self.langDic[self.langName]['v020_publishStopped']+" "+validatorList[validationResultDataList[2]].guideModuleName
+                    mel.eval('warning \"'+stoppedMessage+'\";')
+                    cmds.progressWindow(endProgress=True)
+                    foundIssue = True
+                    break
+        if not foundIssue:
+            print ("good, merci")
+            
+
+
+
+        # TODO result window = log here
+
+
+        self.closeUI()

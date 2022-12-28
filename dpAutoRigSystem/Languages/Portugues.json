@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-12-26",
+    "_updated"       : "2022-12-27",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -628,7 +628,8 @@
     "v014_notFoundNodes"      : "Não encontrado nodes para continuar, desculpe.",
     "v015_freezeTransform"    : "Freeze Transform",
     "v016_freezeTranformDesc" : "Verifique se todas as geometrias têm freeze transformation, com translação e\nrotação com os valores em zero e escala com os valores em um,\ncaso contrário, tenta aplicá-las.",
-    "v017_freezeError"        : "Não foi possível aplicar freeze transform para: ",
-    "v018_foundTransform"     : "Encontradas transformações para: ",
-    "v019_frozenTransform"    : "Freeze transformations aplicadas para: "
+    "v017_freezeError"        : "Não foi possível aplicar freeze transform para:",
+    "v018_foundTransform"     : "Encontradas transformações para:",
+    "v019_frozenTransform"    : "Freeze transformations aplicadas para:",
+    "v020_publishStopped"     : "Processo de publicação cancelado. Verifique esse validador por favor:"
 }

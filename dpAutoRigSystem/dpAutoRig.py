@@ -654,7 +654,7 @@ class DP_AutoRig_UI(object):
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
-        self.allUIs["publishButton"] = cmds.button("publishButton", label=self.langDic[self.langName]['i216_publish'], annotation=self.langDic[self.langName]['i217_publishDesc'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.loadPublisher, parent=self.allUIs["footerPublish"])
+        self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], annotation=self.langDic[self.langName]['i217_publishDesc'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.loadPublisher, parent=self.allUIs["footerPublish"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1531,7 +1531,7 @@ class DP_AutoRig_UI(object):
                     validatorInst.verbose = True
                     if stopIfFoundIssue:
                         if True in validatorInst.foundIssueList:
-                            return False, v
+                            return validationResultData, True, v
         if validationResultData:
             dataList = list(validationResultData.keys())
             dataList.sort()
@@ -1548,10 +1548,10 @@ class DP_AutoRig_UI(object):
         if verbose:
             self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
             print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
-        if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
-            print(self.langDic[self.langName]['i201_saveScene'])
+            if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
+                print(self.langDic[self.langName]['i201_saveScene'])
         cmds.progressWindow(endProgress=True)
-        return validationResultData, None
+        return validationResultData, False, 0
 
 
     def info(self, title, description, text, align, width, height, *args):
