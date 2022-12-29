@@ -657,7 +657,7 @@ class DP_AutoRig_UI(object):
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
-        self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], annotation=self.langDic[self.langName]['i217_publishDesc'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.loadPublisher, parent=self.allUIs["footerPublish"])
+        self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.loadPublisher, parent=self.allUIs["footerPublish"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,

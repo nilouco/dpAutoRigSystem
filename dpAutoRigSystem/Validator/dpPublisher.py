@@ -24,6 +24,7 @@ class Publisher(object):
         self.publisherName = self.langDic[self.langName]['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
+        self.toCheckValidators = True
 
 
     def mainUI(self, *args):
@@ -37,7 +38,6 @@ class Publisher(object):
         if savedScene:
             self.checkPipelineAssetName()
             
-
             # window
             publisher_winWidth  = 380
             publisher_winHeight = 300
@@ -46,21 +46,16 @@ class Publisher(object):
             # create UI layout and elements:
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
             cmds.separator(style="none", parent=publisherLayout)
-            
 
             publisherLayoutA = cmds.rowColumnLayout('publisherLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 5), (2, 'both', 5)], rowSpacing=[(1, 5), (2, 5), (3, 5)], parent=publisherLayout)
             cmds.text('commentTxt', label=self.langDic[self.langName]['i219_comments'], align='right', parent=publisherLayoutA)
             self.commentTF = cmds.textField('commentTF', editable=True, parent=publisherLayoutA)
             
-            #cmds.text('')
             self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadFilePath, adjustableColumn=2, parent=publisherLayout)
             self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, parent=publisherLayout)
 
-            #cmds.text('filePathTxt', label=self.langDic[self.langName]['i220_filePath'], align='right', parent=publisherLayoutA)
-            #self.filePathTF = cmds.textField('filePathTF', editable=True, parent=publisherLayoutA)
-
+            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), backgroundColor=(0.75, 0.75, 0.75), parent=publisherLayout)
-            cmds.text("infoTxt", label=self.langDic[self.langName]['i217_publishDesc'], align="center", height=20, parent=publisherLayout)
             
             cmds.separator(style='none', height=10, width=100, parent=publisherLayout)
             
@@ -75,6 +70,7 @@ class Publisher(object):
             # diagnose?
             # verbose = see log (none, simple or complete)
             # fromUI ?
+            # pipe to find folders like: Publish, ToClient, etc
 
 
     def checkSavedScene(self, *args):
@@ -185,16 +181,14 @@ class Publisher(object):
     def getPipeFileName(self, filePath, *args):
         """
         """
-        assetNameList = []
         print("geting pipe file name mi amigo...")
+
         if filePath:
-            print("FILE PATH HERE:", filePath)
             fileNameList = next(walk(filePath))[2]
-            print("fileNameList =", fileNameList)
             if fileNameList:
-                lastAssetVersion = 0
+                assetNameList = []
+                fileVersion = 0
                 assetName = self.checkPipelineAssetName()
-                print("assetName =", assetName)
                 if not assetName:
                     assetName = self.shortAssetName
                 for fileName in fileNameList:
@@ -202,9 +196,10 @@ class Publisher(object):
                         if not fileName in assetNameList:
                             assetNameList.append(fileName)
                 if assetNameList:
-                    print(assetNameList)
                     fileVersion = self.defineFileVersion(assetNameList)
-                    print("fileVersion ===", fileVersion)
+            print("concate =", assetName+self.rigV+(str(fileVersion).zfill(3)))
+            return assetName+self.rigV+(str(fileVersion).zfill(3))
+                
 
 
 
@@ -215,32 +210,47 @@ class Publisher(object):
             cmds.deleteUI('dpPublisherWindow', window=True)
     
 
-    def runPublishing(self, fromUI, verbose, comments=False, *args):
-        """ Start the publishing process running the checked validators.
+    def verifyCheckedValidators(self, *args):
+        """ Run the verify of checked validators.
         """
-        foundIssue = False
         toCheckValidatorList = [self.dpUIinst.checkInInstanceList, self.dpUIinst.checkOutInstanceList, self.dpUIinst.checkAddOnsInstanceList]
         for validatorList in toCheckValidatorList:
             if validatorList:
                 validationResultDataList = self.dpUIinst.runSelectedValidators(validatorList, True, False, True)
                 if validationResultDataList[1]: #found issue
-                    stoppedMessage = self.langDic[self.langName]['v020_publishStopped']+" "+validatorList[validationResultDataList[2]].guideModuleName
-                    mel.eval('warning \"'+stoppedMessage+'\";')
-                    cmds.progressWindow(endProgress=True)
-                    foundIssue = True
-                    break
-        if not foundIssue:
-            print ("good, merci")
-            
+                    stoppedMessage = self.langDic[self.langName]['v020_publishStopped']+" "+validatorList[validationResultDataList[2]].guideModuleName                    
+                    return stoppedMessage
+        return False
+        
 
+
+
+    def runPublishing(self, fromUI, verifyValidator=False, comments=False, *args):
+        """ Start the publishing process
+        """
+        validatorsResult = False
+        if fromUI:
+            if cmds.checkBox(self.verifyValidatorsCB, query=True, value=True):
+                validatorsResult = self.verifyCheckedValidators()
+        elif verifyValidator:
+            # TODO: find a way to verify validators without UI
+            print("TODO: find a way to verify validators without UI")
+        
+        if validatorsResult:
+            mel.eval('warning \"'+validatorsResult+'\";')
+            cmds.progressWindow(endProgress=True)
+            # TODO report stopped message here
+
+        else:
             # comments
             commentValue = comments
             if not comments and fromUI:
                 commentValue = cmds.textField(self.commentTF, query=True, text=True)
             print("commentValue =", commentValue)
 
+        
 
-            # 
+            # call dpImager
 
 
 

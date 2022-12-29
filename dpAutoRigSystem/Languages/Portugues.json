@@ -377,7 +377,7 @@
     "i214_refFile"         : "Referenciando arquivo",
     "i215_setAttr"         : "Configurando atributos",
     "i216_publish"         : "Publicar",
-    "i217_publishDesc"     : "Verifica todos os validadores marcados e publica o rig.",
+    "i217_verifyChecked"   : "Verificar todos os validadores marcados.",
     "i219_comments"        : "Comentários",
     "i220_filePath"        : "Caminho do arquivo",
     "i221_fileName"        : "Nome do arquivo",
