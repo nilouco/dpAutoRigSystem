@@ -106,6 +106,7 @@ CHECKIN = "Validator/CheckIn"
 CHECKOUT = "Validator/CheckOut"
 VALIDATOR_PRESETS = "Validator/Presets"
 PIPELINE_DRIVE = "R:/"
+DP_PIPELINE = "_dpPipeline"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -148,6 +149,8 @@ class DP_AutoRig_UI(object):
         """ Start the window, menus and main layout for dpAutoRig UI.
         """
         self.dpARVersion = DPAR_VERSION_PY3
+        self.pipelineDrive = PIPELINE_DRIVE
+        self.dpPipeline = DP_PIPELINE
         self.loadedPath = False
         self.loadedModules = False
         self.loadedScripts = False
@@ -645,7 +648,7 @@ class DP_AutoRig_UI(object):
         if self.getValidatorsAddOns():
             cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
             self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-            self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath)
+            self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath+"/"+self.dpPipeline)
             cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
             cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
             self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
@@ -1479,7 +1482,7 @@ class DP_AutoRig_UI(object):
     def getValidatorsAddOns(self, *args):
         self.getPipelineStudioName()
         if self.studioName:
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath)
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath+"/"+self.dpPipeline)
             return self.validatorAddOnsModuleList
 
 
@@ -1487,7 +1490,7 @@ class DP_AutoRig_UI(object):
         self.getPipelineStudioName()
         if self.studioName:
             self.studioPath += "/"
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath, True)
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath+self.dpPipeline+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
                 self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
