@@ -172,9 +172,8 @@ class DP_AutoRig_UI(object):
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
         self.dpLog = DPLOG
-        self.studioName = None
-        self.studioPath = None
         self.optionCtrl = None
+        self.pipeliner = dpPipeliner.Pipeliner()
         
         
         try:
@@ -246,6 +245,7 @@ class DP_AutoRig_UI(object):
             # create menu:
             self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
             cmds.menuItem('translator_MI', label='Translator', command=self.translator)
+            cmds.menuItem('pipeliner_MI', label='Pipeliner', command=partial(self.pipeliner.mainUI, self))
             cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "controls", CONTROLS_PRESETS, True))
             cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
             # window menu:
@@ -381,7 +381,6 @@ class DP_AutoRig_UI(object):
         # initialize some objects here:
         self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
         self.publisher = dpPublisher.Publisher(self)
-        #self.pipeliner = dpPipeliner.Pipeliner(self)
         # --
         
         # creating tabs - mainTabLayout:
@@ -774,7 +773,7 @@ class DP_AutoRig_UI(object):
         self.translatorInst = dpTranslator.Translator(self, self.langDic, self.langName)
         self.translatorInst.dpTranslatorMain()
         
-        
+
     def createPreset(self, type="controls", presetDir=CONTROLS_PRESETS, setOptionVar=True, *args):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
@@ -1471,31 +1470,22 @@ class DP_AutoRig_UI(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-    def getPipelineStudioName(self, pipelineDrive=PIPELINE_DRIVE, *args):
-        # try to find a pipeline structure
-        filePath = cmds.file(query=True, sceneName=True)
-        print("debug 1 filepath =", filePath)
-        if filePath:
-            print("debug 2 filepath =", filePath)
-            if pipelineDrive in filePath:
-                self.studioName = filePath.split(pipelineDrive)[1]
-                self.studioName = self.studioName[:self.studioName.find("/")]
-                self.studioPath = pipelineDrive+self.studioName
-                return self.studioName, self.studioPath
 
 
     def getValidatorsAddOns(self, *args):
-        self.getPipelineStudioName()
+        
+        
+        self.studioName, self.studioPath = self.pipeliner.getPipelineStudioName()
         if self.studioName:
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath+"/"+self.dpPipeline)
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath+"/"+self.pipeliner.folder)
             return self.validatorAddOnsModuleList
 
 
     def loadValidatorPreset(self, *args):
-        self.getPipelineStudioName()
+        self.studioName, self.studioPath = self.pipeliner.getPipelineStudioName()
         if self.studioName:
             self.studioPath += "/"
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath+self.dpPipeline+"/", True)
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath+self.pipeliner.folder+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
                 self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
