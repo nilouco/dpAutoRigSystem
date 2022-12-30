@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.01.40"
-DPAR_UPDATELOG = "N124 Publisher."
+DPAR_UPDATELOG = "N124 Publisher.\nN599 Pipeliner."
 
 
 
@@ -76,6 +76,7 @@ try:
     from .Extras import dpReorderAttr
     from .Languages.Translator import dpTranslator
     from .Validator import dpPublisher
+    from .Validator import dpPipeliner
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
@@ -83,6 +84,7 @@ try:
     reload(dpBaseClass)
     reload(dpLayoutClass)
     reload(dpPublisher)
+    reload(dpPipeliner)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -376,9 +378,10 @@ class DP_AutoRig_UI(object):
         # get current preset choose UI from menu:
         self.presetName = self.getCurrentMenuValue(self.presetList)
         
-        # initialize dpControls:
+        # initialize some objects here:
         self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
-        
+        self.publisher = dpPublisher.Publisher(self)
+        #self.pipeliner = dpPipeliner.Pipeliner(self)
         # --
         
         # creating tabs - mainTabLayout:
@@ -657,7 +660,7 @@ class DP_AutoRig_UI(object):
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
-        self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.loadPublisher, parent=self.allUIs["footerPublish"])
+        self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.publisher.mainUI, parent=self.allUIs["footerPublish"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
@@ -1471,7 +1474,9 @@ class DP_AutoRig_UI(object):
     def getPipelineStudioName(self, pipelineDrive=PIPELINE_DRIVE, *args):
         # try to find a pipeline structure
         filePath = cmds.file(query=True, sceneName=True)
+        print("debug 1 filepath =", filePath)
         if filePath:
+            print("debug 2 filepath =", filePath)
             if pipelineDrive in filePath:
                 self.studioName = filePath.split(pipelineDrive)[1]
                 self.studioName = self.studioName[:self.studioName.find("/")]
@@ -3035,14 +3040,3 @@ class DP_AutoRig_UI(object):
             print(self.langDic[self.langName]['i029_skinNothing'])
 
     ###################### End: Skinning.
-
-    
-    ###################### Start: Publisher.
-
-    def loadPublisher(self, *args):
-        """ Load the publisher UI.
-        """
-        dpPublisherInst = dpPublisher.Publisher(self)
-        dpPublisherInst.mainUI()
-
-    ###################### End: Publisher.

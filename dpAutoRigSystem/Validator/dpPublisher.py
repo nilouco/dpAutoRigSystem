@@ -6,7 +6,7 @@ from os import walk
 from ..Modules.Library import dpUtils
 
 
-DPPUBLISHER_VERSION = 1.0
+DPPUBLISHER_VERSION = 1.1
 
 RIG_V = "_rig_v"
 
@@ -24,7 +24,6 @@ class Publisher(object):
         self.publisherName = self.langDic[self.langName]['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
-        self.toCheckValidators = True
 
 
     def mainUI(self, *args):
@@ -33,7 +32,7 @@ class Publisher(object):
         
         #WIP
         self.ui = True
-        self.closeUI()
+        dpUtils.closeUI('dpPublisherWindow')
         savedScene = self.checkSavedScene()
         if savedScene:
             self.checkPipelineAssetName()
@@ -78,8 +77,9 @@ class Publisher(object):
             If not saved, try to save or save as it.
             Otherwise return False.
         """
+        sceneName = cmds.file(query=True, sceneName=True, shortName=True)
         modifiedScene = cmds.file(query=True, modified=True)
-        if modifiedScene:
+        if not sceneName or modifiedScene:
             saveName = self.langDic[self.langName]['i222_save']
             saveAsName = self.langDic[self.langName]['i223_saveAs']
             cancelName = self.langDic[self.langName]['i132_cancel']
@@ -87,15 +87,15 @@ class Publisher(object):
             if confirmResult == cancelName:
                 return False
             else:
-                if confirmResult == saveName:
-                    return cmds.file(save=True)
-                else:
+                if not sceneName or confirmResult == saveAsName: #untitled or saveAs
                     newName = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=0, dialogStyle=2)
                     if newName:
                         cmds.file(rename=newName[0])
                         return cmds.file(save=True)
                     else:
                         return False
+                else: #save
+                    return cmds.file(save=True)
         return True
 
 
@@ -174,8 +174,11 @@ class Publisher(object):
         """
         """
         print("loading file path from pipeline here... we are the champions my friend")
-        studioName, studioPath = self.dpUIinst.getPipelineStudioName(self.dpUIinst.pipelineDrive)
-        print("studioName and Path =", studioName, studioPath)
+        studioList = self.dpUIinst.getPipelineStudioName(self.dpUIinst.pipelineDrive)
+        if studioList:
+            studioName = studioList[0]
+            studioPath = studioList[1]
+        print("studioList =", studioList)
 
 
     def getPipeFileName(self, filePath, *args):
@@ -201,14 +204,11 @@ class Publisher(object):
             return assetName+self.rigV+(str(fileVersion).zfill(3))
                 
 
-
-
-    def closeUI(self, *args):
-        """ Delete existing Publisher window if it exists.
+    def getFileType(self, *args):
         """
-        if cmds.window('dpPublisherWindow', query=True, exists=True):
-            cmds.deleteUI('dpPublisherWindow', window=True)
-    
+        """
+        return cmds.file(query=True, type=True)[0]
+
 
     def verifyCheckedValidators(self, *args):
         """ Run the verify of checked validators.
@@ -247,14 +247,18 @@ class Publisher(object):
             if not comments and fromUI:
                 commentValue = cmds.textField(self.commentTF, query=True, text=True)
             print("commentValue =", commentValue)
-
+            fileType = self.getFileType()
+            print("fileType =", fileType)
+            
         
+            
 
+
+            # WIP
+            #
             # call dpImager
+            # save published file
+            # TODO result window = log here
 
 
-
-        # TODO result window = log here
-
-
-        self.closeUI()
+        dpUtils.closeUI('dpPublisherWindow')
