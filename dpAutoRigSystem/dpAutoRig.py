@@ -174,6 +174,7 @@ class DP_AutoRig_UI(object):
         self.dpLog = DPLOG
         self.optionCtrl = None
         self.pipeliner = dpPipeliner.Pipeliner()
+        self.savedScene = self.pipeliner.checkSavedScene()
         
         
         try:
@@ -230,7 +231,8 @@ class DP_AutoRig_UI(object):
             cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
             # create a validator preset list:
             self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
-            self.loadValidatorPreset()
+            if self.savedScene:
+                self.loadPipelineValidatorPreset()
             # create menuItems from validator preset list:
             if self.validatorPresetList:
                 # create menuItems with the validator presets
@@ -647,15 +649,16 @@ class DP_AutoRig_UI(object):
         cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
         cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
         # pipeline check-addons
-        if self.getValidatorsAddOns():
-            cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
-            self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-            self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath+"/"+self.dpPipeline)
-            cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
-            cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
-            self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-            cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
-            cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
+        if self.savedScene:
+            if self.getValidatorsAddOns():
+                cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+                self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath+"/"+self.dpPipeline)
+                cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
+                cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
+                self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
+                cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
@@ -1476,12 +1479,13 @@ class DP_AutoRig_UI(object):
         
         
         self.studioName, self.studioPath = self.pipeliner.getPipelineStudioName()
+        print("need to return to get they here:", self.studioName, self.studioPath)
         if self.studioName:
             self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath+"/"+self.pipeliner.folder)
             return self.validatorAddOnsModuleList
 
 
-    def loadValidatorPreset(self, *args):
+    def loadPipelineValidatorPreset(self, *args):
         self.studioName, self.studioPath = self.pipeliner.getPipelineStudioName()
         if self.studioName:
             self.studioPath += "/"

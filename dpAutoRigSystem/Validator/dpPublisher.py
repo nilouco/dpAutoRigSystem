@@ -4,6 +4,9 @@ from maya import mel
 from functools import partial
 from os import walk
 from ..Modules.Library import dpUtils
+from . import dpPipeliner
+from importlib import reload
+reload(dpPipeliner)
 
 
 DPPUBLISHER_VERSION = 1.1
@@ -24,6 +27,27 @@ class Publisher(object):
         self.publisherName = self.langDic[self.langName]['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
+        self.pipeliner = dpPipeliner.Pipeliner()
+
+
+    def saveThisScene(self, *args):
+        sceneName = cmds.file(query=True, sceneName=True, shortName=True)
+        saveName = self.langDic[self.langName]['i222_save']
+        saveAsName = self.langDic[self.langName]['i223_saveAs']
+        cancelName = self.langDic[self.langName]['i132_cancel']
+        confirmResult = cmds.confirmDialog(title=self.publisherName, message=self.langDic[self.langName]['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+        if confirmResult == cancelName:
+            return False
+        else:
+            if not sceneName or confirmResult == saveAsName: #untitled or saveAs
+                newName = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=0, dialogStyle=2)
+                if newName:
+                    cmds.file(rename=newName[0])
+                    return cmds.file(save=True)
+                else:
+                    return False
+            else: #save
+                return cmds.file(save=True)
 
 
     def mainUI(self, *args):
@@ -33,7 +57,10 @@ class Publisher(object):
         #WIP
         self.ui = True
         dpUtils.closeUI('dpPublisherWindow')
-        savedScene = self.checkSavedScene()
+
+        savedScene = self.pipeliner.checkSavedScene()
+        if not savedScene:
+            savedScene = self.saveThisScene()
         if savedScene:
             self.checkPipelineAssetName()
             
@@ -72,31 +99,7 @@ class Publisher(object):
             # pipe to find folders like: Publish, ToClient, etc
 
 
-    def checkSavedScene(self, *args):
-        """ Check if the current scene is saved to return True.
-            If not saved, try to save or save as it.
-            Otherwise return False.
-        """
-        sceneName = cmds.file(query=True, sceneName=True, shortName=True)
-        modifiedScene = cmds.file(query=True, modified=True)
-        if not sceneName or modifiedScene:
-            saveName = self.langDic[self.langName]['i222_save']
-            saveAsName = self.langDic[self.langName]['i223_saveAs']
-            cancelName = self.langDic[self.langName]['i132_cancel']
-            confirmResult = cmds.confirmDialog( title=self.publisherName, message=self.langDic[self.langName]['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName )
-            if confirmResult == cancelName:
-                return False
-            else:
-                if not sceneName or confirmResult == saveAsName: #untitled or saveAs
-                    newName = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=0, dialogStyle=2)
-                    if newName:
-                        cmds.file(rename=newName[0])
-                        return cmds.file(save=True)
-                    else:
-                        return False
-                else: #save
-                    return cmds.file(save=True)
-        return True
+    
 
 
     def checkPipelineAssetName(self, *args):
@@ -174,7 +177,7 @@ class Publisher(object):
         """
         """
         print("loading file path from pipeline here... we are the champions my friend")
-        studioList = self.dpUIinst.getPipelineStudioName(self.dpUIinst.pipelineDrive)
+        studioList = self.pipeliner.getPipelineStudioName(self.dpUIinst.pipelineDrive)
         if studioList:
             studioName = studioList[0]
             studioPath = studioList[1]
@@ -208,6 +211,23 @@ class Publisher(object):
         """
         """
         return cmds.file(query=True, type=True)[0]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     def verifyCheckedValidators(self, *args):

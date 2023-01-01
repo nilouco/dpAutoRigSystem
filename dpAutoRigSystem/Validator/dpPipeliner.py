@@ -21,12 +21,29 @@ class Pipeliner(object):
         # get fileName
         # get studioPath
         # get studioName
+        # day like 2023-01-30
         # mount pipeData
-
+        # Linux
+        # Mac
+        print("TRY LOAD PIULEINER")
+        #self.langDic = dpUIinst.langDic
+        #self.langName = dpUIinst.langName
         self.pipeData = {}
         self.studioName = None
         self.studioPath = None
         self.folder = PIPE_FOLDER
+
+
+    def checkSavedScene(self, *args):
+        """ Check if the current scene is saved to return True.
+            Otherwise return False.
+        """
+        scenePath = cmds.file(query=True, sceneName=True)
+        modifiedScene = cmds.file(query=True, modified=True)
+        if not scenePath or modifiedScene:
+            return False
+        return True
+
 
     def getAddOnsFolder(self, *args):
         #(self, *args):
@@ -48,11 +65,15 @@ class Pipeliner(object):
                 self.studioPath = drive+self.studioName
                 print("from pipeliner == studio data:", self.studioName, self.studioPath)
                 return self.studioName, self.studioPath
+        
+        #TODO return false if not find pipeline structure
+        # TEMP return here
+        return "Testing", PIPE_DRIVE+"Testing"
 
 
     def getPipelineData(self, drive=PIPE_DRIVE, *args):
         # WIP
-
+        self.checkSavedScene()
         self.pipeData['drive'] = "merci"
 
         return self.pipeData
@@ -64,8 +85,8 @@ class Pipeliner(object):
         
         # TODO
         #
-        # create a asset
+        # create an asset
         # specify the pipeline root drive
         # set a studio name
-        # define ToClient, Publish, WIP folders
+        # define ToClient, Publish, Riggging WIP folders
         # etc
