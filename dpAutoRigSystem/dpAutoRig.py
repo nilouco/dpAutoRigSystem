@@ -170,7 +170,6 @@ class DP_AutoRig_UI(object):
         self.dpLog = DPLOG
         self.optionCtrl = None
         self.pipeliner = dpPipeliner.Pipeliner()
-        self.savedScene = self.pipeliner.checkSavedScene()
         
         try:
             # store all UI elements in a dictionary:
@@ -226,7 +225,7 @@ class DP_AutoRig_UI(object):
             cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
             # create a validator preset list:
             self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
-            if self.savedScene:
+            if self.pipeliner.pipeData['presetsPath']:
                 self.loadPipelineValidatorPreset()
             # create menuItems from validator preset list:
             if self.validatorPresetList:
@@ -644,7 +643,7 @@ class DP_AutoRig_UI(object):
         cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
         cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
         # pipeline check-addons
-        if self.savedScene:
+        if self.pipeliner.pipeData['addOnsPath']:
             if self.getValidatorsAddOns():
                 cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
                 self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
@@ -1471,19 +1470,17 @@ class DP_AutoRig_UI(object):
     def getValidatorsAddOns(self, *args):
         """
         """
-        if self.pipeliner.pipeData['sceneName']:
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
-            return self.validatorAddOnsModuleList
+        self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
+        return self.validatorAddOnsModuleList
 
 
     def loadPipelineValidatorPreset(self, *args):
         """
         """
-        if self.pipeliner.pipeData['sceneName']:
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
-            if studioPreset:
-                self.validatorPresetList.insert(0, studioPreset[0])
-                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+        studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
+        if studioPreset:
+            self.validatorPresetList.insert(0, studioPreset[0])
+            self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
 
     
     def setValidatorPreset(self, *args):

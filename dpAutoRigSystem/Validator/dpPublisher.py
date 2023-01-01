@@ -23,7 +23,6 @@ class Publisher(object):
         self.langName = dpUIinst.langName
         self.ui = ui
         self.verbose = verbose
-        self.rigV = RIG_V
         self.publisherName = self.langDic[self.langName]['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
@@ -31,6 +30,9 @@ class Publisher(object):
 
 
     def saveThisScene(self, *args):
+        """ Open a confirmDialog to save or save as this file.
+            Return the saved file path or False if canceled.
+        """
         shortName = cmds.file(query=True, sceneName=True, shortName=True)
         saveName = self.langDic[self.langName]['i222_save']
         saveAsName = self.langDic[self.langName]['i223_saveAs']
@@ -125,7 +127,7 @@ class Publisher(object):
         if assetNameList:
             numberList = []
             for item in assetNameList:
-                numberList.append(int(item[:item.rfind(".")].split(self.rigV)[1]))
+                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['rigName'])[1]))
             return max(numberList)+1
 
 

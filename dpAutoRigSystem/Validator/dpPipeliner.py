@@ -20,9 +20,6 @@ class Pipeliner(object):
         self.pipeData = self.getPipelineData()
         
 
-
-
-
     def checkSavedScene(self, *args):
         """ Check if the current scene is saved to return True.
             Otherwise return False.
@@ -35,7 +32,7 @@ class Pipeliner(object):
 
 
     def getJsonContent(self, jsonPath, *args):
-        """
+        """ Open, read, close and return the json file content.
         """
         dic = open(jsonPath, "r", encoding='utf-8')
         content = json.loads(dic.read())
@@ -44,10 +41,9 @@ class Pipeliner(object):
 
 
     def getPipelinePath(self, *args):
+        """ Returns the path content of the _dpPipelineSetting json file if it exists.
+            Otherwise returns False.
         """
-        """
-        
-        # WIP
         basePath = dpUtils.findPath("dpAutoRig.py")
         basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]
         jsonPath = os.path.join(basePath, self.settingsFile).replace("\\", "/")
@@ -60,7 +56,7 @@ class Pipeliner(object):
         
 
     def getPipelineInfo(self, *args):
-        """
+        """ Read the json info file and return the merged pipeData and it's content if it exists.
         """
         jsonInfoPath = os.path.join(self.pipeData['path'], self.infoFile).replace("\\", "/")
         if os.path.exists(jsonInfoPath):
@@ -69,9 +65,8 @@ class Pipeliner(object):
                 self.pipeData = self.pipeData | content
 
 
-
     def getDrive(self, *args):
-        """
+        """ Returns the pipeline drive if the scene is saved.
         """
         sceneName = self.pipeData['sceneName']
         if sceneName:
@@ -79,7 +74,7 @@ class Pipeliner(object):
 
 
     def getStudio(self, *args):
-        """
+        """ Returns the pipeline studio name if there's one.
         """
         sceneName = self.pipeData['sceneName']
         if sceneName:
@@ -88,30 +83,31 @@ class Pipeliner(object):
 
 
     def getPipelineData(self, *args):
-        """
+        """ Read the dpPipelineSetting to find the pipeline info.
+            Mount the pipeData dictionary and return it.
         """
         self.pipeData = {}
-        if self.checkSavedScene():
-            # mouting pipeline data dictionary
-            self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
-            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
-            self.pipeData['drive'] = self.getDrive()
-            self.pipeData['studio'] = self.getStudio()
-            # getting pipeline settings
-            self.pipeData['path'] = self.getPipelinePath()
-            if not self.pipeData['path']:
-                self.pipeData['path'] = self.pipeData['drive']+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
-            # merger pipeline info
-            self.pipeInfo = self.getPipelineInfo()
-            # mounting structured pipeline data
-            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['addOns']
-            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['presets']
+        # mouting pipeline data dictionary
+        self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
+        self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
+        self.pipeData['drive'] = self.getDrive()
+        self.pipeData['studio'] = self.getStudio()
+        # getting pipeline settings
+        self.pipeData['path'] = self.getPipelinePath()
+        if not self.pipeData['path']:
+            self.pipeData['path'] = self.pipeData['drive']+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
+        # merger pipeline info
+        self.pipeInfo = self.getPipelineInfo()
+        # mounting structured pipeline data
+        self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['addOns']
+        self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['presets']
         return self.pipeData
 
 
-
-    def mainUI(self, *args):
+    def mainUI(self, dpUIinst, *args):
         print ("merci")
+        print("dpUIinst = ", dpUIinst)
+        print("dpUIinst langDic = ", dpUIinst.langDic)
         
         # TODO
         #
