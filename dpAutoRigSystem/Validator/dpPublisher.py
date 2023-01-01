@@ -170,6 +170,7 @@ class Publisher(object):
         """
         print("loading file path from pipeline here... we are the champions my friend")
         # wip to get pipeData info???
+        
 
 
     def getPipeFileName(self, filePath, *args):

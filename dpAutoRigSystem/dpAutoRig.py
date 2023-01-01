@@ -648,7 +648,7 @@ class DP_AutoRig_UI(object):
             if self.getValidatorsAddOns():
                 cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
                 self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsFolder'])
+                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsPath'])
                 cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
                 cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
@@ -1472,7 +1472,7 @@ class DP_AutoRig_UI(object):
         """
         """
         if self.pipeliner.pipeData['sceneName']:
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['drive']+self.pipeliner.pipeData['studio']+"/"+self.pipeliner.pipeData['folder'])
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
             return self.validatorAddOnsModuleList
 
 
@@ -1480,7 +1480,7 @@ class DP_AutoRig_UI(object):
         """
         """
         if self.pipeliner.pipeData['sceneName']:
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['drive']+self.pipeliner.pipeData['studio']+"/"+self.pipeliner.pipeData['folder']+"/", True)
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
                 self.validatorPresetDic = studioPresetDic | self.validatorPresetDic

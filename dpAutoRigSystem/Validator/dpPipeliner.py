@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
-from functools import partial
-from os import walk
+import os
+import json
 from ..Modules.Library import dpUtils
 
 
@@ -16,6 +15,8 @@ class Pipeliner(object):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
+        self.settingsFile = "_dpPipelineSettings.json"
+        self.infoFile = "dpPipelineInfo.json"
         self.pipeData = self.getPipelineData()
         
 
@@ -33,14 +34,39 @@ class Pipeliner(object):
         return True
 
 
-    def getPipelineFolder(self, *args):
+    def getJsonContent(self, jsonPath, *args):
         """
         """
-        print("wip getPipelineFolder here....")
+        dic = open(jsonPath, "r", encoding='utf-8')
+        content = json.loads(dic.read())
+        dic.close()
+        return content
+
+
+    def getPipelinePath(self, *args):
+        """
+        """
+        
         # WIP
+        basePath = dpUtils.findPath("dpAutoRig.py")
+        basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]
+        jsonPath = os.path.join(basePath, self.settingsFile).replace("\\", "/")
+        if os.path.exists(jsonPath):
+            content = self.getJsonContent(jsonPath)
+            if content:
+                if os.path.exists(content['path']):
+                    return content['path']
+        return False
         
 
-
+    def getPipelineInfo(self, *args):
+        """
+        """
+        jsonInfoPath = os.path.join(self.pipeData['path'], self.infoFile).replace("\\", "/")
+        if os.path.exists(jsonInfoPath):
+            content = self.getJsonContent(jsonInfoPath)
+            if content:
+                self.pipeData = self.pipeData | content
 
 
 
@@ -64,31 +90,22 @@ class Pipeliner(object):
     def getPipelineData(self, *args):
         """
         """
-
         self.pipeData = {}
         if self.checkSavedScene():
-            # getting pipeline info
-            pipeFolder = self.getPipelineFolder()
-            if pipeFolder:
-                self.pipeData['folder'] = PIPE_FOLDER
-            else:
-                self.pipeData['folder'] = PIPE_FOLDER
-
             # mouting pipeline data dictionary
             self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
             self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
             self.pipeData['drive'] = self.getDrive()
             self.pipeData['studio'] = self.getStudio()
-            
-            
+            # getting pipeline settings
+            self.pipeData['path'] = self.getPipelinePath()
+            if not self.pipeData['path']:
+                self.pipeData['path'] = self.pipeData['drive']+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
+            # merger pipeline info
+            self.pipeInfo = self.getPipelineInfo()
             # mounting structured pipeline data
-            self.pipeData['addOnsFolder'] = self.pipeData['drive']+self.pipeData['studio']+"/"+self.pipeData['folder']
-
-
-            print("DRIVE = ", self.pipeData['drive'])
-            print("STUDIO = ", self.pipeData['studio'])
-
-
+            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['addOns']
+            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['presets']
         return self.pipeData
 
 
@@ -103,4 +120,5 @@ class Pipeliner(object):
         # set a studio name
         # define ToClient, Publish, Riggging WIP folders
         # toClientFolder with or without date subFolder to zip the file
+        # create validator preset
         # etc

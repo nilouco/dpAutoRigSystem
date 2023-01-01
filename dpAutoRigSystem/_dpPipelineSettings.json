@@ -1,4 +1,4 @@
 {
-    "folder" : "put the path of your pipeline folder info here",
+    "path" : "put the path of your pipeline folder info here",
     "example" : "R:/StudioName/_dpPipeline"
 }
