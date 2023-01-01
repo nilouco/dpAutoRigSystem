@@ -31,7 +31,7 @@ class Publisher(object):
 
 
     def saveThisScene(self, *args):
-        sceneName = cmds.file(query=True, sceneName=True, shortName=True)
+        shortName = cmds.file(query=True, sceneName=True, shortName=True)
         saveName = self.langDic[self.langName]['i222_save']
         saveAsName = self.langDic[self.langName]['i223_saveAs']
         cancelName = self.langDic[self.langName]['i132_cancel']
@@ -39,7 +39,7 @@ class Publisher(object):
         if confirmResult == cancelName:
             return False
         else:
-            if not sceneName or confirmResult == saveAsName: #untitled or saveAs
+            if not shortName or confirmResult == saveAsName: #untitled or saveAs
                 newName = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=0, dialogStyle=2)
                 if newName:
                     cmds.file(rename=newName[0])
@@ -110,10 +110,6 @@ class Publisher(object):
         self.shortAssetName = shortName[:shortName.find("_")]
         folderAssetName = self.currentAssetName[:self.currentAssetName.rfind("/")]
         folderAssetName = folderAssetName[folderAssetName.rfind("/")+1:]
-        print("self.currentAssetName =", self.currentAssetName)
-        print("shortName =", shortName)
-        print("shortAssetName =", self.shortAssetName)
-        print("folderAssetName = ", folderAssetName)
         if folderAssetName == self.shortAssetName:
             print("YESSSS")
             
@@ -129,9 +125,7 @@ class Publisher(object):
         if assetNameList:
             numberList = []
             for item in assetNameList:
-                print("item =", item)
                 numberList.append(int(item[:item.rfind(".")].split(self.rigV)[1]))
-            print("numberList =", numberList)
             return max(numberList)+1
 
 
@@ -166,9 +160,7 @@ class Publisher(object):
     def loadFilePath(self, *args):
         """
         """
-        print("loading filePath here....")
         dialogResult = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.langDic[self.langName]['i187_load'])
-        print("dialogResult = ", dialogResult)
         if dialogResult:
             self.setFilePath(dialogResult[0])
 
@@ -177,11 +169,7 @@ class Publisher(object):
         """
         """
         print("loading file path from pipeline here... we are the champions my friend")
-        studioList = self.pipeliner.getPipelineStudioName(self.dpUIinst.pipelineDrive)
-        if studioList:
-            studioName = studioList[0]
-            studioPath = studioList[1]
-        print("studioList =", studioList)
+        # wip to get pipeData info???
 
 
     def getPipeFileName(self, filePath, *args):
@@ -203,7 +191,6 @@ class Publisher(object):
                             assetNameList.append(fileName)
                 if assetNameList:
                     fileVersion = self.defineFileVersion(assetNameList)
-            print("concate =", assetName+self.rigV+(str(fileVersion).zfill(3)))
             return assetName+self.rigV+(str(fileVersion).zfill(3))
                 
 

@@ -107,8 +107,6 @@ VALIDATOR = "Validator"
 CHECKIN = "Validator/CheckIn"
 CHECKOUT = "Validator/CheckOut"
 VALIDATOR_PRESETS = "Validator/Presets"
-PIPELINE_DRIVE = "R:/"
-DP_PIPELINE = "_dpPipeline"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -151,8 +149,6 @@ class DP_AutoRig_UI(object):
         """ Start the window, menus and main layout for dpAutoRig UI.
         """
         self.dpARVersion = DPAR_VERSION_PY3
-        self.pipelineDrive = PIPELINE_DRIVE
-        self.dpPipeline = DP_PIPELINE
         self.loadedPath = False
         self.loadedModules = False
         self.loadedScripts = False
@@ -175,7 +171,6 @@ class DP_AutoRig_UI(object):
         self.optionCtrl = None
         self.pipeliner = dpPipeliner.Pipeliner()
         self.savedScene = self.pipeliner.checkSavedScene()
-        
         
         try:
             # store all UI elements in a dictionary:
@@ -653,7 +648,7 @@ class DP_AutoRig_UI(object):
             if self.getValidatorsAddOns():
                 cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
                 self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath+"/"+self.dpPipeline)
+                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsFolder'])
                 cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
                 cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
@@ -1473,23 +1468,19 @@ class DP_AutoRig_UI(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-
-
     def getValidatorsAddOns(self, *args):
-        
-        
-        self.studioName, self.studioPath = self.pipeliner.getPipelineStudioName()
-        print("need to return to get they here:", self.studioName, self.studioPath)
-        if self.studioName:
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath+"/"+self.pipeliner.folder)
+        """
+        """
+        if self.pipeliner.pipeData['sceneName']:
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['drive']+self.pipeliner.pipeData['studio']+"/"+self.pipeliner.pipeData['folder'])
             return self.validatorAddOnsModuleList
 
 
     def loadPipelineValidatorPreset(self, *args):
-        self.studioName, self.studioPath = self.pipeliner.getPipelineStudioName()
-        if self.studioName:
-            self.studioPath += "/"
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath+self.pipeliner.folder+"/", True)
+        """
+        """
+        if self.pipeliner.pipeData['sceneName']:
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['drive']+self.pipeliner.pipeData['studio']+"/"+self.pipeliner.pipeData['folder']+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
                 self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
@@ -1765,6 +1756,8 @@ class DP_AutoRig_UI(object):
                 # store custom presets in order to avoid overwrite them when installing the update:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CONTROLS_PRESETS, dpAR_TempDir+"/"+CONTROLS_PRESETS)
+                # keep dpPipelineInfo data
+                shutil.copy2(os.path.join(dpAR_DestFolder, "_dpPipelineSettings.json"), dpAR_TempDir)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:

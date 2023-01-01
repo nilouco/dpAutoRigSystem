@@ -8,30 +8,18 @@ from ..Modules.Library import dpUtils
 
 DPPIPELINER_VERSION = 1.0
 
-PIPE_DRIVE = "R:/"
 PIPE_FOLDER = "_dpPipeline"
+
 
 class Pipeliner(object):
     def __init__(self, *args):
-        """ Initialize the module class loading variables.
+        """ Initialize the module class loading variables and store them in a dictionary.
         """
-        # defining variables:
+        # define variables
+        self.pipeData = self.getPipelineData()
+        
 
-        # get folder
-        # get fileName
-        # get studioPath
-        # get studioName
-        # day like 2023-01-30
-        # mount pipeData
-        # Linux
-        # Mac
-        print("TRY LOAD PIULEINER")
-        #self.langDic = dpUIinst.langDic
-        #self.langName = dpUIinst.langName
-        self.pipeData = {}
-        self.studioName = None
-        self.studioPath = None
-        self.folder = PIPE_FOLDER
+
 
 
     def checkSavedScene(self, *args):
@@ -45,42 +33,67 @@ class Pipeliner(object):
         return True
 
 
-    def getAddOnsFolder(self, *args):
-        #(self, *args):
+    def getPipelineFolder(self, *args):
         """
         """
-        print("passed by here")
-        return PIPE_FOLDER
-
-
-    def getPipelineStudioName(self, drive=PIPE_DRIVE, *args):
-        # try to find a pipeline structure
-        filePath = cmds.file(query=True, sceneName=True)
-        print("debug 1 filepath PIPE =", filePath)
-        if filePath:
-            print("debug 2 filepath =", filePath)
-            if drive in filePath:
-                self.studioName = filePath.split(drive)[1]
-                self.studioName = self.studioName[:self.studioName.find("/")]
-                self.studioPath = drive+self.studioName
-                print("from pipeliner == studio data:", self.studioName, self.studioPath)
-                return self.studioName, self.studioPath
-        
-        #TODO return false if not find pipeline structure
-        # TEMP return here
-        return "Testing", PIPE_DRIVE+"Testing"
-
-
-    def getPipelineData(self, drive=PIPE_DRIVE, *args):
+        print("wip getPipelineFolder here....")
         # WIP
-        self.checkSavedScene()
-        self.pipeData['drive'] = "merci"
+        
+
+
+
+
+
+    def getDrive(self, *args):
+        """
+        """
+        sceneName = self.pipeData['sceneName']
+        if sceneName:
+            return sceneName[:sceneName.find("/")+1]
+
+
+    def getStudio(self, *args):
+        """
+        """
+        sceneName = self.pipeData['sceneName']
+        if sceneName:
+            studioName = sceneName.split(self.pipeData['drive'])[1]
+            return studioName[:studioName.find("/")]
+
+
+    def getPipelineData(self, *args):
+        """
+        """
+
+        self.pipeData = {}
+        if self.checkSavedScene():
+            # getting pipeline info
+            pipeFolder = self.getPipelineFolder()
+            if pipeFolder:
+                self.pipeData['folder'] = PIPE_FOLDER
+            else:
+                self.pipeData['folder'] = PIPE_FOLDER
+
+            # mouting pipeline data dictionary
+            self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
+            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
+            self.pipeData['drive'] = self.getDrive()
+            self.pipeData['studio'] = self.getStudio()
+            
+            
+            # mounting structured pipeline data
+            self.pipeData['addOnsFolder'] = self.pipeData['drive']+self.pipeData['studio']+"/"+self.pipeData['folder']
+
+
+            print("DRIVE = ", self.pipeData['drive'])
+            print("STUDIO = ", self.pipeData['studio'])
+
 
         return self.pipeData
 
 
 
-    def mainUI(self, dpUIinst, *args):
+    def mainUI(self, *args):
         print ("merci")
         
         # TODO
@@ -89,4 +102,5 @@ class Pipeliner(object):
         # specify the pipeline root drive
         # set a studio name
         # define ToClient, Publish, Riggging WIP folders
+        # toClientFolder with or without date subFolder to zip the file
         # etc
