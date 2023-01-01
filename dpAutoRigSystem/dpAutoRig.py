@@ -226,7 +226,7 @@ class DP_AutoRig_UI(object):
             # create a validator preset list:
             self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
             if self.pipeliner.pipeData['presetsPath']:
-                self.loadPipelineValidatorPreset()
+                self.loadPipelineValidatorPresets()
             # create menuItems from validator preset list:
             if self.validatorPresetList:
                 # create menuItems with the validator presets
@@ -1468,14 +1468,14 @@ class DP_AutoRig_UI(object):
 
 
     def getValidatorsAddOns(self, *args):
-        """
+        """ Return a list of Validator's AddOns to load.
         """
         self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
         return self.validatorAddOnsModuleList
 
 
-    def loadPipelineValidatorPreset(self, *args):
-        """
+    def loadPipelineValidatorPresets(self, *args):
+        """ Load the Validator's presets from the pipeline path.
         """
         studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
         if studioPreset:
@@ -1755,6 +1755,7 @@ class DP_AutoRig_UI(object):
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CONTROLS_PRESETS, dpAR_TempDir+"/"+CONTROLS_PRESETS)
                 # keep dpPipelineInfo data
                 shutil.copy2(os.path.join(dpAR_DestFolder, "_dpPipelineSettings.json"), dpAR_TempDir)
+                shutil.copy2(os.path.join(dpAR_DestFolder, "dpPipelineInfo.json"), dpAR_TempDir)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:

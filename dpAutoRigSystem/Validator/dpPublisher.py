@@ -11,7 +11,6 @@ reload(dpPipeliner)
 
 DPPUBLISHER_VERSION = 1.1
 
-RIG_V = "_rig_v"
 
 class Publisher(object):
     def __init__(self, dpUIinst, ui=True, verbose=True):
@@ -82,7 +81,12 @@ class Publisher(object):
             self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadFilePath, adjustableColumn=2, parent=publisherLayout)
             self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, parent=publisherLayout)
 
-            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
+
+
+            # TODO back to verifyValidatorsCB to value = True
+            #self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
+            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=False, parent=publisherLayout)
+
             self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), backgroundColor=(0.75, 0.75, 0.75), parent=publisherLayout)
             
             cmds.separator(style='none', height=10, width=100, parent=publisherLayout)
@@ -113,12 +117,8 @@ class Publisher(object):
         folderAssetName = self.currentAssetName[:self.currentAssetName.rfind("/")]
         folderAssetName = folderAssetName[folderAssetName.rfind("/")+1:]
         if folderAssetName == self.shortAssetName:
-            print("YESSSS")
-            
             return self.shortAssetName
-        else:
-            print("NOOOOOOOOOO")
-            return False
+        return False
 
 
     def defineFileVersion(self, assetNameList, *args):
@@ -127,7 +127,7 @@ class Publisher(object):
         if assetNameList:
             numberList = []
             for item in assetNameList:
-                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['rigName'])[1]))
+                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['middle'])[1]))
             return max(numberList)+1
 
 
@@ -178,8 +178,6 @@ class Publisher(object):
     def getPipeFileName(self, filePath, *args):
         """
         """
-        print("geting pipe file name mi amigo...")
-
         if filePath:
             fileNameList = next(walk(filePath))[2]
             if fileNameList:
@@ -194,7 +192,14 @@ class Publisher(object):
                             assetNameList.append(fileName)
                 if assetNameList:
                     fileVersion = self.defineFileVersion(assetNameList)
-            return assetName+self.rigV+(str(fileVersion).zfill(3))
+            if self.pipeliner.pipeData['capitalize']:
+                assetName = assetName.capitalize()
+            elif self.pipeliner.pipeData['lower']:
+                assetName = assetName.lower()
+            elif self.pipeliner.pipeData['upper']:
+                assetName = assetName.upper()
+            fileName = self.pipeliner.pipeData['prefix']+assetName+self.pipeliner.pipeData['middle']+(str(fileVersion).zfill(int(self.pipeliner.pipeData['padding']))+self.pipeliner.pipeData['suffix'])
+            return fileName
                 
 
     def getFileType(self, *args):
@@ -268,6 +273,7 @@ class Publisher(object):
             #
             # call dpImager
             # save published file
+            # pass all old wip files to Hist folder
             # TODO result window = log here
 
 
