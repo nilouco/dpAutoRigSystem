@@ -2,6 +2,7 @@
 from maya import cmds
 import os
 import json
+from functools import partial
 from ..Modules.Library import dpUtils
 
 
@@ -63,6 +64,7 @@ class Pipeliner(object):
             content = self.getJsonContent(jsonInfoPath)
             if content:
                 self.pipeData = self.pipeData | content
+                return content
 
 
     def getDriveByPath(self, *args):
@@ -82,11 +84,59 @@ class Pipeliner(object):
             return studioName[:studioName.find("/")]
 
 
+    def getProjectByPath(self, *args):
+        """ Returns the pipeline project name if there's one.
+        """
+        sceneName = self.pipeData['sceneName']
+        if sceneName:
+            projectName = sceneName.split(self.pipeData['studio']+"/")[1]
+            return projectName[:projectName.find("/")]
+
+
+    def declareDefaultPipelineInfo(self, *args):
+        """
+        """
+        defaultPipeInfo = {
+        "name"    : "Default Pipeline Info",
+        "author"  : "Danilo Pinheiro",
+        "date"    : "2023-01-01",
+        "updated" : "2023-01-01",
+        
+        "f_drive"      : "",
+        "f_studio"     : "",
+        "f_project"    : "",
+        "f_presets"    : "dpPresets",
+        "f_addOns"     : "dpAddOns",
+        "f_wip"        : "Rigging/WIP",
+        "f_publish"    : "Rigging/Publish",
+        "f_toClient"   : "Data/ToClient",
+        "f_hist"       : "Hist",
+        "s_prefix"     : "",
+        "s_middle"     : "_rig_v",
+        "s_suffix"     : "",
+        "s_model"      : "_m",
+        "s_rig"        : "_v",
+        "s_type"       : "mayaAscii",
+        "i_padding"    : 3,
+        "b_capitalize" : False,
+        "b_upper"      : False,
+        "b_lower"      : False,
+        "b_assetDir"   : True,
+        "b_dateDir"    : True,
+        "b_zip"        : True,
+        "b_imager"     : True
+        }
+
+        return defaultPipeInfo
+
+
+
     def getPipelineData(self, *args):
         """ Read the dpPipelineSetting to find the pipeline info.
             Mount the pipeData dictionary and return it.
         """
         loaded = True
+        self.pipeInfo = self.declareDefaultPipelineInfo()
         self.pipeData = {}
         self.pipeData['addOnsPath'] = False
         self.pipeData['presetsPath'] = False
@@ -106,20 +156,26 @@ class Pipeliner(object):
                 loaded = False
         if loaded:
             # merger pipeline info
-            self.getPipelineInfo()
+            self.pipeInfo = self.getPipelineInfo()
             # mounting structured pipeline data
-            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['addOns']
-            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['presets']
-
-            print("pipeData preset path =", self.pipeData['presetsPath'])
+            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['f_addOns']
+            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['f_presets']
         return self.pipeData
+
+
+    def loadInfoKey(self, key, *args):
+        """
+        """
+        print("loading here key =", key)
+
+
 
 
     def mainUI(self, dpUIinst, *args):
         """
         """
         print ("merci... WIP")
-        """
+        
         self.langDic = dpUIinst.langDic
         self.langName = dpUIinst.langName
 
@@ -134,13 +190,32 @@ class Pipeliner(object):
         cmds.separator(style="none", parent=pipelinerLayout)
 
         pipelinerLayoutA = cmds.rowColumnLayout('pipelinerLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 5), (2, 'both', 5)], rowSpacing=[(1, 5), (2, 5), (3, 5)], parent=pipelinerLayout)
-        cmds.text('commentTxt', label=self.langDic[self.langName]['i219_comments'], align='right', parent=pipelinerLayoutA)
-        self.commentTF = cmds.textField('commentTF', editable=True, parent=pipelinerLayoutA)
+        if self.pipeInfo:
+            self.infoUI = {}
+            for key in list(self.pipeInfo):
+                if "_" in key:
+                    if key.startswith("f_"):
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=pipelinerLayout)
+                    elif key.startswith("i_"):
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], numberOfFields=1, parent=pipelinerLayout)
+                    elif key.startswith("b_"):
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], parent=pipelinerLayout)
+                    elif key.startswith("s_"):
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=pipelinerLayout)
+            # try to force loading empty data info
+            if self.pipeData['sceneName']:
+                if not cmds.textFieldButtonGrp(self.infoUI['f_drive'], query=True, text=True):
+                    self.pipeData['drive'] = self.getDriveByPath()
+                    cmds.textFieldButtonGrp(self.infoUI['f_drive'], edit=True, text=self.pipeData['drive'])
+                if not cmds.textFieldButtonGrp(self.infoUI['f_studio'], query=True, text=True):
+                    self.pipeData['studio'] = self.getStudioByPath()
+                    cmds.textFieldButtonGrp(self.infoUI['f_studio'], edit=True, text=self.pipeData['studio'])
+                if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
+                    self.pipeData['project'] = self.getProjectByPath()
+                    cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipeData['project'])
         
-        self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadFilePath, adjustableColumn=2, parent=pipelinerLayout)
-        self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, parent=pipelinerLayout)
 
-        """
+        
 
         
         # TODO
