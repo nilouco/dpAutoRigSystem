@@ -67,34 +67,29 @@ class Pipeliner(object):
                 return content
 
 
-    def getDriveByPath(self, *args):
-        """ Returns the pipeline drive if the scene is saved.
+    def getInfoByPath(self, field, dependent, path=None, cut=False, *args):
+        """ Use field as the given data to return the result about.
+            Use dependent as the split data to edit the result.
+            Returns the pipeline info name if there's one.
         """
-        sceneName = self.pipeData['sceneName']
-        if sceneName:
-            return sceneName[:sceneName.find("/")+1]
-
-
-    def getStudioByPath(self, *args):
-        """ Returns the pipeline studio name if there's one.
-        """
-        sceneName = self.pipeData['sceneName']
-        if sceneName:
-            studioName = sceneName.split(self.pipeData['drive'])[1]
-            return studioName[:studioName.find("/")]
-
-
-    def getProjectByPath(self, *args):
-        """ Returns the pipeline project name if there's one.
-        """
-        sceneName = self.pipeData['sceneName']
-        if sceneName:
-            projectName = sceneName.split(self.pipeData['studio']+"/")[1]
-            return projectName[:projectName.find("/")]
+        name = self.pipeData['sceneName']
+        if path:
+            name = path
+        if name:
+            if dependent:
+                if self.pipeData[dependent]:
+                    name = name.split(self.pipeData[dependent]+"/")[1]
+            else:
+                name = name[:name.find("/")]
+            if cut:
+                if "/" in name:
+                    name = name[:name.find("/")]
+            self.pipeData[field] = name
+            return self.pipeData[field]
 
 
     def declareDefaultPipelineInfo(self, *args):
-        """
+        """ Returns a default pipeline info data to load the UI if there isn't any.
         """
         defaultPipeInfo = {
         "name"    : "Default Pipeline Info",
@@ -105,12 +100,12 @@ class Pipeliner(object):
         "f_drive"      : "",
         "f_studio"     : "",
         "f_project"    : "",
-        "f_presets"    : "dpPresets",
-        "f_addOns"     : "dpAddOns",
         "f_wip"        : "Rigging/WIP",
         "f_publish"    : "Rigging/Publish",
         "f_toClient"   : "Data/ToClient",
-        "f_hist"       : "Hist",
+        "s_presets"    : "dpPresets",
+        "s_addOns"     : "dpAddOns",
+        "s_hist"       : "Hist",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
@@ -122,13 +117,12 @@ class Pipeliner(object):
         "b_upper"      : False,
         "b_lower"      : False,
         "b_assetDir"   : True,
+        "b_archive"    : True,
         "b_dateDir"    : True,
         "b_zip"        : True,
         "b_imager"     : True
         }
-
         return defaultPipeInfo
-
 
 
     def getPipelineData(self, *args):
@@ -147,9 +141,9 @@ class Pipeliner(object):
         self.pipeData['path'] = self.getPipelinePath()
         if not self.pipeData['path']:
             if self.pipeData['sceneName']:
-                self.pipeData['drive'] = self.getDriveByPath()
-                self.pipeData['studio'] = self.getStudioByPath()
-                self.pipeData['path'] = self.pipeData['drive']+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
+                self.pipeData['drive'] = self.getInfoByPath("drive", None)
+                self.pipeData['studio'] = self.getInfoByPath("studio", "drive", cut=True)
+                self.pipeData['path'] = self.pipeData['drive']+"/"+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipeData['path']):
                     loaded = False
             else:
@@ -158,16 +152,40 @@ class Pipeliner(object):
             # merger pipeline info
             self.pipeInfo = self.getPipelineInfo()
             # mounting structured pipeline data
-            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['f_addOns']
-            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['f_presets']
+            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
+            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
         return self.pipeData
 
 
-    def loadInfoKey(self, key, *args):
+    def conformLoadedInfo(self, key, resultInfoList, *args):
+        """ Edit the loaded info to conform the splited data correctly.
         """
-        """
-        print("loading here key =", key)
+        conformInfo = resultInfoList[0].replace("\\", "/")
+        if key == "f_drive":
+            conformInfo = self.getInfoByPath("drive", None, conformInfo)
+        elif key == "f_studio":
+            conformInfo = self.getInfoByPath("studio", "drive", conformInfo, cut=True)
+        elif key == "f_project":
+            conformInfo = self.getInfoByPath("project", "studio", conformInfo, cut=True)
+        elif key == "f_wip":
+            conformInfo = self.getInfoByPath("wip", "project", conformInfo)
+        elif key == "f_publish":
+            conformInfo = self.getInfoByPath("publish", "project", conformInfo)
+        elif key == "f_toClient":
+            conformInfo = self.getInfoByPath("toClient", "project", conformInfo)
+        return conformInfo
 
+    
+    def loadInfoKey(self, key, *args):
+        """ Method called by the Pipeliner UI button to load the info about the key.
+        """
+        resultInfoList = cmds.fileDialog2(fileMode=3, dialogStyle=2)
+        if resultInfoList:
+            conformInfo = self.conformLoadedInfo(key, resultInfoList)
+            cmds.textFieldButtonGrp(self.infoUI[key], edit=True, text=conformInfo)
+
+
+    
 
 
 
@@ -205,16 +223,14 @@ class Pipeliner(object):
             # try to force loading empty data info
             if self.pipeData['sceneName']:
                 if not cmds.textFieldButtonGrp(self.infoUI['f_drive'], query=True, text=True):
-                    self.pipeData['drive'] = self.getDriveByPath()
+                    self.pipeData['drive'] = self.getInfoByPath("drive", None)
                     cmds.textFieldButtonGrp(self.infoUI['f_drive'], edit=True, text=self.pipeData['drive'])
                 if not cmds.textFieldButtonGrp(self.infoUI['f_studio'], query=True, text=True):
-                    self.pipeData['studio'] = self.getStudioByPath()
+                    self.pipeData['studio'] = self.getInfoByPath("studio", "drive", cut=True)
                     cmds.textFieldButtonGrp(self.infoUI['f_studio'], edit=True, text=self.pipeData['studio'])
                 if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
-                    self.pipeData['project'] = self.getProjectByPath()
+                    self.pipeData['project'] = self.getInfoByPath("project", "studio", cut=True)
                     cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipeData['project'])
-        
-
         
 
         
