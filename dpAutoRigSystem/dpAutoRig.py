@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.40"
-DPAR_UPDATELOG = "N345 - Sneer/Grimace Z axis."
+DPAR_VERSION_PY3 = "4.01.41"
+DPAR_UPDATELOG = "N535 - Delete old namespaces from updated guides."
 
 
 
