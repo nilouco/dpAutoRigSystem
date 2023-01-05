@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.41"
-DPAR_UPDATELOG = "N535 - Delete old namespaces from updated guides."
+DPAR_VERSION_PY3 = "4.01.42"
+DPAR_UPDATELOG = "N616 - Fixed Limb's arm poleVector autoOrient."
 
 
 
