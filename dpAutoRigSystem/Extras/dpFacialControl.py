@@ -30,7 +30,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.14"
+DPFC_VERSION = "1.15"
 
 
 class FacialControl(object):
@@ -181,10 +181,10 @@ class FacialControl(object):
         cmds.text(label=', '.join(LIPS_TGTLIST), parent=doubleCBLayout)
         
         self.sneerCB = cmds.checkBox('sneerCB', label=self.langDic[self.langName]["c063_sneer"], value=1, parent=doubleCBLayout)
-        cmds.text(label=', '.join(SNEER_TGTLIST[:2]), parent=doubleCBLayout)
+        cmds.text(label=', '.join(SNEER_TGTLIST[:2]+SNEER_TGTLIST[4:]), parent=doubleCBLayout)
         
         self.grimaceCB = cmds.checkBox('grimaceCB', label=self.langDic[self.langName]["c064_grimace"], value=1, parent=doubleCBLayout)
-        cmds.text(label=', '.join(GRIMACE_TGTLIST[:2]), parent=doubleCBLayout)
+        cmds.text(label=', '.join(GRIMACE_TGTLIST[:2]+GRIMACE_TGTLIST[4:]), parent=doubleCBLayout)
         
         self.faceCB = cmds.checkBox('faceCB', label=self.langDic[self.langName]["c065_face"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(FACE_TGTLIST), parent=doubleCBLayout)
@@ -452,7 +452,8 @@ class FacialControl(object):
                             if addTranslateY: #useful for Sneer and Grimace
                                 integrateTYPMA = cmds.createNode("plusMinusAverage", name=ctrlName+"_"+attr+"_TY_PMA")
                                 cmds.connectAttr(calibrateMD+".outputX", integrateTYPMA+".input1D[0]", force=True)
-                                cmds.connectAttr(fCtrl+".translateY", integrateTYPMA+".input1D[1]", force=True)
+                                if not "Front" in attr:
+                                    cmds.connectAttr(fCtrl+".translateY", integrateTYPMA+".input1D[1]", force=True)
                                 cmds.connectAttr(integrateTYPMA+".output1D", clp+".input.inputR", force=True)
                                 if "R_" in attr: #hack to set operation as substract in PMA node for Right side
                                     cmds.setAttr(integrateTYPMA+".operation", 2)
