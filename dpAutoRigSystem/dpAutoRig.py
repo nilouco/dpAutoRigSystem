@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.42"
-DPAR_UPDATELOG = "N616 - Fixed Limb's arm poleVector autoOrient."
+DPAR_VERSION_PY3 = "4.01.43"
+DPAR_UPDATELOG = "N617 - Fixed Sneer/Grimace translateY connections."
 
 
 
