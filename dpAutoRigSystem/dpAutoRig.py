@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.41"
-DPAR_UPDATELOG = "N535 - Delete old namespaces from updated guides."
+DPAR_VERSION_PY3 = "4.01.42"
+DPAR_UPDATELOG = "N616 - Fixed Limb's arm poleVector autoOrient."
 
 
 
@@ -2483,7 +2483,7 @@ class DP_AutoRig_UI(object):
                             
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
-                                cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC")
+                                rootPacConst = cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC")
 
                             # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
@@ -2522,6 +2522,9 @@ class DP_AutoRig_UI(object):
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
                                         cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC")
+                                        # poleVector autoOrient for arm
+                                        cmds.delete(rootCtrlRefList[s]+"_PaC")
+                                        cmds.parentConstraint(tipCtrl, rootCtrlRefList[s], maintainOffset=True, name=rootCtrlRefList[s]+"_PaC")
 
                                     # verify if is quadruped
                                     if limbStyle == self.langDic[self.langName]['m037_quadruped'] or limbStyle == self.langDic[self.langName]['m043_quadSpring']:
