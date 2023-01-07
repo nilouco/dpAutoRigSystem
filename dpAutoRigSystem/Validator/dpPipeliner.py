@@ -192,7 +192,7 @@ class Pipeliner(object):
     def mainUI(self, dpUIinst, *args):
         """
         """
-        print ("merci... WIP")
+        print ("merci... WIP -- pipelinerUI")
         
         self.langDic = dpUIinst.langDic
         self.langName = dpUIinst.langName
@@ -200,26 +200,37 @@ class Pipeliner(object):
         dpUtils.closeUI('dpPipelinerWindow')
         # window
         pipeliner_winWidth  = 380
-        pipeliner_winHeight = 300
+        pipeliner_winHeight = 480
         cmds.window('dpPipelinerWindow', title="Pipeliner "+str(DPPIPELINER_VERSION), widthHeight=(pipeliner_winWidth, pipeliner_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpPipelinerWindow')
         # create UI layout and elements:
         pipelinerLayout = cmds.columnLayout('pipelinerLayout', adjustableColumn=True, columnOffset=("both", 10))
-        cmds.separator(style="none", parent=pipelinerLayout)
-
-        pipelinerLayoutA = cmds.rowColumnLayout('pipelinerLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 5), (2, 'both', 5)], rowSpacing=[(1, 5), (2, 5), (3, 5)], parent=pipelinerLayout)
+        # pipeline info
+        pipelineInfoLayout = cmds.columnLayout('pipelineInfoLayout', adjustableColumn=True, columnOffset=("left", 10), parent=pipelinerLayout)
+        cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
+        cmds.text('pipelineInfo', label="Pipeline "+self.langDic[self.langName]['i013_info'], height=30, font='boldLabelFont', parent=pipelineInfoLayout)
+        pathData = self.langDic[self.langName]['i062_notFound']
+        if self.pipeData['path']:
+            pathData = self.pipeData['path']
+        self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.langDic[self.langName]['i220_filePath'], text=pathData, buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadPipeInfo, adjustableColumn=2, parent=pipelineInfoLayout)
+        cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
+        # pipeline data
+        pipelineScrollLayout = cmds.scrollLayout('pipelineScrollLayout', parent=pipelinerLayout)
+        pipelineDataLayout = cmds.columnLayout('pipelineDataLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=pipelineScrollLayout)
+        cmds.text('pipelineData', height=30, label="Pipeline Data", font='boldLabelFont', parent=pipelineDataLayout)
+        # load data from pipeline info
         if self.pipeInfo:
             self.infoUI = {}
             for key in list(self.pipeInfo):
                 if "_" in key:
                     if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=pipelinerLayout)
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=pipelineDataLayout)
                     elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], numberOfFields=1, parent=pipelinerLayout)
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], numberOfFields=1, parent=pipelineDataLayout)
                     elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], parent=pipelinerLayout)
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], parent=pipelineDataLayout)
                     elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=pipelinerLayout)
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=pipelineDataLayout)
             # try to force loading empty data info
             if self.pipeData['sceneName']:
                 if not cmds.textFieldButtonGrp(self.infoUI['f_drive'], query=True, text=True):
@@ -231,8 +242,8 @@ class Pipeliner(object):
                 if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
                     self.pipeData['project'] = self.getInfoByPath("project", "studio", cut=True)
                     cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipeData['project'])
-        
-
+        cmds.separator(style='in', height=20, parent=pipelinerLayout)
+        cmds.button('savePipeInfoBT', label=self.langDic[self.langName]['i222_save'], command=self.savePipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=pipelinerLayout)
         
         # TODO
         #
@@ -241,9 +252,29 @@ class Pipeliner(object):
         # set a studio name
         # define ToClient, Publish, Riggging WIP folders
         # toClientFolder with or without date subFolder to zip the file
-        # create validator preset
         # etc
         #
         # after save data, reload pipeData using getPipelineData ?
         
+        
+        
+        # WIP
+        #
+        # loadPipeInfo
+        # savePipeInfo
+        
         #dpUtils.closeUI('dpPipelinerWindow')
+
+
+
+    def loadPipeInfo(self, *args):
+        """
+        """
+        print("loading pipe info here...")
+    
+    
+    
+    def savePipeInfo(self, *args):
+        """
+        """
+        print("saving pipe info here...")

@@ -67,42 +67,44 @@ class Publisher(object):
             
             # window
             publisher_winWidth  = 380
-            publisher_winHeight = 300
+            publisher_winHeight = 200
             cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(DPPUBLISHER_VERSION), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             cmds.showWindow('dpPublisherWindow')
             # create UI layout and elements:
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
-            cmds.separator(style="none", parent=publisherLayout)
-
-            publisherLayoutA = cmds.rowColumnLayout('publisherLayoutA', numberOfColumns=2, columnWidth=[(1, 100), (2, 280)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 5), (2, 'both', 5)], rowSpacing=[(1, 5), (2, 5), (3, 5)], parent=publisherLayout)
-            cmds.text('commentTxt', label=self.langDic[self.langName]['i219_comments'], align='right', parent=publisherLayoutA)
-            self.commentTF = cmds.textField('commentTF', editable=True, parent=publisherLayoutA)
-            
+            cmds.separator(style="none", height=20, parent=publisherLayout)
+            # fields
             self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadFilePath, adjustableColumn=2, parent=publisherLayout)
-            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, parent=publisherLayout)
-
-
+            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
+            self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.langDic[self.langName]['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
 
             # TODO back to verifyValidatorsCB to value = True
             #self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
-            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=False, parent=publisherLayout)
+            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=40, value=False, parent=publisherLayout)
 
-            self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), backgroundColor=(0.75, 0.75, 0.75), parent=publisherLayout)
+            # buttons
+            publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical2', paneSize=[1, 20, 3], parent=publisherLayout)
+            cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
+            self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
             
-            cmds.separator(style='none', height=10, width=100, parent=publisherLayout)
             
             
             self.setFilePath()
             self.setFileName()
 
-            # file path
-            # file name
+            # TODO
+            #
+            # 
+            # auto load file path
+            # auto load file name
             # version
             # ignore validation checkBox
             # diagnose?
             # verbose = see log (none, simple or complete)
             # fromUI ?
             # pipe to find folders like: Publish, ToClient, etc
+            # log window
+            # 
 
 
     
