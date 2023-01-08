@@ -1470,17 +1470,19 @@ class DP_AutoRig_UI(object):
     def getValidatorsAddOns(self, *args):
         """ Return a list of Validator's AddOns to load.
         """
-        self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
-        return self.validatorAddOnsModuleList
+        if os.path.exists(self.pipeliner.pipeData['addOnsPath']):
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
+            return self.validatorAddOnsModuleList
 
 
     def loadPipelineValidatorPresets(self, *args):
         """ Load the Validator's presets from the pipeline path.
         """
-        studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
-        if studioPreset:
-            self.validatorPresetList.insert(0, studioPreset[0])
-            self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+        if os.path.exists(self.pipeliner.pipeData['presetsPath']):
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
+            if studioPreset:
+                self.validatorPresetList.insert(0, studioPreset[0])
+                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
 
     
     def setValidatorPreset(self, *args):

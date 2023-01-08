@@ -52,6 +52,7 @@ class Pipeliner(object):
             content = self.getJsonContent(jsonPath)
             if content:
                 if os.path.exists(content['path']):
+                    self.infoFile = content['file']
                     return content['path']
         return False
         
@@ -59,9 +60,9 @@ class Pipeliner(object):
     def getPipelineInfo(self, *args):
         """ Read the json info file and return the merged pipeData and it's content if it exists.
         """
-        jsonInfoPath = os.path.join(self.pipeData['path'], self.infoFile).replace("\\", "/")
-        if os.path.exists(jsonInfoPath):
-            content = self.getJsonContent(jsonInfoPath)
+        self.jsonInfoPath = os.path.join(self.pipeData['path'], self.infoFile).replace("\\", "/")
+        if os.path.exists(self.jsonInfoPath):
+            content = self.getJsonContent(self.jsonInfoPath)
             if content:
                 self.pipeData = self.pipeData | content
                 return content
@@ -145,15 +146,21 @@ class Pipeliner(object):
                 self.pipeData['studio'] = self.getInfoByPath("studio", "drive", cut=True)
                 self.pipeData['path'] = self.pipeData['drive']+"/"+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipeData['path']):
+                    self.pipeData['drive'] = ""
+                    self.pipeData['studio'] = ""
+                    self.pipeData['path'] = ""
                     loaded = False
             else:
                 loaded = False
         if loaded:
             # merger pipeline info
             self.pipeInfo = self.getPipelineInfo()
-            # mounting structured pipeline data
-            self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
-            self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
+            if self.pipeInfo:
+                # mounting structured pipeline data
+                self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
+                self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
+            else:
+                print('Not found', self.infoFile)
         return self.pipeData
 
 
@@ -185,19 +192,13 @@ class Pipeliner(object):
             cmds.textFieldButtonGrp(self.infoUI[key], edit=True, text=conformInfo)
 
 
-    
-
-
-
     def mainUI(self, dpUIinst, *args):
+        """ Open an UI to load, set and save the pipeline info.
         """
-        """
-        print ("merci... WIP -- pipelinerUI")
-        
         self.langDic = dpUIinst.langDic
         self.langName = dpUIinst.langName
-
         dpUtils.closeUI('dpPipelinerWindow')
+        self.pipeData = self.getPipelineData()
         # window
         pipeliner_winWidth  = 380
         pipeliner_winHeight = 480
@@ -210,8 +211,8 @@ class Pipeliner(object):
         cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
         cmds.text('pipelineInfo', label="Pipeline "+self.langDic[self.langName]['i013_info'], height=30, font='boldLabelFont', parent=pipelineInfoLayout)
         pathData = self.langDic[self.langName]['i062_notFound']
-        if self.pipeData['path']:
-            pathData = self.pipeData['path']
+        if self.pipeInfo and self.pipeData['path']:
+            pathData = self.pipeData['path']+"/"+self.infoFile
         self.pathDataTBG = cmds.textFieldButtonGrp('pathDataTBG', label=self.langDic[self.langName]['i220_filePath'], text=pathData, buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadPipeInfo, adjustableColumn=2, parent=pipelineInfoLayout)
         cmds.separator(style='in', height=20, parent=pipelineInfoLayout)
         # pipeline data
@@ -242,9 +243,16 @@ class Pipeliner(object):
                 if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
                     self.pipeData['project'] = self.getInfoByPath("project", "studio", cut=True)
                     cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipeData['project'])
-        cmds.separator(style='in', height=20, parent=pipelinerLayout)
-        cmds.button('savePipeInfoBT', label=self.langDic[self.langName]['i222_save'], command=self.savePipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=pipelinerLayout)
+            cmds.separator(style='in', height=20, parent=pipelinerLayout)
+            cmds.button('savePipeInfoBT', label=self.langDic[self.langName]['i222_save'], command=self.savePipeInfo, backgroundColor=(0.75, 0.75, 0.75), parent=pipelinerLayout)
+        else:
+            cmds.text(pathData, parent=pipelineDataLayout)
         
+
+
+
+
+
         # TODO
         #
         # create an asset
@@ -271,6 +279,7 @@ class Pipeliner(object):
         """
         """
         print("loading pipe info here...")
+#        dpUIinst.jobReloadUI()
     
     
     
@@ -278,3 +287,5 @@ class Pipeliner(object):
         """
         """
         print("saving pipe info here...")
+        #save dpPipelineInfo file
+        #save dpPipelineSetting path
