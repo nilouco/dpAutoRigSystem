@@ -335,13 +335,55 @@ class Pipeliner(object):
                     json.dump(settingsDic, jsonFile, indent=4, sort_keys=True)
 
     
+    def getUIDataToSave(self, *args):
+        """ Read the UI fields and load them values in the pipeData dictionary.
+        """
+        for k, key in enumerate(list(self.infoUI)):
+            if key.startswith("f_"):
+                self.pipeData[key] = cmds.textFieldButtonGrp(self.infoUI[key], query=True, text=True)
+            elif key.startswith("i_"):
+                self.pipeData[key] = cmds.intFieldGrp(self.infoUI[key], query=True, value1=True)
+            elif key.startswith("b_"):
+                self.pipeData[key] = cmds.checkBox(self.infoUI[key], query=True, value=True)
+            elif key.startswith("s_"):
+                self.pipeData[key] = cmds.textFieldGrp(self.infoUI[key], query=True, text=True)
+
+
     def savePipeInfo(self, *args):
         """
         """
-        print("saving pipe info here...")
+
+        #WIP
+        
+        self.getUIDataToSave()
+        pathDataFromUI = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
+        if pathDataFromUI:
+            if "/" in pathDataFromUI:
+                self.pipeData['path'] = pathDataFromUI[:pathDataFromUI.rfind("/")]
+            if pathDataFromUI.endswith(".json"):
+                self.infoFile = pathDataFromUI[pathDataFromUI.rfind("/")+1:]
+        if self.pipeData['path'] and self.infoFile:
+            if not os.path.exists(self.pipeData['path']):
+                os.makedirs(self.pipeData['path'])
 
 
 
+        # WIP
+        # TODO
+        # process data before output json file
+        # process data to find good concatenations to help getters
+        # process data to create subfolders
+        # process data to store relavante info to getters like publishPath, createAsset folder, fileName to save published file, etc
+
+
+
+
+            outFile = open(self.pipeData['path']+"/"+self.infoFile, "w")
+            json.dump(self.pipeData, outFile, indent=4)
+            outFile.close()
+            self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
+        else:
+            print("merci")
         #save dpPipelineInfo file
         #save dpPipelineSetting path
 
