@@ -41,13 +41,19 @@ class Pipeliner(object):
         return content
 
 
+    def getJsonSettingsPath(self, *args):
+        """ Returns the json path for the pipeline settings file.
+        """
+        basePath = dpUtils.findPath("dpAutoRig.py")
+        basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]
+        return os.path.join(basePath, self.settingsFile).replace("\\", "/")
+
+
     def getPipelinePath(self, *args):
         """ Returns the path content of the _dpPipelineSetting json file if it exists.
             Otherwise returns False.
         """
-        basePath = dpUtils.findPath("dpAutoRig.py")
-        basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]
-        jsonPath = os.path.join(basePath, self.settingsFile).replace("\\", "/")
+        jsonPath = self.getJsonSettingsPath()
         if os.path.exists(jsonPath):
             content = self.getJsonContent(jsonPath)
             if content:
@@ -312,8 +318,22 @@ class Pipeliner(object):
             cmds.textFieldButtonGrp(self.pathDataTBG, edit=True, text=loadedFilePath)
             self.getPipelineData(self.infoFile)
             self.loadUIData()
+            self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
 
     
+    def setPipelineSettingsPath(self, path, file, *args):
+        """ Set the json file for dpPipelineSetting in the main dpAutoRigSystem folder to use the path and file given.
+        """
+        if path and file:
+            jsonPath = self.getJsonSettingsPath()
+            if os.path.exists(jsonPath):
+                settingsDic = self.getJsonContent(jsonPath)
+                settingsDic['path'] = self.pipeData['path']
+                settingsDic['file'] = self.infoFile
+                # write json file in the HD
+                with open(jsonPath, 'w') as jsonFile:
+                    json.dump(settingsDic, jsonFile, indent=4, sort_keys=True)
+
     
     def savePipeInfo(self, *args):
         """
