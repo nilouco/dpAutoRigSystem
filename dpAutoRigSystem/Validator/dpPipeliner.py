@@ -147,7 +147,7 @@ class Pipeliner(object):
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
             self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
-            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
+#            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
             if self.pipeData['sceneName']:
                 self.pipeData['drive'] = self.getInfoByPath("drive", None)
                 self.pipeData['studio'] = self.getInfoByPath("studio", "drive", cut=True)
@@ -280,6 +280,20 @@ class Pipeliner(object):
         return pathData
 
 
+    def getPublishPath(self, *args):
+        """ Returns the absolute path to publish the current file.
+        """
+        projectFolder = self.pipeData['f_project']
+        if projectFolder:
+            projectFolder += "/"
+        else:
+            # try to find the project name by scene path
+            projectFolder = self.pipeData['sceneName'][self.pipeData['sceneName'].rfind(self.pipeData['studio'])+len(self.pipeData['studio'])+1:self.pipeData['sceneName'].rfind(self.pipeData['f_wip'])]
+        publishPath = self.pipeData['drive']+"/"+self.pipeData['studio']+"/"+projectFolder+self.pipeData['f_publish']
+        print("publishPath ==", publishPath)
+        return publishPath
+
+
     def loadPipeInfo(self, loaded=None, *args):
         """ Update the Pipeliner UI data section with loaded info file.
         """
@@ -364,6 +378,7 @@ class Pipeliner(object):
 
     # WIP
     # relative or absolute paths ???
+    # review f_drive/drive, f_studio/studio, f_etc..., middle, etc...
     #
     #
     # TODO

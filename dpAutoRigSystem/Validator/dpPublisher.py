@@ -9,7 +9,7 @@ from importlib import reload
 reload(dpPipeliner)
 
 
-DPPUBLISHER_VERSION = 1.1
+DPPUBLISHER_VERSION = 1.2
 
 
 class Publisher(object):
@@ -141,6 +141,7 @@ class Publisher(object):
         if not filePath:
             # try to load a pipeline structure to get the filePath to set
             print("trying to find pipe path here.....")
+            filePath = self.pipeliner.getPublishPath()
         if filePath:
             #try:
             cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(filePath))
@@ -262,7 +263,7 @@ class Publisher(object):
             # comments
             commentValue = comments
             if not comments and fromUI:
-                commentValue = cmds.textField(self.commentTF, query=True, text=True)
+                commentValue = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
             print("commentValue =", commentValue)
             fileType = self.getFileType()
             print("fileType =", fileType)
