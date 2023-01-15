@@ -277,6 +277,7 @@ class Publisher(object):
             # save published file
             # pass all old wip files to Hist folder
             # TODO result window = log here
+            # TODO run everything (Publisher and Pipeliner) without UI
 
 
         dpUtils.closeUI('dpPublisherWindow')

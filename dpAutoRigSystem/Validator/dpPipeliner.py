@@ -229,25 +229,6 @@ class Pipeliner(object):
         self.pipelineSaveLayout = cmds.columnLayout('pipelineSaveLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
         # load data from pipeline info
         self.loadUIData()
-        
-        
-
-
-
-
-
-        # TODO
-        #
-        # create an asset
-#
-# 
-
-#         # define ToClient, Publish, Riggging WIP folders
-        # toClientFolder with or without date subFolder to zip the file
-        # etc
-        #
-        # after save data, reload pipeData using getPipelineData ?
-
 
 
     def loadUIData(self, *args):
@@ -349,12 +330,18 @@ class Pipeliner(object):
                 self.pipeData[key] = cmds.textFieldGrp(self.infoUI[key], query=True, text=True)
 
 
-    def savePipeInfo(self, *args):
+    def setPipelineInfoFile(self, *args):
+        """ Save the pipeline info file with all pipeData into a json file.
         """
-        """
+        outFile = open(self.pipeData['path']+"/"+self.infoFile, "w")
+        json.dump(self.pipeData, outFile, indent=4)
+        outFile.close()
 
-        #WIP
-        
+
+    def savePipeInfo(self, *args):
+        """ Save the pipeline data into the json file in the HD.
+            Write the pipeline data path in the pipeline setting json file.
+        """
         self.getUIDataToSave()
         pathDataFromUI = cmds.textFieldButtonGrp(self.pathDataTBG, query=True, text=True)
         if pathDataFromUI:
@@ -365,28 +352,36 @@ class Pipeliner(object):
         if self.pipeData['path'] and self.infoFile:
             if not os.path.exists(self.pipeData['path']):
                 os.makedirs(self.pipeData['path'])
-
-
-
-        # WIP
-        # TODO
-        # process data before output json file
-        # process data to find good concatenations to help getters
-        # process data to create subfolders
-        # process data to store relavante info to getters like publishPath, createAsset folder, fileName to save published file, etc
-
-
-
-
-            outFile = open(self.pipeData['path']+"/"+self.infoFile, "w")
-            json.dump(self.pipeData, outFile, indent=4)
-            outFile.close()
+            self.setPipelineInfoFile()
             self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
+#           dpUIinst.jobReloadUI()
         else:
-            print("merci")
-        #save dpPipelineInfo file
-        #save dpPipelineSetting path
+            print("Unexpected Error: There's no pipeline data to save, sorry.")
 
 
 
-#        dpUIinst.jobReloadUI()
+
+
+    # WIP
+    # relative or absolute paths ???
+    #
+    #
+    # TODO
+    # process data before output json file
+    # process data to find good concatenations to help getters
+    # process data to create subfolders
+    # process data to store relavante info to getters like publishPath, createAsset folder, fileName to save published file, etc
+    #
+    #
+    # TODO
+    #
+    # create an asset
+    # define ToClient, Publish, Riggging WIP folders
+    # toClientFolder with or without date subFolder to zip the file
+    # etc
+    #
+    # after save data, reload pipeData using getPipelineData ???
+    # after save data, reload the UI using the dpUIinst.jobReloadUI() ???
+    #
+    #
+    #
