@@ -139,7 +139,11 @@ class Pipeliner(object):
         loaded = True
         if not loadedPipeInfo:
             self.pipeInfo = self.declareDefaultPipelineInfo()
-            self.pipeData = {}
+            #self.pipeData = {}
+
+            self.pipeData = self.pipeInfo
+
+
             self.pipeData['addOnsPath'] = False
             self.pipeData['presetsPath'] = False
             # getting pipeline settings
@@ -147,14 +151,15 @@ class Pipeliner(object):
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
             self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
-#            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
             if self.pipeData['sceneName']:
-                self.pipeData['drive'] = self.getInfoByPath("drive", None)
-                self.pipeData['studio'] = self.getInfoByPath("studio", "drive", cut=True)
-                self.pipeData['path'] = self.pipeData['drive']+"/"+self.pipeData['studio']+"/"+PIPE_FOLDER #dpTeam
+                self.getInfoByPath("f_drive", None)
+                self.getInfoByPath("f_studio", "f_drive", cut=True)
+                self.getInfoByPath("f_project", "f_studio", cut=True)
+                self.pipeData['path'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipeData['path']):
-                    self.pipeData['drive'] = ""
-                    self.pipeData['studio'] = ""
+                    self.pipeData['f_drive'] = ""
+                    self.pipeData['f_studio'] = ""
+                    self.pipeData['f_project'] = ""
                     self.pipeData['path'] = ""
                     loaded = False
             else:
@@ -176,17 +181,17 @@ class Pipeliner(object):
         """
         conformInfo = resultInfoList[0].replace("\\", "/")
         if key == "f_drive":
-            conformInfo = self.getInfoByPath("drive", None, conformInfo)
+            conformInfo = self.getInfoByPath("f_drive", None, conformInfo)
         elif key == "f_studio":
-            conformInfo = self.getInfoByPath("studio", "drive", conformInfo, cut=True)
+            conformInfo = self.getInfoByPath("f_studio", "f_drive", conformInfo, cut=True)
         elif key == "f_project":
-            conformInfo = self.getInfoByPath("project", "studio", conformInfo, cut=True)
+            conformInfo = self.getInfoByPath("f_project", "f_studio", conformInfo, cut=True)
         elif key == "f_wip":
-            conformInfo = self.getInfoByPath("wip", "project", conformInfo)
+            conformInfo = self.getInfoByPath("f_wip", "f_project", conformInfo)
         elif key == "f_publish":
-            conformInfo = self.getInfoByPath("publish", "project", conformInfo)
+            conformInfo = self.getInfoByPath("f_publish", "f_project", conformInfo)
         elif key == "f_toClient":
-            conformInfo = self.getInfoByPath("toClient", "project", conformInfo)
+            conformInfo = self.getInfoByPath("f_toClient", "f_project", conformInfo)
         return conformInfo
 
     
@@ -253,14 +258,14 @@ class Pipeliner(object):
             try:
                 if self.pipeData['sceneName']:
                     if not cmds.textFieldButtonGrp(self.infoUI['f_drive'], query=True, text=True):
-                        self.pipeData['drive'] = self.getInfoByPath("drive", None)
-                        cmds.textFieldButtonGrp(self.infoUI['f_drive'], edit=True, text=self.pipeData['drive'])
+                        self.getInfoByPath("f_drive", None)
+                        cmds.textFieldButtonGrp(self.infoUI['f_drive'], edit=True, text=self.pipeData['f_drive'])
                     if not cmds.textFieldButtonGrp(self.infoUI['f_studio'], query=True, text=True):
-                        self.pipeData['studio'] = self.getInfoByPath("studio", "drive", cut=True)
-                        cmds.textFieldButtonGrp(self.infoUI['f_studio'], edit=True, text=self.pipeData['studio'])
+                        self.getInfoByPath("f_studio", "f_drive", cut=True)
+                        cmds.textFieldButtonGrp(self.infoUI['f_studio'], edit=True, text=self.pipeData['f_studio'])
                     if not cmds.textFieldButtonGrp(self.infoUI['f_project'], query=True, text=True):
-                        self.pipeData['project'] = self.getInfoByPath("project", "studio", cut=True)
-                        cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipeData['project'])
+                        self.getInfoByPath("f_project", "f_studio", cut=True)
+                        cmds.textFieldButtonGrp(self.infoUI['f_project'], edit=True, text=self.pipeData['f_project'])
             except:
                 pass
             self.pipelineSaveLayout = cmds.columnLayout('pipelineSaveLayout', adjustableColumn=True, width=400, columnOffset=("left", 10), parent=self.pipelinerLayout)
@@ -280,18 +285,20 @@ class Pipeliner(object):
         return pathData
 
 
-    def getPublishPath(self, *args):
+    def loadPublishPath(self, *args):
         """ Returns the absolute path to publish the current file.
         """
-        projectFolder = self.pipeData['f_project']
-        if projectFolder:
-            projectFolder += "/"
+        if self.pipeData['path']:
+            projectFolder = self.pipeData['f_project']
+            if projectFolder:
+                projectFolder += "/"
+            else:
+                # try to find the project name by scene path
+                projectFolder = self.pipeData['sceneName'][self.pipeData['sceneName'].rfind(self.pipeData['f_studio'])+len(self.pipeData['f_studio'])+1:self.pipeData['sceneName'].rfind(self.pipeData['f_wip'])]
+            self.pipeData['publishPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+projectFolder+self.pipeData['f_publish']
+            return self.pipeData['publishPath']
         else:
-            # try to find the project name by scene path
-            projectFolder = self.pipeData['sceneName'][self.pipeData['sceneName'].rfind(self.pipeData['studio'])+len(self.pipeData['studio'])+1:self.pipeData['sceneName'].rfind(self.pipeData['f_wip'])]
-        publishPath = self.pipeData['drive']+"/"+self.pipeData['studio']+"/"+projectFolder+self.pipeData['f_publish']
-        print("publishPath ==", publishPath)
-        return publishPath
+            print("Not found dpPipelineInfo.json file to setup the publishing data, sorry.")
 
 
     def loadPipeInfo(self, loaded=None, *args):
@@ -352,6 +359,18 @@ class Pipeliner(object):
         outFile.close()
 
 
+    def createPipelineInfoSubFolders(self, *args):
+        """ Create pipeline info addOnsPath and presetsPath sub folders if they don't exists.
+        """
+        if not os.path.exists(self.pipeData['addOnsPath']):
+            os.makedirs(self.pipeData['addOnsPath'])
+        if not os.path.exists(self.pipeData['presetsPath']):
+            os.makedirs(self.pipeData['presetsPath'])
+
+
+
+
+
     def savePipeInfo(self, *args):
         """ Save the pipeline data into the json file in the HD.
             Write the pipeline data path in the pipeline setting json file.
@@ -367,10 +386,12 @@ class Pipeliner(object):
             if not os.path.exists(self.pipeData['path']):
                 os.makedirs(self.pipeData['path'])
             self.setPipelineInfoFile()
+            self.createPipelineInfoSubFolders()
             self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
 #           dpUIinst.jobReloadUI()
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
+        dpUtils.closeUI('dpPipelinerWindow')
 
 
 
@@ -378,13 +399,11 @@ class Pipeliner(object):
 
     # WIP
     # relative or absolute paths ???
-    # review f_drive/drive, f_studio/studio, f_etc..., middle, etc...
     #
     #
     # TODO
     # process data before output json file
     # process data to find good concatenations to help getters
-    # process data to create subfolders
     # process data to store relavante info to getters like publishPath, createAsset folder, fileName to save published file, etc
     #
     #

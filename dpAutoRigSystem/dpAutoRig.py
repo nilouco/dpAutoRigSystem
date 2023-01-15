@@ -264,7 +264,7 @@ class DP_AutoRig_UI(object):
             
             # call mainUI in order to populate the main layout:
             self.mainUI()
-            
+
             # check if we need to automatically check for update:
             self.autoCheckUpdate()
         
@@ -276,7 +276,7 @@ class DP_AutoRig_UI(object):
             clearDPARLoadingWindow()
             return
         
-
+        
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
@@ -284,6 +284,7 @@ class DP_AutoRig_UI(object):
         #print self.pDockCtrl
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
+        
         
 
     def deleteExistWindow(self, *args):
@@ -1857,6 +1858,25 @@ class DP_AutoRig_UI(object):
     
     
     ###################### Start: Rigging Modules Instances
+    def checkIfNeedCreateAllGrp(self):
+        """ Verify if there's a All_Grp, masterGrp and return a boolean if need to create one.
+        """
+        masterGrpList = []
+        allTransformList = cmds.ls(selection=False, type="transform")
+        #Get all the masterGrp nodes and ensure it isn't referenced
+        for item in allTransformList:
+            if cmds.objExists(item+"."+MASTER_ATTR):
+                if not cmds.referenceQuery(item, isNodeReferenced=True):
+                    masterGrpList.append(item)
+        if masterGrpList:
+            # validate master (All_Grp) node
+            # If it doesn't work, the user need to clean the current scene to avoid duplicated names, for the moment.
+            for nodeGrp in masterGrpList:
+                if self.validateMasterGrp(nodeGrp):
+                    self.masterGrp = nodeGrp
+                    return False
+        return True
+
 
     '''
         Generic function to create base group
@@ -1898,23 +1918,8 @@ class DP_AutoRig_UI(object):
     '''
     def createBaseRigNode(self):
         sAllGrp = "All_Grp"
-        masterGrpList = []
-        needCreateAllGrp = True
-        # create master hierarchy:
-        allTransformList = cmds.ls(self.prefix+"*", selection=False, type="transform")
-        #Get all the masterGrp obj and ensure it not referenced
-        for item in allTransformList:
-            if cmds.objExists(item+"."+MASTER_ATTR):
-                if not cmds.referenceQuery(item, isNodeReferenced=True):
-                    masterGrpList.append(item)
         localTime = str( time.asctime( time.localtime(time.time()) ) )
-        if masterGrpList:
-            # validate master (All_Grp) node
-            # If it doesn't work, the user need to clean the current scene to avoid duplicated names, for the moment.
-            for nodeGrp in masterGrpList:
-                if self.validateMasterGrp(nodeGrp):
-                    self.masterGrp = nodeGrp
-                    needCreateAllGrp = False
+        needCreateAllGrp = self.checkIfNeedCreateAllGrp()
         if needCreateAllGrp:
             if cmds.objExists(sAllGrp):
                 # rename existing All_Grp node without connections as All_Grp_Old
@@ -1948,8 +1953,12 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
-            # add model version:
+            # add pipeline data:
+            cmds.addAttr(self.masterGrp, longName="guidesFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
+            # setting pipeline data
+            cmds.setAttr(self.masterGrp+".guidesFile", cmds.file(query=True, sceneName=True), type="string")
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)

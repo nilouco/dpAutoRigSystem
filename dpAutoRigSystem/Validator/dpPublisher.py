@@ -2,14 +2,14 @@
 from maya import cmds
 from maya import mel
 from functools import partial
-from os import walk
+import os
 from ..Modules.Library import dpUtils
 from . import dpPipeliner
 from importlib import reload
 reload(dpPipeliner)
 
 
-DPPUBLISHER_VERSION = 1.2
+DPPUBLISHER_VERSION = 1.0
 
 
 class Publisher(object):
@@ -54,7 +54,7 @@ class Publisher(object):
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-        
+        #self.pipeliner.getPipelineData()
         #WIP
         self.ui = True
         dpUtils.closeUI('dpPublisherWindow')
@@ -63,8 +63,6 @@ class Publisher(object):
         if not savedScene:
             savedScene = self.saveThisScene()
         if savedScene:
-            self.checkPipelineAssetName()
-            
             # window
             publisher_winWidth  = 450
             publisher_winHeight = 200
@@ -74,7 +72,7 @@ class Publisher(object):
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
             cmds.separator(style="none", height=20, parent=publisherLayout)
             # fields
-            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadFilePath, adjustableColumn=2, parent=publisherLayout)
+            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.loadFilePath, adjustableColumn=2, changeCommand=self.editPublishPath, parent=publisherLayout)
             self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
             self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.langDic[self.langName]['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
 
@@ -87,6 +85,10 @@ class Publisher(object):
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
             self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
             
+            # workaround to load pipeliner data correctly
+            # TODO find a way to load without UI
+            self.pipeliner.mainUI(self.dpUIinst)
+            dpUtils.closeUI('dpPipelinerWindow')
             
             
             self.setFilePath()
@@ -95,9 +97,7 @@ class Publisher(object):
             # TODO
             #
             # 
-            # auto load file path
-            # auto load file name
-            # version
+            #
             # ignore validation checkBox
             # diagnose?
             # verbose = see log (none, simple or complete)
@@ -107,7 +107,10 @@ class Publisher(object):
             # 
 
 
-    
+    def editPublishPath(self, *args):
+        """ Set the current publish path as the entered text in the textField.
+        """
+        self.pipeliner.pipeData['publishPath'] = cmds.textFieldButtonGrp(self.filePathFBG, query=True, text=True)
 
 
     def checkPipelineAssetName(self, *args):
@@ -124,12 +127,12 @@ class Publisher(object):
 
 
     def defineFileVersion(self, assetNameList, *args):
-        """
+        """ Return the latest number of versioned files list.
         """
         if assetNameList:
             numberList = []
             for item in assetNameList:
-                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['middle'])[1]))
+                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['s_middle'])[1]))
             return max(numberList)+1
 
 
@@ -137,17 +140,17 @@ class Publisher(object):
     def setFilePath(self, filePath=None, *args):
         """
         """
-        print("setting filePath here merci...")
         if not filePath:
             # try to load a pipeline structure to get the filePath to set
-            print("trying to find pipe path here.....")
-            filePath = self.pipeliner.getPublishPath()
+            filePath = self.pipeliner.loadPublishPath()
         if filePath:
-            #try:
-            cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(filePath))
-            self.setFileName(filePath)
-            #except:
-            #    pass
+            try:
+                cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(filePath))
+                self.pipeliner.pipeData['publishPath'] = filePath
+                self.setFileName(filePath)
+            except:
+                pass
+        print("filePath from set here:", filePath)
 
 
     def setFileName(self, filePath=None, *args):
@@ -174,7 +177,7 @@ class Publisher(object):
         """
         """
         print("loading file path from pipeline here... we are the champions my friend")
-        # wip to get pipeData info???
+        # f_wip to get pipeData info???
         
 
 
@@ -182,34 +185,28 @@ class Publisher(object):
         """
         """
         if filePath:
-            fileNameList = next(walk(filePath))[2]
+            assetName = self.checkPipelineAssetName()
+            if not assetName:
+                assetName = self.shortAssetName
+            fileVersion = 0
+            fileNameList = next(os.walk(filePath))[2]
             if fileNameList:
                 assetNameList = []
-                fileVersion = 0
-                assetName = self.checkPipelineAssetName()
-                if not assetName:
-                    assetName = self.shortAssetName
                 for fileName in fileNameList:
                     if assetName+"_" in fileName:
                         if not fileName in assetNameList:
                             assetNameList.append(fileName)
                 if assetNameList:
                     fileVersion = self.defineFileVersion(assetNameList)
-            if self.pipeliner.pipeData['capitalize']:
+            if self.pipeliner.pipeData['b_capitalize']:
                 assetName = assetName.capitalize()
-            elif self.pipeliner.pipeData['lower']:
+            elif self.pipeliner.pipeData['b_lower']:
                 assetName = assetName.lower()
-            elif self.pipeliner.pipeData['upper']:
+            elif self.pipeliner.pipeData['b_upper']:
                 assetName = assetName.upper()
-            fileName = self.pipeliner.pipeData['prefix']+assetName+self.pipeliner.pipeData['middle']+(str(fileVersion).zfill(int(self.pipeliner.pipeData['padding']))+self.pipeliner.pipeData['suffix'])
+            fileName = self.pipeliner.pipeData['s_prefix']+assetName+self.pipeliner.pipeData['s_middle']+(str(fileVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
             return fileName
-                
-
-    def getFileType(self, *args):
-        """
-        """
-        return cmds.file(query=True, type=True)[0]
-
+    
 
 
 
@@ -265,10 +262,34 @@ class Publisher(object):
             if not comments and fromUI:
                 commentValue = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
             print("commentValue =", commentValue)
-            fileType = self.getFileType()
-            print("fileType =", fileType)
             
-        
+
+            #WIP 
+            publishPath = self.pipeliner.pipeData['publishPath']
+            if publishPath:
+                print("publishPath", publishPath)
+
+                if not os.path.exists(publishPath):
+                    os.makedirs(publishPath)
+                newFileName = self.getPipeFileName(publishPath)
+                print("newFilename =", newFileName)
+                
+                publishFilePathName = publishPath+"/"+newFileName
+                print("publish compelete ===", publishFilePathName)
+                #newFile = publishPath+"/"+
+                cmds.file(rename=publishFilePathName)
+                cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
+
+                
+                # try to story source file info into All_Grp
+                #try:
+                if not self.dpUIinst.checkIfNeedCreateAllGrp():
+                #if cmds.objExists(self.dpUIinst.masterGrp):
+                    if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
+                        cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
+                    cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                #except:
+                #    pass
             
 
 
