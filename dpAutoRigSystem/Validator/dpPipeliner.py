@@ -143,7 +143,7 @@ class Pipeliner(object):
 
             self.pipeData = self.pipeInfo
 
-
+            self.pipeData['publishPath'] = False
             self.pipeData['addOnsPath'] = False
             self.pipeData['presetsPath'] = False
             # getting pipeline settings
@@ -366,9 +366,6 @@ class Pipeliner(object):
             os.makedirs(self.pipeData['addOnsPath'])
         if not os.path.exists(self.pipeData['presetsPath']):
             os.makedirs(self.pipeData['presetsPath'])
-
-
-
 
 
     def savePipeInfo(self, *args):

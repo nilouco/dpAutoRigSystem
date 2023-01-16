@@ -1954,17 +1954,23 @@ class DP_AutoRig_UI(object):
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
             # add pipeline data:
-            cmds.addAttr(self.masterGrp, longName="guidesFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
-            # setting pipeline data
-            cmds.setAttr(self.masterGrp+".guidesFile", cmds.file(query=True, sceneName=True), type="string")
+            # set data
+            cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
+            cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
+        # setting pipeline data
+        if not cmds.objExists(self.masterGrp+".lastGuidesFile"):
+            cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
+        cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
         #Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
