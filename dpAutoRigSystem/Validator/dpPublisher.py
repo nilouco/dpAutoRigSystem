@@ -173,7 +173,7 @@ class Publisher(object):
         """ Return the generated file name based on the pipeline publish folder.
             It's check the asset name and define the file version to save the published file.
         """
-        if filePath:
+        if os.path.exists(filePath):
             assetName = self.checkPipelineAssetNameFolder()
             if not assetName:
                 assetName = self.shortAssetName
@@ -195,6 +195,8 @@ class Publisher(object):
                 assetName = assetName.upper()
             fileName = self.pipeliner.pipeData['s_prefix']+assetName+self.pipeliner.pipeData['s_middle']+(str(fileVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
             return fileName
+        else:
+            return False
     
 
     def verifyCheckedValidators(self, *args):
@@ -224,7 +226,6 @@ class Publisher(object):
         # run validators
         #save a publishedFile
         #delete the temp file
-
 
 
 
@@ -258,13 +259,11 @@ class Publisher(object):
 
 
             if self.pipeliner.pipeData['publishPath']:
-
                 # check if there'a a file name to publish this scene
                 publishFileName = self.getPipeFileName(self.pipeliner.pipeData['publishPath'])
                 if fromUI:
                     publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
                 if publishFileName:
-
                     # try to store data into All_Grp if it exists
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
@@ -279,7 +278,6 @@ class Publisher(object):
                             if not cmds.objExists(self.dpUIinst.masterGrp+".modelVersion"):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
-
 
 
                     # create folders to publish file if needed
@@ -303,7 +301,7 @@ class Publisher(object):
                 print("There isn't a publishing path to save the file, sorry.")
 
             # WIP
-            #
+            # review path from user (test desk)
             # call dpImager
             # pass all old wip files to Hist folder
             #
