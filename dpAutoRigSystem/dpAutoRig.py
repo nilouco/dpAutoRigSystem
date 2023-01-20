@@ -1401,48 +1401,67 @@ class DP_AutoRig_UI(object):
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaceList:
-            dpGuidesImportedList = []
+            dpImportedGuideList = []
             for name in namespaceList:
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
-                        if name.find("_dpAR_") > 0:
-                            dpGuidesImportedList.append(name)
-            if dpGuidesImportedList:
+                        if name.find("__dpAR_"):
+                            dpImportedGuideList.append(name)
+            if dpImportedGuideList:
+
+                print("dpImportedGuideList ==", dpImportedGuideList)
+                
                 yesTxt = self.langDic[self.langName]['i071_yes']
                 noTxt = self.langDic[self.langName]['i072_no']
                 # open dialog to confirm merge namespaces:
                 result = cmds.confirmDialog(title=self.langDic[self.langName]['i205_guide'], message=self.langDic[self.langName]['i206_removeNamespace'], 
                                             button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
                 if result == yesTxt:
-                    # get root and child namespaces and separate into two lists:
+                    # reload current guide list before get the customNames
+                    self.populateCreatedGuideModules()
+                    currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
+                    
+                    print("currentCustomNameList 2===", currentCustomNameList)
+                    
+                    
+                    # recursive procedure to remove namespace of imported of imported guides
                     rootNamespaceList = []
-                    self.guidesNamespaceList = []
-                    for guide in dpGuidesImportedList:
-                        splitName = guide.split(":")
-                        rootNamespaceList.append(splitName[0])
-                        self.guidesNamespaceList.append(splitName[1])
-                    # get local guides list
-                    localGuidesList = list(map(lambda guideModule : guideModule.moduleGrp, self.modulesToBeRiggedList))
-                    # merge duplicated Father's name root:    
+                    for guide in dpImportedGuideList:
+                        while ":" in guide:
+                            rootNamespaceList.append(guide.split(":")[0])
+                            guide = guide[len(rootNamespaceList[-1])+1:]
+
+                    # merge duplicated Father's name root:
                     rootNamespaceList = list(set(rootNamespaceList))
+                    
+                    print("rootNamespaceList =", rootNamespaceList)
+
                     # merge namespace with Root
                     for name in rootNamespaceList:
                         cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True )
                         print(f"{self.langDic[self.langName]['m206_mergeNamespace']}: {name}")
+                        
+
+                    
+                    
+                    
+                    
                     # populate all guides after import and create a list with all guides:
                     self.populateCreatedGuideModules()
-                    allList = cmds.ls(selection=False, type="transform")
-                    guidesNameList = []
-                    if allList:
-                        for item in allList:
-                            if cmds.objExists(item+".guideBase"):
-                                if cmds.getAttr(item+".guideBase") == 1:
-                                    guidesNameList.append(item)
-                    # rename imported guides instances to avoid duplicated names:
-                    for idx in range(len(guidesNameList)):
-                        if guidesNameList[idx] not in localGuidesList:
-                            guideCustomName = cmds.getAttr(guidesNameList[idx]+".customName")
-                            self.modulesToBeRiggedList[idx].editUserName(guideCustomName)
+                    #wip
+
+#                    allList = cmds.ls(selection=False, type="transform")
+#                    guidesNameList = []
+#                    if allList:
+#                        for item in allList:
+#                            if cmds.objExists(item+".guideBase"):
+#                                if cmds.getAttr(item+".guideBase") == 1:
+#                                    guidesNameList.append(item)
+#                    # rename imported guides instances to avoid duplicated names:
+#                    for idx in range(len(guidesNameList)):
+#                        if guidesNameList[idx] not in currentGuidesList:
+#                            guideCustomName = cmds.getAttr(guidesNameList[idx]+".customName")
+#                            self.modulesToBeRiggedList[idx].editUserName(guideCustomName)
     
 
     def setPrefix(self, *args):
