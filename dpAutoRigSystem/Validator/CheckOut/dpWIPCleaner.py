@@ -75,8 +75,8 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
-            self.foundIssueList.append(True)
-            self.resultOkList.append(False)
+            self.foundIssueList.append(False)
+            self.resultOkList.append(True)
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v011_notWIP'])
         # --- validator code --- end
         # ---

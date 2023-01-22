@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-12-28",
+    "_updated"       : "2023-01-22",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -383,6 +383,7 @@
     "i221_fileName"        : "Nom du fichier",
     "i222_save"            : "Save",
     "i223_saveAs"          : "Save As",
+    "i224_diagnose"        : "Diagnostiquer",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -636,5 +637,8 @@
     "v017_freezeError"        : "Il n'était pas possible d'appliquer le Freeze transformation en:",
     "v018_foundTransform"     : "Trouvé des transformations pour:",
     "v019_frozenTransform"    : "Freeze Transformations appliquées à:",
-    "v020_publishStopped"     : "Processus de publication arrêté. Vérifier ce validateur-la, s'il vous plaît:"
+    "v020_publishStopped"     : "Processus de publication arrêté. Vérifier ce validateur-la, s'il vous plaît:",
+    "v021_noFileName"         : "Il n'y a pas de nom de fichier de publication pour enregistrer le fichier, désolé.",
+    "v022_noFilePath"         : "Il n'y a pas de chemin de publication pour enregistrer le fichier, désolé.",
+    "v023_successPublished"   : "Fichier publié avec succès!"
 }

@@ -106,7 +106,7 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                         self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
-            self.foundIssueList.append(True)
+            self.foundIssueList.append(False)
             self.resultOkList.append(False)
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end

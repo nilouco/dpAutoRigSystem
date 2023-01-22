@@ -1504,13 +1504,18 @@ class DP_AutoRig_UI(object):
                 validatorInst.changeActive(value)
         
 
-    def runSelectedValidators(self, validatorInstList, verifyMode, verbose=True, stopIfFoundIssue=False, *args):
+    def runSelectedValidators(self, validatorInstList, verifyMode, verbose=True, stopIfFoundBlock=False, publishLog=None, *args):
         """ Run the code for each active validator instance.
             verifyMode = True for verify
                        = False for fix
         """
         validationResultData = {}
         logText = ""
+        if publishLog:
+            logText = "\nPublisher"
+            logText += "\nScene: "+publishLog["Scene"]
+            logText += "\nPublished: "+publishLog["Published"]
+            logText += "\nComment: "+publishLog["Comment"]+"\n"
         if validatorInstList:
             progressAmount = 0
             maxProcess = len(validatorInstList)
@@ -1522,9 +1527,10 @@ class DP_AutoRig_UI(object):
                     validatorInst.verbose = False
                     validationResultData[validatorInst.guideModuleName] = validatorInst.runValidator(verifyMode)
                     validatorInst.verbose = True
-                    if stopIfFoundIssue:
+                    if stopIfFoundBlock:
                         if True in validatorInst.foundIssueList:
-                            return validationResultData, True, v
+                            if False in validatorInst.resultOkList:
+                                return validationResultData, True, v
         if validationResultData:
             dataList = list(validationResultData.keys())
             dataList.sort()
@@ -1541,6 +1547,8 @@ class DP_AutoRig_UI(object):
         if verbose:
             self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
             print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
+            if publishLog:
+                validationResultData["Publisher"] = publishLog
             if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
                 print(self.langDic[self.langName]['i201_saveScene'])
         cmds.progressWindow(endProgress=True)

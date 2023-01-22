@@ -54,14 +54,9 @@ class Publisher(object):
     def mainUI(self, *args):
         """ This is the main method to load the Publisher UI.
         """
-
-        #self.pipeliner.getPipelineData()
-        #WIP
-
-
         self.ui = True
+        dpUtils.closeUI('dpSuccessPublishedWindow')
         dpUtils.closeUI('dpPublisherWindow')
-
         savedScene = self.pipeliner.checkSavedScene()
         if not savedScene:
             savedScene = self.userSaveThisScene()
@@ -78,16 +73,18 @@ class Publisher(object):
             self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.userLoadFilePath, adjustableColumn=2, changeCommand=self.editPublishPath, parent=publisherLayout)
             self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
             self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.langDic[self.langName]['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-
-            # TODO back to verifyValidatorsCB to value = True
-            #self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
-            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=40, value=False, parent=publisherLayout)
-
+            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             # buttons
-            publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical2', paneSize=[1, 20, 3], parent=publisherLayout)
+            publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical3', paneSize=[(1, 20, 20), (2, 20, 20), (3, 50, 20)], parent=publisherLayout)
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
-            self.publishBT = cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('diagnoseBT', label=self.langDic[self.langName]['i224_diagnose'], command=partial(self.runDiagnosing), height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
+            cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
             
+
+
+            #WIP
+
+
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
             self.pipeliner.mainUI(self.dpUIinst)
@@ -101,10 +98,6 @@ class Publisher(object):
             #
             # 
             #
-            # ignore validation checkBox
-            # diagnose?
-            # verbose = see log (none, simple or complete)
-            # fromUI ?
             # pipe to find folders like: Publish, ToClient, etc
             # log window
             # 
@@ -199,71 +192,91 @@ class Publisher(object):
             return False
     
 
-    def verifyCheckedValidators(self, *args):
-        """ Run the verify of checked validators.
+    def runCheckedValidators(self, verifyMode=True, stopIfFoundBlock=True, publishLog=None, *args):
+        """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = [self.dpUIinst.checkInInstanceList, self.dpUIinst.checkOutInstanceList, self.dpUIinst.checkAddOnsInstanceList]
-        for validatorList in toCheckValidatorList:
-            if validatorList:
-                validationResultDataList = self.dpUIinst.runSelectedValidators(validatorList, True, False, True)
-                if validationResultDataList[1]: #found issue
-                    stoppedMessage = self.langDic[self.langName]['v020_publishStopped']+" "+validatorList[validationResultDataList[2]].guideModuleName                    
-                    return stoppedMessage
+        toCheckValidatorList = self.dpUIinst.checkInInstanceList
+        toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
+        toCheckValidatorList.extend(self.dpUIinst.checkAddOnsInstanceList)
+        if toCheckValidatorList:
+            validationResultDataList = self.dpUIinst.runSelectedValidators(toCheckValidatorList, verifyMode, True, stopIfFoundBlock, publishLog)
+            if validationResultDataList[1]: #found issue
+                stoppedMessage = self.langDic[self.langName]['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
+                return stoppedMessage
         return False
         
 
+    def runDiagnosing(self, *args):
+        """ Check all active validators in the verify mode and return the result in a log window.
+        """
+        validatorsResult = self.runCheckedValidators() #verify mode
+        if validatorsResult:
+            mel.eval('warning \"'+validatorsResult+'\";')
+            cmds.progressWindow(endProgress=True)
+        else:
+            validatorsResult = self.langDic[self.langName]['v007_allOk']
+        self.dpUIinst.info('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
 
 
-    def runPublishing(self, fromUI, verifyValidator=False, comments=False, *args):
+    def runPublishing(self, fromUI, verifyValidator=True, comments=False, *args):
         """ Start the publishing process
+            - use dpPipeliner.pipeData info to publish the current file
+            - check if there's a publish path to export the file
+            - check if there's a file name to publish the file
+            - get comments to log
+            - run validators in a fix mode (or not)
+            - store data info like publishedFromFile and model version into the All_Grp if it exists
+            - create the folders to publish file if them not exists yet
+            - save the published file
+            
+
+
+
+            # WIP
+            - call other methods to publish:
+                - dpSendToClient
+                - dpImager
+                - dpCompactor
+                - dpHistory
+
+
 
 
             TODO need to describe the publishing process here...
         """
-
-        #WIP
-        #save a temp file
-        # run validators
-        #save a publishedFile
-        #delete the temp file
-
-
-
-        validatorsResult = False
-        if fromUI:
-            if cmds.checkBox(self.verifyValidatorsCB, query=True, value=True):
-                validatorsResult = self.verifyCheckedValidators()
-        elif verifyValidator:
-            # TODO: find a way to verify validators without UI
-            print("TODO: find a way to verify validators without UI")
-        
-        if validatorsResult:
-            mel.eval('warning \"'+validatorsResult+'\";')
-            cmds.progressWindow(endProgress=True)
-            # TODO report stopped message here
-            # open source file
-            # delete temp file
-
-        else:
-            # comments
-            commentValue = comments
-            if fromUI and not comments:
-                commentValue = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
-            print("commentValue =", commentValue)
-            
-            # TODO add commentValue to LOG
-            
-
-            #WIP 
-
-
-
-            if self.pipeliner.pipeData['publishPath']:
-                # check if there'a a file name to publish this scene
-                publishFileName = self.getPipeFileName(self.pipeliner.pipeData['publishPath'])
-                if fromUI:
-                    publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
-                if publishFileName:
+        if self.pipeliner.pipeData['publishPath']:
+            # check if there'a a file name to publish this scene
+            publishFileName = self.getPipeFileName(self.pipeliner.pipeData['publishPath'])
+            if fromUI:
+                publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
+            if publishFileName:
+                # start logging
+                publishLog = {}
+                publishLog["Scene"] = self.pipeliner.pipeData['sceneName']
+                publishLog["Published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
+                # comments
+                publishLog["Comment"] = ""
+                commentValue = comments
+                if fromUI and not comments:
+                    commentValue = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
+                if commentValue:
+                    publishLog["Comment"] = commentValue
+                
+                # checking validators
+                validatorsResult = False
+                if verifyValidator:
+                    if fromUI:
+                        verifyValidator = cmds.checkBox(self.verifyValidatorsCB, query=True, value=True)
+                if verifyValidator:
+                    validatorsResult = self.runCheckedValidators(False, True, publishLog) #fix mode
+                if validatorsResult:
+                    # reopen current file
+                    cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
+                    # report validator error in a log window
+                    self.dpUIinst.info('i019_log', 'i216_publish', validatorsResult, "left", 250, 150)
+                    cmds.progressWindow(endProgress=True)
+                    mel.eval('warning \"'+validatorsResult+'\";')
+                else:
                     # try to store data into All_Grp if it exists
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
@@ -279,36 +292,55 @@ class Publisher(object):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
 
-
                     # create folders to publish file if needed
                     if not os.path.exists(self.pipeliner.pipeData['publishPath']):
                         os.makedirs(self.pipeliner.pipeData['publishPath'])
-                
-                
 
-                
-                     
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
 
-                
 
-                
-                else:
-                    print("There isn't a publish file name to save the file, sorry.")
+
+
+
+
+                    # publisher log window
+                    self.successPublishedWindow()
+                dpUtils.closeUI('dpPublisherWindow')
+
             else:
-                print("There isn't a publishing path to save the file, sorry.")
+                mel.eval('warning \"'+self.langDic[self.langName]['v021_noFileName']+'\";')
+        else:
+            mel.eval('warning \"'+self.langDic[self.langName]['v022_noFilePath']+'\";')
 
             # WIP
             # review path from user (test desk)
             # call dpImager
+            # send to client
+            # zip file
             # pass all old wip files to Hist folder
             #
+            # TODO create progressWindow
             # TODO result window = log here
             # TODO run everything (Publisher and Pipeliner) without UI
             #
             # after all, ask to open the source file or keep in published file ???
 
 
-        dpUtils.closeUI('dpPublisherWindow')
+    def successPublishedWindow(self, *args):
+        """
+        """
+        dpUtils.closeUI('dpSuccessPublishedWindow')
+        # window
+        winWidth  = 250
+        winHeight = 100
+        cmds.window('dpSuccessPublishedWindow', title=self.publisherName+" "+str(DPPUBLISHER_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.showWindow('dpSuccessPublishedWindow')
+        # create UI layout and elements:
+        succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
+        cmds.separator(style="none", height=20, parent=succesLayout)
+        cmds.text(label=self.langDic[self.langName]['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
+        cmds.separator(style="none", height=20, parent=succesLayout)
+        cmds.text(label=self.langDic[self.langName]['i018_thanks'], parent=succesLayout)
+            
