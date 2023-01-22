@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.1
+dpTargetCleaner_Version = 1.2
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -107,7 +107,7 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
-            self.resultOkList.append(False)
+            self.resultOkList.append(True)
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---

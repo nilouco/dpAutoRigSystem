@@ -11,7 +11,7 @@ TITLE = "v009_wipCleaner"
 DESCRIPTION = "v010_wipCleanerDesc"
 ICON = "/Icons/dp_wipCleaner.png"
 
-dpWIPCleaner_Version = 1.0
+dpWIPCleaner_Version = 1.1
 
 class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

@@ -253,6 +253,8 @@ class Publisher(object):
                 # start logging
                 publishLog = {}
                 publishLog["Scene"] = self.pipeliner.pipeData['sceneName']
+                if not publishFileName[-3:-1] == ".m":
+                    publishFileName += ".m"+self.pipeliner.pipeData['sceneName'][-1]
                 publishLog["Published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
                 # comments
                 publishLog["Comment"] = ""
@@ -306,7 +308,7 @@ class Publisher(object):
 
 
                     # publisher log window
-                    self.successPublishedWindow()
+                    self.successPublishedWindow(publishFileName)
                 dpUtils.closeUI('dpPublisherWindow')
 
             else:
@@ -328,19 +330,21 @@ class Publisher(object):
             # after all, ask to open the source file or keep in published file ???
 
 
-    def successPublishedWindow(self, *args):
+    def successPublishedWindow(self, publishedFile, *args):
         """
         """
         dpUtils.closeUI('dpSuccessPublishedWindow')
         # window
         winWidth  = 250
-        winHeight = 100
+        winHeight = 130
         cmds.window('dpSuccessPublishedWindow', title=self.publisherName+" "+str(DPPUBLISHER_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpSuccessPublishedWindow')
         # create UI layout and elements:
         succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.separator(style="none", height=20, parent=succesLayout)
         cmds.text(label=self.langDic[self.langName]['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
+        cmds.separator(style="none", height=20, parent=succesLayout)
+        cmds.text(label=publishedFile, parent=succesLayout)
         cmds.separator(style="none", height=20, parent=succesLayout)
         cmds.text(label=self.langDic[self.langName]['i018_thanks'], parent=succesLayout)
             

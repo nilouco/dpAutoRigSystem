@@ -75,8 +75,8 @@ try:
     from .Extras import dpUpdateRigInfo
     from .Extras import dpReorderAttr
     from .Languages.Translator import dpTranslator
-    from .Validator import dpPublisher
-    from .Validator import dpPipeliner
+    from .Pipeline import dpPipeliner
+    from .Pipeline import dpPublisher
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
