@@ -389,30 +389,3 @@ class Pipeliner(object):
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         dpUtils.closeUI('dpPipelinerWindow')
-
-
-
-
-
-    # WIP
-    # relative or absolute paths ???
-    #
-    #
-    # TODO
-    # process data before output json file
-    # process data to find good concatenations to help getters
-    # process data to store relavante info to getters like publishPath, createAsset folder, fileName to save published file, etc
-    #
-    #
-    # TODO
-    #
-    # create an asset
-    # define ToClient, Publish, Riggging WIP folders
-    # toClientFolder with or without date subFolder to zip the file
-    # etc
-    #
-    # after save data, reload pipeData using getPipelineData ???
-    # after save data, reload the UI using the dpUIinst.jobReloadUI() ???
-    #
-    #
-    #

@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.2
+dpTargetCleaner_Version = 1.3
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -68,7 +68,11 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                         if not item in exceptionList:
                             exceptionList.append(item)
                     else:
-                        inputDeformerList = cmds.findDeformers(item)
+                        try:
+                            inputDeformerList = cmds.findDeformers(item)
+                        except:
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['i075_moreOne']+": "+item)
+                            inputDeformerList = False
                         if inputDeformerList:
                             for deformerNode in inputDeformerList:
                                 if cmds.objectType(deformerNode) in deformersToKeepList:

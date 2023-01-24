@@ -48,6 +48,7 @@ class Publisher(object):
                 else:
                     return False
             else: #save
+                cmds.file(rename=cmds.file(query=True, sceneName=True))
                 return cmds.file(save=True)
 
 
@@ -79,28 +80,12 @@ class Publisher(object):
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
             cmds.button('diagnoseBT', label=self.langDic[self.langName]['i224_diagnose'], command=partial(self.runDiagnosing), height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
             cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
-            
-
-
-            #WIP
-
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
             self.pipeliner.mainUI(self.dpUIinst)
             dpUtils.closeUI('dpPipelinerWindow')
-            
-            
             self.setPublishFilePath()
-           
-
-            # TODO
-            #
-            # 
-            #
-            # pipe to find folders like: Publish, ToClient, etc
-            # log window
-            # 
 
 
     def editPublishPath(self, *args):
@@ -228,21 +213,7 @@ class Publisher(object):
             - store data info like publishedFromFile and model version into the All_Grp if it exists
             - create the folders to publish file if them not exists yet
             - save the published file
-            
-
-
-
-            # WIP
-            - call other methods to publish:
-                - dpSendToClient
-                - dpImager
-                - dpCompactor
-                - dpHistory
-
-
-
-
-            TODO need to describe the publishing process here...
+            If it fails, it'll reopen the current file without save any change.
         """
         if self.pipeliner.pipeData['publishPath']:
             # check if there'a a file name to publish this scene
@@ -316,7 +287,7 @@ class Publisher(object):
             mel.eval('warning \"'+self.langDic[self.langName]['v022_noFilePath']+'\";')
 
             # WIP
-            # review path from user (test desk)
+            #
             # call dpImager
             # send to client
             # zip file
@@ -326,7 +297,15 @@ class Publisher(object):
             #
             # TODO run everything (Publisher and Pipeliner) without UI
             #
-            
+            # WIP
+            #- call other methods to publish:
+            #    - dpSendToClient
+            #    - dpImager
+            #    - dpCompactor
+            #    - dpHistory
+
+
+
 
     def abortPublishing(self, raison=None, *args):
         """ Stop the publishing process because we found an error somewhere.
@@ -344,10 +323,8 @@ class Publisher(object):
             mel.eval('warning \"'+raison+'\";')
 
 
-
-
     def successPublishedWindow(self, publishedFile, *args):
-        """
+        """ If everything works well we can call a success publishing window here.
         """
         dpUtils.closeUI('dpSuccessPublishedWindow')
         # window
@@ -363,4 +340,3 @@ class Publisher(object):
         cmds.text(label=publishedFile, parent=succesLayout)
         cmds.separator(style="none", height=20, parent=succesLayout)
         cmds.text(label=self.langDic[self.langName]['i018_thanks'], parent=succesLayout)
-            
