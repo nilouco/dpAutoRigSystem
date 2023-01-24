@@ -272,12 +272,8 @@ class Publisher(object):
                 if verifyValidator:
                     validatorsResult = self.runCheckedValidators(False, True, publishLog) #fix mode
                 if validatorsResult:
-                    # reopen current file
-                    cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
-                    # report validator error in a log window
-                    self.dpUIinst.info('i019_log', 'i216_publish', validatorsResult, "left", 250, 150)
-                    cmds.progressWindow(endProgress=True)
-                    mel.eval('warning \"'+validatorsResult+'\";')
+                    self.abortPublishing(validatorsResult)
+
                 else:
                     # try to store data into All_Grp if it exists
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
@@ -296,7 +292,10 @@ class Publisher(object):
 
                     # create folders to publish file if needed
                     if not os.path.exists(self.pipeliner.pipeData['publishPath']):
-                        os.makedirs(self.pipeliner.pipeData['publishPath'])
+                        try:
+                            os.makedirs(self.pipeliner.pipeData['publishPath'])
+                        except:
+                            self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
 
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
@@ -324,10 +323,27 @@ class Publisher(object):
             # pass all old wip files to Hist folder
             #
             # TODO create progressWindow
-            # TODO result window = log here
+            #
             # TODO run everything (Publisher and Pipeliner) without UI
             #
-            # after all, ask to open the source file or keep in published file ???
+            
+
+    def abortPublishing(self, raison=None, *args):
+        """ Stop the publishing process because we found an error somewhere.
+            Reopen the rig file.
+            Log error in a window.
+            End progressWindow.
+            Warning the raison of the error.
+        """
+        # reopen current file
+        cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
+        cmds.progressWindow(endProgress=True)
+        # report the error in a log window
+        if raison:
+            self.dpUIinst.info('i019_log', 'i216_publish', raison, "left", 250, 150)
+            mel.eval('warning \"'+raison+'\";')
+
+
 
 
     def successPublishedWindow(self, publishedFile, *args):
