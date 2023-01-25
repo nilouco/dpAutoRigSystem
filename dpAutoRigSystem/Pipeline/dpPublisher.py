@@ -216,6 +216,11 @@ class Publisher(object):
             If it fails, it'll reopen the current file without save any change.
         """
         if self.pipeliner.pipeData['publishPath']:
+            # Starting progress window
+            maxProcess = 3
+            progressAmount = 0
+            cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Starting...', isInterruptable=False)
+
             # check if there'a a file name to publish this scene
             publishFileName = self.getPipeFileName(self.pipeliner.pipeData['publishPath'])
             if fromUI:
@@ -246,6 +251,9 @@ class Publisher(object):
                     self.abortPublishing(validatorsResult)
 
                 else:
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, progress=progressAmount, status='Storing data...', isInterruptable=False)
+
                     # try to store data into All_Grp if it exists
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
@@ -260,6 +268,9 @@ class Publisher(object):
                             if not cmds.objExists(self.dpUIinst.masterGrp+".modelVersion"):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
+
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, progress=progressAmount, status='Saving the file...', isInterruptable=False)
 
                     # create folders to publish file if needed
                     if not os.path.exists(self.pipeliner.pipeData['publishPath']):
@@ -276,6 +287,20 @@ class Publisher(object):
 
 
 
+                    # WIP
+                    #
+                    # - dpPackager = call other methods to publish: by 
+                    #    - dpSendToClient
+                    #    - dpImager
+                    #    - dpCompactor = zip file
+                    #    - dpHistory = pass all old wip files to Hist folder
+                    #
+                    # TODO review progressWindow
+                    # TODO run everything (Publisher and Pipeliner) without UI
+
+
+
+
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
@@ -286,23 +311,7 @@ class Publisher(object):
         else:
             mel.eval('warning \"'+self.langDic[self.langName]['v022_noFilePath']+'\";')
 
-            # WIP
-            #
-            # call dpImager
-            # send to client
-            # zip file
-            # pass all old wip files to Hist folder
-            #
-            # TODO create progressWindow
-            #
-            # TODO run everything (Publisher and Pipeliner) without UI
-            #
-            # WIP
-            #- call other methods to publish:
-            #    - dpSendToClient
-            #    - dpImager
-            #    - dpCompactor
-            #    - dpHistory
+
 
 
 
@@ -327,6 +336,7 @@ class Publisher(object):
         """ If everything works well we can call a success publishing window here.
         """
         dpUtils.closeUI('dpSuccessPublishedWindow')
+        cmds.progressWindow(endProgress=True)
         # window
         winWidth  = 250
         winHeight = 130
