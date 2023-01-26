@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.3
+dpTargetCleaner_Version = 1.4
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -55,13 +55,10 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
             maxProcess = len(toCheckList)
 
             # get exception list to keep nodes in the scene
-            exceptionList = []
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
-            renderGrp = dpUtils.getNodeByMessage("renderGrp")
-            if renderGrp:
-                renderNodeList = cmds.listRelatives(renderGrp, allDescendents=True, children=True, type="transform", fullPath=False)
-                if renderNodeList:
-                    exceptionList += renderNodeList
+            exceptionList = self.keepGrp(["renderGrp", "proxyGrp"])
+            if not exceptionList:
+                exceptionList = []
             for item in toCheckList:
                 if cmds.objExists(item):
                     if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
@@ -99,7 +96,12 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                             self.resultOkList.append(False)
                         else: #fix        
                             try:
+                                fatherItemList = cmds.listRelatives(item, parent=True, type="transform")
                                 cmds.delete(item)
+                                if fatherItemList:
+                                    brotherList = cmds.listRelatives(fatherItemList[0], allDescendents=True, children=True)
+                                    if not brotherList:
+                                        cmds.delete(fatherItemList[0])
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                             except:
@@ -135,3 +137,17 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
+
+    def keepGrp(self, grpList, *args):
+        """ Check if there're some nodes in the given group to return them.
+        """
+        returnList = []
+        if grpList:
+            for item in grpList:
+                nodeGrp = dpUtils.getNodeByMessage(item)
+            if nodeGrp:
+                nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
+                if nodeList:
+                    returnList += nodeList
+        returnList

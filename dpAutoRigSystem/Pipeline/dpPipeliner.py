@@ -108,11 +108,11 @@ class Pipeliner(object):
         "f_studio"     : "",
         "f_project"    : "",
         "f_wip"        : "Rigging/WIP",
-        "f_publish"    : "Rigging/Publish",
+        "f_publish"    : "Rigging/Published",
         "f_toClient"   : "Data/ToClient",
         "s_presets"    : "dpPresets",
         "s_addOns"     : "dpAddOns",
-        "s_hist"       : "Hist",
+        "s_hist"       : "dpHist",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
@@ -139,10 +139,7 @@ class Pipeliner(object):
         loaded = True
         if not loadedPipeInfo:
             self.pipeInfo = self.declareDefaultPipelineInfo()
-            #self.pipeData = {}
-
             self.pipeData = self.pipeInfo
-
             self.pipeData['publishPath'] = False
             self.pipeData['addOnsPath'] = False
             self.pipeData['presetsPath'] = False

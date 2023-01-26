@@ -114,7 +114,7 @@ class Publisher(object):
 
 
     def defineFileVersion(self, assetNameList, *args):
-        """ Return the latest number of a versioned files list.
+        """ Return the max number plus one of a versioned files list.
         """
         if assetNameList:
             numberList = []
@@ -155,7 +155,7 @@ class Publisher(object):
             assetName = self.checkPipelineAssetNameFolder()
             if not assetName:
                 assetName = self.shortAssetName
-            fileVersion = 0
+            fileVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
             fileNameList = next(os.walk(filePath))[2]
             if fileNameList:
                 assetNameList = []
@@ -252,8 +252,8 @@ class Publisher(object):
 
                 else:
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status='Storing data...', isInterruptable=False)
-
+                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
+                    
                     # try to store data into All_Grp if it exists
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
@@ -269,23 +269,19 @@ class Publisher(object):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
 
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status='Saving the file...', isInterruptable=False)
-
                     # create folders to publish file if needed
                     if not os.path.exists(self.pipeliner.pipeData['publishPath']):
                         try:
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
                             self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
+                    
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
 
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
-
-
-
-
 
                     # WIP
                     #
@@ -298,10 +294,6 @@ class Publisher(object):
                     # TODO review progressWindow
                     # TODO run everything (Publisher and Pipeliner) without UI
 
-
-
-
-
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
                 dpUtils.closeUI('dpPublisherWindow')
@@ -310,10 +302,6 @@ class Publisher(object):
                 mel.eval('warning \"'+self.langDic[self.langName]['v021_noFileName']+'\";')
         else:
             mel.eval('warning \"'+self.langDic[self.langName]['v022_noFilePath']+'\";')
-
-
-
-
 
 
     def abortPublishing(self, raison=None, *args):
