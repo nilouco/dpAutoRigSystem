@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.4
+dpTargetCleaner_Version = 1.5
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -57,8 +57,6 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
             # get exception list to keep nodes in the scene
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             exceptionList = self.keepGrp(["renderGrp", "proxyGrp"])
-            if not exceptionList:
-                exceptionList = []
             for item in toCheckList:
                 if cmds.objExists(item):
                     if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
@@ -142,12 +140,12 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def keepGrp(self, grpList, *args):
         """ Check if there're some nodes in the given group to return them.
         """
-        returnList = []
+        resultList = []
         if grpList:
             for item in grpList:
                 nodeGrp = dpUtils.getNodeByMessage(item)
             if nodeGrp:
                 nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
                 if nodeList:
-                    returnList += nodeList
-        returnList
+                    resultList.extend(nodeList)
+        return resultList
