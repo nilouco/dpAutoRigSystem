@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.40"
+DPAR_VERSION_PY3 = "4.01.44"
 DPAR_UPDATELOG = "N124 Publisher.\nN599 Pipeliner."
 
 

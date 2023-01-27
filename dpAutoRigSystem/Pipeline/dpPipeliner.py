@@ -102,7 +102,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-01-01",
+        "updated" : "2023-01-26",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -112,7 +112,7 @@ class Pipeliner(object):
         "f_toClient"   : "Data/ToClient",
         "s_presets"    : "dpPresets",
         "s_addOns"     : "dpAddOns",
-        "s_hist"       : "dpHist",
+        "s_hist"       : "dpData/dpHist",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
