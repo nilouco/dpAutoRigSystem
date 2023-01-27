@@ -9,7 +9,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DPUG_VERSION = "1.0"
+DPUG_VERSION = "1.1"
 
 
 class UpdateGuides(object):
@@ -483,15 +483,24 @@ class UpdateGuides(object):
 
     def doDelete(self, *args):
         self.closeExistWin('updateSummary')
+        
         for guide in self.updateData:
             try:
                 cmds.parent(guide, world=True)
             except Exception as e:
                 print(e)
+                
         try:
             cmds.delete(*self.updateData.keys())
         except:
             mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound']+'\\n\";')
+        
+        allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
+        for guide in self.updateData:
+             if self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace in allNamespaceList:
+                    cmds.namespace(moveNamespace=(self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, ':'), force=True)
+                    cmds.namespace(removeNamespace=self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, force=True)
+
         self.dpUIinst.jobReloadUI()
 
 
