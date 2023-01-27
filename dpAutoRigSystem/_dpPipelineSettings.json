@@ -1,0 +1,5 @@
+{
+    "path" : "put the path of your pipeline folder info here",
+    "example" : "R:/StudioName/_dpPipeline",
+    "file" : "dpPipelineInfo.json"
+}

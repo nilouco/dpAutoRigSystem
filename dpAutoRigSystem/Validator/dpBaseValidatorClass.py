@@ -67,28 +67,29 @@ class ValidatorStartClass:
         """ Update button background colors if using UI.
         """
         if self.ui:
-            if self.checkedObjList:
-                if self.verifyMode:
-                    if True in self.foundIssueList:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=ISSUE_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=WARNING_COLOR)
-                    else:
+            if cmds.button(self.verifyBT, exists=True):
+                if self.checkedObjList:
+                    if self.verifyMode:
+                        if True in self.foundIssueList:
+                            cmds.button(self.verifyBT, edit=True, backgroundColor=ISSUE_COLOR)
+                            cmds.button(self.fixBT, edit=True, backgroundColor=WARNING_COLOR)
+                        else:
+                            cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
+                            cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                    else: #fix
+                        if False in self.resultOkList:
+                            cmds.button(self.verifyBT, edit=True, backgroundColor=WARNING_COLOR)
+                            cmds.button(self.fixBT, edit=True, backgroundColor=ISSUE_COLOR)
+                        else:
+                            cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                            cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
+                else:
+                    if self.verifyMode:
                         cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
                         cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                else: #fix
-                    if False in self.resultOkList:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=WARNING_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=ISSUE_COLOR)
-                    else:
+                    else: #fix
                         cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
                         cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
-            else:
-                if self.verifyMode:
-                    cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
-                    cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                else: #fix
-                    cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                    cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
     
 
     def reportLog(self, *args):

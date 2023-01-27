@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-12-21",
+    "_updated"       : "2023-01-26",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -376,6 +376,15 @@
     "i213_checked"         : "Checado",
     "i214_refFile"         : "Referenciando arquivo",
     "i215_setAttr"         : "Configurando atributos",
+    "i216_publish"         : "Publicar",
+    "i217_verifyChecked"   : "Verificar todos os validadores marcados.",
+    "i219_comments"        : "Comentários",
+    "i220_filePath"        : "Caminho do arquivo",
+    "i221_fileName"        : "Nome do arquivo",
+    "i222_save"            : "Salvar",
+    "i223_saveAs"          : "Salvar Como",
+    "i224_diagnose"        : "Diagnosticar",
+    "i225_savingFile"      : "Salvando o arquivo...",
 
     "m001_fkLine"               : "Linha Fk",
     "m002_fkLineDesc"           : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -422,7 +431,7 @@
     "m043_quadSpring"           : "Quadrúpede Spring",
     "m044_addBend"              : "Adicionar Dobrador",
     "m045_order"                : "Ordem",
-    "m046_0-0-0-0-0-0-"         : "",
+    "m046_publisher"            : "Publicador",
     "m047_colorOver"            : "Sobrescrever Cores",
     "m048_coloOverDesc"         : "Mostra uma janela para\nsobrescrever as cores dos shapes.",
     "m049_matchMesh"            : "Match Mesh",
@@ -626,7 +635,11 @@
     "v014_notFoundNodes"      : "Não encontrado nodes para continuar, desculpe.",
     "v015_freezeTransform"    : "Freeze Transform",
     "v016_freezeTranformDesc" : "Verifique se todas as geometrias têm freeze transformation, com translação e\nrotação com os valores em zero e escala com os valores em um,\ncaso contrário, tenta aplicá-las.",
-    "v017_freezeError"        : "Não foi possível aplicar freeze transform para: ",
-    "v018_foundTransform"     : "Encontradas transformações para: ",
-    "v019_frozenTransform"    : "Freeze transformations aplicadas para: "
+    "v017_freezeError"        : "Não foi possível aplicar freeze transform para:",
+    "v018_foundTransform"     : "Encontradas transformações para:",
+    "v019_frozenTransform"    : "Freeze transformations aplicadas para:",
+    "v020_publishStopped"     : "Processo de publicação cancelado. Verifique esse validador por favor:",
+    "v021_noFileName"         : "Não tem o nome do arquivo publicado para salvar, desculpe.",
+    "v022_noFilePath"         : "Não tem o caminho do diretório para salvar o arquivo publicado, desculpe.",
+    "v023_successPublished"   : "Arquivo publicado com sucesso!"
 }

@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2022-12-21",
+    "_updated"       : "2023-01-26",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -376,6 +376,15 @@
     "i213_checked"         : "Checked",
     "i214_refFile"         : "Referencing file",
     "i215_setAttr"         : "Setting attributes",
+    "i216_publish"         : "Publish",
+    "i217_verifyChecked"   : "Verify the checked validators",
+    "i219_comments"        : "Comments",
+    "i220_filePath"        : "File path",
+    "i221_fileName"        : "File name",
+    "i222_save"            : "Save",
+    "i223_saveAs"          : "Save As",
+    "i224_diagnose"        : "Diagnose",
+    "i225_savingFile"      : "Saving the file...",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -422,7 +431,7 @@
     "m043_quadSpring"           : "Quadruped Spring",
     "m044_addBend"              : "Add Bend",
     "m045_order"                : "Order",
-    "m046_0-0-0-0-0-0-"         : "",
+    "m046_publisher"            : "Publisher",
     "m047_colorOver"            : "Color Override",
     "m048_coloOverDesc"         : "Show a window to change\nshape color overriding.",
     "m049_matchMesh"            : "Match Mesh",
@@ -627,7 +636,12 @@
     "v014_notFoundNodes"      : "Not found nodes to continue, sorry.",
     "v015_freezeTransform"    : "Freeze Transform",
     "v016_freezeTranformDesc" : "Check if all geometries have frozen transformations, translate,\nrotate values at zero and scale values at one,\notherwise try to apply them.",
-    "v017_freezeError"        : "Can not Freeze Transformations for: ",
-    "v018_foundTransform"     : "Found Transformation for: ",
-    "v019_frozenTransform"    : "Frozen Transformations for: "
+    "v017_freezeError"        : "Can not Freeze Transformations for:",
+    "v018_foundTransform"     : "Found Transformation for:",
+    "v019_frozenTransform"    : "Frozen Transformations for:",
+    "v020_publishStopped"     : "Publishing process stopped... check this validator please:",
+    "v021_noFileName"         : "There isn't a publish file name to save the file, sorry.",
+    "v022_noFilePath"         : "There isn't a publishing path to save the file, sorry.",
+    "v023_successPublished"   : "Published file with success!"
+
 }

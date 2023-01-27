@@ -89,7 +89,7 @@ def findAllModules(path, dir):
     """ Find all modules in the directory.
         Return a list of all module names (without '.py' extension).
     """
-    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate"]
+    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner"]
     allPyFilesList = findAllFiles(path, dir, ".py")
     moduleList = []
     # removing "__init__":
@@ -980,3 +980,10 @@ def dpCreateValidatorPreset(dpUIinst):
                 resultString += ',"'+validator.guideModuleName+'" : '+str(validator.active).lower()
             resultString += "}"
     return resultString
+
+
+def closeUI(winName):
+    """ Closes the given window name if it exists.
+    """
+    if cmds.window(winName, query=True, exists=True):
+        cmds.deleteUI(winName, window=True)

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2022-12-21",
+    "_updated"       : "2023-01-26",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -376,6 +376,15 @@
     "i213_checked"         : "Cochée",
     "i214_refFile"         : "Référencement du fichier",
     "i215_setAttr"         : "Définition d'attributs",
+    "i216_publish"         : "Publier",
+    "i217_verifyChecked"   : "Vérifier tous les validateurs marqués.",
+    "i219_comments"        : "Commentaires",
+    "i220_filePath"        : "Endroit du fichier",
+    "i221_fileName"        : "Nom du fichier",
+    "i222_save"            : "Save",
+    "i223_saveAs"          : "Save As",
+    "i224_diagnose"        : "Diagnostiquer",
+    "i225_savingFile"      : "Enregistre le fichier...",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -422,7 +431,7 @@
     "m043_quadSpring"           : "Quadrupède Spring",
     "m044_addBend"              : "Ajouter Plier",
     "m045_order"                : "Ordre",
-    "m046_0-0-0-0-0-0-"         : "UNUSED: Connexion rapide entre\nles meshes shapes attributs:\n\n.outMesh et .inMesh\n\nDE: MODELS_Grp *_geoShape\nPOUR: render_Grp *_meshShape",
+    "m046_publisher"            : "Publisher",
     "m047_colorOver"            : "Color Override",
     "m048_coloOverDesc"         : "Montre une fenêtre pour\néchanger la couleur des shapes.",
     "m049_matchMesh"            : "Match Mesh",
@@ -626,7 +635,11 @@
     "v014_notFoundNodes"      : "Pas trouvé des nodes pour continuer, désolé.",
     "v015_freezeTransform"    : "Freeze Transform",
     "v016_freezeTranformDesc" : "Vérifiez que toutes les géométries ont des frozen transformations, en translation,\net rotation avec des valeurs à zéro et scale avec des valeurs à un,\nsinon essayez de les appliquer.",
-    "v017_freezeError"        : "Il n'était pas possible d'appliquer le Freeze transformation en: ",
-    "v018_foundTransform"     : "Trouvé des transformations pour: ",
-    "v019_frozenTransform"    : "Freeze Transformations appliquées à: "
+    "v017_freezeError"        : "Il n'était pas possible d'appliquer le Freeze transformation en:",
+    "v018_foundTransform"     : "Trouvé des transformations pour:",
+    "v019_frozenTransform"    : "Freeze Transformations appliquées à:",
+    "v020_publishStopped"     : "Processus de publication arrêté. Vérifier ce validateur-la, s'il vous plaît:",
+    "v021_noFileName"         : "Il n'y a pas de nom de fichier de publication pour enregistrer le fichier, désolé.",
+    "v022_noFilePath"         : "Il n'y a pas de chemin de publication pour enregistrer le fichier, désolé.",
+    "v023_successPublished"   : "Fichier publié avec succès!"
 }

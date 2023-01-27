@@ -1,10 +1,10 @@
 {
-    "_preset"     : "AllOn",
+    "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2022-09-18",
+    "_updated"    : "2023-01-26",
 
-    "ValidatorInTest"    : true,
-    "ValidatorInTest2"   : false,
-    "ValidatorOutTest"   : false
+    "FreezeTransform" : true,
+    "TargetCleaner"   : false,
+    "WIPCleaner"      : false
 }
