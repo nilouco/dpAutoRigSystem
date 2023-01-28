@@ -1592,13 +1592,29 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         
                         # wrist / ankle
                         extremCorrectiveNetList = [None]
-                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
-                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
                         extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
                         extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
                         self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
+                        
+                        # WIP
+                        # fix rotate with 100% of value for the wrist axis
+                        extremJax = cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0]
+                        orientConnection = cmds.listConnections(extremJax+".rotateZ", destination=False, source=True, plugs=True)[0]
+                        cmds.disconnectAttr(orientConnection, extremJax+".rotateZ")
+                        #
+                        cmds.connectAttr(self.skinJointList[-2]+".rotateZ", extremJax+".rotateZ", force=True)
+                        # TODO 
+                        # need to extract rotateZ using quaternion matrix instead of direct connection to avoid the euler issue
+                        #
+                        #
+                        #
+                        #
+
+
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
