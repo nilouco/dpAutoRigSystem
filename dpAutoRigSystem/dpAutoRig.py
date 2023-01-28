@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.43"
-DPAR_UPDATELOG = "N617 - Fixed Sneer/Grimace translateY connections."
+DPAR_VERSION_PY3 = "4.01.47"
+DPAR_UPDATELOG = "N605 - Imported guides namespace fix."
 
 
 
@@ -1396,14 +1396,13 @@ class DP_AutoRig_UI(object):
 
     def checkImportedGuides(self, askUser=True, *args):
         """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
+            Use a recursive method to remove imported of imported guides.
         """
-        removedNamespaceList = []
         importedNamespaceList = []
         currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaceList:
-            oldNamespaceList = namespaceList
             for n, name in enumerate(namespaceList):
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
@@ -1425,70 +1424,22 @@ class DP_AutoRig_UI(object):
                     if cmds.objExists(name+":Guide_Base.customName"):
                         n = 1
                         oldCustomName = cmds.getAttr(name+":Guide_Base.customName")
-                        baseName = oldCustomName
-                        while oldCustomName in currentCustomNameList:
-                            oldCustomName = baseName+str(n)
-                            n += 1
-                        cmds.setAttr(name+":Guide_Base.customName", oldCustomName, type="string")
-                        currentCustomNameList.append(oldCustomName)
+                        if oldCustomName:
+                            baseName = oldCustomName
+                            while oldCustomName in currentCustomNameList:
+                                oldCustomName = baseName+str(n)
+                                n += 1
+                            cmds.setAttr(name+":Guide_Base.customName", oldCustomName, type="string")
+                            currentCustomNameList.append(oldCustomName)
                 # remove namespaces
                 for name in importedNamespaceList:
-                    while ":" in name:
+                    if ":" in name:
                         if cmds.namespace(exists=name):
                             namespaceString = name.split(":")[0]
                             cmds.namespace(removeNamespace=namespaceString, mergeNamespaceWithRoot=True)
                             print(f"{self.langDic[self.langName]['m206_mergeNamespace']}: {namespaceString}")
-                            name = name[len(namespaceString)+1:]
-                                #removedNamespaceList.append(namespaceString)
-                                #if not n == len(namespaceList)-1:
-                                #    self.checkImportedGuides(False)
-                                #break
-                        else:
-                            name = ""
-
-
-            return
-            if removedNamespaceList:
-                dpImportedGuideList = []
-                currentModuleList = list(map(lambda guideModule : guideModule.moduleGrp.split(":")[0], self.modulesToBeRiggedList))
-                print("currentModuleList =", currentModuleList)
-                for removedNamespace in removedNamespaceList:
-                    for oldNamespace in oldNamespaceList:
-                        if removedNamespace+":" in oldNamespace:
-                            dpImportedGuideList.append(oldNamespace.split(":")[-1])
-                print("dpImportedGuideList ==", dpImportedGuideList)
-                return
-                yesTxt = self.langDic[self.langName]['i071_yes']
-                noTxt = self.langDic[self.langName]['i072_no']
-                # open dialog to confirm merge namespaces:
-                result = cmds.confirmDialog(title=self.langDic[self.langName]['i205_guide'], message=self.langDic[self.langName]['i206_removeNamespace'], 
-                                            button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
-                if result == yesTxt:
-                    # reload current guide list before get the customNames
-                    self.populateCreatedGuideModules()
-                    currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
-                    
-                    print("currentCustomNameList 2===", currentCustomNameList)
-                    
-                    print("dpImportedGuideList =", dpImportedGuideList)
-                    
-                    
-                    # populate all guides after import and create a list with all guides:
-                    self.populateCreatedGuideModules()
-                    #wip
-
-#                    allList = cmds.ls(selection=False, type="transform")
-#                    guidesNameList = []
-#                    if allList:
-#                        for item in allList:
-#                            if cmds.objExists(item+".guideBase"):
-#                                if cmds.getAttr(item+".guideBase") == 1:
-#                                    guidesNameList.append(item)
-#                    # rename imported guides instances to avoid duplicated names:
-#                    for idx in range(len(guidesNameList)):
-#                        if guidesNameList[idx] not in currentGuidesList:
-#                            guideCustomName = cmds.getAttr(guidesNameList[idx]+".customName")
-#                            self.modulesToBeRiggedList[idx].editUserName(guideCustomName)
+                            self.checkImportedGuides(False)
+                            break
     
 
     def setPrefix(self, *args):
