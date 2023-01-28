@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.44"
-DPAR_UPDATELOG = "N124 Publisher.\nN599 Pipeliner."
+DPAR_VERSION_PY3 = "4.01.49"
+DPAR_UPDATELOG = "N631 - Lock Finger zero guide rotateZ."
 
 
 
