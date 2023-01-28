@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.44"
-DPAR_UPDATELOG = "N124 Publisher.\nN599 Pipeliner."
+DPAR_VERSION_PY3 = "4.01.46"
+DPAR_UPDATELOG = "N626 Limb wrist corrective joint\nrotateZ pop fixed."
 
 
 
