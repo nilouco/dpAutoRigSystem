@@ -102,7 +102,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-01-26",
+        "updated" : "2023-01-29",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -113,6 +113,7 @@ class Pipeliner(object):
         "s_presets"    : "dpPresets",
         "s_addOns"     : "dpAddOns",
         "s_hist"       : "dpData/dpHist",
+        "s_dropbox"    : "Job",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
@@ -123,11 +124,13 @@ class Pipeliner(object):
         "b_capitalize" : False,
         "b_upper"      : False,
         "b_lower"      : False,
+        "b_deliver"    : True,
+        "b_dateDir"    : True,
         "b_assetDir"   : True,
         "b_archive"    : True,
-        "b_dateDir"    : True,
         "b_zip"        : True,
-        "b_imager"     : True
+        "b_imager"     : True,
+        "b_cloud"      : True
         }
         return defaultPipeInfo
 
@@ -386,3 +389,34 @@ class Pipeliner(object):
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         dpUtils.closeUI('dpPipelinerWindow')
+
+
+    def getPackagePathInfo(self, *args):
+        """ Mount paths into pipeData to use them in the Package module.
+        """
+        self.pipeData['toClientPath'] = None
+        self.pipeData['historyPath'] = None
+        self.pipeData['dropboxPath'] = None
+        
+        if self.pipeData['publishPath']:
+            # send to client path
+            if self.pipeData['b_deliver']:
+                self.pipeData['toClientPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_toClient']
+            # hist path
+            if self.pipeData['b_archive']:
+                self.pipeData['historyPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['s_hist']
+            # dropbox path
+            if self.pipeData['b_cloud']:
+                if self.pipeData['s_dropbox']:
+                    if os.name == "posix": #Linux or Mac
+                        dropDir = "~/.dropbox"
+                    else: #Windows
+                        dropDir = os.getenv('LOCALAPPDATA')+"/Dropbox"
+                    if os.path.exists(dropDir):
+                        dropInfo = dropDir+"/info.json"
+                        if os.path.exists(dropInfo):
+                            content = self.getJsonContent(dropInfo)
+                            if content:
+                                self.pipeData['dropInfoPath'] = content[list(content)[0]]['path'].replace("\\", "/")
+                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
+                                self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']

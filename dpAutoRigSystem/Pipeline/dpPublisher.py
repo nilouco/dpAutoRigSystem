@@ -5,11 +5,13 @@ from functools import partial
 import os
 from ..Modules.Library import dpUtils
 from . import dpPipeliner
+from . import dpPackager
 from importlib import reload
 reload(dpPipeliner)
+reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.0
+DPPUBLISHER_VERSION = 1.1
 
 
 class Publisher(object):
@@ -26,6 +28,7 @@ class Publisher(object):
         self.currentAssetName = None
         self.shortAssetName = None
         self.pipeliner = dpPipeliner.Pipeliner()
+        self.packager = dpPackager.Packager()
 
 
     def userSaveThisScene(self, *args):
@@ -286,6 +289,14 @@ class Publisher(object):
                     # WIP
                     #
                     # - dpPackager = call other methods to publish: by 
+
+
+
+                    #self.packager.sendToClient(self.pipeliner.pipeData['publishPath']+"/"+publishFileName, self.pipeliner.pipeData['toClient'])
+                    self.pipeliner.getPackagePathInfo()
+
+
+
                     #    - dpSendToClient
                     #    - dpImager
                     #    - dpCompactor = zip file
