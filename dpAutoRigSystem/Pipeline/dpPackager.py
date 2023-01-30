@@ -1,5 +1,7 @@
 # importing libraries:
 from maya import cmds
+import zipfile
+import shutil
 
 
 DPPACKAGER_VERSION = 1.0
@@ -27,13 +29,24 @@ class Packager(object):
 #        return packList
 
 
-    def compactor(self, filePath=None, destinationFolder=None, *args):
+    def compactor(self, filePath=None, fileName=None, destinationFolder=None, date=None, *args):
         """
         """
-        if filePath and destinationFolder:
-            print("Neeeeeed frete information here to track the gps....")
-        else:
-            print("just make directory and zip the file to logistica.")
+        if filePath and fileName and destinationFolder and date:
+            
+            # WIP
+            zipName = fileName[:-3]+"_"+date
+            print("zipName", zipName)
+            zip = zipfile.ZipFile(destinationFolder+"/"+zipName+".zip", "w", zipfile.ZIP_DEFLATED)
+            zip.write(filename=filePath+"/"+fileName, arcname=fileName)
+            zip.close()
+
+            print(destinationFolder+"/"+zipName+".zip")
+            return destinationFolder+"/"+zipName+".zip"
+        
+
+
+
 
     
     def sendToClient(self, filePath=None, destinationFolder=None, *args):
@@ -56,12 +69,23 @@ class Packager(object):
         print("history file here...")
 
     
-    def toDropbox(self, *args):
+    def toDropbox(self, file=None, toPath=None, host=None, *args):
         """
+            # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
+            Returns Dropbox's download link
         """
-        # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
         print("to use dropPath + / + s_dropbox + / + studio + / + project")
-        return "dropbox link"
+        
+        if file and toPath:
+            shutil.copy2(file, toPath)
+
+
+            # WIP
+            if host:
+                dropLink = "https://www.dropbox.com/s/"+str(host)+file[file.rfind("/"):]+"?dl=1"
+                return dropLink
+        
+        
 
 
 

@@ -2,11 +2,12 @@
 from maya import cmds
 import os
 import json
+import time
 from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.0
+DPPIPELINER_VERSION = 1.1
 
 PIPE_FOLDER = "_dpPipeline"
 
@@ -16,6 +17,7 @@ class Pipeliner(object):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
+        self.today = time.strftime("%Y-%m-%d", time.localtime())
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.pipeData = self.getPipelineData()
@@ -359,13 +361,19 @@ class Pipeliner(object):
         outFile.close()
 
 
+    def makeDirIfNotExists(self, pathToMake=None, *args):
+        """ Check if the path exists and create it if it doesn't exists.
+        """
+        if pathToMake:
+            if not os.path.exists(pathToMake):
+                os.makedirs(pathToMake)
+
+
     def createPipelineInfoSubFolders(self, *args):
         """ Create pipeline info addOnsPath and presetsPath sub folders if they don't exists.
         """
-        if not os.path.exists(self.pipeData['addOnsPath']):
-            os.makedirs(self.pipeData['addOnsPath'])
-        if not os.path.exists(self.pipeData['presetsPath']):
-            os.makedirs(self.pipeData['presetsPath'])
+        self.makeDirIfNotExists(self.pipeData['addOnsPath'])
+        self.makeDirIfNotExists(self.pipeData['presetsPath'])
 
 
     def savePipeInfo(self, *args):
@@ -380,8 +388,7 @@ class Pipeliner(object):
             if pathDataFromUI.endswith(".json"):
                 self.infoFile = pathDataFromUI[pathDataFromUI.rfind("/")+1:]
         if self.pipeData['path'] and self.infoFile:
-            if not os.path.exists(self.pipeData['path']):
-                os.makedirs(self.pipeData['path'])
+            self.makeDirIfNotExists(self.pipeData['path'])
             self.setPipelineInfoFile()
             self.createPipelineInfoSubFolders()
             self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
@@ -391,20 +398,24 @@ class Pipeliner(object):
         dpUtils.closeUI('dpPipelinerWindow')
 
 
-    def getPackagePathInfo(self, *args):
+    def mountPackagePath(self, *args):
         """ Mount paths into pipeData to use them in the Package module.
         """
         self.pipeData['toClientPath'] = None
         self.pipeData['historyPath'] = None
         self.pipeData['dropboxPath'] = None
-        
+        # mount paths
         if self.pipeData['publishPath']:
             # send to client path
             if self.pipeData['b_deliver']:
                 self.pipeData['toClientPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_toClient']
+                if self.pipeData['b_dateDir']:
+                    self.pipeData['toClientPath'] += "/"+self.today
+                self.makeDirIfNotExists(self.pipeData['toClientPath'])
             # hist path
             if self.pipeData['b_archive']:
-                self.pipeData['historyPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['s_hist']
+                self.pipeData['historyPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']+"/"+self.pipeData['s_hist']
+                self.makeDirIfNotExists(self.pipeData['historyPath'])
             # dropbox path
             if self.pipeData['b_cloud']:
                 if self.pipeData['s_dropbox']:
@@ -420,3 +431,4 @@ class Pipeliner(object):
                                 self.pipeData['dropInfoPath'] = content[list(content)[0]]['path'].replace("\\", "/")
                                 self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
                                 self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
+                                self.makeDirIfNotExists(self.pipeData['dropboxPath'])

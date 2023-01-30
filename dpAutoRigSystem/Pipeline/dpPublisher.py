@@ -174,6 +174,7 @@ class Publisher(object):
                 assetName = assetName.lower()
             elif self.pipeliner.pipeData['b_upper']:
                 assetName = assetName.upper()
+            self.pipeliner.pipeData['assetName'] = assetName
             fileName = self.pipeliner.pipeData['s_prefix']+assetName+self.pipeliner.pipeData['s_middle']+(str(fileVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
             return fileName
         else:
@@ -293,8 +294,12 @@ class Publisher(object):
 
 
                     #self.packager.sendToClient(self.pipeliner.pipeData['publishPath']+"/"+publishFileName, self.pipeliner.pipeData['toClient'])
-                    self.pipeliner.getPackagePathInfo()
+                    self.pipeliner.mountPackagePath()
 
+                    zipFile = self.packager.compactor(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.today)
+                    
+                    dropboxLink = self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'], self.pipeliner.pipeData['dropInfoHost'])
+                    print("dropboxLink ===", dropboxLink)
 
 
                     #    - dpSendToClient
