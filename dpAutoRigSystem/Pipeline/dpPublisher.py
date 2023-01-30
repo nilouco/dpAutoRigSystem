@@ -292,23 +292,27 @@ class Publisher(object):
                     # - dpPackager = call other methods to publish: by 
 
 
+                    # packager
+                    if self.pipeliner.pipeData['b_deliver']:
+                        self.pipeliner.mountPackagePath()
+                        if self.pipeliner.pipeData['toClientPath']:
+                            zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.today)
+                            
+                            if zipFile:
+                                if self.pipeliner.pipeData['dropboxPath']:
+                                    self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
 
-                    #self.packager.sendToClient(self.pipeliner.pipeData['publishPath']+"/"+publishFileName, self.pipeliner.pipeData['toClient'])
-                    self.pipeliner.mountPackagePath()
-
-                    zipFile = self.packager.compactor(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.today)
-                    
-                    dropboxLink = self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'], self.pipeliner.pipeData['dropInfoHost'])
-                    print("dropboxLink ===", dropboxLink)
+#                                if self.pipeliner.pipeData['historyPath']:
+#                                    self.packager.toHistory(self.pipeliner.pipeData['path'], self.pipeliner.pipeData['sceneName'], self.pipeliner.pipeData['toClientPath'])
 
 
-                    #    - dpSendToClient
-                    #    - dpImager
-                    #    - dpCompactor = zip file
-                    #    - dpHistory = pass all old wip files to Hist folder
-                    #
-                    # TODO review progressWindow
-                    # TODO run everything (Publisher and Pipeliner) without UI
+                        #    - dpSendToClient
+                        #    - dpImager
+                        #    - dpCompactor = zip file
+                        #    - dpHistory = pass all old wip files to Hist folder
+                        #
+                        # TODO review progressWindow
+                        # TODO run everything (Publisher and Pipeliner) without UI
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

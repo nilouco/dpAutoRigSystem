@@ -13,79 +13,52 @@ class Packager(object):
         """
         # define variables
         print("loaded Packager here, merci...")
-        
-
-# WIP
-# 
-# To DELETE:
-#
-#    def getPackList(self, packList=None, *args):
-#        """ Verify the active checkboxes to run the packaging actions to export the files.
-#            If we received a list, we just return it because we're runing all by code withou UI dependence.
-#        """
-#        if not packList:
-#            print("generating a packList here... carretos in action!")
-#            packList = ["test", "kombi", "frete"]
-#        return packList
 
 
-    def compactor(self, filePath=None, fileName=None, destinationFolder=None, date=None, *args):
+    def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
+        """ Create a zipped file with given filePath and fileName replacing the extention (.ma or .mb) to .zip
+            Add date at the end of the file if it's given.
+            Write the zip file in the destinationFolder.
+            Returns the zipFilePathName.
         """
-        """
-        if filePath and fileName and destinationFolder and date:
-            
-            # WIP
-            zipName = fileName[:-3]+"_"+date
-            print("zipName", zipName)
-            zip = zipfile.ZipFile(destinationFolder+"/"+zipName+".zip", "w", zipfile.ZIP_DEFLATED)
-            zip.write(filename=filePath+"/"+fileName, arcname=fileName)
-            zip.close()
-
-            print(destinationFolder+"/"+zipName+".zip")
-            return destinationFolder+"/"+zipName+".zip"
+        if date:
+            zipName = fileName[:-3]+"_"+date+".zip"
+        else:
+            zipName = fileName[:-3]+".zip"
+        zip = zipfile.ZipFile(destinationFolder+"/"+zipName, "w", zipfile.ZIP_DEFLATED)
+        zip.write(filename=filePath+"/"+fileName, arcname=fileName)
+        zip.close()
+        return destinationFolder+"/"+zipName
         
 
 
 
 
     
-    def sendToClient(self, filePath=None, destinationFolder=None, *args):
-        """
-        """
-        print ("delivering...")
-        print("filePath =", filePath)
-        print("destinationFolder =", destinationFolder)
-
-
+    
     def imager(self, destinationFolder=None, *args):
         """
         """
         print ("Carreto's photo!")
 
 
-    def history(self, filePath=None, destinationFolder=None, *args):
+    def toHistory(self, filePath, fileName, destinationFolder, *args):
         """
         """
         print("history file here...")
 
+
+
+
     
-    def toDropbox(self, file=None, toPath=None, host=None, *args):
-        """
-            # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
-            Returns Dropbox's download link
-        """
-        print("to use dropPath + / + s_dropbox + / + studio + / + project")
-        
+    def toDropbox(self, file, toPath, *args):
+        """ Just copy the zipped file to the destination path.
+            TODO: Returns Dropbox's download link
+        """        
         if file and toPath:
             shutil.copy2(file, toPath)
 
-
             # WIP
-            if host:
-                dropLink = "https://www.dropbox.com/s/"+str(host)+file[file.rfind("/"):]+"?dl=1"
-                return dropLink
-        
-        
-
-
-
+            #if host:
+                #dropLink = "https://dl.dropboxusercontent.com/u/"+str(host)+file[file.rfind("/"):]+"?dl=1"
+                #return dropLink

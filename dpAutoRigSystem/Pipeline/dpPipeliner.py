@@ -153,6 +153,7 @@ class Pipeliner(object):
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
             self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
+            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
             if self.pipeData['sceneName']:
                 self.getInfoByPath("f_drive", None)
                 self.getInfoByPath("f_studio", "f_drive", cut=True)
@@ -417,6 +418,7 @@ class Pipeliner(object):
                 self.pipeData['historyPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']+"/"+self.pipeData['s_hist']
                 self.makeDirIfNotExists(self.pipeData['historyPath'])
             # dropbox path
+            # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
             if self.pipeData['b_cloud']:
                 if self.pipeData['s_dropbox']:
                     if os.name == "posix": #Linux or Mac
@@ -429,6 +431,6 @@ class Pipeliner(object):
                             content = self.getJsonContent(dropInfo)
                             if content:
                                 self.pipeData['dropInfoPath'] = content[list(content)[0]]['path'].replace("\\", "/")
-                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
+#                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
                                 self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                                 self.makeDirIfNotExists(self.pipeData['dropboxPath'])
