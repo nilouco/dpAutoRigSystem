@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.44"
-DPAR_UPDATELOG = "N124 Publisher.\nN599 Pipeliner."
+DPAR_VERSION_PY3 = "4.01.45"
+DPAR_UPDATELOG = "N629 Foot roll non keyable attributes."
 
 
 
@@ -2435,23 +2435,20 @@ class DP_AutoRig_UI(object):
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
-                                    # add float attributes and connect from ikCtrl to revFootCtrl:
-                                    floatAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=True, userDefined=True)
-                                    for floatAttr in floatAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+floatAttr):
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+floatAttr, query=True, defaultValue=True)
-                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True, defaultValue=defValue)
-                                            cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
-                                            cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
-                                    intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
-                                    for intAttr in intAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+intAttr):
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+intAttr, query=True, defaultValue=True)
-                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=defValue)
-                                            cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
-                                            cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
+                                    # add attributes and connect from ikCtrl to revFootCtrl:
+                                    userAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, userDefined=True)
+                                    for attr in userAttrList:
+                                        if not cmds.objExists(ikCtrl+'.'+attr):
+                                            attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
+                                            currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
+                                            keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
+                                            channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
+                                            cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
+                                            cmds.setAttr(ikCtrl+'.'+attr, currentValue)
+                                            if not keyableStatus:
+                                                cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
+                                            cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
                                         cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
