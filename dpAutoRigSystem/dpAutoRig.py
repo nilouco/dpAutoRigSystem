@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.45"
-DPAR_UPDATELOG = "N629 Foot roll non keyable attributes."
+DPAR_VERSION_PY3 = "4.01.46"
+DPAR_UPDATELOG = "N626 Limb wrist corrective joint\nrotateZ pop fixed."
 
 
 
