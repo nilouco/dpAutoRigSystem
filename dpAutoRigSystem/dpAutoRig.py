@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.47"
-DPAR_UPDATELOG = "N605 - Imported guides namespace fix."
+DPAR_VERSION_PY3 = "4.01.49"
+DPAR_UPDATELOG = "N631 - Lock Finger zero guide rotateZ."
 
 
 
