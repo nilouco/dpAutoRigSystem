@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.0
+dpTargetCleaner_Version = 1.5
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -46,26 +46,28 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            toCheckList = list(set(cmds.listRelatives(cmds.ls(selection=False, type='mesh'), type="transform", parent=True, fullPath=False)))
+            toCheckList = None
+            meshList = cmds.ls(selection=False, type='mesh')
+            if meshList:
+                toCheckList = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
 
             # get exception list to keep nodes in the scene
-            exceptionList = []
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
-            renderGrp = dpUtils.getNodeByMessage("renderGrp")
-            if renderGrp:
-                renderNodeList = cmds.listRelatives(renderGrp, allDescendents=True, children=True, type="transform", fullPath=False)
-                if renderNodeList:
-                    exceptionList += renderNodeList
+            exceptionList = self.keepGrp(["renderGrp", "proxyGrp"])
             for item in toCheckList:
                 if cmds.objExists(item):
                     if cmds.objExists(item+"."+DPKEEPITATTR) and cmds.getAttr(item+"."+DPKEEPITATTR):
                         if not item in exceptionList:
                             exceptionList.append(item)
                     else:
-                        inputDeformerList = cmds.findDeformers(item)
+                        try:
+                            inputDeformerList = cmds.findDeformers(item)
+                        except:
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['i075_moreOne']+": "+item)
+                            inputDeformerList = False
                         if inputDeformerList:
                             for deformerNode in inputDeformerList:
                                 if cmds.objectType(deformerNode) in deformersToKeepList:
@@ -92,7 +94,12 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                             self.resultOkList.append(False)
                         else: #fix        
                             try:
+                                fatherItemList = cmds.listRelatives(item, parent=True, type="transform")
                                 cmds.delete(item)
+                                if fatherItemList:
+                                    brotherList = cmds.listRelatives(fatherItemList[0], allDescendents=True, children=True)
+                                    if not brotherList:
+                                        cmds.delete(fatherItemList[0])
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                             except:
@@ -103,8 +110,8 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                         self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
-            self.foundIssueList.append(True)
-            self.resultOkList.append(False)
+            self.foundIssueList.append(False)
+            self.resultOkList.append(True)
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
@@ -128,3 +135,17 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
+
+    def keepGrp(self, grpList, *args):
+        """ Check if there're some nodes in the given group to return them.
+        """
+        resultList = []
+        if grpList:
+            for item in grpList:
+                nodeGrp = dpUtils.getNodeByMessage(item)
+            if nodeGrp:
+                nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
+                if nodeList:
+                    resultList.extend(nodeList)
+        return resultList

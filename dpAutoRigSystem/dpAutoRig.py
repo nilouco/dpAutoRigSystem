@@ -75,12 +75,16 @@ try:
     from .Extras import dpUpdateRigInfo
     from .Extras import dpReorderAttr
     from .Languages.Translator import dpTranslator
+    from .Pipeline import dpPipeliner
+    from .Pipeline import dpPublisher
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
     reload(dpUpdateRigInfo)
     reload(dpBaseClass)
     reload(dpLayoutClass)
+    reload(dpPublisher)
+    reload(dpPipeliner)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -103,7 +107,6 @@ VALIDATOR = "Validator"
 CHECKIN = "Validator/CheckIn"
 CHECKOUT = "Validator/CheckOut"
 VALIDATOR_PRESETS = "Validator/Presets"
-PIPELINE_DRIVE = "R:/"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -165,10 +168,8 @@ class DP_AutoRig_UI(object):
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
         self.dpLog = DPLOG
-        self.studioName = None
-        self.studioPath = None
         self.optionCtrl = None
-        
+        self.pipeliner = dpPipeliner.Pipeliner()
         
         try:
             # store all UI elements in a dictionary:
@@ -224,7 +225,8 @@ class DP_AutoRig_UI(object):
             cmds.radioMenuItemCollection('validatorPresetRadioMenuCollection')
             # create a validator preset list:
             self.validatorPresetList, self.validatorPresetDic = self.getJsonFileInfo(VALIDATOR_PRESETS)
-            self.loadValidatorPreset()
+            if self.pipeliner.pipeData['presetsPath']:
+                self.loadPipelineValidatorPresets()
             # create menuItems from validator preset list:
             if self.validatorPresetList:
                 # create menuItems with the validator presets
@@ -239,6 +241,7 @@ class DP_AutoRig_UI(object):
             # create menu:
             self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
             cmds.menuItem('translator_MI', label='Translator', command=self.translator)
+            cmds.menuItem('pipeliner_MI', label='Pipeliner', command=partial(self.pipeliner.mainUI, self))
             cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "controls", CONTROLS_PRESETS, True))
             cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
             # window menu:
@@ -261,7 +264,7 @@ class DP_AutoRig_UI(object):
             
             # call mainUI in order to populate the main layout:
             self.mainUI()
-            
+
             # check if we need to automatically check for update:
             self.autoCheckUpdate()
         
@@ -273,7 +276,7 @@ class DP_AutoRig_UI(object):
             clearDPARLoadingWindow()
             return
         
-
+        
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
@@ -281,6 +284,7 @@ class DP_AutoRig_UI(object):
         #print self.pDockCtrl
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
+        
         
 
     def deleteExistWindow(self, *args):
@@ -371,9 +375,9 @@ class DP_AutoRig_UI(object):
         # get current preset choose UI from menu:
         self.presetName = self.getCurrentMenuValue(self.presetList)
         
-        # initialize dpControls:
+        # initialize some objects here:
         self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
-        
+        self.publisher = dpPublisher.Publisher(self)
         # --
         
         # creating tabs - mainTabLayout:
@@ -639,20 +643,26 @@ class DP_AutoRig_UI(object):
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
         cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
         cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
-        # pipeline
-        if self.getValidatorsAddOns():
-            cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
-            self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
-            self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.studioPath)
-            cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
-            cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
-            self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-            cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
-            cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
-
+        # pipeline check-addons
+        if self.pipeliner.pipeData['addOnsPath']:
+            if self.getValidatorsAddOns():
+                cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
+                self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.langDic[self.langName]['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
+                self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsPath'])
+                cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
+                cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
+                self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
+                cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
+        # publisher
+        self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
+        cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
+        self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.publisher.mainUI, parent=self.allUIs["footerPublish"])
+        cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5)]
+                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
+                        attachNone=[(self.allUIs["footerPublish"], 'top')]
                         )
         self.setValidatorPreset()
 
@@ -761,7 +771,7 @@ class DP_AutoRig_UI(object):
         self.translatorInst = dpTranslator.Translator(self, self.langDic, self.langName)
         self.translatorInst.dpTranslatorMain()
         
-        
+
     def createPreset(self, type="controls", presetDir=CONTROLS_PRESETS, setOptionVar=True, *args):
         """ Just call ctrls create preset and set it as userDefined preset.
         """
@@ -1455,29 +1465,19 @@ class DP_AutoRig_UI(object):
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
 
 
-    def getPipelineStudioName(self, pipelineDrive=PIPELINE_DRIVE, *args):
-        # try to find a pipeline structure
-        filePath = cmds.file(query=True, sceneName=True)
-        if filePath:
-            if pipelineDrive in filePath:
-                self.studioName = filePath.split(pipelineDrive)[1]
-                self.studioName = self.studioName[:self.studioName.find("/")]
-                self.studioPath = pipelineDrive+self.studioName
-                return self.studioName, self.studioPath
-
-
     def getValidatorsAddOns(self, *args):
-        self.getPipelineStudioName()
-        if self.studioName:
-            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.studioPath)
+        """ Return a list of Validator's AddOns to load.
+        """
+        if os.path.exists(self.pipeliner.pipeData['addOnsPath']):
+            self.validatorAddOnsModuleList = self.startGuideModules("", "exists", None, path=self.pipeliner.pipeData['addOnsPath'])
             return self.validatorAddOnsModuleList
 
 
-    def loadValidatorPreset(self, *args):
-        self.getPipelineStudioName()
-        if self.studioName:
-            self.studioPath += "/"
-            studioPreset, studioPresetDic = self.getJsonFileInfo(self.studioPath, True)
+    def loadPipelineValidatorPresets(self, *args):
+        """ Load the Validator's presets from the pipeline path.
+        """
+        if os.path.exists(self.pipeliner.pipeData['presetsPath']):
+            studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
                 self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
@@ -1501,24 +1501,33 @@ class DP_AutoRig_UI(object):
                 validatorInst.changeActive(value)
         
 
-    def runSelectedValidators(self, validatorInstList, verifyMode, *args):
+    def runSelectedValidators(self, validatorInstList, verifyMode, verbose=True, stopIfFoundBlock=False, publishLog=None, *args):
         """ Run the code for each active validator instance.
             verifyMode = True for verify
                        = False for fix
         """
         validationResultData = {}
         logText = ""
+        if publishLog:
+            logText = "\nPublisher"
+            logText += "\nScene: "+publishLog["Scene"]
+            logText += "\nPublished: "+publishLog["Published"]
+            logText += "\nComment: "+publishLog["Comment"]+"\n"
         if validatorInstList:
             progressAmount = 0
             maxProcess = len(validatorInstList)
             cmds.progressWindow(title="dpValidator", progress=progressAmount, status='dpValidator: 0%', isInterruptable=False)
-            for validatorInst in validatorInstList:
+            for v, validatorInst in enumerate(validatorInstList):
                 if validatorInst.active:
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(validatorInst.guideModuleName+': '+repr(progressAmount)))
                     validatorInst.verbose = False
                     validationResultData[validatorInst.guideModuleName] = validatorInst.runValidator(verifyMode)
                     validatorInst.verbose = True
+                    if stopIfFoundBlock:
+                        if True in validatorInst.foundIssueList:
+                            if False in validatorInst.resultOkList:
+                                return validationResultData, True, v
         if validationResultData:
             dataList = list(validationResultData.keys())
             dataList.sort()
@@ -1532,11 +1541,15 @@ class DP_AutoRig_UI(object):
             heightSize = 2
         thisTime = str(time.asctime(time.localtime(time.time())))
         logText = thisTime+"\n"+logText
-        self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
-        print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
-        if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
-            print(self.langDic[self.langName]['i201_saveScene'])
+        if verbose:
+            self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
+            print("\n-------------\n"+self.langDic[self.langName]['v000_validator']+"\n"+logText)
+            if publishLog:
+                validationResultData["Publisher"] = publishLog
+            if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
+                print(self.langDic[self.langName]['i201_saveScene'])
         cmds.progressWindow(endProgress=True)
+        return validationResultData, False, 0
 
 
     def info(self, title, description, text, align, width, height, *args):
@@ -1748,6 +1761,9 @@ class DP_AutoRig_UI(object):
                 # store custom presets in order to avoid overwrite them when installing the update:
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CONTROLS_PRESETS, dpAR_TempDir+"/"+CONTROLS_PRESETS)
+                # keep dpPipelineInfo data
+                shutil.copy2(os.path.join(dpAR_DestFolder, "_dpPipelineSettings.json"), dpAR_TempDir)
+                shutil.copy2(os.path.join(dpAR_DestFolder, "dpPipelineInfo.json"), dpAR_TempDir)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
@@ -1847,6 +1863,25 @@ class DP_AutoRig_UI(object):
     
     
     ###################### Start: Rigging Modules Instances
+    def checkIfNeedCreateAllGrp(self):
+        """ Verify if there's a All_Grp, masterGrp and return a boolean if need to create one.
+        """
+        masterGrpList = []
+        allTransformList = cmds.ls(selection=False, type="transform")
+        #Get all the masterGrp nodes and ensure it isn't referenced
+        for item in allTransformList:
+            if cmds.objExists(item+"."+MASTER_ATTR):
+                if not cmds.referenceQuery(item, isNodeReferenced=True):
+                    masterGrpList.append(item)
+        if masterGrpList:
+            # validate master (All_Grp) node
+            # If it doesn't work, the user need to clean the current scene to avoid duplicated names, for the moment.
+            for nodeGrp in masterGrpList:
+                if self.validateMasterGrp(nodeGrp):
+                    self.masterGrp = nodeGrp
+                    return False
+        return True
+
 
     '''
         Generic function to create base group
@@ -1888,23 +1923,8 @@ class DP_AutoRig_UI(object):
     '''
     def createBaseRigNode(self):
         sAllGrp = "All_Grp"
-        masterGrpList = []
-        needCreateAllGrp = True
-        # create master hierarchy:
-        allTransformList = cmds.ls(self.prefix+"*", selection=False, type="transform")
-        #Get all the masterGrp obj and ensure it not referenced
-        for item in allTransformList:
-            if cmds.objExists(item+"."+MASTER_ATTR):
-                if not cmds.referenceQuery(item, isNodeReferenced=True):
-                    masterGrpList.append(item)
         localTime = str( time.asctime( time.localtime(time.time()) ) )
-        if masterGrpList:
-            # validate master (All_Grp) node
-            # If it doesn't work, the user need to clean the current scene to avoid duplicated names, for the moment.
-            for nodeGrp in masterGrpList:
-                if self.validateMasterGrp(nodeGrp):
-                    self.masterGrp = nodeGrp
-                    needCreateAllGrp = False
+        needCreateAllGrp = self.checkIfNeedCreateAllGrp()
         if needCreateAllGrp:
             if cmds.objExists(sAllGrp):
                 # rename existing All_Grp node without connections as All_Grp_Old
@@ -1938,14 +1958,24 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.masterGrp+".name", self.masterGrp, type="string")
             # add date data log:
             cmds.addAttr(self.masterGrp, longName="lastModification", dataType="string")
-            # add model version:
+            # add pipeline data:
+            cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
+            # set data
+            cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
+            cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
+        # setting pipeline data
+        if not cmds.objExists(self.masterGrp+".lastGuidesFile"):
+            cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
+        cmds.setAttr(self.masterGrp+".lastGuidesFile", cmds.file(query=True, sceneName=True), type="string")
 
         #Get or create all the needed group
         self.modelsGrp      = self.getBaseGrp("modelsGrp", self.prefix+"Model_Grp")
@@ -2402,23 +2432,20 @@ class DP_AutoRig_UI(object):
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
-                                    # add float attributes and connect from ikCtrl to revFootCtrl:
-                                    floatAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=True, userDefined=True)
-                                    for floatAttr in floatAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+floatAttr):
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+floatAttr, query=True, defaultValue=True)
-                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True, defaultValue=defValue)
-                                            cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
-                                            cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
-                                    intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
-                                    for intAttr in intAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+intAttr):
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+intAttr, query=True, defaultValue=True)
-                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=defValue)
-                                            cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
-                                            cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
+                                    # add attributes and connect from ikCtrl to revFootCtrl:
+                                    userAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, userDefined=True)
+                                    for attr in userAttrList:
+                                        if not cmds.objExists(ikCtrl+'.'+attr):
+                                            attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
+                                            currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
+                                            keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
+                                            channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
+                                            cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
+                                            cmds.setAttr(ikCtrl+'.'+attr, currentValue)
+                                            if not keyableStatus:
+                                                cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
+                                            cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
                                         cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')

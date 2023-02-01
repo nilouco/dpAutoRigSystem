@@ -11,7 +11,7 @@ TITLE = "v009_wipCleaner"
 DESCRIPTION = "v010_wipCleanerDesc"
 ICON = "/Icons/dp_wipCleaner.png"
 
-dpWIPCleaner_Version = 1.0
+dpWIPCleaner_Version = 1.1
 
 class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -75,8 +75,8 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
-            self.foundIssueList.append(True)
-            self.resultOkList.append(False)
+            self.foundIssueList.append(False)
+            self.resultOkList.append(True)
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v011_notWIP'])
         # --- validator code --- end
         # ---
