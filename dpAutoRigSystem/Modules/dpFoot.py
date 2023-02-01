@@ -327,9 +327,11 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
                 cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll, attributeType='float', keyable=True)
-                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll+rfAngle, attributeType='float', defaultValue=30, keyable=True)
-                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll+rfPlant, attributeType='float', defaultValue=0, keyable=True)
+                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll+rfAngle, attributeType='float', defaultValue=30, keyable=False)
+                cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll+rfPlant, attributeType='float', defaultValue=0, keyable=False)
                 cmds.addAttr(self.footCtrl, longName=sideRFAttr+rfRoll, attributeType='float', keyable=True)
+                cmds.setAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfAngle, channelBox=True)
+                cmds.setAttr(self.footCtrl+"."+footRFAttr+rfRoll+rfPlant, channelBox=True)
 
                 # create clampNodes in order to limit the side rotations:
                 sideClamp = cmds.createNode("clamp", name=side+self.userGuideName+"_Side_Clp")
@@ -415,7 +417,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)
                 
                 # show or hide reverseFoot controls:
-                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='long', min=0, max=1, defaultValue=1)
+                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='bool', defaultValue=1)
                 cmds.setAttr(self.footCtrl+"."+showCtrlsAttr, keyable=False, channelBox=True)
                 showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl]
                 for rfCtrl in showHideCtrlList:
