@@ -2,6 +2,7 @@
 from maya import cmds
 import zipfile
 import shutil
+import os
 
 
 DPPACKAGER_VERSION = 1.0
@@ -42,13 +43,19 @@ class Packager(object):
         print ("Carreto's photo!")
 
 
-    def toHistory(self, filePath, fileName, destinationFolder, *args):
+    def toHistory(self, scenePath, fileShortName, destinationFolder, *args):
+        """ List all Maya scene files in the given scenePath.
+            Put all found Maya scene file into the given destinationFolder, except the current given fileShortName.
         """
-        """
-        print("history file here...")
-
-
-
+        sceneList = []
+        folderContentObj = os.scandir(scenePath)
+        for entry in folderContentObj :
+            if entry.is_file():
+                if not entry.name == fileShortName:
+                    sceneList.append(entry.name)
+        if sceneList:
+            for item in sceneList:
+                shutil.move(scenePath+"/"+item, destinationFolder)
 
     
     def toDropbox(self, file, toPath, *args):

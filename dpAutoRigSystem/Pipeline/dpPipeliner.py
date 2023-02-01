@@ -150,10 +150,10 @@ class Pipeliner(object):
             self.pipeData['presetsPath'] = False
             # getting pipeline settings
             self.pipeData['path'] = self.getPipelinePath()
+        self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
+        self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
-            self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
-            self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
             if self.pipeData['sceneName']:
                 self.getInfoByPath("f_drive", None)
                 self.getInfoByPath("f_studio", "f_drive", cut=True)
@@ -415,7 +415,8 @@ class Pipeliner(object):
                 self.makeDirIfNotExists(self.pipeData['toClientPath'])
             # hist path
             if self.pipeData['b_archive']:
-                self.pipeData['historyPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']+"/"+self.pipeData['s_hist']
+                self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
+                self.pipeData['historyPath'] = self.pipeData['scenePath']+"/"+self.pipeData['s_hist']
                 self.makeDirIfNotExists(self.pipeData['historyPath'])
             # dropbox path
             # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
