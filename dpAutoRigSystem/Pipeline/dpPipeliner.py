@@ -419,9 +419,9 @@ class Pipeliner(object):
                 self.pipeData['historyPath'] = self.pipeData['scenePath']+"/"+self.pipeData['s_hist']
                 self.makeDirIfNotExists(self.pipeData['historyPath'])
             # dropbox path
-            # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
             if self.pipeData['b_cloud']:
                 if self.pipeData['s_dropbox']:
+                    # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
                     if os.name == "posix": #Linux or Mac
                         dropDir = "~/.dropbox"
                     else: #Windows
