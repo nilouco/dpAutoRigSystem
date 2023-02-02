@@ -4,8 +4,8 @@ from maya import mel
 import os
 import json
 from functools import partial
-from dpAutoRigSystem.Modules.Library import dpControls
-from dpAutoRigSystem.Modules.Library import dpUtils
+from ..Modules.Library import dpControls
+from ..Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "FacialControl"
@@ -30,7 +30,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.15"
+DPFC_VERSION = "1.2"
 
 
 class FacialControl(object):
@@ -43,7 +43,10 @@ class FacialControl(object):
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.facialCtrlsGrp = self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp"
-        self.headCtrl = self.dpGetHeadCtrl()
+        self.headCtrl = self.dpGetHeadCtrl('id_093_HeadSub')
+        self.upperHeadCtrl = self.dpGetHeadCtrl('id_081_HeadUpperHead')
+        self.upperJawCtrl = self.dpGetHeadCtrl('id_069_HeadUpperJaw')
+        self.chinCtrl = self.dpGetHeadCtrl('id_025_HeadChin')
         self.jntTargetList = []
         self.RmVNumber = 0
         # redefining Tweaks variables:
@@ -137,12 +140,13 @@ class FacialControl(object):
         return presetContent
     
     
-    def dpGetHeadCtrl(self, *args):
+    def dpGetHeadCtrl(self, id, *args):
         """ Find and return the headCtrl if it exists in the scene.
         """
-        headCtrlList = self.ctrls.getControlNodeById("id_093_HeadSub")
+        headCtrlList = self.ctrls.getControlNodeById(id)
         if headCtrlList:
-            return headCtrlList[0]
+            if cmds.objExists(headCtrlList[0]):
+                return headCtrlList[0]
     
     
     def dpCloseFacialControlWin(self, *args):
@@ -298,31 +302,45 @@ class FacialControl(object):
             cmds.setAttr(lBrowCtrlGrp+".translateX", 4)
             cmds.setAttr(lBrowCtrlGrp+".translateY", 12)
             cmds.setAttr(lBrowCtrlGrp+".translateZ", 13)
+            if self.upperHeadCtrl:
+                cmds.parent(lBrowCtrlGrp, self.upperHeadCtrl)
         if rBrowCtrlGrp:
             cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
             cmds.setAttr(rBrowCtrlGrp+".translateX", -4)
             cmds.setAttr(rBrowCtrlGrp+".translateY", 12)
             cmds.setAttr(rBrowCtrlGrp+".translateZ", 13)
+            if self.upperHeadCtrl:
+                cmds.parent(rBrowCtrlGrp, self.upperHeadCtrl)
         if lMouthCtrlGrp:
             cmds.setAttr(lMouthCtrlGrp+".translateX", 3)
             cmds.setAttr(lMouthCtrlGrp+".translateY", 1.5)
             cmds.setAttr(lMouthCtrlGrp+".translateZ", 13)
+            if self.upperJawCtrl:
+                cmds.parent(lMouthCtrlGrp, self.upperJawCtrl)
         if rMouthCtrlGrp:
             cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
             cmds.setAttr(rMouthCtrlGrp+".translateX", -3)
             cmds.setAttr(rMouthCtrlGrp+".translateY", 1.5)
             cmds.setAttr(rMouthCtrlGrp+".translateZ", 13)
+            if self.upperJawCtrl:
+                cmds.parent(rMouthCtrlGrp, self.upperJawCtrl)
         if lipsCtrlGrp:
             cmds.setAttr(lipsCtrlGrp+".translateY", 1.5)
             cmds.setAttr(lipsCtrlGrp+".translateZ", 13)
+            if self.upperJawCtrl:
+                cmds.parent(lipsCtrlGrp, self.upperJawCtrl)
         if sneerCtrlGrp:
             cmds.setAttr(sneerCtrlGrp+".translateY", 2.5)
             cmds.setAttr(sneerCtrlGrp+".translateZ", 13)
+            if self.upperJawCtrl:
+                cmds.parent(sneerCtrlGrp, self.upperJawCtrl)
         if grimaceCtrlGrp:
             cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
             cmds.setAttr(grimaceCtrlGrp+".scaleZ", -1)
             cmds.setAttr(grimaceCtrlGrp+".translateY", 0.5)
             cmds.setAttr(grimaceCtrlGrp+".translateZ", 13)
+            if self.chinCtrl:
+                cmds.parent(grimaceCtrlGrp, self.chinCtrl)
         if faceCtrlGrp:
             cmds.setAttr(faceCtrlGrp+".translateX", 10)
             cmds.setAttr(faceCtrlGrp+".translateY", 2)
@@ -332,18 +350,21 @@ class FacialControl(object):
                 cmds.setAttr(lEyelidCtrlGrp+".translateX", 2)
                 cmds.setAttr(lEyelidCtrlGrp+".translateY", 10)
                 cmds.setAttr(lEyelidCtrlGrp+".translateZ", 13)
+                if self.upperHeadCtrl:
+                    cmds.parent(lEyelidCtrlGrp, self.upperHeadCtrl)
             if rEyelidCtrlGrp:
                 cmds.setAttr(rEyelidCtrlGrp+".translateX", -2)
                 cmds.setAttr(rEyelidCtrlGrp+".translateY", 10)
                 cmds.setAttr(rEyelidCtrlGrp+".translateZ", 13)
+                if self.upperHeadCtrl:
+                    cmds.parent(rEyelidCtrlGrp, self.upperHeadCtrl)
         
         # integrating to dpAutoRigSystem:
         if self.headCtrl:
-            if cmds.objExists(self.headCtrl):
-                cmds.parent(self.facialCtrlsGrp, self.headCtrl, absolute=True)
-                cmds.setAttr(self.facialCtrlsGrp+".tx", 0)
-                cmds.setAttr(self.facialCtrlsGrp+".ty", 0)
-                cmds.setAttr(self.facialCtrlsGrp+".tz", 0)
+            cmds.parent(self.facialCtrlsGrp, self.headCtrl, absolute=True)
+            cmds.setAttr(self.facialCtrlsGrp+".tx", 0)
+            cmds.setAttr(self.facialCtrlsGrp+".ty", 0)
+            cmds.setAttr(self.facialCtrlsGrp+".tz", 0)
     
         # closes window:
         self.dpCloseFacialControlWin()

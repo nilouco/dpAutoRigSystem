@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.49"
-DPAR_UPDATELOG = "N631 - Lock Finger zero guide rotateZ."
+DPAR_VERSION_PY3 = "4.01.50"
+DPAR_UPDATELOG = "N266 - Facial controls split groups."
 
 
 
