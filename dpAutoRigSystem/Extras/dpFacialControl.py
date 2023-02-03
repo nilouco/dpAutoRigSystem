@@ -42,7 +42,7 @@ class FacialControl(object):
         self.presetDic = presetDic
         self.presetName = presetName
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-        self.facialCtrlsGrp = self.langDic[self.langName]["m017_head"]+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp"
+        self.headFacialCtrlsGrp = self.langDic[self.langName]["m017_head"]+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp"
         self.headCtrl = self.dpGetHeadCtrl('id_093_HeadSub')
         self.upperHeadCtrl = self.dpGetHeadCtrl('id_081_HeadUpperHead')
         self.upperJawCtrl = self.dpGetHeadCtrl('id_069_HeadUpperJaw')
@@ -299,61 +299,61 @@ class FacialControl(object):
         
         # integrating to dpAutoRigSystem:
         if self.headCtrl:
-            self.upperHeadFacialCtrlGrp = cmds.group(name=self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head']+"_"+self.facialCtrlsGrp, empty=True)
-            self.upperJawFacialCtrlGrp = cmds.group(name=self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw']+"_"+self.facialCtrlsGrp, empty=True)
-            self.chinFacialCtrlGrp = cmds.group(name=self.langDic[self.langName]['c026_chin']+"_"+self.facialCtrlsGrp, empty=True)
-            cmds.parent(self.upperHeadFacialCtrlGrp, self.facialCtrlsGrp)
-            cmds.parent(self.upperJawFacialCtrlGrp, self.facialCtrlsGrp)
-            cmds.parent(self.chinFacialCtrlGrp, self.facialCtrlsGrp)
+            self.upperHeadFacialCtrlsGrp = cmds.group(name=self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head']+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
+            self.upperJawFacialCtrlsGrp = cmds.group(name=self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw']+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
+            self.chinFacialCtrlsGrp = cmds.group(name=self.langDic[self.langName]['c026_chin']+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
+            cmds.parent(self.upperHeadFacialCtrlsGrp, self.headFacialCtrlsGrp)
+            cmds.parent(self.upperJawFacialCtrlsGrp, self.headFacialCtrlsGrp)
+            cmds.parent(self.chinFacialCtrlsGrp, self.headFacialCtrlsGrp)
         else:
-            self.upperHeadFacialCtrlGrp = None
-            self.upperJawFacialCtrlGrp = None
-            self.chinFacialCtrlGrp = None
+            self.upperHeadFacialCtrlsGrp = None
+            self.upperJawFacialCtrlsGrp = None
+            self.chinFacialCtrlsGrp = None
 
         # placing control groups:
         if lBrowCtrlGrp:
             cmds.setAttr(lBrowCtrlGrp+".translateX", 4)
             cmds.setAttr(lBrowCtrlGrp+".translateY", 12)
             cmds.setAttr(lBrowCtrlGrp+".translateZ", 13)
-            if self.upperHeadFacialCtrlGrp:
-                cmds.parent(lBrowCtrlGrp, self.upperHeadFacialCtrlGrp)
+            if self.upperHeadFacialCtrlsGrp:
+                cmds.parent(lBrowCtrlGrp, self.upperHeadFacialCtrlsGrp)
         if rBrowCtrlGrp:
             cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
             cmds.setAttr(rBrowCtrlGrp+".translateX", -4)
             cmds.setAttr(rBrowCtrlGrp+".translateY", 12)
             cmds.setAttr(rBrowCtrlGrp+".translateZ", 13)
-            if self.upperHeadFacialCtrlGrp:
-                cmds.parent(rBrowCtrlGrp, self.upperHeadFacialCtrlGrp)
+            if self.upperHeadFacialCtrlsGrp:
+                cmds.parent(rBrowCtrlGrp, self.upperHeadFacialCtrlsGrp)
         if lMouthCtrlGrp:
             cmds.setAttr(lMouthCtrlGrp+".translateX", 3)
             cmds.setAttr(lMouthCtrlGrp+".translateY", 1.5)
             cmds.setAttr(lMouthCtrlGrp+".translateZ", 13)
-            if self.upperJawFacialCtrlGrp:
-                cmds.parent(lMouthCtrlGrp, self.upperJawFacialCtrlGrp)
+            if self.upperJawFacialCtrlsGrp:
+                cmds.parent(lMouthCtrlGrp, self.upperJawFacialCtrlsGrp)
         if rMouthCtrlGrp:
             cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
             cmds.setAttr(rMouthCtrlGrp+".translateX", -3)
             cmds.setAttr(rMouthCtrlGrp+".translateY", 1.5)
             cmds.setAttr(rMouthCtrlGrp+".translateZ", 13)
-            if self.upperJawFacialCtrlGrp:
-                cmds.parent(rMouthCtrlGrp, self.upperJawFacialCtrlGrp)
+            if self.upperJawFacialCtrlsGrp:
+                cmds.parent(rMouthCtrlGrp, self.upperJawFacialCtrlsGrp)
         if lipsCtrlGrp:
             cmds.setAttr(lipsCtrlGrp+".translateY", 1.5)
             cmds.setAttr(lipsCtrlGrp+".translateZ", 13)
-            if self.upperJawFacialCtrlGrp:
-                cmds.parent(lipsCtrlGrp, self.upperJawFacialCtrlGrp)
+            if self.upperJawFacialCtrlsGrp:
+                cmds.parent(lipsCtrlGrp, self.upperJawFacialCtrlsGrp)
         if sneerCtrlGrp:
             cmds.setAttr(sneerCtrlGrp+".translateY", 2.5)
             cmds.setAttr(sneerCtrlGrp+".translateZ", 13)
-            if self.upperJawFacialCtrlGrp:
-                cmds.parent(sneerCtrlGrp, self.upperJawFacialCtrlGrp)
+            if self.upperJawFacialCtrlsGrp:
+                cmds.parent(sneerCtrlGrp, self.upperJawFacialCtrlsGrp)
         if grimaceCtrlGrp:
             cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
             cmds.setAttr(grimaceCtrlGrp+".scaleZ", -1)
             cmds.setAttr(grimaceCtrlGrp+".translateY", 0.5)
             cmds.setAttr(grimaceCtrlGrp+".translateZ", 13)
-            if self.chinFacialCtrlGrp:
-                cmds.parent(grimaceCtrlGrp, self.chinFacialCtrlGrp)
+            if self.chinFacialCtrlsGrp:
+                cmds.parent(grimaceCtrlGrp, self.chinFacialCtrlsGrp)
         if faceCtrlGrp:
             cmds.setAttr(faceCtrlGrp+".translateX", 10)
             cmds.setAttr(faceCtrlGrp+".translateY", 2)
@@ -363,24 +363,25 @@ class FacialControl(object):
                 cmds.setAttr(lEyelidCtrlGrp+".translateX", 2)
                 cmds.setAttr(lEyelidCtrlGrp+".translateY", 10)
                 cmds.setAttr(lEyelidCtrlGrp+".translateZ", 13)
-                if self.upperHeadFacialCtrlGrp:
-                    cmds.parent(lEyelidCtrlGrp, self.upperHeadFacialCtrlGrp)
+                if self.upperHeadFacialCtrlsGrp:
+                    cmds.parent(lEyelidCtrlGrp, self.upperHeadFacialCtrlsGrp)
             if rEyelidCtrlGrp:
                 cmds.setAttr(rEyelidCtrlGrp+".translateX", -2)
                 cmds.setAttr(rEyelidCtrlGrp+".translateY", 10)
                 cmds.setAttr(rEyelidCtrlGrp+".translateZ", 13)
-                if self.upperHeadFacialCtrlGrp:
-                    cmds.parent(rEyelidCtrlGrp, self.upperHeadFacialCtrlGrp)
+                if self.upperHeadFacialCtrlsGrp:
+                    cmds.parent(rEyelidCtrlGrp, self.upperHeadFacialCtrlsGrp)
         
         # integrating to dpAutoRigSystem:
         if self.headCtrl:
-            cmds.parent(self.facialCtrlsGrp, self.headCtrl, absolute=True)
-            cmds.setAttr(self.facialCtrlsGrp+".tx", 0)
-            cmds.setAttr(self.facialCtrlsGrp+".ty", 0)
-            cmds.setAttr(self.facialCtrlsGrp+".tz", 0)
-            cmds.parent(self.upperHeadFacialCtrlGrp, self.upperHeadCtrl)
-            cmds.parent(self.upperJawFacialCtrlGrp, self.upperJawCtrl)
-            cmds.parent(self.chinFacialCtrlGrp, self.chinCtrl)
+            cmds.parent(self.headFacialCtrlsGrp, self.headCtrl, absolute=True)
+            cmds.setAttr(self.headFacialCtrlsGrp+".tx", 0)
+            cmds.setAttr(self.headFacialCtrlsGrp+".ty", 0)
+            cmds.setAttr(self.headFacialCtrlsGrp+".tz", 0)
+            cmds.parent(self.upperHeadFacialCtrlsGrp, self.upperHeadCtrl)
+            cmds.parent(self.upperJawFacialCtrlsGrp, self.upperJawCtrl)
+            cmds.parent(self.chinFacialCtrlsGrp, self.chinCtrl)
+            cmds.select(self.upperHeadFacialCtrlsGrp, self.upperJawFacialCtrlsGrp, self.chinFacialCtrlsGrp, self.headFacialCtrlsGrp)
     
         # closes window:
         self.dpCloseFacialControlWin()
@@ -581,11 +582,11 @@ class FacialControl(object):
                                                                 self.RmVNumber = self.RmVNumber+1
             
             # parenting the hierarchy:
-            if not cmds.objExists(self.facialCtrlsGrp):
-                cmds.group(name=self.facialCtrlsGrp, empty=True)
-            cmds.parent(fCtrlGrp, self.facialCtrlsGrp)
+            if not cmds.objExists(self.headFacialCtrlsGrp):
+                cmds.group(name=self.headFacialCtrlsGrp, empty=True)
+            cmds.parent(fCtrlGrp, self.headFacialCtrlsGrp)
         
-        cmds.select(self.facialCtrlsGrp)
+        cmds.select(self.headFacialCtrlsGrp)
         return fCtrl, fCtrlGrp
     
     
