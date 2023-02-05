@@ -271,6 +271,7 @@ class Publisher(object):
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
                     
                     # try to store data into All_Grp if it exists
+                    renderGrp = None
                     self.pipeliner.pipeData['modelVersion'] = None
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
@@ -286,6 +287,7 @@ class Publisher(object):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
+                        renderGrp = dpUtils.getNodeByMessage("renderGrp")
 
 
                     # create folders to publish file if needed
@@ -294,6 +296,9 @@ class Publisher(object):
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
                             self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
+                    
+                    # setup camera
+                    self.packager.frameCameraToPublish(focusGrp=renderGrp)
                     
                     progressAmount += 1
                     cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)

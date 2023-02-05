@@ -10,6 +10,9 @@ DPPACKAGER_VERSION = 1.0
 
 
 RIGPREVIEW = "Rigging preview"
+CAMERA = "persp"
+CAM_ROTX = -10
+CAM_ROTY = 30
 
 class Packager(object):
     def __init__(self, *args):
@@ -36,11 +39,30 @@ class Packager(object):
         
 
 
+    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, focusGrp=None, *args):
+        """ Prepare the given camera to frame correctly the viewport to publish.
+        """
+        # set up rotation
+        cmds.setAttr(cam+".rotateX", rotX)
+        cmds.setAttr(cam+".rotateY", rotY)
+        # frame all
+        cmds.viewFit(allObjects=True)
+        posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
+        if focusGrp:
+            # frame render group
+            cmds.select(focusGrp)
+            cmds.viewFit()
+            focusPosList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
+            # get average
+            posList = [(posList[0]+focusPosList[0])/2, (posList[1]+focusPosList[1])/2, (posList[2]+focusPosList[2])/2]
+        cmds.select(clear=True)
+        cmds.camera(cam, edit=True, position=[posList[0], posList[1], posList[2]], rotation=[rotX, rotY, 0], aspectRatio=0.8)
+
 
 
     
     
-    def imager(self, dpARVersion, studioName, projectName, assetName, modelVersion, rigVersion, publishVersion, destinationFolder, date, padding=3, rigPreview=RIGPREVIEW, *args):
+    def imager(self, dpARVersion, studioName, projectName, assetName, modelVersion, rigVersion, publishVersion, destinationFolder, date, padding=3, rigPreview=RIGPREVIEW, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, *args):
         """
         """
         # WIP
@@ -78,6 +100,12 @@ class Packager(object):
 
         print("rigPreview ===", rigPreview)
 
+
+        
+        
+
+
+
         return
         # WIP
         #
@@ -95,7 +123,35 @@ class Packager(object):
     ###
 
     
-    
+        # camera view
+        
+        
+
+        # frameAll and store translations
+        # get Render_Grp
+        # check if there're children
+        # if yes
+        #       focus and store translations
+        #       sum frameAll
+        #       divide by 2
+        # use result as translation position of the persp camera or another new camera in the modelPanel
+        # 
+        # rotation is arbitrary
+        #   use constants variables to story it
+        #       RX = -10
+        #       RY = 30
+        # 
+        #cmds.camera("persp", edit=True, position=[15, 16, 27], rotation=[-10, 30, 0], aspectRatio=0.8)
+        #
+        # get screenShot
+        #
+        # back aspectRatio to default = 1.5
+
+        # = enquadramento
+        #aspectRatio = float ??? = 0.8
+        # 
+        # 
+
         # set screenshot dimensions:
         width = 960
         height = 960
