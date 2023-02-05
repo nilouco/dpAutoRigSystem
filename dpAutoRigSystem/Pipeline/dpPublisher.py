@@ -299,7 +299,7 @@ class Publisher(object):
                     
                     # setup camera
                     self.packager.frameCameraToPublish(focusGrp=renderGrp)
-                    
+                    return
                     progressAmount += 1
                     cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
 

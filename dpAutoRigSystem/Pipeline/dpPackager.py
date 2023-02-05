@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 import zipfile
 import shutil
 import os
@@ -42,6 +43,7 @@ class Packager(object):
     def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, focusGrp=None, *args):
         """ Prepare the given camera to frame correctly the viewport to publish.
         """
+        mel.eval('setNamedPanelLayout "Single Perspective View"; updateToolbox(); findNewCurrentModelView;')
         # set up rotation
         cmds.setAttr(cam+".rotateX", rotX)
         cmds.setAttr(cam+".rotateY", rotY)
@@ -57,12 +59,13 @@ class Packager(object):
             posList = [(posList[0]+focusPosList[0])/2, (posList[1]+focusPosList[1])/2, (posList[2]+focusPosList[2])/2]
         cmds.select(clear=True)
         cmds.camera(cam, edit=True, position=[posList[0], posList[1], posList[2]], rotation=[rotX, rotY, 0], aspectRatio=0.8)
-
+        
+        
 
 
     
     
-    def imager(self, dpARVersion, studioName, projectName, assetName, modelVersion, rigVersion, publishVersion, destinationFolder, date, padding=3, rigPreview=RIGPREVIEW, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, *args):
+    def imager(self, dpARVersion, studioName, projectName, assetName, modelVersion, rigVersion, publishVersion, destinationFolder, date, padding=3, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
         """
         """
         # WIP
@@ -108,49 +111,71 @@ class Packager(object):
 
         return
         # WIP
-        #
-        ###
-    #
-    #   THANKS to:
-    #       gfxhacks.com
-    #
-    #   Based on:
-    #       https://gist.github.com/gfxhacks/f3e750f416f94952d7c9894ed8f78a71
-    #   
-    #   This module will capture and save a scene preview based on the active viewport. It will also input text about the file ready to publish.
-    #	It uses playblast feature
-    #
-    ###
+   
 
-    
-        # camera view
+        # setup camera properties
+            # bg
+#            Top
+#            33
+#            0.05
+#            0.75 / 8
+
+#            Bottom
+#            33
+#            0.1
+#            0.45
+        
+#        headsUpDisplay color index
+#        label = 1 / 16
+#        values = 1 / 16
+        
+
+#        'background 0.631 0.631 0.631\n', 'backgroundTop 0.8 0.78 0.76\n', 'backgroundBottom 0.45 0.43 0.4\n', 'templateDormant 0.47 0.47 0.47\n',
+
+
+        cmds.displayPref(displayGradient=True, query=True)
+        cmds.displayPref(displayGradient=True)
+
+        displayRGBColorList = cmds.displayRGBColor(list=True)
+        currentBGColorList = []
+        for item in displayRGBColorList:
+            if 'background ' in item:
+                crashedItemList = item[:-1].split(" ")
+                currentBGColorList = crashedItemList[1:]
+
+
+        displayColors
+        'headsUpDisplayLabels -dormant 16\n', 'headsUpDisplaySliders -dormant 17\n', 'headsUpDisplayValues -dormant 16\n'
+        
+
+        currentHUDLabels = cmds.displayColor('headsUpDisplayLabels', query=True, dormant=True)
+        currentHUDValues = cmds.displayColor('headsUpDisplayValues', query=True, dormant=True)
+        cmds.displayColor('headsUpDisplayLabels', 1, dormant=True) #black
+        cmds.displayColor('headsUpDisplayValues', 1, dormant=True) #black
+
+        cmds.displayRGBColor(list=True)
+
+        cmds.displayRGBColor('background', 0.631, 0.631, 0.631)
+
+
+        # hide grid
+        cmds.grid(toggle=False)
         
         
 
-        # frameAll and store translations
-        # get Render_Grp
-        # check if there're children
-        # if yes
-        #       focus and store translations
-        #       sum frameAll
-        #       divide by 2
-        # use result as translation position of the persp camera or another new camera in the modelPanel
-        # 
-        # rotation is arbitrary
-        #   use constants variables to story it
-        #       RX = -10
-        #       RY = 30
-        # 
-        #cmds.camera("persp", edit=True, position=[15, 16, 27], rotation=[-10, 30, 0], aspectRatio=0.8)
         #
         # get screenShot
         #
-        # back aspectRatio to default = 1.5
-
-        # = enquadramento
-        #aspectRatio = float ??? = 0.8
-        # 
-        # 
+        
+        
+        
+        
+        # back scene preferences to stored status
+        cmds.camera(cam, edit=True, aspectRatio=1.5)
+        cmds.displayColor('headsUpDisplayLabels', currentHUDLabels, dormant=True)
+        cmds.displayColor('headsUpDisplayValues', currentHUDValues, dormant=True)
+        if currentBGColorList:
+            cmds.displayRGBColor('background', currentBGColorList[0], currentBGColorList[1], currentBGColorList[2])
 
         # set screenshot dimensions:
         width = 960
