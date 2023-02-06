@@ -40,7 +40,7 @@ class Packager(object):
         
 
 
-    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, focusGrp=None, *args):
+    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, focusIt=None, *args):
         """ Prepare the given camera to frame correctly the viewport to publish.
         """
         mel.eval('setNamedPanelLayout "Single Perspective View"; updateToolbox(); findNewCurrentModelView;')
@@ -50,9 +50,9 @@ class Packager(object):
         # frame all
         cmds.viewFit(allObjects=True)
         posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
-        if focusGrp:
+        if focusIt:
             # frame render group
-            cmds.select(focusGrp)
+            cmds.select(focusIt)
             cmds.viewFit()
             focusPosList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
             # get average
@@ -162,7 +162,7 @@ class Packager(object):
         cmds.grid(toggle=False)
         
         
-
+        # check film gate - viewport
         #
         # get screenShot
         #
@@ -305,3 +305,11 @@ class Packager(object):
             #if host:
                 #dropLink = "https://dl.dropboxusercontent.com/u/"+str(host)+file[file.rfind("/"):]+"?dl=1"
                 #return dropLink
+
+
+    def toOld(self, sourceFolder, publishFilename, assetNameList, destinationFolder, *args):
+        """
+        """
+        for item in assetNameList:
+            if not item == publishFilename:
+                shutil.move(sourceFolder+"/"+item, destinationFolder)

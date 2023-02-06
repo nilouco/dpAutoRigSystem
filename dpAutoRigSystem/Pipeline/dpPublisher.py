@@ -171,13 +171,13 @@ class Publisher(object):
             publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
             fileNameList = next(os.walk(filePath))[2]
             if fileNameList:
-                assetNameList = []
+                self.assetNameList = []
                 for fileName in fileNameList:
-                    if assetName in fileName:
-                        if not fileName in assetNameList:
-                            assetNameList.append(fileName)
-                if assetNameList:
-                    publishVersion = self.defineFileVersion(assetNameList)
+                    if assetName+self.pipeliner.pipeData['s_middle'] in fileName:
+                        if not fileName in self.assetNameList:
+                            self.assetNameList.append(fileName)
+                if self.assetNameList:
+                    publishVersion = self.defineFileVersion(self.assetNameList)
             if self.pipeliner.pipeData['b_capitalize']:
                 assetName = assetName.capitalize()
             elif self.pipeliner.pipeData['b_lower']:
@@ -229,6 +229,9 @@ class Publisher(object):
             - store data info like publishedFromFile and model version into the All_Grp if it exists
             - create the folders to publish file if them not exists yet
             - save the published file
+            - store old published file version in the dpOld folder
+            - packaging the delivered files as toClient zipFile, toCloud dropbox, toHist folders
+            - generate the image preview
             If it fails, it'll reopen the current file without save any change.
         """
         if self.pipeliner.pipeData['publishPath']:
@@ -289,7 +292,7 @@ class Publisher(object):
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
                         renderGrp = dpUtils.getNodeByMessage("renderGrp")
 
-
+                    # publishing file
                     # create folders to publish file if needed
                     if not os.path.exists(self.pipeliner.pipeData['publishPath']):
                         try:
@@ -298,14 +301,19 @@ class Publisher(object):
                             self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
                     
                     # setup camera
-                    self.packager.frameCameraToPublish(focusGrp=renderGrp)
-                    return
+                    self.packager.frameCameraToPublish(focusIt=renderGrp)
+                    
                     progressAmount += 1
                     cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
 
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
+
+                    # organize old published files
+                    if self.assetNameList:
+                        self.pipeliner.makeDirIfNotExists(self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
 
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
@@ -321,8 +329,8 @@ class Publisher(object):
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
                             # rigging preview image
-                            if self.pipeliner.pipeData['b_imager']:
-                                self.packager.imager(self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.pipeData['toClientPath'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
+                            #if self.pipeliner.pipeData['b_imager']:
+                            #    self.packager.imager(self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.pipeData['toClientPath'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])

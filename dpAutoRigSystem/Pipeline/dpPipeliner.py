@@ -104,7 +104,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-01-29",
+        "updated" : "2023-02-06",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -115,6 +115,7 @@ class Pipeliner(object):
         "s_presets"    : "dpPresets",
         "s_addOns"     : "dpAddOns",
         "s_hist"       : "dpData/dpHist",
+        "s_old"        : "dpOld",
         "s_dropbox"    : "Job",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
@@ -435,3 +436,4 @@ class Pipeliner(object):
 #                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
                                 self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                                 self.makeDirIfNotExists(self.pipeData['dropboxPath'])
+            # old 
