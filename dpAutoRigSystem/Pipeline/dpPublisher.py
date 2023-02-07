@@ -31,6 +31,15 @@ class Publisher(object):
         self.packager = dpPackager.Packager()
 
 
+    def getFileTypeByExtension(self, fileName, *args):
+        """ Return the file type based in the extension of the given file name.
+        """
+        ext = fileName[-2:]
+        if ext == "mb":
+            return "mayaBinary"
+        return "mayaAscii"
+    
+
     def userSaveThisScene(self, *args):
         """ Open a confirmDialog to user save or save as this file.
             Return the saved file path or False if canceled.
@@ -44,15 +53,17 @@ class Publisher(object):
             return False
         else:
             if not shortName or confirmResult == saveAsName: #untitled or saveAs
-                newName = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=0, dialogStyle=2)
+                newName = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
                 if newName:
+                    ext = self.getFileTypeByExtension(newName[0])
                     cmds.file(rename=newName[0])
-                    return cmds.file(save=True)
+                    return cmds.file(save=True, type=ext)
                 else:
                     return False
             else: #save
                 cmds.file(rename=cmds.file(query=True, sceneName=True))
-                return cmds.file(save=True)
+                ext = cmds.file(type=True, query=True)[0]
+                return cmds.file(save=True, type=ext)
 
 
     def mainUI(self, *args):
@@ -329,8 +340,8 @@ class Publisher(object):
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
                             # rigging preview image
-                            #if self.pipeliner.pipeData['b_imager']:
-                            #    self.packager.imager(self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.pipeData['toClientPath'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
+                            if self.pipeliner.pipeData['b_imager']:
+                                self.packager.imager(self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.pipeData['toClientPath'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])

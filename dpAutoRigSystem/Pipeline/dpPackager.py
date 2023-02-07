@@ -61,9 +61,15 @@ class Packager(object):
         cmds.camera(cam, edit=True, position=[posList[0], posList[1], posList[2]], rotation=[rotX, rotY, 0], aspectRatio=0.8)
         
         
+    def getDisplayRGBColorList(self, searchItem, *args):
+        """ Return the RGB values listed for the given searchItem from displayRGBColor Maya command.
+        """
+        displayRGBColorList = cmds.displayRGBColor(list=True)
+        for item in displayRGBColorList:
+            if searchItem+' ' in item:
+                crashedItemList = item[:-1].split(" ")
+                return crashedItemList[1:]
 
-
-    
     
     def imager(self, dpARVersion, studioName, projectName, assetName, modelVersion, rigVersion, publishVersion, destinationFolder, date, padding=3, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
         """
@@ -109,57 +115,54 @@ class Packager(object):
 
 
 
-        return
+        
         # WIP
-   
-
-        # setup camera properties
-            # bg
-#            Top
-#            33
-#            0.05
-#            0.75 / 8
-
-#            Bottom
-#            33
-#            0.1
-#            0.45
-        
-#        headsUpDisplay color index
-#        label = 1 / 16
-#        values = 1 / 16
-        
-
-#        'background 0.631 0.631 0.631\n', 'backgroundTop 0.8 0.78 0.76\n', 'backgroundBottom 0.45 0.43 0.4\n', 'templateDormant 0.47 0.47 0.47\n',
-
-
-        cmds.displayPref(displayGradient=True, query=True)
-        cmds.displayPref(displayGradient=True)
-
-        displayRGBColorList = cmds.displayRGBColor(list=True)
-        currentBGColorList = []
-        for item in displayRGBColorList:
-            if 'background ' in item:
-                crashedItemList = item[:-1].split(" ")
-                currentBGColorList = crashedItemList[1:]
-
-
-        displayColors
-        'headsUpDisplayLabels -dormant 16\n', 'headsUpDisplaySliders -dormant 17\n', 'headsUpDisplayValues -dormant 16\n'
-        
-
+ 
+        # store current user settings
+        currentGrid = cmds.grid(toggle=True, query=True)
+        currentDisplayGradient = cmds.displayPref(displayGradient=True, query=True)
         currentHUDLabels = cmds.displayColor('headsUpDisplayLabels', query=True, dormant=True)
         currentHUDValues = cmds.displayColor('headsUpDisplayValues', query=True, dormant=True)
+        currentBGColorList = self.getDisplayRGBColorList('background')
+        currentBGTopColorList = self.getDisplayRGBColorList('backgroundTop')
+        currentBGBottomColorList = self.getDisplayRGBColorList('backgroundBottom')
+
+
+        print("currentGrid ===", currentGrid)
+        print("currentDisplayGradient ===", currentDisplayGradient)
+        print("currentHUDLabels ===", currentHUDLabels)
+        print("currentHUDValues ===", currentHUDValues)
+        print("currentBGColorList ===", currentBGColorList)
+        print("currentBGTopColorList ===", currentBGTopColorList)
+        print("currentBGBottomColorList ===", currentBGBottomColorList)
+        
+        #dpAR pref
+        #currentBGColorList === ['0.631', '0.631', '0.631']
+        #currentBGTopColorList === ['0.8', '0.782', '0.76']
+        #currentBGBottomColorList === ['0.45', '0.42975', '0.405']
+
+        return
+        # set up custom display settings
+        cmds.grid(toggle=False)
+        cmds.displayPref(displayGradient=True)
         cmds.displayColor('headsUpDisplayLabels', 1, dormant=True) #black
         cmds.displayColor('headsUpDisplayValues', 1, dormant=True) #black
+
+
+
+
+
+        
+        
+
+        
 
         cmds.displayRGBColor(list=True)
 
         cmds.displayRGBColor('background', 0.631, 0.631, 0.631)
 
 
-        # hide grid
-        cmds.grid(toggle=False)
+        
         
         
         # check film gate - viewport
@@ -172,6 +175,8 @@ class Packager(object):
         
         # back scene preferences to stored status
         cmds.camera(cam, edit=True, aspectRatio=1.5)
+        cmds.grid(toggle=currentGrid)
+        cmds.displayPref(displayGradient=currentDisplayGradient)
         cmds.displayColor('headsUpDisplayLabels', currentHUDLabels, dormant=True)
         cmds.displayColor('headsUpDisplayValues', currentHUDValues, dormant=True)
         if currentBGColorList:
