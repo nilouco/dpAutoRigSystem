@@ -302,6 +302,10 @@ class Publisher(object):
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
                         renderGrp = dpUtils.getNodeByMessage("renderGrp")
+                        # TODO Store comments in All_Grp
+                        #
+                        # WIP
+                        #
 
                     # publishing file
                     # create folders to publish file if needed
@@ -341,7 +345,7 @@ class Publisher(object):
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
-                                self.packager.imager(self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.pipeData['toClientPath'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
+                                self.packager.imager(self.pipeliner.pipeData['toClientPath'], self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
