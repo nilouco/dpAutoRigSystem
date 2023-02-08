@@ -599,6 +599,7 @@
     "m208_starFlat"             : "Star Flat",
     "m209_pinSide"              : "Pin Side",
     "m210_interpolation"        : "Interpolation",
+    "m211_eye"                  : "Eye",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

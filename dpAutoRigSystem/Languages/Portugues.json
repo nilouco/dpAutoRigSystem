@@ -599,6 +599,7 @@
     "m208_starFlat"             : "Estrela Plana",
     "m209_pinSide"              : "Pinos Laterais",
     "m210_interpolation"        : "Interpolação",
+    "m211_interpolation"        : "Olho",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",

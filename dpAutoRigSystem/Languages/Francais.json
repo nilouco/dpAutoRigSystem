@@ -599,6 +599,7 @@
     "m208_starFlat"             : "Étoile Plat",
     "m209_pinSide"              : "Côté broche",
     "m210_interpolation"        : "Interpolation",
+    "m211_interpolation"        : "Oeil",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
