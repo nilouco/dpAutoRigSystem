@@ -247,7 +247,7 @@ class Publisher(object):
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            maxProcess = 3
+            maxProcess = 4
             progressAmount = 0
             cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Starting...', isInterruptable=False)
 
@@ -285,13 +285,16 @@ class Publisher(object):
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
                     
                     # try to store data into All_Grp if it exists
-                    renderGrp = None
                     self.pipeliner.pipeData['modelVersion'] = None
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
                         if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
                         cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        # coments
+                        if not cmds.objExists(self.dpUIinst.masterGrp+".comment"):
+                            cmds.addAttr(self.dpUIinst.masterGrp, longName="comment", dataType="string")
+                        cmds.setAttr(self.dpUIinst.masterGrp+".comment", commentValue, type="string")
                         # model version
                         shortName = cmds.file(query=True, sceneName=True, shortName=True)
                         if self.pipeliner.pipeData['s_model'] in shortName:
@@ -301,11 +304,9 @@ class Publisher(object):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
-                        renderGrp = dpUtils.getNodeByMessage("renderGrp")
-                        # TODO Store comments in All_Grp
-                        #
-                        # WIP
-                        #
+
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i227_getImage'], isInterruptable=False)
 
                     # publishing file
                     # create folders to publish file if needed
@@ -315,12 +316,17 @@ class Publisher(object):
                         except:
                             self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
                     
-                    # setup camera
-                    self.packager.frameCameraToPublish(focusIt=renderGrp)
-                    
+                    # mount folders
+                    if self.pipeliner.pipeData['b_deliver']:
+                        self.pipeliner.mountPackagePath()
+                        if self.pipeliner.pipeData['toClientPath']:
+                            # rigging preview image
+                            if self.pipeliner.pipeData['b_imager']:
+                                self.packager.imager(self.pipeliner.pipeData['toClientPath'], self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
+                    cmds.progressWindow(endProgress=True)
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
-
+                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
+                    
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
@@ -335,7 +341,6 @@ class Publisher(object):
                         progressAmount += 1
                         cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i226_exportFiles'], isInterruptable=False)
 
-                        self.pipeliner.mountPackagePath()
                         if self.pipeliner.pipeData['toClientPath']:
                             # toClient
                             zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.today)
@@ -343,16 +348,9 @@ class Publisher(object):
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
-                            # rigging preview image
-                            if self.pipeliner.pipeData['b_imager']:
-                                self.packager.imager(self.pipeliner.pipeData['toClientPath'], self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
-                        
-                        #
-                        # TODO review progressWindow
-                        # TODO run everything (Publisher and Pipeliner) without UI
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

@@ -1965,6 +1965,7 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="comment", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
             # set data
             cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
