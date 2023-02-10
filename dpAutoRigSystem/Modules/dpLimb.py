@@ -1599,22 +1599,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
                         extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
                         self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
-                        
-                        # WIP
-                        # fix rotate with 100% of value for the wrist axis
+                        # fix rotate with 100% of value for the wrist axis - Thanks Andre Ruegger for the help!
                         extremJax = cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0]
                         orientConnection = cmds.listConnections(extremJax+".rotateZ", destination=False, source=True, plugs=True)[0]
                         cmds.disconnectAttr(orientConnection, extremJax+".rotateZ")
-                        #
-                        cmds.connectAttr(self.skinJointList[-2]+".rotateZ", extremJax+".rotateZ", force=True)
-                        # TODO 
-                        # need to extract rotateZ using quaternion matrix instead of direct connection to avoid the euler issue
-                        #
-                        #
-                        #
-                        #
-
-
+                        jaxRotZMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+extremName+"_RotZ_Fix_MD")
+                        cmds.setAttr(jaxRotZMD+".input2Z", 2)
+                        cmds.connectAttr(orientConnection, jaxRotZMD+".input1Z", force=True)
+                        cmds.connectAttr(jaxRotZMD+".outputZ", extremJax+".rotateZ", force=True)
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
