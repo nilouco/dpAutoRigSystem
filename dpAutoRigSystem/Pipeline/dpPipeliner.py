@@ -21,6 +21,7 @@ class Pipeliner(object):
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.pipeData = self.getPipelineData()
+        self.declarePipelineAnnotation()
         
 
     def checkSavedScene(self, *args):
@@ -122,7 +123,6 @@ class Pipeliner(object):
         "s_suffix"     : "",
         "s_model"      : "_m",
         "s_rig"        : "_v",
-        "s_type"       : "mayaAscii",
         "i_padding"    : 3,
         "b_capitalize" : False,
         "b_upper"      : False,
@@ -132,54 +132,67 @@ class Pipeliner(object):
         "b_assetDir"   : True,
         "b_archive"    : True,
         "b_zip"        : True,
+        "b_cloud"      : True,
         "b_imager"     : True,
-        "b_cloud"      : True
+        "b_i_version"  : True,
+        "b_i_studio"   : True,
+        "b_i_project"  : True,
+        "b_i_asset"    : True,
+        "b_i_model"    : True,
+        "b_i_wip"      : True,
+        "b_i_publish"  : True,
+        "b_i_date"     : True,
+        "b_i_degrade"  : True        
         }
         return defaultPipeInfo
 
 
     def declarePipelineAnnotation(self, *args):
+        """ Just declare a member variable to get the pipeline annotation data to search the values in the language dictionary.
         """
-        """
-        pipelineAnnotaion = {
+        self.pipelineAnnotaion = {
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
         "updated" : "2023-02-09",
         
-        "f_drive"      : "",
-        "f_studio"     : "",
-        "f_project"    : "",
-        "f_wip"        : "",
-        "f_publish"    : "",
-        "f_toClient"   : "",
-        "s_presets"    : "",
-        "s_addOns"     : "",
-        "s_hist"       : "",
-        "s_old"        : "",
-        "s_dropbox"    : "",
-        "s_prefix"     : "",
-        "s_middle"     : "",
-        "s_suffix"     : "",
-        "s_model"      : "",
-        "s_rig"        : "",
-        "s_type"       : "",
-        "i_padding"    : "",
-        "b_capitalize" : "",
-        "b_upper"      : "",
-        "b_lower"      : "",
-        "b_deliver"    : "",
-        "b_dateDir"    : "",
-        "b_assetDir"   : "",
-        "b_archive"    : "",
-        "b_zip"        : "",
-        "b_imager"     : "",
-        "b_cloud"      : ""
+        "f_drive"      : "i228_fDriveAnn",
+        "f_studio"     : "i229_fStudioAnn",
+        "f_project"    : "i230_fProjectAnn",
+        "f_wip"        : "i231_fWipAnn",
+        "f_publish"    : "i232_fPublishAnn",
+        "f_toClient"   : "i233_fToClientAnn",
+        "s_presets"    : "i234_sPresetsAnn",
+        "s_addOns"     : "i235_sAddOnsAnn",
+        "s_hist"       : "i236_sHistAnn",
+        "s_old"        : "i237_sOldAnn",
+        "s_dropbox"    : "i238_sDropboxAnn",
+        "s_prefix"     : "i239_sPrefixAnn",
+        "s_middle"     : "i240_sMiddleAnn",
+        "s_suffix"     : "i241_sSuffixAnn",
+        "s_model"      : "i242_sModelAnn",
+        "s_rig"        : "i243_sRigAnn",
+        "i_padding"    : "i245_iPaddingAnn",
+        "b_capitalize" : "i246_bCaptalizeAnn",
+        "b_upper"      : "i247_bUpperAnn",
+        "b_lower"      : "i248_bLowerAnn",
+        "b_deliver"    : "i249_bDeliverAnn",
+        "b_dateDir"    : "i250_bDateDirAnn",
+        "b_assetDir"   : "i251_bAssetDirAnn",
+        "b_archive"    : "i252_bArchiveAnn",
+        "b_zip"        : "i253_bZipAnn",
+        "b_cloud"      : "i254_bCloudAnn",
+        "b_imager"     : "i255_bImagerAnn",
+        "b_i_version"  : "i256_biVersionAnn",
+        "b_i_studio"   : "i257_biStudioAnn",
+        "b_i_project"  : "i258_biProjectAnn",
+        "b_i_asset"    : "i259_biAssetAnn",
+        "b_i_model"    : "i260_biModelAnn",
+        "b_i_wip"      : "i261_biRigAnn",
+        "b_i_publish"  : "i262_biPublishAnn",
+        "b_i_date"     : "i263_biDateAnn",
+        "b_i_degrade"  : "i264_biDegradeAnn"
         }
-        return pipelineAnnotaion
-
-
-
 
 
     def getPipelineData(self, loadedPipeInfo=None, *args):
@@ -295,16 +308,13 @@ class Pipeliner(object):
             for key in list(self.pipeInfo):
                 if "_" in key:
                     if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
                     elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], numberOfFields=1, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], numberOfFields=1, parent=self.pipelineDataLayout)
                     elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], parent=self.pipelineDataLayout)
                     elif key.startswith("s_"):
-                        if key == "s_old":
-                            self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation="Test annotation here, merci", parent=self.pipelineDataLayout)
-                        else:
-                            self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], parent=self.pipelineDataLayout)
             # try to force loading empty data info
             try:
                 if self.pipeData['sceneName']:

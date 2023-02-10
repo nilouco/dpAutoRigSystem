@@ -240,7 +240,7 @@ class Publisher(object):
             - store data info like publishedFromFile and model version into the All_Grp if it exists
             - create the folders to publish file if them not exists yet
             - save the published file
-            - store old published file version in the dpOld folder
+            - backup old published file version in the dpOld folder
             - packaging the delivered files as toClient zipFile, toCloud dropbox, toHist folders
             - generate the image preview
             If it fails, it'll reopen the current file without save any change.
@@ -328,7 +328,7 @@ class Publisher(object):
                         if self.pipeliner.pipeData['toClientPath']:
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
-                                self.packager.imager(self.pipeliner.pipeData['toClientPath'], builtVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
+                                self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.today)
                     cmds.progressWindow(endProgress=True)
                     progressAmount += 1
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)

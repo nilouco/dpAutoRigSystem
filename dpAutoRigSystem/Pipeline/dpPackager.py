@@ -70,7 +70,7 @@ class Packager(object):
                 return valuesList
 
     
-    def imager(self, destinationFolder, dpARVersion=None, studioName=None, projectName=None, assetName=None, modelVersion=None, rigVersion=None, publishVersion=None, date=None, padding=3, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
+    def imager(self, pipeData, dpARVersion, date, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
         """ Save a rigging preview screenShot file with the given informations.
             Thanks Caio Hidaka for the help in this code!
         """
@@ -107,43 +107,39 @@ class Packager(object):
 
         # set up custom display settings
         cmds.grid(toggle=False)
-        cmds.displayPref(displayGradient=True)
+        cmds.displayPref(displayGradient=pipeData['b_i_degrade'])
         cmds.displayColor('headsUpDisplayLabels', 1, dormant=True) #black
         cmds.displayColor('headsUpDisplayValues', 1, dormant=True) #black
         cmds.displayRGBColor('background', 0.631, 0.631, 0.631)
-        
-        #cmds.displayRGBColor('backgroundTop', 0.8, 0.782, 0.76)
-        #cmds.displayRGBColor('backgroundBottom', 0.45, 0.42975, 0.405)
-        
-        cmds.displayRGBColor('backgroundTop', 0.631, 0.631, 0.631)
-        cmds.displayRGBColor('backgroundBottom', 0.32, 0.32, 0.32)
+        cmds.displayRGBColor('backgroundTop', 0.731, 0.731, 0.731)
+        cmds.displayRGBColor('backgroundBottom', 0.42, 0.42, 0.42)
 
         # file information messages
         cmds.headsUpDisplay('HudRigPreviewTxt10', section=0, block=10, labelFontSize="large", allowOverlap=True, label="") #starting by 10 to avoid default Maya's HUD already existing
         cmds.headsUpDisplay('HudRigPreviewTxt11', section=0, block=11, labelFontSize="large", allowOverlap=True, label=rigPreview)
         b = 12
-        if dpARVersion:
+        if pipeData['b_i_version']:
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="dpAutoRigSystem "+dpARVersion)
             b += 1
-        if studioName:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=studioName)
+        if pipeData['b_i_studio']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=pipeData['f_studio'])
             b += 1
-        if projectName:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=projectName)
+        if pipeData['b_i_project']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=pipeData['f_project'])
             b += 1
-        if assetName:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=assetName)
+        if pipeData['b_i_asset']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=pipeData['assetName'])
             b += 1
-        if modelVersion:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Model "+str(modelVersion).zfill(int(padding)))
+        if pipeData['b_i_model']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Model "+str(pipeData['modelVersion']).zfill(int(pipeData['i_padding'])))
             b += 1
-        if rigVersion:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Rig "+str(rigVersion).zfill(int(padding)))
+        if pipeData['b_i_wip']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Rig "+str(pipeData['rigVersion']).zfill(int(pipeData['i_padding'])))
             b += 1
-        if publishVersion:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Publish "+str(publishVersion).zfill(int(padding)))
+        if pipeData['b_i_publish']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="Publish "+str(pipeData['publishVersion']).zfill(int(pipeData['i_padding'])))
             b += 1
-        if date:
+        if pipeData['b_i_date']:
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=date)
             b += 1
             
@@ -167,9 +163,10 @@ class Packager(object):
         width = 0
         height = 0
         currentFrame = int(cmds.currentTime(query=True))
+        destinationFolder = pipeData['toClientPath']
         if not destinationFolder.endswith("/"):
             destinationFolder += "/"
-        exportPath = "{}{}_{}.jpg".format(destinationFolder, assetName, rigPreview.replace(" ", ""))
+        exportPath = "{}{}_{}.jpg".format(destinationFolder, pipeData['assetName'], rigPreview.replace(" ", ""))
         # playblast to make an image
         cmds.playblast(frame=currentFrame, viewer=False, format="image", compression="jpg", showOrnaments=True, completeFilename=exportPath, widthHeight=[width, height], percent=100, forceOverwrite=False, quality=100, editorPanelName=dpImagerPanel)
         # clean up the UI
