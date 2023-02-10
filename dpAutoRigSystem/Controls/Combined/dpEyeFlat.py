@@ -5,15 +5,14 @@ from importlib import reload
 reload(dpBaseControlClass)
 
 # global variables to this module:    
-CLASS_NAME = "Eye"
-
-TITLE = "m211_Eye"
+CLASS_NAME = "EyeFlat"
+TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
-ICON = "/Icons/dp_eyes.png"
+ICON = "/Icons/dp_eyeFlat.png"
 
 dpEyeVersion = 1.0
 
-class Eye(dpBaseControlClass.ControlStartClass):
+class EyeFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
