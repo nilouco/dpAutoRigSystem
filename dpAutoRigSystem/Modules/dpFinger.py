@@ -71,6 +71,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # create a base cvLoc to start the finger joints:
         self.cvBaseJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointLoc0", r=0.2, d=1, guide=True)
         cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
+        cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
         cmds.parent(self.cvBaseJoint, self.moduleGrp)
 
         # transform cvLocs in order to put as a good finger guide:
