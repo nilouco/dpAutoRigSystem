@@ -1404,55 +1404,52 @@ class DP_AutoRig_UI(object):
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.langDic[self.langName]['i005_footerA'])
     
 
-    def checkImportedGuides(self, *args):
+    def checkImportedGuides(self, askUser=True, *args):
         """ This method will check if there's imported dpGuides in the scene and ask if the user wants to delete the namespace.
+            Use a recursive method to remove imported of imported guides.
         """
-        # check all namespaces and if it's dpAR guide:
+        importedNamespaceList = []
+        currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
         if namespaceList:
-            dpGuidesImportedList = []
-            for name in namespaceList:
+            for n, name in enumerate(namespaceList):
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
-                        if name.find("_dpAR_") > 0:
-                            dpGuidesImportedList.append(name)
-            if dpGuidesImportedList:
-                yesTxt = self.langDic[self.langName]['i071_yes']
-                noTxt = self.langDic[self.langName]['i072_no']
-                # open dialog to confirm merge namespaces:
-                result = cmds.confirmDialog(title=self.langDic[self.langName]['i205_guide'], message=self.langDic[self.langName]['i206_removeNamespace'], 
-                                            button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
-                if result == yesTxt:
-                    # get root and child namespaces and separate into two lists:
-                    rootNamespaceList = []
-                    self.guidesNamespaceList = []
-                    for guide in dpGuidesImportedList:
-                        splitName = guide.split(":")
-                        rootNamespaceList.append(splitName[0])
-                        self.guidesNamespaceList.append(splitName[1])
-                    # get local guides list
-                    localGuidesList = list(map(lambda guideModule : guideModule.moduleGrp, self.modulesToBeRiggedList))
-                    # merge duplicated Father's name root:    
-                    rootNamespaceList = list(set(rootNamespaceList))
-                    # merge namespace with Root
-                    for name in rootNamespaceList:
-                        cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True )
-                        print(f"{self.langDic[self.langName]['m206_mergeNamespace']}: {name}")
-                    # populate all guides after import and create a list with all guides:
-                    self.populateCreatedGuideModules()
-                    allList = cmds.ls(selection=False, type="transform")
-                    guidesNameList = []
-                    if allList:
-                        for item in allList:
-                            if cmds.objExists(item+".guideBase"):
-                                if cmds.getAttr(item+".guideBase") == 1:
-                                    guidesNameList.append(item)
-                    # rename imported guides instances to avoid duplicated names:
-                    for idx in range(len(guidesNameList)):
-                        if guidesNameList[idx] not in localGuidesList:
-                            guideCustomName = cmds.getAttr(guidesNameList[idx]+".customName")
-                            self.modulesToBeRiggedList[idx].editUserName(guideCustomName)
+                        if name.find("__dpAR_"):
+                            if askUser:
+                                # open dialog to confirm merge namespaces:
+                                yesTxt = self.langDic[self.langName]['i071_yes']
+                                noTxt = self.langDic[self.langName]['i072_no']
+                                result = cmds.confirmDialog(title=self.langDic[self.langName]['i205_guide'], message=self.langDic[self.langName]['i206_removeNamespace'], 
+                                                            button=[yesTxt, noTxt], defaultButton=yesTxt, cancelButton=noTxt, dismissString=noTxt)
+                                if result == yesTxt:
+                                    askUser = False
+                                else:
+                                    return
+                            importedNamespaceList.append(name)
+            if importedNamespaceList:
+                # review guide custom name before remove namespaces
+                for name in importedNamespaceList:
+                    if cmds.objExists(name+":Guide_Base.customName"):
+                        n = 1
+                        oldCustomName = cmds.getAttr(name+":Guide_Base.customName")
+                        if oldCustomName:
+                            baseName = oldCustomName
+                            while oldCustomName in currentCustomNameList:
+                                oldCustomName = baseName+str(n)
+                                n += 1
+                            cmds.setAttr(name+":Guide_Base.customName", oldCustomName, type="string")
+                            currentCustomNameList.append(oldCustomName)
+                # remove namespaces
+                for name in importedNamespaceList:
+                    if ":" in name:
+                        if cmds.namespace(exists=name):
+                            namespaceString = name.split(":")[0]
+                            cmds.namespace(removeNamespace=namespaceString, mergeNamespaceWithRoot=True)
+                            print(f"{self.langDic[self.langName]['m206_mergeNamespace']}: {namespaceString}")
+                            self.checkImportedGuides(False)
+                            break
     
 
     def setPrefix(self, *args):
@@ -1483,7 +1480,7 @@ class DP_AutoRig_UI(object):
             studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
-                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+                self.validatorPresetDic.update(studioPresetDic)
 
     
     def setValidatorPreset(self, *args):
@@ -1936,6 +1933,7 @@ class DP_AutoRig_UI(object):
             self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
             # adding All_Grp attributes
             cmds.addAttr(self.masterGrp, longName=MASTER_ATTR, attributeType="bool")
+            cmds.addAttr(self.masterGrp, longName="dpAutoRigSystem", dataType="string")
             cmds.addAttr(self.masterGrp, longName="date", dataType="string")
             # system:
             cmds.addAttr(self.masterGrp, longName="maya", dataType="string")
@@ -1951,9 +1949,10 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="name", dataType="string")
             # setting All_Grp data
             cmds.setAttr(self.masterGrp+"."+MASTER_ATTR, True)
+            cmds.setAttr(self.masterGrp+".dpAutoRigSystem", DPAR_GITHUB, type="string")
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
-            cmds.setAttr(self.masterGrp+".system", "dpAutoRig_"+DPAR_VERSION_PY3, type="string")
+            cmds.setAttr(self.masterGrp+".system", DPAR_VERSION_PY3, type="string")
             cmds.setAttr(self.masterGrp+".language", self.langName, type="string")
             cmds.setAttr(self.masterGrp+".preset", self.presetName, type="string")
             cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
@@ -1965,6 +1964,7 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="comment", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
             # set data
             cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
@@ -2435,23 +2435,20 @@ class DP_AutoRig_UI(object):
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
-                                    # add float attributes and connect from ikCtrl to revFootCtrl:
-                                    floatAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=True, userDefined=True)
-                                    for floatAttr in floatAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+floatAttr):
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+floatAttr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+floatAttr, query=True, defaultValue=True)
-                                            cmds.addAttr(ikCtrl, longName=floatAttr, attributeType='float', keyable=True, defaultValue=defValue)
-                                            cmds.setAttr(ikCtrl+'.'+floatAttr, currentValue)
-                                            cmds.connectAttr(ikCtrl+'.'+floatAttr, revFootCtrl+'.'+floatAttr, force=True)
-                                    intAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, keyable=False, userDefined=True)
-                                    for intAttr in intAttrList:
-                                        if not cmds.objExists(ikCtrl+'.'+intAttr):
-                                            currentValue = cmds.getAttr(revFootCtrl+'.'+intAttr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+intAttr, query=True, defaultValue=True)
-                                            cmds.addAttr(ikCtrl, longName=intAttr, attributeType='long', min=0, max=1, defaultValue=defValue)
-                                            cmds.setAttr(ikCtrl+"."+intAttr, currentValue, keyable=False, channelBox=True)
-                                            cmds.connectAttr(ikCtrl+'.'+intAttr, revFootCtrl+'.'+intAttr, force=True)
+                                    # add attributes and connect from ikCtrl to revFootCtrl:
+                                    userAttrList = cmds.listAttr(revFootCtrl, visible=True, scalar=True, userDefined=True)
+                                    for attr in userAttrList:
+                                        if not cmds.objExists(ikCtrl+'.'+attr):
+                                            attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
+                                            currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
+                                            keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
+                                            channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
+                                            cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
+                                            cmds.setAttr(ikCtrl+'.'+attr, currentValue)
+                                            if not keyableStatus:
+                                                cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
+                                            cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
                                         cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')

@@ -2,11 +2,12 @@
 from maya import cmds
 import os
 import json
+import time
 from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.0
+DPPIPELINER_VERSION = 1.1
 
 PIPE_FOLDER = "_dpPipeline"
 
@@ -16,9 +17,11 @@ class Pipeliner(object):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
+        self.today = time.strftime("%Y-%m-%d", time.localtime())
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.pipeData = self.getPipelineData()
+        self.declarePipelineAnnotation()
         
 
     def checkSavedScene(self, *args):
@@ -70,7 +73,7 @@ class Pipeliner(object):
         if os.path.exists(self.jsonInfoPath):
             content = self.getJsonContent(self.jsonInfoPath)
             if content:
-                self.pipeData = self.pipeData | content
+                self.pipeData.update(content)
                 return content
 
 
@@ -102,7 +105,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-01-26",
+        "updated" : "2023-02-06",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -113,23 +116,83 @@ class Pipeliner(object):
         "s_presets"    : "dpPresets",
         "s_addOns"     : "dpAddOns",
         "s_hist"       : "dpData/dpHist",
+        "s_old"        : "dpOld",
+        "s_dropbox"    : "Job",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
         "s_model"      : "_m",
         "s_rig"        : "_v",
-        "s_type"       : "mayaAscii",
         "i_padding"    : 3,
         "b_capitalize" : False,
         "b_upper"      : False,
         "b_lower"      : False,
+        "b_deliver"    : True,
+        "b_dateDir"    : True,
         "b_assetDir"   : True,
         "b_archive"    : True,
-        "b_dateDir"    : True,
         "b_zip"        : True,
-        "b_imager"     : True
+        "b_cloud"      : True,
+        "b_imager"     : True,
+        "b_i_version"  : True,
+        "b_i_studio"   : True,
+        "b_i_project"  : True,
+        "b_i_asset"    : True,
+        "b_i_model"    : True,
+        "b_i_wip"      : True,
+        "b_i_publish"  : True,
+        "b_i_date"     : True,
+        "b_i_degrade"  : True        
         }
         return defaultPipeInfo
+
+
+    def declarePipelineAnnotation(self, *args):
+        """ Just declare a member variable to get the pipeline annotation data to search the values in the language dictionary.
+        """
+        self.pipelineAnnotaion = {
+        "name"    : "Default Pipeline Annotation",
+        "author"  : "Danilo Pinheiro",
+        "date"    : "2023-02-09",
+        "updated" : "2023-02-09",
+        
+        "f_drive"      : "i228_fDriveAnn",
+        "f_studio"     : "i229_fStudioAnn",
+        "f_project"    : "i230_fProjectAnn",
+        "f_wip"        : "i231_fWipAnn",
+        "f_publish"    : "i232_fPublishAnn",
+        "f_toClient"   : "i233_fToClientAnn",
+        "s_presets"    : "i234_sPresetsAnn",
+        "s_addOns"     : "i235_sAddOnsAnn",
+        "s_hist"       : "i236_sHistAnn",
+        "s_old"        : "i237_sOldAnn",
+        "s_dropbox"    : "i238_sDropboxAnn",
+        "s_prefix"     : "i239_sPrefixAnn",
+        "s_middle"     : "i240_sMiddleAnn",
+        "s_suffix"     : "i241_sSuffixAnn",
+        "s_model"      : "i242_sModelAnn",
+        "s_rig"        : "i243_sRigAnn",
+        "i_padding"    : "i245_iPaddingAnn",
+        "b_capitalize" : "i246_bCaptalizeAnn",
+        "b_upper"      : "i247_bUpperAnn",
+        "b_lower"      : "i248_bLowerAnn",
+        "b_deliver"    : "i249_bDeliverAnn",
+        "b_dateDir"    : "i250_bDateDirAnn",
+        "b_assetDir"   : "i251_bAssetDirAnn",
+        "b_archive"    : "i252_bArchiveAnn",
+        "b_zip"        : "i253_bZipAnn",
+        "b_cloud"      : "i254_bCloudAnn",
+        "b_imager"     : "i255_bImagerAnn",
+        "b_i_version"  : "i256_biVersionAnn",
+        "b_i_studio"   : "i257_biStudioAnn",
+        "b_i_project"  : "i258_biProjectAnn",
+        "b_i_asset"    : "i259_biAssetAnn",
+        "b_i_model"    : "i260_biModelAnn",
+        "b_i_wip"      : "i261_biRigAnn",
+        "b_i_publish"  : "i262_biPublishAnn",
+        "b_i_date"     : "i263_biDateAnn",
+        "b_i_degrade"  : "i264_biDegradeAnn"
+        }
 
 
     def getPipelineData(self, loadedPipeInfo=None, *args):
@@ -145,9 +208,10 @@ class Pipeliner(object):
             self.pipeData['presetsPath'] = False
             # getting pipeline settings
             self.pipeData['path'] = self.getPipelinePath()
+        self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
+        self.pipeData['shortName'] = cmds.file(query=True, sceneName=True, shortName=True)
         if not self.pipeData['path']:
             # mouting pipeline data dictionary
-            self.pipeData['sceneName'] = cmds.file(query=True, sceneName=True)
             if self.pipeData['sceneName']:
                 self.getInfoByPath("f_drive", None)
                 self.getInfoByPath("f_studio", "f_drive", cut=True)
@@ -244,13 +308,13 @@ class Pipeliner(object):
             for key in list(self.pipeInfo):
                 if "_" in key:
                     if key.startswith("f_"):
-                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldButtonGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=partial(self.loadInfoKey, key), adjustableColumn=2, parent=self.pipelineDataLayout)
                     elif key.startswith("i_"):
-                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], numberOfFields=1, parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.intFieldGrp(key, label=key[2:], value1=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], numberOfFields=1, parent=self.pipelineDataLayout)
                     elif key.startswith("b_"):
-                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], parent=self.pipelineDataLayout)
                     elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=self.pipelineDataLayout)
+                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation=self.langDic[self.langName][self.pipelineAnnotaion[key]], parent=self.pipelineDataLayout)
             # try to force loading empty data info
             try:
                 if self.pipeData['sceneName']:
@@ -356,13 +420,19 @@ class Pipeliner(object):
         outFile.close()
 
 
+    def makeDirIfNotExists(self, pathToMake=None, *args):
+        """ Check if the path exists and create it if it doesn't exists.
+        """
+        if pathToMake:
+            if not os.path.exists(pathToMake):
+                os.makedirs(pathToMake)
+
+
     def createPipelineInfoSubFolders(self, *args):
         """ Create pipeline info addOnsPath and presetsPath sub folders if they don't exists.
         """
-        if not os.path.exists(self.pipeData['addOnsPath']):
-            os.makedirs(self.pipeData['addOnsPath'])
-        if not os.path.exists(self.pipeData['presetsPath']):
-            os.makedirs(self.pipeData['presetsPath'])
+        self.makeDirIfNotExists(self.pipeData['addOnsPath'])
+        self.makeDirIfNotExists(self.pipeData['presetsPath'])
 
 
     def savePipeInfo(self, *args):
@@ -377,8 +447,7 @@ class Pipeliner(object):
             if pathDataFromUI.endswith(".json"):
                 self.infoFile = pathDataFromUI[pathDataFromUI.rfind("/")+1:]
         if self.pipeData['path'] and self.infoFile:
-            if not os.path.exists(self.pipeData['path']):
-                os.makedirs(self.pipeData['path'])
+            self.makeDirIfNotExists(self.pipeData['path'])
             self.setPipelineInfoFile()
             self.createPipelineInfoSubFolders()
             self.setPipelineSettingsPath(self.pipeData['path'], self.infoFile)
@@ -386,3 +455,42 @@ class Pipeliner(object):
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
         dpUtils.closeUI('dpPipelinerWindow')
+
+
+    def mountPackagePath(self, *args):
+        """ Mount paths into pipeData to use them in the Package module.
+        """
+        self.pipeData['toClientPath'] = None
+        self.pipeData['historyPath'] = None
+        self.pipeData['dropboxPath'] = None
+        # mount paths
+        if self.pipeData['publishPath']:
+            # send to client path
+            if self.pipeData['b_deliver']:
+                self.pipeData['toClientPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_toClient']
+                if self.pipeData['b_dateDir']:
+                    self.pipeData['toClientPath'] += "/"+self.today
+                self.makeDirIfNotExists(self.pipeData['toClientPath'])
+            # hist path
+            if self.pipeData['b_archive']:
+                self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
+                self.pipeData['historyPath'] = self.pipeData['scenePath']+"/"+self.pipeData['s_hist']
+                self.makeDirIfNotExists(self.pipeData['historyPath'])
+            # dropbox path
+            if self.pipeData['b_cloud']:
+                if self.pipeData['s_dropbox']:
+                    # https://help.dropbox.com/fr-fr/installs/locate-dropbox-folder
+                    if os.name == "posix": #Linux or Mac
+                        dropDir = "~/.dropbox"
+                    else: #Windows
+                        dropDir = os.getenv('LOCALAPPDATA')+"/Dropbox"
+                    if os.path.exists(dropDir):
+                        dropInfo = dropDir+"/info.json"
+                        if os.path.exists(dropInfo):
+                            content = self.getJsonContent(dropInfo)
+                            if content:
+                                self.pipeData['dropInfoPath'] = content[list(content)[0]]['path'].replace("\\", "/")
+#                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
+                                self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
+                                self.makeDirIfNotExists(self.pipeData['dropboxPath'])
+            # old 
