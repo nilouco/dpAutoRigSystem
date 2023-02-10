@@ -5,11 +5,13 @@ from functools import partial
 import os
 from ..Modules.Library import dpUtils
 from . import dpPipeliner
+from . import dpPackager
 from importlib import reload
 reload(dpPipeliner)
+reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.0
+DPPUBLISHER_VERSION = 1.1
 
 
 class Publisher(object):
@@ -26,7 +28,17 @@ class Publisher(object):
         self.currentAssetName = None
         self.shortAssetName = None
         self.pipeliner = dpPipeliner.Pipeliner()
+        self.packager = dpPackager.Packager()
 
+
+    def getFileTypeByExtension(self, fileName, *args):
+        """ Return the file type based in the extension of the given file name.
+        """
+        ext = fileName[-2:]
+        if ext == "mb":
+            return "mayaBinary"
+        return "mayaAscii"
+    
 
     def userSaveThisScene(self, *args):
         """ Open a confirmDialog to user save or save as this file.
@@ -41,15 +53,17 @@ class Publisher(object):
             return False
         else:
             if not shortName or confirmResult == saveAsName: #untitled or saveAs
-                newName = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=0, dialogStyle=2)
+                newName = cmds.fileDialog2(fileFilter="Maya ASCII (*.ma);;Maya Binary (*.mb);;", fileMode=0, dialogStyle=2)
                 if newName:
+                    ext = self.getFileTypeByExtension(newName[0])
                     cmds.file(rename=newName[0])
-                    return cmds.file(save=True)
+                    return cmds.file(save=True, type=ext)
                 else:
                     return False
             else: #save
                 cmds.file(rename=cmds.file(query=True, sceneName=True))
-                return cmds.file(save=True)
+                ext = cmds.file(type=True, query=True)[0]
+                return cmds.file(save=True, type=ext)
 
 
     def mainUI(self, *args):
@@ -147,31 +161,44 @@ class Publisher(object):
             self.setPublishFilePath(dialogResult[0])
 
 
+    def getRigWIPVersion(self, *args):
+        """ Find the rig version by scene name and return it.
+        """
+        rigWipVersion = 0
+        shortName = cmds.file(query=True, sceneName=True, shortName=True)
+        if self.pipeliner.pipeData['s_rig'] in shortName:
+            rigWipVersion = shortName[shortName.rfind(self.pipeliner.pipeData['s_rig'])+len(self.pipeliner.pipeData['s_rig']):shortName.rfind(".")]
+        return rigWipVersion
+
+
     def getPipeFileName(self, filePath, *args):
         """ Return the generated file name based on the pipeline publish folder.
             It's check the asset name and define the file version to save the published file.
         """
+        self.assetNameList = []
         if os.path.exists(filePath):
             assetName = self.checkPipelineAssetNameFolder()
             if not assetName:
                 assetName = self.shortAssetName
-            fileVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
+            publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
             fileNameList = next(os.walk(filePath))[2]
             if fileNameList:
-                assetNameList = []
                 for fileName in fileNameList:
-                    if assetName in fileName:
-                        if not fileName in assetNameList:
-                            assetNameList.append(fileName)
-                if assetNameList:
-                    fileVersion = self.defineFileVersion(assetNameList)
+                    if assetName+self.pipeliner.pipeData['s_middle'] in fileName:
+                        if not fileName in self.assetNameList:
+                            self.assetNameList.append(fileName)
+                if self.assetNameList:
+                    publishVersion = self.defineFileVersion(self.assetNameList)
             if self.pipeliner.pipeData['b_capitalize']:
                 assetName = assetName.capitalize()
             elif self.pipeliner.pipeData['b_lower']:
                 assetName = assetName.lower()
             elif self.pipeliner.pipeData['b_upper']:
                 assetName = assetName.upper()
-            fileName = self.pipeliner.pipeData['s_prefix']+assetName+self.pipeliner.pipeData['s_middle']+(str(fileVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
+            self.pipeliner.pipeData['assetName'] = assetName
+            self.pipeliner.pipeData['rigVersion'] = self.getRigWIPVersion()
+            self.pipeliner.pipeData['publishVersion'] = publishVersion
+            fileName = self.pipeliner.pipeData['s_prefix']+assetName+self.pipeliner.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
             return fileName
         else:
             return False
@@ -213,11 +240,14 @@ class Publisher(object):
             - store data info like publishedFromFile and model version into the All_Grp if it exists
             - create the folders to publish file if them not exists yet
             - save the published file
+            - backup old published file version in the dpOld folder
+            - packaging the delivered files as toClient zipFile, toCloud dropbox, toHist folders
+            - generate the image preview
             If it fails, it'll reopen the current file without save any change.
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            maxProcess = 3
+            maxProcess = 4
             progressAmount = 0
             cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Starting...', isInterruptable=False)
 
@@ -255,11 +285,16 @@ class Publisher(object):
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
                     
                     # try to store data into All_Grp if it exists
+                    self.pipeliner.pipeData['modelVersion'] = None
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
                         # published from file
                         if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
                         cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        # coments
+                        if not cmds.objExists(self.dpUIinst.masterGrp+".comment"):
+                            cmds.addAttr(self.dpUIinst.masterGrp, longName="comment", dataType="string")
+                        cmds.setAttr(self.dpUIinst.masterGrp+".comment", commentValue, type="string")
                         # model version
                         shortName = cmds.file(query=True, sceneName=True, shortName=True)
                         if self.pipeliner.pipeData['s_model'] in shortName:
@@ -268,7 +303,18 @@ class Publisher(object):
                             if not cmds.objExists(self.dpUIinst.masterGrp+".modelVersion"):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
+                            self.pipeliner.pipeData['modelVersion'] = modelVersion
+                        if cmds.objExists(self.dpUIinst.masterGrp+".system"):
+                            builtVersion = cmds.getAttr(self.dpUIinst.masterGrp+".system")
+                            if "dpAutoRig_" in builtVersion: #suport old rigged files
+                                builtVersion = builtVersion.split("dpAutoRig_")[1]
+                    else:
+                        builtVersion = self.dpUIinst.dpARVersion
 
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i227_getImage'], isInterruptable=False)
+
+                    # publishing file
                     # create folders to publish file if needed
                     if not os.path.exists(self.pipeliner.pipeData['publishPath']):
                         try:
@@ -276,23 +322,41 @@ class Publisher(object):
                         except:
                             self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
                     
+                    # mount folders
+                    if self.pipeliner.pipeData['b_deliver']:
+                        self.pipeliner.mountPackagePath()
+                        if self.pipeliner.pipeData['toClientPath']:
+                            # rigging preview image
+                            if self.pipeliner.pipeData['b_imager']:
+                                self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.today)
+                    cmds.progressWindow(endProgress=True)
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
-
+                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
+                    
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
 
-                    # WIP
-                    #
-                    # - dpPackager = call other methods to publish: by 
-                    #    - dpSendToClient
-                    #    - dpImager
-                    #    - dpCompactor = zip file
-                    #    - dpHistory = pass all old wip files to Hist folder
-                    #
-                    # TODO review progressWindow
-                    # TODO run everything (Publisher and Pipeliner) without UI
+                    # organize old published files
+                    if self.assetNameList:
+                        self.pipeliner.makeDirIfNotExists(self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+
+                    # packager
+                    if self.pipeliner.pipeData['b_deliver']:
+                        progressAmount += 1
+                        cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i226_exportFiles'], isInterruptable=False)
+
+                        if self.pipeliner.pipeData['toClientPath']:
+                            # toClient
+                            zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.today)
+                            # dropbox
+                            if zipFile:
+                                if self.pipeliner.pipeData['dropboxPath']:
+                                    self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
+                        # hist
+                        if self.pipeliner.pipeData['historyPath']:
+                            self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

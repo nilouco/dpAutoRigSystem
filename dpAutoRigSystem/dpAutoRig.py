@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.51"
-DPAR_UPDATELOG = "N634 - Combined eye control shape."
+DPAR_VERSION_PY3 = "4.01.52"
+DPAR_UPDATELOG = "N124 Publisher.\nN599 Pipeliner.\nN595 Packager."
 
 
 
@@ -1480,7 +1480,7 @@ class DP_AutoRig_UI(object):
             studioPreset, studioPresetDic = self.getJsonFileInfo(self.pipeliner.pipeData['presetsPath']+"/", True)
             if studioPreset:
                 self.validatorPresetList.insert(0, studioPreset[0])
-                self.validatorPresetDic = studioPresetDic | self.validatorPresetDic
+                self.validatorPresetDic.update(studioPresetDic)
 
     
     def setValidatorPreset(self, *args):
@@ -1933,6 +1933,7 @@ class DP_AutoRig_UI(object):
             self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
             # adding All_Grp attributes
             cmds.addAttr(self.masterGrp, longName=MASTER_ATTR, attributeType="bool")
+            cmds.addAttr(self.masterGrp, longName="dpAutoRigSystem", dataType="string")
             cmds.addAttr(self.masterGrp, longName="date", dataType="string")
             # system:
             cmds.addAttr(self.masterGrp, longName="maya", dataType="string")
@@ -1948,9 +1949,10 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="name", dataType="string")
             # setting All_Grp data
             cmds.setAttr(self.masterGrp+"."+MASTER_ATTR, True)
+            cmds.setAttr(self.masterGrp+".dpAutoRigSystem", DPAR_GITHUB, type="string")
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
-            cmds.setAttr(self.masterGrp+".system", "dpAutoRig_"+DPAR_VERSION_PY3, type="string")
+            cmds.setAttr(self.masterGrp+".system", DPAR_VERSION_PY3, type="string")
             cmds.setAttr(self.masterGrp+".language", self.langName, type="string")
             cmds.setAttr(self.masterGrp+".preset", self.presetName, type="string")
             cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
@@ -1962,6 +1964,7 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="comment", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
             # set data
             cmds.setAttr(self.masterGrp+".firstGuidesFile", cmds.file(query=True, sceneName=True), type="string")
