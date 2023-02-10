@@ -175,6 +175,7 @@ class Publisher(object):
         """ Return the generated file name based on the pipeline publish folder.
             It's check the asset name and define the file version to save the published file.
         """
+        self.assetNameList = []
         if os.path.exists(filePath):
             assetName = self.checkPipelineAssetNameFolder()
             if not assetName:
@@ -182,7 +183,6 @@ class Publisher(object):
             publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
             fileNameList = next(os.walk(filePath))[2]
             if fileNameList:
-                self.assetNameList = []
                 for fileName in fileNameList:
                     if assetName+self.pipeliner.pipeData['s_middle'] in fileName:
                         if not fileName in self.assetNameList:
@@ -304,6 +304,12 @@ class Publisher(object):
                                 cmds.addAttr(self.dpUIinst.masterGrp, longName="modelVersion", attributeType="long")
                             cmds.setAttr(self.dpUIinst.masterGrp+".modelVersion", modelVersion)
                             self.pipeliner.pipeData['modelVersion'] = modelVersion
+                        if cmds.objExists(self.dpUIinst.masterGrp+".system"):
+                            builtVersion = cmds.getAttr(self.dpUIinst.masterGrp+".system")
+                            if "dpAutoRig_" in builtVersion: #suport old rigged files
+                                builtVersion = builtVersion.split("dpAutoRig_")[1]
+                    else:
+                        builtVersion = self.dpUIinst.dpARVersion
 
                     progressAmount += 1
                     cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i227_getImage'], isInterruptable=False)
@@ -322,7 +328,7 @@ class Publisher(object):
                         if self.pipeliner.pipeData['toClientPath']:
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
-                                self.packager.imager(self.pipeliner.pipeData['toClientPath'], self.dpUIinst.dpARVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
+                                self.packager.imager(self.pipeliner.pipeData['toClientPath'], builtVersion, self.pipeliner.pipeData['f_studio'], self.pipeliner.pipeData['f_project'], self.pipeliner.pipeData['assetName'], self.pipeliner.pipeData['modelVersion'], self.pipeliner.pipeData['rigVersion'], self.pipeliner.pipeData['publishVersion'], self.pipeliner.today, self.pipeliner.pipeData['i_padding'])
                     cmds.progressWindow(endProgress=True)
                     progressAmount += 1
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)

@@ -72,7 +72,7 @@ class Pipeliner(object):
         if os.path.exists(self.jsonInfoPath):
             content = self.getJsonContent(self.jsonInfoPath)
             if content:
-                self.pipeData = self.pipeData | content
+                self.pipeData.update(content)
                 return content
 
 
@@ -136,6 +136,50 @@ class Pipeliner(object):
         "b_cloud"      : True
         }
         return defaultPipeInfo
+
+
+    def declarePipelineAnnotation(self, *args):
+        """
+        """
+        pipelineAnnotaion = {
+        "name"    : "Default Pipeline Annotation",
+        "author"  : "Danilo Pinheiro",
+        "date"    : "2023-02-09",
+        "updated" : "2023-02-09",
+        
+        "f_drive"      : "",
+        "f_studio"     : "",
+        "f_project"    : "",
+        "f_wip"        : "",
+        "f_publish"    : "",
+        "f_toClient"   : "",
+        "s_presets"    : "",
+        "s_addOns"     : "",
+        "s_hist"       : "",
+        "s_old"        : "",
+        "s_dropbox"    : "",
+        "s_prefix"     : "",
+        "s_middle"     : "",
+        "s_suffix"     : "",
+        "s_model"      : "",
+        "s_rig"        : "",
+        "s_type"       : "",
+        "i_padding"    : "",
+        "b_capitalize" : "",
+        "b_upper"      : "",
+        "b_lower"      : "",
+        "b_deliver"    : "",
+        "b_dateDir"    : "",
+        "b_assetDir"   : "",
+        "b_archive"    : "",
+        "b_zip"        : "",
+        "b_imager"     : "",
+        "b_cloud"      : ""
+        }
+        return pipelineAnnotaion
+
+
+
 
 
     def getPipelineData(self, loadedPipeInfo=None, *args):
@@ -257,7 +301,10 @@ class Pipeliner(object):
                     elif key.startswith("b_"):
                         self.infoUI[key] = cmds.checkBox(key, label=key[2:], value=self.pipeInfo[key], parent=self.pipelineDataLayout)
                     elif key.startswith("s_"):
-                        self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=self.pipelineDataLayout)
+                        if key == "s_old":
+                            self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], annotation="Test annotation here, merci", parent=self.pipelineDataLayout)
+                        else:
+                            self.infoUI[key] = cmds.textFieldGrp(key, label=key[2:], text=self.pipeInfo[key], parent=self.pipelineDataLayout)
             # try to force loading empty data info
             try:
                 if self.pipeData['sceneName']:

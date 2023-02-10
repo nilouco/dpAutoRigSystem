@@ -14,6 +14,7 @@ RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
 CAM_ROTX = -10
 CAM_ROTY = 30
+CTRL_LAYER = "Ctrl_Lyr"
 
 class Packager(object):
 
@@ -99,6 +100,10 @@ class Packager(object):
         cmds.setAttr(cam+".overscan", 1.0)
         currentCamAspectRatio = cmds.camera(cam, query=True, aspectRatio=True)
         cmds.camera(cam, edit=True, aspectRatio=0.8)
+        currentCtrlLyrDisplay = False
+        if cmds.objExists(CTRL_LAYER):
+            currentCtrlLyrDisplay = cmds.getAttr(CTRL_LAYER+".hideOnPlayback")
+            cmds.setAttr(CTRL_LAYER+".hideOnPlayback", 0)
 
         # set up custom display settings
         cmds.grid(toggle=False)
@@ -118,7 +123,7 @@ class Packager(object):
         cmds.headsUpDisplay('HudRigPreviewTxt11', section=0, block=11, labelFontSize="large", allowOverlap=True, label=rigPreview)
         b = 12
         if dpARVersion:
-            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="dpAutoRigSystem v"+dpARVersion)
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="dpAutoRigSystem "+dpARVersion)
             b += 1
         if studioName:
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=studioName)
@@ -190,6 +195,8 @@ class Packager(object):
             cmds.setAttr(cam+"."+camAttrList[c], camAttrVisList[c])
         cmds.setAttr(cam+".overscan", currentCamOverscan)
         cmds.camera(cam, edit=True, aspectRatio=currentCamAspectRatio)
+        if currentCtrlLyrDisplay:
+            cmds.setAttr(CTRL_LAYER+".hideOnPlayback", currentCtrlLyrDisplay)
 
 
     def toHistory(self, scenePath, fileShortName, destinationFolder, *args):
