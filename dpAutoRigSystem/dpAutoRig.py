@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.50"
-DPAR_UPDATELOG = "N266 - Facial controls split groups."
+DPAR_VERSION_PY3 = "4.01.51"
+DPAR_UPDATELOG = "N634 - Combined eye control shape."
 
 
 
