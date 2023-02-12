@@ -5,6 +5,7 @@ import os
 import getpass
 import datetime
 
+DPCONTROL = "dpControl"
 SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 
 dic_colors = {
@@ -625,7 +626,7 @@ class ControlClass(object):
             transformList = cmds.ls(selection=True, type="transform")
         if transformList:
             for item in transformList:
-                if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl") == 1:
+                if cmds.objExists(item+"."+DPCONTROL) and cmds.getAttr(item+"."+DPCONTROL) == 1:
                     # getting current control values from stored attributes:
                     curType = cmds.getAttr(item+".className")
                     curSize = cmds.getAttr(item+".size")
@@ -653,8 +654,8 @@ class ControlClass(object):
         ctrlList, ctrlIDList = [], []
         allTransformList = cmds.ls(selection=False, type='transform')
         for item in allTransformList:
-            if cmds.objExists(item+".dpControl"):
-                if cmds.getAttr(item+".dpControl") == 1:
+            if cmds.objExists(item+"."+DPCONTROL):
+                if cmds.getAttr(item+"."+DPCONTROL) == 1:
                     ctrlList.append(item)
         if ctrlList:
             resultDialog = cmds.promptDialog(
@@ -1015,7 +1016,7 @@ class ControlClass(object):
         allList = cmds.ls(selection=False, type="transform")
         if allList:
             for item in allList:
-                if cmds.objExists(item+".dpControl") and cmds.getAttr(item+".dpControl"):
+                if cmds.objExists(item+"."+DPCONTROL) and cmds.getAttr(item+"."+DPCONTROL):
                     nodeList.append(item)
         return nodeList
 
@@ -1287,3 +1288,58 @@ class ControlClass(object):
         if subShapeList:
             for subShapeNode in subShapeList:
                 cmds.connectAttr(ctrl+".subControlDisplay", subShapeNode+".visibility", force=True)
+
+
+    def mirrorShape(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
+        """ Mirror control shape by naming using prefixes to find nodes.
+            Ask to mirror control shape of all controls if nothing is selected.
+        """
+        if not fromPrefix:
+            fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
+            toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixShapeTF"], query=True, text=True)
+        if fromPrefix and toPrefix:
+            if not nodeName:
+                currentSelectionList = cmds.ls(selection=True, type="transform")
+                if currentSelectionList:
+                    for selectedNode in currentSelectionList:
+                        if selectedNode.startswith(fromPrefix):
+                            self.mirrorShape(selectedNode, fromPrefix, toPrefix)
+                else:
+                    # ask to run for all nodes:
+                    mirrorAll = cmds.confirmDialog(
+                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'],
+                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i265_mirrorShapeAll'], 
+                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
+                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
+                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
+                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
+                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                        allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
+                        allControlList = self.getControlList()
+                        if allNodeList:
+                            for node in allNodeList:
+                                if node in allControlList:
+                                    self.mirrorShape(node, fromPrefix, toPrefix)
+            else:
+                if cmds.objExists(nodeName+"."+DPCONTROL) and cmds.getAttr(nodeName+"."+DPCONTROL) == 1:
+                    destinationNode = toPrefix+nodeName[len(fromPrefix):]
+                    if cmds.objExists(destinationNode):
+
+                        #
+                        # WIP
+                        #
+                        #
+                        duplicatedSource = cmds.duplicate(nodeName, name=nodeName+"_Duplicated_TEMP")[0]
+                        duplicatedGrp = cmds.group(duplicatedSource, name=duplicatedSource+"_Grp")
+                        mirrorShapeGrp = cmds.group(empty=True, name=duplicatedSource+"_MirrorShape_Grp")
+                        cmds.parent(duplicatedGrp, mirrorShapeGrp)
+
+
+                        cmds.setAttr(mirrorShapeGrp+".scaleX", -1)#+axis, -1)
+
+
+
+                        self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinationList=[destinationNode], keepColor=True)
+                        cmds.delete(mirrorShapeGrp)
+        else:
+            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
