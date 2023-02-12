@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.53"
-DPAR_UPDATELOG = "N630 - Wrist Jax rotateX connection."
+DPAR_VERSION_PY3 = "4.01.54"
+DPAR_UPDATELOG = "N638 - Fixed Publish reopen file if error."
 
 
 
