@@ -542,7 +542,7 @@ class ControlClass(object):
             self.pasteAttr(destinationList)
     
     
-    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, *args):
+    def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, force=False, *args):
         """ Transfer control shape from sourceItem to destination list
         """
         if not sourceItem:
@@ -582,7 +582,15 @@ class ControlClass(object):
                         for dupSourceShape in dupSourceShapeList:
                             if needKeepVis:
                                 cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
-                            cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
+                            if not force:
+                                cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
+                            else:
+                                # make sure we use the current shape of a froze transform, usefull to mirror control shapes
+                                forcedShape = cmds.parent(dupSourceShape, destTransform, absolute=True, shape=True)
+                                forcedTransform = cmds.listRelatives(forcedShape, parent=True, type="transform")
+                                cmds.makeIdentity(forcedTransform, apply=True, translate=True, rotate=True, scale=True)
+                                cmds.parent(forcedShape, destTransform, relative=True, shape=True)
+                                cmds.delete(forcedTransform)
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
                         # restore children transforms to correct parent hierarchy:
@@ -1290,20 +1298,21 @@ class ControlClass(object):
                 cmds.connectAttr(ctrl+".subControlDisplay", subShapeNode+".visibility", force=True)
 
 
-    def mirrorShape(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
+    def mirrorShape(self, nodeName=False, fromPrefix=False, toPrefix=False, axis=False, *args):
         """ Mirror control shape by naming using prefixes to find nodes.
             Ask to mirror control shape of all controls if nothing is selected.
         """
         if not fromPrefix:
             fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
             toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixShapeTF"], query=True, text=True)
+            axis = cmds.optionMenu(self.dpUIinst.allUIs["axisShapeMenu"], query=True, value=True)
         if fromPrefix and toPrefix:
             if not nodeName:
                 currentSelectionList = cmds.ls(selection=True, type="transform")
                 if currentSelectionList:
                     for selectedNode in currentSelectionList:
                         if selectedNode.startswith(fromPrefix):
-                            self.mirrorShape(selectedNode, fromPrefix, toPrefix)
+                            self.mirrorShape(selectedNode, fromPrefix, toPrefix, axis)
                 else:
                     # ask to run for all nodes:
                     mirrorAll = cmds.confirmDialog(
@@ -1316,30 +1325,29 @@ class ControlClass(object):
                     if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
-                        if allNodeList:
+                        if allNodeList and allControlList:
+                            # Starting progress window
+                            maxProcess = len(allNodeList)
+                            progressAmount = 0
+                            cmds.progressWindow(title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror'], maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'], isInterruptable=False)
                             for node in allNodeList:
+                                progressAmount += 1
                                 if node in allControlList:
-                                    self.mirrorShape(node, fromPrefix, toPrefix)
+                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)
+                                    self.mirrorShape(node, fromPrefix, toPrefix, axis)
+                                    cmds.refresh()
+                        cmds.progressWindow(endProgress=True)
             else:
                 if cmds.objExists(nodeName+"."+DPCONTROL) and cmds.getAttr(nodeName+"."+DPCONTROL) == 1:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
-
-                        #
-                        # WIP
-                        #
-                        #
+                        # do mirror algorithm
                         duplicatedSource = cmds.duplicate(nodeName, name=nodeName+"_Duplicated_TEMP")[0]
                         duplicatedGrp = cmds.group(duplicatedSource, name=duplicatedSource+"_Grp")
                         mirrorShapeGrp = cmds.group(empty=True, name=duplicatedSource+"_MirrorShape_Grp")
                         cmds.parent(duplicatedGrp, mirrorShapeGrp)
-
-
-                        cmds.setAttr(mirrorShapeGrp+".scaleX", -1)#+axis, -1)
-
-
-
-                        self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinationList=[destinationNode], keepColor=True)
+                        cmds.setAttr(mirrorShapeGrp+".scale"+axis, -1)
+                        self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinationList=[destinationNode], keepColor=True, force=True)
                         cmds.delete(mirrorShapeGrp)
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])

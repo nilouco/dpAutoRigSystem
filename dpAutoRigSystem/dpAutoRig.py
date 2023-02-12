@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.54"
-DPAR_UPDATELOG = "N638 - Fixed Publish reopen file if error."
+DPAR_VERSION_PY3 = "4.01.55"
+DPAR_UPDATELOG = "N065 - Mirror control shapes."
 
 
 
@@ -602,7 +602,10 @@ class DP_AutoRig_UI(object):
         # mirror control shape - layout:
         self.allUIs["mirrorShapeFL"] = cmds.frameLayout('mirrorShapeFL', label=self.langDic[self.langName]['m010_mirror']+" "+self.langDic[self.langName]['m067_shape'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["shapeIOFL"])
         self.allUIs["mirrorShapeLayout"] = cmds.rowColumnLayout('mirrorShapeLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorShapeFL" )
-        self.allUIs["prefixShapeT"] = cmds.text("prefixShapeT", label=self.langDic[self.langName]['i144_prefix'], parent=self.allUIs["mirrorShapeLayout"])
+        self.allUIs["axisShapeMenu"] = cmds.optionMenu("axisShapeMenu", label='', parent=self.allUIs["mirrorShapeLayout"])
+        mirrorShapeMenuItemList = ['X', 'Y', 'Z']
+        for axis in mirrorShapeMenuItemList:
+            cmds.menuItem(label=axis, parent=self.allUIs["axisShapeMenu"])
         self.allUIs["fromPrefixShapeT"] = cmds.text("fromPrefixShapeT", label=self.langDic[self.langName]['i036_from'], parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["fromPrefixShapeTF"] = cmds.textField('fromPrefixShapeTF', text="L_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeT"] = cmds.text("toPrefixShapeT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorShapeLayout"])
