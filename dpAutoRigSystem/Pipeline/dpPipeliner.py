@@ -7,7 +7,7 @@ from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.1
+DPPIPELINER_VERSION = 1.2
 
 PIPE_FOLDER = "_dpPipeline"
 
@@ -414,9 +414,13 @@ class Pipeliner(object):
 
     def setPipelineInfoFile(self, *args):
         """ Save the pipeline info file with all pipeData into a json file.
+            Except the current scene data info.
         """
+        cleanPipeData = self.pipeData
+        cleanPipeData.pop('sceneName', None)
+        cleanPipeData.pop('shortName', None)
         outFile = open(self.pipeData['path']+"/"+self.infoFile, "w")
-        json.dump(self.pipeData, outFile, indent=4)
+        json.dump(cleanPipeData, outFile, indent=4)
         outFile.close()
 
 
