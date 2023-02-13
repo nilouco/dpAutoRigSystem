@@ -37,7 +37,6 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
         self.startValidation()
         
         
-
         # ---
         # --- validator code --- beginning
         if objList:
@@ -79,21 +78,22 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
                 # use another list without the first element to compare it the item repeats
                 anotherList = shortNameList[i+1:]
                 for item in anotherList:
-                    if obj == item:
-                        # found issue here
-                        self.checkedObjList.append(orderedObjList[i])
-                        self.foundIssueList.append(True)
-                        if self.verifyMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.rename(orderedObjList[i], obj+str(n))
-                                n += 1
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+orderedObjList[i])
-                            except:
+                    if cmds.objExists(orderedObjList[i]):
+                        if obj == item:
+                            # found issue here
+                            self.checkedObjList.append(orderedObjList[i])
+                            self.foundIssueList.append(True)
+                            if self.verifyMode:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+orderedObjList[i])
+                            else: #fix
+                                try:
+                                    cmds.rename(orderedObjList[i], obj+str(n))
+                                    n += 1
+                                    self.resultOkList.append(True)
+                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+orderedObjList[i])
+                                except:
+                                    self.resultOkList.append(False)
+                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+orderedObjList[i])
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)

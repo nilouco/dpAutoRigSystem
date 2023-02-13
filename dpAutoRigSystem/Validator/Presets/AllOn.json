@@ -2,8 +2,9 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-01-26",
+    "_updated"    : "2023-02-13",
 
+    "DuplicatedName"  : true,
     "FreezeTransform" : true,
     "TargetCleaner"   : true,
     "WIPCleaner"      : true

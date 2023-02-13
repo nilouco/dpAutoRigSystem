@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.54"
-DPAR_UPDATELOG = "N638 - Fixed Publish reopen file if error."
+DPAR_VERSION_PY3 = "4.01.57"
+DPAR_UPDATELOG = "N556 - Duplicated name new checkin validator."
 
 
 

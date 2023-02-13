@@ -53,8 +53,9 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                 parentNode = cmds.listRelatives(item, parent=True)[0]
-                self.checkedObjList.append(parentNode)
+                # conditional to check here
                 if not '_Mesh' in item:
+                    self.checkedObjList.append(parentNode)
                     self.foundIssueList.append(True)
                     if self.verifyMode:
                         self.resultOkList.append(False)
@@ -69,9 +70,9 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
                         except:
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-                else:
-                    self.foundIssueList.append(False)
-                    self.resultOkList.append(True)
+#                else:
+#                    self.foundIssueList.append(False)
+#                    self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
