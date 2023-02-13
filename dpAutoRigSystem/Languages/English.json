@@ -423,6 +423,7 @@
     "i262_biPublishAnn"    : "Write the publish version in the image preview",
     "i263_biDateAnn"       : "Write the date of today in the image preview, like YYYY-MM-DD.",
     "i264_biDegradeAnn"    : "Generate the image preview using a degrade in the background.",
+    "i265_mirrorShapeAll"  : "Do you want to mirror the control's shapes for all nodes?",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

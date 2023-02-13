@@ -422,6 +422,7 @@
     "i262_biPublishAnn"    : "Écrire la version publiée dans l'aperçu de l'image",
     "i263_biDateAnn"       : "Écrire la date d'aujourd'hui dans l'aperçu de l'image, comme AAAA-MM-JJ.",
     "i264_biDegradeAnn"    : "Génèrer l'aperçu de l'image en utilisant un dégradé en arrière-plan.",
+    "i265_mirrorShapeAll"  : "Esc-que vous voulez faire le mirroir de shape pour tous les contrôlleurs?",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
