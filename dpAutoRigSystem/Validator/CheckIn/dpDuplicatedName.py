@@ -82,11 +82,9 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
                     if obj == item:
                         # found issue here
                         self.checkedObjList.append(orderedObjList[i])
-#                        self.checkedObjList.append(orderedObjList[i])
                         self.foundIssueList.append(True)
                         if self.verifyMode:
                             self.resultOkList.append(False)
-#                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v006_foundIssue']+": "+orderedObjList[i])
                         else: #fix
                             try:
                                 cmds.rename(orderedObjList[i], obj+str(n))
@@ -96,9 +94,6 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
                             except:
                                 self.resultOkList.append(False)
                                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+orderedObjList[i])
-                    else:
-                        self.foundIssueList.append(False)
-                        self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -107,10 +102,6 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
         # --- validator code --- end
         # ---
 
-        print("self.checkedObjList ===", self.checkedObjList)
-        print("self.foundIssueList ===", self.foundIssueList)
-        print("self.resultOkList ===", self.resultOkList)
-        print("self.messageList ===", self.messageList)
 
         # finishing
         self.finishValidation()
