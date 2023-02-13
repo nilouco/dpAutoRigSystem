@@ -101,7 +101,7 @@ class ValidatorStartClass:
         titleText = self.dpUIinst.langDic[self.dpUIinst.langName][self.title]
         modeText = self.dpUIinst.langDic[self.dpUIinst.langName]['v003_mode']
         fixText = self.dpUIinst.langDic[self.dpUIinst.langName]['c052_fix'].upper()
-        vefiryText = self.dpUIinst.langDic[self.dpUIinst.langName]['i210_verify'].upper()
+        verifyText = self.dpUIinst.langDic[self.dpUIinst.langName]['i210_verify'].upper()
         foundIssueText = self.dpUIinst.langDic[self.dpUIinst.langName]['v006_foundIssue']
         everythingOkText = self.dpUIinst.langDic[self.dpUIinst.langName]['v007_allOk']
         # header
@@ -110,7 +110,7 @@ class ValidatorStartClass:
         logText += modeText+": "
         checkText = fixText
         if self.verifyMode:
-            checkText = vefiryText
+            checkText = verifyText
         logText += checkText+"\n"
         # issues
         if True in self.foundIssueList:

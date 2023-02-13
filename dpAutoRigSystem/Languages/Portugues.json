@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-02-12",
+    "_updated"       : "2023-02-13",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -681,5 +681,7 @@
     "v020_publishStopped"     : "Processo de publicação cancelado. Verifique esse validador por favor:",
     "v021_noFileName"         : "Não tem o nome do arquivo publicado para salvar, desculpe.",
     "v022_noFilePath"         : "Não tem o caminho do diretório para salvar o arquivo publicado, desculpe.",
-    "v023_successPublished"   : "Arquivo publicado com sucesso!"
+    "v023_successPublished"   : "Arquivo publicado com sucesso!",
+    "v024_duplicatedName"     : "Nome duplicado",
+    "v025_duplicatedNameDesc" : "Verifica se existem nodes com\no mesmo nome e nos avisa deles."
 }

@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.56"
-DPAR_UPDATELOG = "N639 - Verify dpAutoUpdater integrity.\nFixed keeping pipeline data files."
+DPAR_VERSION_PY3 = "4.01.57"
+DPAR_UPDATELOG = "N556 - Duplicated name new checkin validator."
 
 
 
