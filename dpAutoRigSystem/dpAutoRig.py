@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.54"
-DPAR_UPDATELOG = "N638 - Fixed Publish reopen file if error."
+DPAR_VERSION_PY3 = "4.01.56"
+DPAR_UPDATELOG = "N639 - Verify dpAutoUpdater integrity.\nFixed keeping pipeline data files."
 
 
 
@@ -1762,8 +1762,10 @@ class DP_AutoRig_UI(object):
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+LANGUAGES, dpAR_TempDir+"/"+LANGUAGES)
                 self.keepJsonFilesWhenUpdate(dpAR_DestFolder+"/"+CONTROLS_PRESETS, dpAR_TempDir+"/"+CONTROLS_PRESETS)
                 # keep dpPipelineInfo data
-                shutil.copy2(os.path.join(dpAR_DestFolder, "_dpPipelineSettings.json"), dpAR_TempDir)
-                shutil.copy2(os.path.join(dpAR_DestFolder, "dpPipelineInfo.json"), dpAR_TempDir)
+                if os.path.exists(dpAR_DestFolder+"/_dpPipelineSettings.json"):
+                    shutil.copy2(os.path.join(dpAR_DestFolder, "_dpPipelineSettings.json"), dpAR_TempDir)
+                if os.path.exists(dpAR_DestFolder+"/dpPipelineInfo.json"):
+                    shutil.copy2(os.path.join(dpAR_DestFolder, "dpPipelineInfo.json"), dpAR_TempDir)
 
                 # remove all old live files and folders for this current version, that means delete myself, OMG!
                 for eachFolder in next(os.walk(dpAR_DestFolder))[1]:
