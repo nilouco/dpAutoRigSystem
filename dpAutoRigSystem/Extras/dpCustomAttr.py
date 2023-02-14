@@ -1,8 +1,12 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from functools import partial
-from . import dpRivet
+
+
+
+
+
+# TODO check if we need these modules here
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 
@@ -15,7 +19,7 @@ ICON = "/Icons/dp_customAttr.png"
 
 DPCUSTOMATTR_VERSION = 1.0
 
-
+ATTR_LIST = ['dpKeepIt']
 
 class CustomAttr(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, ui=True, *args, **kwargs):
@@ -31,13 +35,14 @@ class CustomAttr(object):
         if self.ui:
             self.closeUI()
             self.mainUI()
-#            self.refreshUI()
+            self.refreshUI()
+            self.jobChangeSelection()
             
 
-#    def refreshUI(self, *args):
-#        """ Just call populate UI and actualize layout methodes.
-#        """
-#        self.pupulateItems()
+    def refreshUI(self, *args):
+        """ Just call populate UI and actualize layout methodes.
+        """
+        self.populateItems()
 #        self.actualizeEditLayout()
 
         
@@ -58,14 +63,12 @@ class CustomAttr(object):
         cmds.showWindow('dpCustomAttributesWindow')
         # create UI layout and elements:
         customAttributesLayout = cmds.columnLayout('customAttributesLayout', adjustableColumn=True, columnOffset=("both", 10))
-#        cmds.text("infoTxt", label=self.langDic[self.langName]['m066_selectTwo'], align="left", height=30, font='boldLabelFont', parent=customAttributesLayout)
         mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=customAttributesLayout)
 
         self.selectionCollection = cmds.radioCollection('selectionCollection', parent=mainLayout)
         cmds.radioButton(label=self.langDic[self.langName]['i211_all'].capitalize(), annotation="all", onCommand=self.populateItems)
         cmds.radioButton(label=self.langDic[self.langName]['i266_selected'], annotation="selected", onCommand=self.populateItems)
         existing = cmds.radioButton(label=self.langDic[self.langName]['m071_existing'], annotation="existing", onCommand=self.populateItems)
-        cmds.radioCollection(self.selectionCollection, edit=True, select=existing)
 
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", configuration="vertical2", separatorThickness=2, parent=mainLayout)
         leftColumnLayout = cmds.columnLayout('leftColumnLayout', adjustableColumn=True, columnOffset=("both", 2), parent=tablePaneLayout)
@@ -85,9 +88,16 @@ class CustomAttr(object):
         cmds.button("addButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), parent=buttonLayout)
         cmds.button("removeButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), parent=buttonLayout)
         cmds.text("")
-        cmds.button("refreshButton", label=self.langDic[self.langName]['m181_refresh'], backgroundColor=(0.5, 0.5, 0.5), parent=buttonLayout)
+        cmds.button("refreshButton", label=self.langDic[self.langName]['m181_refresh'], backgroundColor=(0.5, 0.5, 0.5), command=self.populateItems, parent=buttonLayout)
+
+        # set ui
+        cmds.radioCollection(self.selectionCollection, edit=True, select=existing)
 
         
+    def jobChangeSelection(self, *args):
+        """ Create a scriptJob to read the selection changing to update the UI.
+        """
+        cmds.scriptJob(event=('SelectionChanged', self.refreshUI), parent='dpCustomAttributesWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
 
     
     
@@ -103,17 +113,35 @@ class CustomAttr(object):
         # WIP
         #
 
-        
-
         if radioButtonAnnotation == "all":
-            print("all, merci")
+            self.updateItemsList(cmds.ls(selection=False, type="transform"))
         elif radioButtonAnnotation == "selected":
-            print("selected, merci2")
+            self.updateItemsList(cmds.ls(selection=True, type="transform"))
         elif radioButtonAnnotation == "existing":
-            print("existing, merci3")
+            self.updateItemsList(self.getExistingList())
 
 
 
+    def getExistingList(self, *args):
+        """ Check all nodes in the Maya's scene to find existing custom attributes.
+            Return the existing custom attributes list of nodes.
+        """
+        existList = []
+        allNodeList = cmds.ls(selection=False, type="transform")
+        if allNodeList:
+            for node in allNodeList:
+                for attr in ATTR_LIST:
+                    if cmds.objExists(node+"."+attr):
+                        existList.append(node)
+        return existList
+
+
+    def updateItemsList(self, itemList, *args):
+        """
+        """
+        cmds.textScrollList(self.itemSL, edit=True, removeAll=True)
+        if itemList:
+            cmds.textScrollList(self.itemSL, edit=True, append=itemList)
 
 
     def actualizeFooter(self, *args):
