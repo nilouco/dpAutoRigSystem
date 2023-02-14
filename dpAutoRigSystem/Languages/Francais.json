@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-02-13",
+    "_updated"       : "2023-02-14",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -423,6 +423,7 @@
     "i263_biDateAnn"       : "Écrire la date d'aujourd'hui dans l'aperçu de l'image, comme AAAA-MM-JJ.",
     "i264_biDegradeAnn"    : "Génèrer l'aperçu de l'image en utilisant un dégradé en arrière-plan.",
     "i265_mirrorShapeAll"  : "Esc-que vous voulez faire le mirroir de shape pour tous les contrôlleurs?",
+    "i266_selected"        : "sélectionnés",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -638,6 +639,8 @@
     "m209_pinSide"              : "Côté broche",
     "m210_interpolation"        : "Interpolation",
     "m211_eyeFlat"              : "Oeil Plat",
+    "m212_customAttr"           : "Attributs Personnalisés",
+    "m213_customAttrDesc"       : "Cet outil est conçu pour créer, modifier ou supprimer\ndes attributs personnalisés utiles pour le\ndpAutoRigSystem.",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
