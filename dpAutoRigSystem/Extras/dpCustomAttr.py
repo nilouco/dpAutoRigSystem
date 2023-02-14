@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
+from ..Modules.Library import dpUtils
 
 
 
@@ -8,7 +8,9 @@ from maya import mel
 
 # TODO check if we need these modules here
 from ..Modules.Library import dpControls
-from ..Modules.Library import dpUtils
+
+
+
 
 
 # global variables to this module:    
@@ -65,6 +67,7 @@ class CustomAttr(object):
         customAttributesLayout = cmds.columnLayout('customAttributesLayout', adjustableColumn=True, columnOffset=("both", 10))
         mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=customAttributesLayout)
 
+        cmds.text("itemsTxt", label="Nodes", align="left", height=30, font='boldLabelFont', parent=mainLayout)
         self.selectionCollection = cmds.radioCollection('selectionCollection', parent=mainLayout)
         cmds.radioButton(label=self.langDic[self.langName]['i211_all'].capitalize(), annotation="all", onCommand=self.populateItems)
         cmds.radioButton(label=self.langDic[self.langName]['i266_selected'], annotation="selected", onCommand=self.populateItems)
@@ -72,7 +75,9 @@ class CustomAttr(object):
 
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", configuration="vertical2", separatorThickness=2, parent=mainLayout)
         leftColumnLayout = cmds.columnLayout('leftColumnLayout', adjustableColumn=True, columnOffset=("both", 2), parent=tablePaneLayout)
-        cmds.text("itemsTxt", label="Nodes", align="left", height=30, font='boldLabelFont', parent=leftColumnLayout)
+        cmds.separator(height=5, style="none", parent=leftColumnLayout)
+        self.itemFilterTF = cmds.textField("itemFilterTF", text="", changeCommand=self.populateItems, parent=leftColumnLayout)
+        cmds.separator(height=5, style="none", parent=leftColumnLayout)
         self.itemSL = cmds.textScrollList("itemSL", width=30, allowMultiSelection=True, selectCommand=self.actualizeFooter, parent=leftColumnLayout)
         
         rightColumnLayout = cmds.columnLayout('rightColumnLayout', adjustableColumn=True, columnOffset=("both", 2), parent=tablePaneLayout)
@@ -87,7 +92,7 @@ class CustomAttr(object):
         buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 60), (2, 60), (3, 100), (4, 60)], parent=mainLayout)
         cmds.button("addButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), parent=buttonLayout)
         cmds.button("removeButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), parent=buttonLayout)
-        cmds.text("")
+        cmds.text("", parent=buttonLayout)
         cmds.button("refreshButton", label=self.langDic[self.langName]['m181_refresh'], backgroundColor=(0.5, 0.5, 0.5), command=self.populateItems, parent=buttonLayout)
 
         # set ui
@@ -98,28 +103,21 @@ class CustomAttr(object):
         """ Create a scriptJob to read the selection changing to update the UI.
         """
         cmds.scriptJob(event=('SelectionChanged', self.refreshUI), parent='dpCustomAttributesWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
-
     
     
     def populateItems(self, *args):
-        """
+        """ Fill the items scroll list element with the choosen option (all, selected or existing).
         """
         # get current selection type (all, selected or existing custom attributes)
         selectionRadioButton = cmds.radioCollection(self.selectionCollection, query=True, select=True)
         radioButtonAnnotation = cmds.radioButton(selectionRadioButton, query=True, annotation=True)
-        
-        
-        #
-        # WIP
-        #
-
+        # fill conform
         if radioButtonAnnotation == "all":
             self.updateItemsList(cmds.ls(selection=False, type="transform"))
         elif radioButtonAnnotation == "selected":
             self.updateItemsList(cmds.ls(selection=True, type="transform"))
         elif radioButtonAnnotation == "existing":
             self.updateItemsList(self.getExistingList())
-
 
 
     def getExistingList(self, *args):
@@ -137,11 +135,23 @@ class CustomAttr(object):
 
 
     def updateItemsList(self, itemList, *args):
-        """
+        """ Use the given list to update the items scroll list in the UI.
         """
         cmds.textScrollList(self.itemSL, edit=True, removeAll=True)
         if itemList:
-            cmds.textScrollList(self.itemSL, edit=True, append=itemList)
+            filteredItemList = self.filterList(itemList)
+            cmds.textScrollList(self.itemSL, edit=True, append=filteredItemList)
+
+
+    def filterList(self, itemList, *args):
+        """ Sort items by name filter.
+            Return the filtered list.
+        """
+        sortedItemList = itemList
+        itemName = cmds.textField(self.itemFilterTF, query=True, text=True)
+        if itemList and itemName:
+            sortedItemList = dpUtils.filterName(itemName, itemList, " ")
+        return sortedItemList
 
 
     def actualizeFooter(self, *args):
@@ -151,3 +161,13 @@ class CustomAttr(object):
         # WIP
         #
         print("fooooooter here")
+
+
+##
+#
+#TODO
+#
+# item filter
+# custom attributes by user defined
+# select item and activate just its checkboxes
+# 
