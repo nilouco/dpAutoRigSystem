@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.57"
-DPAR_UPDATELOG = "N556 - Duplicated name new checkin validator."
+DPAR_VERSION_PY3 = "4.01.58"
+DPAR_UPDATELOG = "N643 - Duplicated name optimize searching."
 
 
 
