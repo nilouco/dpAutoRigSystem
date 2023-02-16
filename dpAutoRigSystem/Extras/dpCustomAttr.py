@@ -23,6 +23,7 @@ DPCUSTOMATTR_VERSION = 1.0
 
 ATTR_LIST = ['dpKeepIt']
 ATTR_START = "dp"
+IGNORE_LIST = ['persp', 'top', 'front', 'side']
 
 
 class CustomAttr(object):
@@ -136,7 +137,8 @@ class CustomAttr(object):
     def updateItemsList(self, thisList, *args):
         """ Use the given list to update the items scroll list in the UI.
         """
-        self.itemList = thisList
+        self.itemList = list(set(thisList) - set(IGNORE_LIST))
+        self.itemList.sort()
         cmds.textScrollList(self.itemSL, edit=True, removeAll=True)
         if thisList:
             self.filterList(thisList)
@@ -200,6 +202,7 @@ class CustomAttr(object):
 #
 #TODO
 #
+# define a good layout with scroll
 # populate checkboxes
 # custom attributes by user defined
 # select item and activate just its checkboxes
