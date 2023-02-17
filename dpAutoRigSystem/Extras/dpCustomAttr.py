@@ -3,16 +3,6 @@ from maya import cmds
 from ..Modules.Library import dpUtils
 
 
-
-
-
-# TODO check if we need these modules here
-from ..Modules.Library import dpControls
-
-
-
-
-
 # global variables to this module:    
 CLASS_NAME = "CustomAttr"
 TITLE = "m212_customAttr"
@@ -35,51 +25,39 @@ class CustomAttr(object):
         self.presetDic = presetDic
         self.presetName = presetName
         self.ui = ui
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-        self.itemList = []
         # call main UI function
         if self.ui:
-            self.itemF = self.getItemFilter()
+            self.getItemFilter()
             self.closeUI()
             self.mainUI()
+            self.jobChangeSelection()
+
+
+    def jobChangeSelection(self, *args):
+        """ Create a scriptJob to read the selection changing to update the UI.
+        """
+        cmds.scriptJob(event=('SelectionChanged', self.clearFilterTxt), parent='dpCustomAttributesWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+
+
+    def clearFilterTxt(self, *args):
+        """
+        """
+        cmds.textFieldButtonGrp(self.itemFilterTFG, edit=True, text="")
 
 
     def getItemFilter(self, *args):
         """
         """
-        itemF = cmds.itemFilter(byType="transform")
+        self.itemF = cmds.itemFilter(byType="transform")
         for ignoreIt in IGNORE_LIST:
-            itemF = cmds.itemFilter(difference=(itemF, cmds.itemFilter(byName=ignoreIt)))
-        return itemF
-
-
-    def changeItemSelectionConnection(self, *args):
-        """
-        """
-        # get current selection type (all, selected or existing custom attributes)
-        selectionRadioButton = cmds.radioCollection(self.selectionCollection, query=True, select=True)
-        radioButtonAnnotation = cmds.radioButton(selectionRadioButton, query=True, annotation=True)
-        # fill conform
-        if radioButtonAnnotation == "all":
-            itemSC = cmds.selectionConnection(worldList=True)
-            print("aaallll")
-        elif radioButtonAnnotation == "selected":
-            itemSC = cmds.selectionConnection(activeList=True)
-            print("sellll")
-#        elif radioButtonAnnotation == "existing":
-
-#            self.updateItemsList(self.getExistingList())
-
-#            self.itemSC = 
-        cmds.spreadSheetEditor(self.mainSSE, forceMainConnection=itemSC, edit=True)
+            self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
         
 
-    def getAttrFilter(self, *args):
+    def selectAllTransforms(self, *args):
         """
         """
-        attrIFA = cmds.itemFilterAttr(byName=ATTR_START+"*")
-
-
+        transformList = cmds.ls(selection=False, type="transform")
+        cmds.select(transformList)
 
         
     def closeUI(self, *args):
@@ -101,16 +79,14 @@ class CustomAttr(object):
         customAttributesLayout = cmds.columnLayout('customAttributesLayout', adjustableColumn=True, columnOffset=("both", 10))
         mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=customAttributesLayout)
         cmds.text("headerTxt", label=self.langDic[self.langName]['i267_customHeader']+' "'+ATTR_START+'"', align="left", height=30, font='boldLabelFont', parent=mainLayout)
-        # selection collection
-        self.selectionCollection = cmds.radioCollection('selectionCollection', parent=mainLayout)
-        all = cmds.radioButton(label=self.langDic[self.langName]['i211_all'].capitalize(), annotation="all", onCommand=self.changeItemSelectionConnection)
-        selected = cmds.radioButton(label=self.langDic[self.langName]['i266_selected'], annotation="selected", onCommand=self.changeItemSelectionConnection)
-#        existing = cmds.radioButton(label=self.langDic[self.langName]['m071_existing'], annotation="existing", onCommand=self.changeItemSelectionConnection)
         
+        filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=mainLayout)
+        self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.langDic[self.langName]['i268_filterByName'], text="", buttonLabel=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all'], buttonCommand=self.selectAllTransforms, changeCommand=self.filterByName, adjustableColumn=2, parent=filterLayout)
+
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
-        itemSC = cmds.selectionConnection(activeList=True)
-        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=itemSC, filter=self.itemF, attrRegExp=ATTR_START, parent=tablePaneLayout)
+        self.itemSC = cmds.selectionConnection(activeList=True)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, parent=tablePaneLayout)
         
         # bottom layout for buttons
         buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 60), (2, 60), (3, 100), (4, 60)], parent=mainLayout)
@@ -120,11 +96,30 @@ class CustomAttr(object):
         cmds.button("refreshButton", label=self.langDic[self.langName]['m181_refresh'], backgroundColor=(0.5, 0.5, 0.5), parent=buttonLayout)
         
         # set ui
-        cmds.radioCollection(self.selectionCollection, edit=True, select=selected)
         cmds.showWindow('dpCustomAttributesWindow')
 
 
+    def filterByName(self, filterName=None, *args):
+        """ Sort items by name filter.
+        """
+        if not filterName:
+            filterName = cmds.textFieldButtonGrp(self.itemFilterTFG, query=True, text=True)
+        if filterName:
+            currentItemList = cmds.selectionConnection(self.itemSC, query=True, object=True)
+            if currentItemList:
+                filteredItemList = dpUtils.filterName(filterName, currentItemList, " ")
+                filteredItemList = list(set(filteredItemList) - set(IGNORE_LIST))
+                filteredItemList.sort()
+                cmds.selectionConnection(self.itemSC, edit=True, clear=True)
+                for item in filteredItemList:
+                    cmds.selectionConnection(self.itemSC, edit=True, select=item)
+            
 
+##########################
+#
+# WIP
+#
+#
 
     def getExistingList(self, *args):
         """ Check all nodes in the Maya's scene to find existing custom attributes.
@@ -140,63 +135,10 @@ class CustomAttr(object):
         return existList
 
 
-    def updateItemsList(self, thisList, *args):
-        """ Use the given list to update the items scroll list in the UI.
-        """
-        self.itemList = list(set(thisList) - set(IGNORE_LIST))
-        self.itemList.sort()
-        #cmds.textScrollList(self.itemSL, edit=True, removeAll=True)
-        if thisList:
-            self.filterList(thisList)
-            cmds.textScrollList(self.itemSL, edit=True, append=self.itemList)
-
-
-    def filterList(self, thisList, *args):
-        """ Sort items by name filter.
-            Redeclare self.itemList with the filtered list.
-        """
-        itemName = cmds.textField(self.itemFilterTF, query=True, text=True)
-        if thisList and itemName:
-            self.itemList = dpUtils.filterName(itemName, thisList, " ")
-
-
-    def actualizeFooter(self, *args):
-        """
-        """
-        #
-        # WIP
-        #
-        print("fooooooter here")
-
-    
-    def populateAttrs(self, *args):
-        """
-        """
-        self.cleanUpAttrData()
-        customAttrList = self.getCustomAttrList(self.itemList)
-        # fill with item list data
-        if customAttrList:
-            customAttrList = list(set(customAttrList)) #removes duplicated items
-            for c, customAttr in enumerate(customAttrList):
-                self.attrUI["attrTxt"+str(c)] = cmds.text("attrTxt"+str(c), label=customAttr[2:], align="center", height=30, font='boldLabelFont', parent=self.rightColumnLayout)
-#                self.attrUI["attrSL"+str(c)] = cmds.textScrollList("attrSL"+str(c), width=30, allowMultiSelection=True, selectCommand=self.actualizeFooter, parent=self.rightColumnLayout)
-
-
-    def cleanUpAttrData(self, *args):
-        """ Delete the current attributes UI elements
-        """
-        if self.attrUI:
-            for element in list(self.attrUI):
-                cmds.deleteUI(self.attrUI[element])
-            self.attrUI = {}
-
-
     def getCustomAttrList(self, thisList, *args):
         """
         """
         customAttrList = []
-        if not thisList:
-            thisList = cmds.ls(selection=False, type="transform")
         if thisList:
             for item in thisList:
                 currentItemAttrList = cmds.listAttr(item)
@@ -206,14 +148,15 @@ class CustomAttr(object):
                             customAttrList.append(attr)
         return customAttrList
 
-##
+
+#####################
 #
 #TODO
 #
-# define a good layout with scroll
-# populate checkboxes
-# custom attributes by user defined
-# select item and activate just its checkboxes
+# list only transforms (not joints)
+# filter attributes by starting with 'dp'
+#   need to change attrRegExp of the sse to use fixedAttrList with filtered attributes
+# select all objects with custom attr = like getExistingList
 # dpAttrList
 # dpID
 # 
