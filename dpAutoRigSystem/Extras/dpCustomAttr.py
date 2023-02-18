@@ -28,6 +28,7 @@ class CustomAttr(object):
         # call main UI function
         if self.ui:
             self.getItemFilter()
+            self.getAttrFilter()
             self.closeUI()
             self.mainUI()
             self.jobChangeSelection()
@@ -42,7 +43,23 @@ class CustomAttr(object):
     def clearFilterTxt(self, *args):
         """
         """
+        newAttrFilterList = []
         cmds.textFieldButtonGrp(self.itemFilterTFG, edit=True, text="")
+        #self.getAttrFilter()
+        currentAttrList = cmds.spreadSheetEditor(self.mainSSE, query=True, allAttr=True)#, longNames=False)#, niceNames=False)
+        print("currentAttrList = ", currentAttrList)
+        if currentAttrList:
+            currentAttrList = list(set(currentAttrList))
+            print("currentAttrList = ", currentAttrList)
+            for attr in currentAttrList:
+                if attr.startswith(ATTR_START):
+                    if not attr in newAttrFilterList:
+                        newAttrFilterList.append(attr)
+        #self.attrFilterList = newAttrFilterList
+        print("newAttrFilterList = ", newAttrFilterList)
+
+        cmds.spreadSheetEditor(self.mainSSE, edit=True, fixedAttrList=newAttrFilterList)
+
 
 
     def getItemFilter(self, *args):
@@ -59,7 +76,24 @@ class CustomAttr(object):
         transformList = cmds.ls(selection=False, type="transform")
         cmds.select(transformList)
 
-        
+
+    def getAttrFilter(self, *args):
+        """
+        """
+        self.attrFilterList = []
+        allNodeList = cmds.ls(selection=False, type="transform")
+        for node in allNodeList:
+            nodeAttrList = cmds.listAttr(node)
+            if nodeAttrList:
+                for attr in nodeAttrList:
+                    if attr.startswith(ATTR_START):
+                        if not attr in self.attrFilterList:
+                            self.attrFilterList.append(attr)
+        if self.attrFilterList:
+            self.attrFilterList.sort()
+        print("attrFilterList =", self.attrFilterList)
+
+
     def closeUI(self, *args):
         """ Delete existing CustomAttributes window if it exists.
         """
@@ -86,7 +120,7 @@ class CustomAttr(object):
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
         self.itemSC = cmds.selectionConnection(activeList=True)
-        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, parent=tablePaneLayout)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, fixedAttrList=self.attrFilterList, parent=tablePaneLayout)
         
         # bottom layout for buttons
         buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 60), (2, 60), (3, 100), (4, 60)], parent=mainLayout)
