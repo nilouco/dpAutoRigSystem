@@ -3,7 +3,7 @@ from maya import cmds
 from ..Modules.Library import dpUtils
 
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "CustomAttr"
 TITLE = "m212_customAttr"
 DESCRIPTION = "m213_customAttrDesc"
@@ -16,7 +16,7 @@ ATTR_START = "dp"
 ATTR_DPID = "dpID"
 ATTR_IGNORE = "Count"
 IGNORE_LIST = ['persp', 'top', 'front', 'side']
-DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jnt', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
+DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 
 
 class CustomAttr(object):
@@ -31,42 +31,8 @@ class CustomAttr(object):
         # call main UI function
         if self.ui:
             self.getItemFilter()
-            self.getAttrFilter()
             self.closeUI()
             self.mainUI()
-            self.jobChangeSelection()
-
-
-    def jobChangeSelection(self, *args):
-        """ Create a scriptJob to read the selection changing to update the UI.
-        """
-        cmds.scriptJob(event=('SelectionChanged', self.updateFilter), parent='dpCustomAttributesWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
-
-
-    def updateFilter(self, *args):
-        """
-        """
-        newAttrFilterList = []
-#        self.filterByName()
-        cmds.textFieldButtonGrp(self.itemFilterTFG, edit=True, text="")
-#        self.getAttrFilter()
-        currentAttrList = cmds.spreadSheetEditor(self.mainSSE, query=True, allAttr=True)#, longNames=False)#, niceNames=False)
-        print("currentAttrList = ", currentAttrList)
-        if currentAttrList:
-            currentAttrList = list(set(currentAttrList))
-            print("currentAttrList = ", currentAttrList)
-            for attr in currentAttrList:
-                if attr.startswith(ATTR_START):
-                    if not attr in newAttrFilterList:
-                        newAttrFilterList.append(attr)
-        #self.attrFilterList = newAttrFilterList
-        print("newAttrFilterList = ", newAttrFilterList)
-        if not ATTR_DPID in newAttrFilterList:
-            newAttrFilterList.append(ATTR_DPID)
-        cmds.spreadSheetEditor(self.mainSSE, edit=True, fixedAttrList=newAttrFilterList)
-
-
-
 
 
     def getItemFilter(self, *args):
@@ -75,7 +41,7 @@ class CustomAttr(object):
         self.itemF = cmds.itemFilter(byType="transform")
         for ignoreIt in IGNORE_LIST:
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
-        
+
 
     def selectAllTransforms(self, *args):
         """
@@ -91,24 +57,6 @@ class CustomAttr(object):
                 if addThisItem:
                     cleanTransformList.append(item)
         cmds.select(cleanTransformList)
-
-
-    def getAttrFilter(self, *args):
-        """
-        """
-        self.attrFilterList = []
-        allNodeList = cmds.ls(selection=False, type="transform")
-        for node in allNodeList:
-            nodeAttrList = cmds.listAttr(node)
-            if nodeAttrList:
-                for attr in nodeAttrList:
-                    if attr.startswith(ATTR_START):
-                        if not attr.endswith(ATTR_IGNORE):
-                            if not attr in self.attrFilterList:
-                                self.attrFilterList.append(attr)
-        if self.attrFilterList:
-            self.attrFilterList.sort()
-        print("attrFilterList =", self.attrFilterList)
 
 
     def closeUI(self, *args):
@@ -137,7 +85,7 @@ class CustomAttr(object):
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
         self.itemSC = cmds.selectionConnection(activeList=True)
-        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, fixedAttrList=self.attrFilterList, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         
         # bottom layout for buttons
         buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 60), (2, 60), (3, 100), (4, 60)], parent=mainLayout)
@@ -153,7 +101,6 @@ class CustomAttr(object):
     def filterByName(self, filterName=None, *args):
         """ Sort items by name filter.
         """
-        print("running filterByName........ here")
         if not filterName:
             filterName = cmds.textFieldButtonGrp(self.itemFilterTFG, query=True, text=True)
         if filterName:
@@ -167,48 +114,18 @@ class CustomAttr(object):
                     cmds.selectionConnection(self.itemSC, edit=True, select=item)
             
 
-##########################
-#
-# WIP
-#
-#
-
-    def getExistingList(self, *args):
-        """ Check all nodes in the Maya's scene to find existing custom attributes.
-            Return the existing custom attributes list of nodes.
-        """
-        existList = []
-        allNodeList = cmds.ls(selection=False, type="transform")
-        if allNodeList:
-            for node in allNodeList:
-                customAttrList = self.getCustomAttrList([node])
-                if customAttrList:
-                    existList.append(node)
-        return existList
-
-
-    def getCustomAttrList(self, thisList, *args):
-        """
-        """
-        customAttrList = []
-        if thisList:
-            for item in thisList:
-                currentItemAttrList = cmds.listAttr(item)
-                for attr in currentItemAttrList:
-                    if attr.startswith(ATTR_START):
-                        if cmds.getAttr(item+"."+attr, type=True) == "bool":
-                            customAttrList.append(attr)
-        return customAttrList
 
 
 #####################
 #
 #TODO
 #
-# list only transforms (not joints)
-# filter attributes by starting with 'dp'
-#   need to change attrRegExp of the sse to use fixedAttrList with filtered attributes
-# select all objects with custom attr = like getExistingList
+# buttons
+#   add
+#   remove
+#   refresh?
 # dpAttrList
 # dpID
+#
+# review UI
 # 
