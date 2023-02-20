@@ -13,7 +13,10 @@ DPCUSTOMATTR_VERSION = 1.0
 
 ATTR_LIST = ['dpKeepIt']
 ATTR_START = "dp"
+ATTR_DPID = "dpID"
+ATTR_IGNORE = "Count"
 IGNORE_LIST = ['persp', 'top', 'front', 'side']
+DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jnt', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 
 
 class CustomAttr(object):
@@ -37,15 +40,16 @@ class CustomAttr(object):
     def jobChangeSelection(self, *args):
         """ Create a scriptJob to read the selection changing to update the UI.
         """
-        cmds.scriptJob(event=('SelectionChanged', self.clearFilterTxt), parent='dpCustomAttributesWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+        cmds.scriptJob(event=('SelectionChanged', self.updateFilter), parent='dpCustomAttributesWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
 
 
-    def clearFilterTxt(self, *args):
+    def updateFilter(self, *args):
         """
         """
         newAttrFilterList = []
+#        self.filterByName()
         cmds.textFieldButtonGrp(self.itemFilterTFG, edit=True, text="")
-        #self.getAttrFilter()
+#        self.getAttrFilter()
         currentAttrList = cmds.spreadSheetEditor(self.mainSSE, query=True, allAttr=True)#, longNames=False)#, niceNames=False)
         print("currentAttrList = ", currentAttrList)
         if currentAttrList:
@@ -57,8 +61,11 @@ class CustomAttr(object):
                         newAttrFilterList.append(attr)
         #self.attrFilterList = newAttrFilterList
         print("newAttrFilterList = ", newAttrFilterList)
-
+        if not ATTR_DPID in newAttrFilterList:
+            newAttrFilterList.append(ATTR_DPID)
         cmds.spreadSheetEditor(self.mainSSE, edit=True, fixedAttrList=newAttrFilterList)
+
+
 
 
 
@@ -73,8 +80,17 @@ class CustomAttr(object):
     def selectAllTransforms(self, *args):
         """
         """
-        transformList = cmds.ls(selection=False, type="transform")
-        cmds.select(transformList)
+        cleanTransformList = []
+        allTransformList = cmds.ls(selection=False, type="transform")
+        for item in allTransformList:
+            if not item in cleanTransformList:
+                addThisItem = True
+                for suffix in DONOTDISPLAY_LIST:
+                    if suffix in item:
+                        addThisItem = False
+                if addThisItem:
+                    cleanTransformList.append(item)
+        cmds.select(cleanTransformList)
 
 
     def getAttrFilter(self, *args):
@@ -87,8 +103,9 @@ class CustomAttr(object):
             if nodeAttrList:
                 for attr in nodeAttrList:
                     if attr.startswith(ATTR_START):
-                        if not attr in self.attrFilterList:
-                            self.attrFilterList.append(attr)
+                        if not attr.endswith(ATTR_IGNORE):
+                            if not attr in self.attrFilterList:
+                                self.attrFilterList.append(attr)
         if self.attrFilterList:
             self.attrFilterList.sort()
         print("attrFilterList =", self.attrFilterList)
@@ -120,7 +137,7 @@ class CustomAttr(object):
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
         self.itemSC = cmds.selectionConnection(activeList=True)
-        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, fixedAttrList=self.attrFilterList, parent=tablePaneLayout)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, fixedAttrList=self.attrFilterList, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         
         # bottom layout for buttons
         buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 60), (2, 60), (3, 100), (4, 60)], parent=mainLayout)
@@ -136,6 +153,7 @@ class CustomAttr(object):
     def filterByName(self, filterName=None, *args):
         """ Sort items by name filter.
         """
+        print("running filterByName........ here")
         if not filterName:
             filterName = cmds.textFieldButtonGrp(self.itemFilterTFG, query=True, text=True)
         if filterName:
