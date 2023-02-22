@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from ..Modules.Library import dpUtils
+from functools import partial
 
 
 # global variables to this module:
@@ -11,10 +12,9 @@ ICON = "/Icons/dp_customAttr.png"
 
 DPCUSTOMATTR_VERSION = 1.0
 
-ATTR_LIST = ['dpKeepIt']
 ATTR_START = "dp"
 ATTR_DPID = "dpID"
-ATTR_IGNORE = "Count"
+ATTR_LIST = [ATTR_DPID, "dpDoNotSkinIt", "dpKeepIt", "dpIgnoreIt", "dpControl"]
 IGNORE_LIST = ['persp', 'top', 'front', 'side']
 DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 
@@ -51,7 +51,6 @@ class CustomAttr(object):
     def mainUI(self, *args):
         """ Create window, layouts and elements for the main UI.
         """
-        self.attrUI = {}
         # window
         customAttributes_winWidth  = 380
         customAttributes_winHeight = 300
@@ -70,9 +69,9 @@ class CustomAttr(object):
         self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=2, columnWidth=[(1, 60), (2, 60)], columnOffset=[(1, "both", 5), (2, "both", 5)], parent=mainLayout)
-        cmds.button("addButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), command=self.addAttrUI, parent=buttonLayout)
-        cmds.button("removeButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), command=self.removeAttrUI, parent=buttonLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=2, columnWidth=[(1, 80), (2, 80)], columnOffset=[(1, "both", 5), (2, "both", 5)], parent=mainLayout)
+        cmds.button("addButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
+        cmds.button("removeButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
         # call window
         cmds.showWindow(self.mainWindowName)
 
@@ -108,12 +107,24 @@ class CustomAttr(object):
                 for item in filteredItemList:
                     cmds.selectionConnection(self.itemSC, edit=True, select=item)
         cmds.textFieldButtonGrp(self.itemFilterTFG, edit=True, text="")
-            
+
 
     def addAttrUI(self, *args):
         """
         """
-        print("merci")
+        add_winWidth  = 220
+        add_winHeight = 300
+        cmds.window(self.addWindowName, title=self.langDic[self.langName]['m212_customAttr']+" "+str(DPCUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        addAttrLayout = cmds.columnLayout('addAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
+        cmds.text("headerAddTxt", label=self.langDic[self.langName]['i045_add']+" "+self.langDic[self.langName]['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=addAttrLayout)
+        cmds.separator(style='none', height=10, parent=addAttrLayout)
+        for a, attr in enumerate(ATTR_LIST):
+            cmds.button("addButton"+str(a), label=attr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.addAttr, a), parent=addAttrLayout)
+            cmds.separator(style='none', height=5, parent=addAttrLayout)
+        cmds.separator(style='single', height=10, parent=addAttrLayout)
+        cmds.text("customAddTxt", label=self.langDic[self.langName]['m212_customAttr']+":", align="left", height=30, parent=addAttrLayout)
+        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustumAttrTFG", label="", text="", buttonLabel=self.langDic[self.langName]['i045_add'], buttonCommand=partial(self.addAttr, "custom", False), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
+        cmds.showWindow(self.addWindowName)
 
 
     def removeAttrUI(self, *args):
@@ -122,10 +133,30 @@ class CustomAttr(object):
         print("thanks")
 
     
-    def addAttr(self, attr, itemList, *args):
+    def addAttr(self, attrIndex, itemList=None, attrName=None, *args):
         """
         """
-        print("kombi")
+        attr = None
+        if not itemList:
+            itemList = cmds.ls(selection=True)
+        if itemList:
+            for item in itemList:
+                if attrIndex == "custom":
+                    if attrName:
+                        attr = attrName
+                    else:
+                        attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
+                elif attrIndex == 0: #dpID
+                    id = dpUtils.generateID(item)
+                    cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
+                    cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
+                    cmds.pause(seconds=1)
+                else:
+                    attr = ATTR_LIST[attrIndex]
+                if attr:
+                    cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=True)
+                    cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
+        print("kombi", attrIndex, itemList)
 
 
     def removeAttr(self, attr, itemList, *args):
@@ -134,10 +165,7 @@ class CustomAttr(object):
         print("netoDaPrefeitura")
 
 
-    def generateID(self, itemList, *args):
-        """
-        """
-        print("Affrixieieity")
+
 
 
 
