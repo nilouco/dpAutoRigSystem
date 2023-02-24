@@ -113,7 +113,7 @@ class CustomAttr(object):
         """
         """
         add_winWidth  = 220
-        add_winHeight = 300
+        add_winHeight = 260
         cmds.window(self.addWindowName, title=self.langDic[self.langName]['m212_customAttr']+" "+str(DPCUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         addAttrLayout = cmds.columnLayout('addAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.text("headerAddTxt", label=self.langDic[self.langName]['i045_add']+" "+self.langDic[self.langName]['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=addAttrLayout)
@@ -134,29 +134,42 @@ class CustomAttr(object):
 
     
     def addAttr(self, attrIndex, itemList=None, attrName=None, *args):
-        """
+        """ Create attributes in the selected transform if them don't exists yet.
         """
         attr = None
         if not itemList:
             itemList = cmds.ls(selection=True)
         if itemList:
+            if self.ui:
+                progressAmount = 0
+                cmds.progressWindow(title=self.langDic[self.langName]['m212_customAttr'], maxValue=len(itemList), progress=progressAmount, status='Adding Attribute', isInterruptable=False)
             for item in itemList:
+                if self.ui:
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, progress=progressAmount)
                 if attrIndex == "custom":
                     if attrName:
                         attr = attrName
-                    else:
+                    elif self.ui:
                         attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
+                        if attr:
+                            if not attr.startswith(ATTR_START):
+                                attr = ATTR_START+attr[0].capitalize()+attr[1:]
                 elif attrIndex == 0: #dpID
-                    id = dpUtils.generateID(item)
-                    cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
-                    cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
-                    cmds.pause(seconds=1)
+                    if not cmds.objExists(item+"."+ATTR_DPID):
+                        id = dpUtils.generateID(item)
+                        cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
+                        cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
+                        cmds.pause(seconds=1)
                 else:
                     attr = ATTR_LIST[attrIndex]
                 if attr:
-                    cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=True)
-                    cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
-        print("kombi", attrIndex, itemList)
+                    if not cmds.objExists(item+"."+attr):
+                        cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
+                        cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
+            if self.ui:
+                cmds.progressWindow(endProgress=True)
+                cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
 
 
     def removeAttr(self, attr, itemList, *args):
