@@ -41,7 +41,7 @@ class CustomAttr(object):
 
 
     def getItemFilter(self, *args):
-        """
+        """ Create a selection filter by transform type excluding the ignoreIt list.
         """
         self.itemF = cmds.itemFilter(byType="transform")
         for ignoreIt in IGNORE_LIST:
@@ -69,15 +69,16 @@ class CustomAttr(object):
         self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=2, columnWidth=[(1, 80), (2, 80)], columnOffset=[(1, "both", 5), (2, "both", 5)], parent=mainLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=mainLayout)
         cmds.button("addButton", label=self.langDic[self.langName]['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
         cmds.button("removeButton", label=self.langDic[self.langName]['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
+        cmds.button("updateIDButton", label=self.langDic[self.langName]['i089_update']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.updateID, parent=buttonLayout)
         # call window
         cmds.showWindow(self.mainWindowName)
 
 
     def selectAllTransforms(self, *args):
-        """
+        """ Just select all transform nodes in the scene.
         """
         cleanTransformList = []
         allTransformList = cmds.ls(selection=False, type="transform")
@@ -110,8 +111,9 @@ class CustomAttr(object):
 
 
     def addAttrUI(self, *args):
+        """ Create a window with buttons to add new attributes.
         """
-        """
+        dpUtils.closeUI(self.addWindowName)
         add_winWidth  = 220
         add_winHeight = 260
         cmds.window(self.addWindowName, title=self.langDic[self.langName]['m212_customAttr']+" "+str(DPCUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -127,12 +129,6 @@ class CustomAttr(object):
         cmds.showWindow(self.addWindowName)
 
 
-    def removeAttrUI(self, *args):
-        """
-        """
-        print("thanks")
-
-    
     def addAttr(self, attrIndex, itemList=None, attrName=None, *args):
         """ Create attributes in the selected transform if them don't exists yet.
         """
@@ -172,26 +168,77 @@ class CustomAttr(object):
                 cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
 
 
-    def removeAttr(self, attr, itemList, *args):
+    def removeAttrUI(self, *args):
         """
         """
-        print("netoDaPrefeitura")
+        dpUtils.closeUI(self.removeWindowName)
+        remove_winWidth  = 150
+        remove_winHeight = 250
+        cmds.window(self.removeWindowName, title=self.langDic[self.langName]['m212_customAttr']+" "+str(DPCUSTOMATTR_VERSION), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        removeAttrLayout = cmds.columnLayout('removeAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
+        cmds.text("headerRemoveTxt", label=self.langDic[self.langName]['i046_remove']+" "+self.langDic[self.langName]['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=removeAttrLayout)
+        cmds.separator(style='none', height=10, parent=removeAttrLayout)
+        toRemoveAttrList = self.getCustomAttrList()
+        if toRemoveAttrList:
+            toRemoveAttrList = list(set(toRemoveAttrList))
+            toRemoveAttrList.sort()
+            for r, rAttr in enumerate(toRemoveAttrList):
+                cmds.button("removeButton"+str(r), label=rAttr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.removeAttr, rAttr), parent=removeAttrLayout)
+                cmds.separator(style='none', height=5, parent=removeAttrLayout)
+        else:
+            cmds.text("noCustomAttrTxt", label=self.langDic[self.langName]['i062_notFound']+" "+self.langDic[self.langName]['m212_customAttr'])
+        cmds.showWindow(self.removeWindowName)
+    
+
+    def removeAttr(self, attr, itemList=None, *args):
+        """
+        """
+        itemList = self.getItemList(itemList)
+        if itemList:
+            for item in itemList:
+                if cmds.objExists(item+"."+attr):
+                    cmds.setAttr(item+"."+attr, edit=True, lock=False)
+                    cmds.deleteAttr(item+"."+attr)
+        self.removeAttrUI()
 
 
+    def getCustomAttrList(self, itemList=None, *args):
+        """
+        """
+        customAttrList = []
+        itemList = self.getItemList(itemList)
+        if itemList:    
+            for item in itemList:
+                currentItemAttrList = cmds.listAttr(item)
+                if currentItemAttrList:
+                    if ATTR_DPID in currentItemAttrList:
+                        customAttrList.append(ATTR_DPID)
+                    for attr in currentItemAttrList:
+                        if attr.startswith(ATTR_START):
+                            if cmds.getAttr(item+"."+attr, type=True) == "bool":
+                                customAttrList.append(attr)
+        return customAttrList
 
 
+    def getItemList(self, itemList=None, *args):
+        """
+        """
+        if not itemList:
+            return cmds.ls(selection=True, type="transform")
+        return itemList
 
+
+    def updateID(self, itemList, *args):
+        """
+        """
+        print("affrisiieiietei")
 
 #####################
 #
 #TODO
 #
 # buttons
-#   add
-#   remove
-#   refresh?
-# dpAttrList
-# dpID
+#   updateID
 #
 # review UI
-# 
+# review method descriptions
