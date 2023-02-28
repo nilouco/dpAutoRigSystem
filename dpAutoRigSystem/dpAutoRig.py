@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.58"
-DPAR_UPDATELOG = "N643 - Duplicated name optimize searching."
+DPAR_VERSION_PY3 = "4.01.59"
+DPAR_UPDATELOG = "N598 - Custom attributes new Extra tool."
 
 
 
