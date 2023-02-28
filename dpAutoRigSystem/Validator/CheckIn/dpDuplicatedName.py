@@ -10,7 +10,7 @@ TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 
-dpDuplicatedName_Version = 1.0
+dpDuplicatedName_Version = 1.1
 
 class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -46,54 +46,60 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
-            # analisys the elements in the allObjectList in order to put it with ordenation from children to grandfather (inverted hierarchy)
-            sizeList = []
-            orderedObjList = []
-            for i, element in enumerate(toCheckList):
-                # find the number of ocorrences of "|" in the string (element)
-                number = element.count("|")
-                # add to a list another list with number and element
-                sizeList.append([number, element])
-            # sort (put in alphabetic order to A-Z) and reverse (invert the order to Z-A)
-            sizeList.sort()
-            sizeList.reverse()
-            # add the elements to the final orderedObjList
-            for n, value in enumerate(sizeList):
-                orderedObjList.append(sizeList[n][1])
-            # prepare a list with nodeNames to iteration
-            shortNameList = []
-            for longName in orderedObjList:
-                # verify if there are childrens in order to get the shortNames
-                if "|" in longName:
-                    shortNameList.append(longName[longName.rfind("|")+1:])
-                else:
-                    shortNameList.append(longName)
-            # compare each obj in the list with the others, deleting it from the original list in order to avoid compare itself
-            n = 0
-            for i, obj in enumerate(shortNameList):
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-                # use another list without the first element to compare it the item repeats
-                anotherList = shortNameList[i+1:]
-                for item in anotherList:
-                    if cmds.objExists(orderedObjList[i]):
-                        if obj == item:
-                            # found issue here
-                            self.checkedObjList.append(orderedObjList[i])
-                            self.foundIssueList.append(True)
-                            if self.verifyMode:
-                                self.resultOkList.append(False)
-                            else: #fix
-                                try:
-                                    cmds.rename(orderedObjList[i], obj+str(n))
-                                    n += 1
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+orderedObjList[i])
-                                except:
+            foundDuplicated = False
+            for node in toCheckList:
+                if "|" in node:
+                    foundDuplicated = True
+                    break
+            if foundDuplicated:
+                # analisys the elements in the allObjectList in order to put it with ordenation from children to grandfather (inverted hierarchy)
+                sizeList = []
+                orderedObjList = []
+                for i, element in enumerate(toCheckList):
+                    # find the number of ocorrences of "|" in the string (element)
+                    number = element.count("|")
+                    # add to a list another list with number and element
+                    sizeList.append([number, element])
+                # sort (put in alphabetic order to A-Z) and reverse (invert the order to Z-A)
+                sizeList.sort()
+                sizeList.reverse()
+                # add the elements to the final orderedObjList
+                for n, value in enumerate(sizeList):
+                    orderedObjList.append(sizeList[n][1])
+                # prepare a list with nodeNames to iteration
+                shortNameList = []
+                for longName in orderedObjList:
+                    # verify if there are childrens in order to get the shortNames
+                    if "|" in longName:
+                        shortNameList.append(longName[longName.rfind("|")+1:])
+                    else:
+                        shortNameList.append(longName)
+                # compare each obj in the list with the others, deleting it from the original list in order to avoid compare itself
+                n = 0
+                for i, obj in enumerate(shortNameList):
+                    if self.verbose:
+                        # Update progress window
+                        progressAmount += 1
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                    # use another list without the first element to compare it the item repeats
+                    anotherList = shortNameList[i+1:]
+                    for item in anotherList:
+                        if cmds.objExists(orderedObjList[i]):
+                            if obj == item:
+                                # found issue here
+                                self.checkedObjList.append(orderedObjList[i])
+                                self.foundIssueList.append(True)
+                                if self.verifyMode:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+orderedObjList[i])
+                                else: #fix
+                                    try:
+                                        cmds.rename(orderedObjList[i], obj+str(n))
+                                        n += 1
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+orderedObjList[i])
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+orderedObjList[i])
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
