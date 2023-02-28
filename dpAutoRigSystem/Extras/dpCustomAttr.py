@@ -136,27 +136,26 @@ class CustomAttr(object):
         if not itemList:
             itemList = cmds.ls(selection=True)
         if itemList:
-            if self.ui:
-                progressAmount = 0
-                cmds.progressWindow(title=self.langDic[self.langName]['m212_customAttr'], maxValue=len(itemList), progress=progressAmount, status='Adding Attribute', isInterruptable=False)
             for item in itemList:
-                if self.ui:
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount)
                 if attrIndex == "custom":
                     if attrName:
                         attr = attrName
                     elif self.ui:
                         attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
                         if attr:
-                            if not attr.startswith(ATTR_START):
-                                attr = ATTR_START+attr[0].capitalize()+attr[1:]
+                            if not attr == ATTR_START:
+                                if not attr.startswith(ATTR_START):
+                                    attr = ATTR_START+attr[0].capitalize()+attr[1:]
+                                else:
+                                    point = len(ATTR_START)
+                                    attr = attr[:point]+attr[point].capitalize()+attr[point+1:]
+                            else:
+                                attr = None
                 elif attrIndex == 0: #dpID
                     if not cmds.objExists(item+"."+ATTR_DPID):
                         id = dpUtils.generateID(item)
                         cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
                         cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
-                        cmds.pause(seconds=1)
                 else:
                     attr = ATTR_LIST[attrIndex]
                 if attr:
@@ -164,15 +163,15 @@ class CustomAttr(object):
                         cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
                         cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
             if self.ui:
-                cmds.progressWindow(endProgress=True)
-                cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
+                if cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, exists=True):
+                    cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
 
 
     def removeAttrUI(self, *args):
-        """
+        """ Create a window showing the current dp custom attributes to delete them.
         """
         dpUtils.closeUI(self.removeWindowName)
-        remove_winWidth  = 150
+        remove_winWidth  = 200
         remove_winHeight = 250
         cmds.window(self.removeWindowName, title=self.langDic[self.langName]['m212_customAttr']+" "+str(DPCUSTOMATTR_VERSION), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         removeAttrLayout = cmds.columnLayout('removeAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
@@ -182,16 +181,16 @@ class CustomAttr(object):
         if toRemoveAttrList:
             toRemoveAttrList = list(set(toRemoveAttrList))
             toRemoveAttrList.sort()
-            for r, rAttr in enumerate(toRemoveAttrList):
-                cmds.button("removeButton"+str(r), label=rAttr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.removeAttr, rAttr), parent=removeAttrLayout)
+            for rAttr in toRemoveAttrList:
+                cmds.button("removeButton"+rAttr, label=rAttr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.removeAttr, rAttr), parent=removeAttrLayout)
                 cmds.separator(style='none', height=5, parent=removeAttrLayout)
         else:
             cmds.text("noCustomAttrTxt", label=self.langDic[self.langName]['i062_notFound']+" "+self.langDic[self.langName]['m212_customAttr'])
         cmds.showWindow(self.removeWindowName)
-    
+
 
     def removeAttr(self, attr, itemList=None, *args):
-        """
+        """ Delete the given attribute and reload the removeAttrUI.
         """
         itemList = self.getItemList(itemList)
         if itemList:
@@ -199,11 +198,13 @@ class CustomAttr(object):
                 if cmds.objExists(item+"."+attr):
                     cmds.setAttr(item+"."+attr, edit=True, lock=False)
                     cmds.deleteAttr(item+"."+attr)
-        self.removeAttrUI()
+                    if self.ui:
+                        if cmds.button("removeButton"+attr, query=True, exists=True):
+                            cmds.deleteUI("removeButton"+attr)
 
 
     def getCustomAttrList(self, itemList=None, *args):
-        """
+        """ Return all boolean attributes starting "dp".
         """
         customAttrList = []
         itemList = self.getItemList(itemList)
@@ -221,24 +222,15 @@ class CustomAttr(object):
 
 
     def getItemList(self, itemList=None, *args):
-        """
+        """ Check if the itemList is a valid item or select all transform to return it.
         """
         if not itemList:
             return cmds.ls(selection=True, type="transform")
         return itemList
 
 
-    def updateID(self, itemList, *args):
+    def updateID(self, itemList=None, *args):
+        """ Remove and Add a new dpID attribute.
         """
-        """
-        print("affrisiieiietei")
-
-#####################
-#
-#TODO
-#
-# buttons
-#   updateID
-#
-# review UI
-# review method descriptions
+        self.removeAttr(ATTR_DPID, itemList)
+        self.addAttr(0, itemList)
