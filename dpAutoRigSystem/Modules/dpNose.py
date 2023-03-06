@@ -350,10 +350,10 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 middleCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+"_Ctrl"
                 tipCtrlName      = side+self.userGuideName+"_"+self.langDic[self.langName]['c120_tip']+"_Ctrl"
                 bottomCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c100_bottom']+"_Ctrl"
-                lSideCtrlName    = side+self.userGuideName+"_"+leftSideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
-                rSideCtrlName    = side+self.userGuideName+"_"+rightSideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
-                lNostrilCtrlName = side+self.userGuideName+"_"+leftSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
-                rNostrilCtrlName = side+self.userGuideName+"_"+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
+                lSideCtrlName    = leftSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
+                rSideCtrlName    = rightSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
+                lNostrilCtrlName = leftSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
+                rNostrilCtrlName = rightSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
                 
                 # creating joints:
                 self.middleJnt = cmds.joint(name=middleJntName, scaleCompensate=False)
