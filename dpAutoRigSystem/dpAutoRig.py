@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.60"
-DPAR_UPDATELOG = "N640 - Nose side control renaming."
+DPAR_VERSION_PY3 = "4.01.61"
+DPAR_UPDATELOG = "N646 - Mirror shape reconnect deformers."
 
 
 
