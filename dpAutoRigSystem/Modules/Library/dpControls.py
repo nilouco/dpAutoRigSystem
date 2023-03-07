@@ -559,18 +559,26 @@ class ControlClass(object):
                     for destTransform in destinationList:
                         needKeepVis = False
                         sourceVis = None
+                        defList = False
                         dupSourceItem = cmds.duplicate(sourceItem)[0]
                         if keepColor:
                             self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
                         if destShapeList:
-                            # keep visibility connections if exists:
                             for destShape in destShapeList:
+                                # keep visibility connections if exists:
                                 visConnectList = cmds.listConnections(destShape+".visibility", destination=False, source=True, plugs=True)
                                 if visConnectList:
                                     needKeepVis = True
                                     sourceVis = visConnectList[0]
                                     break
+                            for destShape in destShapeList:
+                                # keep deformers if exists
+                                try:
+                                    defList = cmds.findDeformers(destShape)
+                                    break
+                                except:
+                                    pass
                             if clearDestinationShapes:
                                 cmds.delete(destShapeList)
                         # hack: unparent destination children in order to get a good shape hierarchy order as index 0:
@@ -578,6 +586,11 @@ class ControlClass(object):
                         if destChildrenList:
                             self.destChildrenGrp = cmds.group(destChildrenList, name="dpTemp_DestChildren_Grp")
                             cmds.parent(self.destChildrenGrp, world=True)
+                        if defList:
+                            for deformerNode in defList:
+                                if cmds.objExists(deformerNode):
+                                    if not cmds.objectType(deformerNode) == "tweak":
+                                        cmds.deformer(deformerNode, edit=True, geometry=dupSourceItem)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
                             if needKeepVis:
@@ -591,6 +604,13 @@ class ControlClass(object):
                                 cmds.makeIdentity(forcedTransform, apply=True, translate=True, rotate=True, scale=True)
                                 cmds.parent(forcedShape, destTransform, relative=True, shape=True)
                                 cmds.delete(forcedTransform)
+                                if defList:
+                                    histList = cmds.listHistory(forcedShape)
+                                    if histList:
+                                        for defNode in histList:
+                                            if cmds.objExists(defNode):
+                                                if cmds.objectType(defNode) == "transformGeometry":
+                                                    cmds.delete(defNode)
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
                         # restore children transforms to correct parent hierarchy:
