@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.59"
-DPAR_UPDATELOG = "N598 - Custom attributes new Extra tool."
+DPAR_VERSION_PY3 = "4.01.60"
+DPAR_UPDATELOG = "N640 - Nose side control renaming."
 
 
 
@@ -587,9 +587,9 @@ class DP_AutoRig_UI(object):
         self.allUIs["mirrorCalibrationLayout"] = cmds.rowColumnLayout('mirrorCalibrationLayout', numberOfColumns=6, columnWidth=[(1, 60), (2, 40), (3, 40), (4, 40), (5, 40), (6, 70)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'left'), (4, 'right'), (5, 'left'), (6, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 20)], parent="mirrorCalibrationFL" )
         self.allUIs["prefixT"] = cmds.text("prefixT", label=self.langDic[self.langName]['i144_prefix'], parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["fromPrefixT"] = cmds.text("fromPrefixT", label=self.langDic[self.langName]['i036_from'], parent=self.allUIs["mirrorCalibrationLayout"])
-        self.allUIs["fromPrefixTF"] = cmds.textField('fromPrefixTF', text="L_", parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["fromPrefixTF"] = cmds.textField('fromPrefixTF', text=self.langDic[self.langName]['p002_left']+"_", parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["toPrefixT"] = cmds.text("toPrefixT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorCalibrationLayout"])
-        self.allUIs["toPrefixTF"] = cmds.textField('toPrefixTF', text="R_", parent=self.allUIs["mirrorCalibrationLayout"])
+        self.allUIs["toPrefixTF"] = cmds.textField('toPrefixTF', text=self.langDic[self.langName]['p003_right']+"_", parent=self.allUIs["mirrorCalibrationLayout"])
         self.allUIs["mirrorCalibrationButton"] = cmds.button("mirrorCalibrationButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(0.5, 0.7, 1.0), height=30, width=70, command=self.ctrls.mirrorCalibration, parent=self.allUIs["mirrorCalibrationLayout"])
         
         # ControlShapeIO - frameLayout:
@@ -607,9 +607,9 @@ class DP_AutoRig_UI(object):
         for axis in mirrorShapeMenuItemList:
             cmds.menuItem(label=axis, parent=self.allUIs["axisShapeMenu"])
         self.allUIs["fromPrefixShapeT"] = cmds.text("fromPrefixShapeT", label=self.langDic[self.langName]['i036_from'], parent=self.allUIs["mirrorShapeLayout"])
-        self.allUIs["fromPrefixShapeTF"] = cmds.textField('fromPrefixShapeTF', text="L_", parent=self.allUIs["mirrorShapeLayout"])
+        self.allUIs["fromPrefixShapeTF"] = cmds.textField('fromPrefixShapeTF', text=self.langDic[self.langName]['p002_left']+"_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeT"] = cmds.text("toPrefixShapeT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorShapeLayout"])
-        self.allUIs["toPrefixShapeTF"] = cmds.textField('toPrefixShapeTF', text="R_", parent=self.allUIs["mirrorShapeLayout"])
+        self.allUIs["toPrefixShapeTF"] = cmds.textField('toPrefixShapeTF', text=self.langDic[self.langName]['p003_right']+"_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.mirrorShape, parent=self.allUIs["mirrorShapeLayout"])
 
         # edit formLayout in order to get a good scalable window:
