@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.61"
-DPAR_UPDATELOG = "N646 - Mirror shape reconnect deformers."
+DPAR_VERSION_PY3 = "4.01.62"
+DPAR_UPDATELOG = "N642 - Review published file viewport options."
 
 
 

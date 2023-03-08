@@ -7,7 +7,7 @@ import shutil
 import os
 
 
-DPPACKAGER_VERSION = 1.0
+DPPACKAGER_VERSION = 1.1
 
 
 RIGPREVIEW = "Rigging Preview"
@@ -147,7 +147,7 @@ class Packager(object):
         dpUtils.closeUI("dpImagerWindow")
         dpImagerWindow = cmds.window('dpImagerWindow', width=720, height=720, menuBarVisible=False, titleBar=True, visible=True)
         cmds.paneLayout(parent=dpImagerWindow)
-        dpImagerPanel = cmds.modelPanel(menuBarVisible=False, label='dpdpImagerPanel')
+        dpImagerPanel = cmds.modelPanel(menuBarVisible=False, label='dpImagerPanel')
         cmds.modelEditor(dpImagerPanel, edit=True, displayAppearance='smoothShaded')
         barLayout = cmds.modelPanel(dpImagerPanel, query=True, barLayout=True)
         cmds.frameLayout(barLayout, edit=True, collapse=True)
@@ -194,6 +194,9 @@ class Packager(object):
         cmds.camera(cam, edit=True, aspectRatio=currentCamAspectRatio)
         if currentCtrlLyrDisplay:
             cmds.setAttr(CTRL_LAYER+".hideOnPlayback", currentCtrlLyrDisplay)
+        # force persp viewport to show file as default view options
+        activeEditor = cmds.playblast(activeEditor=True)
+        cmds.modelEditor(activeEditor, edit=True, displayAppearance='smoothShaded', xray=False, wireframeOnShaded=False, occlusionCulling=False, shadows=False, polymeshes=True, pivots=False, nurbsCurves=True, jointXray=False, displayTextures=False, useDefaultMaterial=False, activeComponentsXray=False)
 
 
     def toHistory(self, scenePath, fileShortName, destinationFolder, *args):
