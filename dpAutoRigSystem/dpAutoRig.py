@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.01.62"
-DPAR_UPDATELOG = "N642 - Review published file viewport options."
+DPAR_VERSION_PY3 = "4.02.00"
+DPAR_UPDATELOG = "Release."
 
 
 
