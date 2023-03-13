@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.00"
-DPAR_UPDATELOG = "Release."
+DPAR_VERSION_PY3 = "4.02.01"
+DPAR_UPDATELOG = "N642 - ngSkinTools cleaner."
 
 
 
