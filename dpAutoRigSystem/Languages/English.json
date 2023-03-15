@@ -427,6 +427,8 @@
     "i266_selected"        : "Selected",
     "i267_customHeader"    : "Custom attributes are booleans starting with",
     "i268_filterByName"    : "Filter selected by name",
+    "i269_posedModel"      : "Posed model (animated)",
+    "i270_fixedModel"      : "Fixed model (sculpted)",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -644,6 +646,8 @@
     "m211_eyeFlat"              : "Eye Flat",
     "m212_customAttr"           : "Custom Attributes",
     "m213_customAttrDesc"       : "This tool is designed to create, edit or remove\nuseful custom attributes for the\ndpAutoRigSystem.",
+    "m214_deltaTarget"          : "Delta Target",
+    "m215_deltaTargetDesc"      : "This tool will extract the delta target from a rigged pose model.",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.01"
-DPAR_UPDATELOG = "N642 - ngSkinTools cleaner."
+DPAR_VERSION_PY3 = "4.02.02"
+DPAR_UPDATELOG = "N648 - Delta Target Extra tool."
 
 
 
