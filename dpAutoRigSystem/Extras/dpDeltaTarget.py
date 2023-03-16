@@ -248,7 +248,31 @@ class DeltaTarget(object):
                 deltaX = fixedVerticeList[i].x - posedVerticeList[i].x
                 deltaY = fixedVerticeList[i].y - posedVerticeList[i].y
                 deltaZ = fixedVerticeList[i].z - posedVerticeList[i].z
-                cmds.move(deltaX, deltaY, deltaZ, deltaMesh+".vtx["+str(i)+"]", absolute=True)
+
+
+                # CARRETOS - Debuging logistica avancada!!!
+                print("Carretos in action!!! -------------------------------------------------------")
+                print(str(i))
+                print("deltaMesh+.vtx[i] =", deltaMesh+".vtx["+str(i)+"]")
+                
+                print("fixedVerticeList[i].x =", fixedVerticeList[i].x)
+                print("fixedVerticeList[i].y =", fixedVerticeList[i].y)
+                print("fixedVerticeList[i].z =", fixedVerticeList[i].z)
+                print("posedVerticeList[i].x =", posedVerticeList[i].x)
+                print("posedVerticeList[i].y =", posedVerticeList[i].y)
+                print("posedVerticeList[i].z =", posedVerticeList[i].z)
+                
+                print("deltaX =", deltaX)
+                print("deltaY =", deltaY)
+                print("deltaZ =", deltaZ)
+               
+                print("----------------------------------------------------------------------------")
+
+                if deltaX != 0 or deltaY != 0 or deltaZ != 0:
+                    print ("YES OR by SHAUL")
+                    cmds.move(deltaX, deltaY, deltaZ, deltaMesh+".vtx["+str(i)+"]", relative=True)
+                #cmds.move(deltaX, deltaY, deltaZ, deltaMesh+".vtx["+str(i)+"]", relative=True, objectSpace=True, worldSpaceDistance=True)
+
             
             cmds.progressWindow(endProgress=True)
 
