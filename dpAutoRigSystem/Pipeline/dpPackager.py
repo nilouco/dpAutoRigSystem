@@ -7,7 +7,7 @@ import shutil
 import os
 
 
-DPPACKAGER_VERSION = 1.1
+DPPACKAGER_VERSION = 1.2
 
 
 RIGPREVIEW = "Rigging Preview"
@@ -74,6 +74,7 @@ class Packager(object):
         """ Save a rigging preview screenShot file with the given informations.
             Thanks Caio Hidaka for the help in this code!
         """
+        mayaVersion = cmds.about(installedVersion=True)
         # store current user settings
         currentGrid = cmds.grid(toggle=True, query=True)
         currentDisplayGradient = cmds.displayPref(displayGradient=True, query=True)
@@ -118,6 +119,9 @@ class Packager(object):
         cmds.headsUpDisplay('HudRigPreviewTxt10', section=0, block=10, labelFontSize="large", allowOverlap=True, label="") #starting by 10 to avoid default Maya's HUD already existing
         cmds.headsUpDisplay('HudRigPreviewTxt11', section=0, block=11, labelFontSize="large", allowOverlap=True, label=rigPreview)
         b = 12
+        if pipeData['b_i_maya']:
+            cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=mayaVersion)
+            b += 1
         if pipeData['b_i_version']:
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label="dpAutoRigSystem "+dpARVersion)
             b += 1

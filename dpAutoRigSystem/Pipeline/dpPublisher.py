@@ -11,7 +11,7 @@ reload(dpPipeliner)
 reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.1
+DPPUBLISHER_VERSION = 1.2
 
 
 class Publisher(object):
