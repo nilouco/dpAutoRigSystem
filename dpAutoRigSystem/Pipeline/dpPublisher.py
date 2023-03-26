@@ -262,6 +262,7 @@ class Publisher(object):
                 if not publishFileName[-3:-1] == ".m":
                     publishFileName += ".m"+self.pipeliner.pipeData['sceneName'][-1]
                 publishLog["Published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
+                publishLog["ExportPath"] = self.pipeliner.pipeData['f_drive']+"/"+self.pipeliner.pipeData['f_studio']+"/"+self.pipeliner.pipeData['f_project']+"/"+self.pipeliner.pipeData['f_toClient']+"/"+self.pipeliner.today
                 # comments
                 publishLog["Comment"] = ""
                 commentValue = comments
@@ -291,7 +292,7 @@ class Publisher(object):
                         if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
                         cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
-                        # coments
+                        # comments
                         if not cmds.objExists(self.dpUIinst.masterGrp+".comment"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="comment", dataType="string")
                         cmds.setAttr(self.dpUIinst.masterGrp+".comment", commentValue, type="string")

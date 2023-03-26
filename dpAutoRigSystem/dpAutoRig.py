@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.02"
-DPAR_UPDATELOG = "N671 - Validator check all log fix."
+DPAR_VERSION_PY3 = "4.02.03"
+DPAR_UPDATELOG = "N645 - Write published image path to the log."
 
 
 
@@ -1524,6 +1524,7 @@ class DP_AutoRig_UI(object):
             logText = "\nPublisher"
             logText += "\nScene: "+publishLog["Scene"]
             logText += "\nPublished: "+publishLog["Published"]
+            logText += "\nExported: "+publishLog["ExportPath"]
             logText += "\nComment: "+publishLog["Comment"]+"\n"
         if validatorInstList:
             progressAmount = 0
