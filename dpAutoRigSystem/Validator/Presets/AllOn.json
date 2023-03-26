@@ -2,10 +2,11 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-03-13",
+    "_updated"    : "2023-03-26",
 
     "DuplicatedName"     : true,
     "FreezeTransform"    : true,
+    "HideDataGrp"        : true,
     "NgSkinToolsCleaner" : true,
     "TargetCleaner"      : true,
     "WIPCleaner"         : true
