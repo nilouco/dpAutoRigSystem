@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.04"
-DPAR_UPDATELOG = "N674 - Maya version image preview."
+DPAR_VERSION_PY3 = "4.02.05"
+DPAR_UPDATELOG = "N675 - Added Hide Data_Grp checkout validator."
 
 
 

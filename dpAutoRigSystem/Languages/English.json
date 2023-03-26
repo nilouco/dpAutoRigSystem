@@ -692,6 +692,8 @@
     "v024_duplicatedName"         : "Duplicated name",
     "v025_duplicatedNameDesc"     : "Check if there are any node with\nduplicated name and report them.",
     "v026_ngskintoolsCleaner"     : "NgSkinTools cleaner",
-    "v027_ngskintoolsCleanerDesc" : "This validator will clean-up all ngSkinTools custom nodes forever."
+    "v027_ngskintoolsCleanerDesc" : "This validator will clean-up all ngSkinTools custom nodes forever.",
+    "v028_hideDataGrp"            : "Hide Data_Grp",
+    "v029_hideDataGrpDesc"        : "This validator will hide the Data_Grp if it isn't hidden yet."
 
 }
