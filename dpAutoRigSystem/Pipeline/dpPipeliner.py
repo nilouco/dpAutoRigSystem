@@ -7,7 +7,7 @@ from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.2
+DPPIPELINER_VERSION = 1.3
 
 PIPE_FOLDER = "_dpPipeline"
 
@@ -105,7 +105,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-02-06",
+        "updated" : "2023-03-26",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -134,6 +134,7 @@ class Pipeliner(object):
         "b_zip"        : True,
         "b_cloud"      : True,
         "b_imager"     : True,
+        "b_i_maya"     : True,
         "b_i_version"  : True,
         "b_i_studio"   : True,
         "b_i_project"  : True,
@@ -183,6 +184,7 @@ class Pipeliner(object):
         "b_zip"        : "i253_bZipAnn",
         "b_cloud"      : "i254_bCloudAnn",
         "b_imager"     : "i255_bImagerAnn",
+        "b_i_maya"     : "i269_biMaya",
         "b_i_version"  : "i256_biVersionAnn",
         "b_i_studio"   : "i257_biStudioAnn",
         "b_i_project"  : "i258_biProjectAnn",

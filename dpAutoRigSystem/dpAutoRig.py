@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.03"
-DPAR_UPDATELOG = "N645 - Write published image path to the log."
+DPAR_VERSION_PY3 = "4.02.04"
+DPAR_UPDATELOG = "N674 - Maya version image preview."
 
 
 
