@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.01"
-DPAR_UPDATELOG = "N642 - ngSkinTools cleaner."
+DPAR_VERSION_PY3 = "4.02.02"
+DPAR_UPDATELOG = "N671 - Validator check all log fix."
 
 
 
@@ -644,8 +644,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
         cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i208_checkin'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
-        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, True), parent=self.allUIs["selectedCheckIn2Layout"])
-        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, False), parent=self.allUIs["selectedCheckIn2Layout"])
+        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckIn2Layout"])
         cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
         # check-out
         self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.langDic[self.langName]['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
@@ -653,8 +653,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
         cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
-        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True), parent=self.allUIs["selectedCheckOut2Layout"])
-        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False), parent=self.allUIs["selectedCheckOut2Layout"])
+        cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOut2Layout"])
         # pipeline check-addons
         if self.pipeliner.pipeData['addOnsPath']:
             if self.getValidatorsAddOns():
@@ -664,8 +664,8 @@ class DP_AutoRig_UI(object):
                 cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
                 cmds.checkBox(label=self.langDic[self.langName]['m004_select']+" "+self.langDic[self.langName]['i211_all']+" "+self.langDic[self.langName]['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-                cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
-                cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                cmds.button(label=self.langDic[self.langName]['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                cmds.button(label=self.langDic[self.langName]['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
