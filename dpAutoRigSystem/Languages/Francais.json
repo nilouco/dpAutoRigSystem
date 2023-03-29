@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-03-26",
+    "_updated"       : "2023-03-28",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -692,5 +692,7 @@
     "v026_ngskintoolsCleaner"     : "NgSkinTools nettoyeur",
     "v027_ngskintoolsCleanerDesc" : "Il va vérifier et suprimer s'il y a des nodes de ngSkinTools dans le fichier.",
     "v028_hideDataGrp"            : "Cacher le Data_Grp",
-    "v029_hideDataGrpDesc"        : "Ce validateur va cacher le Data_Grp s'il n'est pas caché encore."
+    "v029_hideDataGrpDesc"        : "Ce validateur va cacher le Data_Grp s'il n'est pas caché encore.",
+    "v030_resetPose"              : "réinitialiser la pose",
+    "v031_resetPoseDesc"          : "Il va réinitialiser la pose par default du rig."
 }
