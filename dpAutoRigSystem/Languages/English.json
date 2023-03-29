@@ -695,6 +695,6 @@
     "v027_ngskintoolsCleanerDesc" : "This validator will clean-up all ngSkinTools custom nodes forever.",
     "v028_hideDataGrp"            : "Hide Data_Grp",
     "v029_hideDataGrpDesc"        : "This validator will hide the Data_Grp if it isn't hidden yet.",
-    "v030_colorSetCleaner"        : "ColorSet node Cleaner",
-    "v031_colorSetCleanerDesc"    : "This validator will clean-up all colorSet nodes \nwhen Shape Editor and sculpt tools is used."
+    "v030_colorSetCleaner"        : "ColorSet cleaner",
+    "v031_colorSetCleanerDesc"    : "This validator will clean-up all colorSet nodes\nwhen Shape Editor and sculpt tools is used."
 }
