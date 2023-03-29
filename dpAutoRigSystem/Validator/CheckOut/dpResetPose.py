@@ -6,8 +6,8 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "ResetPose"
-TITLE = "v030_resetPose"
-DESCRIPTION = "v031_resetPoseDesc"
+TITLE = "v032_resetPose"
+DESCRIPTION = "v033_resetPoseDesc"
 ICON = "/Icons/dp_resetPose.png"
 
 dpResetPose_Version = 1.0
