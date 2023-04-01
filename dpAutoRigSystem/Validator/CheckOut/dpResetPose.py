@@ -12,6 +12,8 @@ ICON = "/Icons/dp_resetPose.png"
 
 dpResetPose_Version = 1.0
 
+TO_IGNORE = ["rotateOrder"]
+
 class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
@@ -39,11 +41,18 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         
 
         # ---
+
+        # TODO
+        # list attr
+        # get default value
+        # set value as default
+        
+
         # --- validator code --- beginning
         if objList:
             toCheckList = objList
         else:
-            toCheckList = cmds.ls(selection=False, type='mesh')
+            toCheckList = cmds.ls(selection=False, type='transform')
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
@@ -52,10 +61,21 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-                parentNode = cmds.listRelatives(item, parent=True)[0]
                 # conditional to check here
-                if not '_Mesh' in item:
-                    self.checkedObjList.append(parentNode)
+                if cmds.objExists(item+".dpControl"):
+                    self.checkedObjList.append(item)
+
+
+                    # WIP
+                    
+                    attrData = self.getAttrDefaultValueData(item)
+                    
+                    print(item, attrData)
+
+                    
+
+
+                    # 
                     self.foundIssueList.append(True)
                     if self.verifyMode:
                         self.resultOkList.append(False)
@@ -70,9 +90,9 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                         except:
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-#                else:
-#                    self.foundIssueList.append(False)
-#                    self.resultOkList.append(True)
+                #else:
+                #    self.foundIssueList.append(False)
+                #    self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -100,3 +120,25 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
+    
+    def getAttrDefaultValueData(self, node, ignoreAttrList=TO_IGNORE, *args):
+        """
+            Returns a dictionary with a list of default and current values for each attribute.
+        """
+        attrData = {}
+        attrList = cmds.listAttr(node, channelBox=True)
+        allAttrList = cmds.listAttr(node)
+        animAttrList = cmds.listAnimatable(node)
+        if allAttrList and animAttrList:
+            orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in attrList]
+            attrList.extend(orderedAttrs)
+        if ignoreAttrList:
+            for item in ignoreAttrList:
+                if item in attrList:
+                    attrList.remove(item)
+        if attrList:
+            for attr in attrList:
+                attrData[attr] = [cmds.addAttr(node+"."+attr, query=True, defaultValue=True), cmds.getAttr(node+"."+attr)]
+        return attrData
+    
