@@ -22,6 +22,9 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        self.nonDynZeroAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
+        self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
+#        self.axisList = ["X", "Y", "Z"]
     
 
     def runValidator(self, verifyMode=True, objList=None, *args):
@@ -72,11 +75,12 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                     
                     print(item, attrData)
 
-                    
-
+                    for attr in list(attrData):
+                        if not attr[0] == attr[1]:
+                            print("Not IGUAL =", attr, attrData[attr])
 
                     # 
-                    self.foundIssueList.append(True)
+                            self.foundIssueList.append(True)
                     if self.verifyMode:
                         self.resultOkList.append(False)
                     else: #fix
@@ -122,23 +126,33 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
     
-    def getAttrDefaultValueData(self, node, ignoreAttrList=TO_IGNORE, *args):
+    def getAttrDefaultValueData(self, item, ignoreAttrList=TO_IGNORE, *args):
         """
             Returns a dictionary with a list of default and current values for each attribute.
         """
         attrData = {}
-        attrList = cmds.listAttr(node, channelBox=True)
-        allAttrList = cmds.listAttr(node)
-        animAttrList = cmds.listAnimatable(node)
+        attrList = cmds.listAttr(item, channelBox=True)
+        if not attrList:
+            attrList = []
+        allAttrList = cmds.listAttr(item)
+        animAttrList = cmds.listAnimatable(item)
         if allAttrList and animAttrList:
             orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in attrList]
             attrList.extend(orderedAttrs)
         if ignoreAttrList:
-            for item in ignoreAttrList:
-                if item in attrList:
-                    attrList.remove(item)
+            for ignoreAttr in ignoreAttrList:
+                if ignoreAttr in attrList:
+                    attrList.remove(ignoreAttr)
         if attrList:
+            print("attrList =", attrList)
             for attr in attrList:
-                attrData[attr] = [cmds.addAttr(node+"."+attr, query=True, defaultValue=True), cmds.getAttr(node+"."+attr)]
+                print("attr =", attr)
+                attrType = cmds.attributeQuery(attr, node=item, attributeType=True)
+                currentValue = cmds.getAttr(item+"."+attr)
+                if attr in self.nonDynZeroAttrList: #translate and rotate
+                    attrData[attr] = [0.0, currentValue, attrType]
+                elif attr in self.nonDynOneAttrList: #scale
+                    attrData[attr] = [1.0, currentValue, attrType]
+                else: #custom and visibility
+                    attrData[attr] = [cmds.addAttr(item+"."+attr, query=True, defaultValue=True), currentValue, attrType]
         return attrData
-    
