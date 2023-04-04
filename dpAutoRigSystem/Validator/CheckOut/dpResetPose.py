@@ -12,7 +12,21 @@ ICON = "/Icons/dp_resetPose.png"
 
 dpResetPose_Version = 1.0
 
-TO_IGNORE = ["rotateOrder"]
+TO_IGNORE = ["rotateOrder", "scaleCompensate"]
+ATTR_TYPE = {
+                # boolean
+                "bool" : 0,
+                # integer
+                "long" : 1,
+                "short" : 1,
+                "byte" : 1,
+                "enum" : 1,
+                # float
+                "float" : 2,
+                "double" : 2,
+                "doubleAngle" : 2,
+                "doubleLinear" : 2
+            }
 
 class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -24,7 +38,6 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
         self.nonDynZeroAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
         self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
-#        self.axisList = ["X", "Y", "Z"]
     
 
     def runValidator(self, verifyMode=True, objList=None, *args):
@@ -44,13 +57,6 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         
 
         # ---
-
-        # TODO
-        # list attr
-        # get default value
-        # set value as default
-        
-
         # --- validator code --- beginning
         if objList:
             toCheckList = objList
@@ -68,35 +74,39 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                 if cmds.objExists(item+".dpControl"):
                     self.checkedObjList.append(item)
 
-
-                    # WIP
-                    
+                    editedAttrData = {}
                     attrData = self.getAttrDefaultValueData(item)
-                    
-                    print(item, attrData)
-
                     for attr in list(attrData):
-                        if not attr[0] == attr[1]:
-                            print("Not IGUAL =", attr, attrData[attr])
-
-                    # 
-                            self.foundIssueList.append(True)
+                        
+                        attrType = self.getAttrType(attrData[attr][2])
+                        
+                        if attrType == 0: #boolean
+                            if not bool(attrData[attr][0]) == bool(attrData[attr][1]):
+                                editedAttrData[attr] = attrData[attr][0]
+                        elif attrType == 1: #integer
+                            if not int(attrData[attr][0]) == int(attrData[attr][1]):
+                                editedAttrData[attr] = attrData[attr][0]
+                        elif attrType == 2: #float
+                            if not float(attrData[attr][0]) == float(attrData[attr][1]):
+                                editedAttrData[attr] = attrData[attr][0]
+                    
+                    if editedAttrData:
+                        self.foundIssueList.append(True)
+                        #self.messageList.append(str(editedAttrData.keys()))
+                    else:
+                        self.foundIssueList.append(False)
+                    
                     if self.verifyMode:
                         self.resultOkList.append(False)
                     else: #fix
-                        try:
-                            #WIP: (index to fix error OMG!)
-                            parentNode = cmds.listRelatives(item, parent=True)[0] # change index here to test
-                            #raise Exception("Carreto trombado na pista")
-                            cmds.rename(parentNode, parentNode+"_Mesh")
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
-                        except:
-                            self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-                #else:
-                #    self.foundIssueList.append(False)
-                #    self.resultOkList.append(True)
+                        for attr in list(editedAttrData):
+                            try:
+                                cmds.setAttr(item+"."+attr, editedAttrData[attr][0])
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item+"."+attr)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item+"."+attr)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -127,8 +137,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
 
     
     def getAttrDefaultValueData(self, item, ignoreAttrList=TO_IGNORE, *args):
-        """
-            Returns a dictionary with a list of default and current values for each attribute.
+        """ Returns a dictionary with a list of default and current values for each attribute of the given node.
         """
         attrData = {}
         attrList = cmds.listAttr(item, channelBox=True)
@@ -144,9 +153,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                 if ignoreAttr in attrList:
                     attrList.remove(ignoreAttr)
         if attrList:
-            print("attrList =", attrList)
             for attr in attrList:
-                print("attr =", attr)
                 attrType = cmds.attributeQuery(attr, node=item, attributeType=True)
                 currentValue = cmds.getAttr(item+"."+attr)
                 if attr in self.nonDynZeroAttrList: #translate and rotate
@@ -156,3 +163,10 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                 else: #custom and visibility
                     attrData[attr] = [cmds.addAttr(item+"."+attr, query=True, defaultValue=True), currentValue, attrType]
         return attrData
+
+
+    def getAttrType(self, inputData, *args):
+        """ Just return the attribute type number for the given attribute name based in the Maya's attribute types from documentation.
+        """
+        if inputData:
+            return ATTR_TYPE[inputData]
