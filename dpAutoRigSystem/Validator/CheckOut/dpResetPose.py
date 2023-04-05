@@ -86,7 +86,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                             if not int(attrData[attr][0]) == int(attrData[attr][1]):
                                 editedAttrList.append(attr)
                         elif attrType == 2: #float
-                            if not float(attrData[attr][0]) == float(attrData[attr][1]):
+                            if not float(format(attrData[attr][0],".3f")) == float(format(attrData[attr][1],".3f")):
                                 editedAttrList.append(attr)
                     
                     if editedAttrList:
@@ -112,13 +112,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                                 elif attrType == 1: #integer
                                     cmds.setAttr(item+"."+attr, int(attrData[attr][0]))
                                 elif attrType == 2: #float
-                                    #cmds.setAttr(item+"."+attr, float(attrData[attr][0]))
-                                    cmds.setAttr(item+"."+attr, 1)
                                     cmds.setAttr(item+"."+attr, float(format(attrData[attr][0],".3f")))
-                                    print(item, attr, attrData[attr][0])
-                                    print(attrData[attr][0], attrData[attr][1])
-                                    print(format(attrData[attr][0],".3f"))
-                                    print(format(attrData[attr][1],".3f"))
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item+"."+attr)
                             except:
