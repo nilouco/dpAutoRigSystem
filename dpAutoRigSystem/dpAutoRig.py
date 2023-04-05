@@ -74,6 +74,7 @@ try:
     from .Modules import dpLayoutClass
     from .Extras import dpUpdateRigInfo
     from .Extras import dpReorderAttr
+    from .Extras import dpCustomAttr
     from .Languages.Translator import dpTranslator
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
@@ -378,6 +379,7 @@ class DP_AutoRig_UI(object):
         # initialize some objects here:
         self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
         self.publisher = dpPublisher.Publisher(self)
+        self.customAttr = dpCustomAttr.CustomAttr(self, self.langDic, self.langName, self.presetDic, self.presetName, False)
         # --
         
         # creating tabs - mainTabLayout:
@@ -1258,6 +1260,8 @@ class DP_AutoRig_UI(object):
                     self.checkOutInstanceList.append(validatorInstance)
                 else: #addOns
                     self.checkAddOnsInstanceList.append(validatorInstance)
+                    if validatorInstance.customName:
+                        cmds.checkBox(validatorCB, edit=True, label=validatorInstance.customName)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
@@ -2522,6 +2526,9 @@ class DP_AutoRig_UI(object):
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+
+                                # remove dpControl attribute
+                                self.customAttr.removeAttr("dpControl", [worldRef])
                             
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
@@ -2878,6 +2885,8 @@ class DP_AutoRig_UI(object):
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+                                # remove dpControl attribute
+                                self.customAttr.removeAttr("dpControl", [worldRef])
 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

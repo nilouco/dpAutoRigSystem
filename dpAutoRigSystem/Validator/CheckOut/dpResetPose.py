@@ -61,7 +61,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            toCheckList = cmds.ls(selection=False, type='transform')
+            toCheckList = self.dpUIinst.ctrls.getControlList()
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
@@ -74,34 +74,51 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
                 if cmds.objExists(item+".dpControl"):
                     self.checkedObjList.append(item)
 
-                    editedAttrData = {}
+                    editedAttrList = []
                     attrData = self.getAttrDefaultValueData(item)
                     for attr in list(attrData):
-                        
+                        # get attribute type to use in the variables comparation
                         attrType = self.getAttrType(attrData[attr][2])
-                        
                         if attrType == 0: #boolean
-                            if not bool(attrData[attr][0]) == bool(attrData[attr][1]):
-                                editedAttrData[attr] = attrData[attr][0]
+                            if not bool(attrData[attr][0]) == bool(attrData[attr][1]): #defaultValue vs currentValue
+                                editedAttrList.append(attr)
                         elif attrType == 1: #integer
                             if not int(attrData[attr][0]) == int(attrData[attr][1]):
-                                editedAttrData[attr] = attrData[attr][0]
+                                editedAttrList.append(attr)
                         elif attrType == 2: #float
                             if not float(attrData[attr][0]) == float(attrData[attr][1]):
-                                editedAttrData[attr] = attrData[attr][0]
+                                editedAttrList.append(attr)
                     
-                    if editedAttrData:
+                    if editedAttrList:
                         self.foundIssueList.append(True)
-                        #self.messageList.append(str(editedAttrData.keys()))
+                        for a, attr in enumerate(editedAttrList):
+                            if a == 0:
+                                attrString = "."
+                            else:
+                                attrString += "/"
+                            attrString += attr
+                        self.checkedObjList[-1] = item+attrString
                     else:
                         self.foundIssueList.append(False)
                     
                     if self.verifyMode:
                         self.resultOkList.append(False)
                     else: #fix
-                        for attr in list(editedAttrData):
+                        for attr in editedAttrList:
                             try:
-                                cmds.setAttr(item+"."+attr, editedAttrData[attr][0])
+                                attrType = self.getAttrType(attrData[attr][2])
+                                if attrType == 0: #boolean
+                                    cmds.setAttr(item+"."+attr, bool(attrData[attr][0]))
+                                elif attrType == 1: #integer
+                                    cmds.setAttr(item+"."+attr, int(attrData[attr][0]))
+                                elif attrType == 2: #float
+                                    #cmds.setAttr(item+"."+attr, float(attrData[attr][0]))
+                                    cmds.setAttr(item+"."+attr, 1)
+                                    cmds.setAttr(item+"."+attr, float(format(attrData[attr][0],".3f")))
+                                    print(item, attr, attrData[attr][0])
+                                    print(attrData[attr][0], attrData[attr][1])
+                                    print(format(attrData[attr][0],".3f"))
+                                    print(format(attrData[attr][1],".3f"))
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item+"."+attr)
                             except:
@@ -138,6 +155,9 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
     
     def getAttrDefaultValueData(self, item, ignoreAttrList=TO_IGNORE, *args):
         """ Returns a dictionary with a list of default and current values for each attribute of the given node.
+            index 0 = default value
+            index 1 = current value
+            index 2 = attribute type
         """
         attrData = {}
         attrList = cmds.listAttr(item, channelBox=True)
@@ -167,6 +187,10 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
 
     def getAttrType(self, inputData, *args):
         """ Just return the attribute type number for the given attribute name based in the Maya's attribute types from documentation.
+            Return:
+                0 = boolean
+                1 = integer
+                2 = float
         """
         if inputData:
             return ATTR_TYPE[inputData]
