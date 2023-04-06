@@ -36,6 +36,8 @@ class ControlClass(object):
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, self.dpUIinst.langDic, self.dpUIinst.langName, self.dpUIinst.presetDic, self.dpUIinst.presetName, ui=False, verbose=False)
+        self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
+        self.defaultValueWindowName = "dpDefaultValueOptionWindow"
 
 
     # CONTROLS functions:
@@ -1373,6 +1375,7 @@ class ControlClass(object):
     def setupDefaultValues(self, resetMode=True, ctrlList=None, *args):
         """ Set or Reset control attributes to their default values.
             Ask user to run for all nodes if there aren't any selected nodes.
+            Settings argument calls the window to setup each default value for selected nodes.
         """
         if not ctrlList:
             nodeToRunList = self.getSelectedControls()
@@ -1386,9 +1389,8 @@ class ControlClass(object):
             if resetMode:
                 self.resetPose.runValidator(False, nodeToRunList)
             else: #set default values
-                ignoreAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
                 for item in nodeToRunList:
-                    attrList = self.resetPose.getSetupAttrList(item, ignoreAttrList)
+                    attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
                     if attrList:
                         for attr in attrList:
                             cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
@@ -1398,3 +1400,28 @@ class ControlClass(object):
         """ Return the intersection of all dpControls in the scene and the selected items.
         """
         return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))
+    
+
+    def defaultValueOptionsWindow(self, *args):
+        """
+        """
+        dpUtils.closeUI(self.defaultValueWindowName)
+        # window
+        defaultValueOption_winWidth  = 380
+        defaultValueOption_winHeight = 300
+        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i002_options'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        # create UI layout and elements:
+        defaultValueOptionLayout = cmds.columnLayout('defaultValueOptionLayout', adjustableColumn=True, columnOffset=("both", 10))
+        mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=defaultValueOptionLayout)
+        cmds.text("selectedTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], align="left", height=30, font='boldLabelFont', parent=mainLayout)
+        cmds.button("refreshBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m181_refresh'], command=self.refreshSelectedDefaultValues, parent=mainLayout)
+        
+        cmds.separator(style='none', height=10, parent=mainLayout)
+        # call window
+        cmds.showWindow(self.defaultValueWindowName)
+        
+
+    def refreshSelectedDefaultValues(self, *args):
+        """
+        """
+        print("REFRESSSXIETIEI")

@@ -540,9 +540,10 @@ class DP_AutoRig_UI(object):
         
         # setupControl - frameLayout:
         self.allUIs["defaultValuesControlFL"] = cmds.frameLayout('defaultValuesControlFL', label=self.langDic[self.langName]['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
-        self.allUIs["defaultValuesControl2Layout"] = cmds.paneLayout("defaultValuesControl2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["defaultValuesControlFL"])
-        self.allUIs["resetToDefaultValuesButton"] = cmds.button("resetToDefaultValuesButton", label=self.langDic[self.langName]['i271_reset'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=partial(self.ctrls.setupDefaultValues, True), parent=self.allUIs["defaultValuesControl2Layout"])
-        self.allUIs["setDefaultValuesButton"] = cmds.button("setDefaultValuesButton", label=self.langDic[self.langName]['i272_set'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ctrls.setupDefaultValues, False), parent=self.allUIs["defaultValuesControl2Layout"])
+        self.allUIs["defaultValuesControl3Layout"] = cmds.paneLayout("defaultValuesControl3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["defaultValuesControlFL"])
+        self.allUIs["resetToDefaultValuesButton"] = cmds.button("resetToDefaultValuesButton", label=self.langDic[self.langName]['i271_reset'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ctrls.setupDefaultValues, True), parent=self.allUIs["defaultValuesControl3Layout"])
+        self.allUIs["setDefaultValuesButton"] = cmds.button("setDefaultValuesButton", label=self.langDic[self.langName]['i272_set'], backgroundColor=(1.0, 0.8, 0.5), height=30, command=partial(self.ctrls.setupDefaultValues, False), parent=self.allUIs["defaultValuesControl3Layout"])
+        self.allUIs["setupDefaultValuesButton"] = cmds.button("setupDefaultValuesButton", label=self.langDic[self.langName]['i274_setup'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=self.ctrls.defaultValueOptionsWindow, parent=self.allUIs["defaultValuesControl3Layout"])
 
         # createControl - frameLayout:
         self.allUIs["createControlLayout"] = cmds.frameLayout('createControlLayout', label=self.langDic[self.langName]['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent=self.allUIs["controlLayout"])
