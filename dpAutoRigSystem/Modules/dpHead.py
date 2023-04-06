@@ -239,7 +239,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             drivenGrp = cmds.group(attrCtrl, name=drivenGrp)
         if not cmds.objExists(self.jawCtrl+"."+startRotName):
             if positiveRotation: #open
-                cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=0, minValue=0, keyable=True)
+                cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=5, minValue=0, keyable=True)
             else: #close
                 cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=0, maxValue=0, keyable=True)
             cmds.setAttr(self.jawCtrl+"."+startRotName, keyable=False, channelBox=True)

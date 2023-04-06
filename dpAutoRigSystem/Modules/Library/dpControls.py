@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from . import dpUtils
+from ...Validator.CheckOut import dpResetPose
 import os
 import getpass
 import datetime
@@ -34,6 +35,7 @@ class ControlClass(object):
         self.presetName = presetName
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
+        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, self.dpUIinst.langDic, self.dpUIinst.langName, self.dpUIinst.presetDic, self.dpUIinst.presetName, ui=False, verbose=False)
 
 
     # CONTROLS functions:
@@ -674,6 +676,21 @@ class ControlClass(object):
                     self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
             cmds.select(transformList)
     
+
+    def confirmAskUser(self, titleText, messageText, *args):
+        """
+        """
+        # ask user to continue
+        resultQuestion = cmds.confirmDialog(
+                                        title=titleText,
+                                        message=messageText, 
+                                        button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
+                                        defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
+                                        cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
+                                        dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
+        if resultQuestion == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+            return True
+        return False
     
     def dpCreateControlsPreset(self, *args):
         """ Creates a json file as a Control Preset and returns it.
@@ -696,16 +713,10 @@ class ControlClass(object):
             if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
-                confirmSameName = self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']
+                confirmSameName = True
                 if resultName in self.presetDic:
-                    confirmSameName = cmds.confirmDialog(
-                                                        title=self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'], 
-                                                        message=self.dpUIinst.langDic[self.dpUIinst.langName]['i135_existingName'], 
-                                                        button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                                        defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                                        cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                                        dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-                if confirmSameName == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    confirmSameName = self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'], self.dpUIinst.langDic[self.dpUIinst.langName]['i135_existingName'])
+                if confirmSameName:
                     author = getpass.getuser()
                     date = str(datetime.datetime.now().date())
                     resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
@@ -974,14 +985,7 @@ class ControlClass(object):
                             self.mirrorCalibration(selectedNode, fromPrefix, toPrefix)
                 else:
                     # ask to run for all nodes:
-                    mirrorAll = cmds.confirmDialog(
-                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'],
-                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll'], 
-                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         if allNodeList:
                             for node in allNodeList:
@@ -1335,14 +1339,7 @@ class ControlClass(object):
                             self.mirrorShape(selectedNode, fromPrefix, toPrefix, axis)
                 else:
                     # ask to run for all nodes:
-                    mirrorAll = cmds.confirmDialog(
-                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'],
-                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i265_mirrorShapeAll'], 
-                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i265_mirrorShapeAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
@@ -1371,3 +1368,33 @@ class ControlClass(object):
                         cmds.delete(mirrorShapeGrp)
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
+
+
+    def setupDefaultValues(self, resetMode=True, ctrlList=None, *args):
+        """ Set or Reset control attributes to their default values.
+            Ask user to run for all nodes if there aren't any selected nodes.
+        """
+        if not ctrlList:
+            nodeToRunList = self.getSelectedControls()
+            if not nodeToRunList:
+                # ask to run for all nodes:
+                if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i273_runAllNodes']):
+                    nodeToRunList = self.getControlList()
+        else:
+            nodeToRunList = self.getControlList()
+        if nodeToRunList:
+            if resetMode:
+                self.resetPose.runValidator(False, nodeToRunList)
+            else: #set default values
+                ignoreAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
+                for item in nodeToRunList:
+                    attrList = self.resetPose.getSetupAttrList(item, ignoreAttrList)
+                    if attrList:
+                        for attr in attrList:
+                            cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
+    
+
+    def getSelectedControls(self, *args):
+        """ Return the intersection of all dpControls in the scene and the selected items.
+        """
+        return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))

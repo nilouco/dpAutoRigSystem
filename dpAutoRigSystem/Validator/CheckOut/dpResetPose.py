@@ -146,14 +146,10 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
-    
-    def getAttrDefaultValueData(self, item, ignoreAttrList=TO_IGNORE, *args):
-        """ Returns a dictionary with a list of default and current values for each attribute of the given node.
-            index 0 = default value
-            index 1 = current value
-            index 2 = attribute type
+
+    def getSetupAttrList(self, item, ignoreAttrList=TO_IGNORE, *args):
+        """ Returns the desired attribute list to work with set or reset default values.
         """
-        attrData = {}
         attrList = cmds.listAttr(item, channelBox=True)
         if not attrList:
             attrList = []
@@ -166,6 +162,17 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
             for ignoreAttr in ignoreAttrList:
                 if ignoreAttr in attrList:
                     attrList.remove(ignoreAttr)
+        return attrList
+    
+
+    def getAttrDefaultValueData(self, item, *args):
+        """ Returns a dictionary with a list of default and current values for each attribute of the given node.
+            index 0 = default value
+            index 1 = current value
+            index 2 = attribute type
+        """
+        attrData = {}
+        attrList = self.getSetupAttrList(item)
         if attrList:
             for attr in attrList:
                 attrType = cmds.attributeQuery(attr, node=item, attributeType=True)
