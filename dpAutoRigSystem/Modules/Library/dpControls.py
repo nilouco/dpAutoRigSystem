@@ -2,6 +2,7 @@
 from maya import cmds
 from . import dpUtils
 from ...Validator.CheckOut import dpResetPose
+from functools import partial
 import os
 import getpass
 import datetime
@@ -1403,19 +1404,27 @@ class ControlClass(object):
     
 
     def defaultValueEditor(self, *args):
-        """
+        """ Create an UI to edit the attributes default values.
         """
         dpUtils.closeUI(self.defaultValueWindowName)
         # window
-        defaultValueOption_winWidth  = 480
+        defaultValueOption_winWidth  = 430
         defaultValueOption_winHeight = 300
         cmds.window(self.defaultValueWindowName, title=self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         dvMainLayout = cmds.columnLayout('dvMainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueWindowName)
-        dvHeaderLayout = cmds.rowColumnLayout('dvHeaderLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 150), (3, 100)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], adjustableColumn=2, parent=dvMainLayout)
-        cmds.text("selectedTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], align="left", height=30, parent=dvHeaderLayout)
-        cmds.separator(style='none', height=10, parent=dvHeaderLayout)
-        cmds.button("refreshBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m181_refresh'], command=self.populateSelectedControls, parent=dvHeaderLayout)
+        cmds.separator(style='none', height=5, parent=dvMainLayout)
+        dvHeaderLayout = cmds.rowColumnLayout('dvHeaderLayout', numberOfColumns=3, columnWidth=[(1, 150), (2, 10), (3, 180)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], adjustableColumn=2, parent=dvMainLayout)
+        cmds.button("editSelectedCtrlBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], command=self.populateSelectedControls, parent=dvHeaderLayout)
+        cmds.separator(style='none', height=30, parent=dvHeaderLayout)
+        cmds.button("selectAllBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m166_selAllControls'], command=partial(self.selectAllControls, True), parent=dvHeaderLayout)
+        FirstCL = cmds.columnLayout('FirstSL',  adjustableColumn=True, columnOffset=("both", 10), parent=dvMainLayout)
+        firstRL = cmds.rowLayout("firstRL", numberOfColumns=4, columnWidth4=(150, 100, 50, 50), height=32, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=FirstCL)
+        cmds.text("controllerTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i111_controller'], font='boldLabelFont', align="center", parent=firstRL)
+        cmds.text("attributeTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i275_attribute'], font='boldLabelFont', parent=firstRL)
+        cmds.text("defaultTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'], font='boldLabelFont', parent=firstRL)
+        cmds.text("currentTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i276_current'], font='boldLabelFont', parent=firstRL)
+        cmds.separator(style='single', height=10, parent=dvMainLayout)
         self.defaultValueLayout = cmds.scrollLayout('defaultValueMainLayout', width=350, height=200, parent=dvMainLayout)
         self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
         self.populateSelectedControls()
@@ -1424,36 +1433,61 @@ class ControlClass(object):
         
 
     def populateSelectedControls(self, *args):
-        """
+        """ Refresh the default value editor UI to fill it with the selected dpAR controllers.
         """
         try:
             cmds.deleteUI(self.dvSelectedLayout)
         except:
             pass
         self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
-
-
         ctrlList = self.getSelectedControls()
         if ctrlList:
-            cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), height=32, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.dvSelectedLayout)
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i111_controller'], font='boldLabelFont')
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i275_attribute'], font='boldLabelFont')
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'], font='boldLabelFont')
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i276_current'], font='boldLabelFont')
+            ctrlList.sort()
             for c, ctrl in enumerate(ctrlList):
                 attrList = self.resetPose.getSetupAttrList(ctrl, self.ignoreDefaultValuesAttrList)
                 if attrList:
-                    cmds.separator(style='single', height=10, parent=self.dvSelectedLayout)
                     for a, attr in enumerate(attrList):
                         cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.dvSelectedLayout)
                         if a == 0:
-                            cmds.text(label=ctrl)
+                            cmds.button(label=ctrl, command=partial(self.selectControl, ctrl, True))
                         else:
                             cmds.text(label="")
                         cmds.text(label=attr)
-                        
-                        #WIP
+                        # default value
+                        cmds.floatField(value=cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), precision=3, changeCommand=partial(self.setDefaultValue, ctrl, attr))
+                        # current value
+                        cmds.floatField(value=cmds.getAttr(ctrl+"."+attr), precision=3, changeCommand=partial(self.setCurrentValue, ctrl, attr))
+                    cmds.separator(style='single', height=10, parent=self.dvSelectedLayout)
 
-                        #cmds.field
-                        
-        
+
+    def selectControl(self, ctrl, refreshUI=False, *args):
+        """ Select the given controller.
+            Populate the defaultValueEditor if True.
+        """
+        if cmds.objExists(ctrl):
+            cmds.select(ctrl)
+        if refreshUI:
+            self.populateSelectedControls()
+
+
+    def selectAllControls(self, refreshUI=False, *args):
+        """ Select all dpAR controllers in the scene.
+            Populate the defaultValueEditor if True.
+        """
+        ctrlList = self.getControlList()
+        if ctrlList:
+            cmds.select(ctrlList)
+        if refreshUI:
+            self.populateSelectedControls()
+
+
+    def setDefaultValue(self, ctrl, attr, value, *args):
+        """ Edit the default value of the given controller.
+        """
+        cmds.addAttr(ctrl+"."+attr, edit=True, defaultValue=value)
+
+
+    def setCurrentValue(self, ctrl, attr, value, *args):
+        """ Edit the current value of the given controller.
+        """
+        cmds.setAttr(ctrl+"."+attr, value)
