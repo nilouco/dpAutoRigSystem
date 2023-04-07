@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.06"
-DPAR_UPDATELOG = "N676 - Added ColorSet node cleaner\ncheckout validator."
+DPAR_VERSION_PY3 = "4.02.07"
+DPAR_UPDATELOG = "N638 - TargetCleaner deleting issue fixed."
 
 
 
