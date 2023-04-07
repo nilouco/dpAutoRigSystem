@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.06"
-DPAR_UPDATELOG = "N676 - Added ColorSet node cleaner\ncheckout validator."
+DPAR_VERSION_PY3 = "4.02.08"
+DPAR_UPDATELOG = "N559 - Added Namespace cleaner\ncheckin validator."
 
 
 
@@ -1428,7 +1428,7 @@ class DP_AutoRig_UI(object):
             for n, name in enumerate(namespaceList):
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
-                        if name.find("__dpAR_"):
+                        if name.find("_dpAR_") != -1:
                             if askUser:
                                 # open dialog to confirm merge namespaces:
                                 yesTxt = self.langDic[self.langName]['i071_yes']
