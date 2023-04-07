@@ -30,7 +30,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = "1.2"
+DPFC_VERSION = 1.3
 
 
 class FacialControl(object):
@@ -164,7 +164,7 @@ class FacialControl(object):
         
         facialCtrl_winWidth  = 380
         facialCtrl_winHeight = 380
-        dpFacialControlWin = cmds.window('dpFacialControlWindow', title=self.langDic[self.langName]["m085_facialCtrl"]+" "+DPFC_VERSION, widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpFacialControlWin = cmds.window('dpFacialControlWindow', title=self.langDic[self.langName]["m085_facialCtrl"]+" "+str(DPFC_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("left", 10))
@@ -451,13 +451,8 @@ class FacialControl(object):
                         aliasList = cmds.aliasAttr(self.bsNode, query=True)
             # create control calling dpControls function:
             fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=0, rot=rotVector)
-            
             # ctrl zeroOut grp and color:
-            fCtrlGrp = cmds.duplicate(fCtrl, name=fCtrl+'_Grp')[0]
-            allChildrenList = cmds.listRelatives(fCtrlGrp, allDescendents=True, children=True, fullPath=True)
-            if allChildrenList:
-                cmds.delete(allChildrenList)
-            cmds.parent(fCtrl, fCtrlGrp, absolute=True)
+            fCtrlGrp = dpUtils.zeroOut([fCtrl])[0]
             self.ctrls.colorShape([fCtrl], color)
             # lock or limit XYZ axis:
             self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
