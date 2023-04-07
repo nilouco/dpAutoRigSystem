@@ -11,7 +11,7 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.5
+dpTargetCleaner_Version = 1.6
 
 DPKEEPITATTR = "dpKeepIt"
 
@@ -144,8 +144,8 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if grpList:
             for item in grpList:
                 nodeGrp = dpUtils.getNodeByMessage(item)
-            if nodeGrp:
-                nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
-                if nodeList:
-                    resultList.extend(nodeList)
+                if nodeGrp:
+                    nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
+                    if nodeList:
+                        resultList.extend(nodeList)
         return resultList
