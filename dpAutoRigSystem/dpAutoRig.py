@@ -2478,7 +2478,8 @@ class DP_AutoRig_UI(object):
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
                                         cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
-                                    cmds.rename(revFootCtrl, revFootCtrl+"_Old")
+                                    revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
+                                    self.customAttr.removeAttr("dpControl", [revFootCtrlOld])
                         
                         # worldRef of extremGuide from limbModule controlled by optionCtrl:
                         if moduleType == LIMB:
