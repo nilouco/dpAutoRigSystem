@@ -431,7 +431,9 @@
     "i271_reset"           : "Réinitialiser",
     "i272_set"             : "Configurer",
     "i273_runAllNodes"     : "Est-ce que vous vouler rouler pour tous les nodes?",
-    "i274_setup"           : "Configuration",
+    "i274_editor"          : "Editeur",
+    "i275_attribute"       : "Attribut",
+    "i276_current"         : "Courant",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

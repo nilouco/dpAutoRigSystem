@@ -1402,26 +1402,58 @@ class ControlClass(object):
         return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))
     
 
-    def defaultValueOptionsWindow(self, *args):
+    def defaultValueEditor(self, *args):
         """
         """
         dpUtils.closeUI(self.defaultValueWindowName)
         # window
-        defaultValueOption_winWidth  = 380
+        defaultValueOption_winWidth  = 480
         defaultValueOption_winHeight = 300
-        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i002_options'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
-        defaultValueOptionLayout = cmds.columnLayout('defaultValueOptionLayout', adjustableColumn=True, columnOffset=("both", 10))
-        mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=defaultValueOptionLayout)
-        cmds.text("selectedTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], align="left", height=30, font='boldLabelFont', parent=mainLayout)
-        cmds.button("refreshBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m181_refresh'], command=self.refreshSelectedDefaultValues, parent=mainLayout)
-        
-        cmds.separator(style='none', height=10, parent=mainLayout)
+        dvMainLayout = cmds.columnLayout('dvMainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueWindowName)
+        dvHeaderLayout = cmds.rowColumnLayout('dvHeaderLayout', numberOfColumns=3, columnWidth=[(1, 100), (2, 150), (3, 100)], columnAlign=[(1, 'left'), (2, 'right'), (3, 'right')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], adjustableColumn=2, parent=dvMainLayout)
+        cmds.text("selectedTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], align="left", height=30, parent=dvHeaderLayout)
+        cmds.separator(style='none', height=10, parent=dvHeaderLayout)
+        cmds.button("refreshBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m181_refresh'], command=self.populateSelectedControls, parent=dvHeaderLayout)
+        self.defaultValueLayout = cmds.scrollLayout('defaultValueMainLayout', width=350, height=200, parent=dvMainLayout)
+        self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
+        self.populateSelectedControls()
         # call window
         cmds.showWindow(self.defaultValueWindowName)
         
 
-    def refreshSelectedDefaultValues(self, *args):
+    def populateSelectedControls(self, *args):
         """
         """
-        print("REFRESSSXIETIEI")
+        try:
+            cmds.deleteUI(self.dvSelectedLayout)
+        except:
+            pass
+        self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
+
+
+        ctrlList = self.getSelectedControls()
+        if ctrlList:
+            cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), height=32, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.dvSelectedLayout)
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i111_controller'], font='boldLabelFont')
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i275_attribute'], font='boldLabelFont')
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'], font='boldLabelFont')
+            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i276_current'], font='boldLabelFont')
+            for c, ctrl in enumerate(ctrlList):
+                attrList = self.resetPose.getSetupAttrList(ctrl, self.ignoreDefaultValuesAttrList)
+                if attrList:
+                    cmds.separator(style='single', height=10, parent=self.dvSelectedLayout)
+                    for a, attr in enumerate(attrList):
+                        cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.dvSelectedLayout)
+                        if a == 0:
+                            cmds.text(label=ctrl)
+                        else:
+                            cmds.text(label="")
+                        cmds.text(label=attr)
+                        
+                        #WIP
+
+                        #cmds.field
+                        
+        

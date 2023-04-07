@@ -432,7 +432,9 @@
     "i271_reset"           : "Reset",
     "i272_set"             : "Set",
     "i273_runAllNodes"     : "Do you want to run for all nodes?",
-    "i274_setup"           : "Setup",
+    "i274_editor"          : "Editor",
+    "i275_attribute"       : "Attribute",
+    "i276_current"         : "Current",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
