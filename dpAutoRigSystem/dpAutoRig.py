@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.07"
+DPAR_VERSION_PY3 = "4.02.08"
 DPAR_UPDATELOG = "N583 - Reset Pose checkout validator.\nN111 - Store default values\nN112 - Reset to default values."
 
 
