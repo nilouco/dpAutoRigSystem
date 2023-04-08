@@ -42,12 +42,8 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            # toCheckList = cmds.ls(selection=False, type='mesh')
             toCheckList = cmds.attributeQuery('correctiveCtrls', node='Option_Ctrl', exists=True)
             
-            print("toCheckList =", toCheckList)
-
-
         if toCheckList:
             progressAmount = 0
             maxProcess = 1
@@ -56,69 +52,45 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-            #parentNode = cmds.listRelatives(item, parent=True)[0]
             parentNode = "Option_Ctrl.correctiveCtrls"
             # conditional to check here
             
             checkChannelBox= cmds.getAttr(parentNode, channelBox=True)
-            print("#########___checkChannelBox = ", checkChannelBox)
-
-            checkLocked= cmds.getAttr(parentNode, lock=True)
-            print("#########_____checkLocked = ", checkLocked)
-            
+            checkLocked= cmds.getAttr(parentNode, lock=True)            
 
             if checkChannelBox:
-                print("*****passei aqui de kombi*****")
                 self.checkedObjList.append(parentNode)
                 self.foundIssueList.append(True)
                 if self.verifyMode:
                     self.resultOkList.append(False)
                 else: #fix
                     try:
-                        #WIP: (index to fix error OMG!)
-                        parentNode = "Option_Ctrl.correctiveCtrls"     #cmds.listRelatives(item, parent=True)[0] # change index here to test
-                        #raise Exception("Carreto trombado na pista")
-                        print("Passei aqui")
                         cmds.setAttr(parentNode, lock=True, channelBox=False)
-
                         self.resultOkList.append(True)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
                     except:
                         self.resultOkList.append(False)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
             elif not checkLocked:
-                print("*****passei aqui de Carreto*****")
                 self.checkedObjList.append(parentNode)
                 self.foundIssueList.append(True)
                 if self.verifyMode:
                     self.resultOkList.append(False)
                 else: #fix
                     try:
-                        #WIP: (index to fix error OMG!)
-                        parentNode = "Option_Ctrl.correctiveCtrls"     #cmds.listRelatives(item, parent=True)[0] # change index here to test
-                        #raise Exception("Carreto trombado na pista")
-                        print("Passei aqui")
                         cmds.setAttr(parentNode, lock=True, channelBox=False)
-
                         self.resultOkList.append(True)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
                     except:
                         self.resultOkList.append(False)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-                    # else:
-                    #     self.foundIssueList.append(False)
-                    #     self.resultOkList.append(True)
-
             
             else:
                 self.checkedObjList.append("")
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
-        
-        
-        
-        
+
         # --- validator code --- end
         # ---
 
