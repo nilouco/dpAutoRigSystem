@@ -10,6 +10,7 @@
     "ColorSetCleaner"    : false,
     "HideDataGrp"        : false,
     "NgSkinToolsCleaner" : false,
+    "ResetPose"          : false,
     "TargetCleaner"      : false,
     "WIPCleaner"         : false
 }

@@ -763,7 +763,7 @@ class RibbonClass(object):
             constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PoC"))
             constr.append(cmds.pointConstraint(bottom, top_Loc[3], mo=False, name=top_Loc[3]+"_PoC"))
             # this is an important constraint to avoid Ribbon flipping and follow correctely the hierarchy:
-            cmds.parentConstraint(top, locatorsGrp, maintainOffset=True, name=locatorsGrp+"_Pac")
+            cmds.parentConstraint(top, locatorsGrp, maintainOffset=True, name=locatorsGrp+"_PaC")
             
         #fix loc_Grp scale
         if guides:

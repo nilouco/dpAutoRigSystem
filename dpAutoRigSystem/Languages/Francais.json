@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-03-29",
+    "_updated"       : "2023-04-06",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -427,6 +427,13 @@
     "i267_customHeader"    : "Attributs personalisés sont des booleans qui commence avec",
     "i268_filterByName"    : "Filtrer les sélectionés par nom",
     "i269_biMaya"          : "Écrire la version du Maya dans l'image d'aperçu du rig",
+    "i270_defaultValues"   : "Valueurs par Défault",
+    "i271_reset"           : "Réinitialiser",
+    "i272_set"             : "Configurer",
+    "i273_runAllNodes"     : "Est-ce que vous vouler rouler pour tous les nodes?",
+    "i274_editor"          : "Editeur",
+    "i275_attribute"       : "Attribut",
+    "i276_current"         : "Courant",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -694,5 +701,8 @@
     "v028_hideDataGrp"            : "Cacher le Data_Grp",
     "v029_hideDataGrpDesc"        : "Ce validateur va cacher le Data_Grp s'il n'est pas caché encore.",
     "v030_colorSetCleaner"        : "Nettoyeur des ColorSets",
-    "v031_colorSetCleanerDesc"    : "Ce validateur nettoiera tous les nodes de colorSet\nlorsque l'éditeur de forme et les outils de sculpture sont utilisés."
+    "v031_colorSetCleanerDesc"    : "Ce validateur nettoiera tous les nodes de colorSet\nlorsque l'éditeur de forme et les outils de sculpture sont utilisés.",
+    "v032_resetPose"              : "réinitialiser la pose",
+    "v033_resetPoseDesc"          : "Il va réinitialiser la pose par default du rig."
+    
 }
