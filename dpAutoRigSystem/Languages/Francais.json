@@ -700,6 +700,9 @@
     "v027_ngskintoolsCleanerDesc" : "Il va vérifier et suprimer s'il y a des nodes de ngSkinTools dans le fichier.",
     "v028_hideDataGrp"            : "Cacher le Data_Grp",
     "v029_hideDataGrpDesc"        : "Ce validateur va cacher le Data_Grp s'il n'est pas caché encore.",
+    "v030_colorSetCleaner"        : "Nettoyeur des ColorSets",
+    "v031_colorSetCleanerDesc"    : "Ce validateur nettoiera tous les nodes de colorSet\nlorsque l'éditeur de forme et les outils de sculpture sont utilisés.",
     "v032_resetPose"              : "réinitialiser la pose",
     "v033_resetPoseDesc"          : "Il va réinitialiser la pose par default du rig."
+    
 }

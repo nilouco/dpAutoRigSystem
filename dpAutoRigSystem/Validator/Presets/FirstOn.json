@@ -6,8 +6,8 @@
 
     "DuplicatedName"     : true,
     "FreezeTransform"    : false,
-    
-    "ColorSetCleaner"    : true,
+
+    "ColorSetCleaner"    : false,
     "HideDataGrp"        : false,
     "NgSkinToolsCleaner" : false,
     "ResetPose"          : false,
