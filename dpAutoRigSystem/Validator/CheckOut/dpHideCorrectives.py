@@ -6,11 +6,11 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "HideCorrectives"
-TITLE = "v034_hideDataGrpDesc"
-DESCRIPTION = "v035_hideDataGrpDesc"
+TITLE = "v034_hideCorrectives"
+DESCRIPTION = "v035_hideCorrectivesDesc"
 ICON = "/Icons/dp_validatorTemplate.png"
 
-dpHideCorrectiveControls = 1.0
+dpHideCorrective = 1.0
 
 class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,7 +36,6 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
-        
 
         # ---
         # --- validator code --- beginning
@@ -44,47 +43,82 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
             toCheckList = objList
         else:
             # toCheckList = cmds.ls(selection=False, type='mesh')
-            toCheckList = cmds.addAttr("Option_Ctrl.correctiveCtrls", query = True)[0]
-            print("#################################_Existe Atributo!")
+            toCheckList = cmds.attributeQuery('correctiveCtrls', node='Option_Ctrl', exists=True)
+            
+            print("toCheckList =", toCheckList)
 
 
         if toCheckList:
             progressAmount = 0
-            maxProcess = len(toCheckList)
-            for item in toCheckList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-                #parentNode = cmds.listRelatives(item, parent=True)[0]
-                # conditional to check here
-                if not '_Mesh' in item:
-                    #self.checkedObjList.append(parentNode)
-                    self.foundIssueList.append(True)
-                    if self.verifyMode:
+            maxProcess = 1
+            #for item in toCheckList:
+            if self.verbose:
+                # Update progress window
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+            #parentNode = cmds.listRelatives(item, parent=True)[0]
+            parentNode = "Option_Ctrl.correctiveCtrls"
+            # conditional to check here
+            
+            checkChannelBox= cmds.getAttr(parentNode, channelBox=True)
+            print("#########___checkChannelBox = ", checkChannelBox)
+
+            checkLocked= cmds.getAttr(parentNode, lock=True)
+            print("#########_____checkLocked = ", checkLocked)
+            
+
+            if checkChannelBox:
+                print("*****passei aqui de kombi*****")
+                self.checkedObjList.append(parentNode)
+                self.foundIssueList.append(True)
+                if self.verifyMode:
+                    self.resultOkList.append(False)
+                else: #fix
+                    try:
+                        #WIP: (index to fix error OMG!)
+                        parentNode = "Option_Ctrl.correctiveCtrls"     #cmds.listRelatives(item, parent=True)[0] # change index here to test
+                        #raise Exception("Carreto trombado na pista")
+                        print("Passei aqui")
+                        cmds.setAttr(parentNode, lock=True, channelBox=False)
+
+                        self.resultOkList.append(True)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
+                    except:
                         self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            #WIP: (index to fix error OMG!)
-                            #parentNode = cmds.listRelatives(item, parent=True)[0] # change index here to test
-                            #raise Exception("Carreto trombado na pista")
-                            print("Passei aqui")
-                            cmds.setAttr(lock = True, channelBox = False)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
+            elif not checkLocked:
+                print("*****passei aqui de Carreto*****")
+                self.checkedObjList.append(parentNode)
+                self.foundIssueList.append(True)
+                if self.verifyMode:
+                    self.resultOkList.append(False)
+                else: #fix
+                    try:
+                        #WIP: (index to fix error OMG!)
+                        parentNode = "Option_Ctrl.correctiveCtrls"     #cmds.listRelatives(item, parent=True)[0] # change index here to test
+                        #raise Exception("Carreto trombado na pista")
+                        print("Passei aqui")
+                        cmds.setAttr(parentNode, lock=True, channelBox=False)
 
+                        self.resultOkList.append(True)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
+                    except:
+                        self.resultOkList.append(False)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
+                    # else:
+                    #     self.foundIssueList.append(False)
+                    #     self.resultOkList.append(True)
 
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
-                        except:
-                            self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-#                else:
-#                    self.foundIssueList.append(False)
-#                    self.resultOkList.append(True)
-        else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            
+            else:
+                self.checkedObjList.append("")
+                self.foundIssueList.append(False)
+                self.resultOkList.append(True)
+                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+        
+        
+        
+        
         # --- validator code --- end
         # ---
 
