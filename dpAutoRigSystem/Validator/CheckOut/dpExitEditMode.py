@@ -36,8 +36,6 @@ class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
-        
-
         # ---
         # --- validator code --- beginning
         if objList:
@@ -61,12 +59,15 @@ class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                #WIP:
-                                
-
-
-
-
+                                # delete the corrective script job
+                                self.dpUIinst.ctrls.deleteOldCorrectiveJobs(item)
+                                # remove color override
+                                shapeList = cmds.listRelatives(item, shapes=True, children=True, fullPath=True)
+                                if shapeList:
+                                    for shapeNode in shapeList:
+                                        cmds.setAttr(shapeNode+".overrideRGBColors", 0)
+                                # set edit mode off
+                                cmds.setAttr(item+".editMode", 0)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                             except:
@@ -79,8 +80,6 @@ class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
-
-
 
         # finishing
         self.finishValidation()
