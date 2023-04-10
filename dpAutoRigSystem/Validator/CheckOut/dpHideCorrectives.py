@@ -6,8 +6,8 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "HideCorrectives"
-TITLE = "v034_hideCorrectives"
-DESCRIPTION = "v035_hideCorrectivesDesc"
+TITLE = "v036_hideCorrectives"
+DESCRIPTION = "v037_hideCorrectivesDesc"
 ICON = "/Icons/dp_validatorTemplate.png"
 
 dpHideCorrective = 1.0

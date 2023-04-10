@@ -697,6 +697,6 @@
     "v029_hideDataGrpDesc"        : "This validator will hide the Data_Grp if it isn't hidden yet.",
     "v030_colorSetCleaner"        : "ColorSet cleaner",
     "v031_colorSetCleanerDesc"    : "This validator will clean-up all colorSet nodes\nwhen Shape Editor and sculpt tools is used.",
-    "v034_hideCorrectives"        : "Hide Correctives",
-    "v035_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl"
+    "v036_hideCorrectives"        : "Hide Correctives",
+    "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl"
 }
