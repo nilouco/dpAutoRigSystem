@@ -2,13 +2,14 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2023-03-26",
+    "_updated"    : "2023-04-10",
 
     "DuplicatedName"     : false,
     "FreezeTransform"    : false,
 
     "ColorSetCleaner"    : true,
     "HideDataGrp"        : true,
+    "NamespaceCleaner"   : true,
     "NgSkinToolsCleaner" : true,
     "TargetCleaner"      : true,
     "WIPCleaner"         : true
