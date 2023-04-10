@@ -19,9 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.06"
+DPAR_VERSION_PY3 = "4.02.10"
 DPAR_UPDATELOG = "N588 - Added Hide Correctives controls\ncheckout validator."
-
 
 
 ###################### Start: Loading.
@@ -74,6 +73,7 @@ try:
     from .Modules import dpLayoutClass
     from .Extras import dpUpdateRigInfo
     from .Extras import dpReorderAttr
+    from .Extras import dpCustomAttr
     from .Languages.Translator import dpTranslator
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
@@ -378,6 +378,7 @@ class DP_AutoRig_UI(object):
         # initialize some objects here:
         self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
         self.publisher = dpPublisher.Publisher(self)
+        self.customAttr = dpCustomAttr.CustomAttr(self, self.langDic, self.langName, self.presetDic, self.presetName, False)
         # --
         
         # creating tabs - mainTabLayout:
@@ -536,6 +537,13 @@ class DP_AutoRig_UI(object):
         self.allUIs["controlMainLayout"] = cmds.scrollLayout('controlMainLayout', parent=self.allUIs["controlTabLayout"])
         self.allUIs["controlLayout"] = cmds.columnLayout('controlLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['controlMainLayout'])
         
+        # setupControl - frameLayout:
+        self.allUIs["defaultValuesControlFL"] = cmds.frameLayout('defaultValuesControlFL', label=self.langDic[self.langName]['i270_defaultValues'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
+        self.allUIs["defaultValuesControl3Layout"] = cmds.paneLayout("defaultValuesControl3Layout", configuration="vertical3", separatorThickness=2.0, parent=self.allUIs["defaultValuesControlFL"])
+        self.allUIs["resetToDefaultValuesButton"] = cmds.button("resetToDefaultValuesButton", label=self.langDic[self.langName]['i271_reset'], backgroundColor=(1.0, 0.9, 0.6), height=30, command=partial(self.ctrls.setupDefaultValues, True), parent=self.allUIs["defaultValuesControl3Layout"])
+        self.allUIs["setDefaultValuesButton"] = cmds.button("setDefaultValuesButton", label=self.langDic[self.langName]['i272_set'], backgroundColor=(1.0, 0.8, 0.5), height=30, command=partial(self.ctrls.setupDefaultValues, False), parent=self.allUIs["defaultValuesControl3Layout"])
+        self.allUIs["setupDefaultValuesButton"] = cmds.button("setupDefaultValuesButton", label=self.langDic[self.langName]['i274_editor'], backgroundColor=(1.0, 0.6, 0.4), height=30, command=self.ctrls.defaultValueEditor, parent=self.allUIs["defaultValuesControl3Layout"])
+
         # createControl - frameLayout:
         self.allUIs["createControlLayout"] = cmds.frameLayout('createControlLayout', label=self.langDic[self.langName]['i114_createControl'], collapsable=True, collapse=False, marginWidth=10, marginHeight=10, parent=self.allUIs["controlLayout"])
         self.allUIs["optionsB"] = cmds.frameLayout('optionsB', label=self.langDic[self.langName]['i002_options'], collapsable=True, collapse=False, marginWidth=10, parent=self.allUIs["createControlLayout"])
@@ -1258,6 +1266,8 @@ class DP_AutoRig_UI(object):
                     self.checkOutInstanceList.append(validatorInstance)
                 else: #addOns
                     self.checkAddOnsInstanceList.append(validatorInstance)
+                    if validatorInstance.customName:
+                        cmds.checkBox(validatorCB, edit=True, label=validatorInstance.customName)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
@@ -2467,7 +2477,8 @@ class DP_AutoRig_UI(object):
                                     if ikFkNetworkList:
                                         lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
                                         cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
-                                    cmds.rename(revFootCtrl, revFootCtrl+"_Old")
+                                    revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
+                                    self.customAttr.removeAttr("dpControl", [revFootCtrlOld])
                         
                         # worldRef of extremGuide from limbModule controlled by optionCtrl:
                         if moduleType == LIMB:
@@ -2522,6 +2533,9 @@ class DP_AutoRig_UI(object):
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+
+                                # remove dpControl attribute
+                                self.customAttr.removeAttr("dpControl", [worldRef])
                             
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
@@ -2878,6 +2892,8 @@ class DP_AutoRig_UI(object):
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+                                # remove dpControl attribute
+                                self.customAttr.removeAttr("dpControl", [worldRef])
 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

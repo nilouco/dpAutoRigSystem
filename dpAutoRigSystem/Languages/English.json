@@ -428,6 +428,13 @@
     "i267_customHeader"    : "Custom attributes are booleans starting with",
     "i268_filterByName"    : "Filter selected by name",
     "i269_biMaya"          : "Write the Maya version in the image preview",
+    "i270_defaultValues"   : "Default Values",
+    "i271_reset"           : "Reset",
+    "i272_set"             : "Set",
+    "i273_runAllNodes"     : "Do you want to run for all nodes?",
+    "i274_editor"          : "Editor",
+    "i275_attribute"       : "Attribute",
+    "i276_current"         : "Current",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -697,6 +704,11 @@
     "v029_hideDataGrpDesc"        : "This validator will hide the Data_Grp if it isn't hidden yet.",
     "v030_colorSetCleaner"        : "ColorSet cleaner",
     "v031_colorSetCleanerDesc"    : "This validator will clean-up all colorSet nodes\nwhen Shape Editor and sculpt tools is used.",
+    "v032_resetPose"              : "Reset pose",
+    "v033_resetPoseDesc"          : "This validator will reset the rig to its default pose.",
+    "v034_exitEditMode"           : "Exit edit mode",
+    "v035_exitEditModeDesc"       : "This validator will check if there any corrective\ncontroller in the edit mode and\nit'll back to normal state without save changes\nor settings.",
     "v036_hideCorrectives"        : "Hide Correctives",
     "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl"
+
 }

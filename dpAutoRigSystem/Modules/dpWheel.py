@@ -275,7 +275,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c068_startFrame'], attributeType="long", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c067_radius'], attributeType="float", min=0.01, defaultValue=self.ctrlRadius, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c069_radiusScale'], attributeType="float", defaultValue=1, keyable=False)
-                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=1, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering'], attributeType="bool", defaultValue=0, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), attributeType="float", defaultValue=0, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
@@ -289,10 +289,17 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering'], steeringValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c021_showControls'], showControlsValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 1, channelBox=True)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 1)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo'], 1, channelBox=True)
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
                         cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 0)
+                        self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 0)
+                # set default values:
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c068_startFrame'], startFrameValue)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c070_steering'], steeringValue)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c021_showControls'], showControlsValue)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c093_tryKeepUndo'], 1)
                 
                 # automatic rotation wheel setup:
                 receptSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering']+"_MD")

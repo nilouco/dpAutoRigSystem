@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
 from . import dpUtils
+from ...Validator.CheckOut import dpResetPose
+from functools import partial
 import os
 import getpass
 import datetime
@@ -34,6 +36,9 @@ class ControlClass(object):
         self.presetName = presetName
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
+        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, self.dpUIinst.langDic, self.dpUIinst.langName, self.dpUIinst.presetDic, self.dpUIinst.presetName, ui=False, verbose=False)
+        self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
+        self.defaultValueWindowName = "dpDefaultValueOptionWindow"
 
 
     # CONTROLS functions:
@@ -674,6 +679,21 @@ class ControlClass(object):
                     self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
             cmds.select(transformList)
     
+
+    def confirmAskUser(self, titleText, messageText, *args):
+        """
+        """
+        # ask user to continue
+        resultQuestion = cmds.confirmDialog(
+                                        title=titleText,
+                                        message=messageText, 
+                                        button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
+                                        defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
+                                        cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
+                                        dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
+        if resultQuestion == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+            return True
+        return False
     
     def dpCreateControlsPreset(self, *args):
         """ Creates a json file as a Control Preset and returns it.
@@ -696,16 +716,10 @@ class ControlClass(object):
             if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
-                confirmSameName = self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']
+                confirmSameName = True
                 if resultName in self.presetDic:
-                    confirmSameName = cmds.confirmDialog(
-                                                        title=self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'], 
-                                                        message=self.dpUIinst.langDic[self.dpUIinst.langName]['i135_existingName'], 
-                                                        button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                                        defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                                        cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                                        dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-                if confirmSameName == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    confirmSameName = self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'], self.dpUIinst.langDic[self.dpUIinst.langName]['i135_existingName'])
+                if confirmSameName:
                     author = getpass.getuser()
                     date = str(datetime.datetime.now().date())
                     resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
@@ -974,14 +988,7 @@ class ControlClass(object):
                             self.mirrorCalibration(selectedNode, fromPrefix, toPrefix)
                 else:
                     # ask to run for all nodes:
-                    mirrorAll = cmds.confirmDialog(
-                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'],
-                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll'], 
-                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         if allNodeList:
                             for node in allNodeList:
@@ -1335,14 +1342,7 @@ class ControlClass(object):
                             self.mirrorShape(selectedNode, fromPrefix, toPrefix, axis)
                 else:
                     # ask to run for all nodes:
-                    mirrorAll = cmds.confirmDialog(
-                                                    title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'],
-                                                    message=self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i265_mirrorShapeAll'], 
-                                                    button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                                    defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                                    cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                                    dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-                    if mirrorAll == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                    if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i265_mirrorShapeAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
@@ -1371,3 +1371,123 @@ class ControlClass(object):
                         cmds.delete(mirrorShapeGrp)
         else:
             print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
+
+
+    def setupDefaultValues(self, resetMode=True, ctrlList=None, *args):
+        """ Set or Reset control attributes to their default values.
+            Ask user to run for all nodes if there aren't any selected nodes.
+            Settings argument calls the window to setup each default value for selected nodes.
+        """
+        if not ctrlList:
+            nodeToRunList = self.getSelectedControls()
+            if not nodeToRunList:
+                # ask to run for all nodes:
+                if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i273_runAllNodes']):
+                    nodeToRunList = self.getControlList()
+        else:
+            nodeToRunList = self.getControlList()
+        if nodeToRunList:
+            if resetMode:
+                self.resetPose.runValidator(False, nodeToRunList)
+            else: #set default values
+                for item in nodeToRunList:
+                    attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
+                    if attrList:
+                        for attr in attrList:
+                            cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
+    
+
+    def getSelectedControls(self, *args):
+        """ Return the intersection of all dpControls in the scene and the selected items.
+        """
+        return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))
+    
+
+    def defaultValueEditor(self, *args):
+        """ Create an UI to edit the attributes default values.
+        """
+        dpUtils.closeUI(self.defaultValueWindowName)
+        # window
+        defaultValueOption_winWidth  = 430
+        defaultValueOption_winHeight = 300
+        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        # create UI layout and elements:
+        dvMainLayout = cmds.columnLayout('dvMainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueWindowName)
+        cmds.separator(style='none', height=5, parent=dvMainLayout)
+        dvHeaderLayout = cmds.rowColumnLayout('dvHeaderLayout', numberOfColumns=3, columnWidth=[(1, 150), (2, 10), (3, 180)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], adjustableColumn=2, parent=dvMainLayout)
+        cmds.button("editSelectedCtrlBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], command=self.populateSelectedControls, parent=dvHeaderLayout)
+        cmds.separator(style='none', height=30, parent=dvHeaderLayout)
+        cmds.button("selectAllBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m166_selAllControls'], command=partial(self.selectAllControls, True), parent=dvHeaderLayout)
+        FirstCL = cmds.columnLayout('FirstSL',  adjustableColumn=True, columnOffset=("both", 10), parent=dvMainLayout)
+        firstRL = cmds.rowLayout("firstRL", numberOfColumns=4, columnWidth4=(150, 100, 50, 50), height=32, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=FirstCL)
+        cmds.text("controllerTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i111_controller'], font='boldLabelFont', align="center", parent=firstRL)
+        cmds.text("attributeTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i275_attribute'], font='boldLabelFont', parent=firstRL)
+        cmds.text("defaultTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'], font='boldLabelFont', parent=firstRL)
+        cmds.text("currentTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i276_current'], font='boldLabelFont', parent=firstRL)
+        cmds.separator(style='single', height=10, parent=dvMainLayout)
+        self.defaultValueLayout = cmds.scrollLayout('defaultValueMainLayout', width=350, height=200, parent=dvMainLayout)
+        self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
+        self.populateSelectedControls()
+        # call window
+        cmds.showWindow(self.defaultValueWindowName)
+        
+
+    def populateSelectedControls(self, *args):
+        """ Refresh the default value editor UI to fill it with the selected dpAR controllers.
+        """
+        try:
+            cmds.deleteUI(self.dvSelectedLayout)
+        except:
+            pass
+        self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
+        ctrlList = self.getSelectedControls()
+        if ctrlList:
+            ctrlList.sort()
+            for c, ctrl in enumerate(ctrlList):
+                attrList = self.resetPose.getSetupAttrList(ctrl, self.ignoreDefaultValuesAttrList)
+                if attrList:
+                    for a, attr in enumerate(attrList):
+                        cmds.rowLayout(numberOfColumns=4, columnWidth4=(150, 100, 50, 50), columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=self.dvSelectedLayout)
+                        if a == 0:
+                            cmds.button(label=ctrl, command=partial(self.selectControl, ctrl, True))
+                        else:
+                            cmds.text(label="")
+                        cmds.text(label=attr)
+                        # default value
+                        cmds.floatField(value=cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), precision=3, changeCommand=partial(self.setDefaultValue, ctrl, attr))
+                        # current value
+                        cmds.floatField(value=cmds.getAttr(ctrl+"."+attr), precision=3, changeCommand=partial(self.setCurrentValue, ctrl, attr))
+                    cmds.separator(style='single', height=10, parent=self.dvSelectedLayout)
+
+
+    def selectControl(self, ctrl, refreshUI=False, *args):
+        """ Select the given controller.
+            Populate the defaultValueEditor if True.
+        """
+        if cmds.objExists(ctrl):
+            cmds.select(ctrl)
+        if refreshUI:
+            self.populateSelectedControls()
+
+
+    def selectAllControls(self, refreshUI=False, *args):
+        """ Select all dpAR controllers in the scene.
+            Populate the defaultValueEditor if True.
+        """
+        ctrlList = self.getControlList()
+        if ctrlList:
+            cmds.select(ctrlList)
+        if refreshUI:
+            self.populateSelectedControls()
+
+
+    def setDefaultValue(self, ctrl, attr, value, *args):
+        """ Edit the default value of the given controller.
+        """
+        cmds.addAttr(ctrl+"."+attr, edit=True, defaultValue=value)
+
+
+    def setCurrentValue(self, ctrl, attr, value, *args):
+        """ Edit the current value of the given controller.
+        """
+        cmds.setAttr(ctrl+"."+attr, value)

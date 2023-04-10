@@ -8,9 +8,11 @@
     "FreezeTransform"    : false,
 
     "ColorSetCleaner"    : true,
+    "ExitEditMode"       : true,
     "HideDataGrp"        : true,
     "HideCorrectives"    : true,
     "NgSkinToolsCleaner" : true,
+    "ResetPose"          : true,
     "TargetCleaner"      : true,
     "WIPCleaner"         : true
 }

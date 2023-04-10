@@ -432,10 +432,10 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
-                    cmds.delete(cmds.parentConstraint(self.skinJointList[-1], self.ikCtrl, maintainOffset=False))
-                    cmds.delete(cmds.pointConstraint(self.cvEndJoint, self.ikCtrl, maintainOffset=False))
                     self.ikCtrlZero = dpUtils.zeroOut([self.ikCtrl])[0]
                     self.ikCtrlZeroList.append(self.ikCtrlZero)
+                    cmds.delete(cmds.parentConstraint(self.skinJointList[-1], self.ikCtrlZero, maintainOffset=False))
+                    cmds.delete(cmds.pointConstraint(self.cvEndJoint, self.ikCtrlZero, maintainOffset=False))
                     cmds.connectAttr(self.ikFkRevNode+".outputX", self.ikCtrlZero+".visibility", force=True)
                     for q in range(2, self.nJoints+1):
                         cmds.connectAttr(side+self.userGuideName+"_01_Ctrl.ikFkBlend", side+self.userGuideName+"_%02d_Ctrl.visibility"%(q), force=True)
