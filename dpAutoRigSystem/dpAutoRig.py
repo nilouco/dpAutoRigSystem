@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.08"
+DPAR_VERSION_PY3 = "4.02.11"
 DPAR_UPDATELOG = "N559 - Added Namespace cleaner\ncheckin validator."
 
 

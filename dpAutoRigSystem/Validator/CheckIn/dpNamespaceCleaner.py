@@ -115,14 +115,12 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         """
         dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
 
-
     def finishValidation(self, *args):
         """ Call main base methods to finish the validation of this class.
         """
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
-
     
     def removeNamespace(self, *args):
         """ This function will use recursive method to remove all namespace, 
