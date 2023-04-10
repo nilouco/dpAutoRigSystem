@@ -705,6 +705,8 @@
     "v032_resetPose"              : "réinitialiser la pose",
     "v033_resetPoseDesc"          : "Il va réinitialiser la pose par default du rig.",
     "v034_exitEditMode"           : "Sortir du mode d'édition",
-    "v035_exitEditModeDesc"       : "Ce validateur va vérifier s'il y a des controlleurs\nde correctives en mode d'édition et va\nles mettre en mode normal sans enregistrer les changements."
+    "v035_exitEditModeDesc"       : "Ce validateur va vérifier s'il y a des controlleurs\nde correctives en mode d'édition et va\nles mettre en mode normal sans enregistrer les changements.",
+    "v036_keyframeCleaner"        : "Nettoyeur de keyframe",
+    "v037_keyframeCleanerDesc"    : "Ce validateur va éffacer des keyframes dans l'objets animés.\nIl ne check pas des drivenKeys, blendWeights ou pairBlends."
     
 }

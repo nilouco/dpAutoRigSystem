@@ -10,6 +10,7 @@
     "ColorSetCleaner"    : false,
     "ExitEditMode"       : false,
     "HideDataGrp"        : false,
+    "KeyframeCleaner"    : false,
     "NgSkinToolsCleaner" : false,
     "ResetPose"          : false,
     "TargetCleaner"      : false,
