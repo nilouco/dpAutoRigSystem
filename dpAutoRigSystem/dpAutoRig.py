@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.02.06"
-DPAR_UPDATELOG = "N676 - Added ColorSet node cleaner\ncheckout validator."
+DPAR_UPDATELOG = "N588 - Added Hide Correctives controls\ncheckout validator."
 
 
 

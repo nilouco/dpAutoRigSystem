@@ -9,7 +9,7 @@ reload(dpBaseValidatorClass)
 CLASS_NAME = "HideCorrectives"
 TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
-ICON = "/Icons/dp_validatorTemplate.png"
+ICON = "/Icons/dp_hideCorrectives.png"
 
 dpHideCorrective = 1.0
 
@@ -70,14 +70,13 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
                 else:
-                    self.carretos()
+                    self.noFoundNodes()
         else:
-            self.carretos()
+            self.noFoundNodes()
 
         # --- validator code --- end
         # ---
 
-        
 
         # finishing
         self.finishValidation()
@@ -98,8 +97,8 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
 
-    def carretos(self, *args):
-        """ Logistica avancada!
+    def noFoundNodes(self, *args):
+        """ Set dataLog when don't have any objects to verify.
         """
         self.checkedObjList.append("")
         self.foundIssueList.append(False)
