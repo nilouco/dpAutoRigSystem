@@ -19,9 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.09"
-DPAR_UPDATELOG = "N587 - Exit edit mode."
-
+DPAR_VERSION_PY3 = "4.02.10"
+DPAR_UPDATELOG = "N588 - Added Hide Correctives controls\ncheckout validator."
 
 
 ###################### Start: Loading.

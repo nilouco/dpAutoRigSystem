@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-04-09",
+    "_updated"       : "2023-04-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -707,6 +707,8 @@
     "v032_resetPose"              : "Reset pose",
     "v033_resetPoseDesc"          : "This validator will reset the rig to its default pose.",
     "v034_exitEditMode"           : "Exit edit mode",
-    "v035_exitEditModeDesc"       : "This validator will check if there any corrective\ncontroller in the edit mode and\nit'll back to normal state without save changes\nor settings."
+    "v035_exitEditModeDesc"       : "This validator will check if there any corrective\ncontroller in the edit mode and\nit'll back to normal state without save changes\nor settings.",
+    "v036_hideCorrectives"        : "Hide Correctives",
+    "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl"
 
 }
