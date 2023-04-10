@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
+from ... Modules.Library import dpUtils
 from importlib import reload
 reload(dpBaseValidatorClass)
 
@@ -39,62 +40,44 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
 
         # ---
         # --- validator code --- beginning
-        if objList:
-            toCheckList = objList
-        else:
-            toCheckList = cmds.attributeQuery('correctiveCtrls', node='Option_Ctrl', exists=True)
-            
-        if toCheckList:
-            progressAmount = 0
-            maxProcess = 1
-            #for item in toCheckList:
-            if self.verbose:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-            parentNode = "Option_Ctrl.correctiveCtrls"
-            # conditional to check here
-            
-            checkChannelBox= cmds.getAttr(parentNode, channelBox=True)
-            checkLocked= cmds.getAttr(parentNode, lock=True)            
-
-            if checkChannelBox:
-                self.checkedObjList.append(parentNode)
-                self.foundIssueList.append(True)
-                if self.verifyMode:
-                    self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        cmds.setAttr(parentNode, lock=True, channelBox=False)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-            elif not checkLocked:
-                self.checkedObjList.append(parentNode)
-                self.foundIssueList.append(True)
-                if self.verifyMode:
-                    self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        cmds.setAttr(parentNode, lock=True, channelBox=False)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+parentNode)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+parentNode)
-            
+        optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
+        if optionCtrl:
+            if objList:
+                toCheckList = cmds.attributeQuery('correctiveCtrls', node=objList[0], exists=True)
             else:
-                self.checkedObjList.append("")
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
-                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+                toCheckList = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
+            if toCheckList:
+                progressAmount = 0
+                maxProcess = 1
+                if self.verbose:
+                    # Update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                item = optionCtrl+".correctiveCtrls"
+                # conditional to check here
+                checkChannelBox = cmds.getAttr(item, channelBox=True)
+                if checkChannelBox:
+                    self.checkedObjList.append(item)
+                    self.foundIssueList.append(True)
+                    if self.verifyMode:
+                        self.resultOkList.append(False)
+                    else: #fix
+                        try:
+                            cmds.setAttr(item, lock=True, channelBox=False)
+                            self.resultOkList.append(True)
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
+                        except:
+                            self.resultOkList.append(False)
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
+                else:
+                    self.carretos()
+        else:
+            self.carretos()
 
         # --- validator code --- end
         # ---
 
-
+        
 
         # finishing
         self.finishValidation()
@@ -113,3 +96,12 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
+
+    def carretos(self, *args):
+        """ Logistica avancada!
+        """
+        self.checkedObjList.append("")
+        self.foundIssueList.append(False)
+        self.resultOkList.append(True)
+        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
