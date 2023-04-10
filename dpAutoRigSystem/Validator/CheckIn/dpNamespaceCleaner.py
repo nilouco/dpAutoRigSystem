@@ -20,19 +20,6 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
-    
-    def removeNamespace(self, *args):
-        """ This function will use recursive method to remove all namespace, 
-            when it's not a guide namespace
-        """
-        cmds.namespace(setNamespace=':')
-        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
-        for name in namespaceList:
-            if name != "UI" and name != "shared":
-                if name.find("_dpAR_") == -1:
-                        cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
-                        self.removeNamespace()
-                        break
 
     def runValidator(self, verifyMode=True, objList=None, *args):
         """ Main method to process this validator instructions.
@@ -61,7 +48,7 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
             if namespaceListMain:
                 for namespace in namespaceListMain:
                     if namespace != "UI" and namespace != "shared":
-                        # check if there's dpGuides in the list
+                        # check if there's dpGuides in the list members
                         types = cmds.namespaceInfo(namespace, listNamespace=True)
                         for type in types:
                             # if dpGuides, append to list with Guides, else append to withouGuides
@@ -73,16 +60,15 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 namespaceWithGuidesList = []
                 # append to new list in order to remove the namespace guide base
                 for namespace in namespaceWithGuidesListMain:
+                    # it will only add to namespaceWithGuideList if it's not a guide base
                     if "_dpAR_" not in namespace:
                         namespaceWithGuidesList.append(namespace)
                 # append to a new list if not find the item from with guides in without guides
                 for item in namespaceWithoutGuidesListMain:
                     if item not in namespaceWithGuidesListMain:
                         namespaceWithoutGuidesList.append(item)
-                
                 # set both list together, excluding the duplicated names
                 namespaceListToClean = list(set(namespaceWithGuidesList)) + list(set(namespaceWithoutGuidesList))
-                
         if namespaceListToClean:
             progressAmount = 0
             maxProcess = len(namespaceListMain)
@@ -101,7 +87,7 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                             # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
                             self.dpUIinst.checkImportedGuides(False)
                         else:
-                            # call function inside validator, to remove namespaces when it's not a guide.
+                            # call function inside validator to remove namespaces when it's not a guide.
                             self.removeNamespace()
                             
                         self.resultOkList.append(True)
@@ -109,12 +95,12 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     except:
                         self.resultOkList.append(False)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+namespace)
-
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
             self.resultOkList.append(True)
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+
         # --- validator code --- end
         # ---
 
@@ -136,3 +122,17 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
+    
+    def removeNamespace(self, *args):
+        """ This function will use recursive method to remove all namespace, 
+            when it's not a guide namespace
+        """
+        cmds.namespace(setNamespace=':')
+        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
+        for name in namespaceList:
+            if name != "UI" and name != "shared":
+                if name.find("_dpAR_") == -1:
+                        cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
+                        self.removeNamespace()
+                        break
