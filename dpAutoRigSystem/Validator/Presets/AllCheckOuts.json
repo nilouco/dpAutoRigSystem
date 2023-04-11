@@ -6,6 +6,7 @@
 
     "DuplicatedName"     : false,
     "FreezeTransform"    : false,
+    "NamespaceCleaner"   : false,
 
     "ColorSetCleaner"    : true,
     "ExitEditMode"       : true,

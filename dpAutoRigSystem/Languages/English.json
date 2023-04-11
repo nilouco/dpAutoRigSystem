@@ -709,6 +709,8 @@
     "v034_exitEditMode"           : "Exit edit mode",
     "v035_exitEditModeDesc"       : "This validator will check if there any corrective\ncontroller in the edit mode and\nit'll back to normal state without save changes\nor settings.",
     "v036_hideCorrectives"        : "Hide Correctives",
-    "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl"
+    "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl",
+    "v038_namespaceCleaner"       : "Namespace cleaner",
+    "v039_namespaceCleanerDesc"   : "Check if there are namespaces to clean them up.\nIt won't delete namespace from dpGuides."
 
 }

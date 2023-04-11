@@ -19,8 +19,9 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.10"
-DPAR_UPDATELOG = "N588 - Added Hide Correctives controls\ncheckout validator."
+DPAR_VERSION_PY3 = "4.02.11"
+DPAR_UPDATELOG = "N559 - Added Namespace cleaner\ncheckin validator."
+
 
 
 ###################### Start: Loading.
@@ -1438,7 +1439,7 @@ class DP_AutoRig_UI(object):
             for n, name in enumerate(namespaceList):
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
-                        if name.find("__dpAR_"):
+                        if name.find("_dpAR_") != -1:
                             if askUser:
                                 # open dialog to confirm merge namespaces:
                                 yesTxt = self.langDic[self.langName]['i071_yes']

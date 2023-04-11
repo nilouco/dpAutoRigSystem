@@ -707,6 +707,8 @@
     "v034_exitEditMode"           : "Sortir du mode d'édition",
     "v035_exitEditModeDesc"       : "Ce validateur va vérifier s'il y a des controlleurs\nde correctives en mode d'édition et va\nles mettre en mode normal sans enregistrer les changements.",
     "v036_hideCorrectives"        : "Masquer les correctifs",
-    "v037_hideCorrectivesDesc"    : "Ce validateur verrouillera et masquera l'attribut correctif sur Option_Ctrl"
+    "v037_hideCorrectivesDesc"    : "Ce validateur verrouillera et masquera l'attribut correctif sur Option_Ctrl",
+    "v038_namespaceCleaner"       : "Namespace nettoyeur",
+    "v039_namespaceCleanerDesc"   : "Vérifiez s'il existe des namespaces pour les nettoyer.\nCela ne supprimera pas les namespaces de dpGuides."
 
 }
