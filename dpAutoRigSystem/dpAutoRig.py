@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.13"
-DPAR_UPDATELOG = "N655 - HideDataGrp code optimization."
+DPAR_VERSION_PY3 = "4.02.14"
+DPAR_UPDATELOG = "N628 - Corrective joints calibration fix\nof scaled guides."
 
 
 ###################### Start: Loading.
