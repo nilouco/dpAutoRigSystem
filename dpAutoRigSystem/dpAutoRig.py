@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.10"
+DPAR_VERSION_PY3 = "4.02.12"
 DPAR_UPDATELOG = "N574 - Keyframe cleaner check-out validator."
 
 

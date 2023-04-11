@@ -6,8 +6,8 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "KeyframeCleaner"
-TITLE = "v036_keyframeCleaner"
-DESCRIPTION = "v037_keyframeCleanerDesc"
+TITLE = "v040_keyframeCleaner"
+DESCRIPTION = "v041_keyframeCleanerDesc"
 ICON = "/Icons/dp_keyframeCleaner.png"
 
 dpKeyframeCleaner_Version = 1.0

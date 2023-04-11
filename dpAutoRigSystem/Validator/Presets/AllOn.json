@@ -2,13 +2,15 @@
     "_preset"     : "AllOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-04-09",
+    "_updated"    : "2023-04-11",
 
     "DuplicatedName"     : true,
     "FreezeTransform"    : true,
+    "NamespaceCleaner"   : true,
 
     "ColorSetCleaner"    : true,
     "ExitEditMode"       : true,
+    "HideCorrectives"    : true,
     "HideDataGrp"        : true,
     "KeyframeCleaner"    : true,
     "NgSkinToolsCleaner" : true,
