@@ -19,9 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.11"
-DPAR_UPDATELOG = "N559 - Added Namespace cleaner\ncheckin validator."
-
+DPAR_VERSION_PY3 = "4.02.12"
+DPAR_UPDATELOG = "N574 - Keyframe cleaner check-out validator."
 
 
 ###################### Start: Loading.

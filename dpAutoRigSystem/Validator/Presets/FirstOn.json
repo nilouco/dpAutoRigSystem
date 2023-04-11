@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-04-10",
+    "_updated"    : "2023-04-11",
 
     "DuplicatedName"     : true,
     "FreezeTransform"    : false,
@@ -10,8 +10,9 @@
 
     "ColorSetCleaner"    : false,
     "ExitEditMode"       : false,
-    "HideDataGrp"        : false,
     "HideCorrectives"    : false,
+    "HideDataGrp"        : false,
+    "KeyframeCleaner"    : false,
     "NgSkinToolsCleaner" : false,
     "ResetPose"          : false,
     "TargetCleaner"      : false,
