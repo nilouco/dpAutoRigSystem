@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.12"
-DPAR_UPDATELOG = "N574 - Keyframe cleaner check-out validator."
+DPAR_VERSION_PY3 = "4.02.13"
+DPAR_UPDATELOG = "N655 - HideDataGrp code optimization."
 
 
 ###################### Start: Loading.
