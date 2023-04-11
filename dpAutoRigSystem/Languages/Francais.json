@@ -706,7 +706,11 @@
     "v033_resetPoseDesc"          : "Il va réinitialiser la pose par default du rig.",
     "v034_exitEditMode"           : "Sortir du mode d'édition",
     "v035_exitEditModeDesc"       : "Ce validateur va vérifier s'il y a des controlleurs\nde correctives en mode d'édition et va\nles mettre en mode normal sans enregistrer les changements.",
+    "v036_hideCorrectives"        : "Masquer les correctifs",
+    "v037_hideCorrectivesDesc"    : "Ce validateur verrouillera et masquera l'attribut correctif sur Option_Ctrl",
+    "v038_namespaceCleaner"       : "Namespace nettoyeur",
+    "v039_namespaceCleanerDesc"   : "Vérifiez s'il existe des namespaces pour les nettoyer.\nCela ne supprimera pas les namespaces de dpGuides.",
     "v040_keyframeCleaner"        : "Nettoyeur de keyframe",
     "v041_keyframeCleanerDesc"    : "Ce validateur va éffacer des keyframes dans l'objets animés.\nIl ne check pas des drivenKeys, blendWeights ou pairBlends."
-    
+
 }
