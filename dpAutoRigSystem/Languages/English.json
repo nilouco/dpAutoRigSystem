@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-04-10",
+    "_updated"       : "2023-04-11",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -711,6 +711,10 @@
     "v036_hideCorrectives"        : "Hide Correctives",
     "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl",
     "v038_namespaceCleaner"       : "Namespace cleaner",
-    "v039_namespaceCleanerDesc"   : "Check if there are namespaces to clean them up.\nIt won't delete namespace from dpGuides."
-
+    "v039_namespaceCleanerDesc"   : "Check if there are namespaces to clean them up.\nIt won't delete namespace from dpGuides.",
+    
+    
+    "v042_referenceCleaner"       : "Referenced file cleaner",
+    "v043_referenceCleanerDesc"   : "This validator will check if there are referenced file to clean them up."
+    
 }

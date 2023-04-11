@@ -708,8 +708,12 @@
     "v034_exitEditMode"           : "Sair do modo edição",
     "v035_exitEditModeDesc"       : "Esse validador vai verificar se tem algum controle corretivo\nem modo de edição e vai voltar para o modo nomal\nsem guardar nenhuma alteração e configuração.",
     "v036_hideCorrectives"        : "Esconder Correctivos",
-    "v037_hideCorrectivesDesc"    : "Este validator irá aplicar trancar e ocultar o atributo de correctivo no Option_Ctrl",
+    "v037_hideCorrectivesDesc"    : "Este validador irá aplicar trancar e ocultar o atributo de correctivo no Option_Ctrl",
     "v038_namespaceCleaner"       : "Namespace limpador",
-    "v039_namespaceCleanerDesc"   : "Verifica se existem namespace para limpar.\nNão deletará namespaces de dpGuias."
-
+    "v039_namespaceCleanerDesc"   : "Verifica se existem namespace para limpar.\nNão deletará namespaces de dpGuias.",
+    
+    
+    "v042_referenceCleaner"       : "Arquivo referenciado limpador",
+    "v043_referenceCleanerDesc"   : "Este validador checará se tem arquivos referenciados para limpar."
+    
 }
