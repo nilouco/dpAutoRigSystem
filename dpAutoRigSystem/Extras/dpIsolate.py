@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 
 # global variables to this module:    
 CLASS_NAME = "Isolate"
@@ -8,9 +8,9 @@ TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
 
-dpIsolateVersion = 1.0
+dpIsolateVersion = 1.1
 
-class Isolate():
+class Isolate(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
@@ -64,7 +64,7 @@ class Isolate():
         if len(nodeList) == 3:
             for nodeName in nodeList:
                 if not cmds.objExists(nodeName):
-                    print self.langDic[self.langName]['e004_objNotExist'], nodeName
+                    print(self.langDic[self.langName]['e004_objNotExist'], nodeName)
                     return
         # call scripted function
         self.dpIsolate(self.isolateName, nodeList)

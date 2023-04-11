@@ -1,8 +1,8 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
-from ..Modules.Library import dpControls as dpControls
-from ..Modules.Library import dpUtils as utils
+from maya import cmds
+from maya import mel
+from ..Modules.Library import dpControls
+from ..Modules.Library import dpUtils
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -11,10 +11,10 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.8"
+DPHD_VERSION = "2.13"
 
 
-class HeadDeformer():
+class HeadDeformer(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
@@ -26,23 +26,7 @@ class HeadDeformer():
         self.headCtrl = None
         self.wellDone = True
         # call main function
-        if (int(cmds.about(version=True)[:4]) == 2020):
-            callMessage = False
-            installedVersion = cmds.about(installedVersion=True)
-            if not "." in installedVersion:
-                callMessage = True
-            else:
-                updateVersion = int(installedVersion[installedVersion.rfind(".")+1:])
-                if updateVersion < 3:
-                    callMessage = True
-            if callMessage:
-                dialogReturn = cmds.confirmDialog(title="Maya 2020 bug", message=self.langDic[self.langName]["b001_BugMayaHD"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
-                if dialogReturn == self.langDic[self.langName]["i174_continue"]:
-                    self.dpHeadDeformer(self)
-            else:
-                self.dpHeadDeformer(self)
-        else:
-            self.dpHeadDeformer(self)
+        self.dpHeadDeformer(self)
     
     
     def dpHeadDeformer(self, *args):
@@ -57,8 +41,8 @@ class HeadDeformer():
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
-        validName = utils.validateName(headDeformerName+"_FFDSet", "FFDSet")
-        numbering = validName.replace(headDeformerName, "")[:-7]
+        validName = dpUtils.validateName(headDeformerName+"_FFD", "FFD")
+        numbering = validName.replace(headDeformerName, "")[:-4]
         if numbering:
             headDeformerName = headDeformerName+numbering
             centerSymmetryName = centerSymmetryName+numbering
@@ -68,7 +52,7 @@ class HeadDeformer():
         selList = cmds.ls(selection=True)
         if selList:
             # lattice deformer
-            latticeDefList = cmds.lattice(name=headDeformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=1, objectCentered=True) #[Set, Lattice, Base]
+            latticeDefList = cmds.lattice(name=headDeformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
             latticePointsList = latticeDefList[1]+".pt[0:5][2:5][0:5]"
             
             # store initial scaleY in order to avoid lattice rotation bug on non frozen transformations
@@ -120,25 +104,6 @@ class HeadDeformer():
                 for axis in axisList:
                     cmds.setAttr(defHandle+".scale"+axis, 1)
             
-            # force correct rename for Maya versions before 2020:
-            if (int(cmds.about(version=True)[:4]) < 2020):
-                if cmds.objExists(twistDefList[0]+"Set"):
-                    cmds.rename(twistDefList[0]+"Set", headDeformerName+"_TwistSet")
-                    twistDefList[0] = cmds.rename(twistDefList[0], headDeformerName+"_Twist")
-                    twistDefList[1] = cmds.rename(twistDefList[1], headDeformerName+"_TwistHandle")
-                if cmds.objExists(squashDefList[0]+"Set"):
-                    cmds.rename(squashDefList[0]+"Set", headDeformerName+"_SquashSet")
-                    squashDefList[0] = cmds.rename(squashDefList[0], headDeformerName+"_Squash")
-                    squashDefList[1] = cmds.rename(squashDefList[1], headDeformerName+"_SquashHandle")
-                if cmds.objExists(sideBendDefList[0]+"Set"):
-                    cmds.rename(sideBendDefList[0]+"Set", headDeformerName+"_Side_BendSet")
-                    sideBendDefList[0] = cmds.rename(sideBendDefList[0], headDeformerName+"_Side_Bend")
-                    sideBendDefList[1] = cmds.rename(sideBendDefList[1], headDeformerName+"_Side_BendHandle")
-                if cmds.objExists(frontBendDefList[0]+"Set"):
-                    cmds.rename(frontBendDefList[0]+"Set", headDeformerName+"_Front_BendSet")
-                    frontBendDefList[0] = cmds.rename(frontBendDefList[0], headDeformerName+"_Front_Bend")
-                    frontBendDefList[1] = cmds.rename(frontBendDefList[1], headDeformerName+"_Front_BendHandle")
-                
             # arrow control curve
             arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", headDeformerName+"_Ctrl", 0.25*bBoxSize, d=0)
             
@@ -204,7 +169,7 @@ class HeadDeformer():
             # create symmetry setup
             centerClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:3][0:5]", relative=True, name=centerSymmetryName+"_Cls") #[Cluster, Handle]
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
-            clustersZeroList = utils.zeroOut([centerClusterList[1], topClusterList[1]])
+            clustersZeroList = dpUtils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.delete(cmds.parentConstraint(centerClusterList[1], clustersZeroList[1]))
             clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.langDic[self.langName]["c101_symmetry"]+"_Grp")
             # arrange lattice deform points percent
@@ -212,7 +177,7 @@ class HeadDeformer():
             # symmetry controls
             centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90))
             topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0))
-            symmetryCtrlZeroList = utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
+            symmetryCtrlZeroList = dpUtils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
             for axis in axisList:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
                 cmds.connectAttr(centerSymmetryCtrl+".rotate"+axis, centerClusterList[1]+".rotate"+axis, force=True)
@@ -223,7 +188,7 @@ class HeadDeformer():
             
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
-            utils.zeroOut([arrowCtrl])
+            dpUtils.zeroOut([arrowCtrl])
             offsetGrp = cmds.group(name=headDeformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=headDeformerName+"_Data_Grp", empty=True)
             cmds.delete(cmds.parentConstraint(latticeDefList[2], arrowCtrlGrp, maintainOffset=False))
@@ -243,7 +208,7 @@ class HeadDeformer():
             
             # try to integrate to Head_Head_Ctrl
             allTransformList = cmds.ls(selection=False, type="transform")
-            headCtrlList = self.ctrls.getControlNodeById("id_023_HeadHead")
+            headCtrlList = self.ctrls.getControlNodeById("id_093_HeadSub")
             if headCtrlList:
                 if len(headCtrlList) > 1:
                     mel.eval("warning" + "\"" + self.langDic[self.langName]["i075_moreOne"] + " Head control.\"" + ";")
@@ -285,8 +250,12 @@ class HeadDeformer():
                                                 for mainShape in singleMainShapeList:
                                                     toHeadDefCtrlList.append(mainShape)
                 if toHeadDefCtrlList:
+                    useComponentTag = cmds.optionVar(query="deformationUseComponentTags")
                     for item in toHeadDefCtrlList:
-                        cmds.sets(item, include=headDeformerName+"_FFDSet")
+                        if useComponentTag:
+                            cmds.deformer(headDeformerName+"_FFD", edit=True, geometry=item)
+                        else:
+                            cmds.sets(item, include=headDeformerName+"_FFDSet")
                 cmds.parent(arrowCtrlGrp, self.headCtrl)
             else:
                 mel.eval("warning" + "\"" + self.langDic[self.langName]["e020_notFoundHeadCtrl"] + "\"" + ";")
@@ -311,7 +280,7 @@ class HeadDeformer():
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:
-                print self.langDic[self.langName]["i179_addedHeadDef"],
+                print(self.langDic[self.langName]["i179_addedHeadDef"])
         
         else:
             mel.eval("warning" + "\"" + self.langDic[self.langName]["i034_notSelHeadDef"] + "\"" + ";")

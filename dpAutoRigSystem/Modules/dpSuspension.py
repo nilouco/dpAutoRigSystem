@@ -1,9 +1,9 @@
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 
 # global variables to this module:    
@@ -13,19 +13,19 @@ DESCRIPTION = "m154_suspensionDesc"
 ICON = "/Icons/dp_suspension.png"
 
 
-class Suspension(Base.StartClass, Layout.LayoutClass):
+class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
     
     
     def getModuleAttr(self, moduleAttr, *args):
@@ -33,7 +33,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
         
     
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
@@ -81,7 +81,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
     
     
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -132,7 +132,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 # declare guide:
@@ -142,7 +142,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
-                self.dist = self.ctrls.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
+                self.dist = dpUtils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
                 self.jointList, self.mainCtrlList, self.ctrlZeroList, self.ctrlList, self.aimLocList, self.upLocList = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
@@ -152,7 +152,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:
-                    utils.setJointLabel(jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+letter)
+                    dpUtils.setJointLabel(jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+letter)
                     self.jointList.append(jnt)
                     
                     # create a control:
@@ -167,16 +167,16 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                     cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScC")
                     self.ctrlList.append(ctrl)
                     # zeroOut controls:
-                    zeroOutCtrlGrp = utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
+                    zeroOutCtrlGrp = dpUtils.zeroOut([mainCtrl, ctrl, upLocCtrl])
                     self.mainCtrlList.append(zeroOutCtrlGrp[0])
                     self.ctrlZeroList.append(zeroOutCtrlGrp[1])
                     cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
-                        utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
+                        dpUtils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
                         cmds.delete(cmds.parentConstraint(self.cvALoc, zeroOutCtrlGrp[0], maintainOffset=False))
                     else:
-                        utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
+                        dpUtils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
                         cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
                         # integrating data:
                         self.suspensionBCtrlGrpList.append(zeroOutCtrlGrp[0])
@@ -222,12 +222,12 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.mainCtrlList, name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.jointList, name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.locatorsGrp, name=side+self.userGuideName+"_Grp")
+                self.toScalableHookGrp = cmds.group(self.jointList, name=side+self.userGuideName+"_Scalable_Grp")
+                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.locatorsGrp, name=side+self.userGuideName+"_Static_Grp")
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
@@ -236,6 +236,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 self.ctrlHookGrpList.append(self.toCtrlHookGrp)
+                self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
@@ -248,7 +249,7 @@ class Suspension(Base.StartClass, Layout.LayoutClass):
     
     
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

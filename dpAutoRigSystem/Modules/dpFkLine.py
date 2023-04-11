@@ -1,9 +1,9 @@
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 
 # global variables to this module:    
@@ -13,23 +13,23 @@ DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
 
 
-class FkLine(Base.StartClass, Layout.LayoutClass):
+class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
     
     
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
@@ -64,7 +64,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        utils.useDefaultRenderLayer()
+        dpUtils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -106,7 +106,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 self.cvEndJoint = self.guideName+"_JointEnd"
                 self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
                 # re-parent the children guides:
-                childrenGuideBellowList = utils.getGuideChildrenList(self.cvJointLoc)
+                childrenGuideBellowList = dpUtils.getGuideChildrenList(self.cvJointLoc)
                 if childrenGuideBellowList:
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvJointLoc)
@@ -129,12 +129,12 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:
-            Layout.LayoutClass.createPreviewMirror(self)
+            dpLayoutClass.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
     
     
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -185,7 +185,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
@@ -203,7 +203,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    dpUtils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
                     self.jntCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
@@ -211,7 +211,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.guide, self.jntCtrl, maintainOffset=False))
                     # zeroOut controls:
-                    self.zeroOutCtrlGrp = utils.zeroOut([self.jntCtrl])[0]
+                    self.zeroOutCtrlGrp = dpUtils.zeroOut([self.jntCtrl])[0]
                     # hide visibility attribute:
                     cmds.setAttr(self.jntCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
@@ -224,12 +224,12 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     cmds.setAttr(self.jntCtrl+".scaleCompensate", 1, channelBox=True)
                     cmds.connectAttr(self.jntCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
-                        utils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
+                        dpUtils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
                         self.ctrlZeroGrp = self.zeroOutCtrlGrp
                     elif n == self.nJoints-1:
-                        utils.originedFrom(objName=self.jntCtrl, attrString=self.guide+";"+self.cvEndJoint)
+                        dpUtils.originedFrom(objName=self.jntCtrl, attrString=self.guide+";"+self.cvEndJoint)
                     else:
-                        utils.originedFrom(objName=self.jntCtrl, attrString=self.guide)
+                        dpUtils.originedFrom(objName=self.jntCtrl, attrString=self.guide)
                     # grouping:
                     if n > 0:
                         # parent joints as a simple chain (line)
@@ -244,8 +244,8 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                     # add articulationJoint:
                     if n > 0:
                         if self.addArticJoint:
-                            artJntList = utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            artJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            dpUtils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     # end chain:
                     if n == self.nJoints-1:
@@ -254,17 +254,17 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Grp")
+                self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Scalable_Grp")
+                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
@@ -272,6 +272,7 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
                 # add module type counter value
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
+                self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
@@ -284,4 +285,4 @@ class FkLine(Base.StartClass, Layout.LayoutClass):
     
     
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)

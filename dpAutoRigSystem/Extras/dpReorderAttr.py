@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 from functools import partial
 
 # global variables to this module:
@@ -10,9 +10,9 @@ DESCRIPTION = "m088_reoderAttrDesc"
 ICON = "/Icons/dp_reorderAttr.png"
 
 
-DPRA_VERSION = "1.1"
+DPRA_VERSION = "1.2"
 
-class ReorderAttr():
+class ReorderAttr(object):
     def __init__(self, dpUIinst, langDic, langName, ui=True, *args, **kwargs):
         self.langDic = langDic
         self.langName = langName

@@ -1,8 +1,8 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
-from dpAutoRigSystem.Modules.Library import dpControls
-from dpAutoRigSystem.Modules.Library import dpUtils as utils
+from maya import cmds
+from maya import mel
+from ..Modules.Library import dpControls
+from ..Modules.Library import dpUtils
 
 
 class ControlStartClass:
@@ -97,6 +97,7 @@ class ControlStartClass:
         cvCurve = cmds.curve(name=cvName, point=cvPointList, degree=cvDegree, knot=cvKnot, periodic=cvPeriodic)
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
         self.ctrls.renameShape([cvCurve])
+        self.ctrls.displayRotateOrderAttr([cvCurve])
         return cvCurve
     
     
@@ -163,7 +164,7 @@ class ControlStartClass:
         # getting current selection:
         destinationList = cmds.ls(selection=True, type="transform")
         # check if the given name is good or add a sequencial number on it:
-        self.cvName = utils.validateName(cvName, self.suffix)
+        self.cvName = dpUtils.validateName(cvName, self.suffix)
         self.cvID = cvID
         self.cvSize = cvSize
         self.cvDegree = cvDegree

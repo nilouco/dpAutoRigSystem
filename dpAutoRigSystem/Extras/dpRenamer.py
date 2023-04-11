@@ -1,15 +1,16 @@
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
+from maya import mel
 from functools import partial
 from ..Modules.Library import dpControls
 
 # global variables to this module:
 CLASS_NAME = "Renamer"
-TITLE = "m178_renamer"
-DESCRIPTION = "m179_renamerDesc"
+TITLE = "m214_renamer"
+DESCRIPTION = "m215_renamerDesc"
 ICON = "/Icons/dp_renamer.png"
 
-DPRENAMER_VERSION = "0.6"
+DPRENAMER_VERSION = "0.7"
 
 
 class Renamer():
@@ -56,14 +57,14 @@ class Renamer():
         mainLayout  = cmds.formLayout('mainLayout', numberOfDivisions=450, parent=dpRenamerWin)
 
         fieldsLayout = cmds.columnLayout('fieldsLayout', adjustableColumn=True, width=150, parent=mainLayout)
-        self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["m180_selected"], self.langDic[self.langName]["m181_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
+        self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["i266_selected"], self.langDic[self.langName]["m216_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
         cmds.text('dpRenamer - WIP')
 #        cmds.button('getInfoFromUI', label="getInfoFromUI", command=self.getInfoFromUI)#self.langDic[self.langName]['i124_copyPasteAttr']"", command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
         
-        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m185_sequence'], changeCommand=self.refreshPreview, value=False)
-        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m187_name'], changeCommand=self.refreshPreview, text="")
+        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.refreshPreview, value=False)
+        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.refreshPreview, text="")
         self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start)
-        self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m186_padding'], changeCommand=self.refreshPreview, value1=self.padding)
+        self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding)
 #        cmds.button('sequenceBT', label=self.langDic[self.langName]['m185_sequence'], command=partial(self.runRenamer, self.originalList, True, False, False, False), backgroundColor=(1.0, 0.4, 0.2), parent=fieldsLayout)
 
         cmds.text(label="")
@@ -72,12 +73,12 @@ class Renamer():
 #        cmds.button('prefixBT', label=self.langDic[self.langName]['i144_prefix'], command=partial(self.runRenamer, self.originalList, False, True, False, False), backgroundColor=(0.7, 0.9, 1.0), parent=fieldsLayout)
         
         cmds.text(label="")
-        self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m182_suffix'], changeCommand=self.refreshPreview, value=False)
+        self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m217_suffix'], changeCommand=self.refreshPreview, value=False)
         self.suffixTF = cmds.textField('suffixTF', changeCommand=self.refreshPreview, text="")
 #        cmds.button('suffixBT', label=self.langDic[self.langName]['m182_suffix'], command=partial(self.runRenamer, self.originalList, False, False, True, False), backgroundColor=(0.9, 0.9, 0.7), parent=fieldsLayout)
         
         cmds.text(label="")
-        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m183_search']+" - "+self.langDic[self.langName]['m184_replace'], changeCommand=self.refreshPreview, value=False)
+        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.refreshPreview, value=False)
         self.searchTF = cmds.textField('searchTF', changeCommand=self.refreshPreview, text="")
         self.replaceTF = cmds.textField('replaceTF', changeCommand=self.refreshPreview, text="")
 #        cmds.button('replaceBT', label=self.langDic[self.langName]['m184_replace'], command=partial(self.runRenamer, self.originalList, False, False, False, True), backgroundColor=(0.9, 1.0, 0.5), parent=fieldsLayout)
@@ -130,10 +131,10 @@ class Renamer():
 
 # WIP:
     def testeWip(self, addPrefix, *args):
-        print "teste wip"
+        print("teste wip")
     
     def selectSource(self, *args):
-        print "selected soucr in sl"
+        print("selected soucr in sl")
 
     
     def refreshOriginal(self, *args):

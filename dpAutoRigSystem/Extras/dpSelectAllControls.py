@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 
 # global variables to this module:    
 CLASS_NAME = "SelectAllControls"
@@ -9,7 +9,7 @@ DESCRIPTION = "m167_selAllControlsDesc"
 ICON = "/Icons/dp_selAllControls.png"
 
 
-class SelectAllControls():
+class SelectAllControls(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
@@ -80,7 +80,7 @@ class SelectAllControls():
                             else:
                                 ctrlsToSelectList.append(ctrlName)
                     cmds.select(ctrlsToSelectList)
-                    print self.langDic[self.langName]["m169_selectedCtrls"]+str(ctrlsToSelectList)
+                    print(self.langDic[self.langName]["m169_selectedCtrls"]+str(ctrlsToSelectList))
             else:
                 mel.eval("warning \""+self.langDic[self.langName]["e019_notFoundAllGrp"]+"\";")
     

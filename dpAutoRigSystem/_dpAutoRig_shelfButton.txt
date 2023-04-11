@@ -39,12 +39,13 @@ try:
     #Ex Linux --> sys.path.append("/home/yourUserName/dpAutoRigSystem")
     sys.path.append("Your Path to the project")
     
-    import maya.cmds as cmds
+    from maya import cmds
     import dpAutoRigSystem
-    import dpAutoRigSystem.dpAutoRig as autoRig
+    from dpAutoRigSystem import dpAutoRig as autoRig
+    from importlib import reload
     reload(autoRig)
     autoRigUI = autoRig.DP_AutoRig_UI()
-    print "\ndpAutoRigSystem loaded with success."
+    print("\ndpAutoRigSystem loaded with success.")
 except:
-    print "Error: importing python modules !!!"
-    print "Make sure the dpAutoRigSystem is in a correct MAYA_PATH directory (C:/Program Files/Autodesk/Maya2011/Python/Lib/site-packages/dpAutoRigSystem), and do not change any file, please."
+    print("Error: importing python modules !!!")
+    print("Make sure the dpAutoRigSystem is in a correct MAYA_PATH directory (C:/Program Files/Autodesk/Maya2011/Python/Lib/site-packages/dpAutoRigSystem), and do not change any file, please.")

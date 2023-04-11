@@ -1,15 +1,19 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.OpenMaya as om
+from maya import cmds
+from maya import OpenMaya as om
 import os
 import sys
 import re
 import cProfile
-import shutil
-import urllib
-import zipfile
-import StringIO
+import urllib.request
 import webbrowser
+import math
+import json
+import time
+import getpass
+import datetime
+from io import TextIOWrapper
+from importlib import reload
 
 
 # UTILS functions:
@@ -28,7 +32,7 @@ def findEnv(key, path):
     envPath = ""
 
     if splitEnvList:
-        splitEnvList = filter(lambda x: x != "" and x != ' ' and x != None, splitEnvList)
+        splitEnvList = [x for x in splitEnvList if x != "" and x != ' ' and x != None]
         for env in splitEnvList:
             env = os.path.abspath(env) # Fix crash when there's relative path in os.environ
             if env in dpARPath:
@@ -85,12 +89,13 @@ def findAllModules(path, dir):
     """ Find all modules in the directory.
         Return a list of all module names (without '.py' extension).
     """
+    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner"]
     allPyFilesList = findAllFiles(path, dir, ".py")
     moduleList = []
     # removing "__init__":
     for file in allPyFilesList:
         #Ensure base class are skipped
-        if file != "dpBaseClass" and file != "dpLayoutClass" and file != "dpBaseControlClass":
+        if not file in baseClassList:
             moduleList.append(file)
     return moduleList
 
@@ -130,11 +135,11 @@ def findLastNumber(nameList, basename):
                 except ValueError:
                     pass
 
+    # sorted(numberList) doesn't work properly as expected after 5 elements.
     numberList.sort()
     numberList.reverse()
-
     if numberList:
-        # get the greather valuer (first):
+        # get the greather value (first item):
         existValue = numberList[0]
 
     # work with created guides in the scene:
@@ -216,7 +221,7 @@ def useDefaultRenderLayer():
 def zeroOut(transformList=[], offset=False):
     """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
         If don't have a transformList given, try to get the current selection.
-        If want to create with offset, it'll be a, offset group between zeroGrp and transform.
+        If want to create with offset, it'll be an offset group between zeroGrp and transform.
         Return a list of names of the zeroOut groups.
     """
     zeroList = []
@@ -378,6 +383,60 @@ def hook():
     return hookDic
 
 
+def distanceBet(a, b, name="temp_DistBet", keep=False):
+    """ Creates a distance between node for 2 objects a and b.
+        Keeps them in the scene or delete.
+        Returns the distance value only in case of not keeping distBet node or
+        a list of distance value, distanceNode, two nulls used to calculate and the created constraint.
+    """
+    if cmds.objExists(a) and cmds.objExists(b):
+        # create nulls:
+        nullA = cmds.group(empty=True, name=a+"_DistBetNull_Grp")
+        nullB = cmds.group(empty=True, name=b+"_DistBetNull_Grp")
+        nullC = cmds.group(empty=True, name=b+"_DistBetNull_OrigRef_Grp")
+        cmds.pointConstraint(a, nullA, maintainOffset=False, name=nullA+"_PaC")
+        cmds.pointConstraint(b, nullB, maintainOffset=False, name=nullB+"_PaC")
+        cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
+        pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
+        # create distanceBetween node:
+        distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
+        # connect aPos to the distance between point1:
+        cmds.connectAttr(nullA+".tx", distBet+".point1X")
+        cmds.connectAttr(nullA+".ty", distBet+".point1Y")
+        cmds.connectAttr(nullA+".tz", distBet+".point1Z")
+        # connect bPos to the distance between point2:
+        cmds.connectAttr(nullB+".tx", distBet+".point2X")
+        cmds.connectAttr(nullB+".ty", distBet+".point2Y")
+        cmds.connectAttr(nullB+".tz", distBet+".point2Z")
+        dist = cmds.getAttr(distBet+".distance")
+        if keep:
+            return [dist, distBet, nullA, nullB, nullC, pointConst]
+        else:
+            cmds.delete(distBet, nullA, nullB, nullC, pointConst)
+            return [dist, None, None, None, None, None]
+
+
+def middlePoint(a, b, createLocator=False):
+    """ UNUSED...
+        Find the point location in the middle of two items.
+        Return the middle point position as a vector and a locator in that postition if wanted.
+    """
+    if cmds.objExists(a) and cmds.objExists(b):
+        # get xform datas:
+        aPos = cmds.xform(a, query=True, worldSpace=True, rotatePivot=True)
+        bPos = cmds.xform(b, query=True, worldSpace=True, rotatePivot=True)
+        # calculating the result position:
+        resultPosX = ( aPos[0] + bPos[0] )/2
+        resultPosY = ( aPos[1] + bPos[1] )/2
+        resultPosZ = ( aPos[2] + bPos[2] )/2
+        resultPos = [resultPosX, resultPosY, resultPosZ]
+        if createLocator:
+            middleLoc = cmds.spaceLocator(name=a+"_"+b+"_Middle_Loc", position=resultPos)[0]
+            cmds.xform(middleLoc, centerPivots=True)
+            return [resultPos, middleLoc]
+        return[resultPos]
+
+        
 def clearNodeGrp(nodeGrpName='dpAR_GuideMirror_Grp', attrFind='guideBaseMirror', unparent=False):
     """ Check if there is any node with the attribute attrFind in the nodeGrpName and then unparent its children and delete it.
     """
@@ -459,7 +518,7 @@ def getModulesToBeRigged(instanceList):
             guideNamespaceName = guideModule.guideNamespace
             if guideNamespaceName in allNamespaceList:
                 userGuideName = guideModule.userGuideName
-                if not cmds.objExists(userGuideName+'_Grp'):
+                if not cmds.objExists(userGuideName+'_Static_Grp'):
                     modulesToBeRiggedList.append(guideModule)
     return modulesToBeRiggedList
 
@@ -475,23 +534,25 @@ def getCtrlRadius(nodeName):
     return radius
 
 
-def zeroOutJoints(jntList=None):
+def zeroOutJoints(jntList=None, displayBone=False):
     """ Duplicate the joints, parent as zeroOut.
         Returns the father joints (zeroOuted).
-        Deprecated = using zeroOut function insted.
     """
     resultList = []
     zeroOutJntSuffix = "_Jzt"
     if jntList:
         for jnt in jntList:
             if cmds.objExists(jnt):
-                jxtName = jnt.replace("_Jnt", "").replace("_Jxt", "")
+                jxtName = jnt.replace("_Jnt", "").replace("_"+zeroOutJntSuffix, "")
                 if not zeroOutJntSuffix in jxtName:
                     jxtName += zeroOutJntSuffix
                 dup = cmds.duplicate(jnt, name=jxtName)[0]
                 deleteChildren(dup)
                 clearDpArAttr([dup])
+                deleteJointLabel(dup)
                 cmds.parent(jnt, dup)
+                if not displayBone:
+                    cmds.setAttr(dup+".drawStyle", 2) #none
                 resultList.append(dup)
     return resultList
 
@@ -530,6 +591,17 @@ def setJointLabel(jointName, sideNumber, typeNumber, labelString):
     cmds.setAttr(jointName+".type", typeNumber)
     if typeNumber == 18: #other
         cmds.setAttr(jointName+".otherType", labelString, type="string")
+
+
+def deleteJointLabel(jointName):
+    """ Set joint labelling to
+        side = None
+        type = Other
+        other type = ""
+    """
+    cmds.setAttr(jointName+".side", 3)#None
+    cmds.setAttr(jointName+".type", 18)#Other
+    cmds.setAttr(jointName+".otherType", "", type="string")
 
 
 def extractSuffix(nodeName):
@@ -586,16 +658,14 @@ def checkRawURLForUpdate(DPAR_VERSION, DPAR_RAWURL, *args):
     """
     try:
         gotRemoteFile = False
-        
         # getting dpAutoRig.py file from GitHub website using the Raw URL:
-        remoteSource = urllib.urlopen(DPAR_RAWURL)
-        remoteContents = remoteSource.readlines()
-        
+        remoteSource = urllib.request.urlopen(DPAR_RAWURL)
+        remoteContents = TextIOWrapper(remoteSource, encoding='utf-8')
         # find the line with the version and compare them:
         for line in remoteContents:
-            if "DPAR_VERSION = " in line:
+            if "DPAR_VERSION_PY3 = " in line:
                 gotRemoteFile = True
-                remoteVersion = line[16:-2] #these magic numbers filter only the version XX.YY.ZZ
+                remoteVersion = line[20:-2] #these magic numbers filter only the version XX.YY.ZZ
                 if remoteVersion == DPAR_VERSION:
                     # 0 - the current version is up to date
                     return [0, None, None]
@@ -624,7 +694,7 @@ def visitWebSite(website, *args):
     webbrowser.open(website, new=2)
     
     
-def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", *args):
+def checkLoadedPlugin(pluginName, message="Not loaded plugin", *args):
     """ Check if plugin is loaded and try to load it.
         Returns True if ok (loaded)
         Returns False if not found or not loaded.
@@ -633,19 +703,12 @@ def checkLoadedPlugin(pluginName, exceptName=None, message="Not loaded plugin", 
     if not (cmds.pluginInfo(pluginName, query=True, loaded=True)):
         loadedPlugin = False
         try:
-            # Maya 2012
             cmds.loadPlugin(pluginName+".mll")
             loadedPlugin = True
         except:
-            if exceptName:
-                try:
-                    # Maya 2013 or earlier
-                    cmds.loadPlugin(exceptName+".mll")
-                    loadedPlugin = True
-                except:
-                    pass
+            pass
     if not loadedPlugin:
-        print message, pluginName
+        print(message, pluginName)
     return loadedPlugin
     
     
@@ -702,50 +765,69 @@ def validateName(nodeName, suffix=None, *args):
     return nodeName
 
 
-def articulationJoint(fatherNode, brotherNode, corrNumber=0, dist=1, jarRadius=1.5, *args):
+def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcrRotList=None, dist=1, jarRadius=1.5, doScale=True, *args):
     """ Create a simple joint to help skinning with a half rotation value.
         Receives the number of corrective joints to be created. Zero by default.
+        Place these corrective joints with the given vector list.
         Returns the created joint list.
     """
     jointList = []
     if fatherNode and brotherNode:
         if cmds.objExists(fatherNode) and cmds.objExists(brotherNode):
+            jaxName = brotherNode[:brotherNode.rfind("_")]+"_Jax"
             jarName = brotherNode[:brotherNode.rfind("_")]+"_Jar"
             cmds.select(clear=True)
-            jar = cmds.joint(name=jarName, scaleCompensate=False, radius=jarRadius)
+            jax = cmds.joint(name=jaxName, radius=0.5*jarRadius)
+            jar = cmds.joint(name=jarName, radius=jarRadius)
             cmds.addAttr(jar, longName='dpAR_joint', attributeType='float', keyable=False)
+            cmds.delete(cmds.parentConstraint(brotherNode, jax, maintainOffset=0))
+            cmds.parent(jax, fatherNode)
+            cmds.makeIdentity(jax, apply=True)
+            cmds.setAttr(jax+".segmentScaleCompensate", 0)
+            cmds.setAttr(jar+".segmentScaleCompensate", 1)
             jointList.append(jar)
-            for i in range(0, corrNumber):
-                jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
-                cmds.setAttr(jcr+".translateX", ((i+1)*dist))
-                cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+            for i in range(0, jcrNumber):
                 cmds.select(jar)
+                jcr = cmds.joint(name=brotherNode[:brotherNode.rfind("_")+1]+str(i)+"_Jcr")
+                cmds.setAttr(jcr+".segmentScaleCompensate", 0)
+                cmds.addAttr(jcr, longName='dpAR_joint', attributeType='float', keyable=False)
+                if jcrPosList:
+                    cmds.setAttr(jcr+".translateX", jcrPosList[i][0]*dist)
+                    cmds.setAttr(jcr+".translateY", jcrPosList[i][1]*dist)
+                    cmds.setAttr(jcr+".translateZ", jcrPosList[i][2]*dist)
+                if jcrRotList:
+                    cmds.setAttr(jcr+".rotateX", jcrRotList[i][0])
+                    cmds.setAttr(jcr+".rotateY", jcrRotList[i][1])
+                    cmds.setAttr(jcr+".rotateZ", jcrRotList[i][2])
                 jointList.append(jcr)
-            cmds.delete(cmds.parentConstraint(brotherNode, jar, maintainOffset=0))
-            cmds.makeIdentity(jar, apply=True)
-            cmds.setAttr(jar+".segmentScaleCompensate", 0)
-            cmds.parent(jar, fatherNode)
-            cmds.pointConstraint(brotherNode, jar, maintainOffset=True, name=jarName+"_PoC")[0]
-            oc = cmds.orientConstraint(fatherNode, brotherNode, jar, maintainOffset=True, name=jarName+"_OrC")[0]
+            cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
+            oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
             cmds.setAttr(oc+".interpType", 2) #Shortest
+            if doScale:
+                cmds.scaleConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_ScC")
             return jointList
 
 
-def getNodeByMessage(grpAttrName, *args):
-    """ Get connected node by All_Grp message attribute.
-        Return the found node name or False if it not found.
+def getNodeByMessage(attrName, node=None, *args):
+    """ Get connected node in the given attribute searching as message.
+        If there isn't a given node, try to use All_Grp.
+        Return the found node name or False if it wasn't found.
     """
     result = False
-    allTransformList = cmds.ls(selection=False, type="transform")
-    if allTransformList:
-        for transform in allTransformList:
-            if cmds.objExists(transform+".masterGrp"):
-                # found All_Grp
-                if cmds.objExists(transform+"."+grpAttrName):
-                    foundNodeList = cmds.listConnections(transform+"."+grpAttrName, source=True, destination=False)
-                    if foundNodeList:
-                        result = foundNodeList[0]
+    if not node:
+        # try to find All_Grp
+        allTransformList = cmds.ls(selection=False, type="transform")
+        if allTransformList:
+            for transform in allTransformList:
+                if cmds.objExists(transform+".masterGrp"):
+                    if cmds.getAttr(transform+".masterGrp") == 1:
+                        node = transform #All_Grp found
                         break
+    if node:
+        if cmds.objExists(node+"."+attrName):
+            foundNodeList = cmds.listConnections(node+"."+attrName, source=True, destination=False)
+            if foundNodeList:
+                result = foundNodeList[0]
     return result
 
 
@@ -797,3 +879,119 @@ def extract_world_scale_from_matrix(obj):
     z_scale = om.MScriptUtil.getDoubleArrayItem(ptr, 2)
 
     return [x_scale, y_scale, z_scale]
+
+
+def resolveName(name, suffix, *args):
+    """ Resolve repeated name adding number in the middle of the string.
+        Returns the resolved baseName and name (including the suffix).
+    """
+    name = name[0].upper()+name[1:].replace(" ", "_")
+    baseName = name
+    name = name+"_00_"+suffix
+    if cmds.objExists(name):
+        i = 1
+        while cmds.objExists(name):
+            name = baseName+"_"+str(i).zfill(2)+"_"+suffix
+            i = i+1
+        baseName = baseName+"_"+str(i-1).zfill(2)
+    else:
+        baseName = baseName+"_00"
+    return baseName, name
+
+
+def magnitude(vector, *args):
+    """ Returns the square root of the sum of power 2 from a given vector.
+    """
+    return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))
+
+
+def jointChainLength(jointList):
+    """ Returns a sum of the joint lengths given.
+    """
+    i = 0
+    chainlength = 0
+    if jointList:
+        while ( i < len(jointList) - 1 ):
+            if cmds.objExists(jointList[i]):
+                if cmds.objExists(jointList[i+1]):
+                    a = cmds.xform(jointList[i], query=True, pivots=True, worldSpace=True)
+                    b = cmds.xform(jointList[i+1], query=True, pivots=True, worldSpace=True)
+                    x = b[0] - a[0]
+                    y = b[1] - a[1]
+                    z = b[2] - a[2]
+                    v = [x,y,z]
+                    chainlength += magnitude(v)
+            i += 1
+    return chainlength
+
+
+def unlockAttr(nodeList):
+    attrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ']
+    for node in nodeList:
+        if cmds.objExists(node):
+            for attr in attrList:
+                cmds.setAttr(node+"."+attr, lock=False)
+
+
+def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
+    """ Save to path the given dictionary as a json file.
+    """
+    currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+    if not path:
+        path = cmds.file(query=True, sceneName=True)
+        if not path:
+            return False
+        dpFolder = path[:path.rfind("/")]
+        if subFolder:
+            dpFolder = dpFolder+"/"+subFolder
+        if not os.path.exists(dpFolder):
+            os.makedirs(dpFolder)
+        if not name:
+            name = path[path.rfind("/")+1:path.rfind(".")]
+        pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
+    print("\nLog file", pathFile)
+    outFile = open(pathFile, "w")
+    json.dump(dic, outFile, indent=4)
+    outFile.close()
+    return pathFile
+
+
+def dpCreateValidatorPreset(dpUIinst):
+    """ Creates a json file as a Validator Preset and returns it.
+    """
+    resultString = None
+    validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList + dpUIinst.checkAddOnsInstanceList
+    if validatorsList:
+        resultDialog = cmds.promptDialog(
+                                            title=dpUIinst.langDic[dpUIinst.langName]['i129_createPreset'],
+                                            message=dpUIinst.langDic[dpUIinst.langName]['i130_presetName'],
+                                            button=[dpUIinst.langDic[dpUIinst.langName]['i131_ok'], dpUIinst.langDic[dpUIinst.langName]['i132_cancel']],
+                                            defaultButton=dpUIinst.langDic[dpUIinst.langName]['i131_ok'],
+                                            cancelButton=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'],
+                                            dismissString=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'])
+        if resultDialog == dpUIinst.langDic[dpUIinst.langName]['i131_ok']:
+            resultName = cmds.promptDialog(query=True, text=True)
+            resultName = resultName[0].upper()+resultName[1:]
+            author = getpass.getuser()
+            date = str(datetime.datetime.now().date())
+            resultString = '{"_preset":"'+resultName+'","_author":"'+author+'","_date":"'+date+'","_updated":"'+date+'"'
+            # add validators and its current active values
+            for validator in validatorsList:
+                resultString += ',"'+validator.guideModuleName+'" : '+str(validator.active).lower()
+            resultString += "}"
+    return resultString
+
+
+def closeUI(winName):
+    """ Closes the given window name if it exists.
+    """
+    if cmds.window(winName, query=True, exists=True):
+        cmds.deleteUI(winName, window=True)
+
+
+def generateID(name):
+        """ Return an ID generated by the sum of the "dp" string, plus the given name, plus the current time.
+        """
+        now = str(round(time.time()*10000000000000))
+        word = ("dp"+str(name)).encode('utf-8').hex()
+        return word+"."+now

@@ -5,18 +5,18 @@
 #       david@djx.com.au
 #       www.djx.com.au
 #
-#	CREDITS by David Johnson:
-#		Michael Bazhutkin, I used your excellent rivet.mel for years - thanks for sharing!
-#		Mike Rhone, who said "Better than rivet:Use a follicle."
-#		Brecht Debaene, for showing me how to hook up a follicle
-#		robthebloke.org, for sharing the knowlege.
+#    CREDITS by David Johnson:
+#        Michael Bazhutkin, I used your excellent rivet.mel for years - thanks for sharing!
+#        Mike Rhone, who said "Better than rivet:Use a follicle."
+#        Brecht Debaene, for showing me how to hook up a follicle
+#        robthebloke.org, for sharing the knowlege.
 #
 ###
 
 
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 from functools import partial
 
 # global variables to this module:
@@ -29,10 +29,10 @@ ICON = "/Icons/dp_rivet.png"
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DPRV_VERSION = "1.1"
+DPRV_VERSION = "1.3"
 
-class Rivet():
-    def __init__(self, dpUIinst, langDic, langName, *args, **kwargs):
+class Rivet(object):
+    def __init__(self, dpUIinst, langDic, langName, ui=True, *args, **kwargs):
         # declaring variables
         self.langDic = langDic
         self.langName = langName
@@ -41,17 +41,21 @@ class Rivet():
         self.meshNode = None
         self.selectedUVSet = None
         # call main function
-        self.dpRivetUI(self)
-        # try to fill UI items from selection
-        self.dpFillUI(self)
+        if ui:
+            self.dpRivetUI()
+            # try to fill UI items from selection
+            self.dpFillUI()
+
+    def dpCloseRivetUi(self, *args):
+        if cmds.window('dpRivetWindow', query=True, exists=True):
+            cmds.deleteUI('dpRivetWindow', window=True)
     
     
     def dpRivetUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpRivetUI Window:
-        if cmds.window('dpRivetWindow', query=True, exists=True):
-            cmds.deleteUI('dpRivetWindow', window=True)
+        self.dpCloseRivetUi()
         rivet_winWidth  = 305
         rivet_winHeight = 470
         dpRivetWin = cmds.window('dpRivetWindow', title=self.langDic[self.langName]["m083_rivet"]+" "+DPRV_VERSION, widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -123,6 +127,7 @@ class Rivet():
         
         # call run function to create Rivet setup using UI values
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, RIVET_GRP, True)
+        self.dpCloseRivetUi()
     
     
     def dpSelectUVSetWin(self, uvSetList, *args):
@@ -267,8 +272,9 @@ class Rivet():
                     cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
         """ Create the Rivet setup.
+            Returns follicle node.
         """
         # declaring variables
         self.shapeToAttachList = None
@@ -400,8 +406,11 @@ class Rivet():
                 uvSetList = cmds.polyUVSet(dupShape, query=True, allUVSets=True)
                 if len(uvSetList) > 1:
                     if not uvSetList[0] == uvSetName:
-                        # change uvSet order because closestPointOnMesh uses the default uv set
-                        cmds.polyUVSet(dupShape, copy=True, uvSet=uvSetName, newUVSet=uvSetList[0])
+                        try:
+                            # change uvSet order because closestPointOnMesh uses the default uv set
+                            cmds.polyUVSet(dupShape, copy=True, uvSet=uvSetName, newUVSet=uvSetList[0])
+                        except:
+                            uvSetName = uvSetList[0]
                         
                 # closest point on mesh node:
                 self.cpNode = cmds.createNode("closestPointOnMesh", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
@@ -456,11 +465,11 @@ class Rivet():
                 
                 # attach follicle and rivet using constraint:
                 if attachTranslate and attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC")
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC")
                 elif attachTranslate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))
                 elif attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=True, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))
+                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))
                 
                 # try to integrate to dpAutoRigSystem in order to keep the Rig as scalable:
                 if self.masterCtrl:
@@ -478,3 +487,4 @@ class Rivet():
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
         
         cmds.select(clear=True)
+        return folTransf

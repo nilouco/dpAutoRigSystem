@@ -1,17 +1,17 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 
-from Library import dpControls
-from Library import dpUtils as utils
+from .Library import dpControls
+from .Library import dpUtils
+from ..Extras import dpCorrectionManager
 
-
-class RigType:
+class RigType(object):
     biped = "biped"
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-class StartClass:
+class StartClass(object):
     def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
@@ -38,6 +38,8 @@ class StartClass:
         self.annotation = self.moduleGrp+"_Ant"
         # calling dpControls:
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName, self.moduleGrp)
+        # starting correctionManater:
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, False)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -63,7 +65,7 @@ class StartClass:
         """ Create the elements to Guide module in the scene, like controls, etc...
         """
         # GUIDE:
-        utils.useDefaultRenderLayer()
+        dpUtils.useDefaultRenderLayer()
         # create guide base (moduleGrp):
         guideBaseList = self.ctrls.cvBaseGuide(self.moduleGrp, r=2)
         self.moduleGrp = guideBaseList[0]
@@ -141,9 +143,9 @@ class StartClass:
         except:
             pass
         # delete the guide module:
-        utils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
+        dpUtils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
         # clear default 'dpAR_GuideMirror_Grp':
-        utils.clearNodeGrp()
+        dpUtils.clearNodeGrp()
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
@@ -182,8 +184,9 @@ class StartClass:
                     self.enteredText = cmds.textField(self.userName, query=True, text=True)
                 except:
                     self.enteredText = ""
+            self.enteredText = self.enteredText.replace(" ", "_")
             # call utils to return the normalized text:
-            self.customName = utils.normalizeText(self.enteredText, prefixMax=30)
+            self.customName = dpUtils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:
@@ -202,8 +205,9 @@ class StartClass:
                             dpAR_nameList.append(currentName)
                         if cmds.objExists(transform+".customName"):
                             currentName = cmds.getAttr(transform+".customName")
-                            if not currentName in dpAR_nameList:
-                                dpAR_nameList.append(currentName)
+                            if currentName:
+                                if not currentName in dpAR_nameList:
+                                    dpAR_nameList.append(currentName)
                     if dpAR_nameList:
                         dpAR_nameList.sort()
                         for currentName in dpAR_nameList:
@@ -211,7 +215,7 @@ class StartClass:
                                 # getting the index of the last digit in the name:
                                 n = len(currentName)+1
                                 hasDigit = False
-                                for i in reversed(xrange(len(currentName))):
+                                for i in reversed(range(len(currentName))):
                                     if currentName[i].isdigit():
                                         n = i
                                         hasDigit = True
@@ -235,6 +239,80 @@ class StartClass:
                 # set userGuideName:
                 self.userGuideName = self.customName
     
+
+    def setupCorrectiveNet(self, ctrl, firstNode, secondNode, netName, axis, axisOrder, inputEndValue, isLeg=None, legList=None, *args):
+        """ Create the correction manager network node and returns it.
+            legList = [
+                        0 = rename,
+                        1 = axis,
+                        2 = axisOrder
+                        3 = inputValue,
+                    ]
+        """
+        if not cmds.objExists(ctrl+"."+self.langDic[self.langName]['c124_corrective']):
+            cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        # corrective network node
+        correctiveNet = self.correctionManager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
+        cmds.connectAttr(ctrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveNet+".corrective", force=True)
+        cmds.setAttr(correctiveNet+".axis", axis)
+        cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
+        if isLeg:
+            cmds.setAttr(correctiveNet+".axis", legList[1])
+            cmds.setAttr(correctiveNet+".axisOrder", legList[2])
+        correctionNetInputValue = cmds.getAttr(correctiveNet+".inputValue")
+        if correctionNetInputValue+inputEndValue == 0:
+            inputEndValue += 1
+        cmds.setAttr(correctiveNet+".inputStart", correctionNetInputValue) #offset default position
+        cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+inputEndValue)
+        if isLeg:
+            if correctionNetInputValue+legList[3] == 0:
+                legList[3] += 1
+            cmds.setAttr(correctiveNet+".inputEnd", correctionNetInputValue+legList[3])
+            correctiveNet = self.correctionManager.changeName(legList[0])+"_Net"
+        return correctiveNet
+
+
+    def setupJcrControls(self, jcrList, s, jointLabelAdd, labelName, correctiveNetList, calibratePresetList, invertList, mirrorList=None, *args):
+        """ Create corrective joint controllers.
+        """
+        if jcrList:
+            l = 0
+            sDefault = s
+            mirrorPrefixList = [self.langDic[self.langName]['p002_left'], self.langDic[self.langName]['p003_right']]
+            for i, jcr in enumerate(jcrList):
+                if not i == 0: #exclude jar in the index 0
+                    # logic to mirror calibration setup for left and right sides of a centered module like neck/head
+                    m = i
+                    if mirrorList:
+                        if mirrorList[i]:
+                            s += 1
+                            if l == 0:
+                                oldJcr = jcr
+                                jcr = cmds.rename(jcr, mirrorPrefixList[l]+"_"+jcr)
+                            else:
+                                jcr = cmds.rename(jcr, mirrorPrefixList[l]+"_"+oldJcr)
+                                m -= 1
+                            jcrList[i] = jcr
+                            l += 1
+                        else:
+                            m = i
+                            s = sDefault
+                    else:
+                        s = sDefault
+                    # add joint label, create controller, zeroOut
+                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(m))
+                    jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
+                    cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
+                    # preset calibration
+                    for calibrateAttr in calibratePresetList[i].keys():
+                        cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr]*self.ctrlRadius)
+                    if invertList:
+                        invertAttrList = invertList[i]
+                        if invertAttrList:
+                            for invertAttr in invertAttrList:
+                                cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
+                                cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
+
     
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
@@ -252,11 +330,11 @@ class StartClass:
             self.ctrls.unPinGuide(self.moduleGrp)
             
             # RIG:
-            utils.useDefaultRenderLayer()
+            dpUtils.useDefaultRenderLayer()
             
             # get the radius value to controls:
             if cmds.objExists(self.radiusCtrl):
-                self.ctrlRadius = utils.getCtrlRadius(self.radiusCtrl)
+                self.ctrlRadius = dpUtils.getCtrlRadius(self.radiusCtrl)
             else:
                 self.ctrlRadius = 1
                 
@@ -288,6 +366,15 @@ class StartClass:
                 self.userGuideName = prefix + self.userGuideName
             cmds.select(clear=True)
     
+
+    def hookSetup(self, *args):
+        """ Add message attributes to map hooked groups for the rigged module.
+        """
+        cmds.addAttr(self.toStaticHookGrp, longName="controlHookGrp", attributeType="message")
+        cmds.addAttr(self.toStaticHookGrp, longName="scalableHookGrp", attributeType="message")
+        cmds.connectAttr(self.toCtrlHookGrp+".message", self.toStaticHookGrp+".controlHookGrp", force=True)
+        cmds.connectAttr(self.toScalableHookGrp+".message", self.toStaticHookGrp+".scalableHookGrp", force=True)
+
     
     def integratingInfo(self, *args):
         """ This method just create this dictionary in order to build information of module integration.
@@ -295,18 +382,21 @@ class StartClass:
         self.integratedActionsDic = {}
         
         
-    # Gets:
+    # Getters:
     #
     def getArticulation(self, *args):
         return cmds.getAttr(self.moduleGrp+".articulation")
 
     def getModuleAttr(self, moduleAttr, *args):
         return cmds.getAttr(self.moduleGrp + "." + moduleAttr)
+
     
-    # Sets:
+    # Setters:
     #
     def setArticulation(self, value, *args):
         self.addArticJoint = value
         cmds.setAttr(self.moduleGrp + ".articulation", value)
     
-    
+    def setCorrective(self, value, *args):
+        self.addCorrective = value
+        cmds.setAttr(self.moduleGrp + ".corrective", value)

@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 
 # global variables to this module:    
 CLASS_NAME = "Arm"
@@ -35,7 +35,7 @@ def Arm(dpUIinst):
 
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+armName))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+armName))
         
         # creating module instances:
         armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
@@ -60,10 +60,11 @@ def Arm(dpUIinst):
         cmds.setAttr(armBaseGuide+".displayAnnotation", 0)
         cmds.setAttr(armLimbInstance.cvExtremLoc+".translateZ", 7)
         cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
+        armLimbInstance.changeStyle(dpUIinst.langDic[dpUIinst.langName]['m026_biped'])
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + `progressAmount` + ' '+dpUIinst.langDic[dpUIinst.langName]['m007_finger']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dpUIinst.langDic[dpUIinst.langName]['m007_finger']))
         
         # edit finger guides:
         fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
@@ -92,7 +93,7 @@ def Arm(dpUIinst):
 
         # select the armGuide_Base:
         cmds.select(armBaseGuide)
-        print dpUIinst.langDic[dpUIinst.langName]['m091_createdArm']+"\n",
+        print(dpUIinst.langDic[dpUIinst.langName]['m091_createdArm'])
     else:
         # error checking modules in the folder:
         mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

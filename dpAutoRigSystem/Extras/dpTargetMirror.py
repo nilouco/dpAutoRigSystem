@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 from functools import partial
 
 # global variables to this module:
@@ -9,9 +9,9 @@ TITLE = "m055_tgtMirror"
 DESCRIPTION = "m056_tgtMirrorDesc"
 ICON = "/Icons/dp_targetMirror.png"
 
-DPTM_VERSION = "2.4"
+DPTM_VERSION = "2.5"
 
-class TargetMirror():
+class TargetMirror(object):
     def __init__(self, dpUIinst, langDic, langName, *args, **kwargs):
         self.langDic = langDic
         self.langName = langName
@@ -74,7 +74,7 @@ class TargetMirror():
             if self.dpCheckGeometry(selectedList[0]):
                 cmds.textField(self.originalModelTextField, edit=True, text=selectedList[0])
         else:
-            print "Original Model > None"
+            print("Original Model > None")
     
     
     def dpAddSelect(self, *args):
@@ -193,7 +193,7 @@ class TargetMirror():
                     if cmds.progressWindow(query=True, isCancelled=True):
                         cancelled = True
                         break
-                    cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + `progressAmount` + ' target'))
+                    cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
                     if not item == origNode:
                         # start copying
                         if self.dpCheckGeometry(item):

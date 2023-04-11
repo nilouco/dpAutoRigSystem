@@ -4,11 +4,11 @@
 
 
 # importing libraries:
-import maya.cmds as cmds
+from maya import cmds
 
-from Library import dpUtils as utils
-import dpBaseClass as Base
-import dpLayoutClass as Layout
+from .Library import dpUtils
+from . import dpBaseClass
+from . import dpLayoutClass
 
 
 # global variables to this module:    
@@ -18,23 +18,23 @@ DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 
 
-class Wheel(Base.StartClass, Layout.LayoutClass):
+class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        Base.StartClass.__init__(self, *args, **kwargs)
+        dpBaseClass.StartClass.__init__(self, *args, **kwargs)
     
     
     def createModuleLayout(self, *args):
-        Base.StartClass.createModuleLayout(self)
-        Layout.LayoutClass.basicModuleLayout(self)
+        dpBaseClass.StartClass.createModuleLayout(self)
+        dpLayoutClass.LayoutClass.basicModuleLayout(self)
     
     
     def createGuide(self, *args):
-        Base.StartClass.createGuide(self)
+        dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="geo", dataType='string')
@@ -125,7 +125,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
     
         
     def rigModule(self, *args):
-        Base.StartClass.rigModule(self)
+        dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             try:
@@ -176,7 +176,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 # declare guides:
@@ -193,7 +193,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 self.centerJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.centerJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                utils.setJointLabel(self.centerJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel'])
+                dpUtils.setJointLabel(self.centerJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel'])
                 # create end joint:
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_JEnd", radius=0.5)
                 # main joint:
@@ -201,22 +201,22 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.mainJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                utils.setJointLabel(self.mainJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c058_main'])
+                dpUtils.setJointLabel(self.mainJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c058_main'])
                 # create end joint:
                 self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_JEnd", radius=0.5)
                 
                 # create controls:
                 self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.langDic[self.langName]['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree)
-                self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.langDic[self.langName]['c011_RevFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
-                self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.langDic[self.langName]['c010_RevFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
+                self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.langDic[self.langName]['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
+                self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.langDic[self.langName]['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
                 self.mainCtrlList.append(self.mainCtrl)
                 self.wheelCtrlList.append(self.wheelCtrl)
                 
                 # origined from attributes:
-                utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.radiusGuide)
-                utils.originedFrom(objName=self.insideCtrl, attrString=self.cvInsideLoc)
-                utils.originedFrom(objName=self.outsideCtrl, attrString=self.cvOutsideLoc)
+                dpUtils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvCenterLoc+";"+self.cvFrontLoc+";"+self.radiusGuide)
+                dpUtils.originedFrom(objName=self.insideCtrl, attrString=self.cvInsideLoc)
+                dpUtils.originedFrom(objName=self.outsideCtrl, attrString=self.cvOutsideLoc)
                 
                 # prepare group to receive steering wheel connection:
                 self.toSteeringGrp = cmds.group(self.insideCtrl, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering'].capitalize()+"_Grp")
@@ -231,6 +231,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.wheelCtrl, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, self.mainCtrl, maintainOffset=False))
                 cmds.parentConstraint(self.mainCtrl, self.mainJoint, maintainOffset=False, name=self.mainJoint+"_PaC")
+                cmds.scaleConstraint(self.mainCtrl, self.mainJoint, maintainOffset=True, name=self.mainJoint+"_ScC")
                 cmds.delete(cmds.parentConstraint(self.cvFrontLoc, self.mainEndJoint, maintainOffset=False))
                 if s == 1 and cmds.getAttr(self.moduleGrp+".flip") == 1:
                     cmds.move(self.ctrlRadius, self.mainCtrl, moveY=True, relative=True, objectSpace=True, worldSpaceDistance=True)
@@ -240,8 +241,8 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvOutsideLoc, self.outsideCtrl, maintainOffset=False))
                 
                 # zeroOut controls:
-                zeroGrpList = utils.zeroOut([self.mainCtrl, self.wheelCtrl, self.toSteeringGrp, self.outsideCtrl])
-                wheelAutoGrp = utils.zeroOut([self.wheelCtrl])
+                zeroGrpList = dpUtils.zeroOut([self.mainCtrl, self.wheelCtrl, self.toSteeringGrp, self.outsideCtrl])
+                wheelAutoGrp = dpUtils.zeroOut([self.wheelCtrl])
                 wheelAutoGrp = cmds.rename(wheelAutoGrp, side+self.userGuideName+"_"+self.langDic[self.langName]['m156_wheel']+"_Auto_Grp")
                 
                 # fixing flip mirror:
@@ -274,7 +275,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c068_startFrame'], attributeType="long", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c067_radius'], attributeType="float", min=0.01, defaultValue=self.ctrlRadius, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c069_radiusScale'], attributeType="float", defaultValue=1, keyable=False)
-                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=1, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering'], attributeType="bool", defaultValue=0, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), attributeType="float", defaultValue=0, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
@@ -288,10 +289,17 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering'], steeringValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c021_showControls'], showControlsValue, channelBox=True)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 1, channelBox=True)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 1)
                 cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c093_tryKeepUndo'], 1, channelBox=True)
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
                         cmds.setAttr(self.wheelCtrl+"."+self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 0)
+                        self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), 0)
+                # set default values:
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c068_startFrame'], startFrameValue)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c070_steering'], steeringValue)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c021_showControls'], showControlsValue)
+                self.ctrls.setDefaultValue(self.wheelCtrl, self.langDic[self.langName]['c093_tryKeepUndo'], 1)
                 
                 # automatic rotation wheel setup:
                 receptSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c070_steering']+"_MD")
@@ -347,7 +355,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.skinCluster(self.centerJoint, self.geoHolder, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c046_holder']+"_SC")
                 if self.loadedGeo:
                     if cmds.objExists(self.loadedGeo):
-                        baseName = utils.extractSuffix(self.loadedGeo)
+                        baseName = dpUtils.extractSuffix(self.loadedGeo)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
@@ -360,7 +368,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                                     itemType = cmds.objectType(item)
                                     if itemType == "mesh" or itemType == "nurbsSurface":
                                         try:
-                                            skinClusterName = utils.extractSuffix(item)+"_SC"
+                                            skinClusterName = dpUtils.extractSuffix(item)+"_SC"
                                             cmds.skinCluster(self.centerJoint, item, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
                                         except:
                                             pass
@@ -372,14 +380,14 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 upperClusterList = cmds.cluster(latticeList[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+"_Cls") #[deform, handle]
                 middleClusterList = cmds.cluster(latticeList[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.userGuideName+"_"+self.langDic[self.langName]['m033_middle']+"_Cls") #[deform, handle]
                 lowerClusterList = cmds.cluster(latticeList[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+"_Cls") #[deform, handle]
-                clusterGrpList = utils.zeroOut([upperClusterList[1], middleClusterList[1], lowerClusterList[1]])
+                clusterGrpList = dpUtils.zeroOut([upperClusterList[1], middleClusterList[1], lowerClusterList[1]])
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
                 # deform controls:
                 upperDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
                 middleDefCtrl = self.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.langDic[self.langName]['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
                 lowerDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180))
-                defCtrlGrpList = utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
+                defCtrlGrpList = dpUtils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.userGuideName+"_Ctrl_Grp")
                 
                 # positions:
@@ -410,12 +418,12 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(zeroGrpList[2], name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.centerJoint, self.mainJoint, defGrp, name=side+self.userGuideName+"_Joint_Grp")
-                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder, name=side+self.userGuideName+"_Grp")
+                self.toScalableHookGrp = cmds.group(self.centerJoint, self.mainJoint, defGrp, name=side+self.userGuideName+"_Scalable_Grp")
+                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.oldLoc, self.wheelAutoGrpLoc, self.geoHolder, name=side+self.userGuideName+"_Static_Grp")
                 # add hook attributes to be read when rigging integrated modules:
-                utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
@@ -424,6 +432,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 self.ctrlHookGrpList.append(self.toCtrlHookGrp)
+                self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
@@ -436,7 +445,7 @@ class Wheel(Base.StartClass, Layout.LayoutClass):
     
     
     def integratingInfo(self, *args):
-        Base.StartClass.integratingInfo(self)
+        dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
         """
         self.integratedActionsDic = {

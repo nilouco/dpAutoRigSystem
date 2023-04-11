@@ -1,19 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
 
-try:
-    import pymel.core as pymel
-    loadedSqBindPose = False
-    try:
-        import sstk.maya.animation.sqBindPose as sqBindPose
-        reload(sqBindPose)
-        loadedSqBindPose = True
-    except:
-        pass
-except Exception as e:
-    print "Error: importing python modules!!!\n",
-    print e
 
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
@@ -22,7 +9,7 @@ DESCRIPTION = "m058_updateRigInfoDesc"
 ICON = "/Icons/dp_updateRigInfo.png"
 
 
-class UpdateRigInfo():
+class UpdateRigInfo(object):
     def __init__(self, *args, **kwargs):
         # call main function
         self.dpMain(self)
@@ -53,10 +40,6 @@ class UpdateRigInfo():
             ctrlString = ""
             if ctrlList:
                 for i, item in enumerate(ctrlList):
-                    if (loadedSqBindPose):
-                        nCurNode = pymel.PyNode(item)
-                        if sqBindPose.is_pose_outdated(nCurNode):
-                            sqBindPose.store_pose(pymel.PyNode(item))
                     ctrlString = ctrlString + str(item)
                     if i < len(ctrlList):
                         ctrlString = ctrlString + ";"
@@ -70,6 +53,6 @@ class UpdateRigInfo():
                     if i < len(meshList):
                         meshString = meshString + ";"
                 cmds.setAttr(masterGrp+".geometryList", meshString, type="string")
-            print "Control List = ", ctrlString
-            print "Mesh List    = ", meshString
-            print "Updated Rig Info: "+masterGrp,
+            print("Control List = "+ctrlString)
+            print("Mesh List = "+meshString)
+            print("Updated Rig Info: "+masterGrp)

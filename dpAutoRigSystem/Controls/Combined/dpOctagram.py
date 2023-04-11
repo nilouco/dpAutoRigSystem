@@ -1,7 +1,8 @@
 # importing libraries:
-import maya.cmds as cmds
-import dpAutoRigSystem.Controls.dpBaseControlClass as BaseControl
-reload(BaseControl)
+from maya import cmds
+from .. import dpBaseControlClass
+from importlib import reload
+reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Octagram"
@@ -11,14 +12,14 @@ ICON = "/Icons/dp_octagram.png"
 
 dpOctagramVersion = 1.2
 
-class Octagram(BaseControl.ControlStartClass):
+class Octagram(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        BaseControl.ControlStartClass.__init__(self, *args, **kwargs)
+        dpBaseControlClass.ControlStartClass.__init__(self, *args, **kwargs)
         # dependence module list:
         self.checkModuleList = ['dpSquare']
     

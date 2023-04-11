@@ -1,6 +1,6 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
+from maya import cmds
+from maya import mel
 
 # global variables to this module:    
 CLASS_NAME = "PrintSelection"
@@ -9,7 +9,7 @@ DESCRIPTION = "m054_printSelDesc"
 ICON = "/Icons/dp_printSelection.png"
 
 
-class PrintSelection():
+class PrintSelection(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
@@ -53,12 +53,12 @@ class PrintSelection():
         """
         if resultDic:
             # log
-            print "\n-------"
-            print "Print Selection Result:"
-            print "List:"
-            print resultDic['list']
-            print "String:"
-            print resultDic['string']
-            print "-------"
+            print("\n-------")
+            print("Print Selection Result:")
+            print("List:")
+            print(resultDic['list'])
+            print("String:")
+            print(resultDic['string'])
+            print("-------")
         else:
             mel.eval("warning \""+self.langDic[self.langName]['i042_notSelection']+"\";")

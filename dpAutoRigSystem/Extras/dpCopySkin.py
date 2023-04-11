@@ -1,8 +1,9 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
-import dpAutoRigSystem.Modules.Library.dpUtils as utils
-reload(utils)
+from maya import cmds
+from maya import mel
+from ..Modules.Library import dpUtils
+from importlib import reload
+reload(dpUtils)
 
 # global variables to this module:    
 CLASS_NAME = "CopySkin"
@@ -10,9 +11,9 @@ TITLE = "m097_copySkin"
 DESCRIPTION = "m098_copySkinDesc"
 ICON = "/Icons/dp_copySkin.png"
 
-dpCopySkinVersion = 1.2
+dpCopySkinVersion = 1.3
 
-class CopySkin():
+class CopySkin(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
@@ -45,13 +46,13 @@ class CopySkin():
                     elif checkSkin == -1:
                         mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+sourceItem+"\";")
                     else:
-                        print self.langDic[self.langName]['e007_notSkinFound']
+                        print(self.langDic[self.langName]['e007_notSkinFound'])
                 else:
-                    print self.langDic[self.langName]['e006_firstSkinnedGeo']
+                    print(self.langDic[self.langName]['e006_firstSkinnedGeo'])
             else:
                 mel.eval("warning \""+self.langDic[self.langName]["i163_sameName"]+" "+sourceItem+"\";")
         else:
-            print self.langDic[self.langName]['e005_selectOneObj']
+            print(self.langDic[self.langName]['e005_selectOneObj'])
 
 
     def dpCheckSkinCluster(self, shapeList, *args):
@@ -78,7 +79,7 @@ class CopySkin():
         """
         for item in destinationList:
             # get correct naming
-            skinClusterName = utils.extractSuffix(item)
+            skinClusterName = dpUtils.extractSuffix(item)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
             # create skinCluster node
@@ -88,4 +89,4 @@ class CopySkin():
             # copy skin weights from sourceItem to item node
             cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
             # log result
-            print self.langDic[self.langName]['i083_copiedSkin'], sourceItem, item
+            print(self.langDic[self.langName]['i083_copiedSkin'], sourceItem, item)

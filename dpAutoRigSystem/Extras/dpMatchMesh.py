@@ -1,7 +1,7 @@
 # importing libraries:
-import maya.cmds as cmds
-import maya.mel as mel
-import maya.OpenMaya as om
+from maya import cmds
+from maya import mel
+from maya import OpenMaya as om
 
 # global variables to this module:    
 CLASS_NAME = "MatchMesh"
@@ -10,7 +10,7 @@ DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
 
 
-class MatchMesh():
+class MatchMesh(object):
     def __init__(self, dpUIinst, langDic, langName, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
@@ -139,7 +139,7 @@ class MatchMesh():
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        cmds.progressWindow(edit=True, maxValue=nbVertice, progress=progressAmount, status=('Transfering: ' + `progressAmount` + ' vertex'))
+                        cmds.progressWindow(edit=True, maxValue=nbVertice, progress=progressAmount, status=('Transfering: ' + repr(progressAmount) + ' vertex'))
                         
                         # transfer data
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
@@ -154,9 +154,9 @@ class MatchMesh():
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
                     
                     if not cancelled:
-                        print self.langDic[self.langName]['i035_transfData'], self.langDic[self.langName]['i036_from'].upper(), ":", fromMesh, ",", self.langDic[self.langName]['i037_to'].upper(), ":", toMesh
+                        print(self.langDic[self.langName]['i035_transfData'], self.langDic[self.langName]['i036_from'].upper(), ":", fromMesh, ",", self.langDic[self.langName]['i037_to'].upper(), ":", toMesh)
                     else:
-                        print self.langDic[self.langName]['i038_canceled']
+                        print(self.langDic[self.langName]['i038_canceled'])
                     
                 else:
                     mel.eval("warning \""+self.langDic[self.langName]['i039_notMatchDif']+"\";")
