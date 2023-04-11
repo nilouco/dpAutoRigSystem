@@ -6,11 +6,14 @@
 
     "DuplicatedName"     : true,
     "FreezeTransform"    : true,
+    "NamespaceCleaner"   : true,
 
     "ColorSetCleaner"    : true,
+    "ExitEditMode"       : true,
     "HideDataGrp"        : true,
-    "NamespaceCleaner"   : true,
+    "HideCorrectives"    : true,
     "NgSkinToolsCleaner" : true,
+    "ResetPose"          : true,
     "TargetCleaner"      : true,
     "WIPCleaner"         : true
 }

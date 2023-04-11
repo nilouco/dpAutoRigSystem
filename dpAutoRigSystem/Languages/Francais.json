@@ -695,7 +695,7 @@
     "v029_hideDataGrpDesc"        : "Ce validateur va cacher le Data_Grp s'il n'est pas caché encore.",
     "v030_colorSetCleaner"        : "Nettoyeur des ColorSets",
     "v031_colorSetCleanerDesc"    : "Ce validateur nettoiera tous les nodes de colorSet\nlorsque l'éditeur de forme et les outils de sculpture sont utilisés.",
-    "v032_namespaceCleaner"       : "Namespace nettoyeur",
-    "v033_namespaceCleanerDesc"   : "Vérifiez s'il existe des espaces de noms pour les nettoyer.\nCela ne supprimera pas l'espace de noms de dpGuides."
+    "v038_namespaceCleaner"       : "Namespace nettoyeur",
+    "v039_namespaceCleanerDesc"   : "Vérifiez s'il existe des namespaces pour les nettoyer.\nCela ne supprimera pas les namespaces de dpGuides."
 
 }
