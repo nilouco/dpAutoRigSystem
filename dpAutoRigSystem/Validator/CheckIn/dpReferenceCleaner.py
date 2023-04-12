@@ -36,7 +36,7 @@ class ReferenceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
-        
+
 
         # ---
         # --- validator code --- beginning
@@ -65,15 +65,15 @@ class ReferenceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                             
                             # Import objects from referenced file.
                             cmds.file(path, importReference=True)
+
+                            # The line bellow is to remove the namespaces after import reference. It can crash when there're
+                            # a bunch of guides and geometry together in the file
                             self.removeNamespace()
                             self.resultOkList.append(True)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                         except:
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
-#                else:
-#                    self.foundIssueList.append(False)
-#                    self.resultOkList.append(True)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -88,7 +88,6 @@ class ReferenceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         self.finishValidation()
         return self.dataLogDic
 
-
     def startValidation(self, *args):
         """ Procedures to start the validation cleaning old data.
         """
@@ -101,6 +100,7 @@ class ReferenceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
 
     def removeNamespace(self, *args):
         """ This function will use recursive method to remove all namespace, 
