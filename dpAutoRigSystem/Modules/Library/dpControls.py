@@ -1330,7 +1330,15 @@ class ControlClass(object):
             Ask to mirror control shape of all controls if nothing is selected.
         """
         # call reset all controls before run script.
-        self.setupDefaultValues(resetMode=True)
+        
+        #self.setupDefaultValues(resetMode=True, ctrlList=None)
+        setDefaltValues = 0
+        print("setDefaltValues_ANTES =============",setDefaltValues)
+        # if setDefaltValues == 0:
+        #     self.setupDefaultValues(resetMode=True, ctrlList=None)
+        #     setDefaltValues += 1
+        #     print("Passei Aqui =============",setDefaltValues)
+        # print("setDefaltValues =============",setDefaltValues)
 
         if not fromPrefix:
             fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
@@ -1340,8 +1348,18 @@ class ControlClass(object):
             if not nodeName:
                 currentSelectionList = cmds.ls(selection=True, type="transform")
                 if currentSelectionList:
+                    if setDefaltValues == 0:
+                            self.setupDefaultValues(resetMode=True, ctrlList=None)
+                            setDefaltValues += 1
+                            print("Passei Aqui =============",setDefaltValues)
+                    print("setDefaltValues =============",setDefaltValues)
                     for selectedNode in currentSelectionList:
                         if selectedNode.startswith(fromPrefix):
+                            # if setDefaltValues == 0:
+                            #     self.setupDefaultValues(resetMode=True, ctrlList=None)
+                            #     setDefaltValues += 1
+                            #     print("Passei Aqui =============",setDefaltValues)
+                            # print("setDefaltValues =============",setDefaltValues)
                             self.mirrorShape(selectedNode, fromPrefix, toPrefix, axis)
                 else:
                     # ask to run for all nodes:
@@ -1357,6 +1375,11 @@ class ControlClass(object):
                                 progressAmount += 1
                                 if node in allControlList:
                                     cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)
+                                    if setDefaltValues == 0:
+                                        self.setupDefaultValues(resetMode=True, ctrlList=None)
+                                        setDefaltValues += 1
+                                        print("Passei Aqui =============",setDefaltValues)
+                                    print("setDefaltValues =============",setDefaltValues)                                    
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
                         cmds.progressWindow(endProgress=True)
