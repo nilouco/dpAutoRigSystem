@@ -83,12 +83,12 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 self.resultOkList.append(False)
             else: #fix
                 try:
-                    # if namespaceWithGuidesList:
-                    #     # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
-                    #     self.dpUIinst.checkImportedGuides(False)
-                    # if namespaceWithoutGuidesList:
-                    #     # call function inside validator to remove namespaces when it's not a guide.
-                    self.removeNamespace()
+                    if namespaceWithGuidesList:
+                        # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
+                        self.dpUIinst.checkImportedGuides(False)
+                    elif namespaceWithoutGuidesList:
+                        # call function inside validator to remove namespaces when it's not a guide.
+                        self.removeNamespace()
                     self.resultOkList.append(True)
                     self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+namespace)
                 except:
@@ -132,6 +132,4 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 if name.find("_dpAR_") == -1:
                     cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
                     self.removeNamespace()
-                    break
-                else:
-                    self.dpUIinst.checkImportedGuides(False)
+                    break               
