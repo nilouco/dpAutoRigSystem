@@ -710,9 +710,9 @@
     "v037_hideCorrectivesDesc"    : "Ce validateur verrouillera et masquera l'attribut correctif sur Option_Ctrl",
     "v038_namespaceCleaner"       : "Namespace nettoyeur",
     "v039_namespaceCleanerDesc"   : "Vérifiez s'il existe des namespaces pour les nettoyer.\nCela ne supprimera pas les namespaces de dpGuides.",
-    
-    
+    "v040_keyframeCleaner"        : "Nettoyeur de keyframe",
+    "v041_keyframeCleanerDesc"    : "Ce validateur va éffacer des keyframes dans l'objets animés.\nIl ne check pas des drivenKeys, blendWeights ou pairBlends.",
     "v042_importReference"       : "Importateur fichiers de référencé",
     "v043_importReferenceDesc"   : "Ce validateur vérifiera s'il existe des fichiers référencés pour les importer."
-
+    
 }

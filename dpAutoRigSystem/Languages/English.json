@@ -712,9 +712,9 @@
     "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl",
     "v038_namespaceCleaner"       : "Namespace cleaner",
     "v039_namespaceCleanerDesc"   : "Check if there are namespaces to clean them up.\nIt won't delete namespace from dpGuides.",
-    
-    
-    "v042_importReference"       : "Import Referenced file",
-    "v043_importReferenceDesc"   : "This validator will check if there are referenced file to import them up."
-    
+    "v040_keyframeCleaner"        : "Keyframe cleaner",
+    "v041_keyframeCleanerDesc"    : "This validator will delete the animated objects keyframes.\nIt won't check drivenKeys, blendWeights or pairBlends.",
+    "v042_importReference"        : "Import Referenced file",
+    "v043_importReferenceDesc"    : "This validator will check if there are referenced file to import them up."
+
 }

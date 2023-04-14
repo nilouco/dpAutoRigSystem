@@ -37,32 +37,27 @@ class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
-        
-
         # ---
         # --- validator code --- beginning
         dataGrp = None
         if objList:
-            dataGrp = objList
+            dataGrp = objList[0]
         else:
             dataGrp = dpUtils.getNodeByMessage("dataGrp")
             if not dataGrp:
                 if cmds.objExists("Data_Grp"):
                     dataGrp = "Data_Grp"
         if dataGrp:
-            progressAmount = 0
-            maxProcess = len(dataGrp)
             if self.verbose:
                 # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                cmds.progressWindow(edit=True, maxValue=1, progress=1, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(1)))
             self.checkedObjList.append(dataGrp)
             visibilityStatus = cmds.getAttr(dataGrp+".visibility")
             if visibilityStatus:
                 self.foundIssueList.append(True)
                 if self.verifyMode:
                     self.resultOkList.append(False)
-                else: #fix    
+                else: #fix
                     try:
                         cmds.setAttr(dataGrp+".visibility", 0)
                         self.resultOkList.append(True)
@@ -80,8 +75,6 @@ class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
-
-
 
         # finishing
         self.finishValidation()
