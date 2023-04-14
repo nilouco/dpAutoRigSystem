@@ -711,9 +711,9 @@
     "v037_hideCorrectivesDesc"    : "Este validador irá aplicar trancar e ocultar o atributo de correctivo no Option_Ctrl",
     "v038_namespaceCleaner"       : "Namespace limpador",
     "v039_namespaceCleanerDesc"   : "Verifica se existem namespace para limpar.\nNão deletará namespaces de dpGuias.",
-    
-    
-    "v042_importReference"       : "Importa Arquivo referenciado",
-    "v043_importReferenceDesc"   : "Este validador checará se tem arquivos referenciados para importar."
-    
+    "v040_keyframeCleaner"        : "Keyframe limpador",
+    "v041_keyframeCleanerDesc"    : "Esse validador vai limpar keyframes em objetos animados.\nEle não verifica drivenKeys, blendWeights ou pairBlends.",
+    "v042_importReference"        : "Importa Arquivo referenciado",
+    "v043_importReferenceDesc"    : "Este validador checará se tem arquivos referenciados para importar."
+
 }
