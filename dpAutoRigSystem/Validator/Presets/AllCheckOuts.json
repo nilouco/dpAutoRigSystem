@@ -2,10 +2,11 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2023-04-10",
+    "_updated"    : "2023-04-13",
 
     "DuplicatedName"     : false,
     "FreezeTransform"    : false,
+    "ImportReference"    : false,
     "NamespaceCleaner"   : false,
 
     "ColorSetCleaner"    : true,

@@ -6,6 +6,7 @@
 
     "DuplicatedName"     : true,
     "FreezeTransform"    : false,
+    "ImportReference"    : false,
     "NamespaceCleaner"   : false,
 
     "ColorSetCleaner"    : false,
