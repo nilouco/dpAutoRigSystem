@@ -46,26 +46,24 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         if referenceList:
             progressAmount = 0
             maxProcess = len(referenceList)
-            for item in referenceList:
+            for reference in referenceList:
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-                path = cmds.referenceQuery(item, filename=True)
-                self.checkedObjList.append(item)
+                self.checkedObjList.append(reference)
                 self.foundIssueList.append(True)
-                if path:
-                    if self.verifyMode:
+                if self.verifyMode:
+                    self.resultOkList.append(False)
+                else: #fix
+                    try:
+                        # Import objects from referenced file.
+                        self.importRefence()
+                        self.resultOkList.append(True)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+reference)
+                    except:
                         self.resultOkList.append(False)
-                    else: #fix
-                        try:
-                            # Import objects from referenced file.
-                            cmds.file(path, importReference=True)
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
-                        except:
-                            self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+reference)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -92,3 +90,23 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
+
+    def importRefence(self, *args):
+        """ This function will use recursive method to import referenced file, 
+        """
+        referenceList = cmds.ls(references=True)
+        print(referenceList)
+        if referenceList:
+            print("===REF LIST===", referenceList)
+            for ref in referenceList:
+                topReference = cmds.referenceQuery(ref, referenceNode=True, topReference=True)
+                print(topReference)
+                if topReference:
+                    print("^^^TOP REF^^^", topReference)
+                    path = cmds.referenceQuery(topReference, filename=True)
+                    if path:
+                        print(">>> PATH >>>", path)
+                        cmds.file(path, importReference=True)
+                        self.importRefence()
+                        break
+                        
