@@ -1329,8 +1329,6 @@ class ControlClass(object):
         """ Mirror control shape by naming using prefixes to find nodes.
             Ask to mirror control shape of all controls if nothing is selected.
         """
-        # call reset all controls before run script. 
-        self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
 
         if not fromPrefix:
             fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
@@ -1494,3 +1492,10 @@ class ControlClass(object):
         """ Edit the current value of the given controller.
         """
         cmds.setAttr(ctrl+"."+attr, value)
+
+
+    def resetMirrorShape(self, *args):
+        """ Call reset all controls before run mirrorShape script.
+        """
+        self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
+        self.mirrorShape()
