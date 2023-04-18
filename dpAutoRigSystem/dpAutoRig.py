@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.10"
-DPAR_UPDATELOG = "N588 - Added Hide Correctives controls\ncheckout validator."
+DPAR_VERSION_PY3 = "4.02.15"
+DPAR_UPDATELOG = "N634 - Improvement the mirrorShape script to set zero\ncontrols before mirror controls shapes."
 
 
 ###################### Start: Loading.
