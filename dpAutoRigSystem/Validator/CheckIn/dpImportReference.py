@@ -78,6 +78,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         self.finishValidation()
         return self.dataLogDic
 
+
     def startValidation(self, *args):
         """ Procedures to start the validation cleaning old data.
         """
@@ -91,22 +92,31 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
+
     def importRefence(self, *args):
-        """ This function will use recursive method to import referenced file, 
-        """
-        referenceList = cmds.ls(references=True)
-        print(referenceList)
-        if referenceList:
-            print("===REF LIST===", referenceList)
-            for ref in referenceList:
-                topReference = cmds.referenceQuery(ref, referenceNode=True, topReference=True)
-                print(topReference)
-                if topReference:
-                    print("^^^TOP REF^^^", topReference)
+        """ This function will import objects from referenced file, 
+            Using list of all objects from scene to get the order from outliner
+        """ 
+        allRefList = []
+        # List all objects from scene to get the order from References in outliner
+        allObjectList = cmds.ls(selection=False, long=True)
+        # List the references
+        refToCompareList = cmds.ls(references=True)
+        for obj in allObjectList:
+            if cmds.objExists(obj):
+                # Query if it's a reference node. It's also appending unnecessary nodes but it has referenced name
+                ref = cmds.referenceQuery( obj, isNodeReferenced=True )
+                if ref:
+                    allRefList.append(obj)
+        for reference in allRefList:
+            # Using try before get the top reference, some of the references are not real references
+            try:
+                # Get the top reference to import, it only work if it's the top reference
+                topReference = cmds.referenceQuery(reference, referenceNode=True, topReference=True)
+                if topReference in refToCompareList:
                     path = cmds.referenceQuery(topReference, filename=True)
                     if path:
-                        print(">>> PATH >>>", path)
+                        # Import objects from referenced file
                         cmds.file(path, importReference=True)
-                        self.importRefence()
-                        break
-                        
+            except:
+                pass
