@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.15"
-DPAR_UPDATELOG = "N634 - Improvement the mirrorShape script to set zero\ncontrols before mirror controls shapes."
+DPAR_VERSION_PY3 = "4.02.16"
+DPAR_UPDATELOG = "N662 - Side controller calibration\nnew checkout validator."
 
 
 ###################### Start: Loading.
