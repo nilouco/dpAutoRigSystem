@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.14"
-DPAR_UPDATELOG = "N628 - Corrective joints calibration fix\nof scaled guides."
+DPAR_VERSION_PY3 = "4.02.16"
+DPAR_UPDATELOG = "N662 - Side controller calibration\nnew checkout validator."
 
 
 ###################### Start: Loading.

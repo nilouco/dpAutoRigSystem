@@ -43,7 +43,6 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
         else:
             toCheckList = self.dpUIinst.ctrls.getControlList()
         if toCheckList:
-            remainingList = toCheckList.copy()
             pairDic = {}
             progressAmount = 0
             maxProcess = len(toCheckList)
@@ -54,48 +53,46 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                 # conditional to check here
                 if cmds.objExists(item+".calibrationList"):
-                    if item in remainingList:
-                        remainingList.remove(item)
-                        if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
-                            foundOtherSide = False
-                            for node in remainingList:
-                                if node[2:] == item[2:]: #other side found
-                                    pairDic[item] = node
-                                    remainingList.remove(node)
-                                    foundOtherSide = True
-                                    break
-                            if foundOtherSide:
-                                calibrationAttr = cmds.getAttr(item+".calibrationList")
-                                if calibrationAttr:
-                                    calibrationList = calibrationAttr.split(";")
-                                    if calibrationList:
-                                        notDefaultAttrList = []
-                                        for attr in calibrationList:
-                                            if not float(format(cmds.getAttr(item+"."+attr),".3f")) == float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f")):
-                                                notDefaultAttrList.append(attr)
-                                        if notDefaultAttrList:
-                                            for notDefaultAttr in notDefaultAttrList:
-                                                if not cmds.getAttr(item+"."+notDefaultAttr) == cmds.getAttr(pairDic[item]+"."+notDefaultAttr):
-                                                    
-                                                    print("NOT DEFAULT", item, notDefaultAttr, pairDic[item])
-
-                                                    self.checkedObjList.append(item)
-                                                    self.foundIssueList.append(True)
-                                                    if self.verifyMode:
-                                                        self.resultOkList.append(False)
-                                                    else: #fix
-                                                        try:
-
-
-
-
-                                                            self.resultOkList.append(True)
-                                                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
-                                                        except:
-                                                            self.resultOkList.append(False)
-                                                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
-                else:
-                    remainingList.remove(item)
+                    if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
+                        foundOtherSide = False
+                        for node in toCheckList:
+                            if node[2:] == item[2:]: #other side found
+                                pairDic[item] = node
+                                foundOtherSide = True
+                                break
+                        if foundOtherSide:
+                            calibrationAttr = cmds.getAttr(item+".calibrationList")
+                            if calibrationAttr:
+                                calibrationList = calibrationAttr.split(";")
+                                if calibrationList:
+                                    for attr in calibrationList:
+                                        # current values
+                                        itemCurrentValue = float(format(cmds.getAttr(item+"."+attr),".3f"))
+                                        pairCurrentValue = float(format(cmds.getAttr(pairDic[item]+"."+attr),".3f"))
+                                        if not itemCurrentValue == pairCurrentValue:
+                                            # found issue here
+                                            self.checkedObjList.append(item+"."+attr)
+                                            self.foundIssueList.append(True)
+                                            if self.verifyMode:
+                                                self.resultOkList.append(False)
+                                            else: #fix
+                                                try:
+                                                    # default values (supposed to be the same for the two sides)
+                                                    itemDefaultValue = float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f"))
+                                                    if pairCurrentValue == itemDefaultValue:
+                                                        # pair current value is equal to its default value, so we set the pair value as item current value
+                                                        cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
+                                                    else:
+                                                        # check for left, top or front side to use it as priority node:
+                                                        if item[0] == self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left'] or item[0] == self.dpUIinst.langDic[self.dpUIinst.langName]['p004_top'] or item[0] == self.dpUIinst.langDic[self.dpUIinst.langName]['p006_front']:
+                                                            cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
+                                                        else:
+                                                            cmds.setAttr(item+"."+attr, pairCurrentValue)
+                                                    self.resultOkList.append(True)
+                                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item+"."+attr)
+                                                except:
+                                                    self.resultOkList.append(False)
+                                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item+"."+attr)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
