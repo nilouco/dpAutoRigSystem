@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.15"
-DPAR_UPDATELOG = "N561 - Added Referenced file importer\ncheckin validator."
+DPAR_VERSION_PY3 = "4.02.16"
+DPAR_UPDATELOG = "N561 - Added Import reference file\ncheckin validator."
 
 
 

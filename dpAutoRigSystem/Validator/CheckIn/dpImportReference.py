@@ -10,7 +10,7 @@ TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
 ICON = "/Icons/dp_importReference.png"
 
-dpImportReference_Version = 1.0
+dpImportReference_Version = 1.1
 
 class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,13 +36,12 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
-
         # ---
         # --- validator code --- beginning
         if objList:
             referenceList = objList
         else:
-            referenceList = cmds.ls(references=True)
+            referenceList = cmds.file(query=True, reference=True)
         if referenceList:
             progressAmount = 0
             maxProcess = len(referenceList)
@@ -53,17 +52,10 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                 self.checkedObjList.append(reference)
                 self.foundIssueList.append(True)
-                if self.verifyMode:
-                    self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        # Import objects from referenced file.
-                        self.importRefence()
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+reference)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+reference)
+            if self.verifyMode:
+                self.resultOkList.append(False)
+            else: #fix
+                self.importRefence()
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -71,8 +63,6 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
-
-
 
         # finishing
         self.finishValidation()
@@ -94,29 +84,24 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
 
 
     def importRefence(self, *args):
-        """ This function will import objects from referenced file, 
-            Using list of all objects from scene to get the order from outliner
-        """ 
-        allRefList = []
-        # List all objects from scene to get the order from References in outliner
-        allObjectList = cmds.ls(selection=False, long=True)
-        # List the references
-        refToCompareList = cmds.ls(references=True)
-        for obj in allObjectList:
-            if cmds.objExists(obj):
-                # Query if it's a reference node. It's also appending unnecessary nodes but it has referenced name
-                ref = cmds.referenceQuery( obj, isNodeReferenced=True )
-                if ref:
-                    allRefList.append(obj)
-        for reference in allRefList:
-            # Using try before get the top reference, some of the references are not real references
-            try:
-                # Get the top reference to import, it only work if it's the top reference
-                topReference = cmds.referenceQuery(reference, referenceNode=True, topReference=True)
-                if topReference in refToCompareList:
-                    path = cmds.referenceQuery(topReference, filename=True)
-                    if path:
-                        # Import objects from referenced file
-                        cmds.file(path, importReference=True)
-            except:
-                pass
+        """ This function will import objects from referenced file.
+        """
+        refList = cmds.file(query=True, reference=True)
+        if refList:
+            for ref in refList:
+                topRef = cmds.referenceQuery(ref, referenceNode=True, topReference=True)
+                if cmds.objExists(topRef):
+                    # Only import it if it's loaded, otherwise it would throw an error.
+                    if cmds.referenceQuery(ref, isLoaded=True):
+                        try:
+                            cmds.file(ref, importReference=True)
+                            self.resultOkList.append(True)
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+ref)
+                            self.importRefence()
+                            break
+                        except:
+                            self.resultOkList.append(False)
+                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+ref)
+                    else:
+                        self.resultOkList.append(False)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+ref)
