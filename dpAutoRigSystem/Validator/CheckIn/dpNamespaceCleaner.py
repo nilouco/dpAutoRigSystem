@@ -79,21 +79,21 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                 self.checkedObjList.append(namespace)
                 self.foundIssueList.append(True)
-                if self.verifyMode:
+            if self.verifyMode:
+                self.resultOkList.append(False)
+            else: #fix
+                try:
+                    if namespaceWithGuidesList:
+                        # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
+                        self.dpUIinst.checkImportedGuides(False)
+                    elif namespaceWithoutGuidesList:
+                        # call function inside validator to remove namespaces when it's not a guide.
+                        self.removeNamespace()
+                    self.resultOkList.append(True)
+                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+namespace)
+                except:
                     self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        if namespace in namespaceWithGuidesList:
-                            # call checkImportedGuides from dpAutoRig, to remove namespace when it's guide.
-                            self.dpUIinst.checkImportedGuides(False)
-                        else:
-                            # call function inside validator to remove namespaces when it's not a guide.
-                            self.removeNamespace()
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+namespace)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+namespace)
+                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+namespace)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -132,4 +132,4 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 if name.find("_dpAR_") == -1:
                     cmds.namespace(removeNamespace=name, mergeNamespaceWithRoot=True)
                     self.removeNamespace()
-                    break
+                    break               

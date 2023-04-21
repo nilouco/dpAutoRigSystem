@@ -19,8 +19,9 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.16"
-DPAR_UPDATELOG = "N662 - Side controller calibration\nnew checkout validator."
+DPAR_VERSION_PY3 = "4.02.17"
+DPAR_UPDATELOG = "N561 - Added Import reference file\ncheckin validator."
+
 
 
 ###################### Start: Loading.
