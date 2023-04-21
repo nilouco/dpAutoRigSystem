@@ -55,7 +55,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
             if self.verifyMode:
                 self.resultOkList.append(False)
             else: #fix
-                self.importRefence()
+                self.importReference()
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -83,7 +83,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
 
-    def importRefence(self, *args):
+    def importReference(self, *args):
         """ This function will import objects from referenced file.
         """
         refList = cmds.file(query=True, reference=True)
@@ -97,7 +97,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
                             cmds.file(ref, importReference=True)
                             self.resultOkList.append(True)
                             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+ref)
-                            self.importRefence()
+                            self.importReference()
                             break
                         except:
                             self.resultOkList.append(False)
