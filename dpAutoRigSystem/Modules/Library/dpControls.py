@@ -1329,6 +1329,7 @@ class ControlClass(object):
         """ Mirror control shape by naming using prefixes to find nodes.
             Ask to mirror control shape of all controls if nothing is selected.
         """
+
         if not fromPrefix:
             fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
             toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixShapeTF"], query=True, text=True)
@@ -1353,7 +1354,7 @@ class ControlClass(object):
                             for node in allNodeList:
                                 progressAmount += 1
                                 if node in allControlList:
-                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)
+                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)                                   
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
                         cmds.progressWindow(endProgress=True)
@@ -1491,3 +1492,10 @@ class ControlClass(object):
         """ Edit the current value of the given controller.
         """
         cmds.setAttr(ctrl+"."+attr, value)
+
+
+    def resetMirrorShape(self, *args):
+        """ Call reset all controls before run mirrorShape script.
+        """
+        self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
+        self.mirrorShape()
