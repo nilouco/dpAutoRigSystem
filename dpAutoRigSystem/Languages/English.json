@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-04-14",
+    "_updated"       : "2023-04-18",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -715,6 +715,8 @@
     "v040_keyframeCleaner"        : "Keyframe cleaner",
     "v041_keyframeCleanerDesc"    : "This validator will delete the animated objects keyframes.\nIt won't check drivenKeys, blendWeights or pairBlends.",
     "v042_importReference"        : "Import Referenced file",
-    "v043_importReferenceDesc"    : "This validator will check if there are referenced file to import them up."
+    "v043_importReferenceDesc"    : "This validator will check if there are referenced file to import them up.",
+    "v044_sideCalibration"        : "Side calibration",
+    "v045_sideCalibrationDesc"    : "This validator will detect if there're some\ncontrollers with different side calibration\nand priorize the setup from the non defaultValue\nor use the left side as source if the two sides are configured."
 
 }

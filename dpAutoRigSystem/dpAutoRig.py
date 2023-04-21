@@ -619,7 +619,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["fromPrefixShapeTF"] = cmds.textField('fromPrefixShapeTF', text=self.langDic[self.langName]['p002_left']+"_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeT"] = cmds.text("toPrefixShapeT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeTF"] = cmds.textField('toPrefixShapeTF', text=self.langDic[self.langName]['p003_right']+"_", parent=self.allUIs["mirrorShapeLayout"])
-        self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.mirrorShape, parent=self.allUIs["mirrorShapeLayout"])
+        self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.resetMirrorShape, parent=self.allUIs["mirrorShapeLayout"])
 
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
