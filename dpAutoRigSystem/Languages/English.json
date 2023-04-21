@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-04-10",
+    "_updated"       : "2023-04-11",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -709,6 +709,10 @@
     "v034_exitEditMode"           : "Exit edit mode",
     "v035_exitEditModeDesc"       : "This validator will check if there any corrective\ncontroller in the edit mode and\nit'll back to normal state without save changes\nor settings.",
     "v036_hideCorrectives"        : "Hide Correctives",
-    "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl"
+    "v037_hideCorrectivesDesc"    : "This validator will lock and hide the corrective attribute on Option_Ctrl",
+    "v038_namespaceCleaner"       : "Namespace cleaner",
+    "v039_namespaceCleanerDesc"   : "Check if there are namespaces to clean them up.\nIt won't delete namespace from dpGuides.",
+    "v040_keyframeCleaner"        : "Keyframe cleaner",
+    "v041_keyframeCleanerDesc"    : "This validator will delete the animated objects keyframes.\nIt won't check drivenKeys, blendWeights or pairBlends."
 
 }

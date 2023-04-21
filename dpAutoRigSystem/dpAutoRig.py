@@ -1438,7 +1438,7 @@ class DP_AutoRig_UI(object):
             for n, name in enumerate(namespaceList):
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
-                        if name.find("__dpAR_"):
+                        if name.find("_dpAR_") != -1:
                             if askUser:
                                 # open dialog to confirm merge namespaces:
                                 yesTxt = self.langDic[self.langName]['i071_yes']
