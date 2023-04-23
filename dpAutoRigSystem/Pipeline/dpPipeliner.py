@@ -7,7 +7,7 @@ from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.3
+DPPIPELINER_VERSION = 1.4
 
 PIPE_FOLDER = "_dpPipeline"
 
@@ -500,3 +500,4 @@ class Pipeliner(object):
                                 self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                                 self.makeDirIfNotExists(self.pipeData['dropboxPath'])
             # old 
+            self.makeDirIfNotExists(self.pipeData['publishPath']+"/"+self.pipeData['s_old'])

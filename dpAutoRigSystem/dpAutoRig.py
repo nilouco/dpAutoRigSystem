@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.17"
-DPAR_UPDATELOG = "N561 - Added Import reference file\ncheckin validator."
+DPAR_VERSION_PY3 = "4.02.18"
+DPAR_UPDATELOG = "N664 - Overwrite archived old version\nwhen publishing a file and already there're\nduplicated files in the Rigging/Published/dpOld folder."
 
 
 

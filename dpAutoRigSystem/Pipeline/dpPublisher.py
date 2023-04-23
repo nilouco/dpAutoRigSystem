@@ -11,7 +11,7 @@ reload(dpPipeliner)
 reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.2
+DPPUBLISHER_VERSION = 1.3
 
 
 class Publisher(object):
@@ -338,11 +338,6 @@ class Publisher(object):
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
 
-                    # organize old published files
-                    if self.assetNameList:
-                        self.pipeliner.makeDirIfNotExists(self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
-                        self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
-
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
                         progressAmount += 1
@@ -358,6 +353,9 @@ class Publisher(object):
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
+                        # organize old published files
+                        if self.assetNameList:
+                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
