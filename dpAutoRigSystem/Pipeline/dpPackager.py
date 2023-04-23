@@ -7,7 +7,7 @@ import shutil
 import os
 
 
-DPPACKAGER_VERSION = 1.2
+DPPACKAGER_VERSION = 1.3
 
 
 RIGPREVIEW = "Rigging Preview"
@@ -215,6 +215,7 @@ class Packager(object):
                     sceneList.append(entry.name)
         if sceneList:
             for item in sceneList:
+                self.removeExistingArchived(destinationFolder, item)
                 shutil.move(scenePath+"/"+item, destinationFolder)
 
     
@@ -236,4 +237,12 @@ class Packager(object):
         """
         for item in assetNameList:
             if not item == publishFilename:
+                self.removeExistingArchived(destinationFolder, item)
                 shutil.move(sourceFolder+"/"+item, destinationFolder)
+
+
+    def removeExistingArchived(self, filePath, fileName, *args):
+        """ Delete existing same achived version in dpOld if it exists to avoid naming conflict when copying.
+        """
+        if os.path.isfile(filePath+"/"+fileName):
+            os.remove(filePath+"/"+fileName)
