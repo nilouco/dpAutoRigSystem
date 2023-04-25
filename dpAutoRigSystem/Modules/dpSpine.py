@@ -81,7 +81,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.cvEndJoint, self.cvJointLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         # Edit GUIDE:
         cmds.setAttr(self.moduleGrp+".rx", -90)

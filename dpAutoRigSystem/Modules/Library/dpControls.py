@@ -120,7 +120,7 @@ class ControlClass(object):
                     print("Error: Cannot connect", toObj, ".", attr, "directely.")
         
         
-    def setLockHide(self, objList, attrList, l=True, k=False, *args):
+    def setLockHide(self, objList, attrList, l=True, k=False, cb=False, *args):
         """Set lock or hide to attributes for object in lists.
         """
         if objList and attrList:
@@ -128,9 +128,9 @@ class ControlClass(object):
                 for attr in attrList:
                     try:
                         # set lock and hide of given attributes:
-                        cmds.setAttr(obj+"."+attr, lock=l, keyable=k)
+                        cmds.setAttr(obj+"."+attr, lock=l, keyable=k, channelBox=cb)
                     except:
-                        print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k)
+                        print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
                         
                         
     def setNonKeyable(self, objList, attrList, *args):
@@ -417,7 +417,7 @@ class ControlClass(object):
         cmds.setAttr(radiusCtrl+".translateX", r)
         cmds.parent(radiusCtrl, circle, relative=True)
         cmds.transformLimits(radiusCtrl, tx=(0.01, 1), etx=(True, False))
-        self.setLockHide([radiusCtrl], ['ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.setLockHide([radiusCtrl], ['ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # find makeNurbCircle history of the circles:
         historyList = self.findHistory([circle, radiusCtrl], 'makeNurbCircle')
         circleHistory     = historyList[0]
@@ -806,7 +806,7 @@ class ControlClass(object):
             cmds.setAttr(self.dpARTempGrp+".visibility", 0)
             cmds.setAttr(self.dpARTempGrp+".template", 1)
             cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
-            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
         cmds.parent(clusterHandle, self.dpARTempGrp)
     
     
