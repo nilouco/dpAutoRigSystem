@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from . import dpUtils
 from ...Validator.CheckOut import dpResetPose
 from functools import partial
@@ -42,52 +43,72 @@ class ControlClass(object):
 
 
     # CONTROLS functions:
-    def colorShape(self, objList, color, rgb=False, *args):
+    def colorShape(self, objList, color, rgb=False, outliner=False, *args):
         """ Create a color override for all shapes from the objList.
         """
+        iColorIdx = color
         if rgb:
-            if (color in dic_colors):
+            if color in list(dic_colors):
                 color = dic_colors[color]
-        elif (color in dic_colors):
+        elif color in list(dic_colors):
             iColorIdx = dic_colors[color]
-        else:
-            iColorIdx = color
 
         # find shapes and apply the color override:
         shapeTypeList = ['nurbsCurve', 'nurbsSurface', 'mesh', 'subdiv']
         if objList:
             for objName in objList:
-                objType = cmds.objectType(objName)
-                # verify if the object is the shape type:
-                if objType in shapeTypeList:
-                    # set override as enable:
-                    cmds.setAttr(objName+".overrideEnabled", 1)
-                    # set color override:
-                    if rgb:
-                        cmds.setAttr(objName+".overrideRGBColors", 1)
-                        cmds.setAttr(objName+".overrideColorR", color[0])
-                        cmds.setAttr(objName+".overrideColorG", color[1])
-                        cmds.setAttr(objName+".overrideColorB", color[2])
-                    else:
-                        cmds.setAttr(objName+".overrideRGBColors", 0)
-                        cmds.setAttr(objName+".overrideColor", iColorIdx)
-                # verify if the object is a transform type:
-                elif objType == "transform":
-                    # find all shapes children of the transform object:
-                    shapeList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
-                    if shapeList:
-                        for shape in shapeList:
-                            # set override as enable:
-                            cmds.setAttr(shape+".overrideEnabled", 1)
-                            # set color override:
-                            if rgb:
-                                cmds.setAttr(shape+".overrideRGBColors", 1)
-                                cmds.setAttr(shape+".overrideColorR", color[0])
-                                cmds.setAttr(shape+".overrideColorG", color[1])
-                                cmds.setAttr(shape+".overrideColorB", color[2])
-                            else:
-                                cmds.setAttr(shape+".overrideRGBColors", 0)
-                                cmds.setAttr(shape+".overrideColor", iColorIdx)
+                if outliner:
+                    self.setColorOverride(objName, color, iColorIdx, rgb, outliner)
+                else:
+                    objType = cmds.objectType(objName)
+                    # verify if the object is the shape type:
+                    if objType in shapeTypeList:
+                        self.setColorOverride(objName, color, iColorIdx, rgb)
+                    # verify if the object is a transform type:
+                    elif objType == "transform":
+                        # find all shapes children of the transform object:
+                        shapeList = cmds.listRelatives(objName, shapes=True, children=True, fullPath=True)
+                        if shapeList:
+                            for shape in shapeList:
+                                self.setColorOverride(shape, color, iColorIdx, rgb)
+
+
+    def setColorOverride(self, item, color, iColorIdx, rgb, outliner=False, *args):
+        """ Set the color for the given node and color data.
+        """
+        if outliner:
+            cmds.setAttr(item+".useOutlinerColor", 1)
+            cmds.setAttr(item+".outlinerColor.outlinerColorR", color[0])
+            cmds.setAttr(item+".outlinerColor.outlinerColorG", color[1])
+            cmds.setAttr(item+".outlinerColor.outlinerColorB", color[2])
+            try:
+                mel.eval("AEdagNodeCommonRefreshOutliners;")
+            except:
+                pass
+        else:
+            # set override as enable:
+            cmds.setAttr(item+".overrideEnabled", 1)
+            # set color override:
+            if rgb:
+                cmds.setAttr(item+".overrideRGBColors", 1)
+                cmds.setAttr(item+".overrideColorR", color[0])
+                cmds.setAttr(item+".overrideColorG", color[1])
+                cmds.setAttr(item+".overrideColorB", color[2])
+            else:
+                cmds.setAttr(item+".overrideRGBColors", 0)
+                cmds.setAttr(item+".overrideColor", iColorIdx)
+
+
+    def removeColor(self, itemList, *args):
+        """ Just remove color of given list or selected nodes.
+        """
+        if not itemList:
+            itemList = cmds.ls(selection=True)
+        if itemList:
+            for item in itemList:
+                cmds.setAttr(item+".overrideEnabled", 0)
+                cmds.setAttr(item+".overrideRGBColors", 0)
+                cmds.setAttr(item+".useOutlinerColor", 0)
 
 
     def renameShape(self, transformList, *args):

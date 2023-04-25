@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.20"
-DPAR_UPDATELOG = "N622 Broken corrective manager network cleaner."
+DPAR_VERSION_PY3 = "4.02.21"
+DPAR_UPDATELOG = "N665 Outliner color using ColorOverride tool."
 
 
 
@@ -1998,6 +1998,8 @@ class DP_AutoRig_UI(object):
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
+            # set outliner color
+            self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True)
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
@@ -2018,6 +2020,10 @@ class DP_AutoRig_UI(object):
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
         self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
+        # set outliner color
+        self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True)
+        self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True)
+        self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True)
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
@@ -2246,7 +2252,7 @@ class DP_AutoRig_UI(object):
                     self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
             
             #Colorize all controller in yellow as a base
-            if (bColorize):
+            if bColorize:
                 aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
                 aAllCtrls = cmds.ls("*_Ctrl")
                 lPattern = re.compile(self.langDic[self.langName]['p002_left'] + '_.*._Ctrl')
