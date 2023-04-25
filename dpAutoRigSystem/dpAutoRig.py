@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.19"
-DPAR_UPDATELOG = "N654 Display rotateOrder attribute only if\nthere's a rotate attribute to animate\nin the controller."
+DPAR_VERSION_PY3 = "4.02.20"
+DPAR_UPDATELOG = "N622 Broken corrective manager network cleaner."
 
 
 
