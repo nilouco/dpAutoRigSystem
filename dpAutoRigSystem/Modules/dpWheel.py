@@ -65,7 +65,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(cvFrontLocPosNode+".input1D[0]", -0.5)
         cmds.connectAttr(radiusCtrl+".translateX", cvFrontLocPosNode+".input1D[1]")
         cmds.connectAttr(cvFrontLocPosNode+".output1D", self.cvFrontLoc+".tx")
-        self.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         self.cvInsideLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_InsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvInsideLoc, self.cvCenterLoc)
@@ -77,7 +77,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(inverseRadius+".input2X", -1)
         cmds.connectAttr(radiusCtrl+".translateX", inverseRadius+".input1X")
         cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
-        self.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         self.cvOutsideLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_OutsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvOutsideLoc, self.cvCenterLoc)
@@ -86,7 +86,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.jGuideOutside+".template", 1)
         cmds.transformLimits(self.cvOutsideLoc, tz=(-1, 0.01), etz=(False, True))
         cmds.connectAttr(inverseRadius+".outputX", self.cvOutsideLoc+".translateY")
-        self.ctrls.setLockHide([self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvCenterLoc, self.moduleGrp)
         cmds.parent(self.jGuideFront, self.jGuideInside, self.jGuideOutside, self.jGuideCenter)
@@ -261,7 +261,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.mainCtrl+".scaleCompensate", self.mainJoint+".segmentScaleCompensate", force=True)
                 # hide visibility attributes:
                 self.ctrls.setLockHide([self.mainCtrl, self.insideCtrl, self.outsideCtrl], ['v'])
-                self.ctrls.setLockHide([self.wheelCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v'])
+                self.ctrls.setLockHide([self.wheelCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 
                 # grouping:
                 cmds.parentConstraint(self.wheelCtrl, self.centerJoint, maintainOffset=False, name=self.centerJoint+"_PaC")

@@ -53,7 +53,7 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.jBGuide = cmds.joint(name=self.guideName+"_jBGuide", radius=0.001)
         cmds.setAttr(self.jBGuide+".template", 1)
         cmds.transformLimits(self.cvBLoc, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvBLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvBLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvALoc, self.moduleGrp)
         cmds.parent(self.jBGuide, self.jAGuide)
@@ -160,7 +160,7 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     ctrl = self.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
                     upLocCtrl = self.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree)
                     self.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
-                    self.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+                    self.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:
                     cmds.parent(ctrl, upLocCtrl, mainCtrl)
                     cmds.parentConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_PaC")

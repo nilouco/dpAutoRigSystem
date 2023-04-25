@@ -71,7 +71,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
@@ -224,9 +224,9 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.langDic[self.langName]['c046_holder']+"_Grp")
-                        self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                        self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c046_holder']+"_Jis"))
-                        self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], True, True)
+                        self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.getHasSDKLocator():
                             if not self.langDic[self.langName]['c058_main'] in self.userGuideName:

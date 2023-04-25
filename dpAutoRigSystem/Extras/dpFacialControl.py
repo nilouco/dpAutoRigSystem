@@ -456,7 +456,7 @@ class FacialControl(object):
             self.ctrls.colorShape([fCtrl], color)
             # lock or limit XYZ axis:
             self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
-            self.ctrls.setLockHide([fCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setLockHide([fCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             # start work with custom attributes
             if attrList:
                 for a, attr in enumerate(attrList):

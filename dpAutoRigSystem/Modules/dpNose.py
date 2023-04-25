@@ -77,7 +77,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # transform cvLocs in order to put as a good nose guide setup:
         cmds.setAttr(self.cvTopLoc+".rotateX", 60)
         cmds.setAttr(self.cvMiddleLoc+".translateY", -0.6)

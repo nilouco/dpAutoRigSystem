@@ -164,7 +164,7 @@ class HeadDeformer(object):
                     if cmds.objectType(unitConvNode) == "unitConversion":
                         cmds.setAttr(unitConvNode+".conversionFactor", 1)
             
-            self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             
             # create symmetry setup
             centerClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:3][0:5]", relative=True, name=centerSymmetryName+"_Cls") #[Cluster, Handle]

@@ -98,7 +98,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.ctrls.directConnect(self.cvLCornerLipLoc, self.jGuideLLip, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # transform cvLocs in order to put as a good head guide:
         cmds.setAttr(self.moduleGrp+".rotateX", -90)
         cmds.setAttr(self.moduleGrp+".rotateY", 90)
