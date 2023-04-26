@@ -54,18 +54,19 @@ class UnlockInitialShadingGroup(dpBaseValidatorClass.ValidatorStartClass):
                     if item == "initialShadingGroup":
                         # conditional to check here
                         if cmds.lockNode(item, query=True, lockUnpublished=True):
-                            self.checkedObjList.append(item)
-                            self.foundIssueList.append(True)
-                            if self.verifyMode:
-                                self.resultOkList.append(False)
-                            else: #fix
-                                try:
-                                    cmds.lockNode(item, lock=False, lockUnpublished=False)
-                                    self.resultOkList.append(True)
-                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
-                                except:
+                            if cmds.getAttr(item+".nodeState", lock=True):
+                                self.checkedObjList.append(item)
+                                self.foundIssueList.append(True)
+                                if self.verifyMode:
                                     self.resultOkList.append(False)
-                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
+                                else: #fix
+                                    try:
+                                        cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
