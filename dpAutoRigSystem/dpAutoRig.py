@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.20"
-DPAR_UPDATELOG = "N622 Broken corrective manager network cleaner."
+DPAR_VERSION_PY3 = "4.02.21"
+DPAR_UPDATELOG = "N608 Unlock initialShadingGroup."
 
 
 
