@@ -62,6 +62,7 @@ class UnlockInitialShadingGroup(dpBaseValidatorClass.ValidatorStartClass):
                                 else: #fix
                                     try:
                                         cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                        cmds.setAttr(item+".nodeState", lock=False)
                                         self.resultOkList.append(True)
                                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                                     except:
