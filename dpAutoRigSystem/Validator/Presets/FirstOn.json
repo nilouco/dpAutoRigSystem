@@ -2,12 +2,13 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-04-25",
+    "_updated"    : "2023-04-27",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
     "ImportReference"           : false,
     "NamespaceCleaner"          : false,
+    "ShowBPCleaner"             : false,
     "UnlockInitialShadingGroup" : false,
 
     "BrokenNetCleaner"          : false,

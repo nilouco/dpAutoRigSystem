@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.21"
-DPAR_UPDATELOG = "N608 Unlock initialShadingGroup."
+DPAR_VERSION_PY3 = "4.02.22"
+DPAR_UPDATELOG = "N610 - ShowBP scriptNode cleaner\nas a new check-in validator."
 
 
 
