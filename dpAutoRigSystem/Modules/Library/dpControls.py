@@ -1395,7 +1395,9 @@ class ControlClass(object):
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
                     if attrList:
                         for attr in attrList:
-                            cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
+                            # hack to avoid Maya limitation to edit boolean attributes
+                            if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
+                                cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
     
 
     def getSelectedControls(self, *args):

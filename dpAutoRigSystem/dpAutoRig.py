@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.22"
-DPAR_UPDATELOG = "N610 - ShowBP scriptNode cleaner\nas a new check-in validator."
+DPAR_VERSION_PY3 = "4.02.23"
+DPAR_UPDATELOG = "N667 - Fixed set default value of boolean attribute\nMaya's issue as a new check-in validator."
 
 
 

@@ -150,19 +150,24 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
     def getSetupAttrList(self, item, ignoreAttrList=TO_IGNORE, *args):
         """ Returns the desired attribute list to work with set or reset default values.
         """
+        cleanAttrList = []
         attrList = cmds.listAttr(item, channelBox=True)
         if not attrList:
             attrList = []
+        if attrList:
+            for attrName in attrList:
+                if not cmds.attributeQuery(attrName, node=item, attributeType=True) == "bool":
+                    cleanAttrList.append(attrName)
         allAttrList = cmds.listAttr(item)
         animAttrList = cmds.listAnimatable(item)
         if allAttrList and animAttrList:
-            orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in attrList]
-            attrList.extend(orderedAttrs)
+            orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in cleanAttrList]
+            cleanAttrList.extend(orderedAttrs)
         if ignoreAttrList:
             for ignoreAttr in ignoreAttrList:
-                if ignoreAttr in attrList:
-                    attrList.remove(ignoreAttr)
-        return attrList
+                if ignoreAttr in cleanAttrList:
+                    cleanAttrList.remove(ignoreAttr)
+        return cleanAttrList
     
 
     def getAttrDefaultValueData(self, item, *args):
