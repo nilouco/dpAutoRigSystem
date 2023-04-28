@@ -161,7 +161,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         allAttrList = cmds.listAttr(item)
         animAttrList = cmds.listAnimatable(item)
         if allAttrList and animAttrList:
-            orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in attrList]
+            orderedAttrs = [attr for attr in allAttrList for animAttr in animAttrList if animAttr.endswith(attr) and not attr in cleanAttrList]
             cleanAttrList.extend(orderedAttrs)
         if ignoreAttrList:
             for ignoreAttr in ignoreAttrList:
