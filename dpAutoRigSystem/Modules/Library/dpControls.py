@@ -195,7 +195,7 @@ class ControlClass(object):
         cmds.setAttr(ribbonNurbsPlane+".visibility", 0)
         self.setNotRenderable([ribbonNurbsPlaneShape])
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        cmds.addAttr(ribbonNurbsPlane, longName="doNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+        cmds.addAttr(ribbonNurbsPlane, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
         # create groups to be used as a root of the ribbon system:
         ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_Rbn_RibbonJoint_Grp")
         # create joints:
@@ -831,7 +831,7 @@ class ControlClass(object):
         if not ctrlName.endswith("_JointEnd"):
             if not ctrlName.endswith("_RadiusCtrl"):
                 if not cmds.objExists(ctrlName+".pinGuide"):
-                    cmds.addAttr(ctrlName, longName="pinGuide", attributeType='bool')
+                    cmds.addAttr(ctrlName, longName="pinGuide", attributeType="bool")
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                     cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
@@ -1235,7 +1235,7 @@ class ControlClass(object):
         """
         cmds.addAttr(ctrlName, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # create an attribute to be used as editMode by module:
-        cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=False, defaultValue=False)
+        cmds.addAttr(ctrlName, longName="editMode", attributeType="bool", keyable=False)
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
 
 
@@ -1317,7 +1317,7 @@ class ControlClass(object):
     def setSubControlDisplay(self, ctrl, subCtrl, defValue, *args):
         """ Set the shapes visibility of sub control.
         """
-        cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="bool", defaultValue=defValue)
+        cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="short", minValue=0, maxValue=1, defaultValue=defValue)
         cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
         subShapeList = cmds.listRelatives(subCtrl, children=True, type="shape")
         if subShapeList:
@@ -1394,6 +1394,7 @@ class ControlClass(object):
                 for item in nodeToRunList:
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
                     if attrList:
+                        print("attrList =", attrList)
                         for attr in attrList:
                             # hack to avoid Maya limitation to edit boolean attributes
                             if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":

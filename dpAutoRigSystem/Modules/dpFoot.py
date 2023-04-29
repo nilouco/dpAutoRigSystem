@@ -417,7 +417,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)
                 
                 # show or hide reverseFoot controls:
-                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='bool', defaultValue=1)
+                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='short', minValue=0, defaultValue=1, maxValue=1)
                 cmds.setAttr(self.footCtrl+"."+showCtrlsAttr, keyable=False, channelBox=True)
                 showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl]
                 for rfCtrl in showHideCtrlList:

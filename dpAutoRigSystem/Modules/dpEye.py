@@ -567,7 +567,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.lookAtCtrl, maintainOffset=False))
                 lookAtCtrlZeroGrp = dpUtils.zeroOut([self.lookAtCtrl])
                 cmds.parent(lookAtCtrlZeroGrp, self.eyeCtrl, relative=False)
-                cmds.addAttr(self.lookAtCtrl, longName="active", attributeType="bool", defaultValue=1, keyable=True)
+                cmds.addAttr(self.lookAtCtrl, longName=self.langDic[self.langName]['c118_active'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                 dpUtils.originedFrom(objName=self.lookAtCtrl, attrString=side+self.userGuideName+"_Guide_JointEnd")
                 
                 # up locator:
@@ -582,7 +582,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # look at aim constraint:
                 aimConst = cmds.aimConstraint(self.lookAtCtrl, eyeZeroList[1], worldUpType="object", worldUpObject=self.upLocGrp+"|"+self.lUpGrpLoc+"|"+self.lUpLoc, maintainOffset=True, name=self.fkEyeCtrl+"_Zero_0_Grp"+"_AiC")[0]
-                cmds.connectAttr(self.lookAtCtrl+".active", aimConst+"."+self.lookAtCtrl+"W0", force=True)
+                cmds.connectAttr(self.lookAtCtrl+"."+self.langDic[self.langName]['c118_active'], aimConst+"."+self.lookAtCtrl+"W0", force=True)
                 # eye aim rotation
                 cmds.addAttr(self.fkEyeCtrl, longName="aimRotation", attributeType="float", keyable=True)
                 cmds.connectAttr(self.fkEyeCtrl+".aimRotation", self.jnt+".rotateZ", force=True)

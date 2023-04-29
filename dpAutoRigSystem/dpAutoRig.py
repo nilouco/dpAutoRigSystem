@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.23"
-DPAR_UPDATELOG = "N667 - Fixed set default value of boolean attribute\nMaya's issue as a new check-in validator."
+DPAR_VERSION_PY3 = "4.02.24"
+DPAR_UPDATELOG = "N668 Change boolean attributes to integer."
 
 
 
@@ -1010,7 +1010,7 @@ class DP_AutoRig_UI(object):
                         transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
                         if transformNameList:
                             # do not add ribbon nurbs plane to the list:
-                            if not cmds.objExists(transformNameList[0]+".doNotSkinIt"):
+                            if not cmds.objExists(transformNameList[0]+".dpDoNotSkinIt"):
                                 if not transformNameList[0] in geomList:
                                     if chooseGeom == "allGeoms":
                                         geomList.append(transformNameList[0])
@@ -2626,7 +2626,7 @@ class DP_AutoRig_UI(object):
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
-                                cmds.addAttr(self.optionCtrl, longName=actVVAttr, attributeType="bool", defaultValue=True, keyable=True)
+                                cmds.addAttr(self.optionCtrl, longName=actVVAttr, attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
                                 cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
                                 cmds.connectAttr(self.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)

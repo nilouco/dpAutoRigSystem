@@ -10,9 +10,9 @@ TITLE = "v032_resetPose"
 DESCRIPTION = "v033_resetPoseDesc"
 ICON = "/Icons/dp_resetPose.png"
 
-dpResetPose_Version = 1.0
+dpResetPose_Version = 1.2
 
-TO_IGNORE = ["rotateOrder", "scaleCompensate"]
+TO_IGNORE = ["rotateOrder", "pinGuide", "editMode"]
 ATTR_TYPE = {
                 # boolean
                 "bool" : 0,

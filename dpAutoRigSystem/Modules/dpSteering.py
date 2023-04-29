@@ -148,8 +148,8 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleX", -1)
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleZ", -1)
-                cmds.addAttr(self.steeringCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                cmds.setAttr(self.steeringCtrl+".scaleCompensate", 1, channelBox=True)
+                cmds.addAttr(self.steeringCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                cmds.setAttr(self.steeringCtrl+".scaleCompensate", channelBox=True)
                 cmds.connectAttr(self.steeringCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 # integrating setup:
                 cmds.addAttr(self.steeringCtrl, longName=self.langDic[self.langName]['c071_limit'], defaultValue=500, attributeType="float", keyable=False)

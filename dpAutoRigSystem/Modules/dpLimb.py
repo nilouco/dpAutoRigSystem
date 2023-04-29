@@ -973,7 +973,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(annotation+'.template', 1)
                 cmds.setAttr(annotLoc+'.visibility', 0)
                 # set annotation visibility as a display option attribute:
-                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='bool', keyable=False, defaultValue=True)
+                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='short', minValue=0, maxValue=1, keyable=False, defaultValue=1)
                 cmds.setAttr(self.ikCornerCtrl+".displayAnnotation", channelBox=True)
                 cmds.connectAttr(self.ikCornerCtrl+".displayAnnotation", annotation+".visibility", force=True)
 
