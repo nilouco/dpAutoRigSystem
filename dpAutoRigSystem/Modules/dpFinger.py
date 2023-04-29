@@ -250,8 +250,8 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             self.ikFkRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_ikFk_Rev")
                             cmds.connectAttr(self.fingerCtrl+".ikFkBlend", self.ikFkRevNode+".inputX", force=True)
                         if not cmds.objExists(self.fingerCtrl+'.scaleCompensate'):
-                            cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='bool', keyable=False)
-                            cmds.setAttr(self.fingerCtrl+".scaleCompensate", 1, channelBox=True)
+                            cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=False)
+                            cmds.setAttr(self.fingerCtrl+".scaleCompensate", channelBox=True)
                             scaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_%02d_ScaleCompensate_MD"%(n))
                             self.scaleCompensateCond = cmds.createNode("condition", name=side+self.userGuideName+"_%02d_ScaleCompensate_Cnd"%(n))
                             cmds.connectAttr(self.fingerCtrl+".scaleCompensate", scaleCompensateMD+".input1X", force=True)

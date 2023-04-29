@@ -342,7 +342,7 @@ class RibbonClass(object):
             ribbon = cmds.nurbsPlane(ax=axis, w=1, lr=numJoints, d=3, u=1, v=numJoints, ch=0, name=name+'_Plane')[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, su=1, du=1, dv=3, tol=0.01, fr=0, dir=0) 
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        cmds.addAttr(ribbon, longName="doNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+        cmds.addAttr(ribbon, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
         #call the function to create follicles and joint in the nurbsPlane
         results = self.createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
         rb_Jnt = results[0]

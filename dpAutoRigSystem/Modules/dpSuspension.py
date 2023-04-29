@@ -188,12 +188,12 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleX", -1)
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleY", -1)
                             cmds.setAttr(zeroOutCtrlGrp[0]+".scaleZ", -1)
-                    cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                    cmds.setAttr(ctrl+".scaleCompensate", 1, channelBox=True)
+                    cmds.addAttr(ctrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                    cmds.setAttr(ctrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(ctrl+".scaleCompensate", jnt+".segmentScaleCompensate", force=True)
                     
                     # working with aim setup:
-                    cmds.addAttr(ctrl, longName="active", attributeType="bool", defaultValue=1, keyable=True)
+                    cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c118_active'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                     aimLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+letter+"_Aim_Loc")[0]
                     upLoc = cmds.spaceLocator(name=side+self.userGuideName+"_"+letter+"_Up_Loc")[0]
                     locGrp = cmds.group(aimLoc, upLoc, name=side+self.userGuideName+"_"+letter+"_Loc_Grp")
@@ -208,10 +208,10 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # aim constraints:
                 # B to A:
                 aAimConst = cmds.aimConstraint(self.aimLocList[1], self.ctrlZeroList[0], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[0], maintainOffset=True, name=self.ctrlZeroList[0]+"_AiC")[0]
-                cmds.connectAttr(self.ctrlList[0]+".active", aAimConst+"."+self.aimLocList[1]+"W0", force=True)
+                cmds.connectAttr(self.ctrlList[0]+"."+self.langDic[self.langName]['c118_active'], aAimConst+"."+self.aimLocList[1]+"W0", force=True)
                 # A to B:
                 bAimConst = cmds.aimConstraint(self.aimLocList[0], self.ctrlZeroList[1], aimVector=(0, 0, 1), upVector=(1, 0, 0), worldUpType="object", worldUpObject=self.upLocList[1], maintainOffset=True, name=self.ctrlZeroList[0]+"_AiC")[0]
-                cmds.connectAttr(self.ctrlList[1]+".active", bAimConst+"."+self.aimLocList[0]+"W0", force=True)
+                cmds.connectAttr(self.ctrlList[1]+"."+self.langDic[self.langName]['c118_active'], bAimConst+"."+self.aimLocList[0]+"W0", force=True)
                 
                 # integrating data:
                 self.loadedFatherB = cmds.getAttr(self.moduleGrp+".fatherB")

@@ -554,7 +554,7 @@ class LayoutClass(object):
                                     # rebuild the shape as a nurbsSphere:
                                     if cmds.objectType(dupRenamed) == 'transform':
                                         # make this previewMirrorGuide as not skinable from dpAR_UI:
-                                        cmds.addAttr(dupRenamed, longName="doNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+                                        cmds.addAttr(dupRenamed, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
                                         childrenShapeList = cmds.listRelatives(dupRenamed, shapes=True, children=True)
                                         if childrenShapeList:
                                             cmds.delete(childrenShapeList)
