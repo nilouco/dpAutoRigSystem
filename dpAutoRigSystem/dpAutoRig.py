@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.24"
-DPAR_UPDATELOG = "N668 Change boolean attributes to integer."
+DPAR_VERSION_PY3 = "4.02.25"
+DPAR_UPDATELOG = "N609 Vaccine virus remover\nas a new checkin validator."
 
 
 
