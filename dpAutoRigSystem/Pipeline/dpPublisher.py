@@ -11,7 +11,7 @@ reload(dpPipeliner)
 reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.3
+DPPUBLISHER_VERSION = 1.4
 
 
 class Publisher(object):
@@ -356,6 +356,19 @@ class Publisher(object):
                         # organize old published files
                         if self.assetNameList:
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        # discord
+
+                        # WIP
+
+                        if self.pipeliner.pipeData['b_discord']:
+                            print("Discord-zando here.... after checkBox")
+                            print(self.pipeliner.pipeData['webhookToken'])
+                            messageText = "from dpAR... publishLog:\n"+str(publishLog)
+                            self.packager.toDiscord(self.pipeliner.pipeData['webhookToken'], messageText)
+                            
+
+
+
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

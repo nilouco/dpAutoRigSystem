@@ -7,9 +7,10 @@ from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.4
+DPPIPELINER_VERSION = 1.5
 
 PIPE_FOLDER = "_dpPipeline"
+WEBHOOK = "https://discord.com/api/webhooks/1099059606531084392/JZooIHiPg_ZGdhXfW0beuZz_iCodSchMXfSSGTgCFRr7ZUCuE8Dfh5Qb-e2jRLinBkO5"
 
 
 class Pipeliner(object):
@@ -105,7 +106,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-03-26",
+        "updated" : "2023-05-01",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -118,6 +119,7 @@ class Pipeliner(object):
         "s_hist"       : "dpData/dpHist",
         "s_old"        : "dpOld",
         "s_dropbox"    : "Job",
+        "s_webhook"    : "",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
@@ -133,6 +135,7 @@ class Pipeliner(object):
         "b_archive"    : True,
         "b_zip"        : True,
         "b_cloud"      : True,
+        "b_discord"    : True,
         "b_imager"     : True,
         "b_i_maya"     : True,
         "b_i_version"  : True,
@@ -155,7 +158,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2023-02-09",
+        "updated" : "2023-05-01",
         
         "f_drive"      : "i228_fDriveAnn",
         "f_studio"     : "i229_fStudioAnn",
@@ -193,7 +196,9 @@ class Pipeliner(object):
         "b_i_wip"      : "i261_biRigAnn",
         "b_i_publish"  : "i262_biPublishAnn",
         "b_i_date"     : "i263_biDateAnn",
-        "b_i_degrade"  : "i264_biDegradeAnn"
+        "b_i_degrade"  : "i264_biDegradeAnn",
+        "s_webhook"    : "i277_sWebhookAnn",
+        "b_discord"    : "i278_bDiscordAnn"
         }
 
 
@@ -469,6 +474,7 @@ class Pipeliner(object):
         self.pipeData['toClientPath'] = None
         self.pipeData['historyPath'] = None
         self.pipeData['dropboxPath'] = None
+        self.pipeData['webhookToken'] = None
         # mount paths
         if self.pipeData['publishPath']:
             # send to client path
@@ -501,3 +507,9 @@ class Pipeliner(object):
                                 self.makeDirIfNotExists(self.pipeData['dropboxPath'])
             # old 
             self.makeDirIfNotExists(self.pipeData['publishPath']+"/"+self.pipeData['s_old'])
+            # discord
+            if self.pipeData['b_discord']:
+                if self.pipeData['s_webhook']:
+                    self.pipeData['webhookToken'] = self.pipeData['s_webhook']
+                else:
+                    self.pipeData['webhookToken'] = WEBHOOK
