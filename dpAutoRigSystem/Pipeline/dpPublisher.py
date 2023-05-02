@@ -359,7 +359,7 @@ class Publisher(object):
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
                             messageText = publishLog["Scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["Comment"]+"*"
-                            result = self.packager.toDiscord(self.pipeliner.pipeData['webhookURL'], messageText)
+                            result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
                                 print(self.langDic[self.langName][result])
 

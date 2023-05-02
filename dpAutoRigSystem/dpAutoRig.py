@@ -136,6 +136,7 @@ DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
+LOCATION_WEBHOOK = "https://discord.com/api/webhooks/1102768121921683526/4-hL-b5tNI0qaT_zbBC2S7nXCQIeOp3EuTbueRNKanVI3iW8tFsy34q7GQRSRuhHguiD"
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
 DPSHAPE = "dpShape"
@@ -165,7 +166,8 @@ class DP_AutoRig_UI(object):
         self.checkAddOnsInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
-        self.userDefAutoCheckUpdate = 0
+        self.userDefAutoCheckUpdate = 1
+        self.userDefAgreeTerms = 1
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
         self.dpLog = DPLOG
@@ -256,6 +258,7 @@ class DP_AutoRig_UI(object):
             cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
             cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
             cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+            cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
             cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
             cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
             
@@ -267,7 +270,10 @@ class DP_AutoRig_UI(object):
             self.mainUI()
 
             # check if we need to automatically check for update:
-            self.autoCheckUpdate()
+            self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
+            # also check for agreement of terms and conditions
+            self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
+            
         
 
         except Exception as e:
@@ -1850,41 +1856,82 @@ class DP_AutoRig_UI(object):
         """ Set the optionVar for auto check update preference as stored userDefAutoCheckUpdate read variable.
         """
         cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', int(currentValue)))
+        self.userDefAutoCheckUpdate = currentValue
+
+
+    def setAutoCheckAgreePref(self, currentValue, *args):
+        """ Set the optionVar for auto check agree terms and conditions preference as stored userDefAgreeTerms read variable.
+        """
+        cmds.optionVar(intValue=('dpAutoRigAgreeTermsCond', int(currentValue)))
+        self.userDefAgreeTerms = currentValue
     
     
-    def autoCheckUpdate(self, *args):
-        """ Store user choose about automatically check for update in an optionVar.
-            If active, try to check for update once a day.
+    def autoCheckOptionVar(self, checkOptVar,  lastDateOptVar, mode, *args):
+        """ Store user choose about automatically check for update or agree terms and conditions in an optionVar.
+            If active, try to check for update or location once a day.
         """
         firstTimeOpenDPAR = False
-        # verify if there is an optionVar of last autoCheckUpdate checkBox choose value by user in the maya system:
-        autoCheckUpdateExists = cmds.optionVar(exists='dpAutoRigAutoCheckUpdate')
-        if not autoCheckUpdateExists:
-            cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', 1))
+        # verify if there is an optionVar of last optionVar checkBox choose value by user in the maya system:
+        autoCheckExists = cmds.optionVar(exists=checkOptVar)
+        if not autoCheckExists:
+            cmds.optionVar(intValue=(checkOptVar, 1))
             firstTimeOpenDPAR = True
         
-        # get its value puting in a variable userDefAutoCheckUpdate:
-        self.userDefAutoCheckUpdate = cmds.optionVar(query='dpAutoRigAutoCheckUpdate')
-        if self.userDefAutoCheckUpdate == 1:
-            # verify if there is an optionVar for store the date of the lastest autoCheckUpdate ran in order to avoid many hits in the GitHub server:
+        # get its value puting in a self variable:
+        optVarValue = cmds.optionVar(query=checkOptVar)
+        if optVarValue == 1:
+            if mode == "update":
+                self.userDefAutoCheckUpdate = optVarValue
+            else: #terms
+                self.userDefAgreeTerms = optVarValue
+            # verify if there is an optionVar for store the date of the lastest optionVar ran in order to avoid many hits in the GitHub server:
             todayDate = str(datetime.datetime.now().date())
-            lastAutoCheckUpdateExists = cmds.optionVar(exists='dpAutoRigLastDateAutoCheckUpdate')
-            if not lastAutoCheckUpdateExists:
-                cmds.optionVar(stringValue=('dpAutoRigLastDateAutoCheckUpdate', todayDate))
-            # get its value puting in a variable userDefAutoCheckUpdate:
-            lastDateAutoCheckUpdate = cmds.optionVar(query='dpAutoRigLastDateAutoCheckUpdate')
-            if not lastDateAutoCheckUpdate == todayDate:
-                # then check for update:
-                self.checkForUpdate(verbose=False)
-                cmds.optionVar(stringValue=('dpAutoRigLastDateAutoCheckUpdate', todayDate))
+            lastAutoCheckExists = cmds.optionVar(exists=lastDateOptVar)
+            if not lastAutoCheckExists:
+                cmds.optionVar(stringValue=(lastDateOptVar, todayDate))
+            # get its value puting in a variable:
+            lastDateAutoCheck = cmds.optionVar(query=lastDateOptVar)
+            if not lastDateAutoCheck == todayDate:
+                cmds.optionVar(stringValue=(lastDateOptVar, todayDate))
+                if mode == "update":
+                    self.checkForUpdate(verbose=False)
+                else: # agree terms and cond
+                    self.getLocalData()
         
         # force checkForUpdate if it's the first time openning the dpAutoRigSystem in this computer:
         if firstTimeOpenDPAR:
-            self.checkForUpdate(verbose=True)
-        
-        
+            if mode == "update":
+                self.checkForUpdate(verbose=True)
+            else: #terms
+                self.checkTermsAndCond()
+
     
+    def getLocalData(self, *args):
+        """
+        """
+        print("getting local data here... TODO")
+
     
+    def checkTermsAndCond(self, *args):
+        """ Create a window to ask user if agree to terms and conditions.
+        """
+        terms_winWidth  = 205
+        terms_winHeight = 200
+        # creating Terms and Conditions Window:
+        if cmds.window('dpTermsCondWindow', query=True, exists=True):
+            cmds.deleteUI('dpTermsCondWindow', window=True)
+        dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.langDic[self.langName]['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        termsLayout = cmds.columnLayout('termsLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpTermsCondWin)
+        cmds.text("\n"+self.langDic[self.langName]['i282_termsCondDesc'], align="center", parent=termsLayout)
+        # agreement:
+        cmds.separator(height=30)
+        self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.langDic[self.langName]['i280_iAgreeTermsCond'], align="left", value=self.userDefAgreeTerms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
+        cmds.separator(height=30)
+        # call window:
+        cmds.showWindow(dpTermsCondWin)
+
+
     ###################### End: UI
     
     

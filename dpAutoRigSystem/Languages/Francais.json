@@ -434,9 +434,12 @@
     "i274_editor"          : "Editeur",
     "i275_attribute"       : "Attribut",
     "i276_current"         : "Courant",
-    "i277_sWebhookAnn"     : "C'est le token du Webhook de Discord pour avoir le log.",
+    "i277_sWebhookAnn"     : "C'est l'URL du Webhook de Discord pour avoir le log.",
     "i278_bDiscordAnn"     : "Avoir l'intégration de dpAutoRigSystem avec le Discord.",
     "i279_didntSend"       : "Ce n'était pas envoyé l'info du log.",
+    "i280_iAgreeTermsCond" : "J'accepte les termes et conditions.",
+    "i281_termsCond"       : "Termes et Conditions",
+    "i282_termsCondDesc"   : "Terms and Conditions\n\nThis is an open source script to rigging in Maya.\nIt's a free tool wrote to help the community.\nUsing it the user agree to do the best to have a\nquality rig and always respect others professionals.\nThat means we considere the world a beautiful place to\nwork and live in peace with all.\nYou can use this tool for educational, personal or professional work.\nThis tool can collect some information like geolocation,\nfile, computer or user name just for statistic proporse.\nWe won't share it with anybody.\nIt'll just help us to know the usage of this tool.\nAnd maybe it can drive our effort to develop\na better rigging tool as possible.",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

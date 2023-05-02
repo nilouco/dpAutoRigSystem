@@ -10,7 +10,7 @@ from ..Modules.Library import dpUtils
 DPPIPELINER_VERSION = 1.5
 
 PIPE_FOLDER = "_dpPipeline"
-WEBHOOK = "https://discord.com/api/webhooks/1099059606531084392/JZooIHiPg_ZGdhXfW0beuZz_iCodSchMXfSSGTgCFRr7ZUCuE8Dfh5Qb-e2jRLinBkO5"
+PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1099059606531084392/JZooIHiPg_ZGdhXfW0beuZz_iCodSchMXfSSGTgCFRr7ZUCuE8Dfh5Qb-e2jRLinBkO5"
 
 
 class Pipeliner(object):
@@ -475,7 +475,7 @@ class Pipeliner(object):
         self.pipeData['toClientPath'] = None
         self.pipeData['historyPath'] = None
         self.pipeData['dropboxPath'] = None
-        self.pipeData['webhookURL'] = None
+        self.pipeData['publishedWebhook'] = None
         # mount paths
         if self.pipeData['publishPath']:
             # send to client path
@@ -506,17 +506,17 @@ class Pipeliner(object):
 #                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
                                 self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                                 self.makeDirIfNotExists(self.pipeData['dropboxPath'])
-            # old 
+            # old
             self.makeDirIfNotExists(self.pipeData['publishPath']+"/"+self.pipeData['s_old'])
             # discord
             if self.pipeData['b_discord']:
                 if self.pipeData['s_webhook']:
-                    self.pipeData['webhookURL'] = self.pipeData['s_webhook']
+                    self.pipeData['publishedWebhook'] = self.pipeData['s_webhook']
                 else: 
                     self.jsonWebhookPath = os.path.join(self.pipeData['path'], self.webhookFile).replace("\\", "/")
                     if os.path.exists(self.jsonWebhookPath):
                         content = self.getJsonContent(self.jsonWebhookPath)
                         if content:
-                            self.pipeData['webhookURL'] = content['webhook']
+                            self.pipeData['publishedWebhook'] = content['webhook']
                     else:
-                        self.pipeData['webhookURL'] = WEBHOOK
+                        self.pipeData['publishedWebhook'] = PUBLISHED_WEBHOOK
