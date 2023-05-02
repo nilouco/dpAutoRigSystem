@@ -251,20 +251,16 @@ class Packager(object):
 
     
     def toDiscord(self, webhook, messageText, *args):
+        """ This method will send the given message text string to the Discord webhook.
         """
-        """
-        print("sending message to discord here...", webhook, messageText)
-
-        #WIP
         if webhook and messageText:
             messageDic = {"content": messageText}
             messageData = json.dumps(messageDic).encode("utf8")
             try:
                 req = request.Request(webhook, messageData, {"content-type": "application/json"})
                 req.add_header("user-agent", "dpAR Discord Webhook")
-                f = request.urlopen(req)
-                print(f)
+                request.urlopen(req)
             except:
-                print("no internet connection or fail request")
+                return 'i088_internetFail'
         else:
-            print("no webhook or data to send to Discord")
+            return 'i279_didntSend'

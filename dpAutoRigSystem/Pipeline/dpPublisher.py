@@ -357,18 +357,11 @@ class Publisher(object):
                         if self.assetNameList:
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
-
-                        # WIP
-
                         if self.pipeliner.pipeData['b_discord']:
-                            print("Discord-zando here.... after checkBox")
-                            print(self.pipeliner.pipeData['webhookToken'])
-                            messageText = "from dpAR... publishLog:\n"+str(publishLog)
-                            self.packager.toDiscord(self.pipeliner.pipeData['webhookToken'], messageText)
-                            
-
-
-
+                            messageText = publishLog["Scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["Comment"]+"*"
+                            result = self.packager.toDiscord(self.pipeliner.pipeData['webhookURL'], messageText)
+                            if result: #error
+                                print(self.langDic[self.langName][result])
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

@@ -436,6 +436,7 @@
     "i276_current"         : "Courant",
     "i277_sWebhookAnn"     : "C'est le token du Webhook de Discord pour avoir le log.",
     "i278_bDiscordAnn"     : "Avoir l'intégration de dpAutoRigSystem avec le Discord.",
+    "i279_didntSend"       : "Ce n'était pas envoyé l'info du log.",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

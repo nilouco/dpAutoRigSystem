@@ -21,6 +21,7 @@ class Pipeliner(object):
         self.today = time.strftime("%Y-%m-%d", time.localtime())
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
+        self.webhookFile = "dpWebhook.json"
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
         
@@ -474,7 +475,7 @@ class Pipeliner(object):
         self.pipeData['toClientPath'] = None
         self.pipeData['historyPath'] = None
         self.pipeData['dropboxPath'] = None
-        self.pipeData['webhookToken'] = None
+        self.pipeData['webhookURL'] = None
         # mount paths
         if self.pipeData['publishPath']:
             # send to client path
@@ -510,6 +511,12 @@ class Pipeliner(object):
             # discord
             if self.pipeData['b_discord']:
                 if self.pipeData['s_webhook']:
-                    self.pipeData['webhookToken'] = self.pipeData['s_webhook']
-                else:
-                    self.pipeData['webhookToken'] = WEBHOOK
+                    self.pipeData['webhookURL'] = self.pipeData['s_webhook']
+                else: 
+                    self.jsonWebhookPath = os.path.join(self.pipeData['path'], self.webhookFile).replace("\\", "/")
+                    if os.path.exists(self.jsonWebhookPath):
+                        content = self.getJsonContent(self.jsonWebhookPath)
+                        if content:
+                            self.pipeData['webhookURL'] = content['webhook']
+                    else:
+                        self.pipeData['webhookURL'] = WEBHOOK
