@@ -1879,11 +1879,11 @@ class DP_AutoRig_UI(object):
         
         # get its value puting in a self variable:
         optVarValue = cmds.optionVar(query=checkOptVar)
+        if mode == "update":
+            self.userDefAutoCheckUpdate = optVarValue
+        else: #terms
+            self.userDefAgreeTerms = optVarValue
         if optVarValue == 1:
-            if mode == "update":
-                self.userDefAutoCheckUpdate = optVarValue
-            else: #terms
-                self.userDefAgreeTerms = optVarValue
             # verify if there is an optionVar for store the date of the lastest optionVar ran in order to avoid many hits in the GitHub server:
             todayDate = str(datetime.datetime.now().date())
             lastAutoCheckExists = cmds.optionVar(exists=lastDateOptVar)
@@ -1910,7 +1910,7 @@ class DP_AutoRig_UI(object):
         """
         """
         print("getting local data here... TODO")
-        # WIP: TODO = open again with current optVar value.
+        # WIP: 
 
 
     
