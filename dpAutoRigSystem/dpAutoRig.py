@@ -1910,6 +1910,8 @@ class DP_AutoRig_UI(object):
         """
         """
         print("getting local data here... TODO")
+        # WIP: TODO = open again with current optVar value.
+
 
     
     def checkTermsAndCond(self, *args):
