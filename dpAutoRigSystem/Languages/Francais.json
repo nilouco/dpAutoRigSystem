@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-04-25",
+    "_updated"       : "2023-05-05",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -719,6 +719,13 @@
     "v046_brokenNetCleaner"       : "Nettoyeur de networks brisés",
     "v047_brokenNetCleanerDesc"   : "Ce validateur va chercher pour des nodes de\nnetwork de correction manager qui sont brisés\net va les effacer.",
     "v048_unlockIniShadGrp"       : "Débloquer InitialShadingGroup",
-    "v049_unlockIniShadGrpDesc"   : "Ce validateur va débloquer l'InitialShadingGroup\npour éviter le bloque qui existe\nde juste creer un simples cube."
+    "v049_unlockIniShadGrpDesc"   : "Ce validateur va débloquer l'InitialShadingGroup\npour éviter le bloque qui existe\nde juste creer un simples cube.",
+    "v050_showBPCleaner"          : "ShowBP nettoyeur",
+    "v051_showBPCleanerDesc"      : "Ce validateur va éffacer des ShowBP scriptNodes.",
 
+    "v054_displayLayers"          : "Afficher les calques",
+    "v055_displayLayersDesc"      : "Ce validateur créera les couches d'affichage par défaut.",
+    "v056_emptyLayers"            : "Calques vides",
+    "v057_layerConfiguration"     : "Configuration des couches"
+    
 }

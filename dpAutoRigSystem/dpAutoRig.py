@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.21"
-DPAR_UPDATELOG = "N608 Unlock initialShadingGroup."
+DPAR_VERSION_PY3 = "4.02.26"
+DPAR_UPDATELOG = "N471, N584, N585 - Added new checkout validator DisplayLayer\nwhich will create Ctrl_Lyr and Geo_Lyr."
 
 
 
