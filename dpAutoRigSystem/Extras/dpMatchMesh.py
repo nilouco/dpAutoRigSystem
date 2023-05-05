@@ -86,7 +86,7 @@ class MatchMesh(object):
                 # selecting meshes
                 cmds.select([fromMesh, toMesh])
                 meshList = om.MSelectionList()
-                om.MGlobal_getActiveSelectionList(meshList)
+                om.MGlobal.getActiveSelectionList(meshList)
                 
                 # declaring from and to objects, dagPaths and vertice lists
                 fromObject = om.MObject()
