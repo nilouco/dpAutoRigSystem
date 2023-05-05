@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.26"
-DPAR_UPDATELOG = "N672 - Discord integration.\nAlso included Terms and Conditions."
+DPAR_VERSION_PY3 = "4.02.27"
+DPAR_UPDATELOG = "N679	Conform Maya2024 to use MatchMesh."
 
 
 
