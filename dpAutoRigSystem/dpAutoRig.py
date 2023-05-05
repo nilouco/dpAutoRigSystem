@@ -1923,7 +1923,6 @@ class DP_AutoRig_UI(object):
             infoData['country'] = locDic['country']
             infoData['region'] = locDic['region']
             infoData['city'] = locDic['city']
-            infoData['ip'] = locDic['ip']
             infoData['user'] = getpass.getuser()
             infoData['host'] = socket.gethostname()
             infoData['os'] = platform.system()
