@@ -10,7 +10,7 @@ from ..Modules.Library import dpUtils
 DPPIPELINER_VERSION = 1.5
 
 PIPE_FOLDER = "_dpPipeline"
-PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1099059606531084392/JZooIHiPg_ZGdhXfW0beuZz_iCodSchMXfSSGTgCFRr7ZUCuE8Dfh5Qb-e2jRLinBkO5"
+PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1104147293478846555/3IdA5ipiG-nqpv1dfg6Q4zWt-Oo-q-EtUisq5z9UpsroW07-NMLTrjJNzAibkUD48TZX"
 
 
 class Pipeliner(object):
