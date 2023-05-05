@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.25"
-DPAR_UPDATELOG = "N609 Vaccine virus remover\nas a new checkin validator."
+DPAR_VERSION_PY3 = "4.02.26"
+DPAR_UPDATELOG = "N672 - Discord integration.\nAlso included Terms and Conditions."
 
 
 
@@ -141,7 +141,7 @@ DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
 LOCATION_WEBHOOK = "https://discord.com/api/webhooks/1102768121921683526/4-hL-b5tNI0qaT_zbBC2S7nXCQIeOp3EuTbueRNKanVI3iW8tFsy34q7GQRSRuhHguiD"
-LOCATION_URL = "https://geolocation-db.com/json"
+LOCATION_URL = "https://ipinfo.io/json"
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
 DPSHAPE = "dpShape"
@@ -279,8 +279,6 @@ class DP_AutoRig_UI(object):
             self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
             # also check for agreement of terms and conditions
             self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
-            
-        
 
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
@@ -288,7 +286,6 @@ class DP_AutoRig_UI(object):
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
             return
-        
         
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
@@ -1915,25 +1912,26 @@ class DP_AutoRig_UI(object):
     def getLocalData(self, *args):
         """ Collect info for statistical purposes.
         """
-        # WIP: 
-        
-        locResponse = False
+        locDic = False
         try:
             locResponse = urllib.request.urlopen(LOCATION_URL)
-        except:
-            print("no response")
-            pass
-        if locResponse:
             locDic = json.loads(locResponse.read())
-            if locDic:
-                infoData = {}
-                infoData['Location'] = locDic['country_code']+" - "+locDic['country_name']+" - "+locDic['state']+" - "+locDic['city']+" - "+locDic['IPv4']
-                infoData['user'] = getpass.getuser()
-                infoData['host'] = socket.gethostname()
-                infoData['os'] = platform.system()
-                print(infoData)
-                if infoData:
-                    self.packager.toDiscord(LOCATION_WEBHOOK, "WIP :spy:\n"+str(infoData))
+        except:
+            pass
+        if locDic:
+            infoData = {}
+            infoData['country'] = locDic['country']
+            infoData['region'] = locDic['region']
+            infoData['city'] = locDic['city']
+            infoData['ip'] = locDic['ip']
+            infoData['user'] = getpass.getuser()
+            infoData['host'] = socket.gethostname()
+            infoData['os'] = platform.system()
+            infoData['Maya'] = cmds.about(version=True)
+            infoData['dpAR'] = DPAR_VERSION_PY3
+            #print(infoData)
+            if infoData:
+                self.packager.toDiscord(LOCATION_WEBHOOK, str(infoData))
 
     
     def checkTermsAndCond(self, *args):
