@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.27"
-DPAR_UPDATELOG = "N679	Conform Maya2024 to use MatchMesh."
+DPAR_VERSION_PY3 = "4.02.28"
+DPAR_UPDATELOG = "N680 - Center eyelids pivot guide."
 
 
 

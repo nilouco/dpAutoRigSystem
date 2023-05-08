@@ -16,6 +16,7 @@ EYELID = "eyelid"
 IRIS = "iris"
 PUPIL = "pupil"
 SPEC = "specular"
+PIVOT = "lidPivot"
 
 class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):
@@ -52,6 +53,8 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+"."+PUPIL, 1)
         cmds.addAttr(self.moduleGrp, longName=SPEC, attributeType='bool')
         cmds.setAttr(self.moduleGrp+"."+SPEC, 0)
+        cmds.addAttr(self.moduleGrp, longName=PIVOT, attributeType='bool')
+        cmds.setAttr(self.moduleGrp+"."+PIVOT, 0)
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # main joint (center of eye globe)
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
@@ -76,9 +79,13 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
         self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
+        # eyelid center pivot
+        self.cvLidPivotLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_LidPivotLoc", r=0.5, d=1, guide=True)
+        cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", 0)
+        cmds.parent(self.cvLidPivotLoc, self.cvJointLoc)
         # upper eyelid guide
         self.cvUpperEyelidLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_UpperEyelidLoc", r=0.2, d=1, guide=True)
-        cmds.parent(self.cvUpperEyelidLoc, self.cvJointLoc)
+        cmds.parent(self.cvUpperEyelidLoc, self.cvLidPivotLoc)
         cmds.setAttr(self.cvUpperEyelidLoc+".ty", 0.5)
         cmds.setAttr(self.cvUpperEyelidLoc+".tz", 0.5)
         self.ctrls.setLockHide([self.cvUpperEyelidLoc], ['tx', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
@@ -86,7 +93,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.jUpperEyelid+".template", 1)
         # lower eyelid guide
         self.cvLowerEyelidLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_LowerEyelidLoc", r=0.2, d=1, guide=True)
-        cmds.parent(self.cvLowerEyelidLoc, self.cvJointLoc)
+        cmds.parent(self.cvLowerEyelidLoc, self.cvLidPivotLoc)
         cmds.setAttr(self.cvLowerEyelidLoc+".ty", -0.5)
         cmds.setAttr(self.cvLowerEyelidLoc+".tz", 0.5)
         self.ctrls.setLockHide([self.cvLowerEyelidLoc], ['tx', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
@@ -113,6 +120,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvUpperEyelidLoc, self.jUpperEyelid, maintainOffset=True, name=self.jUpperEyelid+"_PaC")
         cmds.parentConstraint(self.cvLowerEyelidLoc, self.jLowerEyelid, maintainOffset=True, name=self.jLowerEyelid+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
+        cmds.parentConstraint(self.cvLidPivotLoc, self.jEyelid, maintainOffset=False, name=self.jEyelid+"_PaC")
     
     
     def changeEyelid(self, *args):
@@ -133,6 +141,8 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.jEyelid+".visibility", currentEyelidValue)
         cmds.setAttr(self.jUpperEyelid+".visibility", currentEyelidValue)
         cmds.setAttr(self.jLowerEyelid+".visibility", currentEyelidValue)
+        cmds.checkBox(self.lidPivotCB, edit=True, value=currentEyelidValue)
+        self.changeLidPivot()
         
         
     def changeSpecular(self, *args):
@@ -142,6 +152,13 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".specular", cmds.checkBox(self.specCB, query=True, value=True))
         cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox(self.specCB, query=True, value=False))
         
+    def changeLidPivot(self, *args):
+        """ Set the attribute value for eyelid center pivot.
+        """
+        self.cvLidPivotLoc = self.guideName+"_LidPivotLoc"
+        cmds.setAttr(self.moduleGrp+".lidPivot", cmds.checkBox(self.lidPivotCB, query=True, value=True))
+        cmds.setAttr(self.cvLidPivotLoc+"0Shape.visibility", cmds.checkBox(self.lidPivotCB, query=True, value=False))
+
 
     def changeIris(self, *args):
         """ Set the attribute value for iris.
@@ -232,7 +249,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # positioning correctely eyelid control:
         cmds.delete(cmds.parentConstraint(self.eyelidJxt, eyelidCtrlZero, mo=False))
         cmds.delete(cmds.pointConstraint(eyelidJnt, eyelidCtrlZero, mo=False))
-        cmds.xform(eyelidCtrlZero, translation=(0,0,self.ctrlRadius), relative=True)
+        cmds.xform(eyelidCtrlZero, translation=(0, 0, self.ctrlRadius), relative=True)
         # adding useful control attributes to calibrate eyelid setup:
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c049_intensity']+"X", attributeType="float", minValue=0, defaultValue=1)
         cmds.addAttr(eyelidCtrl, longName=self.langDic[self.langName]['c049_intensity']+"Y", attributeType="float", minValue=0, defaultValue=1)
@@ -518,7 +535,6 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.guide = side+self.userGuideName+"_Guide_JointLoc1"
                 self.cvEndJointZero = side+self.userGuideName+"_Guide_JointEnd_Grp"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
-                self.cvSpecularLoc = side+self.userGuideName+"_Guide_SpecularLoc"
                 # create a joint:
                 self.jxt = cmds.joint(name=side+self.userGuideName+"_1_Jxt", scaleCompensate=False)
                 self.subJnt = cmds.joint(name=side+self.userGuideName+"_1_Sub_Jxt", scaleCompensate=False)
@@ -609,6 +625,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # create specular setup:
                 if self.getModuleAttr(SPEC):
                     cmds.select(clear=True)
+                    self.cvSpecularLoc = side+self.userGuideName+"_Guide_SpecularLoc"
                     # specular joint:
                     self.eyeSpecJnt = cmds.joint(name=side+self.userGuideName+"Specular_1_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.eyeSpecJnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -679,11 +696,12 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # declare eyelid guides:
                     self.cvUpperEyelidLoc = side+self.userGuideName+"_Guide_UpperEyelidLoc"
                     self.cvLowerEyelidLoc = side+self.userGuideName+"_Guide_LowerEyelidLoc"
+                    self.cvLidPivotLoc = side+self.userGuideName+"_Guide_LidPivotLoc"
                     
                     # creating eyelids joints:
                     cmds.select(clear=True)
                     self.eyelidJxt = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName]['c042_eyelid']+"_Jxt", scaleCompensate=False)
-                    cmds.delete(cmds.parentConstraint(self.guide, self.eyelidJxt, mo=False))
+                    cmds.delete(cmds.parentConstraint(self.cvLidPivotLoc, self.eyelidJxt, mo=False))
                     cmds.parent(self.eyelidJxt, self.eyeScaleJnt)
                     self.upperEyelidBaseJxt, self.upperEyelidJnt = self.createEyelidJoints(side, 'c044_upper', "", self.cvUpperEyelidLoc, s+jointLabelAdd)
                     self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt = self.createEyelidJoints(side, 'c044_upper', self.langDic[self.langName]['c029_middle'], self.cvUpperEyelidLoc, s+jointLabelAdd)
