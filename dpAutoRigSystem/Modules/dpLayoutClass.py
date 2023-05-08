@@ -249,10 +249,12 @@ class LayoutClass(object):
                     
                 # create eyelid layout:
                 if self.eyelidExists:
-                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=5, columnWidth5=(100, 75, 75, 50, 40), columnAlign=[(1, 'right'), (5, 'right')], adjustableColumn=5, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 10)], parent="selectedModuleColumn" )
+                    self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="selectedModuleColumn" )
                     cmds.text(" ", parent=self.eyelidLayout)
                     eyelidValue = cmds.getAttr(self.moduleGrp+".eyelid")
                     self.eyelidCB = cmds.checkBox(label=self.langDic[self.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.eyelidLayout)
+                    lidPivotValue = cmds.getAttr(self.moduleGrp+".lidPivot")
+                    self.lidPivotCB = cmds.checkBox(label=self.langDic[self.langName]['i283_pivot'], value=lidPivotValue, changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
                     specValue = cmds.getAttr(self.moduleGrp+".specular")
                     self.specCB = cmds.checkBox(label=self.langDic[self.langName]['i184_specular'], value=specValue, changeCommand=self.changeSpecular, parent=self.eyelidLayout)
                     irisValue = cmds.getAttr(self.moduleGrp+".iris")
