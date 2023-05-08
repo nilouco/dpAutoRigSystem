@@ -730,6 +730,8 @@
     "v050_showBPCleaner"          : "ShowBP nettoyeur",
     "v051_showBPCleanerDesc"      : "Ce validateur va éffacer des ShowBP scriptNodes.",
     "v052_vaccineCleaner"         : "Vaccine nettoyeur",
-    "v053_vaccineCleanerDesc"     : "Ce validateur va désinfecter le virus de vaccine."
+    "v053_vaccineCleanerDesc"     : "Ce validateur va désinfecter le virus de vaccine.",
+    "v054_expCtrlHierarchy"       : "Vérifier la hiérarchie des contrôles",
+    "v055_expCtrlHierarchyDesc"   : "Vérifiez si la hiérarchie des contrôles correspond\nà un état précédent exporté,\npour éviter la perte d'animation."
 
 }

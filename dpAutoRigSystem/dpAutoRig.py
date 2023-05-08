@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.28"
-DPAR_UPDATELOG = "N680 - Center eyelids pivot guide."
+DPAR_VERSION_PY3 = "4.02.29"
+DPAR_UPDATELOG = "N589 - Export controllers hierarchy."
 
 
 
