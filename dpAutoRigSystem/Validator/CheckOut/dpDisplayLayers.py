@@ -41,17 +41,16 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         # ---
         # --- validator code --- beginning
         if objList:
-            toCheckList = ctrlsGeometryList
+            ctrlsGeometryList = objList
         else:
             # List all controls
             ctrlsGeometryList = None
             self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
             if self.allCtrlsList:
                 renderGrpList = self.getGeometryTranform()
+                ctrlsGeometryList = self.allCtrlsList
                 if renderGrpList:
                     ctrlsGeometryList = self.allCtrlsList + renderGrpList
-                else:
-                    ctrlsGeometryList = self.allCtrlsList
         if ctrlsGeometryList:
             self.geoLayerName = "Geo_Lyr"
             self.ctrlLayerName = "Ctrl_Lyr"
@@ -78,11 +77,10 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                         if itemsInGeoLayerList and itemsInCtrlLayerList:
                             progressAmount = 0
                             maxProcess = len(self.allCtrlsList)
-                            for item in itemsInCtrlLayerList:
-                                if self.verbose:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                            if self.verbose:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
                             missingGeoList = list(set(renderGrpList) - set(itemsInGeoLayerList))
                             remainingGeoList = list(set(itemsInGeoLayerList) - set(renderGrpList))
                             missingCtrlList = list(set(self.allCtrlsList) - set(itemsInCtrlLayerList))
@@ -92,13 +90,13 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                                 self.verifyFixMode(toFixList)
                         else:
                             # Empty layer
-                            self.verifyFixMode(self.dpUIinst.langDic[self.dpUIinst.langName]['v056_emptyLayers'])
+                            self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v056_emptyLayers']])
                     else:
                         # Layer configuration
-                        self.verifyFixMode(self.dpUIinst.langDic[self.dpUIinst.langName]['v057_layerConfiguration'])
+                        self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v057_layerConfiguration']])
                 else:
                     # No display layer
-                    self.verifyFixMode(self.dpUIinst.langDic[self.dpUIinst.langName]['v054_displayLayers'])
+                    self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v054_displayLayers']])
             else:
                 # Extra Lyr to delete
                 self.verifyFixMode(self.extraLyrToDelete)
@@ -135,36 +133,41 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         """ 
         geoList = self.getGeometryTranform()
         if geoList:
-            self.createGeoLyr(geoList, self.geoLayerName)
+            self.createNewLayer(geoList, self.geoLayerName)
         else:
             if cmds.objExists(self.geoLayerName):
                 cmds.delete(self.geoLayerName)
 
-        self.createCtrlLyr(self.allCtrlsList, self.ctrlLayerName)
+        self.createNewLayer(self.allCtrlsList, self.ctrlLayerName, False)
         if self.extraLyrToDelete:
-            for layer in self.extraLyrToDelete:
-                cmds.delete(layer)
+            cmds.delete(self.extraLyrToDelete)
         
 
-    def createGeoLyr(self, geoList, geoLayerName, *args):
+    def createNewLayer(self, itemList, layerName, geoType=True, *args):
         """ Creates Geo_Lyr with the objects inside Render_Grp and Proxy_Grp
         """
-        if geoList:
-            cmds.select(geoList)
-            geoLyr = str(cmds.createDisplayLayer (name=geoLayerName, noRecurse=True))
+        if itemList:
+            cmds.select(itemList)
+            newLayer = str(cmds.createDisplayLayer(name=layerName, noRecurse=True))
             # Count numbers in name
             numeric = 0
-            for n in geoLyr:
+            for n in newLayer:
                 if n.isdigit():
                     numeric +=1
             # If there's numeric in name, delete the first, rename the new one and displayType 2 option
             if numeric > 0:           
-                cmds.delete (self.geoLayerName)
-                newLyr = cmds.rename (geoLyr, self.geoLayerName)
-                cmds.setAttr(newLyr+".displayType", 2)
+                cmds.delete (self.layerName)
+                newLyr = cmds.rename (newLayer, self.layerName)
+                if geoType:
+                    cmds.setAttr(newLyr+".displayType", 2)
+                else: #ctrl
+                    cmds.setAttr(newLyr+".hideOnPlayback", 1)
                 cmds.select(clear=True)
             else:
-                cmds.setAttr(self.geoLayerName+".displayType", 2)
+                if geoType:
+                    cmds.setAttr(self.layerName+".displayType", 2)
+                else: #ctrl
+                    cmds.setAttr(self.ctrlLayerName+".hideOnPlayback", 1)
                 cmds.select(clear=True)
 
 
@@ -197,22 +200,16 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         renderGrp = dpUtils.getNodeByMessage("renderGrp")
         proxyGrp = dpUtils.getNodeByMessage("proxyGrp")
         if renderGrp and proxyGrp:
-            renderGrpShapesList = cmds.listRelatives(renderGrp, allDescendents=True, type="mesh")
-            proxyGrpShapesList = cmds.listRelatives(proxyGrp, allDescendents=True, type="mesh")
-            if proxyGrpShapesList == None:
-                proxyGrpShapesList = []
-            if renderGrpShapesList == None:
-                renderGrpShapesList = []
+            renderGrpShapesList = cmds.listRelatives(renderGrp, allDescendents=True, type="mesh") or []
+            proxyGrpShapesList = cmds.listRelatives(proxyGrp, allDescendents=True, type="mesh") or []
             allShapesList = list(set(renderGrpShapesList + proxyGrpShapesList))
+            renderGrpList = []
             if allShapesList:
-                renderGrpList = []
                 for shape in allShapesList:
                     if not "Orig" in shape:
                         transform = cmds.listRelatives(shape, parent=True)[0]
                         # Get the transform only
                         renderGrpList.append(transform)
-            else:
-                renderGrpList = []
             return renderGrpList
 
 
@@ -221,7 +218,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
             If it's a list it will append the items in the dic and run the main function once.
             If it's not a list it will append the obj and run the main function.
         """
-        if isinstance(itemList, list):
+        if itemList:
             for i, item in enumerate(itemList):
                 if self.verifyMode:
                     self.resultOkList.append(False)
@@ -238,18 +235,4 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                     except:#fix
                         self.resultOkList.append(False)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
-        else:    
-            if self.verifyMode:#verify
-                self.resultOkList.append(False)
-                self.checkedObjList.append(itemList)
-                self.foundIssueList.append(True)
-            else:#fix
-                try:
-                    self.createDisplayLayers()
-                    self.resultOkList.append(True)
-                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+itemList)
-                except:
-                    self.resultOkList.append(False)
-                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+itemList)
-
                 
