@@ -156,8 +156,8 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                     numeric +=1
             # If there's numeric in name, delete the first, rename the new one and displayType 2 option
             if numeric > 0:           
-                cmds.delete (self.layerName)
-                newLyr = cmds.rename (newLayer, self.layerName)
+                cmds.delete(layerName)
+                newLyr = cmds.rename(newLayer, layerName)
                 if geoType:
                     cmds.setAttr(newLyr+".displayType", 2)
                 else: #ctrl
@@ -165,9 +165,9 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                 cmds.select(clear=True)
             else:
                 if geoType:
-                    cmds.setAttr(self.layerName+".displayType", 2)
+                    cmds.setAttr(layerName+".displayType", 2)
                 else: #ctrl
-                    cmds.setAttr(self.ctrlLayerName+".hideOnPlayback", 1)
+                    cmds.setAttr(layerName+".hideOnPlayback", 1)
                 cmds.select(clear=True)
 
 
