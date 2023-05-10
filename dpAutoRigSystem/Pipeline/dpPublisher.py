@@ -11,7 +11,7 @@ reload(dpPipeliner)
 reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.3
+DPPUBLISHER_VERSION = 1.4
 
 
 class Publisher(object):
@@ -356,6 +356,12 @@ class Publisher(object):
                         # organize old published files
                         if self.assetNameList:
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        # discord
+                        if self.pipeliner.pipeData['b_discord']:
+                            messageText = publishLog["Scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["Comment"]+"*"
+                            result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
+                            if result: #error
+                                print(self.langDic[self.langName][result])
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

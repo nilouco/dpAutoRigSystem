@@ -311,7 +311,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
                     cmds.addAttr(self.toParentExtremCtrl, longName=self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
                     cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName="active"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="bool", defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.langDic[self.langName]['c118_active']+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
                     cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
                     if s == 1:

@@ -207,8 +207,8 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
                 if not self.getHasIndirectSkin():
-                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                    cmds.setAttr(self.singleCtrl+".scaleCompensate", 1, channelBox=True)
+                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                    cmds.setAttr(self.singleCtrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(self.singleCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
                     # create fatherJoints in order to zeroOut the skinning joint:

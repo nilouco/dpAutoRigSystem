@@ -2,12 +2,14 @@
 from maya import cmds
 from maya import mel
 from ..Modules.Library import dpUtils
+from urllib import request
+import json
 import zipfile
 import shutil
 import os
 
 
-DPPACKAGER_VERSION = 1.3
+DPPACKAGER_VERSION = 1.4
 
 
 RIGPREVIEW = "Rigging Preview"
@@ -246,3 +248,19 @@ class Packager(object):
         """
         if os.path.isfile(filePath+"/"+fileName):
             os.remove(filePath+"/"+fileName)
+
+    
+    def toDiscord(self, webhook, messageText, *args):
+        """ This method will send the given message text string to the Discord webhook.
+        """
+        if webhook and messageText:
+            messageDic = {"content": messageText}
+            messageData = json.dumps(messageDic).encode("utf8")
+            try:
+                req = request.Request(webhook, messageData, {"content-type": "application/json"})
+                req.add_header("user-agent", "dpAR Discord Webhook")
+                request.urlopen(req)
+            except:
+                return 'i088_internetFail'
+        else:
+            return 'i279_didntSend'

@@ -4,12 +4,14 @@
     "_date"       : "2022-09-12",
     "_updated"    : "2023-05-05",
 
+
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
     "ImportReference"           : false,
     "NamespaceCleaner"          : false,
     "ShowBPCleaner"             : false,
     "UnlockInitialShadingGroup" : false,
+    "VaccineCleaner"            : false,
 
     "BrokenNetCleaner"          : false,
     "ColorSetCleaner"           : false,

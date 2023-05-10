@@ -130,7 +130,7 @@ class CustomAttr(object):
 
 
     def addAttr(self, attrIndex, itemList=None, attrName=None, *args):
-        """ Create attributes in the selected transform if them don't exists yet.
+        """ Create attributes in the selected transform if they don't exists yet.
         """
         attr = None
         if not itemList:

@@ -10,6 +10,7 @@
     "NamespaceCleaner"          : false,
     "ShowBPCleaner"             : false,
     "UnlockInitialShadingGroup" : false,
+    "VaccineCleaner"            : false,
 
     "BrokenNetCleaner"          : true,
     "ColorSetCleaner"           : true,
