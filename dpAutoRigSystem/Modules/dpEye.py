@@ -410,7 +410,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         return eyelidCtrl, eyelidCtrlZero
         
         
-    def createIrisPupilSetup(self, s, side, type, codeName, sec, jointLabelNumber, *args):
+    def createIrisPupilSetup(self, s, side, type, codeName, jointLabelNumber, *args):
         ''' Predefined function to add Iris or Pupil setup.
             Returns control.
         '''
@@ -425,7 +425,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # create end joint:
         endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.langDic[self.langName][codeName]+"_JEnd", scaleCompensate=False, radius=0.5)
         cmds.delete(cmds.parentConstraint(mainJnt, endJoint, maintainOffset=False))
-        cmds.setAttr(endJoint+".translateZ", 1)
+        cmds.setAttr(endJoint+".translateZ", self.ctrlRadius)
         # creating control:
         if type == IRIS:
             ctrlId = "id_012_EyeIris"
@@ -455,6 +455,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(ctrlZero[0]+".scaleZ", -1)
                 else:
                     cmds.setAttr(ctrlZero[0]+".scaleZ", 1)
+            cmds.setAttr(endJoint+".translateZ", -self.ctrlRadius)
         cmds.parentConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_PaC")
         cmds.scaleConstraint(self.fkEyeSubCtrl, ctrlZero[0], maintainOffset=True, name=ctrlZero[0]+"_ScC")
         cmds.parent(mainJnt, self.jnt)
@@ -614,7 +615,9 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # create endScale joint:
                 self.endScaleJoint = cmds.joint(name=side+self.userGuideName+"Scale_JEnd", radius=0.5)
                 cmds.delete(cmds.parentConstraint(self.eyeScaleJnt, self.endScaleJoint, maintainOffset=False))
-                cmds.setAttr(self.endScaleJoint+".translateZ", 1)
+                cmds.setAttr(self.endScaleJoint+".translateZ", self.ctrlRadius)
+                if s == 1:
+                    cmds.setAttr(self.endScaleJoint+".translateZ", -self.ctrlRadius)
                 # create constraints to eyeScale:
                 cmds.pointConstraint(self.jnt, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_PoC")
                 cmds.orientConstraint(self.baseEyeCtrl, self.eyeScaleJnt, maintainOffset=False, name=self.eyeScaleJnt+"_OrC")
@@ -634,10 +637,10 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.eyeSpecScaleJnt = cmds.joint(name=side+self.userGuideName+"Specular_2_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.eyeSpecScaleJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     dpUtils.setJointLabel(self.eyeSpecScaleJnt, s+jointLabelAdd, 18, self.userGuideName+"Specular_2")
-                    cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", 1)
+                    cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", self.ctrlRadius)
                     # create endSpecular joint:
                     self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_JEnd", radius=0.5)
-                    cmds.setAttr(self.endSpecJoint+".translateZ", 0.2)
+                    cmds.setAttr(self.endSpecJoint+".translateZ", 0.2*self.ctrlRadius)
                     cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)
                     # specular control:
                     self.eyeSpecCtrl = self.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.userGuideName+"_Spec_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
@@ -736,13 +739,13 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     
                 # create iris setup:
                 if self.getModuleAttr(IRIS):
-                    self.irisCtrl = self.createIrisPupilSetup(s, side, IRIS, 'i080_iris', 12, s+jointLabelAdd)
+                    self.irisCtrl = self.createIrisPupilSetup(s, side, IRIS, 'i080_iris', s+jointLabelAdd)
                     self.irisCtrlList.append(self.irisCtrl)
                     self.hasIris = True
                     
                 # create pupil setup:
                 if self.getModuleAttr(PUPIL):
-                    self.pupilCtrl = self.createIrisPupilSetup(s, side, PUPIL, 'i081_pupil', 4, s+jointLabelAdd)
+                    self.pupilCtrl = self.createIrisPupilSetup(s, side, PUPIL, 'i081_pupil', s+jointLabelAdd)
                     self.pupilCtrlList.append(self.pupilCtrl)
                     self.hasPupil = True
                     
