@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from functools import partial
-from ..Modules.Library import dpControls
 
 # global variables to this module:
 CLASS_NAME = "Renamer"
@@ -21,7 +19,6 @@ class Renamer():
         self.langName = langName
         self.presetDic = presetDic
         self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
         self.selOption = 1 #Selection
         self.originalList, self.previewList = [], []
         self.addSequence = None
@@ -113,7 +110,7 @@ class Renamer():
 
     
     def refreshOriginal(self, *args):
-        """
+        """ Refresh the original selected item list and update the UI textScrollList.
         """
         self.getObjList()
         if self.originalList:
@@ -122,7 +119,7 @@ class Renamer():
 
 
     def refreshPreview(self, *args):
-        """
+        """ Reload the preview naming list and populate its UI textScrollList.
         """
         self.refreshOriginal()
         self.generatePreviewList(None)
@@ -132,7 +129,7 @@ class Renamer():
     
 
     def getInfoFromUI(self, *args):
-        """
+        """ Just load the member variables with info from UI.
         """
         # checkBoxes
         self.addSequence = cmds.checkBox(self.sequenceCB, query=True, value=True)
@@ -150,9 +147,8 @@ class Renamer():
         self.padding = cmds.intFieldGrp(self.paddingIFG, query=True, value1=True)
         
     
-    
     def generatePreviewList(self, *args):
-        """
+        """ Generate a renamed preview list used to rename the original listed items.
         """
         self.getObjList()
         if self.originalList:
@@ -162,32 +158,28 @@ class Renamer():
             self.getInfoFromUI()
             for i, item in enumerate(self.originalList):
                 if cmds.objExists(item):
-                    # WIP:
+                    # new:
                     newName = item
                     if "|" in item:
                         newName = item[item.rfind("|")+1:]
-                    
                     previewDic[item] = newName
-                    
+                    # sequence
                     if self.addSequence:
                         previewDic[item] = self.sequenceName+str(self.start+i).zfill(self.padding)
-
+                    # replace
                     if self.searchReplace:
                         previewDic[item] = previewDic[item].replace(self.searchName, self.replaceName)
                     if self.addPrefix:
                         previewDic[item] = self.prefixName+previewDic[item]
                     if self.addSuffix:
                         previewDic[item] = previewDic[item]+self.suffixName
-                    
-
             if previewDic:
                 for item in self.originalList:
                     self.previewList.append(previewDic[item])
     
 
-
     def getObjList(self, *args):
-        """
+        """ Get the listed objects to rename them.
         """
         # list current selection
         self.originalList = cmds.ls(selection=True)
@@ -207,7 +199,7 @@ class Renamer():
 
 
     def runRenamerByUI(self, *args):
-        """
+        """ Rename originalList from UI info.
         """
         self.getObjList()
         if self.originalList:
@@ -220,20 +212,17 @@ class Renamer():
                             item = itemList[0]
                     if cmds.objExists(item):
                         cmds.rename(item, self.previewList[i])
-#            cmds.select(clear=True)
+                    else:
+                        mel.eval('warning \"Not able to rename:\"'+item+';')
             self.refreshPreview()
-        
-        
         else:
             mel.eval("warning \"Need to select anything to run.\";")
             
 
 # TODO
 #
-# need to comment each method description
 # need to organize layout
 # need to translate phrases
-# test more than one same name with *item*
 # setup scroll layouts
 # what to do with item selection in scroll layouts
 # or just not enable selection in scroll layouts?
