@@ -731,6 +731,10 @@
     "v050_showBPCleaner"          : "ShowBP limpador",
     "v051_showBPCleanerDesc"      : "Esse validador vai deletar ShowBP scriptNodes.",
     "v052_vaccineCleaner"         : "Vacina limpador",
-    "v053_vaccineCleanerDesc"     : "Esse validador vai desinfectar o vírus da vacina."
-
+    "v053_vaccineCleanerDesc"     : "Esse validador vai desinfectar o vírus da vacina.",
+    "v054_displayLayers"          : "Camadas de visualização",
+    "v055_displayLayersDesc"      : "Esse validador criará as camadas de visualização padrão.",
+    "v056_emptyLayers"            : "Camadas vazias",
+    "v057_layerConfiguration"     : "Configurações das camadas"
+    
 }

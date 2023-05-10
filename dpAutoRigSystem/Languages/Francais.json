@@ -730,6 +730,10 @@
     "v050_showBPCleaner"          : "ShowBP nettoyeur",
     "v051_showBPCleanerDesc"      : "Ce validateur va éffacer des ShowBP scriptNodes.",
     "v052_vaccineCleaner"         : "Vaccine nettoyeur",
-    "v053_vaccineCleanerDesc"     : "Ce validateur va désinfecter le virus de vaccine."
-
+    "v053_vaccineCleanerDesc"     : "Ce validateur va désinfecter le virus de vaccine.",
+    "v054_displayLayers"          : "Afficher les calques",
+    "v055_displayLayersDesc"      : "Ce validateur créera les couches d'affichage par défaut.",
+    "v056_emptyLayers"            : "Calques vides",
+    "v057_layerConfiguration"     : "Configuration des couches"
+    
 }

@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2023-04-30",
+    "_updated"    : "2023-05-10",
 
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,
@@ -14,6 +14,7 @@
 
     "BrokenNetCleaner"          : true,
     "ColorSetCleaner"           : true,
+    "DisplayLayers"             : true,
     "ExitEditMode"              : true,
     "HideCorrectives"           : true,
     "HideDataGrp"               : true,
