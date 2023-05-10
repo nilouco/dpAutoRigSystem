@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2023-05-10",
+    "_updated"    : "2023-05-11",
 
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,
@@ -23,5 +23,6 @@
     "ResetPose"                 : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
+    "UnknownNodesCleaner"       : true,
     "WIPCleaner"                : true
 }
