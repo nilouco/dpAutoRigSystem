@@ -10,7 +10,7 @@ TITLE = "m214_renamer"
 DESCRIPTION = "m215_renamerDesc"
 ICON = "/Icons/dp_renamer.png"
 
-DPRENAMER_VERSION = "0.7"
+DPRENAMER_VERSION = "0.8"
 
 
 class Renamer():
@@ -38,6 +38,7 @@ class Renamer():
         # call main function
         if ui:
             self.renamerUI()
+            cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
     
     
     def closeRenamerUI(self, *args):
@@ -59,35 +60,25 @@ class Renamer():
         fieldsLayout = cmds.columnLayout('fieldsLayout', adjustableColumn=True, width=150, parent=mainLayout)
         self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["i266_selected"], self.langDic[self.langName]["m216_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
         cmds.text('dpRenamer - WIP')
-#        cmds.button('getInfoFromUI', label="getInfoFromUI", command=self.getInfoFromUI)#self.langDic[self.langName]['i124_copyPasteAttr']"", command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
         
         self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.refreshPreview, value=False)
         self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.refreshPreview, text="")
         self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start)
         self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding)
-#        cmds.button('sequenceBT', label=self.langDic[self.langName]['m185_sequence'], command=partial(self.runRenamer, self.originalList, True, False, False, False), backgroundColor=(1.0, 0.4, 0.2), parent=fieldsLayout)
 
         cmds.text(label="")
         self.prefixCB = cmds.checkBox('prefixCB', label=self.langDic[self.langName]['i144_prefix'], changeCommand=self.refreshPreview, value=False)
         self.prefixTF = cmds.textField('prefixTF', changeCommand=self.refreshPreview, text="")
-#        cmds.button('prefixBT', label=self.langDic[self.langName]['i144_prefix'], command=partial(self.runRenamer, self.originalList, False, True, False, False), backgroundColor=(0.7, 0.9, 1.0), parent=fieldsLayout)
         
         cmds.text(label="")
         self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m217_suffix'], changeCommand=self.refreshPreview, value=False)
         self.suffixTF = cmds.textField('suffixTF', changeCommand=self.refreshPreview, text="")
-#        cmds.button('suffixBT', label=self.langDic[self.langName]['m182_suffix'], command=partial(self.runRenamer, self.originalList, False, False, True, False), backgroundColor=(0.9, 0.9, 0.7), parent=fieldsLayout)
-        
+
         cmds.text(label="")
         self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.refreshPreview, value=False)
         self.searchTF = cmds.textField('searchTF', changeCommand=self.refreshPreview, text="")
         self.replaceTF = cmds.textField('replaceTF', changeCommand=self.refreshPreview, text="")
-#        cmds.button('replaceBT', label=self.langDic[self.langName]['m184_replace'], command=partial(self.runRenamer, self.originalList, False, False, False, True), backgroundColor=(0.9, 1.0, 0.5), parent=fieldsLayout)
         
-        cmds.text(label="")
-        cmds.text(label="----")
-        cmds.button('refreshOriginalBT', label="Refresh Original", command=self.refreshOriginal, backgroundColor=(0.7, 0.7, 0.9), parent=fieldsLayout)
-        cmds.button('refreshPreviewBT', label="Refresh Preview", command=self.refreshPreview, backgroundColor=(0.9, 1.0, 0.7), parent=fieldsLayout)
-
         selectedLayout = cmds.columnLayout('selectedLayout', adjustableColumn=True, width=190, parent=mainLayout)
         cmds.text(label="hello", parent=selectedLayout)
         self.originalSL = cmds.textScrollList('selectedSL', width=150, enable=True, parent=selectedLayout)
@@ -107,17 +98,9 @@ class Renamer():
                         attachPosition=[(fieldsLayout, 'right', 5, 150)],
                         attachNone=[(footerLayout, 'top')]
                         )
-
-
-
-        self.refreshOriginal()
-        self.refreshPreview()
-
         # calling UI:
         cmds.showWindow(dpRenamerWin)
 
-
-    
 
     def changeSelOption(self, *args):
         """ Read the current UI selected radio button option.
@@ -125,19 +108,13 @@ class Renamer():
             Return the current value
         """
         self.selOption = cmds.radioButtonGrp(self.selectRB, query=True, select=True)
+        self.refreshPreview()
         return self.selOption
-
-
-
-# WIP:
-    def testeWip(self, addPrefix, *args):
-        print("teste wip")
-    
-    def selectSource(self, *args):
-        print("selected soucr in sl")
 
     
     def refreshOriginal(self, *args):
+        """
+        """
         self.getObjList()
         if self.originalList:
             cmds.textScrollList(self.originalSL, edit=True, removeAll=True)
@@ -145,6 +122,8 @@ class Renamer():
 
 
     def refreshPreview(self, *args):
+        """
+        """
         self.refreshOriginal()
         self.generatePreviewList(None)
         if self.previewList:
@@ -153,6 +132,8 @@ class Renamer():
     
 
     def getInfoFromUI(self, *args):
+        """
+        """
         # checkBoxes
         self.addSequence = cmds.checkBox(self.sequenceCB, query=True, value=True)
         self.addPrefix = cmds.checkBox(self.prefixCB, query=True, value=True)
@@ -171,6 +152,8 @@ class Renamer():
     
     
     def generatePreviewList(self, *args):
+        """
+        """
         self.getObjList()
         if self.originalList:
             self.previewList = []
@@ -184,7 +167,6 @@ class Renamer():
                     if "|" in item:
                         newName = item[item.rfind("|")+1:]
                     
-
                     previewDic[item] = newName
                     
                     if self.addSequence:
@@ -205,26 +187,39 @@ class Renamer():
 
 
     def getObjList(self, *args):
+        """
+        """
         # list current selection
         self.originalList = cmds.ls(selection=True)
         if self.originalList:
             # check if need to add hierarchy children
             if self.selOption == 2: #Hierarchy
                 for item in self.originalList:
-                    childrenList = cmds.listRelatives(item, allDescendents=True)
-                    if childrenList:
-                        for child in childrenList:
-                            self.originalList.append(child)
+                    try:
+                        childrenList = cmds.listRelatives(item, allDescendents=True)
+                        if childrenList:
+                            for child in childrenList:
+                                if not child in self.originalList:
+                                    self.originalList.append(child)
+                    except: #more than one object with the same name
+                        print("More than one same name here errorr....")
         return self.originalList
 
 
     def runRenamerByUI(self, *args):
+        """
+        """
         self.getObjList()
         if self.originalList:
             self.generatePreviewList()
             if self.previewList:
                 for i, item in enumerate(self.originalList):
-                    cmds.rename(item, self.previewList[i])
+                    if not cmds.objExists(item):
+                        itemList = cmds.ls("*"+item+"*")
+                        if itemList:
+                            item = itemList[0]
+                    if cmds.objExists(item):
+                        cmds.rename(item, self.previewList[i])
 #            cmds.select(clear=True)
             self.refreshPreview()
         
@@ -232,3 +227,15 @@ class Renamer():
         else:
             mel.eval("warning \"Need to select anything to run.\";")
             
+
+# TODO
+#
+# need to comment each method description
+# need to organize layout
+# need to translate phrases
+# test more than one same name with *item*
+# setup scroll layouts
+# what to do with item selection in scroll layouts
+# or just not enable selection in scroll layouts?
+#
+#
