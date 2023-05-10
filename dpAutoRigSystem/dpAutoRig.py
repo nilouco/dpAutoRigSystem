@@ -19,7 +19,7 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.29"
+DPAR_VERSION_PY3 = "4.02.31"
 DPAR_UPDATELOG = "N589 - Export controllers hierarchy."
 
 
