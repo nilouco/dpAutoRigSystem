@@ -47,19 +47,19 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
             ctrlsGeometryList = None
             self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
             if self.allCtrlsList:
-                renderGrpList = self.getGeometryTranform()
+                allGeoList = self.getGeometryTranform()
                 ctrlsGeometryList = self.allCtrlsList
-                if renderGrpList:
-                    ctrlsGeometryList = self.allCtrlsList + renderGrpList
+                if allGeoList:
+                    ctrlsGeometryList = self.allCtrlsList + allGeoList
         if ctrlsGeometryList:
             self.geoLayerName = "Geo_Lyr"
             self.ctrlLayerName = "Ctrl_Lyr"
             allLayersList = cmds.ls(type="displayLayer")
-            self.extraLyrToDelete = []
+            self.extraLayerToDelete = []
             for layer in allLayersList:
                 if layer != self.geoLayerName and layer != self.ctrlLayerName and layer != "defaultLayer":
-                    self.extraLyrToDelete.append(layer)
-            if not self.extraLyrToDelete:
+                    self.extraLayerToDelete.append(layer)
+            if not self.extraLayerToDelete:
                 if cmds.objExists(self.geoLayerName) and cmds.objExists(self.ctrlLayerName):
                     layersConfigurationCheckList = [True, False, 2, True, True, 0]
                     geoLyrVisibility = cmds.getAttr(self.geoLayerName+".visibility") #True
@@ -81,8 +81,8 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                                 # Update progress window
                                 progressAmount += 1
                                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
-                            missingGeoList = list(set(renderGrpList) - set(itemsInGeoLayerList))
-                            remainingGeoList = list(set(itemsInGeoLayerList) - set(renderGrpList))
+                            missingGeoList = list(set(allGeoList) - set(itemsInGeoLayerList))
+                            remainingGeoList = list(set(itemsInGeoLayerList) - set(allGeoList))
                             missingCtrlList = list(set(self.allCtrlsList) - set(itemsInCtrlLayerList))
                             remainingCtrlList = list(set(itemsInCtrlLayerList) - set(self.allCtrlsList))
                             toFixList = missingGeoList + remainingGeoList + missingCtrlList + remainingCtrlList
@@ -99,7 +99,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                     self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v054_displayLayers']])
             else:
                 # Extra Lyr to delete
-                self.verifyFixMode(self.extraLyrToDelete)
+                self.verifyFixMode(self.extraLayerToDelete)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -137,10 +137,9 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         else:
             if cmds.objExists(self.geoLayerName):
                 cmds.delete(self.geoLayerName)
-
         self.createNewLayer(self.allCtrlsList, self.ctrlLayerName, False)
-        if self.extraLyrToDelete:
-            cmds.delete(self.extraLyrToDelete)
+        if self.extraLayerToDelete:
+            cmds.delete(self.extraLayerToDelete)
         
 
     def createNewLayer(self, itemList, layerName, geoType=True, *args):
@@ -157,11 +156,11 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
             # If there's numeric in name, delete the first, rename the new one and displayType 2 option
             if numeric > 0:           
                 cmds.delete(layerName)
-                newLyr = cmds.rename(newLayer, layerName)
+                newLayer = cmds.rename(newLayer, layerName)
                 if geoType:
-                    cmds.setAttr(newLyr+".displayType", 2)
+                    cmds.setAttr(newLayer+".displayType", 2)
                 else: #ctrl
-                    cmds.setAttr(newLyr+".hideOnPlayback", 1)
+                    cmds.setAttr(newLayer+".hideOnPlayback", 1)
                 cmds.select(clear=True)
             else:
                 if geoType:
@@ -171,46 +170,23 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                 cmds.select(clear=True)
 
 
-    def createCtrlLyr(self, ctrlList, ctrlLayerName, *args):
-        """ Creates Ctrl_Lyr with all dpControls
-        """
-        if ctrlList:
-            cmds.select(ctrlList)
-            ctrlLyr = str(cmds.createDisplayLayer (name=ctrlLayerName, noRecurse=True))
-            # Count numbers in name
-            numeric = 0
-            for n in ctrlLyr:
-                if n.isdigit():
-                    numeric +=1
-            # If there's numeric in name, delete the first, rename the new one and hide Playblack option
-            if numeric > 0:           
-                cmds.delete (self.ctrlLayerName)
-                newLyr = cmds.rename (ctrlLyr, self.ctrlLayerName)
-                cmds.setAttr (newLyr+".hideOnPlayback", 1)
-                cmds.select(clear=True)
-            else:
-                cmds.setAttr (self.ctrlLayerName+".hideOnPlayback", 1)
-                cmds.select(clear=True)
-
-
     def getGeometryTranform(self, *args):
-        """ Get all transform nodes from Render_Grp and Proxy_Grp. If it found nothing it will return an empty list.
+        """ Get all transform nodes from Render_Grp and Proxy_Grp. If finds nothing, it will return an empty list.
         """
-        # Get all transform node from Render_Grp
         renderGrp = dpUtils.getNodeByMessage("renderGrp")
         proxyGrp = dpUtils.getNodeByMessage("proxyGrp")
         if renderGrp and proxyGrp:
             renderGrpShapesList = cmds.listRelatives(renderGrp, allDescendents=True, type="mesh") or []
             proxyGrpShapesList = cmds.listRelatives(proxyGrp, allDescendents=True, type="mesh") or []
             allShapesList = list(set(renderGrpShapesList + proxyGrpShapesList))
-            renderGrpList = []
+            allGeoList = []
             if allShapesList:
                 for shape in allShapesList:
                     if not "Orig" in shape:
                         transform = cmds.listRelatives(shape, parent=True)[0]
                         # Get the transform only
-                        renderGrpList.append(transform)
-            return renderGrpList
+                        allGeoList.append(transform)
+            return allGeoList
 
 
     def verifyFixMode(self, itemList, *args):
@@ -235,4 +211,3 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                     except:#fix
                         self.resultOkList.append(False)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
-                
