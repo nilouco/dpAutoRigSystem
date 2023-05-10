@@ -12,7 +12,7 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-dpExitEditMode_Version = 1.0
+dpDisplayLayers_Version = 1.0
 
 class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -183,9 +183,12 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
             if allShapesList:
                 for shape in allShapesList:
                     if not "Orig" in shape:
-                        transform = cmds.listRelatives(shape, parent=True)[0]
-                        # Get the transform only
-                        allGeoList.append(transform)
+                        try:
+                            transform = cmds.listRelatives(shape, parent=True)[0]
+                            # Get the transform only
+                            allGeoList.append(transform)
+                        except:
+                            pass
             return allGeoList
 
 
