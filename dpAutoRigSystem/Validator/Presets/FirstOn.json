@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-05-10",
+    "_updated"    : "2023-05-11",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
@@ -23,5 +23,6 @@
     "ResetPose"                 : false,
     "SideCalibration"           : false,
     "TargetCleaner"             : false,
+    "UnknownNodesCleaner"       : false,
     "WIPCleaner"                : false
 }
