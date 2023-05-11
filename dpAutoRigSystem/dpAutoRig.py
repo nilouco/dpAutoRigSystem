@@ -20,7 +20,7 @@
 
 # current version:
 DPAR_VERSION_PY3 = "4.02.31"
-DPAR_UPDATELOG = "N577 - Added new validator to clean Unknown Nodes."
+DPAR_UPDATELOG = "N577 - Added new validator to remove Unknown Nodes."
 
 
 
