@@ -87,11 +87,11 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def logInfo(self, informationDictionary):
         for ctrl in informationDictionary:
             if informationDictionary[ctrl][0] == None:
-                self.messageList.append(f"{ctrl} foi adicionado a hierarquia, filho do {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} was added to the hierarchy, sun of {informationDictionary[ctrl][1]}")
             elif informationDictionary[ctrl][1] == None:
-                self.messageList.append(f"{ctrl} foi excluído.")
+                self.messageList.append(f"{ctrl} was removed.")
             else:
-                self.messageList.append(f"{ctrl} mudou de hierarquia, onde seu antigo pai era {informationDictionary[ctrl][0]}, e o novo pai é {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} changed hierarchy, last parent: {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
 
     def compareHierarchy(self, originalHierarchy, newHierarchy):
         if originalHierarchy != newHierarchy:
@@ -99,24 +99,27 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             self.logInfo(infoDic)
             return False
         else:
-            self.messageList.append("Hierarquias iguais.")
+            self.messageList.append("Matching hierarchys.")
             return True
 
     def changeIntVersionToString(self, int):
         stringVersion = str(int)
         if len(stringVersion) < 3:
             stringVersion = stringVersion.zfill(3)
-        return f"_v{stringVersion}"
+        return f"_h{stringVersion}"
 
     def lookForLastHierarchy(self):
         lastHierarchyFilePath = None
         currentPath = cmds.file(query=True, sceneName=True)
         dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHierarchy"
         if os.path.exists(dpHierarchyPath):
-            lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
-            if lastFileVersion:
-                lastFileVersionString = self.changeIntVersionToString(lastFileVersion)
-                lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
+            if self.dpTeamFile:
+                lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
+            else:
+                lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
+                if lastFileVersion:
+                    lastFileVersionString = self.changeIntVersionToString(lastFileVersion)
+                    lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
         return lastHierarchyFilePath
     
     def retrieveDicFromFile(self, filePath):
@@ -132,7 +135,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             for file in filesList:
                 length = len(file)
                 if self.currentFileName in file and file[length - 5:] == ".json":
-                    thisFileVersion = int(file[file.rfind("_v")+2:-5])
+                    thisFileVersion = int(file[file.rfind("_h")+2:-5])
                     if thisFileVersion > lastBiggerVersion:
                             lastBiggerVersion = thisFileVersion
             lastFileVersion = lastBiggerVersion
@@ -141,17 +144,24 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def exportCtlrsHierarchyToFile(self, dicToJson):
         currentPath = cmds.file(query=True, sceneName=True)
         dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHierarchy"
-        finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}_v001.json"
+        finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}_h001.json"
         if os.path.exists(dpHierarchyPath):
-            lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
-            if lastFileVersion:
-                lastFileVersionString = self.changeIntVersionToString(lastFileVersion+1)
-                finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
+            if self.dpTeamFile:
+                finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
+            else:
+                lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
+                if lastFileVersion:
+                    lastFileVersionString = self.changeIntVersionToString(lastFileVersion+1)
+                    finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
         else:
             os.mkdir(dpHierarchyPath)
         with open (finalSaveFilePath, "w") as json_file:
             json.dump(dicToJson, json_file)
-        self.messageList.append(f"Arquivo exportado: {finalSaveFilePath}")
+        self.messageList.append(f"File exported: {finalSaveFilePath}")
+    
+    def checkIfdpTeam(self):
+        length = len(self.currentFileName)
+        return self.currentFileName[length-5:-3] == "_v"
 
     def runValidator(self, verifyMode=True, objList=None, *args):
         """ Main method to process this validator instructions.
@@ -171,21 +181,26 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         # --- validator code --- beginning
 
         self.currentFileName = cmds.file(query=True, sceneName=True, shortName=True)[:-3]
-        rootCtrl = None
+        rootNode = None
+
+        self.dpTeamFile = self.checkIfdpTeam()
+        if self.dpTeamFile:
+            self.currentFileName = self.currentFileName.replace("_v", "_h")
+        
         # Verify if another Ctrl was sent via code to check hierarchy from.
         if objList and cmds.objExists(objList[0]) and self.checkNurbs(objList[0]):
-            rootCtrl = objList[0]
-        elif cmds.objExists("Root_Ctrl") and self.checkNurbs("Root_Ctrl"):
-            rootCtrl = "Root_Ctrl"
+            rootNode = objList[0]
+        elif cmds.objExists("Global_Ctrl") and self.checkNurbs("Global_Ctrl"):
+            rootNode = "Global_Ctrl"
         else:
-            self.checkedObjList.append(str(rootCtrl))
+            self.checkedObjList.append(str(rootNode))
             self.foundIssueList.append(False)
             self.resultOkList.append(True)
-            self.messageList.append("Nao existe Root, chame o validador via código e passe o controle raiz em uma lista [\"Raiz_Ctrl\"]")
+            self.messageList.append("There is no Global_Ctrl")
             self.finishValidation()
             return self.dataLogDic
 
-        currentFileHierarchyDic = self.raiseHierarchy(rootCtrl)
+        currentFileHierarchyDic = self.raiseHierarchy(rootNode)
         lastHierarchyFilePath = self.lookForLastHierarchy()
         isHierarchySame = True
 
@@ -195,7 +210,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             self.checkedObjList.append(lastHierarchyFilePath)
         else:
             self.checkedObjList.append("Ctrls Hierarchy")
-            self.messageList.append("Essa é a primeira versão da hierarquia OK")
+            self.messageList.append("This is the first hierarchy version. OK")
 
         if self.verifyMode:
             if isHierarchySame:
