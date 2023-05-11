@@ -59,8 +59,8 @@ class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     self.resultOkList.append(False)
                 else: #fix
                     try:
-                        cmds.delete(item)
-                        cmds.select(clear=True)
+                        if cmds.objExists(item):
+                            cmds.delete(item)
                         self.resultOkList.append(True)
                         self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                     except:
