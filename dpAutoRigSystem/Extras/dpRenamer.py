@@ -61,7 +61,7 @@ class Renamer():
         self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["i266_selected"], self.langDic[self.langName]["m216_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
         self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.sequenceChange, value=False, parent=fieldsLayout)
-        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
+        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.nameChange, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
@@ -112,6 +112,17 @@ class Renamer():
         cmds.textFieldGrp(self.sequenceTFG, edit=True, enable=setValue)
         cmds.intFieldGrp(self.startIFG, edit=True, enable=setValue)
         cmds.intFieldGrp(self.paddingIFG, edit=True, enable=setValue)
+        self.refreshPreview()
+
+
+    def nameChange(self, value, *args):
+        """ Set sequence checkbox on or of.
+        """
+        if value == "":
+            cmds.checkBox(self.sequenceCB, edit=True, value=False)
+        else:
+            cmds.checkBox(self.sequenceCB, edit=True, value=True)
+        self.sequenceChange(True)
         self.refreshPreview()
 
 
