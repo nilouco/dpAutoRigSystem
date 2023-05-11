@@ -8,8 +8,8 @@ reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "CtrlsHierarchy"
-TITLE = "v054_expCtrlHierarchy"
-DESCRIPTION = "v055_expCtrlHierarchyDesc"
+TITLE = "v060_expCtrlHierarchy"
+DESCRIPTION = "v061_expCtrlHierarchyDesc"
 ICON = "/Icons/dp_controlsHierarchy.png"
 
 dpCtrlsHierarchy_Version = 1.0
