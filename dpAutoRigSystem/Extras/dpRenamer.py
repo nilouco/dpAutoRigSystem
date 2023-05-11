@@ -8,7 +8,7 @@ TITLE = "m214_renamer"
 DESCRIPTION = "m215_renamerDesc"
 ICON = "/Icons/dp_renamer.png"
 
-DPRENAMER_VERSION = "0.8"
+DPRENAMER_VERSION = "0.9"
 
 
 class Renamer():
@@ -32,8 +32,9 @@ class Renamer():
         self.replaceName = None
         self.padding = 2
         self.start = 0
+        self.ui = ui
         # call main function
-        if ui:
+        if self.ui:
             self.renamerUI()
             cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
     
@@ -50,53 +51,88 @@ class Renamer():
         """
         self.closeRenamerUI()
         # UI:
-        dpRenamerWin = cmds.window('dpRenamerWin', title='Renamer - v'+DPRENAMER_VERSION, width=200, height=575, sizeable=True, minimizeButton=False, maximizeButton=False)
+        renamerWidth = 530
+        renamerHeight = 280
+        dpRenamerWin = cmds.window('dpRenamerWin', title='Renamer - v'+DPRENAMER_VERSION, width=renamerWidth, height=renamerHeight, sizeable=True, minimizeButton=False, maximizeButton=False)
         # UI elements:
-        mainLayout  = cmds.formLayout('mainLayout', numberOfDivisions=450, parent=dpRenamerWin)
-
+        mainLayout = cmds.rowColumnLayout('mainLayout', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)])
+        # fields
         fieldsLayout = cmds.columnLayout('fieldsLayout', adjustableColumn=True, width=150, parent=mainLayout)
         self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["i266_selected"], self.langDic[self.langName]["m216_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
-        cmds.text('dpRenamer - WIP')
-        
-        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.refreshPreview, value=False)
-        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.refreshPreview, text="")
-        self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start)
-        self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding)
-
-        cmds.text(label="")
-        self.prefixCB = cmds.checkBox('prefixCB', label=self.langDic[self.langName]['i144_prefix'], changeCommand=self.refreshPreview, value=False)
-        self.prefixTF = cmds.textField('prefixTF', changeCommand=self.refreshPreview, text="")
-        
-        cmds.text(label="")
-        self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m217_suffix'], changeCommand=self.refreshPreview, value=False)
-        self.suffixTF = cmds.textField('suffixTF', changeCommand=self.refreshPreview, text="")
-
-        cmds.text(label="")
-        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.refreshPreview, value=False)
-        self.searchTF = cmds.textField('searchTF', changeCommand=self.refreshPreview, text="")
-        self.replaceTF = cmds.textField('replaceTF', changeCommand=self.refreshPreview, text="")
-        
-        selectedLayout = cmds.columnLayout('selectedLayout', adjustableColumn=True, width=190, parent=mainLayout)
-        cmds.text(label="hello", parent=selectedLayout)
-        self.originalSL = cmds.textScrollList('selectedSL', width=150, enable=True, parent=selectedLayout)
-        cmds.text(label="merci", parent=selectedLayout)
-
-        previewLayout = cmds.columnLayout('previewLayout', adjustableColumn=True, width=200, parent=mainLayout)
-        cmds.text(label="PREVIEW")
-        self.previewSL = cmds.textScrollList('previewSL', width=250, enable=True, parent=previewLayout)
-
-        footerLayout = cmds.columnLayout('footerLayout', adjustableColumn=True, width=100, parent=mainLayout)
+        cmds.separator(style="single", height=20, parent=fieldsLayout)
+        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.sequenceChange, value=False, parent=fieldsLayout)
+        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
+        self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
+        self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
+        cmds.separator(style="single", height=20, parent=fieldsLayout)
+        prePosLayout = cmds.rowColumnLayout('prePosLayout', numberOfColumns=2, columnWidth=[(1, 90), (2, 97)], columnSpacing=[(2, 5)], parent=fieldsLayout)
+        self.prefixCB = cmds.checkBox('prefixCB', label=self.langDic[self.langName]['i144_prefix'], changeCommand=self.refreshPreview, value=False, parent=prePosLayout)
+        self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m217_suffix'], changeCommand=self.refreshPreview, value=False, parent=prePosLayout)
+        self.prefixTF = cmds.textField('prefixTF', changeCommand=self.prefixChange, parent=prePosLayout)
+        self.suffixTF = cmds.textField('suffixTF', changeCommand=self.suffixChange, parent=prePosLayout)
+        cmds.separator(style="single", height=20, parent=fieldsLayout)
+        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.searchReplaceChange, value=False, parent=fieldsLayout)
+        self.searchTFG = cmds.textFieldGrp('searchTFG', label="From", changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label="To", changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        # loaded items
+        itemsLayout = cmds.columnLayout('itemsLayout', adjustableColumn=True, width=300, parent=mainLayout)
+        cmds.text(label="Preview", align="center", height=20, font="boldLabelFont", parent=itemsLayout)
+        scrollsLayout = cmds.rowColumnLayout('scrollsLayout', numberOfColumns=2, columnWidth=[(1, 140), (2, 140)], columnSpacing=[(1, 5), (2, 5)], columnAlign=[(1, "center"), (2, "center")], rowSpacing=[(1, 5), (2, 5)], parent=itemsLayout)
+        cmds.text(label="Current", parent=scrollsLayout)
+        cmds.text(label="Rename To", parent=scrollsLayout)
+        self.originalSL = cmds.textScrollList('selectedSL', width=130, enable=True, parent=scrollsLayout)
+        self.previewSL = cmds.textScrollList('previewSL', width=130, enable=True, parent=scrollsLayout)
+        # footer
+        footerLayout = cmds.columnLayout('footerLayout', adjustableColumn=True, width=100, parent=itemsLayout)
+        cmds.separator(style="none", height=5, parent=footerLayout)
         cmds.button('runRenamerBT', label="Run Carreto Run!", command=self.runRenamerByUI, parent=footerLayout)
-
-        # edit formLayout in order to get a good scalable window:
-        cmds.formLayout(mainLayout, edit=True,
-                        attachForm=[(fieldsLayout, 'top', 5), (fieldsLayout, 'left', 5), (selectedLayout, 'top', 5), (previewLayout, 'right', 5), (footerLayout, 'left', 5), (footerLayout, 'bottom', 5), (footerLayout, 'right', 5), (previewLayout, 'right', 5)],
-                        attachControl=[(selectedLayout, 'left', 5, fieldsLayout), (selectedLayout, 'bottom', 5, footerLayout), (footerLayout, 'left', 5, fieldsLayout)],
-                        attachPosition=[(fieldsLayout, 'right', 5, 150)],
-                        attachNone=[(footerLayout, 'top')]
-                        )
         # calling UI:
         cmds.showWindow(dpRenamerWin)
+
+
+    def sequenceChange(self, value, *args):
+        """ Active or desactive the search and replace field because it doesn't work well with sequence field.
+        """
+        setValue = True
+        if value:
+            setValue = False
+        cmds.checkBox(self.searchReplaceCB, edit=True, enable=setValue)
+        cmds.textFieldGrp(self.searchTFG, edit=True, enable=setValue)
+        cmds.textFieldGrp(self.replaceTFG, edit=True, enable=setValue)
+        self.refreshPreview()
+
+
+    def searchReplaceChange(self, value, *args):
+        """ Active or desactive the sequence field because it doesn't work well with search and replace field.
+        """
+        setValue = True
+        if value:
+            setValue = False
+        cmds.checkBox(self.sequenceCB, edit=True, enable=setValue)
+        cmds.textFieldGrp(self.sequenceTFG, edit=True, enable=setValue)
+        cmds.intFieldGrp(self.startIFG, edit=True, enable=setValue)
+        cmds.intFieldGrp(self.paddingIFG, edit=True, enable=setValue)
+        self.refreshPreview()
+
+
+    def prefixChange(self, value, *args):
+        """ Set prefix checkbox on or of.
+        """
+        if value == "":
+            cmds.checkBox(self.prefixCB, edit=True, value=False)
+        else:
+            cmds.checkBox(self.prefixCB, edit=True, value=True)
+        self.refreshPreview()
+
+
+    def suffixChange(self, value, *args):
+        """ Set suffix checkbox on or of.
+        """
+        if value == "":
+            cmds.checkBox(self.suffixCB, edit=True, value=False)
+        else:
+            cmds.checkBox(self.suffixCB, edit=True, value=True)
+        self.refreshPreview()
 
 
     def changeSelOption(self, *args):
@@ -140,8 +176,8 @@ class Renamer():
         self.sequenceName = cmds.textFieldGrp(self.sequenceTFG, query=True, text=True)
         self.prefixName = cmds.textField(self.prefixTF, query=True, text=True)
         self.suffixName = cmds.textField(self.suffixTF, query=True, text=True)
-        self.searchName = cmds.textField(self.searchTF, query=True, text=True)
-        self.replaceName = cmds.textField(self.replaceTF, query=True, text=True)
+        self.searchName = cmds.textFieldGrp(self.searchTFG, query=True, text=True)
+        self.replaceName = cmds.textFieldGrp(self.replaceTFG, query=True, text=True)
         # intFields
         self.start = cmds.intFieldGrp(self.startIFG, query=True, value1=True)
         self.padding = cmds.intFieldGrp(self.paddingIFG, query=True, value1=True)
@@ -214,17 +250,36 @@ class Renamer():
                         cmds.rename(item, self.previewList[i])
                     else:
                         mel.eval('warning \"Not able to rename:\"'+item+';')
+            self.resetUI()
             self.refreshPreview()
         else:
             mel.eval("warning \"Need to select anything to run.\";")
             
 
+    def resetUI(self, *args):
+        """ Just back UI to default initial values.
+        """
+        if self.ui:
+            cmds.radioButtonGrp(self.selectRB, edit=True, select=1)
+            # checkBoxes
+            cmds.checkBox(self.sequenceCB, edit=True, value=False)
+            cmds.checkBox(self.prefixCB, edit=True, value=False)
+            cmds.checkBox(self.suffixCB, edit=True, value=False)
+            cmds.checkBox(self.searchReplaceCB, edit=True, value=False)
+            # textFields
+            cmds.textFieldGrp(self.sequenceTFG, edit=True, text="")
+            cmds.textField(self.prefixTF, edit=True, text="")
+            cmds.textField(self.suffixTF, edit=True, text="")
+            cmds.textFieldGrp(self.searchTFG, edit=True, text="")
+            cmds.textFieldGrp(self.replaceTFG, edit=True, text="")
+            # intFields
+            cmds.intFieldGrp(self.startIFG, edit=True, value1=self.start)
+            cmds.intFieldGrp(self.paddingIFG, edit=True, value1=self.padding)
+            # enables
+            self.sequenceChange(False)
+            self.searchReplaceChange(False)
+
+
 # TODO
 #
-# need to organize layout
 # need to translate phrases
-# setup scroll layouts
-# what to do with item selection in scroll layouts
-# or just not enable selection in scroll layouts?
-#
-#
