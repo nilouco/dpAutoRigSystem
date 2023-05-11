@@ -733,7 +733,7 @@
     "v051_showBPCleanerDesc"      : "This validator will delete the ShowBP scriptNodes.",
     "v052_vaccineCleaner"         : "Vaccine cleaner",
     "v053_vaccineCleanerDesc"     : "This validator will desinfect the vaccine virus.",
-    "v054_expCtrlHierarchy"       : "Check Controls Hierarchy",
+    "v054_expCtrlHierarchy"       : "Controls Hierarchy",
     "v055_expCtrlHierarchyDesc"   : "Check if controls hierarchy match\nwith a previous state exported,\nto prevent animation loss."
 
 }

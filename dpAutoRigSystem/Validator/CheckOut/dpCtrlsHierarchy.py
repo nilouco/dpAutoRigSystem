@@ -1,21 +1,20 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
-from importlib import reload
 import json
 import os
+from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "CheckCtrlsHierarchy"
+CLASS_NAME = "CtrlsHierarchy"
 TITLE = "v054_expCtrlHierarchy"
 DESCRIPTION = "v055_expCtrlHierarchyDesc"
-ICON = "/Icons/dp_CheckCtrlsHierarchy.png"
+ICON = "/Icons/dp_controlsHierarchy.png"
 
-dpCheckCtrlsHierarchy_Version = 1.0
+dpCtrlsHierarchy_Version = 1.0
 
-class CheckCtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
+class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -110,20 +109,20 @@ class CheckCtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         return f"_v{stringVersion}"
 
     def lookForLastHierarchy(self):
-        lastHyerarchyFilePath = None
+        lastHierarchyFilePath = None
         currentPath = cmds.file(query=True, sceneName=True)
-        dpHyerarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHyerarchy"
-        if os.path.exists(dpHyerarchyPath):
-            lastFileVersion = self.findLastFileVersion(dpHyerarchyPath)
+        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHierarchy"
+        if os.path.exists(dpHierarchyPath):
+            lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
             if lastFileVersion:
                 lastFileVersionString = self.changeIntVersionToString(lastFileVersion)
-                lastHyerarchyFilePath = f"{dpHyerarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
-        return lastHyerarchyFilePath
+                lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
+        return lastHierarchyFilePath
     
     def retrieveDicFromFile(self, filePath):
         with open(filePath) as json_file:
-            prevHyerarchy = json.load(json_file)
-        return prevHyerarchy
+            prevHierarchy = json.load(json_file)
+        return prevHierarchy
     
     def findLastFileVersion(self, filesPath):
         lastFileVersion = None
@@ -141,13 +140,15 @@ class CheckCtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
 
     def exportCtlrsHierarchyToFile(self, dicToJson):
         currentPath = cmds.file(query=True, sceneName=True)
-        dpHyerarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHyerarchy"
-        finalSaveFilePath = f"{dpHyerarchyPath}/{self.currentFileName}_v001.json"
-        if os.path.exists(dpHyerarchyPath):
-            lastFileVersion = self.findLastFileVersion(dpHyerarchyPath)
+        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHierarchy"
+        finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}_v001.json"
+        if os.path.exists(dpHierarchyPath):
+            lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
             if lastFileVersion:
                 lastFileVersionString = self.changeIntVersionToString(lastFileVersion+1)
-                finalSaveFilePath = f"{dpHyerarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
+                finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
+        else:
+            os.mkdir(dpHierarchyPath)
         with open (finalSaveFilePath, "w") as json_file:
             json.dump(dicToJson, json_file)
         self.messageList.append(f"Arquivo exportado: {finalSaveFilePath}")
@@ -177,9 +178,9 @@ class CheckCtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         elif cmds.objExists("Root_Ctrl") and self.checkNurbs("Root_Ctrl"):
             rootCtrl = "Root_Ctrl"
         else:
-            self.checkedObjList.append(rootCtrl)
-            self.foundIssueList.append(True)
-            self.resultOkList.append(False)
+            self.checkedObjList.append(str(rootCtrl))
+            self.foundIssueList.append(False)
+            self.resultOkList.append(True)
             self.messageList.append("Nao existe Root, chame o validador via código e passe o controle raiz em uma lista [\"Raiz_Ctrl\"]")
             self.finishValidation()
             return self.dataLogDic
