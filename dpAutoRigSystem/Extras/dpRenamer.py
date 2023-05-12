@@ -53,7 +53,7 @@ class Renamer():
         # UI:
         renamerWidth = 530
         renamerHeight = 280
-        dpRenamerWin = cmds.window('dpRenamerWin', title='Renamer - v'+DPRENAMER_VERSION, width=renamerWidth, height=renamerHeight, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpRenamerWin = cmds.window('dpRenamerWin', title=self.langDic[self.langName]['m214_renamer']+' - v'+DPRENAMER_VERSION, width=renamerWidth, height=renamerHeight, sizeable=True, minimizeButton=False, maximizeButton=False)
         # UI elements:
         mainLayout = cmds.rowColumnLayout('mainLayout', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)])
         # fields
@@ -72,20 +72,20 @@ class Renamer():
         self.suffixTF = cmds.textField('suffixTF', changeCommand=self.suffixChange, parent=prePosLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
         self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.searchReplaceChange, value=False, parent=fieldsLayout)
-        self.searchTFG = cmds.textFieldGrp('searchTFG', label="From", changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
-        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label="To", changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.searchTFG = cmds.textFieldGrp('searchTFG', label=self.langDic[self.langName]['i036_from'], changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label=self.langDic[self.langName]['i037_to'], changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
         # loaded items
         itemsLayout = cmds.columnLayout('itemsLayout', adjustableColumn=True, width=300, parent=mainLayout)
-        cmds.text(label="Preview", align="center", height=20, font="boldLabelFont", parent=itemsLayout)
+        cmds.text(label=self.langDic[self.langName]['m223_preview'], align="center", height=20, font="boldLabelFont", parent=itemsLayout)
         scrollsLayout = cmds.rowColumnLayout('scrollsLayout', numberOfColumns=2, columnWidth=[(1, 140), (2, 140)], columnSpacing=[(1, 5), (2, 5)], columnAlign=[(1, "center"), (2, "center")], rowSpacing=[(1, 5), (2, 5)], parent=itemsLayout)
-        cmds.text(label="Current", parent=scrollsLayout)
-        cmds.text(label="Rename To", parent=scrollsLayout)
+        cmds.text(label=self.langDic[self.langName]['i276_current'], parent=scrollsLayout)
+        cmds.text(label=self.langDic[self.langName]['m224_rename']+" "+self.langDic[self.langName]['i037_to'], parent=scrollsLayout)
         self.originalSL = cmds.textScrollList('selectedSL', width=130, enable=True, parent=scrollsLayout)
         self.previewSL = cmds.textScrollList('previewSL', width=130, enable=True, parent=scrollsLayout)
         # footer
         footerLayout = cmds.columnLayout('footerLayout', adjustableColumn=True, width=100, parent=itemsLayout)
         cmds.separator(style="none", height=5, parent=footerLayout)
-        cmds.button('runRenamerBT', label="Run Carreto Run!", command=self.runRenamerByUI, parent=footerLayout)
+        cmds.button('runRenamerBT', label=self.langDic[self.langName]['m224_rename'], command=self.runRenamerByUI, parent=footerLayout)
         # calling UI:
         cmds.showWindow(dpRenamerWin)
 
@@ -241,7 +241,7 @@ class Renamer():
                                 if not child in self.originalList:
                                     self.originalList.append(child)
                     except: #more than one object with the same name
-                        print("More than one same name here errorr....")
+                        mel.eval("warning \""+self.langDic[self.langName]['i075_moreOne']+' '+self.langDic[self.langName]['i076_sameName']+"\";")
         return self.originalList
 
 
@@ -260,11 +260,11 @@ class Renamer():
                     if cmds.objExists(item):
                         cmds.rename(item, self.previewList[i])
                     else:
-                        mel.eval('warning \"Not able to rename:\"'+item+';')
+                        mel.eval("warning \""+self.langDic[self.langName]['v005_cantFix']+" "+item+"\";")
             self.resetUI()
             self.refreshPreview()
         else:
-            mel.eval("warning \"Need to select anything to run.\";")
+            mel.eval("warning \""+self.langDic[self.langName]['m225_selectAnything']+"\";")
             
 
     def resetUI(self, *args):
@@ -289,8 +289,3 @@ class Renamer():
             # enables
             self.sequenceChange(False)
             self.searchReplaceChange(False)
-
-
-# TODO
-#
-# need to translate phrases
