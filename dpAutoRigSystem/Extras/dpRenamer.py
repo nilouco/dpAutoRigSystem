@@ -8,7 +8,7 @@ TITLE = "m214_renamer"
 DESCRIPTION = "m215_renamerDesc"
 ICON = "/Icons/dp_renamer.png"
 
-DPRENAMER_VERSION = "0.9"
+DPRENAMER_VERSION = "1.0"
 
 
 class Renamer():
@@ -61,19 +61,19 @@ class Renamer():
         self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["i266_selected"], self.langDic[self.langName]["m216_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
         self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.sequenceChange, value=False, parent=fieldsLayout)
-        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], changeCommand=self.nameChange, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
+        self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], textChangedCommand=self.nameChange, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
         prePosLayout = cmds.rowColumnLayout('prePosLayout', numberOfColumns=2, columnWidth=[(1, 90), (2, 97)], columnSpacing=[(2, 5)], parent=fieldsLayout)
         self.prefixCB = cmds.checkBox('prefixCB', label=self.langDic[self.langName]['i144_prefix'], changeCommand=self.refreshPreview, value=False, parent=prePosLayout)
         self.suffixCB = cmds.checkBox('suffixCB', label=self.langDic[self.langName]['m217_suffix'], changeCommand=self.refreshPreview, value=False, parent=prePosLayout)
-        self.prefixTF = cmds.textField('prefixTF', changeCommand=self.prefixChange, parent=prePosLayout)
-        self.suffixTF = cmds.textField('suffixTF', changeCommand=self.suffixChange, parent=prePosLayout)
+        self.prefixTF = cmds.textField('prefixTF', textChangedCommand=self.prefixChange, parent=prePosLayout)
+        self.suffixTF = cmds.textField('suffixTF', textChangedCommand=self.suffixChange, parent=prePosLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
         self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.searchReplaceChange, value=False, parent=fieldsLayout)
-        self.searchTFG = cmds.textFieldGrp('searchTFG', label=self.langDic[self.langName]['i036_from'], changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
-        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label=self.langDic[self.langName]['i037_to'], changeCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.searchTFG = cmds.textFieldGrp('searchTFG', label=self.langDic[self.langName]['i036_from'], textChangedCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label=self.langDic[self.langName]['i037_to'], textChangedCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
         # loaded items
         itemsLayout = cmds.columnLayout('itemsLayout', adjustableColumn=True, width=300, parent=mainLayout)
         cmds.text(label=self.langDic[self.langName]['m223_preview'], align="center", height=20, font="boldLabelFont", parent=itemsLayout)
