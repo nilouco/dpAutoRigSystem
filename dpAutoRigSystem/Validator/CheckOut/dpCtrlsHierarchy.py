@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
+from ... Modules.Library import dpUtils
 import json
 import os
 from importlib import reload
@@ -220,12 +221,22 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
                 self.foundIssueList.append(True)
                 self.resultOkList.append(False)
         else:
-            if lastHierarchyFilePath == None:
-                self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
-            elif not isHierarchySame:
-                self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
+            if dpUtils.checkSavedScene():
+                if lastHierarchyFilePath == None:
+                    self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
+                elif not isHierarchySame:
+                    self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
+                self.foundIssueList.append(False)
+                self.resultOkList.append(True)
+            else:
+                self.checkedObjList.append("Scene")
+                self.foundIssueList.append(True)
+                self.resultOkList.append(False)
+                self.messageList.append("Could not fix hierarchy")
+                self.messageList.append("Please save your scene before export controls hierarchy")
+                self.finishValidation()
+                return self.dataLogDic
+            
 
         # --- validator code --- end
         # ---

@@ -995,3 +995,13 @@ def generateID(name):
         now = str(round(time.time()*10000000000000))
         word = ("dp"+str(name)).encode('utf-8').hex()
         return word+"."+now
+
+def checkSavedScene():
+    """ Check if the current scene is saved to return True.
+        Otherwise return False.
+    """
+    scenePath = cmds.file(query=True, sceneName=True)
+    modifiedScene = cmds.file(query=True, modified=True)
+    if not scenePath or modifiedScene:
+        return False
+    return True
