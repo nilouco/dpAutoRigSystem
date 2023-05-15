@@ -739,10 +739,10 @@
     "v063_firstHierarchy"         : "This is the first hierarchy version. OK",
     "v064_ctrlsHierarchy"         : "Could not fix hierarchy.",
     "v065_ctrlsHierarchy"         : "Please save your scene before export controls hierarchy.",
-    "v066_ctrlsHierarchy"         : "was added to the hierarchy, sun of",
+    "v066_ctrlsHierarchy"         : "was added to the hierarchy, son of",
     "v067_ctrlsHierarchy"         : "was removed.",
     "v068_ctrlsHierarchy"         : "changed hierarchy, last parent:",
     "v069_ctrlsHierarchy"         : "Matching hierarchies.",
-    "v070_ctrlsHierarchy"         : "Fichier exporté:"
+    "v070_ctrlsHierarchy"         : "File exported:"
 
 }
