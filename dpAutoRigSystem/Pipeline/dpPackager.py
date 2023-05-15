@@ -268,7 +268,7 @@ class Packager(object):
             return 'i279_didntSend'
 
 
-    def toCallback(self, callbackPath, callbackFile, *args):
+    def toCallback(self, callbackPath, callbackFile, data=None, *args):
         """ Just eval the Python callback object.
             Call main method.
             Returns its result.
@@ -277,11 +277,11 @@ class Packager(object):
         print("callbacking file =", callbackFile)
 
         # WIP
-        #import dpPublishCallback
         if not callbackPath in sys.path:
            sys.path.append(callbackPath)
         print(sys.path)
         #dpCallback = __import__(callbackFile)#, {}, {}, [callbackFile])
+        #import dpPublishCallback
         try:
             dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
             reload(dpCallback)
@@ -289,7 +289,7 @@ class Packager(object):
             print(dir(dpCallback))
             callback = dpCallback.Callback()
             print("returned =", callback)
-            result = callback.main()
+            result = callback.main(data)
             print("result =", result)
             return result
         except:

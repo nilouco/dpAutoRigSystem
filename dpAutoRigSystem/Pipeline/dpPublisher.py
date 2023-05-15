@@ -285,6 +285,8 @@ class Publisher(object):
                     progressAmount += 1
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
                     
+                    self.pipeliner.pipeData.update(publishLog)
+
                     # try to store data into All_Grp if it exists
                     self.pipeliner.pipeData['modelVersion'] = None
                     if not self.dpUIinst.checkIfNeedCreateAllGrp():
@@ -366,7 +368,7 @@ class Publisher(object):
                     # publishing callback
                     if self.pipeliner.pipeData['s_callback']:
                         if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
-                            callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'])
+                            callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'], self.pipeliner.pipeData)
                             print("Callback result =", callbackResult)
 
                     # publisher log window
