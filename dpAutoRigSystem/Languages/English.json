@@ -734,6 +734,15 @@
     "v052_vaccineCleaner"         : "Vaccine cleaner",
     "v053_vaccineCleanerDesc"     : "This validator will desinfect the vaccine virus.",
     "v060_expCtrlHierarchy"       : "Controls Hierarchy",
-    "v061_expCtrlHierarchyDesc"   : "Check if controls hierarchy match\nwith a previous state exported,\nto prevent animation loss."
+    "v061_expCtrlHierarchyDesc"   : "Check if controls hierarchy match\nwith a previous state exported,\nto prevent animation loss.",
+    "v062_globalMissing"          : "Global_Ctrl missing.",
+    "v063_firstHierarchy"         : "This is the first hierarchy version. OK",
+    "v064_ctrlsHierarchy"         : "Could not fix hierarchy.",
+    "v065_ctrlsHierarchy"         : "Please save your scene before export controls hierarchy.",
+    "v066_ctrlsHierarchy"         : "was added to the hierarchy, sun of",
+    "v067_ctrlsHierarchy"         : "was removed.",
+    "v068_ctrlsHierarchy"         : "changed hierarchy, last parent:",
+    "v069_ctrlsHierarchy"         : "Matching hierarchies.",
+    "v070_ctrlsHierarchy"         : "Fichier exporté:"
 
 }

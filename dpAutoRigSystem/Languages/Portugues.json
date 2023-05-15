@@ -733,6 +733,15 @@
     "v052_vaccineCleaner"         : "Vacina limpador",
     "v053_vaccineCleanerDesc"     : "Esse validador vai desinfectar o vírus da vacina.",
     "v060_expCtrlHierarchy"       : "Hierarquia de Controles",
-    "v061_expCtrlHierarchyDesc"   : "Verifique se a hierarquia de controles corresponde\na um estado anterior exportado,\npara evitar perda de animação."
+    "v061_expCtrlHierarchyDesc"   : "Verifique se a hierarquia de controles corresponde\na um estado anterior exportado,\npara evitar perda de animação.",
+    "v062_globalMissing"          : "Global_Ctrl não encontrado.",
+    "v063_firstHierarchy"         : "Essa é a primeira versão da hierarquia. OK.",
+    "v064_ctrlsHierarchy"         : "Não foi possível exportar hierarquia.",
+    "v065_ctrlsHierarchy"         : "Por favor salve sua cena antes de exportar a hierarquia.",
+    "v066_ctrlsHierarchy"         : "foi adicionado a hierarquia, filho de",
+    "v067_ctrlsHierarchy"         : "foi removido.",
+    "v068_ctrlsHierarchy"         : "mudou de hierarquia, último pai:",
+    "v069_ctrlsHierarchy"         : "Hierarquias iguais.",
+    "v070_ctrlsHierarchy"         : "Arquivo exportardo:"
 
 }
