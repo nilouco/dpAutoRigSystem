@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-05-07",
+    "_updated"       : "2023-05-15",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -731,17 +731,15 @@
     "v051_showBPCleanerDesc"      : "Ce validateur va éffacer des ShowBP scriptNodes.",
     "v052_vaccineCleaner"         : "Vaccine nettoyeur",
     "v053_vaccineCleanerDesc"     : "Ce validateur va désinfecter le virus de vaccine.",
-    "v060_expCtrlHierarchy"       : "Hiérarchie des contrôles",
-    "v061_expCtrlHierarchyDesc"   : "Vérifiez si la hiérarchie des contrôles correspond\nà un état précédent exporté,\npour éviter la perte d'animation.",
+    "v061_controlsHierarchy"      : "Hiérarchie des contrôleurs",
+    "v061_controlsHierarchyDesc"  : "Vérifiez si la hiérarchie des contrôleurs correspond\nà un état précédent exporté,\npour éviter la perte d'animation.",
     "v062_globalMissing"          : "Global_Ctrl manquant.",
     "v063_firstHierarchy"         : "Il s'agit de la première version de la hiérarchie. D'accord",
-    "v064_ctrlsHierarchy"         : "Impossible d'exporter la hiérarchie.",
-    "v065_ctrlsHierarchy"         : "Veuillez enregistrer votre scène\navant d'exporter la hiérarchie des contrôles.",
-    "v066_ctrlsHierarchy"         : "a été ajouté à la hiérarchie, soleil de",
-    "v067_ctrlsHierarchy"         : "a été éliminé.",
-    "v068_ctrlsHierarchy"         : "hiérarchie modifiée, dernier parent:",
-    "v069_ctrlsHierarchy"         : "MHiérarchies correspondantes.",
-    "v070_ctrlsHierarchy"         : "Fichier exporté:"
-    
+    "v064_hierarchy"              : "hiérarchie.",
+    "v065_addedSonOf"             : "a été ajouté à la hiérarchie, fils de",
+    "v066_wasRemoved"             : "a été éliminé.",
+    "v067_changedParent"          : "hiérarchie modifiée, dernier parent:",
+    "v068_matchingHierarchies"    : "Hiérarchies correspondantes.",
+    "v069_exportedFile"           : "Fichier exporté:"
 
 }

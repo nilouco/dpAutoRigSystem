@@ -8,14 +8,16 @@ from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "CtrlsHierarchy"
-TITLE = "v060_expCtrlHierarchy"
-DESCRIPTION = "v061_expCtrlHierarchyDesc"
+CLASS_NAME = "ControlsHierarchy"
+TITLE = "v060_controlsHierarchy"
+DESCRIPTION = "v061_controlsHierarchyDesc"
 ICON = "/Icons/dp_controlsHierarchy.png"
 
-dpCtrlsHierarchy_Version = 1.0
+dpControlsHierarchy_Version = 1.0
 
-class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
+HIERARCHY_PATH = "dpData/dpHierarchy"
+
+class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -88,11 +90,11 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def logInfo(self, informationDictionary):
         for ctrl in informationDictionary:
             if informationDictionary[ctrl][0] == None:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v066_ctrlsHierarchy']} {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
             elif informationDictionary[ctrl][1] == None:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v067_ctrlsHierarchy']}")
+                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v066_wasRemoved']}")
             else:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v068_ctrlsHierarchy']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
 
     def compareHierarchy(self, originalHierarchy, newHierarchy):
         if originalHierarchy != newHierarchy:
@@ -100,7 +102,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             self.logInfo(infoDic)
             return False
         else:
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v069_ctrlsHierarchy'])
+            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v068_matchingHierarchies'])
             return True
 
     def changeIntVersionToString(self, int):
@@ -112,7 +114,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def lookForLastHierarchy(self):
         lastHierarchyFilePath = None
         currentPath = cmds.file(query=True, sceneName=True)
-        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHierarchy"
+        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+HIERARCHY_PATH
         if os.path.exists(dpHierarchyPath):
             if self.dpTeamFile:
                 lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
@@ -144,7 +146,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
 
     def exportCtlrsHierarchyToFile(self, dicToJson):
         currentPath = cmds.file(query=True, sceneName=True)
-        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+"dpData/dpHierarchy"
+        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+HIERARCHY_PATH
         finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}_h001.json"
         if os.path.exists(dpHierarchyPath):
             if self.dpTeamFile:
@@ -158,7 +160,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             os.mkdir(dpHierarchyPath)
         with open (finalSaveFilePath, "w") as json_file:
             json.dump(dicToJson, json_file)
-        self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v070_ctrlsHierarchy']} {finalSaveFilePath}")
+        self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v069_exportedFile']} {finalSaveFilePath}")
     
     def checkIfdpTeam(self):
         length = len(self.currentFileName)
@@ -188,11 +190,12 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         if self.dpTeamFile:
             self.currentFileName = self.currentFileName.replace("_v", "_h")
         
+        globalCtrl = dpUtils.getNodeByMessage("globalCtrl")
         # Verify if another Ctrl was sent via code to check hierarchy from.
         if objList and cmds.objExists(objList[0]) and self.checkNurbs(objList[0]):
             rootNode = objList[0]
-        elif cmds.objExists("Global_Ctrl") and self.checkNurbs("Global_Ctrl"):
-            rootNode = "Global_Ctrl"
+        elif cmds.objExists(globalCtrl) and self.checkNurbs(globalCtrl):
+            rootNode = globalCtrl
         else:
             self.checkedObjList.append(str(rootNode))
             self.foundIssueList.append(False)
@@ -210,7 +213,7 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             isHierarchySame = self.compareHierarchy(lastHierarchyDic, currentFileHierarchyDic)
             self.checkedObjList.append(lastHierarchyFilePath)
         else:
-            self.checkedObjList.append("Ctrls Hierarchy")
+            self.checkedObjList.append("Controls Hierarchy")
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v063_firstHierarchy'])
 
         if self.verifyMode:
@@ -232,8 +235,8 @@ class CtrlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
                 self.checkedObjList.append("Scene")
                 self.foundIssueList.append(True)
                 self.resultOkList.append(False)
-                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v064_ctrlsHierarchy'])
-                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v065_ctrlsHierarchy'])
+                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['v064_hierarchy'])
+                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
                 self.finishValidation()
                 return self.dataLogDic
             

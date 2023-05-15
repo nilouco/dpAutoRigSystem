@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-05-07",
+    "_updated"       : "2023-05-15",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -732,16 +732,15 @@
     "v051_showBPCleanerDesc"      : "Esse validador vai deletar ShowBP scriptNodes.",
     "v052_vaccineCleaner"         : "Vacina limpador",
     "v053_vaccineCleanerDesc"     : "Esse validador vai desinfectar o vírus da vacina.",
-    "v060_expCtrlHierarchy"       : "Hierarquia de Controles",
-    "v061_expCtrlHierarchyDesc"   : "Verifique se a hierarquia de controles corresponde\na um estado anterior exportado,\npara evitar perda de animação.",
+    "v061_controlsHierarchy"      : "Hierarquia de Controles",
+    "v061_controlsHierarchyDesc"  : "Verifique se a hierarquia de controles corresponde\na um estado anterior exportado,\npara evitar perda de animação.",
     "v062_globalMissing"          : "Global_Ctrl não encontrado.",
     "v063_firstHierarchy"         : "Essa é a primeira versão da hierarquia. OK.",
-    "v064_ctrlsHierarchy"         : "Não foi possível exportar hierarquia.",
-    "v065_ctrlsHierarchy"         : "Por favor salve sua cena antes de exportar a hierarquia.",
-    "v066_ctrlsHierarchy"         : "foi adicionado a hierarquia, filho de",
-    "v067_ctrlsHierarchy"         : "foi removido.",
-    "v068_ctrlsHierarchy"         : "mudou de hierarquia, último pai:",
-    "v069_ctrlsHierarchy"         : "Hierarquias iguais.",
-    "v070_ctrlsHierarchy"         : "Arquivo exportardo:"
+    "v064_hierarchy"              : "hierarquia.",
+    "v065_addedSonOf"             : "foi adicionado a hierarquia, filho de",
+    "v066_wasRemoved"             : "foi removido.",
+    "v067_changedParent"          : "mudou de hierarquia, último pai:",
+    "v068_matchingHierarchies"    : "Hierarquias iguais.",
+    "v069_exportedFile"           : "Arquivo exportado:"
 
 }
