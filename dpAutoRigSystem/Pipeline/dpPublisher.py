@@ -11,7 +11,7 @@ reload(dpPipeliner)
 reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.4
+DPPUBLISHER_VERSION = 1.5
 
 
 class Publisher(object):
@@ -362,6 +362,12 @@ class Publisher(object):
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
                                 print(self.langDic[self.langName][result])
+
+                    # publishing callback
+                    if self.pipeliner.pipeData['s_callback']:
+                        if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
+                            callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'])
+                            print("Callback result =", callbackResult)
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

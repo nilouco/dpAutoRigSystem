@@ -3,13 +3,15 @@ from maya import cmds
 from maya import mel
 from ..Modules.Library import dpUtils
 from urllib import request
+from importlib import reload
 import json
 import zipfile
 import shutil
 import os
+import sys
 
 
-DPPACKAGER_VERSION = 1.4
+DPPACKAGER_VERSION = 1.5
 
 
 RIGPREVIEW = "Rigging Preview"
@@ -264,3 +266,33 @@ class Packager(object):
                 return 'i088_internetFail'
         else:
             return 'i279_didntSend'
+
+
+    def toCallback(self, callbackPath, callbackFile, *args):
+        """ Just eval the Python callback object.
+            Call main method.
+            Returns its result.
+        """
+        print("callbacking path =", callbackPath)
+        print("callbacking file =", callbackFile)
+
+        # WIP
+        #import dpPublishCallback
+        if not callbackPath in sys.path:
+           sys.path.append(callbackPath)
+        print(sys.path)
+        #dpCallback = __import__(callbackFile)#, {}, {}, [callbackFile])
+        try:
+            dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
+            reload(dpCallback)
+            print(dpCallback)
+            print(dir(dpCallback))
+            callback = dpCallback.Callback()
+            print("returned =", callback)
+            result = callback.main()
+            print("result =", result)
+            return result
+        except:
+            pass
+
+
