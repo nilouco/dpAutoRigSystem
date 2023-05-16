@@ -15,6 +15,7 @@
     "BrokenNetCleaner"          : true,
     "ColorSetCleaner"           : true,
     "ControlsHierarchy"         : true,
+    "DisplayLayers"             : true,
     "ExitEditMode"              : true,
     "HideCorrectives"           : true,
     "HideDataGrp"               : true,
@@ -23,5 +24,6 @@
     "ResetPose"                 : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
+    "UnknownNodesCleaner"       : true,
     "WIPCleaner"                : true
 }
