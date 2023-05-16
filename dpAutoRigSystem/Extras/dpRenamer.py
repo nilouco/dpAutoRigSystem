@@ -60,7 +60,7 @@ class Renamer():
         fieldsLayout = cmds.columnLayout('fieldsLayout', adjustableColumn=True, width=150, parent=mainLayout)
         self.selectRB = cmds.radioButtonGrp('selectRB', labelArray2=[self.langDic[self.langName]["i266_selected"], self.langDic[self.langName]["m216_hierarchy"]], numberOfRadioButtons=2, select=self.selOption, changeCommand=self.changeSelOption, parent=fieldsLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
-        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.sequenceChange, value=False, parent=fieldsLayout)
+        self.sequenceCB = cmds.checkBox('sequenceCB', label=self.langDic[self.langName]['m220_sequence'], changeCommand=self.sequenceCBChange, value=False, parent=fieldsLayout)
         self.sequenceTFG = cmds.textFieldGrp('sequenceTFG', label=self.langDic[self.langName]['m222_name'], textChangedCommand=self.nameChange, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         self.startIFG = cmds.intFieldGrp('startIFG', label=self.langDic[self.langName]['c110_start'], changeCommand=self.refreshPreview, value1=self.start, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
         self.paddingIFG = cmds.intFieldGrp('paddingIFG', label=self.langDic[self.langName]['m221_padding'], changeCommand=self.refreshPreview, value1=self.padding, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 100)], adjustableColumn2=True, parent=fieldsLayout)
@@ -71,9 +71,9 @@ class Renamer():
         self.prefixTF = cmds.textField('prefixTF', textChangedCommand=self.prefixChange, parent=prePosLayout)
         self.suffixTF = cmds.textField('suffixTF', textChangedCommand=self.suffixChange, parent=prePosLayout)
         cmds.separator(style="single", height=20, parent=fieldsLayout)
-        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.searchReplaceChange, value=False, parent=fieldsLayout)
-        self.searchTFG = cmds.textFieldGrp('searchTFG', label=self.langDic[self.langName]['i036_from'], textChangedCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
-        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label=self.langDic[self.langName]['i037_to'], textChangedCommand=self.refreshPreview, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.searchReplaceCB = cmds.checkBox('searchReplaceCB', label=self.langDic[self.langName]['m218_search']+" - "+self.langDic[self.langName]['m219_replace'], changeCommand=self.searchReplaceCBChange, value=False, parent=fieldsLayout)
+        self.searchTFG = cmds.textFieldGrp('searchTFG', label=self.langDic[self.langName]['i036_from'], textChangedCommand=self.searchChange, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
+        self.replaceTFG = cmds.textFieldGrp('replaceTFG', label=self.langDic[self.langName]['i037_to'], textChangedCommand=self.searchChange, columnAlign=[(1, "right"), (2, "right")], columnWidth=[(1, 30), (2, 136)], adjustableColumn2=True, parent=fieldsLayout)
         # loaded items
         itemsLayout = cmds.columnLayout('itemsLayout', adjustableColumn=True, width=300, parent=mainLayout)
         cmds.text(label=self.langDic[self.langName]['m223_preview'], align="center", height=20, font="boldLabelFont", parent=itemsLayout)
@@ -90,28 +90,42 @@ class Renamer():
         cmds.showWindow(dpRenamerWin)
 
 
-    def sequenceChange(self, value, *args):
+    def setSequenceFieldsEnable(self, value, *args):
+        """
+        """
+        cmds.textFieldGrp(self.sequenceTFG, edit=True, enable=value)
+        cmds.intFieldGrp(self.startIFG, edit=True, enable=value)
+        cmds.intFieldGrp(self.paddingIFG, edit=True, enable=value)   
+
+
+    def setSearchReplaceFieldsEnable(self, value, *args):
+        """
+        """
+        cmds.textFieldGrp(self.searchTFG, edit=True, enable=value)
+        cmds.textFieldGrp(self.replaceTFG, edit=True, enable=value)
+
+
+    def sequenceCBChange(self, value, *args):
         """ Active or desactive the search and replace field because it doesn't work well with sequence field.
         """
-        setValue = True
         if value:
-            setValue = False
-        cmds.checkBox(self.searchReplaceCB, edit=True, enable=setValue)
-        cmds.textFieldGrp(self.searchTFG, edit=True, enable=setValue)
-        cmds.textFieldGrp(self.replaceTFG, edit=True, enable=setValue)
+            cmds.checkBox(self.searchReplaceCB, edit=True, value=False)
+            self.setSearchReplaceFieldsEnable(False)
+            self.setSequenceFieldsEnable(True)
+        else:
+            self.setSearchReplaceFieldsEnable(True)
         self.refreshPreview()
 
 
-    def searchReplaceChange(self, value, *args):
+    def searchReplaceCBChange(self, value, *args):
         """ Active or desactive the sequence field because it doesn't work well with search and replace field.
         """
-        setValue = True
         if value:
-            setValue = False
-        cmds.checkBox(self.sequenceCB, edit=True, enable=setValue)
-        cmds.textFieldGrp(self.sequenceTFG, edit=True, enable=setValue)
-        cmds.intFieldGrp(self.startIFG, edit=True, enable=setValue)
-        cmds.intFieldGrp(self.paddingIFG, edit=True, enable=setValue)
+            cmds.checkBox(self.sequenceCB, edit=True, value=False)
+            self.setSequenceFieldsEnable(False)
+            self.setSearchReplaceFieldsEnable(True)
+        else:
+            self.setSequenceFieldsEnable(True)
         self.refreshPreview()
 
 
@@ -120,9 +134,11 @@ class Renamer():
         """
         if value == "":
             cmds.checkBox(self.sequenceCB, edit=True, value=False)
+            self.setSearchReplaceFieldsEnable(True)
         else:
             cmds.checkBox(self.sequenceCB, edit=True, value=True)
-        self.sequenceChange(True)
+            cmds.checkBox(self.searchReplaceCB, edit=True, value=False)
+            self.setSearchReplaceFieldsEnable(False)
         self.refreshPreview()
 
 
@@ -143,6 +159,19 @@ class Renamer():
             cmds.checkBox(self.suffixCB, edit=True, value=False)
         else:
             cmds.checkBox(self.suffixCB, edit=True, value=True)
+        self.refreshPreview()
+
+
+    def searchChange(self, value, *args):
+        """ Set search checkbox on or of.
+        """
+        if value == "":
+            if cmds.textFieldGrp(self.searchTFG, query=True, text=True) == "":
+                cmds.checkBox(self.searchReplaceCB, edit=True, value=False)
+                self.setSequenceFieldsEnable(True)
+        else:
+            cmds.checkBox(self.searchReplaceCB, edit=True, value=True)
+            self.setSequenceFieldsEnable(False)
         self.refreshPreview()
 
 
@@ -286,6 +315,3 @@ class Renamer():
             # intFields
             cmds.intFieldGrp(self.startIFG, edit=True, value1=self.start)
             cmds.intFieldGrp(self.paddingIFG, edit=True, value1=self.padding)
-            # enables
-            self.sequenceChange(False)
-            self.searchReplaceChange(False)

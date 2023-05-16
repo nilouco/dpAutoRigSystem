@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.10"
-DPAR_UPDATELOG = "N588 - Added Hide Correctives controls\ncheckout validator."
+DPAR_VERSION_PY3 = "4.02.33"
+DPAR_UPDATELOG = "N100 - Added Renamer Extra tool."
 
 
 ###################### Start: Loading.
