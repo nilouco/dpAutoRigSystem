@@ -526,7 +526,7 @@ class Pipeliner(object):
                         self.pipeData['publishedWebhook'] = PUBLISHED_WEBHOOK
             # callback
             if not self.pipeData['s_callback']:
-                callback = os.path.join(self.pipeData['path'], self.callbackFile).replace("\\", "/")
+                callback = os.path.join(self.pipeData['path'], self.callbackFile)
                 if os.path.exists(callback):
                     self.pipeData['s_callback'] = callback
             if self.pipeData['s_callback']:

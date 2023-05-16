@@ -273,26 +273,14 @@ class Packager(object):
             Call main method.
             Returns its result.
         """
-        print("callbacking path =", callbackPath)
-        print("callbacking file =", callbackFile)
-
-        # WIP
         if not callbackPath in sys.path:
            sys.path.append(callbackPath)
-        print(sys.path)
-        #dpCallback = __import__(callbackFile)#, {}, {}, [callbackFile])
-        #import dpPublishCallback
         try:
+            #import dpPublishCallback
             dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
             reload(dpCallback)
-            print(dpCallback)
-            print(dir(dpCallback))
             callback = dpCallback.Callback()
-            print("returned =", callback)
             result = callback.main(data)
-            print("result =", result)
             return result
         except:
             pass
-
-
