@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.31"
-DPAR_UPDATELOG = "N577 - Added new validator to remove Unknown Nodes."
+DPAR_VERSION_PY3 = "4.02.32"
+DPAR_UPDATELOG = "N589 - Export controllers hierarchy."
 
 
 
