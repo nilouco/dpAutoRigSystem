@@ -19,7 +19,7 @@ class Renamer():
         self.langName = langName
         self.presetDic = presetDic
         self.presetName = presetName
-        self.selOption = 1 #Selection
+        self.selOption = 1 #Selected
         self.originalList, self.previewList = [], []
         self.addSequence = None
         self.addPrefix = None
@@ -53,7 +53,7 @@ class Renamer():
         # UI:
         renamerWidth = 530
         renamerHeight = 280
-        dpRenamerWin = cmds.window('dpRenamerWin', title=self.langDic[self.langName]['m214_renamer']+' - v'+DPRENAMER_VERSION, width=renamerWidth, height=renamerHeight, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpRenamerWin = cmds.window('dpRenamerWin', title=self.langDic[self.langName]['m214_renamer']+' - v'+DPRENAMER_VERSION, width=renamerWidth, height=renamerHeight, sizeable=False, minimizeButton=False, maximizeButton=False)
         # UI elements:
         mainLayout = cmds.rowColumnLayout('mainLayout', numberOfColumns=2, columnWidth=[(1, 200), (2, 200)], columnSpacing=[(1, 10), (2, 10)])
         # fields
@@ -130,7 +130,7 @@ class Renamer():
 
 
     def nameChange(self, value, *args):
-        """ Set sequence checkbox on or of.
+        """ Set sequence checkbox on or off.
         """
         if value == "":
             cmds.checkBox(self.sequenceCB, edit=True, value=False)
@@ -143,7 +143,7 @@ class Renamer():
 
 
     def prefixChange(self, value, *args):
-        """ Set prefix checkbox on or of.
+        """ Set prefix checkbox on or off.
         """
         if value == "":
             cmds.checkBox(self.prefixCB, edit=True, value=False)
@@ -153,7 +153,7 @@ class Renamer():
 
 
     def suffixChange(self, value, *args):
-        """ Set suffix checkbox on or of.
+        """ Set suffix checkbox on or off.
         """
         if value == "":
             cmds.checkBox(self.suffixCB, edit=True, value=False)
@@ -163,7 +163,7 @@ class Renamer():
 
 
     def searchChange(self, value, *args):
-        """ Set search checkbox on or of.
+        """ Set search checkbox on or off.
         """
         if value == "":
             if cmds.textFieldGrp(self.searchTFG, query=True, text=True) == "":
@@ -244,7 +244,8 @@ class Renamer():
                         previewDic[item] = self.sequenceName+str(self.start+i).zfill(self.padding)
                     # replace
                     if self.searchReplace:
-                        previewDic[item] = previewDic[item].replace(self.searchName, self.replaceName)
+                        if not self.searchName == "":
+                            previewDic[item] = previewDic[item].replace(self.searchName, self.replaceName)
                     if self.addPrefix:
                         previewDic[item] = self.prefixName+previewDic[item]
                     if self.addSuffix:
