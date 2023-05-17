@@ -27,17 +27,6 @@ class Pipeliner(object):
         self.declarePipelineAnnotation()
         
 
-    def checkSavedScene(self, *args):
-        """ Check if the current scene is saved to return True.
-            Otherwise return False.
-        """
-        scenePath = cmds.file(query=True, sceneName=True)
-        modifiedScene = cmds.file(query=True, modified=True)
-        if not scenePath or modifiedScene:
-            return False
-        return True
-
-
     def getJsonContent(self, jsonPath, *args):
         """ Open, read, close and return the json file content.
         """

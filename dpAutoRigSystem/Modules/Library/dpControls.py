@@ -1329,7 +1329,6 @@ class ControlClass(object):
         """ Mirror control shape by naming using prefixes to find nodes.
             Ask to mirror control shape of all controls if nothing is selected.
         """
-
         if not fromPrefix:
             fromPrefix = cmds.textField(self.dpUIinst.allUIs["fromPrefixShapeTF"], query=True, text=True)
             toPrefix = cmds.textField(self.dpUIinst.allUIs["toPrefixShapeTF"], query=True, text=True)

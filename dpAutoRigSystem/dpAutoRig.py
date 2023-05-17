@@ -629,7 +629,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["toPrefixShapeT"] = cmds.text("toPrefixShapeT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeTF"] = cmds.textField('toPrefixShapeTF', text=self.langDic[self.langName]['p003_right']+"_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.resetMirrorShape, parent=self.allUIs["mirrorShapeLayout"])
-
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
                         attachForm=[(self.allUIs["controlMainLayout"], 'top', 20), (self.allUIs["controlMainLayout"], 'left', 5), (self.allUIs["controlMainLayout"], 'right', 5), (self.allUIs["controlMainLayout"], 'bottom', 5)]
@@ -643,7 +642,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["extraMainLayout"] = cmds.scrollLayout("extraMainLayout", parent=self.allUIs["extraTabLayout"])
         self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
         self.extraModuleList = self.startGuideModules(EXTRAS, "start", "extraLayout")
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["extraTabLayout"], edit=True,
                         attachForm=[(self.allUIs["extraMainLayout"], 'top', 20), (self.allUIs["extraMainLayout"], 'left', 5), (self.allUIs["extraMainLayout"], 'right', 5), (self.allUIs["extraMainLayout"], 'bottom', 5)]

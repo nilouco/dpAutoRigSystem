@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-05-11",
+    "_updated"    : "2023-05-15",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
@@ -14,6 +14,7 @@
 
     "BrokenNetCleaner"          : false,
     "ColorSetCleaner"           : false,
+    "ControlsHierarchy"         : false,
     "DisplayLayers"             : false,
     "ExitEditMode"              : false,
     "HideCorrectives"           : false,
@@ -25,4 +26,5 @@
     "TargetCleaner"             : false,
     "UnknownNodesCleaner"       : false,
     "WIPCleaner"                : false
+
 }

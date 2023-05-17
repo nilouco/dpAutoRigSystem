@@ -151,7 +151,8 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvSpecularLoc = self.guideName+"_SpecularLoc"
         cmds.setAttr(self.moduleGrp+".specular", cmds.checkBox(self.specCB, query=True, value=True))
         cmds.setAttr(self.cvSpecularLoc+".visibility", cmds.checkBox(self.specCB, query=True, value=False))
-        
+
+
     def changeLidPivot(self, *args):
         """ Set the attribute value for eyelid center pivot.
         """
@@ -536,6 +537,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.guide = side+self.userGuideName+"_Guide_JointLoc1"
                 self.cvEndJointZero = side+self.userGuideName+"_Guide_JointEnd_Grp"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                self.cvSpecularLoc = side+self.userGuideName+"_Guide_SpecularLoc"
                 # create a joint:
                 self.jxt = cmds.joint(name=side+self.userGuideName+"_1_Jxt", scaleCompensate=False)
                 self.subJnt = cmds.joint(name=side+self.userGuideName+"_1_Sub_Jxt", scaleCompensate=False)

@@ -72,7 +72,7 @@ class Publisher(object):
         self.ui = True
         dpUtils.closeUI('dpSuccessPublishedWindow')
         dpUtils.closeUI('dpPublisherWindow')
-        savedScene = self.pipeliner.checkSavedScene()
+        savedScene = dpUtils.checkSavedScene()
         if not savedScene:
             savedScene = self.userSaveThisScene()
         if savedScene:
