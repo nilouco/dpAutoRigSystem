@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.33"
-DPAR_UPDATELOG = "N100 - Added Renamer Extra tool."
+DPAR_VERSION_PY3 = "4.02.34"
+DPAR_UPDATELOG = "N663 - Publish callback."
 
 
 
@@ -1924,6 +1924,7 @@ class DP_AutoRig_UI(object):
             infoData['user'] = getpass.getuser()
             infoData['host'] = socket.gethostname()
             infoData['os'] = platform.system()
+            infoData['lang'] = self.langName
             infoData['Maya'] = cmds.about(version=True)
             infoData['dpAR'] = DPAR_VERSION_PY3
             #print(infoData)

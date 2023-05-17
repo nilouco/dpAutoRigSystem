@@ -442,6 +442,7 @@
     "i281_termsCond"       : "Terms and Conditions",
     "i282_termsCondDesc"   : "Welcome to the Terms and Conditions\nof this open source Maya rigging script,\nprovided as a free tool to assist the community.\nBy utilizing this tool, the user agrees to strive\nfor a high-quality rig and to always\nshow respect to other professionals. We believe\nin creating a beautiful and harmonious world\nin which to work and live. This tool is\navailable for personal, educational, or professional use.\nPlease note that for statistical purposes,\ncertain information may be collected, such as geolocation,\nfile name, computer or user name, for example.\nHowever, this information will never be shared\nwith third parties and will solely\nbe used to improve the functionality of the tool.\nThank you for using our rigging tool,\nand we hope it assists you in creating even better work.",
     "i283_pivot"           : "Pivot",
+    "i284_sCallbackAnn"    : "Callback this Python code init method after\nfinish the publishing.\nIt's useful to run next process in the pipeline.",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

@@ -7,7 +7,7 @@ from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.5
+DPPIPELINER_VERSION = 1.6
 
 PIPE_FOLDER = "_dpPipeline"
 PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1104147293478846555/3IdA5ipiG-nqpv1dfg6Q4zWt-Oo-q-EtUisq5z9UpsroW07-NMLTrjJNzAibkUD48TZX"
@@ -22,6 +22,7 @@ class Pipeliner(object):
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.webhookFile = "dpWebhook.json"
+        self.callbackFile = "dpPublishCallback.py"
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
         
@@ -96,7 +97,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-05-01",
+        "updated" : "2023-05-14",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -110,6 +111,7 @@ class Pipeliner(object):
         "s_old"        : "dpOld",
         "s_dropbox"    : "Job",
         "s_webhook"    : "",
+        "s_callback"   : "",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
@@ -188,7 +190,8 @@ class Pipeliner(object):
         "b_i_date"     : "i263_biDateAnn",
         "b_i_degrade"  : "i264_biDegradeAnn",
         "s_webhook"    : "i277_sWebhookAnn",
-        "b_discord"    : "i278_bDiscordAnn"
+        "b_discord"    : "i278_bDiscordAnn",
+        "s_callback"   : "i284_sCallbackAnn"
         }
 
 
@@ -465,6 +468,7 @@ class Pipeliner(object):
         self.pipeData['historyPath'] = None
         self.pipeData['dropboxPath'] = None
         self.pipeData['publishedWebhook'] = None
+        self.pipeData['callback'] = None
         # mount paths
         if self.pipeData['publishPath']:
             # send to client path
@@ -509,3 +513,12 @@ class Pipeliner(object):
                             self.pipeData['publishedWebhook'] = content['webhook']
                     else:
                         self.pipeData['publishedWebhook'] = PUBLISHED_WEBHOOK
+            # callback
+            if not self.pipeData['s_callback']:
+                callback = os.path.join(self.pipeData['path'], self.callbackFile)
+                if os.path.exists(callback):
+                    self.pipeData['s_callback'] = callback
+            if self.pipeData['s_callback']:
+                callback = self.pipeData['s_callback'].replace("\\", "/")
+                self.pipeData['callbackPath'] = callback[:callback.rfind("/")]
+                self.pipeData['callbackFile'] = callback[callback.rfind("/")+1:-3]
