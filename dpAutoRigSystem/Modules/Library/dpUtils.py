@@ -996,6 +996,7 @@ def generateID(name):
         word = ("dp"+str(name)).encode('utf-8').hex()
         return word+"."+now
 
+
 def checkSavedScene():
     """ Check if the current scene is saved to return True.
         Otherwise return False.
