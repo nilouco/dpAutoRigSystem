@@ -11,7 +11,7 @@ reload(dpPipeliner)
 reload(dpPackager)
 
 
-DPPUBLISHER_VERSION = 1.2
+DPPUBLISHER_VERSION = 1.4
 
 
 class Publisher(object):
@@ -72,7 +72,7 @@ class Publisher(object):
         self.ui = True
         dpUtils.closeUI('dpSuccessPublishedWindow')
         dpUtils.closeUI('dpPublisherWindow')
-        savedScene = self.pipeliner.checkSavedScene()
+        savedScene = dpUtils.checkSavedScene()
         if not savedScene:
             savedScene = self.userSaveThisScene()
         if savedScene:
@@ -338,11 +338,6 @@ class Publisher(object):
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
                     cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
 
-                    # organize old published files
-                    if self.assetNameList:
-                        self.pipeliner.makeDirIfNotExists(self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
-                        self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
-
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
                         progressAmount += 1
@@ -358,6 +353,15 @@ class Publisher(object):
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
+                        # organize old published files
+                        if self.assetNameList:
+                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        # discord
+                        if self.pipeliner.pipeData['b_discord']:
+                            messageText = publishLog["Scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["Comment"]+"*"
+                            result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
+                            if result: #error
+                                print(self.langDic[self.langName][result])
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

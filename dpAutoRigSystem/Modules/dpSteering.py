@@ -47,7 +47,7 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
@@ -141,15 +141,15 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # zeroOut controls:
                 zeroOutCtrlGrpList = dpUtils.zeroOut([self.steeringCtrl, self.mainCtrl])
                 # hide visibility attribute:
-                self.ctrls.setLockHide([self.steeringCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v'])
+                self.ctrls.setLockHide([self.steeringCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 # fixing flip mirror:
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleX", -1)
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrpList[0]+".scaleZ", -1)
-                cmds.addAttr(self.steeringCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                cmds.setAttr(self.steeringCtrl+".scaleCompensate", 1, channelBox=True)
+                cmds.addAttr(self.steeringCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                cmds.setAttr(self.steeringCtrl+".scaleCompensate", channelBox=True)
                 cmds.connectAttr(self.steeringCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 # integrating setup:
                 cmds.addAttr(self.steeringCtrl, longName=self.langDic[self.langName]['c071_limit'], defaultValue=500, attributeType="float", keyable=False)

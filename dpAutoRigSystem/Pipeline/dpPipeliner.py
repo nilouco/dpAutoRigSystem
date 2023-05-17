@@ -7,9 +7,10 @@ from functools import partial
 from ..Modules.Library import dpUtils
 
 
-DPPIPELINER_VERSION = 1.3
+DPPIPELINER_VERSION = 1.5
 
 PIPE_FOLDER = "_dpPipeline"
+PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1104147293478846555/3IdA5ipiG-nqpv1dfg6Q4zWt-Oo-q-EtUisq5z9UpsroW07-NMLTrjJNzAibkUD48TZX"
 
 
 class Pipeliner(object):
@@ -20,20 +21,10 @@ class Pipeliner(object):
         self.today = time.strftime("%Y-%m-%d", time.localtime())
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
+        self.webhookFile = "dpWebhook.json"
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
         
-
-    def checkSavedScene(self, *args):
-        """ Check if the current scene is saved to return True.
-            Otherwise return False.
-        """
-        scenePath = cmds.file(query=True, sceneName=True)
-        modifiedScene = cmds.file(query=True, modified=True)
-        if not scenePath or modifiedScene:
-            return False
-        return True
-
 
     def getJsonContent(self, jsonPath, *args):
         """ Open, read, close and return the json file content.
@@ -105,7 +96,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2023-03-26",
+        "updated" : "2023-05-01",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -118,6 +109,7 @@ class Pipeliner(object):
         "s_hist"       : "dpData/dpHist",
         "s_old"        : "dpOld",
         "s_dropbox"    : "Job",
+        "s_webhook"    : "",
         "s_prefix"     : "",
         "s_middle"     : "_rig_v",
         "s_suffix"     : "",
@@ -133,6 +125,7 @@ class Pipeliner(object):
         "b_archive"    : True,
         "b_zip"        : True,
         "b_cloud"      : True,
+        "b_discord"    : True,
         "b_imager"     : True,
         "b_i_maya"     : True,
         "b_i_version"  : True,
@@ -155,7 +148,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2023-02-09",
+        "updated" : "2023-05-01",
         
         "f_drive"      : "i228_fDriveAnn",
         "f_studio"     : "i229_fStudioAnn",
@@ -193,7 +186,9 @@ class Pipeliner(object):
         "b_i_wip"      : "i261_biRigAnn",
         "b_i_publish"  : "i262_biPublishAnn",
         "b_i_date"     : "i263_biDateAnn",
-        "b_i_degrade"  : "i264_biDegradeAnn"
+        "b_i_degrade"  : "i264_biDegradeAnn",
+        "s_webhook"    : "i277_sWebhookAnn",
+        "b_discord"    : "i278_bDiscordAnn"
         }
 
 
@@ -469,6 +464,7 @@ class Pipeliner(object):
         self.pipeData['toClientPath'] = None
         self.pipeData['historyPath'] = None
         self.pipeData['dropboxPath'] = None
+        self.pipeData['publishedWebhook'] = None
         # mount paths
         if self.pipeData['publishPath']:
             # send to client path
@@ -499,4 +495,17 @@ class Pipeliner(object):
 #                                self.pipeData['dropInfoHost'] = content[list(content)[0]]['host']
                                 self.pipeData['dropboxPath'] = self.pipeData['dropInfoPath']+"/"+self.pipeData['s_dropbox']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                                 self.makeDirIfNotExists(self.pipeData['dropboxPath'])
-            # old 
+            # old
+            self.makeDirIfNotExists(self.pipeData['publishPath']+"/"+self.pipeData['s_old'])
+            # discord
+            if self.pipeData['b_discord']:
+                if self.pipeData['s_webhook']:
+                    self.pipeData['publishedWebhook'] = self.pipeData['s_webhook']
+                else: 
+                    self.jsonWebhookPath = os.path.join(self.pipeData['path'], self.webhookFile).replace("\\", "/")
+                    if os.path.exists(self.jsonWebhookPath):
+                        content = self.getJsonContent(self.jsonWebhookPath)
+                        if content:
+                            self.pipeData['publishedWebhook'] = content['webhook']
+                    else:
+                        self.pipeData['publishedWebhook'] = PUBLISHED_WEBHOOK

@@ -1,19 +1,18 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "HideDataGrp"
-TITLE = "v028_hideDataGrp"
-DESCRIPTION = "v029_hideDataGrpDesc"
-ICON = "/Icons/dp_hideDataGrp.png"
+CLASS_NAME = "UnknownNodesCleaner"
+TITLE = "v058_unknownNodesCleaner"
+DESCRIPTION = "v059_unknownNodesCleanerDesc"
+ICON = "/Icons/dp_unknownNodesCleaner.png"
 
-dpHideDataGrp_Version = 1.0
+dpUnknownNodesCleaner_Version = 1.0
 
-class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
+class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -37,37 +36,36 @@ class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.startValidation()
         
+        
+
         # ---
         # --- validator code --- beginning
-        dataGrp = None
         if objList:
-            dataGrp = objList[0]
+            toCheckList = objList
         else:
-            dataGrp = dpUtils.getNodeByMessage("dataGrp")
-            if not dataGrp:
-                if cmds.objExists("Data_Grp"):
-                    dataGrp = "Data_Grp"
-        if dataGrp:
-            if self.verbose:
-                # Update progress window
-                cmds.progressWindow(edit=True, maxValue=1, progress=1, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(1)))
-            self.checkedObjList.append(dataGrp)
-            visibilityStatus = cmds.getAttr(dataGrp+".visibility")
-            if visibilityStatus:
+            toCheckList = cmds.ls(selection=False, type='unknown')
+        if toCheckList:
+            progressAmount = 0
+            maxProcess = len(toCheckList)
+            for item in toCheckList:
+                if self.verbose:
+                    # Update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                # conditional to check here
+                self.checkedObjList.append(item)
                 self.foundIssueList.append(True)
                 if self.verifyMode:
                     self.resultOkList.append(False)
                 else: #fix
                     try:
-                        cmds.setAttr(dataGrp+".visibility", 0)
+                        if cmds.objExists(item):
+                            cmds.delete(item)
                         self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+dataGrp)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
                     except:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+dataGrp)
-            else:
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
+                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
@@ -75,6 +73,8 @@ class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
             self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
         # --- validator code --- end
         # ---
+
+
 
         # finishing
         self.finishValidation()

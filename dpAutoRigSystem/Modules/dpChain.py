@@ -64,7 +64,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
@@ -311,7 +311,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
                     cmds.addAttr(self.toParentExtremCtrl, longName=self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
                     cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName="active"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="bool", defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.langDic[self.langName]['c118_active']+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
                     cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
                     if s == 1:
@@ -478,9 +478,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(self.ikCtrlLast+".scaleZ", self.ikJointList[-2]+".scaleZ", force=True)
                     elif not c == 0:
                         if c == 2:
-                            self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "sx", "sy", "sz", "v"])
+                            self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "sx", "sy", "sz", "v", "ro"])
                         else:
-                            self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v"])
+                            self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v", "ro"])
                     else: #first
                         cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])

@@ -23,6 +23,7 @@ DPAR_VERSION_PY3 = "4.02.33"
 DPAR_UPDATELOG = "N100 - Added Renamer Extra tool."
 
 
+
 ###################### Start: Loading.
 
 import os
@@ -65,6 +66,8 @@ try:
     import datetime
     import io
     import sys
+    import socket
+    import platform
     from maya import mel
     from functools import partial
     from .Modules.Library import dpUtils
@@ -77,6 +80,7 @@ try:
     from .Languages.Translator import dpTranslator
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
+    from .Pipeline import dpPackager
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
@@ -85,6 +89,7 @@ try:
     reload(dpLayoutClass)
     reload(dpPublisher)
     reload(dpPipeliner)
+    reload(dpPackager)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -135,6 +140,8 @@ DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
+LOCATION_WEBHOOK = "https://discord.com/api/webhooks/1104146750085812335/WPY3GD8J9ooEyUfDaGGjLBxT43l7meG7rINKtAApo0NTfeajvYw_uKeEz2vS-ypr_Uhm"
+LOCATION_URL = "https://ipinfo.io/json"
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
 DPSHAPE = "dpShape"
@@ -164,12 +171,14 @@ class DP_AutoRig_UI(object):
         self.checkAddOnsInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
-        self.userDefAutoCheckUpdate = 0
+        self.userDefAutoCheckUpdate = 1
+        self.userDefAgreeTerms = 1
         self.dpData = DPDATA
         self.dpShape = DPSHAPE
         self.dpLog = DPLOG
         self.optionCtrl = None
         self.pipeliner = dpPipeliner.Pipeliner()
+        self.packager = dpPackager.Packager()
         
         try:
             # store all UI elements in a dictionary:
@@ -255,6 +264,7 @@ class DP_AutoRig_UI(object):
             cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
             cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
             cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+            cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
             cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
             cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
             
@@ -266,8 +276,9 @@ class DP_AutoRig_UI(object):
             self.mainUI()
 
             # check if we need to automatically check for update:
-            self.autoCheckUpdate()
-        
+            self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
+            # also check for agreement of terms and conditions
+            self.autoCheckOptionVar("dpAutoRigAgreeTermsCond", "dpAutoRigLastDateAgreeTermsCond", "terms")
 
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
@@ -275,7 +286,6 @@ class DP_AutoRig_UI(object):
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
             return
-        
         
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
@@ -618,8 +628,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["fromPrefixShapeTF"] = cmds.textField('fromPrefixShapeTF', text=self.langDic[self.langName]['p002_left']+"_", parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeT"] = cmds.text("toPrefixShapeT", label=self.langDic[self.langName]['i037_to'], parent=self.allUIs["mirrorShapeLayout"])
         self.allUIs["toPrefixShapeTF"] = cmds.textField('toPrefixShapeTF', text=self.langDic[self.langName]['p003_right']+"_", parent=self.allUIs["mirrorShapeLayout"])
-        self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.mirrorShape, parent=self.allUIs["mirrorShapeLayout"])
-
+        self.allUIs["mirrorShapeButton"] = cmds.button("mirrorShapeButton", label=self.langDic[self.langName]['m010_mirror'], backgroundColor=(1.0, 0.5, 0.5), height=30, width=70, command=self.ctrls.resetMirrorShape, parent=self.allUIs["mirrorShapeLayout"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["controlTabLayout"], edit=True,
                         attachForm=[(self.allUIs["controlMainLayout"], 'top', 20), (self.allUIs["controlMainLayout"], 'left', 5), (self.allUIs["controlMainLayout"], 'right', 5), (self.allUIs["controlMainLayout"], 'bottom', 5)]
@@ -633,7 +642,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["extraMainLayout"] = cmds.scrollLayout("extraMainLayout", parent=self.allUIs["extraTabLayout"])
         self.allUIs["extraLayout"] = cmds.columnLayout("extraLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["extraMainLayout"])
         self.extraModuleList = self.startGuideModules(EXTRAS, "start", "extraLayout")
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["extraTabLayout"], edit=True,
                         attachForm=[(self.allUIs["extraMainLayout"], 'top', 20), (self.allUIs["extraMainLayout"], 'left', 5), (self.allUIs["extraMainLayout"], 'right', 5), (self.allUIs["extraMainLayout"], 'bottom', 5)]
@@ -1009,7 +1017,7 @@ class DP_AutoRig_UI(object):
                         transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
                         if transformNameList:
                             # do not add ribbon nurbs plane to the list:
-                            if not cmds.objExists(transformNameList[0]+".doNotSkinIt"):
+                            if not cmds.objExists(transformNameList[0]+".dpDoNotSkinIt"):
                                 if not transformNameList[0] in geomList:
                                     if chooseGeom == "allGeoms":
                                         geomList.append(transformNameList[0])
@@ -1438,7 +1446,7 @@ class DP_AutoRig_UI(object):
             for n, name in enumerate(namespaceList):
                 if name != "UI" and name != "shared":
                     if name.count(":") > 0:
-                        if name.find("__dpAR_"):
+                        if name.find("_dpAR_") != -1:
                             if askUser:
                                 # open dialog to confirm merge namespaces:
                                 yesTxt = self.langDic[self.langName]['i071_yes']
@@ -1849,41 +1857,100 @@ class DP_AutoRig_UI(object):
         """ Set the optionVar for auto check update preference as stored userDefAutoCheckUpdate read variable.
         """
         cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', int(currentValue)))
+        self.userDefAutoCheckUpdate = currentValue
+
+
+    def setAutoCheckAgreePref(self, currentValue, *args):
+        """ Set the optionVar for auto check agree terms and conditions preference as stored userDefAgreeTerms read variable.
+        """
+        cmds.optionVar(intValue=('dpAutoRigAgreeTermsCond', int(currentValue)))
+        self.userDefAgreeTerms = currentValue
     
     
-    def autoCheckUpdate(self, *args):
-        """ Store user choose about automatically check for update in an optionVar.
-            If active, try to check for update once a day.
+    def autoCheckOptionVar(self, checkOptVar,  lastDateOptVar, mode, *args):
+        """ Store user choose about automatically check for update or agree terms and conditions in an optionVar.
+            If active, try to check for update or location once a day.
         """
         firstTimeOpenDPAR = False
-        # verify if there is an optionVar of last autoCheckUpdate checkBox choose value by user in the maya system:
-        autoCheckUpdateExists = cmds.optionVar(exists='dpAutoRigAutoCheckUpdate')
-        if not autoCheckUpdateExists:
-            cmds.optionVar(intValue=('dpAutoRigAutoCheckUpdate', 1))
+        # verify if there is an optionVar of last optionVar checkBox choose value by user in the maya system:
+        autoCheckExists = cmds.optionVar(exists=checkOptVar)
+        if not autoCheckExists:
+            cmds.optionVar(intValue=(checkOptVar, 1))
             firstTimeOpenDPAR = True
         
-        # get its value puting in a variable userDefAutoCheckUpdate:
-        self.userDefAutoCheckUpdate = cmds.optionVar(query='dpAutoRigAutoCheckUpdate')
-        if self.userDefAutoCheckUpdate == 1:
-            # verify if there is an optionVar for store the date of the lastest autoCheckUpdate ran in order to avoid many hits in the GitHub server:
+        # get its value puting in a self variable:
+        optVarValue = cmds.optionVar(query=checkOptVar)
+        if mode == "update":
+            self.userDefAutoCheckUpdate = optVarValue
+        else: #terms
+            self.userDefAgreeTerms = optVarValue
+        if optVarValue == 1:
+            # verify if there is an optionVar for store the date of the lastest optionVar ran in order to avoid many hits in the GitHub server:
             todayDate = str(datetime.datetime.now().date())
-            lastAutoCheckUpdateExists = cmds.optionVar(exists='dpAutoRigLastDateAutoCheckUpdate')
-            if not lastAutoCheckUpdateExists:
-                cmds.optionVar(stringValue=('dpAutoRigLastDateAutoCheckUpdate', todayDate))
-            # get its value puting in a variable userDefAutoCheckUpdate:
-            lastDateAutoCheckUpdate = cmds.optionVar(query='dpAutoRigLastDateAutoCheckUpdate')
-            if not lastDateAutoCheckUpdate == todayDate:
-                # then check for update:
-                self.checkForUpdate(verbose=False)
-                cmds.optionVar(stringValue=('dpAutoRigLastDateAutoCheckUpdate', todayDate))
+            lastAutoCheckExists = cmds.optionVar(exists=lastDateOptVar)
+            if not lastAutoCheckExists:
+                cmds.optionVar(stringValue=(lastDateOptVar, todayDate))
+            # get its value puting in a variable:
+            lastDateAutoCheck = cmds.optionVar(query=lastDateOptVar)
+            if not lastDateAutoCheck == todayDate:
+                cmds.optionVar(stringValue=(lastDateOptVar, todayDate))
+                if mode == "update":
+                    self.checkForUpdate(verbose=False)
+                else: # agree terms and cond
+                    self.getLocalData()
         
         # force checkForUpdate if it's the first time openning the dpAutoRigSystem in this computer:
         if firstTimeOpenDPAR:
-            self.checkForUpdate(verbose=True)
-        
-        
+            if mode == "update":
+                self.checkForUpdate(verbose=True)
+            else: #terms
+                self.checkTermsAndCond()
+
     
+    def getLocalData(self, *args):
+        """ Collect info for statistical purposes.
+        """
+        locDic = False
+        try:
+            locResponse = urllib.request.urlopen(LOCATION_URL)
+            locDic = json.loads(locResponse.read())
+        except:
+            pass
+        if locDic:
+            infoData = {}
+            infoData['country'] = locDic['country']
+            infoData['region'] = locDic['region']
+            infoData['city'] = locDic['city']
+            infoData['user'] = getpass.getuser()
+            infoData['host'] = socket.gethostname()
+            infoData['os'] = platform.system()
+            infoData['Maya'] = cmds.about(version=True)
+            infoData['dpAR'] = DPAR_VERSION_PY3
+            #print(infoData)
+            if infoData:
+                self.packager.toDiscord(LOCATION_WEBHOOK, str(infoData))
+
     
+    def checkTermsAndCond(self, *args):
+        """ Create a window to ask user if agree to terms and conditions.
+        """
+        terms_winWidth  = 205
+        terms_winHeight = 200
+        # creating Terms and Conditions Window:
+        if cmds.window('dpTermsCondWindow', query=True, exists=True):
+            cmds.deleteUI('dpTermsCondWindow', window=True)
+        dpTermsCondWin = cmds.window('dpTermsCondWindow', title='dpAutoRigSystem - '+self.langDic[self.langName]['i281_termsCond'], iconName='dpInfo', widthHeight=(terms_winWidth, terms_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        termsLayout = cmds.columnLayout('termsLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpTermsCondWin)
+        cmds.text("\n"+self.langDic[self.langName]['i282_termsCondDesc'], align="center", parent=termsLayout)
+        # agreement:
+        cmds.separator(height=30)
+        self.autoCheckTermsCondCB = cmds.checkBox('autoCheckTermsCondCB', label=self.langDic[self.langName]['i280_iAgreeTermsCond'], align="left", value=self.userDefAgreeTerms, changeCommand=self.setAutoCheckAgreePref, parent=termsLayout)
+        cmds.separator(height=30)
+        # call window:
+        cmds.showWindow(dpTermsCondWin)
+
+
     ###################### End: UI
     
     
@@ -2625,7 +2692,7 @@ class DP_AutoRig_UI(object):
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
-                                cmds.addAttr(self.optionCtrl, longName=actVVAttr, attributeType="bool", defaultValue=True, keyable=True)
+                                cmds.addAttr(self.optionCtrl, longName=actVVAttr, attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+actVVAttr, hipsA+'.'+actVVAttr)
                                 cmds.setAttr(hipsA+'.'+actVVAttr, keyable=False)
                                 cmds.connectAttr(self.masterCtrl+'.scaleX', hipsA+'.'+mScaleVVAttr)

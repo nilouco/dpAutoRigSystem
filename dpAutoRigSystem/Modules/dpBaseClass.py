@@ -305,7 +305,10 @@ class StartClass(object):
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
                     for calibrateAttr in calibratePresetList[i].keys():
-                        cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr]*self.ctrlRadius)
+                        if "calibrateT" in calibrateAttr:
+                            cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr]*self.ctrlRadius)
+                        else:
+                            cmds.setAttr(jcrCtrl+"."+calibrateAttr, calibratePresetList[i][calibrateAttr])
                     if invertList:
                         invertAttrList = invertList[i]
                         if invertAttrList:

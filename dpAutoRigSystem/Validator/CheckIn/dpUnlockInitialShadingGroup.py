@@ -1,19 +1,18 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 from importlib import reload
 reload(dpBaseValidatorClass)
 
 # global variables to this module:    
-CLASS_NAME = "HideDataGrp"
-TITLE = "v028_hideDataGrp"
-DESCRIPTION = "v029_hideDataGrpDesc"
-ICON = "/Icons/dp_hideDataGrp.png"
+CLASS_NAME = "UnlockInitialShadingGroup"
+TITLE = "v048_unlockIniShadGrp"
+DESCRIPTION = "v049_unlockIniShadGrpDesc"
+ICON = "/Icons/dp_unlockInitialShadingGroup.png"
 
-dpHideDataGrp_Version = 1.0
+dpUnlockInitialShadingGroup_Version = 1.0
 
-class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
+class UnlockInitialShadingGroup(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -39,35 +38,36 @@ class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
         
         # ---
         # --- validator code --- beginning
-        dataGrp = None
         if objList:
-            dataGrp = objList[0]
+            toCheckList = objList
         else:
-            dataGrp = dpUtils.getNodeByMessage("dataGrp")
-            if not dataGrp:
-                if cmds.objExists("Data_Grp"):
-                    dataGrp = "Data_Grp"
-        if dataGrp:
-            if self.verbose:
-                # Update progress window
-                cmds.progressWindow(edit=True, maxValue=1, progress=1, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(1)))
-            self.checkedObjList.append(dataGrp)
-            visibilityStatus = cmds.getAttr(dataGrp+".visibility")
-            if visibilityStatus:
-                self.foundIssueList.append(True)
-                if self.verifyMode:
-                    self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        cmds.setAttr(dataGrp+".visibility", 0)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+dataGrp)
-                    except:
-                        self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+dataGrp)
-            else:
-                self.foundIssueList.append(False)
-                self.resultOkList.append(True)
+            toCheckList = ["initialShadingGroup"]
+        if toCheckList:
+            progressAmount = 0
+            maxProcess = len(toCheckList)
+            for item in toCheckList:
+                if self.verbose:
+                    # Update progress window
+                    progressAmount += 1
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                if cmds.objExists(item):
+                    if item == "initialShadingGroup":
+                        # conditional to check here
+                        if cmds.lockNode(item, query=True, lockUnpublished=True):
+                            if cmds.getAttr(item+".nodeState", lock=True):
+                                self.checkedObjList.append(item)
+                                self.foundIssueList.append(True)
+                                if self.verifyMode:
+                                    self.resultOkList.append(False)
+                                else: #fix
+                                    try:
+                                        cmds.lockNode(item, lock=False, lockUnpublished=False)
+                                        cmds.setAttr(item+".nodeState", lock=False)
+                                        self.resultOkList.append(True)
+                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
+                                    except:
+                                        self.resultOkList.append(False)
+                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
         else:
             self.checkedObjList.append("")
             self.foundIssueList.append(False)

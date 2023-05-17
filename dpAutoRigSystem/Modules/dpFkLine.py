@@ -53,7 +53,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvJointLoc, self.moduleGrp)
         cmds.parent(self.jGuideEnd, self.jGuide1)
@@ -220,8 +220,8 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleX", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
-                    cmds.addAttr(self.jntCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                    cmds.setAttr(self.jntCtrl+".scaleCompensate", 1, channelBox=True)
+                    cmds.addAttr(self.jntCtrl, longName='scaleCompensate', attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=False)
+                    cmds.setAttr(self.jntCtrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(self.jntCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
                         dpUtils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)

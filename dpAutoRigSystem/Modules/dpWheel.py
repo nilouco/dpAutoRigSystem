@@ -65,7 +65,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(cvFrontLocPosNode+".input1D[0]", -0.5)
         cmds.connectAttr(radiusCtrl+".translateX", cvFrontLocPosNode+".input1D[1]")
         cmds.connectAttr(cvFrontLocPosNode+".output1D", self.cvFrontLoc+".tx")
-        self.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvCenterLoc, self.cvFrontLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         self.cvInsideLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_InsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvInsideLoc, self.cvCenterLoc)
@@ -77,7 +77,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(inverseRadius+".input2X", -1)
         cmds.connectAttr(radiusCtrl+".translateX", inverseRadius+".input1X")
         cmds.connectAttr(inverseRadius+".outputX", self.cvInsideLoc+".translateY")
-        self.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvInsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         self.cvOutsideLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_OutsideLoc", r=0.2, d=1, guide=True)
         cmds.parent(self.cvOutsideLoc, self.cvCenterLoc)
@@ -86,7 +86,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.jGuideOutside+".template", 1)
         cmds.transformLimits(self.cvOutsideLoc, tz=(-1, 0.01), etz=(False, True))
         cmds.connectAttr(inverseRadius+".outputX", self.cvOutsideLoc+".translateY")
-        self.ctrls.setLockHide([self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvOutsideLoc], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         
         cmds.parent(self.cvCenterLoc, self.moduleGrp)
         cmds.parent(self.jGuideFront, self.jGuideInside, self.jGuideOutside, self.jGuideCenter)
@@ -253,15 +253,15 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(zeroOutGrp+".scaleY", -1)
                             cmds.setAttr(zeroOutGrp+".scaleZ", -1)
                 
-                cmds.addAttr(self.wheelCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                cmds.addAttr(self.wheelCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
                 cmds.setAttr(self.wheelCtrl+".scaleCompensate", 1, channelBox=True)
                 cmds.connectAttr(self.wheelCtrl+".scaleCompensate", self.centerJoint+".segmentScaleCompensate", force=True)
-                cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
+                cmds.addAttr(self.mainCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
                 cmds.setAttr(self.mainCtrl+".scaleCompensate", 1, channelBox=True)
                 cmds.connectAttr(self.mainCtrl+".scaleCompensate", self.mainJoint+".segmentScaleCompensate", force=True)
                 # hide visibility attributes:
                 self.ctrls.setLockHide([self.mainCtrl, self.insideCtrl, self.outsideCtrl], ['v'])
-                self.ctrls.setLockHide([self.wheelCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v'])
+                self.ctrls.setLockHide([self.wheelCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                 
                 # grouping:
                 cmds.parentConstraint(self.wheelCtrl, self.centerJoint, maintainOffset=False, name=self.centerJoint+"_PaC")
@@ -271,12 +271,12 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(zeroGrpList[3], self.insideCtrl, absolute=True)
                 
                 # add attributes:
-                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c047_autoRotate'], attributeType="bool", defaultValue=1, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c047_autoRotate'], attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c068_startFrame'], attributeType="long", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c067_radius'], attributeType="float", min=0.01, defaultValue=self.ctrlRadius, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c069_radiusScale'], attributeType="float", defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType="long", min=0, max=1, defaultValue=1, keyable=True)
-                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering'], attributeType="bool", defaultValue=0, keyable=True)
+                cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering'], attributeType="short", minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['i037_to']+self.langDic[self.langName]['c070_steering'].capitalize(), attributeType="float", defaultValue=0, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c070_steering']+self.langDic[self.langName]['c053_invert'].capitalize(), attributeType="long", min=0, max=1, defaultValue=1, keyable=False)
                 cmds.addAttr(self.wheelCtrl, longName=self.langDic[self.langName]['c093_tryKeepUndo'], attributeType="long", min=0, max=1, defaultValue=1, keyable=False)

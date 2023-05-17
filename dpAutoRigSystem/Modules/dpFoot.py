@@ -86,7 +86,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # transform cvLocs in order to put as a good foot guide:
         cmds.setAttr(self.cvFootLoc+".translateZ", 2)
         cmds.setAttr(self.cvFootLoc+".rotateX", 90)
@@ -417,7 +417,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)
                 
                 # show or hide reverseFoot controls:
-                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='bool', defaultValue=1)
+                cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='short', minValue=0, defaultValue=1, maxValue=1)
                 cmds.setAttr(self.footCtrl+"."+showCtrlsAttr, keyable=False, channelBox=True)
                 showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl]
                 for rfCtrl in showHideCtrlList:

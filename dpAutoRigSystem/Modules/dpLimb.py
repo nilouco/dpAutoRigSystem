@@ -153,7 +153,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
         # limit, lock and hide cvEnd:
         cmds.transformLimits(self.cvEndJoint, tz=(0.01, 1), etz=(True, False))
-        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.ctrls.setLockHide([self.cvEndJoint], ['tx', 'ty', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
 
         # creating relationship of corner:
         self.cornerPointGrp = cmds.group(self.cornerGrp, name=self.cornerGrp+"_Zero_0_Grp")
@@ -973,12 +973,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(annotation+'.template', 1)
                 cmds.setAttr(annotLoc+'.visibility', 0)
                 # set annotation visibility as a display option attribute:
-                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='bool', keyable=False, defaultValue=True)
+                cmds.addAttr(self.ikCornerCtrl, longName="displayAnnotation", attributeType='short', minValue=0, maxValue=1, keyable=False, defaultValue=1)
                 cmds.setAttr(self.ikCornerCtrl+".displayAnnotation", channelBox=True)
                 cmds.connectAttr(self.ikCornerCtrl+".displayAnnotation", annotation+".visibility", force=True)
 
                 # prepare groups to rotate and translate automatically:
-                self.ctrls.setLockHide([self.ikCornerCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+                self.ctrls.setLockHide([self.ikCornerCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                 self.cornerGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_PoleVector_Grp", absolute=True)
                 self.cornerOrientGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_PoleVectorOrient_Grp", absolute=True)
                 cmds.delete(cmds.parentConstraint(self.ikExtremCtrl, self.cornerGrp, maintainOffset=False))
@@ -1095,7 +1095,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.orientConstraint(forearmCtrl, forearmJnt, skip=["x", "y"], maintainOffset=True, name=forearmJnt+"_OrC")
                     # create attribute to forearm autoRotate:
                     cmds.addAttr(forearmCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
-                    self.ctrls.setLockHide([forearmCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v'])
+                    self.ctrls.setLockHide([forearmCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # make rotate connections:
                     forearmMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.langDic[self.langName][ 'c030_forearm']+"_MD")
                     cmds.connectAttr(forearmCtrl+'.'+self.langDic[self.langName]['c033_autoOrient'], forearmMD+'.input1X')

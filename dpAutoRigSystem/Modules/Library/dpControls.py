@@ -120,7 +120,7 @@ class ControlClass(object):
                     print("Error: Cannot connect", toObj, ".", attr, "directely.")
         
         
-    def setLockHide(self, objList, attrList, l=True, k=False, *args):
+    def setLockHide(self, objList, attrList, l=True, k=False, cb=False, *args):
         """Set lock or hide to attributes for object in lists.
         """
         if objList and attrList:
@@ -128,9 +128,9 @@ class ControlClass(object):
                 for attr in attrList:
                     try:
                         # set lock and hide of given attributes:
-                        cmds.setAttr(obj+"."+attr, lock=l, keyable=k)
+                        cmds.setAttr(obj+"."+attr, lock=l, keyable=k, channelBox=cb)
                     except:
-                        print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k)
+                        print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
                         
                         
     def setNonKeyable(self, objList, attrList, *args):
@@ -195,7 +195,7 @@ class ControlClass(object):
         cmds.setAttr(ribbonNurbsPlane+".visibility", 0)
         self.setNotRenderable([ribbonNurbsPlaneShape])
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        cmds.addAttr(ribbonNurbsPlane, longName="doNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+        cmds.addAttr(ribbonNurbsPlane, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
         # create groups to be used as a root of the ribbon system:
         ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_Rbn_RibbonJoint_Grp")
         # create joints:
@@ -417,7 +417,7 @@ class ControlClass(object):
         cmds.setAttr(radiusCtrl+".translateX", r)
         cmds.parent(radiusCtrl, circle, relative=True)
         cmds.transformLimits(radiusCtrl, tx=(0.01, 1), etx=(True, False))
-        self.setLockHide([radiusCtrl], ['ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+        self.setLockHide([radiusCtrl], ['ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
         # find makeNurbCircle history of the circles:
         historyList = self.findHistory([circle, radiusCtrl], 'makeNurbCircle')
         circleHistory     = historyList[0]
@@ -806,7 +806,7 @@ class ControlClass(object):
             cmds.setAttr(self.dpARTempGrp+".visibility", 0)
             cmds.setAttr(self.dpARTempGrp+".template", 1)
             cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
-            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+            self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
         cmds.parent(clusterHandle, self.dpARTempGrp)
     
     
@@ -831,7 +831,7 @@ class ControlClass(object):
         if not ctrlName.endswith("_JointEnd"):
             if not ctrlName.endswith("_RadiusCtrl"):
                 if not cmds.objExists(ctrlName+".pinGuide"):
-                    cmds.addAttr(ctrlName, longName="pinGuide", attributeType='bool')
+                    cmds.addAttr(ctrlName, longName="pinGuide", attributeType="bool")
                     cmds.setAttr(ctrlName+".pinGuide", channelBox=True)
                     cmds.addAttr(ctrlName, longName="pinGuideConstraint", attributeType="message")
                     cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
@@ -1235,7 +1235,7 @@ class ControlClass(object):
         """
         cmds.addAttr(ctrlName, longName="intensity", attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # create an attribute to be used as editMode by module:
-        cmds.addAttr(ctrlName, longName="editMode", attributeType='bool', keyable=False, defaultValue=False)
+        cmds.addAttr(ctrlName, longName="editMode", attributeType="bool", keyable=False)
         cmds.setAttr(ctrlName+".editMode", channelBox=True)
 
 
@@ -1317,7 +1317,7 @@ class ControlClass(object):
     def setSubControlDisplay(self, ctrl, subCtrl, defValue, *args):
         """ Set the shapes visibility of sub control.
         """
-        cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="bool", defaultValue=defValue)
+        cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="short", minValue=0, maxValue=1, defaultValue=defValue)
         cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
         subShapeList = cmds.listRelatives(subCtrl, children=True, type="shape")
         if subShapeList:
@@ -1353,7 +1353,7 @@ class ControlClass(object):
                             for node in allNodeList:
                                 progressAmount += 1
                                 if node in allControlList:
-                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)
+                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)                                   
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
                         cmds.progressWindow(endProgress=True)
@@ -1393,8 +1393,11 @@ class ControlClass(object):
                 for item in nodeToRunList:
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
                     if attrList:
+                        print("attrList =", attrList)
                         for attr in attrList:
-                            cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
+                            # hack to avoid Maya limitation to edit boolean attributes
+                            if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
+                                cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
     
 
     def getSelectedControls(self, *args):
@@ -1491,3 +1494,10 @@ class ControlClass(object):
         """ Edit the current value of the given controller.
         """
         cmds.setAttr(ctrl+"."+attr, value)
+
+
+    def resetMirrorShape(self, *args):
+        """ Call reset all controls before run mirrorShape script.
+        """
+        self.setupDefaultValues(resetMode=True, ctrlList=self.getControlList())
+        self.mirrorShape()
