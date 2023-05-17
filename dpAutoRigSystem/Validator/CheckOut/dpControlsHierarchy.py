@@ -117,7 +117,8 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+HIERARCHY_PATH
         if os.path.exists(dpHierarchyPath):
             if self.dpTeamFile:
-                lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
+                if os.path.exists(f"{dpHierarchyPath}/{self.currentFileName}.json"):
+                    lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
             else:
                 lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
                 if lastFileVersion:
