@@ -158,7 +158,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
                     lastFileVersionString = self.changeIntVersionToString(lastFileVersion+1)
                     finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
         else:
-            os.mkdir(dpHierarchyPath)
+            os.makedirs(dpHierarchyPath)
         with open (finalSaveFilePath, "w") as json_file:
             json.dump(dicToJson, json_file)
         self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v069_exportedFile']} {finalSaveFilePath}")
