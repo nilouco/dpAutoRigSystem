@@ -759,6 +759,7 @@
     "v066_wasRemoved"             : "a été éliminé.",
     "v067_changedParent"          : "hiérarchie modifiée, dernier parent:",
     "v068_matchingHierarchies"    : "Hiérarchies correspondantes.",
-    "v069_exportedFile"           : "Fichier exporté:"
+    "v069_exportedFile"           : "Fichier exporté:",
+    "v070_duplicateName"          : "Élément possible avec un nom en double dans la hiérarchie des nodus:"
 
 }

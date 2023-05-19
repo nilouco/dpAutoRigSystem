@@ -27,7 +27,12 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
 
     def checkNurbs(self, transform):
-        shapeList = cmds.listRelatives(transform, shapes=True)
+        try:
+            shapeList = cmds.listRelatives(transform, shapes=True)
+        except Exception as e:
+            print(e)
+            self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v070_duplicateName']} {transform}")
+            return False
         if shapeList:
             for shape in shapeList:
                 if "nurbsCurve" not in cmds.objectType(shape):
@@ -150,15 +155,14 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+HIERARCHY_PATH
         finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}_h001.json"
         if os.path.exists(dpHierarchyPath):
-            if self.dpTeamFile:
-                finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
-            else:
-                lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
-                if lastFileVersion:
-                    lastFileVersionString = self.changeIntVersionToString(lastFileVersion+1)
-                    finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
+            lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
+            if lastFileVersion:
+                lastFileVersionString = self.changeIntVersionToString(lastFileVersion+1)
+                finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}{lastFileVersionString}.json"
         else:
             os.makedirs(dpHierarchyPath)
+        if self.dpTeamFile:
+            finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
         with open (finalSaveFilePath, "w") as json_file:
             json.dump(dicToJson, json_file)
         self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v069_exportedFile']} {finalSaveFilePath}")
