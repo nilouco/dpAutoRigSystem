@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.34"
-DPAR_UPDATELOG = "N663 - Publish callback."
+DPAR_VERSION_PY3 = "4.02.35"
+DPAR_UPDATELOG = "N670 - Fix Validator footer button.\nN686 - ControlsHierarchy fix"
 
 
 
@@ -687,9 +687,10 @@ class DP_AutoRig_UI(object):
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
         self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.langDic[self.langName]['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.publisher.mainUI, parent=self.allUIs["footerPublish"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
+        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 5), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
+                        attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 55), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
                         attachNone=[(self.allUIs["footerPublish"], 'top')]
                         )
         self.setValidatorPreset()

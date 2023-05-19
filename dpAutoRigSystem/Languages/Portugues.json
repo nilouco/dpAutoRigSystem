@@ -760,6 +760,7 @@
     "v066_wasRemoved"             : "foi removido.",
     "v067_changedParent"          : "mudou de hierarquia, último pai:",
     "v068_matchingHierarchies"    : "Hierarquias iguais.",
-    "v069_exportedFile"           : "Arquivo exportado:"
+    "v069_exportedFile"           : "Arquivo exportado:",
+    "v070_duplicateName"          : "Possível item com nome duplicado na hierarquia de nodes:"
 
 }
