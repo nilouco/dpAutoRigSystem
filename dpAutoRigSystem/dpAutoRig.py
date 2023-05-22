@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.35"
-DPAR_UPDATELOG = "N670 - Fix Validator footer button.\nN686 - ControlsHierarchy fix"
+DPAR_VERSION_PY3 = "4.02.36"
+DPAR_UPDATELOG = "N690 Language fix."
 
 
 
