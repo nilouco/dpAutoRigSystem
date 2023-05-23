@@ -197,7 +197,7 @@ class Packager(object):
         for i in range(len(hudList)):
             cmds.headsUpDisplay(hudList[i], edit=True, visible=currentHUDVisList[i])
         # remove hud texts
-        for n in range((h+3), b):
+        for n in range((h+1), b):
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(n), remove=True)
         for c in range(len(camAttrList)):
             cmds.setAttr(cam+"."+camAttrList[c], camAttrVisList[c])
