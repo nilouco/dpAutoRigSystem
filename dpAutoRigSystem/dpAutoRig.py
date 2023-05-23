@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.36"
-DPAR_UPDATELOG = "N690 Language fix."
+DPAR_VERSION_PY3 = "4.02.37"
+DPAR_UPDATELOG = "N692 Packager HUD imager issue fixed."
 
 
 
