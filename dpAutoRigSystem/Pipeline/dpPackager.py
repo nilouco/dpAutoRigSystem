@@ -11,7 +11,7 @@ import os
 import sys
 
 
-DPPACKAGER_VERSION = 1.5
+DPPACKAGER_VERSION = 1.6
 
 
 RIGPREVIEW = "Rigging Preview"
@@ -89,12 +89,16 @@ class Packager(object):
         currentBGBottomColorList = self.getDisplayRGBColorList('backgroundBottom')
         
         # save hudList to hide:
+        h = 0
         currentHUDVisList = []
         hudList = cmds.headsUpDisplay(listHeadsUpDisplays=True)
         for item in hudList:
             currentHUDVis = cmds.headsUpDisplay(item, query=True, visible=True)
             currentHUDVisList.append(currentHUDVis)
             cmds.headsUpDisplay(item, edit=True, visible=False)
+            currentSection = cmds.headsUpDisplay(item, query=True, section=True)
+            if currentSection == 0:
+                h += 1
         camAttrVisList = []
         camAttrList = ["displayGateMask", "displayResolution", "displayFilmGate", "displayFieldChart", "displaySafeAction", "displaySafeTitle", "displayFilmPivot", "displayFilmOrigin", "depthOfField"]
         for attr in camAttrList:
@@ -120,9 +124,9 @@ class Packager(object):
         cmds.displayRGBColor('backgroundBottom', 0.42, 0.42, 0.42)
 
         # file information messages
-        cmds.headsUpDisplay('HudRigPreviewTxt10', section=0, block=10, labelFontSize="large", allowOverlap=True, label="") #starting by 10 to avoid default Maya's HUD already existing
-        cmds.headsUpDisplay('HudRigPreviewTxt11', section=0, block=11, labelFontSize="large", allowOverlap=True, label=rigPreview)
-        b = 12
+        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+1), section=0, block=(h+1), labelFontSize="large", allowOverlap=True, label="")
+        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+2), section=0, block=(h+2), labelFontSize="large", allowOverlap=True, label=rigPreview)
+        b = h+3
         if pipeData['b_i_maya']:
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=mayaVersion)
             b += 1
@@ -180,7 +184,6 @@ class Packager(object):
         # clean up the UI
         cmds.deleteUI(dpImagerPanel, panel=True)
         dpUtils.closeUI("dpImagerWindow")
-        
         # back scene preferences to stored status
         cmds.camera(cam, edit=True, aspectRatio=1.5)
         cmds.grid(toggle=currentGrid)
@@ -194,7 +197,7 @@ class Packager(object):
         for i in range(len(hudList)):
             cmds.headsUpDisplay(hudList[i], edit=True, visible=currentHUDVisList[i])
         # remove hud texts
-        for n in range(10, b):
+        for n in range((h+1), b):
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(n), remove=True)
         for c in range(len(camAttrList)):
             cmds.setAttr(cam+"."+camAttrList[c], camAttrVisList[c])
