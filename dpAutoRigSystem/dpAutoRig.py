@@ -19,8 +19,8 @@
 
 
 # current version:
-DPAR_VERSION_PY3 = "4.02.37"
-DPAR_UPDATELOG = "N692 Packager HUD imager issue fixed."
+DPAR_VERSION_PY3 = "4.02.38"
+DPAR_UPDATELOG = "N696 Remove controls hierarchy\nunmodified restriction."
 
 
 
