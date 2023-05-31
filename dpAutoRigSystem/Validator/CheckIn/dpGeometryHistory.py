@@ -57,7 +57,9 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
                                 if cmds.nodeType(history) != "tweak": 
                                     if history != "initialShadingGroup":
                                         geoList.append(transform)
+            # Merge duplicated names
             geoToCleanFullPathList = list(set(geoList))
+            # Get shortName to better reading in display log
             geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
         if geoToCleanList:
             for geo in geoToCleanList:
