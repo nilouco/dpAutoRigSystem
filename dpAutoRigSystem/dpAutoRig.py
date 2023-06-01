@@ -18,9 +18,8 @@
 ###################################################################
 
 
-# current version:
-DPAR_VERSION_PY3 = "4.02.38"
-DPAR_UPDATELOG = "N696 Remove controls hierarchy\nunmodified restriction."
+DPAR_VERSION_PY3 = "4.02.39"
+DPAR_UPDATELOG = "N560 - Added new check-in validator to clean-up geometry history."
 
 
 
