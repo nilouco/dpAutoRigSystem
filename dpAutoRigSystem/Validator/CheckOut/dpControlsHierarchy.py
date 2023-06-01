@@ -124,6 +124,11 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             if self.dpTeamFile:
                 if os.path.exists(f"{dpHierarchyPath}/{self.currentFileName}.json"):
                     lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
+                else:
+                    lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
+                    if lastFileVersion:
+                        lastFileVersionString = self.changeIntVersionToString(lastFileVersion)
+                        lastHierarchyFilePath = f"{dpHierarchyPath}/{self.currentFileName[:-5]}{lastFileVersionString}.json"
             else:
                 lastFileVersion = self.findLastFileVersion(dpHierarchyPath)
                 if lastFileVersion:
@@ -141,9 +146,12 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         filesList = os.listdir(filesPath)
         if len(filesList) > 0:
             lastBiggerVersion = 0
+            pseudoFileName = self.currentFileName
+            if self.dpTeamFile:
+                    pseudoFileName = self.currentFileName[:-5]
             for file in filesList:
                 length = len(file)
-                if self.currentFileName in file and file[length - 5:] == ".json":
+                if pseudoFileName in file and file[length - 5:] == ".json":
                     thisFileVersion = int(file[file.rfind("_h")+2:-5])
                     if thisFileVersion > lastBiggerVersion:
                             lastBiggerVersion = thisFileVersion
@@ -229,7 +237,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
                 self.foundIssueList.append(True)
                 self.resultOkList.append(False)
         else:
-            if dpUtils.checkSavedScene():
+            if cmds.file(query=True, sceneName=True) != "":
                 if lastHierarchyFilePath == None:
                     self.exportCtlrsHierarchyToFile(currentFileHierarchyDic)
                 elif not isHierarchySame:
