@@ -89,6 +89,7 @@ try:
     reload(dpPublisher)
     reload(dpPipeliner)
     reload(dpPackager)
+    reload(dpCustomAttr)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -273,7 +274,7 @@ class DP_AutoRig_UI(object):
             
             # call mainUI in order to populate the main layout:
             self.mainUI()
-
+            
             # check if we need to automatically check for update:
             self.autoCheckOptionVar("dpAutoRigAutoCheckUpdate", "dpAutoRigLastDateAutoCheckUpdate", "update")
             # also check for agreement of terms and conditions
@@ -281,6 +282,7 @@ class DP_AutoRig_UI(object):
 
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
+            print("error here -00000")
             print("Exception:", e)
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
@@ -383,13 +385,18 @@ class DP_AutoRig_UI(object):
         self.langName = self.getCurrentMenuValue(self.langList)
         # get current preset choose UI from menu:
         self.presetName = self.getCurrentMenuValue(self.presetList)
+        # optimize dictionaries
+        self.lang = self.langDic[self.langName]
+        self.ctrlPreset = self.presetDic[self.presetName]
         
         # initialize some objects here:
-        self.ctrls = dpControls.ControlClass(self, self.presetDic, self.presetName)
+        self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
-        self.customAttr = dpCustomAttr.CustomAttr(self, self.langDic, self.langName, self.presetDic, self.presetName, False)
+        print( "==== before custoMAttr")
+        self.customAttr = dpCustomAttr.CustomAttr(self, False)
+        print( "==== after custoMAttr")
         # --
-        
+        print("-------------- after selfs ------------------")
         # creating tabs - mainTabLayout:
         self.allUIs["mainTabLayout"] = cmds.tabLayout('mainTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
         cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["mainTabLayout"], 'top', 0), (self.allUIs["mainTabLayout"], 'left', 0), (self.allUIs["mainTabLayout"], 'bottom', 0), (self.allUIs["mainTabLayout"], 'right', 0)) )
@@ -1306,7 +1313,7 @@ class DP_AutoRig_UI(object):
         # get the CLASS_NAME from guideModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
-        guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName, userSpecName, rigType)
+        guideInstance = guideClass(self, userSpecName, rigType)
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
@@ -1326,7 +1333,7 @@ class DP_AutoRig_UI(object):
         # get the CLASS_NAME from extraModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this extraModule as an Instance:
-        guideInstance = guideClass(self, self.langDic, self.langName, self.presetDic, self.presetName)
+        guideInstance = guideClass(self)
         return guideInstance
     
 

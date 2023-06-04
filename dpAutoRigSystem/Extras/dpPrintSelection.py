@@ -8,13 +8,13 @@ TITLE = "m053_printSel"
 DESCRIPTION = "m054_printSelDesc"
 ICON = "/Icons/dp_printSelection.png"
 
+DP_PRINTSELECTION_VERSION = 2.0
+
 
 class PrintSelection(object):
-    def __init__(self, dpUIinst, langDic, langName, *args):
+    def __init__(self, dpUIinst, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
         # call main function
         self.dpMain(self)
     
@@ -30,7 +30,7 @@ class PrintSelection(object):
             if self.resultDic:
                 self.dpPrintResults(self.resultDic)
         else:
-            mel.eval("warning \""+self.langDic[self.langName]['i042_notSelection']+"\";")
+            mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\";")
     
     
     def dpDefineDic(self, selList, *args):
@@ -61,4 +61,4 @@ class PrintSelection(object):
             print(resultDic['string'])
             print("-------")
         else:
-            mel.eval("warning \""+self.langDic[self.langName]['i042_notSelection']+"\";")
+            mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\";")

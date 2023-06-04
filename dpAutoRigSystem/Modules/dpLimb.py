@@ -28,8 +28,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
-        self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName)
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, False)
+        self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst)
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
 
         #Declare variable
         self.integratedActionsDic = {}
@@ -1213,7 +1213,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     try:
                         from .Library import jcRibbon
                         reload(jcRibbon)
-                        RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, self.ctrlRadius, self.curveDegree)
+                        RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.ctrlRadius, self.curveDegree)
                         loadedRibbon = True
                     except Exception as e:
                         print(e)

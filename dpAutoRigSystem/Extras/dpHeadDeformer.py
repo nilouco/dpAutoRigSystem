@@ -11,18 +11,14 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
 
-DPHD_VERSION = "2.13"
+DP_HEADDEFORMER_VERSION = 2.14
 
 
 class HeadDeformer(object):
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
+    def __init__(self, dpUIinst, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.headCtrl = None
         self.wellDone = True
         # call main function
@@ -33,11 +29,11 @@ class HeadDeformer(object):
         """ Create the arrow curve and deformers (squash and bends).
         """
         # defining variables
-        headDeformerName = self.langDic[self.langName]["c024_head"]+self.langDic[self.langName]["c097_deformer"]
-        centerSymmetryName = self.langDic[self.langName]["c098_center"]+self.langDic[self.langName]["c101_symmetry"]
-        topSymmetryName = self.langDic[self.langName]["c099_top"]+self.langDic[self.langName]["c101_symmetry"]
-        intensityName = self.langDic[self.langName]["c049_intensity"]
-        expandName = self.langDic[self.langName]["c104_expand"]
+        headDeformerName = self.dpUIinst.langDic[self.dpUIinst.langName]["c024_head"]+self.dpUIinst.langDic[self.dpUIinst.langName]["c097_deformer"]
+        centerSymmetryName = self.dpUIinst.langDic[self.dpUIinst.langName]["c098_center"]+self.dpUIinst.langDic[self.dpUIinst.langName]["c101_symmetry"]
+        topSymmetryName = self.dpUIinst.langDic[self.dpUIinst.langName]["c099_top"]+self.dpUIinst.langDic[self.dpUIinst.langName]["c101_symmetry"]
+        intensityName = self.dpUIinst.langDic[self.dpUIinst.langName]["c049_intensity"]
+        expandName = self.dpUIinst.langDic[self.dpUIinst.langName]["c104_expand"]
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
@@ -171,7 +167,7 @@ class HeadDeformer(object):
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
             clustersZeroList = dpUtils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.delete(cmds.parentConstraint(centerClusterList[1], clustersZeroList[1]))
-            clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.langDic[self.langName]["c101_symmetry"]+"_Grp")
+            clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]["c101_symmetry"]+"_Grp")
             # arrange lattice deform points percent
             cmds.percent(topClusterList[0], [latticeDefList[1]+".pt[0:5][2][0]", latticeDefList[1]+".pt[0:5][2][1]", latticeDefList[1]+".pt[0:5][2][2]", latticeDefList[1]+".pt[0:5][2][3]", latticeDefList[1]+".pt[0:5][2][4]", latticeDefList[1]+".pt[0:5][2][5]"], value=0.5)
             # symmetry controls
@@ -211,7 +207,7 @@ class HeadDeformer(object):
             headCtrlList = self.ctrls.getControlNodeById("id_093_HeadSub")
             if headCtrlList:
                 if len(headCtrlList) > 1:
-                    mel.eval("warning" + "\"" + self.langDic[self.langName]["i075_moreOne"] + " Head control.\"" + ";")
+                    mel.eval("warning" + "\"" + self.dpUIinst.langDic[self.dpUIinst.langName]["i075_moreOne"] + " Head control.\"" + ";")
                 else:
                     self.headCtrl = headCtrlList[0]
             if self.headCtrl:
@@ -258,7 +254,7 @@ class HeadDeformer(object):
                             cmds.sets(item, include=headDeformerName+"_FFDSet")
                 cmds.parent(arrowCtrlGrp, self.headCtrl)
             else:
-                mel.eval("warning" + "\"" + self.langDic[self.langName]["e020_notFoundHeadCtrl"] + "\"" + ";")
+                mel.eval("warning" + "\"" + self.dpUIinst.langDic[self.dpUIinst.langName]["e020_notFoundHeadCtrl"] + "\"" + ";")
                 self.wellDone = False
             
             cmds.parent(squashDefList[1], sideBendDefList[1], frontBendDefList[1], twistDefList[1], offsetGrp)
@@ -280,7 +276,7 @@ class HeadDeformer(object):
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:
-                print(self.langDic[self.langName]["i179_addedHeadDef"])
+                print(self.dpUIinst.langDic[self.dpUIinst.langName]["i179_addedHeadDef"])
         
         else:
-            mel.eval("warning" + "\"" + self.langDic[self.langName]["i034_notSelHeadDef"] + "\"" + ";")
+            mel.eval("warning" + "\"" + self.dpUIinst.langDic[self.dpUIinst.langName]["i034_notSelHeadDef"] + "\"" + ";")

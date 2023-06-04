@@ -15,21 +15,17 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DPZIP_VERSION = "2.15"
+DP_ZIPPER_VERSION = 2.16
 
 
 class Zipper(object):
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
+    def __init__(self, dpUIinst, *args, **kwargs):
         # redeclaring variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-        self.zipperName = self.langDic[self.langName]['m061_zipper']
-        self.firstName = self.langDic[self.langName]['c114_first']
-        self.secondName = self.langDic[self.langName]['c115_second']
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.zipperName = self.dpUIinst.langDic[self.dpUIinst.langName]['m061_zipper']
+        self.firstName = self.dpUIinst.langDic[self.dpUIinst.langName]['c114_first']
+        self.secondName = self.dpUIinst.langDic[self.dpUIinst.langName]['c115_second']
         self.goodToDPAR = True
         self.origModel = None
         self.firstCurve = None
@@ -57,33 +53,33 @@ class Zipper(object):
         """
         zipper_winWidth  = 380
         zipper_winHeight = 300
-        cmds.window('dpZipperWindow', title=self.zipperName+" "+str(DPZIP_VERSION), widthHeight=(zipper_winWidth, zipper_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpZipperWindow', title=self.zipperName+" "+str(DP_ZIPPER_VERSION), widthHeight=(zipper_winWidth, zipper_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpZipperWindow')
         
         # create UI layout and elements:
         zipperLayout = cmds.columnLayout('zipperLayout', adjustableColumn=True, columnOffset=("left", 10))
-        cmds.text(label=self.langDic[self.langName]['i191_selectPoly'], align="left", height=30, font='boldLabelFont', parent=zipperLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i191_selectPoly'], align="left", height=30, font='boldLabelFont', parent=zipperLayout)
         # original model layout:
         zipperLayoutA = cmds.rowColumnLayout('zipperLayoutA', numberOfColumns=2, columnWidth=[(1, 160), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=zipperLayout)
-        self.origModel_BT = cmds.button('origModel_BT', label=self.langDic[self.langName]['i187_load']+" "+self.langDic[self.langName]['m152_originalModel']+" >>", command=self.dpLoadOrigModel, backgroundColor=(1.0, 0.9, 0.4), parent=zipperLayoutA)
+        self.origModel_BT = cmds.button('origModel_BT', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i187_load']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m152_originalModel']+" >>", command=self.dpLoadOrigModel, backgroundColor=(1.0, 0.9, 0.4), parent=zipperLayoutA)
         self.origModel_TF = cmds.textField('origModel_TF', editable=False, parent=zipperLayoutA)
         cmds.separator(style='in', height=15, width=100, parent=zipperLayout)
         # polygon edges to curves layout:
-        cmds.text(label=self.langDic[self.langName]['i188_selectEdges'], align="left", height=30, font='boldLabelFont', parent=zipperLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i188_selectEdges'], align="left", height=30, font='boldLabelFont', parent=zipperLayout)
         zipperLayoutB = cmds.rowColumnLayout('zipperLayoutB', numberOfColumns=2, columnWidth=[(1, 160), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], rowSpacing=(1, 3), parent=zipperLayout)
-        self.first_BT = cmds.button('first_BT', label=self.langDic[self.langName]['i187_load']+" "+self.langDic[self.langName]['c114_first']+" "+self.langDic[self.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c114_first"), backgroundColor=(1.0, 0.9, 0.4), parent=zipperLayoutB)
+        self.first_BT = cmds.button('first_BT', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i187_load']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['c114_first']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c114_first"), backgroundColor=(1.0, 0.9, 0.4), parent=zipperLayoutB)
         self.first_TF = cmds.textField('first_TF', editable=False, parent=zipperLayoutB)
-        self.second_BT = cmds.button('second_BT', label=self.langDic[self.langName]['i187_load']+" "+self.langDic[self.langName]['c115_second']+" "+self.langDic[self.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c115_second"), backgroundColor=(1.0, 0.9, 0.4), parent=zipperLayoutB)
+        self.second_BT = cmds.button('second_BT', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i187_load']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['c115_second']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i189_curve']+" >>", command=partial(self.dpCreateCurveFromEdge, "c115_second"), backgroundColor=(1.0, 0.9, 0.4), parent=zipperLayoutB)
         self.second_TF = cmds.textField('second_TF', editable=False, parent=zipperLayoutB)
         cmds.separator(style='in', height=15, width=100, parent=zipperLayout)
         # options layout:
-        cmds.text(label=self.langDic[self.langName]["i002_options"]+":", height=30, font='boldLabelFont', align='left', parent=zipperLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i002_options"]+":", height=30, font='boldLabelFont', align='left', parent=zipperLayout)
         zipperLayoutC = cmds.columnLayout('zipperLayoutC', adjustableColumn=True, columnOffset=("left", 10), rowSpacing=3, parent=zipperLayout)
-        self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label=self.langDic[self.langName]['i189_curve']+' '+self.langDic[self.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], columnAlign=[(1, 'left'), (2, 'left')], columnWidth=[(1, 100), (2, 50), (3, 50), (4, 50)], adjustableColumn=4, numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, vertical=False, parent=zipperLayoutC)
-        self.goodToDPAR_CB = cmds.checkBox("goodToDPAR_CB", label=self.langDic[self.langName]['i190_integrateDPAR'], value=1, align='left', parent=zipperLayoutC)
+        self.curveDirectionRB = cmds.radioButtonGrp('curveDirectionRB', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i189_curve']+' '+self.dpUIinst.langDic[self.dpUIinst.langName]['i106_direction'], labelArray3=['X', 'Y', 'Z'], columnAlign=[(1, 'left'), (2, 'left')], columnWidth=[(1, 100), (2, 50), (3, 50), (4, 50)], adjustableColumn=4, numberOfRadioButtons=3, select=1, changeCommand=self.dpGetCurveDirection, vertical=False, parent=zipperLayoutC)
+        self.goodToDPAR_CB = cmds.checkBox("goodToDPAR_CB", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i190_integrateDPAR'], value=1, align='left', parent=zipperLayoutC)
         cmds.separator(style='none', height=15, width=100, parent=zipperLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=zipperLayout)
-        cmds.button(label=self.langDic[self.langName]["i158_create"]+" "+self.zipperName, annotation=self.langDic[self.langName]["i158_create"]+" "+self.zipperName, command=self.dpCreateZipper, width=350, backgroundColor=(0.3, 1, 0.7), parent=createLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i158_create"]+" "+self.zipperName, annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["i158_create"]+" "+self.zipperName, command=self.dpCreateZipper, width=350, backgroundColor=(0.3, 1, 0.7), parent=createLayout)
     
     
     def dpGetGoodToDPAR(self, *args):
@@ -100,10 +96,10 @@ class Zipper(object):
         if selectedList:
             if cmds.objectType(cmds.listRelatives(selectedList[0], children=True)[0]) == "mesh":
                 cmds.textField(self.origModel_TF, edit=True, text=selectedList[0])
-                cmds.button(self.origModel_BT, edit=True, label=self.langDic[self.langName]['m152_originalModel'], backgroundColor=(0.3, 0.8, 1.0))
+                cmds.button(self.origModel_BT, edit=True, label=self.dpUIinst.langDic[self.dpUIinst.langName]['m152_originalModel'], backgroundColor=(0.3, 0.8, 1.0))
                 self.origModel = selectedList[0]
         else:
-            mel.eval('warning \"'+self.langDic[self.langName]['i191_selectPoly']+'\";')
+            mel.eval('warning \"'+self.dpUIinst.langDic[self.dpUIinst.langName]['i191_selectPoly']+'\";')
     
     
     def dpCreateCurveFromEdge(self, zipperId, *args):
@@ -133,7 +129,7 @@ class Zipper(object):
             # load curve data:
             self.dpLoadData(baseCurve)
         else:
-            mel.eval('warning \"'+self.langDic[self.langName]['i188_selectEdges']+'\";')
+            mel.eval('warning \"'+self.dpUIinst.langDic[self.dpUIinst.langName]['i188_selectEdges']+'\";')
     
     
     def dpDeleteOldCurve(self, zipperId, *args):
@@ -172,11 +168,11 @@ class Zipper(object):
         """        
         if zipperId == "c114_first":
             cmds.textField(self.first_TF, edit=True, text=curveName)
-            cmds.button(self.first_BT, edit=True, label=self.firstName+" "+self.langDic[self.langName]['i189_curve'], backgroundColor=(0.3, 0.8, 1.0))
+            cmds.button(self.first_BT, edit=True, label=self.firstName+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i189_curve'], backgroundColor=(0.3, 0.8, 1.0))
             self.firstCurve = curveName
         elif zipperId == "c115_second":
             cmds.textField(self.second_TF, edit=True, text=curveName)
-            cmds.button(self.second_BT, edit=True, label=self.secondName+" "+self.langDic[self.langName]['i189_curve'], backgroundColor=(0.3, 0.8, 1.0))
+            cmds.button(self.second_BT, edit=True, label=self.secondName+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i189_curve'], backgroundColor=(0.3, 0.8, 1.0))
             self.secondCurve = curveName
     
     
@@ -213,8 +209,8 @@ class Zipper(object):
     def dpGenerateMiddleCurve(self, origCurve, *args):
         """ Create a middle curve using an avgCurves node.
         """
-        self.middleCurve = cmds.duplicate(origCurve, name=self.zipperName+"_"+self.langDic[self.langName]['c029_middle']+"_Crv")[0]
-        averageCurveNode = cmds.createNode('avgCurves', name=self.zipperName+"_"+self.langDic[self.langName]['c029_middle']+"_AvgC")
+        self.middleCurve = cmds.duplicate(origCurve, name=self.zipperName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c029_middle']+"_Crv")[0]
+        averageCurveNode = cmds.createNode('avgCurves', name=self.zipperName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c029_middle']+"_AvgC")
         cmds.setAttr(averageCurveNode+".automaticWeight", 0)
         cmds.connectAttr(self.firstCurve+".worldSpace", averageCurveNode+".inputCurve1", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace", averageCurveNode+".inputCurve2", force=True)
@@ -227,13 +223,13 @@ class Zipper(object):
             This method calculate the setRange values and clamp them to target weights of the curve blendShapes.
         """
         # declaring names:
-        activeAttr = "zipper"+self.langDic[self.langName]['c118_active'].capitalize()
-        crescentAttr = self.langDic[self.langName]['c116_crescent']
-        decrescentAttr = self.langDic[self.langName]['c117_decrescent']
-        autoAttr = self.langDic[self.langName]['c119_auto']
-        autoIntensityAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c049_intensity'].capitalize()
-        autoCalibrateMinAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']+"Min"
-        autoCalibrateMaxAttr = self.langDic[self.langName]['c119_auto']+self.langDic[self.langName]['c111_calibrate']+"Max"
+        activeAttr = "zipper"+self.dpUIinst.langDic[self.dpUIinst.langName]['c118_active'].capitalize()
+        crescentAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c116_crescent']
+        decrescentAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c117_decrescent']
+        autoAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c119_auto']
+        autoIntensityAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c119_auto']+self.dpUIinst.langDic[self.dpUIinst.langName]['c049_intensity'].capitalize()
+        autoCalibrateMinAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c119_auto']+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Min"
+        autoCalibrateMaxAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c119_auto']+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Max"
         initialDistanceAttr = "initialDistance"
         distanceAttr = "distance"
         rigScaleAttr = "rigScale"
@@ -438,8 +434,8 @@ class Zipper(object):
         """ Main method to buid the all zipper setup.
             Uses the pre-defined and loaded curves.
         """
-        dialogRun = cmds.confirmDialog(title="Zipper", message=self.langDic[self.langName]["i192_notUndoable"], button=[self.langDic[self.langName]["i174_continue"],self.langDic[self.langName]["i132_cancel"]], defaultButton=self.langDic[self.langName]["i174_continue"], cancelButton=self.langDic[self.langName]["i132_cancel"], dismissString=self.langDic[self.langName]["i132_cancel"])
-        if dialogRun == self.langDic[self.langName]["i174_continue"]:
+        dialogRun = cmds.confirmDialog(title="Zipper", message=self.dpUIinst.langDic[self.dpUIinst.langName]["i192_notUndoable"], button=[self.dpUIinst.langDic[self.dpUIinst.langName]["i174_continue"],self.dpUIinst.langDic[self.dpUIinst.langName]["i132_cancel"]], defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]["i174_continue"], cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]["i132_cancel"], dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]["i132_cancel"])
+        if dialogRun == self.dpUIinst.langDic[self.dpUIinst.langName]["i174_continue"]:
             self.dpGetGoodToDPAR()
             if self.firstCurve and self.secondCurve:
                 if self.origModel:
@@ -453,8 +449,8 @@ class Zipper(object):
                     self.dpZipperDataGrp()
                     self.dpZipperCloseUI()
                     cmds.select(self.zipperCtrl)
-                    print(self.langDic[self.langName]['m174_createdZipper'])
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['m174_createdZipper'])
                 else:
-                    mel.eval('warning \"'+self.langDic[self.langName]['i191_selectPoly']+'\";')
+                    mel.eval('warning \"'+self.dpUIinst.langDic[self.dpUIinst.langName]['i191_selectPoly']+'\";')
             else:
-                mel.eval('warning \"'+self.langDic[self.langName]['i188_selectEdges']+'\";')
+                mel.eval('warning \"'+self.dpUIinst.langDic[self.dpUIinst.langName]['i188_selectEdges']+'\";')

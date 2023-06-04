@@ -10,9 +10,11 @@ CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
 
+DP_VALIDATORSTARTCLASS_VERSION = 2.0
 
-class ValidatorStartClass:
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
+
+class ValidatorStartClass(object):
+    def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:

@@ -25,18 +25,19 @@ dic_colors = {
     "none": 0,
 }
 
+DP_CONTROLS_VERSION = 2.0
+
+
 class ControlClass(object):
 
-    def __init__(self, dpUIinst, presetDic, presetName, moduleGrp=None, *args):
+    def __init__(self, dpUIinst, moduleGrp=None, *args):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.presetDic = presetDic
-        self.presetName = presetName
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
-        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, self.dpUIinst.langDic, self.dpUIinst.langName, self.dpUIinst.presetDic, self.dpUIinst.presetName, ui=False, verbose=False)
+        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
 
@@ -250,7 +251,7 @@ class ControlClass(object):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.presetDic[self.presetName][ctrlType]['type']
+        ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['type']
         return ctrlModule
         
         
@@ -258,7 +259,7 @@ class ControlClass(object):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.presetDic[self.presetName][ctrlType]['degree']
+        ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['degree']
         return ctrlModule
 
 
@@ -738,10 +739,10 @@ class ControlClass(object):
                                 ctrl_Degree = cmds.getAttr(ctrlNode+".degree")
                                 resultString += ',"'+ctrl_ID+'":{"type":"'+ctrl_Type+'","degree":'+str(ctrl_Degree)+'}'
                     # check if we got all controlIDs:
-                    for j, pID in enumerate(self.presetDic[self.presetName]):
+                    for j, pID in enumerate(self.dpUIinst.ctrlPreset):
                         if not pID in ctrlIDList:
                             # get missing controlIDs from current preset:
-                            resultString += ',"'+pID+'":{"type":"'+self.presetDic[self.presetName][pID]["type"]+'","degree":'+str(self.presetDic[self.presetName][pID]["degree"])+'}'
+                            resultString += ',"'+pID+'":{"type":"'+self.dpUIinst.ctrlPreset[pID]["type"]+'","degree":'+str(self.dpUIinst.ctrlPreset[pID]["degree"])+'}'
                     resultString += "}"
         return resultString
     

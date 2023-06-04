@@ -29,17 +29,15 @@
 from maya import cmds
 from . import dpControls
 
+DP_SOFTIK_VERSION = 2.0
+
 
 class SoftIkClass(object):
 
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args):
+    def __init__(self, dpUIinst, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
 
 
     def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, axis="Z", *args):
@@ -50,7 +48,7 @@ class SoftIkClass(object):
         softIkCalibValue = 0.02*cmds.getAttr(distBetween+".distance")
         # add the dSoft and softIk attributes on the controller:
         cmds.addAttr(ctrlName, longName="softIk", attributeType="double", min=0, defaultValue=0, max=1, keyable=True)
-        cmds.addAttr(ctrlName, longName="softIk_"+self.langDic[self.langName]['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
+        cmds.addAttr(ctrlName, longName="softIk_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate'], attributeType="double", min=0.001, defaultValue=softIkCalibValue, keyable=False)
         cmds.addAttr(ctrlName, longName="softDistance", attributeType="double", min=0.001, defaultValue=0.001, keyable=True)
         
         # set up node network for softIk:
@@ -87,13 +85,13 @@ class SoftIkClass(object):
         cmds.setAttr(distDiffPMA+".operation", 2) #substract
 
         # make connections:
-        cmds.connectAttr(ctrlName+".softIk_"+self.langDic[self.langName]['c111_calibrate'], self.calibrateMD+".input1X", force=True)
+        cmds.connectAttr(ctrlName+".softIk_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate'], self.calibrateMD+".input1X", force=True)
         cmds.connectAttr(self.calibrateMD+".outputX", softRmV+".outputMax", force=True)
         cmds.connectAttr(ctrlName+".softIk", softRmV+".inputValue", force=True)
         cmds.connectAttr(softRmV+".outValue", ctrlName+".softDistance", force=True)
         cmds.connectAttr(ctrlName+".startChainLength", lengthStartMD+".input1X", force=True)
         cmds.connectAttr(lengthStartMD+".outputX", daMD+".input1D[0]", force=True)
-        cmds.connectAttr(ctrlName+"."+self.langDic[self.langName]["c113_length"], lengthStartMD+".input2X", force=True)
+        cmds.connectAttr(ctrlName+"."+self.dpUIinst.langDic[self.dpUIinst.langName]["c113_length"], lengthStartMD+".input2X", force=True)
         cmds.connectAttr(ctrlName+".softDistance", daMD+".input1D[1]", force=True)
         cmds.connectAttr(distBetween+".distance", xMinusDaPMA+".input1D[0]", force=True)
         cmds.connectAttr(daMD+".output1D", xMinusDaPMA+".input1D[1]", force=True)
@@ -130,7 +128,7 @@ class SoftIkClass(object):
             cmds.connectAttr(distDiffPMA+".output1D", stretchBC+".color2G", force=True)
             cmds.connectAttr(softRatioMD+".outputX", stretchBC+".color1R", force=True)
             cmds.connectAttr(stretchBC+".outputR", lenghtOutputMD+".input1X", force=True)
-            cmds.connectAttr(ctrlName+"."+self.langDic[self.langName]["c113_length"], lenghtOutputMD+".input2X", force=True)
+            cmds.connectAttr(ctrlName+"."+self.dpUIinst.langDic[self.dpUIinst.langName]["c113_length"], lenghtOutputMD+".input2X", force=True)
             cmds.connectAttr(stretchBC+".outputG", softIkRigScaleMD+".input1X", force=True)
             i = 0
             while ( i < len(ikJointList)-1 ):

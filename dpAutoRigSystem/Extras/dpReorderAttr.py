@@ -9,13 +9,12 @@ TITLE = "m087_reorderAttr"
 DESCRIPTION = "m088_reoderAttrDesc"
 ICON = "/Icons/dp_reorderAttr.png"
 
+DP_REORDERATTR_VERSION = 1.2
 
-DPRA_VERSION = "1.2"
 
 class ReorderAttr(object):
-    def __init__(self, dpUIinst, langDic, langName, ui=True, *args, **kwargs):
-        self.langDic = langDic
-        self.langName = langName
+    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+        self.dpUIinst = dpUIinst
         # call main function
         if ui:
             self.dpReorderAttrUI(self)
@@ -33,14 +32,14 @@ class ReorderAttr(object):
         self.dpCloseReorderAttrUI()
         reorderAttr_winWidth  = 175
         reorderAttr_winHeight = 75
-        dpReorderAttrWin = cmds.window('dpReorderAttrWindow', title=self.langDic[self.langName]["m087_reorderAttr"]+" "+DPRA_VERSION, widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpReorderAttrWin = cmds.window('dpReorderAttrWindow', title=self.dpUIinst.langDic[self.dpUIinst.langName]["m087_reorderAttr"]+" "+str(DP_REORDERATTR_VERSION), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         reorderAttrLayout = cmds.columnLayout('reorderAttrLayout', columnOffset=("left", 30))
         cmds.separator(style='none', height=7, parent=reorderAttrLayout)
-        cmds.button(label=self.langDic[self.langName]["i154_up"], annotation=self.langDic[self.langName]["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True), parent=reorderAttrLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i154_up"], annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True), parent=reorderAttrLayout)
         cmds.separator(style='in', height=10, width=110, parent=reorderAttrLayout)
-        cmds.button(label=self.langDic[self.langName]["i156_down"], annotation=self.langDic[self.langName]["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True), parent=reorderAttrLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i156_down"], annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True), parent=reorderAttrLayout)
         
         # call dpReorderAttrUI Window:
         cmds.showWindow(dpReorderAttrWin)

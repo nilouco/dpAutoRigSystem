@@ -9,13 +9,13 @@ TITLE = "m049_matchMesh"
 DESCRIPTION = "m050_matchMeshDesc"
 ICON = "/Icons/dp_matchMesh.png"
 
+DP_MATCHMESH_VERSION = 2.0
+
 
 class MatchMesh(object):
-    def __init__(self, dpUIinst, langDic, langName, *args):
+    def __init__(self, dpUIinst, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
         # call main function
         self.dpMain(self)
     
@@ -154,13 +154,13 @@ class MatchMesh(object):
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
                     
                     if not cancelled:
-                        print(self.langDic[self.langName]['i035_transfData'], self.langDic[self.langName]['i036_from'].upper(), ":", fromMesh, ",", self.langDic[self.langName]['i037_to'].upper(), ":", toMesh)
+                        print(self.dpUIinst.langDic[self.dpUIinst.langName]['i035_transfData'], self.dpUIinst.langDic[self.dpUIinst.langName]['i036_from'].upper(), ":", fromMesh, ",", self.dpUIinst.langDic[self.dpUIinst.langName]['i037_to'].upper(), ":", toMesh)
                     else:
-                        print(self.langDic[self.langName]['i038_canceled'])
+                        print(self.dpUIinst.langDic[self.dpUIinst.langName]['i038_canceled'])
                     
                 else:
-                    mel.eval("warning \""+self.langDic[self.langName]['i039_notMatchDif']+"\";")
+                    mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i039_notMatchDif']+"\";")
                 cmds.select(selList)
             
             else:
-                mel.eval("warning \""+self.langDic[self.langName]['i040_notMatchSel']+"\";")
+                mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i040_notMatchSel']+"\";")

@@ -9,22 +9,14 @@ TITLE = "m135_copyPasteAttr"
 DESCRIPTION = "m136_copyPasteAttrDesc"
 ICON = "/Icons/dp_copyPasteAttr.png"
 
-DPCP_VERSION = "2.1"
-
-
-# import libraries
-from maya import cmds
+DP_COPYPASTEATTR_VERSION = 2.2
 
 
 class CopyPasteAttr(object):
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
+    def __init__(self, dpUIinst, *args, **kwargs):
         # defining variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
         # call main function
         self.copyPasteAttrUI()
     
@@ -41,11 +33,11 @@ class CopyPasteAttr(object):
         """
         self.closeCopyPasteAttrUI()
         # UI:
-        dpCopyPasteAttrWin = cmds.window('dpCopyPasteAttrWin', title='CopyPasteAttr - v'+DPCP_VERSION, width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
+        dpCopyPasteAttrWin = cmds.window('dpCopyPasteAttrWin', title='CopyPasteAttr - v'+str(DP_COPYPASTEATTR_VERSION), width=200, height=75, sizeable=True, minimizeButton=False, maximizeButton=False)
         # UI elements:
         mainLayout  = cmds.columnLayout('mainLayout', width=150, height=75, adjustableColumn=True, parent=dpCopyPasteAttrWin)
-        copyButton         = cmds.button('copyButton', label=self.langDic[self.langName]['i122_copyAttr'], command=partial(self.ctrls.copyAttr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent=mainLayout)
-        pasteButton        = cmds.button('pasteButton', label=self.langDic[self.langName]['i123_pasteAttr'], command=partial(self.ctrls.pasteAttr, verbose=True), backgroundColor=(1.0, 1.0, 0.7), parent=mainLayout)
-        copyAndPasteButton = cmds.button('copyAndPasteButton', label=self.langDic[self.langName]['i124_copyPasteAttr'], command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
+        cmds.button('copyButton', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i122_copyAttr'], command=partial(self.ctrls.copyAttr, verbose=True), backgroundColor=(0.7, 1.0, 0.7), parent=mainLayout)
+        cmds.button('pasteButton', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i123_pasteAttr'], command=partial(self.ctrls.pasteAttr, verbose=True), backgroundColor=(1.0, 1.0, 0.7), parent=mainLayout)
+        cmds.button('copyAndPasteButton', label=self.dpUIinst.langDic[self.dpUIinst.langName]['i124_copyPasteAttr'], command=partial(self.ctrls.copyAndPasteAttr, True), backgroundColor=(0.7, 0.9, 1.0), parent=mainLayout)
         # calling UI:
         cmds.showWindow(dpCopyPasteAttrWin)

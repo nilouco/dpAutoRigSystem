@@ -30,19 +30,15 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DPFC_VERSION = 1.3
+DP_FACIALCONTROL_VERSION = 1.4
 
 
 class FacialControl(object):
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, *args, **kwargs):
+    def __init__(self, dpUIinst, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
-        self.headFacialCtrlsGrp = self.langDic[self.langName]["m017_head"]+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp"
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.headFacialCtrlsGrp = self.dpUIinst.langDic[self.dpUIinst.langName]["m017_head"]+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]["c059_facial"]+"_Ctrls_Grp"
         self.headCtrl = self.dpGetHeadCtrl('id_093_HeadSub')
         self.upperHeadCtrl = self.dpGetHeadCtrl('id_081_HeadUpperHead')
         self.upperJawCtrl = self.dpGetHeadCtrl('id_069_HeadUpperJaw')
@@ -67,16 +63,16 @@ class FacialControl(object):
     
     def dpInitTweaksVariables(self, *args):
         # part names:
-        mainName = self.langDic[self.langName]['c058_main']
-        tweaksName = self.langDic[self.langName]['m081_tweaks']
-        middleName = self.langDic[self.langName]['c029_middle']
-        eyebrowName = self.langDic[self.langName]['c041_eyebrow']
-        cornerName = self.langDic[self.langName]['c043_corner']
-        upperName = self.langDic[self.langName]['c044_upper']
-        lowerName = self.langDic[self.langName]['c045_lower']
-        lipName = self.langDic[self.langName]['c039_lip']
-        squintName = self.langDic[self.langName]['c054_squint']
-        cheekName = self.langDic[self.langName]['c055_cheek']
+        mainName = self.dpUIinst.langDic[self.dpUIinst.langName]['c058_main']
+        tweaksName = self.dpUIinst.langDic[self.dpUIinst.langName]['m081_tweaks']
+        middleName = self.dpUIinst.langDic[self.dpUIinst.langName]['c029_middle']
+        eyebrowName = self.dpUIinst.langDic[self.dpUIinst.langName]['c041_eyebrow']
+        cornerName = self.dpUIinst.langDic[self.dpUIinst.langName]['c043_corner']
+        upperName = self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']
+        lowerName = self.dpUIinst.langDic[self.dpUIinst.langName]['c045_lower']
+        lipName = self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']
+        squintName = self.dpUIinst.langDic[self.dpUIinst.langName]['c054_squint']
+        cheekName = self.dpUIinst.langDic[self.dpUIinst.langName]['c055_cheek']
         # eyebrows names:
         self.eyebrowMiddleName = tweaksName+"_"+middleName+"_"+eyebrowName
         self.eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
@@ -164,67 +160,67 @@ class FacialControl(object):
         
         facialCtrl_winWidth  = 380
         facialCtrl_winHeight = 380
-        dpFacialControlWin = cmds.window('dpFacialControlWindow', title=self.langDic[self.langName]["m085_facialCtrl"]+" "+str(DPFC_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpFacialControlWin = cmds.window('dpFacialControlWindow', title=self.dpUIinst.langDic[self.dpUIinst.langName]["m085_facialCtrl"]+" "+str(DP_FACIALCONTROL_VERSION), widthHeight=(facialCtrl_winWidth, facialCtrl_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         facialCtrlLayout = cmds.columnLayout('facialCtrlLayout', columnOffset=("left", 10))
-        cmds.text(label=self.langDic[self.langName]["m139_facialCtrlsAttr"], height=30, parent=facialCtrlLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m139_facialCtrlsAttr"], height=30, parent=facialCtrlLayout)
         
         doubleCBLayout = cmds.rowColumnLayout('doubleCBLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=facialCtrlLayout)
         
-        self.browCB = cmds.checkBox('browCB', label=self.langDic[self.langName]["c060_brow"], value=1, parent=doubleCBLayout)
+        self.browCB = cmds.checkBox('browCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c060_brow"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(BROW_TGTLIST), parent=doubleCBLayout)
         
-        self.eyelidCB = cmds.checkBox('eyelidCB', label=self.langDic[self.langName]["c042_eyelid"], value=1, parent=doubleCBLayout)
+        self.eyelidCB = cmds.checkBox('eyelidCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c042_eyelid"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(EYELID_TGTLIST[2:]), parent=doubleCBLayout)
         
-        self.mouthCB = cmds.checkBox('mouthCB', label=self.langDic[self.langName]["c061_mouth"], value=1, parent=doubleCBLayout)
+        self.mouthCB = cmds.checkBox('mouthCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c061_mouth"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(MOUTH_TGTLIST), parent=doubleCBLayout)
         
-        self.lipsCB = cmds.checkBox('lipsCB', label=self.langDic[self.langName]["c062_lips"], value=1, parent=doubleCBLayout)
+        self.lipsCB = cmds.checkBox('lipsCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c062_lips"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(LIPS_TGTLIST), parent=doubleCBLayout)
         
-        self.sneerCB = cmds.checkBox('sneerCB', label=self.langDic[self.langName]["c063_sneer"], value=1, parent=doubleCBLayout)
+        self.sneerCB = cmds.checkBox('sneerCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c063_sneer"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(SNEER_TGTLIST[:2]+SNEER_TGTLIST[4:]), parent=doubleCBLayout)
         
-        self.grimaceCB = cmds.checkBox('grimaceCB', label=self.langDic[self.langName]["c064_grimace"], value=1, parent=doubleCBLayout)
+        self.grimaceCB = cmds.checkBox('grimaceCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c064_grimace"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(GRIMACE_TGTLIST[:2]+GRIMACE_TGTLIST[4:]), parent=doubleCBLayout)
         
-        self.faceCB = cmds.checkBox('faceCB', label=self.langDic[self.langName]["c065_face"], value=1, parent=doubleCBLayout)
+        self.faceCB = cmds.checkBox('faceCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["c065_face"], value=1, parent=doubleCBLayout)
         cmds.text(label=', '.join(FACE_TGTLIST), parent=doubleCBLayout)
         
         cmds.separator(height=20, style="in", horizontal=True, parent=facialCtrlLayout)
         
         # radio buttons (blendShapes/joints):
-        cmds.text("typeText", label=self.langDic[self.langName]["i182_facialMessage"], height=30, parent=facialCtrlLayout)
+        cmds.text("typeText", label=self.dpUIinst.langDic[self.dpUIinst.langName]["i182_facialMessage"], height=30, parent=facialCtrlLayout)
         typeCollectionLayout = cmds.columnLayout('typeCollectionLayout', columnOffset=('left', 10), width=310, parent=facialCtrlLayout)
         self.typeCollection = cmds.radioCollection('typeCollection', parent=typeCollectionLayout)
-        cmds.radioButton( label=self.langDic[self.langName]['m170_blendShapes']+" - "+self.langDic[self.langName]['i185_animation'], annotation=TYPE_BS, onCommand=self.dpChangeType )
-        cmds.radioButton( label=self.langDic[self.langName]['i181_facialJoint']+" - "+self.langDic[self.langName]['i186_gaming'], annotation=TYPE_JOINTS, onCommand=self.dpChangeType )
+        cmds.radioButton( label=self.dpUIinst.langDic[self.dpUIinst.langName]['m170_blendShapes']+" - "+self.dpUIinst.langDic[self.dpUIinst.langName]['i185_animation'], annotation=TYPE_BS, onCommand=self.dpChangeType )
+        cmds.radioButton( label=self.dpUIinst.langDic[self.dpUIinst.langName]['i181_facialJoint']+" - "+self.dpUIinst.langDic[self.dpUIinst.langName]['i186_gaming'], annotation=TYPE_JOINTS, onCommand=self.dpChangeType )
         cmds.separator(height=20, style="in", horizontal=True, parent=typeCollectionLayout)
         
         # BlendShapes UI:
-        self.bsLayout = cmds.frameLayout("bsLayout", label=self.langDic[self.langName]["m170_blendShapes"], width=350, collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
-        self.connectCB = cmds.checkBox("connectCB", label=self.langDic[self.langName]["m140_tryConnectFacial"]+" "+self.langDic[self.langName]["m170_blendShapes"], value=1, height=30, changeCommand=self.dpChangeConnectCB, parent=self.bsLayout)
+        self.bsLayout = cmds.frameLayout("bsLayout", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m170_blendShapes"], width=350, collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
+        self.connectCB = cmds.checkBox("connectCB", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m140_tryConnectFacial"]+" "+self.dpUIinst.langDic[self.dpUIinst.langName]["m170_blendShapes"], value=1, height=30, changeCommand=self.dpChangeConnectCB, parent=self.bsLayout)
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 120), (2, 180)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.bsLayout)
-        self.loadBSButton = cmds.button("loadBSButton", label=self.langDic[self.langName]["m141_loadBlendShape"]+" >", annotation=self.langDic[self.langName]["m172_loadBSDesc"], backgroundColor=(0.6, 0.6, 1.0), width=120, command=self.dpLoadBSNode, parent=doubleLayout)
+        self.loadBSButton = cmds.button("loadBSButton", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m141_loadBlendShape"]+" >", annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["m172_loadBSDesc"], backgroundColor=(0.6, 0.6, 1.0), width=120, command=self.dpLoadBSNode, parent=doubleLayout)
         self.bsNodeTextField = cmds.textField('bsNodeTextField', width=160, text='', editable=False, parent=doubleLayout)
         bsTgtListFoundLayout = cmds.columnLayout('bsTgtListFoundLayout', columnOffset=('left', 10), width=310, rowSpacing=4, parent=self.bsLayout)
-        self.bsTgtListTxt = cmds.text("bsTgtListTxt", label=self.langDic[self.langName]["m170_blendShapes"]+" "+self.langDic[self.langName]["m142_targetListFound"], height=30, parent=bsTgtListFoundLayout)
+        self.bsTgtListTxt = cmds.text("bsTgtListTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m170_blendShapes"]+" "+self.dpUIinst.langDic[self.dpUIinst.langName]["m142_targetListFound"], height=30, parent=bsTgtListFoundLayout)
         self.bsTargetScrollList = cmds.textScrollList('bsTargetScrollList', width=290, height=100, enable=True, parent=bsTgtListFoundLayout)
         cmds.text(label='', parent=bsTgtListFoundLayout)
         
         # Joints UI:
-        self.jointsLayout = cmds.frameLayout("jointsLayout", label=self.langDic[self.langName]["m171_joints"], width=350, collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
-        self.connectFJ = cmds.checkBox("connectFJ", label=self.langDic[self.langName]["m140_tryConnectFacial"]+" "+self.langDic[self.langName]["m085_facialCtrl"], value=1, height=30, changeCommand=self.dpChangeConnectFJ, parent=self.jointsLayout)
+        self.jointsLayout = cmds.frameLayout("jointsLayout", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m171_joints"], width=350, collapsable=True, collapse=True, enable=False, parent=facialCtrlLayout)
+        self.connectFJ = cmds.checkBox("connectFJ", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m140_tryConnectFacial"]+" "+self.dpUIinst.langDic[self.dpUIinst.langName]["m085_facialCtrl"], value=1, height=30, changeCommand=self.dpChangeConnectFJ, parent=self.jointsLayout)
         doubleJointsLayout = cmds.rowColumnLayout('doubleJointsLayout', numberOfColumns=2, columnWidth=[(1, 120), (2, 180)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.jointsLayout)
         jntTgtListFoundLayout = cmds.columnLayout('jntTgtListFoundLayout', columnOffset=('left', 10), width=310, rowSpacing=4, parent=self.jointsLayout)
-        self.jntTgtListTxt = cmds.text("jntTgtListTxt", label=self.langDic[self.langName]["m171_joints"]+" "+self.langDic[self.langName]["m142_targetListFound"], height=30, parent=jntTgtListFoundLayout)
+        self.jntTgtListTxt = cmds.text("jntTgtListTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]["m171_joints"]+" "+self.dpUIinst.langDic[self.dpUIinst.langName]["m142_targetListFound"], height=30, parent=jntTgtListFoundLayout)
         self.jntTargetScrollList = cmds.textScrollList('jntTargetScrollList', width=290, height=100, enable=True, parent=jntTgtListFoundLayout)
         
         cmds.separator(height=20, style="in", horizontal=True, parent=facialCtrlLayout)
-        cmds.button(label=self.langDic[self.langName]["m143_createSelected"], annotation="Create selected facial controls.", width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpSelectedCtrls, parent=facialCtrlLayout)
-        cmds.button(label=self.langDic[self.langName]["m144_createDefaltPackage"], annotation="Create default facial controls package.", width=290, backgroundColor=(1.0, 1.0, 0.6), command=self.dpCreateDefaultPackage, parent=facialCtrlLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m143_createSelected"], annotation="Create selected facial controls.", width=290, backgroundColor=(0.6, 1.0, 0.6), command=self.dpSelectedCtrls, parent=facialCtrlLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m144_createDefaltPackage"], annotation="Create default facial controls package.", width=290, backgroundColor=(1.0, 1.0, 0.6), command=self.dpCreateDefaultPackage, parent=facialCtrlLayout)
         
         # call facialControlUI Window:
         cmds.showWindow(dpFacialControlWin)
@@ -285,23 +281,23 @@ class FacialControl(object):
         """
         connectBS, connectJnt = self.dpGetUserType()
         # creating controls:
-        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
-        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
+        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"], self.dpUIinst.langDic[self.dpUIinst.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
+        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"], self.dpUIinst.langDic[self.dpUIinst.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
         if self.userType == TYPE_BS:
-            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
-            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
-        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
-        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
-        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
-        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, True, connectBS, connectJnt, "cyan")
+            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"], self.dpUIinst.langDic[self.dpUIinst.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
+            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"], self.dpUIinst.langDic[self.dpUIinst.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
+        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"], self.dpUIinst.langDic[self.dpUIinst.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
+        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"], self.dpUIinst.langDic[self.dpUIinst.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
+        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
+        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, True, connectBS, connectJnt, "cyan")
         
         # integrating to dpAutoRigSystem:
         if self.headCtrl:
-            self.upperHeadFacialCtrlsGrp = cmds.group(name=self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head']+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
-            self.upperJawFacialCtrlsGrp = cmds.group(name=self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw']+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
-            self.chinFacialCtrlsGrp = cmds.group(name=self.langDic[self.langName]['c026_chin']+"_"+self.langDic[self.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
+            self.upperHeadFacialCtrlsGrp = cmds.group(name=self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
+            self.upperJawFacialCtrlsGrp = cmds.group(name=self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
+            self.chinFacialCtrlsGrp = cmds.group(name=self.dpUIinst.langDic[self.dpUIinst.langName]['c026_chin']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]["c059_facial"]+"_Ctrls_Grp", empty=True)
             cmds.parent(self.upperHeadFacialCtrlsGrp, self.headFacialCtrlsGrp)
             cmds.parent(self.upperJawFacialCtrlsGrp, self.headFacialCtrlsGrp)
             cmds.parent(self.chinFacialCtrlsGrp, self.headFacialCtrlsGrp)
@@ -393,29 +389,29 @@ class FacialControl(object):
         connectBS, connectJnt = self.dpGetUserType()
         
         if cmds.checkBox(self.browCB, query=True, value=True):
-            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
-            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
+            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"], self.dpUIinst.langDic[self.dpUIinst.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red")
+            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"], self.dpUIinst.langDic[self.dpUIinst.langName]["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue")
             if rBrowCtrlGrp:
                 cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.eyelidCB, query=True, enable=True):
             if cmds.checkBox(self.eyelidCB, query=True, value=True):
-                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
-                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
+                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"], self.dpUIinst.langDic[self.dpUIinst.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red")
+                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"], self.dpUIinst.langDic[self.dpUIinst.langName]["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue")
         if cmds.checkBox(self.mouthCB, query=True, value=True):
-            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p002_left"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
-            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.langDic[self.langName]["p003_right"], self.langDic[self.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
+            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"], self.dpUIinst.langDic[self.dpUIinst.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red")
+            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"], self.dpUIinst.langDic[self.dpUIinst.langName]["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue")
             if rMouthCtrlGrp:
                 cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.lipsCB, query=True, value=True):
-            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
+            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow")
         if cmds.checkBox(self.sneerCB, query=True, value=True):
-            sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+            sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
         if cmds.checkBox(self.grimaceCB, query=True, value=True):
-            grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
+            grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
             if grimaceCtrlGrp:
                 cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
         if cmds.checkBox(self.faceCB, query=True, value=True):
-            faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.langDic[self.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, False, True, connectBS, connectJnt, "cyan")
+            faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.langDic[self.dpUIinst.langName]["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, False, True, connectBS, connectJnt, "cyan")
         
     
     def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, connectBS=True, connectJnt=False, color='yellow', addTranslateY=False, limitMinY=False, *args):
@@ -640,13 +636,13 @@ class FacialControl(object):
                         self.dpLoadBSTgtList(bsNodeList[0])
                         self.bsNode = bsNodeList[0]
                     else:
-                        mel.eval("warning \""+self.langDic[self.langName]["e018_selectBlendShape"]+"\";")
+                        mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]["e018_selectBlendShape"]+"\";")
                 else:
-                    mel.eval("warning \""+self.langDic[self.langName]["e018_selectBlendShape"]+"\";")
+                    mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]["e018_selectBlendShape"]+"\";")
             else:
-                mel.eval("warning \""+self.langDic[self.langName]["e018_selectBlendShape"]+"\";")
+                mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]["e018_selectBlendShape"]+"\";")
         else:
-            mel.eval("warning \""+self.langDic[self.langName]["e018_selectBlendShape"]+"\";")
+            mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]["e018_selectBlendShape"]+"\";")
     
     
     def dpLoadBSTgtList(self, bsNodeName, *args):
@@ -665,8 +661,8 @@ class FacialControl(object):
     def dpLoadJointNode(self, itemList, *args):
         """ Load the respective items to build the joint target list (offset group node).
         """
-        leftPrefix = self.langDic[self.langName]["p002_left"]+"_"
-        rightPrefix = self.langDic[self.langName]["p003_right"]+"_"
+        leftPrefix = self.dpUIinst.langDic[self.dpUIinst.langName]["p002_left"]+"_"
+        rightPrefix = self.dpUIinst.langDic[self.dpUIinst.langName]["p003_right"]+"_"
         offsetSuffix = "_Ctrl_Offset_Grp"
         for item in itemList:
             centerName = item+offsetSuffix

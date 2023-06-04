@@ -6,13 +6,11 @@ from ..Modules.Library import dpUtils
 
 
 class ControlStartClass:
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -28,9 +26,7 @@ class ControlStartClass:
         self.cvPeriodic = None
         self.controlsGuideDir = 'Controls'
         self.suffix = "Ctrl"
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
     
     
     def getControlUIValues(self, cvName='', *args):
@@ -153,7 +149,7 @@ class ControlStartClass:
                     self.ctrls.transferShape(True, True, self.cvCurve, destinationList, True)
             else:
                 cmds.delete(self.cvCurve)
-                mel.eval("warning \""+self.langDic[self.langName]['e011_notSelShape']+"\";")
+                mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['e011_notSelShape']+"\";")
     
     
     def cvCreate(self, useUI, cvID, cvName='Control_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, combine=False, *args):

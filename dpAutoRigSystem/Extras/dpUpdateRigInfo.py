@@ -8,6 +8,8 @@ TITLE = "m057_updateRigInfo"
 DESCRIPTION = "m058_updateRigInfoDesc"
 ICON = "/Icons/dp_updateRigInfo.png"
 
+DP_UPDATERIGINFO_VERSION = 2.0
+
 
 class UpdateRigInfo(object):
     def __init__(self, *args, **kwargs):

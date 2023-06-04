@@ -25,17 +25,16 @@ TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
 ICON = "/Icons/dp_rivet.png"
 
-
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DPRV_VERSION = "1.3"
+DP_RIVET_VERSION = 1.4
+
 
 class Rivet(object):
-    def __init__(self, dpUIinst, langDic, langName, ui=True, *args, **kwargs):
+    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # declaring variables
-        self.langDic = langDic
-        self.langName = langName
+        self.dpUIinst = dpUIinst
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None
@@ -45,6 +44,7 @@ class Rivet(object):
             self.dpRivetUI()
             # try to fill UI items from selection
             self.dpFillUI()
+
 
     def dpCloseRivetUi(self, *args):
         if cmds.window('dpRivetWindow', query=True, exists=True):
@@ -58,42 +58,42 @@ class Rivet(object):
         self.dpCloseRivetUi()
         rivet_winWidth  = 305
         rivet_winHeight = 470
-        dpRivetWin = cmds.window('dpRivetWindow', title=self.langDic[self.langName]["m083_rivet"]+" "+DPRV_VERSION, widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpRivetWin = cmds.window('dpRivetWindow', title=self.dpUIinst.langDic[self.dpUIinst.langName]["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10))
-        cmds.text(label=self.langDic[self.langName]["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=rivetLayout)
-        cmds.button(label=self.langDic[self.langName]["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
         self.geoToAttachTF = cmds.textField('geoToAttachTF', width=180, text="", changeCommand=partial(self.dpLoadGeoToAttach, None, True), parent=doubleLayout)
         uvSetLayout = cmds.rowColumnLayout('uvSetLayout', numberOfColumns=2, columnWidth=[(1, 110), (2, 210)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 1), (2, 'left', 10)], parent=rivetLayout)
         cmds.text(label="UV Set:", font='obliqueLabelFont', parent=uvSetLayout)
         self.uvSetTF = cmds.textField('uvSetTF', width=180, text="", editable=False, parent=uvSetLayout)
         cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.langDic[self.langName]["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         itemsLayout = cmds.columnLayout('itemsLayout', columnOffset=('left', 10), width=310, parent=rivetLayout)
         self.itemScrollList = cmds.textScrollList('itemScrollList', width=290, height=100, allowMultiSelection=True, parent=itemsLayout)
         cmds.separator(style='none', height=5, parent=itemsLayout)
         middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=itemsLayout)
-        cmds.button(label=self.langDic[self.langName]["i045_add"], annotation=self.langDic[self.langName]["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
-        cmds.button(label=self.langDic[self.langName]["i046_remove"], annotation=self.langDic[self.langName]["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i045_add"], annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i046_remove"], annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
         cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.langDic[self.langName]["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
         fatherLayout = cmds.columnLayout('fatherLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.attachTCB = cmds.checkBox('attachTCB', label=self.langDic[self.langName]["m148_attach"]+" Translate", value=True, parent=fatherLayout)
-        self.attachRCB = cmds.checkBox('attachRCB', label=self.langDic[self.langName]["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
-        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.langDic[self.langName]["m149_createGroupConst"], value=True, parent=fatherLayout)
+        self.attachTCB = cmds.checkBox('attachTCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["m148_attach"]+" Translate", value=True, parent=fatherLayout)
+        self.attachRCB = cmds.checkBox('attachRCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
+        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["m149_createGroupConst"], value=True, parent=fatherLayout)
         invertLayout = cmds.columnLayout('invertLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.langDic[self.langName]["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
+        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
         translateLayout = cmds.rowColumnLayout('translateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=translateLayout)
-        self.invertTCB = cmds.checkBox('invertTCB', label=self.langDic[self.langName]["m151_invert"]+" Translate", value=True, parent=translateLayout)
+        self.invertTCB = cmds.checkBox('invertTCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["m151_invert"]+" Translate", value=True, parent=translateLayout)
         rotateLayout = cmds.rowColumnLayout('rotateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=rotateLayout)
-        self.invertRCB = cmds.checkBox('invertRCB', label=self.langDic[self.langName]["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
+        self.invertRCB = cmds.checkBox('invertRCB', label=self.dpUIinst.langDic[self.dpUIinst.langName]["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
-        cmds.button(label=self.langDic[self.langName]["i158_create"]+" "+self.langDic[self.langName]["m083_rivet"], annotation=self.langDic[self.langName]["i158_create"]+" "+self.langDic[self.langName]["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
+        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["i158_create"]+" "+self.dpUIinst.langDic[self.dpUIinst.langName]["m083_rivet"], annotation=self.dpUIinst.langDic[self.dpUIinst.langName]["i158_create"]+" "+self.dpUIinst.langDic[self.dpUIinst.langName]["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
         
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)

@@ -7,21 +7,20 @@ TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 ICON = "/Icons/dp_limbSpaceSwitch.png"
 
-DPLSS_VERSION = "2.0"
+DP_LIMBSPACESWITCH_VERSION = 2.1
+
 
 class LimbSpaceSwitch(object):
-    def __init__(self, dpUIinst, langDic, langName, *args):
+    def __init__(self, dpUIinst, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
         
         self.globalName = "Global"
         self.rootName = "Root"
-        self.spineName = self.langDic[self.langName]['m011_spine']
-        self.hipsName = self.langDic[self.langName]['c027_hips']
-        self.headName = self.langDic[self.langName]['c024_head']
-        self.chestName = self.langDic[self.langName]['c028_chest']
+        self.spineName = self.dpUIinst.langDic[self.dpUIinst.langName]['m011_spine']
+        self.hipsName = self.dpUIinst.langDic[self.dpUIinst.langName]['c027_hips']
+        self.headName = self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']
+        self.chestName = self.dpUIinst.langDic[self.dpUIinst.langName]['c028_chest']
         
         self.globalCtrl = self.globalName+"_Ctrl"
         self.rootCtrl = self.rootName+"_Ctrl"
@@ -31,7 +30,7 @@ class LimbSpaceSwitch(object):
         self.spineChestBCtrl = self.spineName+"_"+self.chestName+"B_Ctrl"
         self.headSubCtrl = self.headName+"_"+self.headName+"_Sub_Ctrl"
 
-        self.followAttr = self.langDic[self.langName]['c032_follow']
+        self.followAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow']
         
         # call main function
         self.dpMain(self)
@@ -72,8 +71,8 @@ class LimbSpaceSwitch(object):
     def dpDoAddHandFollow(self, *args):
         """ Set attributes and call setDrivenKey method.
         """
-        sideList = [self.langDic[self.langName]['p002_left'], self.langDic[self.langName]['p003_right']]
-        limbList = [self.langDic[self.langName]['c037_arm']+"_"+self.langDic[self.langName]['c004_arm_extrem'], self.langDic[self.langName]['c006_leg_main']+"_"+self.langDic[self.langName]['c009_leg_extrem']]
+        sideList = [self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left'], self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right']]
+        limbList = [self.dpUIinst.langDic[self.dpUIinst.langName]['c037_arm']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c004_arm_extrem'], self.dpUIinst.langDic[self.dpUIinst.langName]['c006_leg_main']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c009_leg_extrem']]
         for side in sideList:
             for x, limbNode in enumerate(limbList):
                 ikCtrl = side+"_"+limbNode+"_Ik_Ctrl"

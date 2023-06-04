@@ -8,17 +8,14 @@ TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
 
-dpIsolateVersion = 1.1
+DP_ISOLATE_VERSION = 1.2
 
 class Isolate(object):
-    def __init__(self, dpUIinst, langDic, langName, *args):
+    def __init__(self, dpUIinst, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
-        
         self.rootName = "Root"
-        self.isolateName = self.langDic[self.langName]['m095_isolate']
+        self.isolateName = self.dpUIinst.langDic[self.dpUIinst.langName]['m095_isolate']
         
         # base item to isolate
         self.rootCtrl = self.rootName+"_Ctrl"
@@ -64,7 +61,7 @@ class Isolate(object):
         if len(nodeList) == 3:
             for nodeName in nodeList:
                 if not cmds.objExists(nodeName):
-                    print(self.langDic[self.langName]['e004_objNotExist'], nodeName)
+                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['e004_objNotExist'], nodeName)
                     return
         # call scripted function
         self.dpIsolate(self.isolateName, nodeList)
