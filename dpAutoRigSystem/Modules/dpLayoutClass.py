@@ -9,12 +9,11 @@ reload(dpUtils)
 
 
 class LayoutClass(object):
-    def __init__(self, dpUIinst, langDic, langName, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON):
+    def __init__(self, dpUIinst, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON):
         """ Initialize the layout class.
         """
         # defining variables:
-        self.langDic = langDic
-        self.langName = langName
+        self.dpUIinst = dpUIinst
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -28,12 +27,12 @@ class LayoutClass(object):
         # BASIC MODULE LAYOUT:
         self.basicColumn = cmds.rowLayout(numberOfColumns=5, width=190, columnWidth5=(30, 20, 80, 20, 35), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent=self.topColumn)
         # create basic module UI:
-        self.selectButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
-        self.annotationCheckBox = cmds.checkBox(label=" ", annotation=self.langDic[self.langName]['m014_annotation'], onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), value=0, parent=self.basicColumn)
-        self.userName = cmds.textField('userName', annotation=self.langDic[self.langName]['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
-        self.colorButton = cmds.button(label=" ", annotation=self.langDic[self.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
+        self.selectButton = cmds.button(label=" ", annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
+        self.annotationCheckBox = cmds.checkBox(label=" ", annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['m014_annotation'], onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), value=0, parent=self.basicColumn)
+        self.userName = cmds.textField('userName', annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
+        self.colorButton = cmds.button(label=" ", annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
         shapeSizeValue = cmds.getAttr(self.moduleGrp+'.shapeSize')
-        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.langDic[self.langName]['m067_shape']+" "+self.langDic[self.langName]['i115_size'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
+        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i115_size'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
         # edit values reading from guide:
         displayAnnotationValue = cmds.getAttr(self.moduleGrp+'.displayAnnotation')
         cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
@@ -141,7 +140,7 @@ class LayoutClass(object):
                 
                 # UI
                 # edit label of frame layout:
-                cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.langDic[self.langName]['i011_editSelected']+" "+self.langDic[self.langName]['i143_module']+" :  "+self.langDic[self.langName][self.title]+" - "+self.userGuideName)
+                cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i143_module']+" :  "+self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+" - "+self.userGuideName)
                 # edit button with "S" letter indicating it is selected:
                 cmds.button(self.selectButton, edit=True, label="S", backgroundColor=(1.0, 1.0, 1.0))
                 cmds.columnLayout("selectedModuleColumn", adjustableColumn=True, parent="selectedModuleLayout")
@@ -150,21 +149,21 @@ class LayoutClass(object):
                 if self.nJointsAttrExists:
                     nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
                     if nJointsAttr > 0:
-                        self.nSegmentsText = cmds.text(label=self.langDic[self.langName]['m003_segments'], parent=self.segDelColumn)
+                        self.nSegmentsText = cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m003_segments'], parent=self.segDelColumn)
                         self.nJointsIF = cmds.intField(value=nJointsAttr, minValue=1, changeCommand=partial(self.changeJointNumber, 0), parent=self.segDelColumn)
                     else:
-                        self.nSegmentsText = cmds.text(label=self.langDic[self.langName]['m003_segments'], parent=self.segDelColumn)
+                        self.nSegmentsText = cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m003_segments'], parent=self.segDelColumn)
                         self.nJointsIF = cmds.intField(value=nJointsAttr, minValue=0, editable=False, parent=self.segDelColumn)
                 else:
                     cmds.text(" ", parent=self.segDelColumn)
                     cmds.text(" ", parent=self.segDelColumn)
                 # create Delete button:
-                self.deleteButton = cmds.button(label=self.langDic[self.langName]['m005_delete'], command=self.deleteModule, backgroundColor=(1.0, 0.7, 0.7), parent=self.segDelColumn)
-                self.duplicateButton = cmds.button(label=self.langDic[self.langName]['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.langDic[self.langName]['i068_CtrlD'], parent=self.segDelColumn)
+                self.deleteButton = cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m005_delete'], command=self.deleteModule, backgroundColor=(1.0, 0.7, 0.7), parent=self.segDelColumn)
+                self.duplicateButton = cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['i068_CtrlD'], parent=self.segDelColumn)
                 
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                cmds.text(self.langDic[self.langName]['m010_mirror'], parent=self.doubleRigColumn)
+                cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror'], parent=self.doubleRigColumn)
                 self.mirrorMenu = cmds.optionMenu("mirrorMenu", label='', changeCommand=self.changeMirror, parent=self.doubleRigColumn)
                 mirrorMenuItemList = ['off', 'X', 'Y', 'Z', 'XY', 'XZ', 'YZ', 'XYZ']
                 for item in mirrorMenuItemList:
@@ -174,12 +173,12 @@ class LayoutClass(object):
                 if currentMirrorNameList:
                     menuNameItemList = str(currentMirrorNameList).split(';')
                 else:
-                    L = self.langDic[self.langName]['p002_left']
-                    R = self.langDic[self.langName]['p003_right']
-                    T = self.langDic[self.langName]['p004_top']
-                    B = self.langDic[self.langName]['p005_bottom']
-                    F = self.langDic[self.langName]['p006_front']
-                    Bk= self.langDic[self.langName]['p007_back']
+                    L = self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left']
+                    R = self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right']
+                    T = self.dpUIinst.langDic[self.dpUIinst.langName]['p004_top']
+                    B = self.dpUIinst.langDic[self.dpUIinst.langName]['p005_bottom']
+                    F = self.dpUIinst.langDic[self.dpUIinst.langName]['p006_front']
+                    Bk= self.dpUIinst.langDic[self.dpUIinst.langName]['p007_back']
                     menuNameItemList = [L+' --> '+R, R+' --> '+L, T+' --> '+B, B+' --> '+T, F+' --> '+Bk, Bk+' --> '+F]
                 # create items for mirrorName menu:
                 self.mirrorNameMenu = cmds.optionMenu("mirrorNameMenu", label='', changeCommand=self.changeMirrorName, parent=self.doubleRigColumn)
@@ -211,7 +210,7 @@ class LayoutClass(object):
                 # aim direction for eye look at:
                 if self.aimDirectionAttrExists:
                     self.aimDirectionLayout = cmds.rowLayout('aimDirectionLayout', numberOfColumns=4, columnWidth4=(100, 50, 180, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.langDic[self.langName]['i082_aimDirection'], parent=self.aimDirectionLayout)
+                    cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]['i082_aimDirection'], parent=self.aimDirectionLayout)
                     self.aimMenu = cmds.optionMenu("aimMenu", label='', changeCommand=self.changeAimDirection, parent=self.aimDirectionLayout)
                     self.aimMenuItemList = ['+X', '-X', '+Y', '-Y', '+Z', '-Z']
                     for item in self.aimMenuItemList:
@@ -238,7 +237,7 @@ class LayoutClass(object):
                     self.indirectSkinCB = cmds.checkBox(label="Indirect Skinning", value=indirectSkinValue, changeCommand=self.changeIndirectSkin, parent=self.indirectSkinLayout)
                     cmds.text(" ", parent=self.indirectSkinLayout)
                     holderValue = cmds.getAttr(self.moduleGrp+".holder")
-                    self.holderCB = cmds.checkBox(label=self.langDic[self.langName]['c046_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
+                    self.holderCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['c046_holder'], value=holderValue, enable=False, changeCommand=self.changeHolder, parent=self.indirectSkinLayout)
                     self.sdkLocatorLayout = cmds.rowLayout('sdkLocatorLayout', numberOfColumns=4, columnWidth4=(100, 150, 10, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
                     cmds.text(" ", parent=self.sdkLocatorLayout)
                     cmds.text(" ", parent=self.sdkLocatorLayout)
@@ -252,20 +251,20 @@ class LayoutClass(object):
                     self.eyelidLayout = cmds.rowLayout('eyelidLayout', numberOfColumns=6, columnWidth6=(30, 75, 75, 80, 40, 60), columnAlign=[(1, 'right'), (2, 'left'), (6, 'right')], adjustableColumn=6, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2), (6, 'both', 2)], parent="selectedModuleColumn" )
                     cmds.text(" ", parent=self.eyelidLayout)
                     eyelidValue = cmds.getAttr(self.moduleGrp+".eyelid")
-                    self.eyelidCB = cmds.checkBox(label=self.langDic[self.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.eyelidLayout)
+                    self.eyelidCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i079_eyelid'], value=eyelidValue, changeCommand=self.changeEyelid, parent=self.eyelidLayout)
                     lidPivotValue = cmds.getAttr(self.moduleGrp+".lidPivot")
-                    self.lidPivotCB = cmds.checkBox(label=self.langDic[self.langName]['i283_pivot'], value=lidPivotValue, changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
+                    self.lidPivotCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i283_pivot'], value=lidPivotValue, changeCommand=self.changeLidPivot, parent=self.eyelidLayout)
                     specValue = cmds.getAttr(self.moduleGrp+".specular")
-                    self.specCB = cmds.checkBox(label=self.langDic[self.langName]['i184_specular'], value=specValue, changeCommand=self.changeSpecular, parent=self.eyelidLayout)
+                    self.specCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i184_specular'], value=specValue, changeCommand=self.changeSpecular, parent=self.eyelidLayout)
                     irisValue = cmds.getAttr(self.moduleGrp+".iris")
-                    self.irisCB = cmds.checkBox(label=self.langDic[self.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.eyelidLayout)
+                    self.irisCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i080_iris'], value=irisValue, changeCommand=self.changeIris, parent=self.eyelidLayout)
                     pupilValue = cmds.getAttr(self.moduleGrp+".pupil")
-                    self.pupilCB = cmds.checkBox(label=self.langDic[self.langName]['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.eyelidLayout)
+                    self.pupilCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i081_pupil'], value=pupilValue, changeCommand=self.changePupil, parent=self.eyelidLayout)
                 
                 # create geometry layout:
                 if self.geoExists:
                     self.geoColumn = cmds.rowLayout('geoColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
-                    cmds.button(label=self.langDic[self.langName]["m146_geo"]+" >", command=self.loadGeo, parent=self.geoColumn)
+                    cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m146_geo"]+" >", command=self.loadGeo, parent=self.geoColumn)
                     self.geoTF = cmds.textField('geoTF', text='', enable=True, changeCommand=self.changeGeo, parent=self.geoColumn)
                     currentGeo = cmds.getAttr(self.moduleGrp+".geo")
                     if currentGeo:
@@ -274,7 +273,7 @@ class LayoutClass(object):
                 # create startFrame layout:
                 if self.startFrameExists:
                     self.startFrameColumn = cmds.rowLayout('startFrameColumn', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.langDic[self.langName]["i169_startFrame"], parent=self.startFrameColumn)
+                    cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]["i169_startFrame"], parent=self.startFrameColumn)
                     self.startFrameIF = cmds.intField('startFrameIF', value=1, changeCommand=self.changeStartFrame, parent=self.startFrameColumn)
                     currentStartFrame = cmds.getAttr(self.moduleGrp+".startFrame")
                     if currentStartFrame:
@@ -287,14 +286,14 @@ class LayoutClass(object):
                     else:
                         self.wheelLayout = cmds.rowLayout('wheelLayout', numberOfColumns=4, columnWidth4=(100, 60, 70, 40), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
                     steeringValue = cmds.getAttr(self.moduleGrp+".steering")
-                    self.steeringCB = cmds.checkBox(label=self.langDic[self.langName]['m158_steering'], value=steeringValue, changeCommand=self.changeSteering, parent=self.wheelLayout)
+                    self.steeringCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m158_steering'], value=steeringValue, changeCommand=self.changeSteering, parent=self.wheelLayout)
                     showControlsValue = cmds.getAttr(self.moduleGrp+".showControls")
-                    self.showControlsCB = cmds.checkBox(label=self.langDic[self.langName]['i170_showControls'], value=showControlsValue, changeCommand=self.changeShowControls, parent=self.wheelLayout)
+                    self.showControlsCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i170_showControls'], value=showControlsValue, changeCommand=self.changeShowControls, parent=self.wheelLayout)
                 
                 # create fatherB layout:
                 if self.fatherBExists:
                     self.fatherBColumn = cmds.rowLayout('fatherBColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
-                    cmds.button(label=self.langDic[self.langName]["m160_fatherB"]+" >", command=self.loadFatherB, parent=self.fatherBColumn)
+                    cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]["m160_fatherB"]+" >", command=self.loadFatherB, parent=self.fatherBColumn)
                     self.fatherBTF = cmds.textField('fatherBTF', text='', enable=True, changeCommand=self.changeFatherB, parent=self.fatherBColumn)
                     currentFatherB = cmds.getAttr(self.moduleGrp+".fatherB")
                     if currentFatherB:
@@ -303,7 +302,7 @@ class LayoutClass(object):
                 # create degree layout:
                 if self.degreeExists:
                     self.degreeColumn = cmds.rowLayout('degreeColumn', numberOfColumns=3, columnWidth3=(100, 100, 70), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
-                    cmds.text(self.langDic[self.langName]['i119_curveDegree'], parent=self.degreeColumn)
+                    cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]['i119_curveDegree'], parent=self.degreeColumn)
                     self.degreeMenu = cmds.optionMenu("degreeMenu", label='', changeCommand=self.changeDegree, parent=self.degreeColumn)
                     self.degreeMenuItemList = ['0 - Preset', '1 - Linear', '3 - Cubic']
                     for item in self.degreeMenuItemList:
@@ -320,7 +319,7 @@ class LayoutClass(object):
                 # create articulation joint layout:
                 if self.articulationExists:
                     self.articLayout = cmds.rowLayout('articLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.langDic[self.langName]['m173_articulation'], parent=self.articLayout)
+                    cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]['m173_articulation'], parent=self.articLayout)
                     articValue = cmds.getAttr(self.moduleGrp+".articulation")
                     self.articCB = cmds.checkBox(label="", value=articValue, changeCommand=self.changeArticulation, parent=self.articLayout)
                 
@@ -328,12 +327,12 @@ class LayoutClass(object):
                 if self.nostrilExists:
                     cmds.text(" ", parent=self.articLayout)
                     nostrilValue = cmds.getAttr(self.moduleGrp+".nostril")
-                    self.nostrilCB = cmds.checkBox(label=self.langDic[self.langName]['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
+                    self.nostrilCB = cmds.checkBox(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m079_nostril'], value=nostrilValue, changeCommand=self.changeNostril, parent=self.articLayout)
 
                 # create corrective layout:
                 if self.correctiveExists:
                     self.correctiveLayout = cmds.rowLayout('correctiveLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.langDic[self.langName]['c124_corrective'].capitalize(), parent=self.correctiveLayout)
+                    cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]['c124_corrective'].capitalize(), parent=self.correctiveLayout)
                     correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
                     self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
                 
@@ -453,7 +452,7 @@ class LayoutClass(object):
             stopMirrorOperation = self.checkFatherMirror()
             if not stopMirrorOperation:
                 # loading Maya matrix node (for mirror porpuses)
-                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
+                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
                     cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')

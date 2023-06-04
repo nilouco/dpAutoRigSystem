@@ -304,13 +304,13 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # grouping:
                     if n > 0:
                         if n == 1:
-                            if not cmds.objExists(self.fingerCtrl+'.'+self.langDic[self.langName]['c021_showControls']):
-                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
+                            if not cmds.objExists(self.fingerCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c021_showControls']):
+                                cmds.addAttr(self.fingerCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c021_showControls'], attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                                 self.ctrlShape0 = cmds.listRelatives(side+self.userGuideName+"_00_Ctrl", children=True, type='nurbsCurve')[0]
-                                cmds.connectAttr(self.fingerCtrl+"."+self.langDic[self.langName]['c021_showControls'], self.ctrlShape0+".visibility", force=True)
-                                cmds.setAttr(self.fingerCtrl+'.'+self.langDic[self.langName]['c021_showControls'], keyable=False, channelBox=True)
+                                cmds.connectAttr(self.fingerCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c021_showControls'], self.ctrlShape0+".visibility", force=True)
+                                cmds.setAttr(self.fingerCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c021_showControls'], keyable=False, channelBox=True)
                             for j in range(1, self.nJoints+1):
-                                cmds.addAttr(self.fingerCtrl, longName=self.langDic[self.langName]['c022_phalange']+str(j), attributeType='float', keyable=True)
+                                cmds.addAttr(self.fingerCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c022_phalange']+str(j), attributeType='float', keyable=True)
                         # parent joints as a simple chain (line)
                         self.fatherJnt = side+self.userGuideName+"_%02d_Jnt"%(n-1)
                         cmds.parent(self.jnt, self.fatherJnt, absolute=True)
@@ -355,10 +355,10 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for n in range(1, self.nJoints+1):
                     self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
                     self.sdkGrp = side+self.userGuideName+"_%02d_SDK_Grp"%(n)
-                    cmds.connectAttr(self.fingerCtrl+"."+self.langDic[self.langName]['c022_phalange']+str(n), self.sdkGrp+".rotateY", force=True)
+                    cmds.connectAttr(self.fingerCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c022_phalange']+str(n), self.sdkGrp+".rotateY", force=True)
                     if n > 1:
                         self.ctrlShape = cmds.listRelatives(side+self.userGuideName+"_%02d_Ctrl"%(n), children=True, type='nurbsCurve')[0]
-                        cmds.connectAttr(self.fingerCtrl+"."+self.langDic[self.langName]['c021_showControls'], self.ctrlShape+".visibility", force=True)
+                        cmds.connectAttr(self.fingerCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c021_showControls'], self.ctrlShape+".visibility", force=True)
 
                 # ik and Fk setup
                 if self.nJoints == 2:

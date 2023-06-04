@@ -12,21 +12,17 @@ class RigType(object):
     default = "unknown" #Support old guide system
 
 class StartClass(object):
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
+    def __init__(self, dpUIinst, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
         self.icon = ICON
         self.userGuideName = userGuideName
         self.rigType = rigType
-        self.presetDic = presetDic
-        self.presetName = presetName
         # defining namespace:
         self.guideNamespace = self.guideModuleName + "__" + self.userGuideName
         # defining guideNamespace:
@@ -37,9 +33,9 @@ class StartClass(object):
         self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
         self.annotation = self.moduleGrp+"_Ant"
         # calling dpControls:
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName, self.moduleGrp)
+        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.moduleGrp)
         # starting correctionManater:
-        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, False)
+        self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
         # starting module:
         if not self.namespaceExists:
             cmds.namespace(add=self.guideNamespace)
@@ -55,7 +51,7 @@ class StartClass(object):
         """ Create the Module Layout, so it will exists in the right as a new options to editModules.
         """
         # MODULE LAYOUT:
-        self.moduleLayout = self.langDic[self.langName][self.title]+" - "+self.userGuideName
+        self.moduleLayout = self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+" - "+self.userGuideName
         self.moduleFrameLayout = cmds.frameLayout(self.moduleLayout , label=self.moduleLayout, collapsable=True, collapse=False, parent="modulesLayoutA")
         self.topColumn = cmds.columnLayout(self.moduleLayout+"_TopColumn", adjustableColumn=True, parent=self.moduleFrameLayout)
         # here we have just the column layouts to be populated by modules.
@@ -84,7 +80,7 @@ class StartClass(object):
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
-        cmds.setAttr(self.moduleGrp+".mirrorName", self.langDic[self.langName]['p002_left']+' --> '+self.langDic[self.langName]['p003_right'], type='string')
+        cmds.setAttr(self.moduleGrp+".mirrorName", self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left']+' --> '+self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right'], type='string')
         cmds.setAttr(self.moduleGrp+".hookNode", "_Grp", type='string')
         cmds.setAttr(self.moduleGrp+".moduleInstanceInfo", self, type='string')
         cmds.setAttr(self.moduleGrp+".guideObjectInfo", self.dpUIinst.guide, type='string')
@@ -128,7 +124,7 @@ class StartClass(object):
                 else:
                     try:
                         self.deleteModule()
-                        mel.eval('warning \"'+ self.langDic[self.langName]['e000_GuideNotFound'] +' - '+ self.moduleGrp +'\";')
+                        mel.eval('warning \"'+ self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound'] +' - '+ self.moduleGrp +'\";')
                     except:
                         pass
                     return False
@@ -157,7 +153,7 @@ class StartClass(object):
             self.clearSelectedModuleLayout()
             # edit the footer A text:
             self.currentText = cmds.text("footerAText", query=True, label=True)
-            cmds.text("footerAText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.langDic[self.langName]['i005_footerA'])
+            cmds.text("footerAText", edit=True, label=str(int(self.currentText[:self.currentText.find(" ")]) - 1) +" "+ self.dpUIinst.langDic[self.dpUIinst.langName]['i005_footerA'])
         except:
             pass
         # clear module from instance list (clean dpUI list):
@@ -249,11 +245,11 @@ class StartClass(object):
                         3 = inputValue,
                     ]
         """
-        if not cmds.objExists(ctrl+"."+self.langDic[self.langName]['c124_corrective']):
-            cmds.addAttr(ctrl, longName=self.langDic[self.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+        if not cmds.objExists(ctrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c124_corrective']):
+            cmds.addAttr(ctrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c124_corrective'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
         # corrective network node
         correctiveNet = self.correctionManager.createCorrectionManager([firstNode, secondNode], name=netName, correctType=self.correctionManager.angleName, toRivet=False, fromUI=False)
-        cmds.connectAttr(ctrl+"."+self.langDic[self.langName]['c124_corrective'], correctiveNet+".corrective", force=True)
+        cmds.connectAttr(ctrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c124_corrective'], correctiveNet+".corrective", force=True)
         cmds.setAttr(correctiveNet+".axis", axis)
         cmds.setAttr(correctiveNet+".axisOrder", axisOrder)
         if isLeg:
@@ -278,7 +274,7 @@ class StartClass(object):
         if jcrList:
             l = 0
             sDefault = s
-            mirrorPrefixList = [self.langDic[self.langName]['p002_left'], self.langDic[self.langName]['p003_right']]
+            mirrorPrefixList = [self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left'], self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right']]
             for i, jcr in enumerate(jcrList):
                 if not i == 0: #exclude jar in the index 0
                     # logic to mirror calibration setup for left and right sides of a centered module like neck/head

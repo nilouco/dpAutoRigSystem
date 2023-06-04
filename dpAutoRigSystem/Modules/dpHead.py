@@ -217,22 +217,22 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         # declaring naming:
         attrBaseName = dpUtils.extractSuffix(attrCtrl)
-        drivenGrp = attrBaseName+"_"+self.langDic[self.langName][openCloseID]+self.langDic[self.langName]['c034_move']+"_Grp"
+        drivenGrp = attrBaseName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+self.dpUIinst.langDic[self.dpUIinst.langName]['c034_move']+"_Grp"
         # attribute names:
-        intAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName][intAttrID].capitalize()+axis
-        startRotName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation"
-        unitFixAttrName = self.langDic[self.langName][openCloseID].lower()+"UnitFix"+axis
-        calibAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+axis
-        calibOutputAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output']
-        outputAttrName = self.langDic[self.langName][openCloseID].lower()+self.langDic[self.langName]['c112_output']
+        intAttrName = self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID].lower()+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+axis
+        startRotName = self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c110_start'].capitalize()+"Rotation"
+        unitFixAttrName = self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID].lower()+"UnitFix"+axis
+        calibAttrName = self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+axis
+        calibOutputAttrName = self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output']
+        outputAttrName = self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output']
         # utility node names:
-        jawCalibrateMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+self.langDic[self.langName]['c111_calibrate']+"_"+axis+"_MD"
-        jawUnitFixMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_UnitFix_"+axis+"_MD"
-        jawIntMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_MD"
-        jawStartMDName = attrBaseName+self.langDic[self.langName][openCloseID]+"_Start_"+axis+"_MD"
-        jawIntPMAName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_Start_"+axis+"_PMA"
-        jawIntCndName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_Cnd"
-        jawOutputRmVName = attrBaseName+self.langDic[self.langName][openCloseID]+"_"+self.langDic[self.langName]['c112_output']+"_RmV"
+        jawCalibrateMDName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"_"+axis+"_MD"
+        jawUnitFixMDName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_UnitFix_"+axis+"_MD"
+        jawIntMDName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+"_"+axis+"_MD"
+        jawStartMDName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_Start_"+axis+"_MD"
+        jawIntPMAName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+"_Start_"+axis+"_PMA"
+        jawIntCndName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+"_"+axis+"_Cnd"
+        jawOutputRmVName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output']+"_RmV"
         
         # create move group and its attributes:
         if not cmds.objExists(drivenGrp):
@@ -288,8 +288,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         
         # invert rotation for lower lip exception:
         if invertRot:
-            invetRotPMAName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_InvertRot_PMA"
-            invetRotMDName = attrBaseName+self.langDic[self.langName][openCloseID]+self.langDic[self.langName][intAttrID].capitalize()+"_"+axis+"_InvertRot_MD"
+            invetRotPMAName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+"_"+axis+"_InvertRot_PMA"
+            invetRotMDName = attrBaseName+self.dpUIinst.langDic[self.dpUIinst.langName][openCloseID]+self.dpUIinst.langDic[self.dpUIinst.langName][intAttrID].capitalize()+"_"+axis+"_InvertRot_MD"
             invetRotPMA = cmds.createNode('plusMinusAverage', name=invetRotPMAName)
             invetRotMD = cmds.createNode('multiplyDivide', name=invetRotMDName)
             cmds.setAttr(invetRotPMA+".operation", 2) #substract
@@ -410,32 +410,32 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.radiusGuide     = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 
                 # generating naming:
-                headJntName = side+self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+"_Jnt"
+                headJntName = side+self.userGuideName+"_01_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_Jnt"
                 if self.addArticJoint:
-                    headJntName = side+self.userGuideName+"_02_"+self.langDic[self.langName]['c024_head']+"_Jnt"
-                upperJawJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw']+"_Jnt"
-                upperHeadJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head']+"_Jnt"
-                upperEndJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head']+"_JEnd"
-                jawJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw']+"_Jnt"
-                chinJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c026_chin']+"_Jnt"
-                chewJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c048_chew']+"_Jnt"
+                    headJntName = side+self.userGuideName+"_02_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_Jnt"
+                upperJawJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw']+"_Jnt"
+                upperHeadJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_Jnt"
+                upperEndJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_JEnd"
+                jawJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw']+"_Jnt"
+                chinJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c026_chin']+"_Jnt"
+                chewJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c048_chew']+"_Jnt"
                 endJntName = side+self.userGuideName+"_JEnd"
-                lCornerLipJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c043_corner']+self.langDic[self.langName]['c039_lip']+"_Jnt"
-                rCornerLipJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c043_corner']+self.langDic[self.langName]['c039_lip']+"_Jnt"
-                upperLipJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c039_lip']+"_Jnt"
-                lowerLipJntName = side+self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+self.langDic[self.langName]['c039_lip']+"_Jnt"
-                neckCtrlBaseName = side+self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']
-                headCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_Ctrl"
-                headSubCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_Sub_Ctrl"
-                upperJawCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw']+"_Ctrl"
-                upperHeadCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head']+"_Ctrl"
-                jawCtrlName  = side+self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw']+"_Ctrl"
-                chinCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c026_chin']+"_Ctrl"
-                chewCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c048_chew']+"_Ctrl"
-                lCornerLipCtrlName = self.langDic[self.langName]['p002_left']+"_"+self.userGuideName+"_"+self.langDic[self.langName]['c043_corner']+self.langDic[self.langName]['c039_lip']+"_Ctrl"
-                rCornerLipCtrlName = self.langDic[self.langName]['p003_right']+"_"+self.userGuideName+"_"+self.langDic[self.langName]['c043_corner']+self.langDic[self.langName]['c039_lip']+"_Ctrl"
-                upperLipCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c039_lip']+"_Ctrl"
-                lowerLipCtrlName = side+self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+self.langDic[self.langName]['c039_lip']+"_Ctrl"
+                lCornerLipJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c043_corner']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Jnt"
+                rCornerLipJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c043_corner']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Jnt"
+                upperLipJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Jnt"
+                lowerLipJntName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c045_lower']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Jnt"
+                neckCtrlBaseName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c023_neck']
+                headCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_Ctrl"
+                headSubCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_Sub_Ctrl"
+                upperJawCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw']+"_Ctrl"
+                upperHeadCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_Ctrl"
+                jawCtrlName  = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw']+"_Ctrl"
+                chinCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c026_chin']+"_Ctrl"
+                chewCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c048_chew']+"_Ctrl"
+                lCornerLipCtrlName = self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left']+"_"+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c043_corner']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Ctrl"
+                rCornerLipCtrlName = self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c043_corner']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Ctrl"
+                upperLipCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Ctrl"
+                lowerLipCtrlName = side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c045_lower']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Ctrl"
                 
                 # get the number of joints to be created for the neck:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
@@ -473,17 +473,17 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 for n in range(0, self.nJoints):
-                    dpUtils.setJointLabel(self.neckJointList[n], s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']+"_"+str(n).zfill(2))
-                dpUtils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c024_head'])
-                dpUtils.setJointLabel(self.upperJawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c025_jaw'])
-                dpUtils.setJointLabel(self.upperHeadJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c024_head'])
-                dpUtils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c025_jaw'])
-                dpUtils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c026_chin'])
-                dpUtils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c048_chew'])
-                dpUtils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.langDic[self.langName]['c039_lip'])
-                dpUtils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.langDic[self.langName]['c039_lip'])
-                dpUtils.setJointLabel(self.upperLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c044_upper']+self.langDic[self.langName]['c039_lip'])
-                dpUtils.setJointLabel(self.lowerLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c045_lower']+self.langDic[self.langName]['c039_lip'])
+                    dpUtils.setJointLabel(self.neckJointList[n], s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c023_neck']+"_"+str(n).zfill(2))
+                dpUtils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head'])
+                dpUtils.setJointLabel(self.upperJawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw'])
+                dpUtils.setJointLabel(self.upperHeadJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head'])
+                dpUtils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c025_jaw'])
+                dpUtils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c026_chin'])
+                dpUtils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c048_chew'])
+                dpUtils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip'])
+                dpUtils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip'])
+                dpUtils.setJointLabel(self.upperLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c044_upper']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip'])
+                dpUtils.setJointLabel(self.lowerLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c045_lower']+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip'])
                 # creating controls:
                 for n in range(0, self.nJoints):
                     neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z")
@@ -638,10 +638,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(headRotateParentConst+".interpType", 2) #shortest
 
                 # connect reverseNode:
-                cmds.addAttr(self.headCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], headRotateParentConst+"."+self.neckCtrlList[-1]+"W0", force=True)
-                self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['c032_follow'].capitalize()+"_Rev")
-                cmds.connectAttr(self.headCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.headRevNode+".inputX", force=True)
+                cmds.addAttr(self.headCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, keyable=True)
+                cmds.connectAttr(self.headCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], headRotateParentConst+"."+self.neckCtrlList[-1]+"W0", force=True)
+                self.headRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'].capitalize()+"_Rev")
+                cmds.connectAttr(self.headCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], self.headRevNode+".inputX", force=True)
                 cmds.connectAttr(self.headRevNode+'.outputX', headRotateParentConst+"."+self.worldRef+"W1", force=True)
                 
                 # setup neck autoRotate:
@@ -649,15 +649,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.neckPivot = cmds.xform(self.neckCtrlList[n], query=True, worldSpace=True, translation=True)
                     self.neckOrientGrp = cmds.group(self.neckCtrlList[n], name=self.neckCtrlList[n]+"_Orient_Grp")
                     cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
-                    cmds.addAttr(self.neckCtrlList[n], longName=self.langDic[self.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=self.autoRotateCalc(n), keyable=True)
-                    neckARMDName = self.langDic[self.langName]['c047_autoRotate'][0].capitalize()+self.langDic[self.langName]['c047_autoRotate'][1:]
+                    cmds.addAttr(self.neckCtrlList[n], longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=self.autoRotateCalc(n), keyable=True)
+                    neckARMDName = self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate'][0].capitalize()+self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate'][1:]
                     neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_MD")
                     cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
                     cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
                     cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)
-                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2X", force=True)
-                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Y", force=True)
-                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.langDic[self.langName]['c047_autoRotate'], neckARMD+".input2Z", force=True)
+                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate'], neckARMD+".input2X", force=True)
+                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate'], neckARMD+".input2Y", force=True)
+                    cmds.connectAttr(self.neckCtrlList[n]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate'], neckARMD+".input2Z", force=True)
                     cmds.connectAttr(neckARMD+".outputX", self.neckOrientGrp+".rotateX", force=True)
                     if self.rigType == dpBaseClass.RigType.quadruped:
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
@@ -677,10 +677,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # jaw follow sub head or root ctrl (using worldRef)
                 jawParentConst = cmds.parentConstraint(self.headSubCtrl, self.worldRef, self.zeroCtrlList[2], maintainOffset=True, name=self.zeroCtrlList[2]+"_PaC")[0]
                 cmds.setAttr(jawParentConst+".interpType", 2) #Shortest, no flip cause problem with scrubing
-                cmds.addAttr(self.jawCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
-                cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawParentConst+"."+self.headSubCtrl+"W0", force=True)
+                cmds.addAttr(self.jawCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                cmds.connectAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], jawParentConst+"."+self.headSubCtrl+"W0", force=True)
                 jawFollowRev = cmds.createNode("reverse", name=self.jawCtrl+"_Rev")
-                cmds.connectAttr(self.jawCtrl+"."+self.langDic[self.langName]['c032_follow'], jawFollowRev+".inputX", force=True)
+                cmds.connectAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], jawFollowRev+".inputX", force=True)
                 cmds.connectAttr(jawFollowRev+".outputX", jawParentConst+"."+self.worldRef+"W1", force=True)
                 cmds.scaleConstraint(self.headSubCtrl, self.zeroCtrlList[2], maintainOffset=True, name=self.zeroCtrlList[2]+"_ScC")[0]
                 
@@ -699,39 +699,39 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.setupJawMove(self.lowerLipCtrl, "c109_close", False, "Z", "c039_lip")
                 
                 # set jaw move and lips calibrate default values:
-                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c110_start'].capitalize()+"Rotation", 5)
-                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y", -2)
-                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 0)
-                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output'], 30)
-                cmds.setAttr(self.jawCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output'], -10)
-                cmds.setAttr(self.upperLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 2)
-                cmds.setAttr(self.lowerLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y", 0)
-                cmds.setAttr(self.lowerLipCtrl+"."+self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z", 2)
+                cmds.setAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c108_open'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c110_start'].capitalize()+"Rotation", 5)
+                cmds.setAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c108_open'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Y", -2)
+                cmds.setAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Z", 0)
+                cmds.setAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c108_open'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output'], 30)
+                cmds.setAttr(self.jawCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output'], -10)
+                cmds.setAttr(self.upperLipCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Z", 2)
+                cmds.setAttr(self.lowerLipCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Y", 0)
+                cmds.setAttr(self.lowerLipCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Z", 2)
                 
                 # upper lip follows lower lip:
-                cmds.addAttr(self.upperLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.upperLipCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 upperLipConst = cmds.parentConstraint(self.upperJawCtrl, self.lowerLipCtrl, self.zeroCtrlList[5], maintainOffset=True, name=self.zeroCtrlList[5]+"_PaC")[0]
                 upperLipRev = cmds.createNode("reverse", name=self.zeroCtrlList[5]+"_Follow_Rev")
-                cmds.connectAttr(self.upperLipCtrl+"."+self.langDic[self.langName]['c032_follow'], upperLipRev+".inputX", force=True)
-                cmds.connectAttr(self.upperLipCtrl+"."+self.langDic[self.langName]['c032_follow'], upperLipConst+"."+self.lowerLipCtrl+"W1", force=True)
+                cmds.connectAttr(self.upperLipCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], upperLipRev+".inputX", force=True)
+                cmds.connectAttr(self.upperLipCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], upperLipConst+"."+self.lowerLipCtrl+"W1", force=True)
                 cmds.connectAttr(upperLipRev+".outputX", upperLipConst+"."+self.upperJawCtrl+"W0", force=True)
 
                 # left side lip:
                 lLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperJawCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_PaC")[0]
                 cmds.setAttr(lLipParentConst+".interpType", 2)
-                cmds.addAttr(self.lCornerLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
-                cmds.connectAttr(self.lCornerLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], lLipParentConst+"."+self.jawCtrl+"W0", force=True)
-                self.lLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p002_left']+"_"+self.langDic[self.langName]['c039_lip']+"_Rev")
-                cmds.connectAttr(self.lCornerLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.lLipRevNode+".inputX", force=True)
+                cmds.addAttr(self.lCornerLipCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
+                cmds.connectAttr(self.lCornerLipCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], lLipParentConst+"."+self.jawCtrl+"W0", force=True)
+                self.lLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Rev")
+                cmds.connectAttr(self.lCornerLipCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], self.lLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.lLipRevNode+'.outputX', lLipParentConst+"."+self.upperJawCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.upperJawCtrl, self.lLipGrp, maintainOffset=True, name=self.lLipGrp+"_ScC")[0]
                 # right side lip:
                 rLipParentConst = cmds.parentConstraint(self.jawCtrl, self.upperJawCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_PaC")[0]
                 cmds.setAttr(rLipParentConst+".interpType", 2)
-                cmds.addAttr(self.rCornerLipCtrl, longName=self.langDic[self.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
-                cmds.connectAttr(self.rCornerLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], rLipParentConst+"."+self.jawCtrl+"W0", force=True)
-                self.rLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.langDic[self.langName]['p003_right']+"_"+self.langDic[self.langName]['c039_lip']+"_Rev")
-                cmds.connectAttr(self.rCornerLipCtrl+'.'+self.langDic[self.langName]['c032_follow'], self.rLipRevNode+".inputX", force=True)
+                cmds.addAttr(self.rCornerLipCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.5, keyable=True)
+                cmds.connectAttr(self.rCornerLipCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], rLipParentConst+"."+self.jawCtrl+"W0", force=True)
+                self.rLipRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['p003_right']+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c039_lip']+"_Rev")
+                cmds.connectAttr(self.rCornerLipCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], self.rLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+self.upperJawCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.upperJawCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScC")[0]
                 
@@ -764,17 +764,17 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
                                     cmds.setAttr(articJntList[0]+".scaleY", -1)
                                     cmds.setAttr(articJntList[0]+".scaleZ", -1)
-                            dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+self.langDic[self.langName]['c023_neck']+"_"+str(n)+"_Jar")
+                            dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c023_neck']+"_"+str(n)+"_Jar")
 
                         # head corrective
                         headCorrectiveNetList = [None]
-                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_YawRight", 2, 2, -80))
-                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_YawLeft", 2, 2, 80))
-                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_PitchUp", 0, 0, 80))
-                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head']+"_PitchDown", 0, 0, -80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_YawRight", 2, 2, -80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_YawLeft", 2, 2, 80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_PitchUp", 0, 0, 80))
+                        headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+"_PitchDown", 0, 0, -80))
                         headCalibratePresetList, invertList = self.getCalibratePresetList(s)
                         articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
-                        self.setupJcrControls(articJntList, s, jointLabelAdd, side+self.userGuideName+"_"+self.langDic[self.langName]['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList, [False, True, True, False, False])
+                        self.setupJcrControls(articJntList, s, jointLabelAdd, side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList, [False, True, True, False, False])
                         if s == 1:
                             if self.addFlip:
                                 cmds.setAttr(articJntList[0]+".scaleX", -1)
@@ -782,15 +782,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 cmds.setAttr(articJntList[0]+".scaleZ", -1)
                     else:
                         articJntList = dpUtils.articulationJoint(neckBaseJzt, self.neckJointList[0])
-                        dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
-                        cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.langDic[self.langName]['c023_neck']+self.langDic[self.langName]['c106_base']+"_Jar")
+                        dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c023_neck']+self.dpUIinst.langDic[self.dpUIinst.langName]['c106_base']+"_Jar")
+                        cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c023_neck']+self.dpUIinst.langDic[self.dpUIinst.langName]['c106_base']+"_Jar")
                         articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt)
                     
                     self.neckJointList.insert(0, neckBaseJzt)
                     cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
                     cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
-                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base']+"_Jar")
-                    cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.langDic[self.langName]['c024_head']+self.langDic[self.langName]['c106_base']+"_Jar")
+                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+self.dpUIinst.langDic[self.dpUIinst.langName]['c106_base']+"_Jar")
+                    cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c024_head']+self.dpUIinst.langDic[self.dpUIinst.langName]['c106_base']+"_Jar")
                 
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
@@ -807,18 +807,18 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.zeroCtrlList[1], self.headSubCtrl, absolute=True) #upperJawCtrl
                 
                 # calibration attributes:
-                neckCalibrationList = [self.langDic[self.langName]['c047_autoRotate']]
+                neckCalibrationList = [self.dpUIinst.langDic[self.dpUIinst.langName]['c047_autoRotate']]
                 jawCalibrationList = [
-                                    self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y",
-                                    self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z",
-                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y",
-                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z",
-                                    self.langDic[self.langName]['c108_open'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output'],
-                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+self.langDic[self.langName]['c112_output']
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c108_open'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Y",
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c108_open'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Z",
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Y",
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Z",
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c108_open'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output'],
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+self.dpUIinst.langDic[self.dpUIinst.langName]['c112_output']
                 ]
                 lipCalibrationList = [
-                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Y",
-                                    self.langDic[self.langName]['c109_close'].lower()+self.langDic[self.langName]['c111_calibrate']+"Z"
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Y",
+                                    self.dpUIinst.langDic[self.dpUIinst.langName]['c109_close'].lower()+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']+"Z"
                 ]
                 self.ctrls.setCalibrationAttr(self.neckCtrlList[0], neckCalibrationList)
                 self.ctrls.setCalibrationAttr(self.jawCtrl, jawCalibrationList)

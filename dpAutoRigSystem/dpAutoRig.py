@@ -282,7 +282,6 @@ class DP_AutoRig_UI(object):
 
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
-            print("error here -00000")
             print("Exception:", e)
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
@@ -392,11 +391,9 @@ class DP_AutoRig_UI(object):
         # initialize some objects here:
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
-        print( "==== before custoMAttr")
         self.customAttr = dpCustomAttr.CustomAttr(self, False)
-        print( "==== after custoMAttr")
         # --
-        print("-------------- after selfs ------------------")
+
         # creating tabs - mainTabLayout:
         self.allUIs["mainTabLayout"] = cmds.tabLayout('mainTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
         cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["mainTabLayout"], 'top', 0), (self.allUIs["mainTabLayout"], 'left', 0), (self.allUIs["mainTabLayout"], 'bottom', 0), (self.allUIs["mainTabLayout"], 'right', 0)) )
@@ -1423,16 +1420,16 @@ class DP_AutoRig_UI(object):
                 dpUIinst = self
                 if cmds.attributeQuery("rigType", node=module[2], ex=True):
                     curRigType = cmds.getAttr(module[2] + ".rigType")
-                    moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], curRigType)
+                    moduleInst = moduleClass(dpUIinst, module[1], curRigType)
                 else:
                     if cmds.attributeQuery("Style", node=module[2], ex=True):
                         iStyle = cmds.getAttr(module[2] + ".Style")
                         if (iStyle == 0 or iStyle == 1):
-                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], dpBaseClass.RigType.biped)
+                            moduleInst = moduleClass(dpUIinst, module[1], dpBaseClass.RigType.biped)
                         else:
-                            moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], dpBaseClass.RigType.quadruped)
+                            moduleInst = moduleClass(dpUIinst, module[1], dpBaseClass.RigType.quadruped)
                     else:
-                        moduleInst = moduleClass(dpUIinst, self.langDic, self.langName, self.presetDic, self.presetName, module[1], dpBaseClass.RigType.default)
+                        moduleInst = moduleClass(dpUIinst, module[1], dpBaseClass.RigType.default)
                 self.moduleInstancesList.append(moduleInst)
                 # reload pinGuide scriptJob:
                 self.ctrls.startPinGuide(module[2])
@@ -2193,7 +2190,7 @@ class DP_AutoRig_UI(object):
         if objList and attrList:
             for obj in objList:
                 # load dpReorderAttribute:
-                dpRAttr = dpReorderAttr.ReorderAttr(self, self.langDic, self.langName, False)
+                dpRAttr = dpReorderAttr.ReorderAttr(self, False)
                 # Reordering Option_Ctrl attributos progress window
                 progressAmount = 0
                 cmds.progressWindow(title='Reordering Attributes', progress=progressAmount, status='Reordering: 0%', isInterruptable=False)
