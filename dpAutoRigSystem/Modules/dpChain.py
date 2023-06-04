@@ -12,6 +12,8 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
+DP_CHAIN_VERSION = 2.0
+
 
 class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

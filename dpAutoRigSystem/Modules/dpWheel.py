@@ -17,6 +17,8 @@ TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 
+DP_WHEEL_VERSION = 2.0
+
 
 class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

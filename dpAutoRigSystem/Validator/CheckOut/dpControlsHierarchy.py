@@ -13,9 +13,10 @@ TITLE = "v060_controlsHierarchy"
 DESCRIPTION = "v061_controlsHierarchyDesc"
 ICON = "/Icons/dp_controlsHierarchy.png"
 
-dpControlsHierarchy_Version = 1.0
-
 HIERARCHY_PATH = "dpData/dpHierarchy"
+
+DP_CONTROLSHIERARCHY_VERSION = 1.3
+
 
 class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

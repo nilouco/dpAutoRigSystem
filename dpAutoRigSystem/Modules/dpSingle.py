@@ -13,6 +13,8 @@ TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
 
+DP_SINGLE_VERSION = 2.0
+
 
 class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

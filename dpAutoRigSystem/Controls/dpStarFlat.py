@@ -10,7 +10,8 @@ TITLE = "m208_starFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_starFlat.png"
 
-dpStarFlatVersion = 1.0
+DP_STARFLAT_VERSION = 1.1
+
 
 class StarFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

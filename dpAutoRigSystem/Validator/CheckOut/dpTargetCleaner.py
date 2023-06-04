@@ -11,9 +11,10 @@ TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.6
-
 DPKEEPITATTR = "dpKeepIt"
+
+DP_TARGETCLEANER_VERSION = 1.7
+
 
 class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

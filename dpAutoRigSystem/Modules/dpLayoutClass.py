@@ -7,6 +7,8 @@ from .Library import dpUtils
 from importlib import reload
 reload(dpUtils)
 
+DP_LAYOUTCLASS_VERSION = 2.0
+
 
 class LayoutClass(object):
     def __init__(self, dpUIinst, userGuideName, CLASS_NAME, TITLE, DESCRIPTION, ICON):

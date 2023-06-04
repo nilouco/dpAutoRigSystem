@@ -4,6 +4,8 @@ from maya import mel
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 
+DP_CONTROLSTARTCLASS_VERSION = 2.0
+
 
 class ControlStartClass:
     def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON):

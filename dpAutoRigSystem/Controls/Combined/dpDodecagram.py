@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
 from importlib import reload
 reload(dpBaseControlClass)
@@ -10,7 +11,8 @@ TITLE = "m114_dodecagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_dodecagram.png"
 
-dpDodecagramVersion = 1.2
+DP_DODECAGRAM_VERSION = 1.3
+
 
 class Dodecagram(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

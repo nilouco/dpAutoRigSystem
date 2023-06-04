@@ -12,7 +12,8 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-dpDisplayLayers_Version = 1.0
+DP_DISPLAYLAYERS_VERSION = 1.1
+
 
 class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

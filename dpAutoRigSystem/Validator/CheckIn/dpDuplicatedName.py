@@ -10,7 +10,7 @@ TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 
-dpDuplicatedName_Version = 1.1
+DP_DUPLICATEDNAME_VERSION = 1.2
 
 class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

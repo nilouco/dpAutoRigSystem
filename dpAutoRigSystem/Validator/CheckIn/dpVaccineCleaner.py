@@ -11,7 +11,8 @@ TITLE = "v052_vaccineCleaner"
 DESCRIPTION = "v053_vaccineCleanerDesc"
 ICON = "/Icons/dp_vaccineCleaner.png"
 
-dpVaccineCleaner_Version = 1.0
+DP_VACCINECLEANER_VERSION = 1.1
+
 
 class VaccineCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

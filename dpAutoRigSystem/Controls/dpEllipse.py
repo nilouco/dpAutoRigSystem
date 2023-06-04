@@ -10,7 +10,8 @@ TITLE = "m122_ellipse"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ellipse.png"
 
-dpEllipseVersion = 1.2
+DP_ELLIPSE_VERSION = 1.3
+
 
 class Ellipse(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

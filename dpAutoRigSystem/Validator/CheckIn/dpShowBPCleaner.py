@@ -10,7 +10,8 @@ TITLE = "v050_showBPCleaner"
 DESCRIPTION = "v051_showBPCleanerDesc"
 ICON = "/Icons/dp_showBPCleaner.png"
 
-dpShowBPCleaner_Version = 1.0
+DP_SHOWBPCLEANER_VERSION = 1.1
+
 
 class ShowBPCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

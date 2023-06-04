@@ -10,7 +10,7 @@ TITLE = "m162_wheelShape"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_wheelShape.png"
 
-dpWheelShapeVersion = 1.1
+DP_WHEELSHAPE_VERSION = 1.2
 
 class WheelShape(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

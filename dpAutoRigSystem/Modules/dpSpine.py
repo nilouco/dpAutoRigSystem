@@ -11,6 +11,8 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
+DP_SPINE_VERSION = 2.0
+
 
 class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):

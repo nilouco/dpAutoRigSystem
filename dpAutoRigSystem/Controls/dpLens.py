@@ -10,7 +10,8 @@ TITLE = "m126_lens"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_lens.png"
 
-dpLensVersion = 1.2
+DP_LENS_VERSION = 1.3
+
 
 class Lens(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

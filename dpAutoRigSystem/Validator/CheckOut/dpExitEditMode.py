@@ -10,7 +10,8 @@ TITLE = "v034_exitEditMode"
 DESCRIPTION = "v035_exitEditModeDesc"
 ICON = "/Icons/dp_exitEditMode.png"
 
-dpExitEditMode_Version = 1.0
+DP_EXITEDITMODE_VERSION = 1.1
+
 
 class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

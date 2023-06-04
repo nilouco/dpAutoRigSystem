@@ -10,7 +10,8 @@ TITLE = "m121_squashTop"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_squashTop.png"
 
-dpSquashTopVersion = 1.2
+DP_SQUASHTOP_VERSION = 1.3
+
 
 class SquashTop(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

@@ -12,6 +12,8 @@ TITLE = "m158_steering"
 DESCRIPTION = "m159_steeringDesc"
 ICON = "/Icons/dp_steering.png"
 
+DP_STEERING_VERSION = 2.0
+
 
 class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

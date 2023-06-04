@@ -8,6 +8,7 @@ TITLE = "m030_leg"
 DESCRIPTION = "m031_legDesc"
 ICON = "/Icons/dp_leg.png"
 
+DP_LEG_VERSION = 2.0
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

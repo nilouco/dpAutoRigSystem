@@ -10,7 +10,8 @@ TITLE = "m133_locatorFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_locatorFlat.png"
 
-dpLocatorFlatVersion = 1.2
+DP_LOCATORFLAT_VERSION = 1.3
+
 
 class LocatorFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

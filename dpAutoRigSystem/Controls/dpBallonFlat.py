@@ -10,7 +10,8 @@ TITLE = "m117_ballonFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ballonFlat.png"
 
-dpBallonFlatVersion = 1.2
+DP_BALLONFLAT_VERSION = 1.3
+
 
 class BallonFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

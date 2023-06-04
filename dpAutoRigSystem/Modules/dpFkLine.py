@@ -12,6 +12,8 @@ TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
 
+DP_FKLINE_VERSION = 2.0
+
 
 class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

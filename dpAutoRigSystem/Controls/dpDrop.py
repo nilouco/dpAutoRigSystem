@@ -10,7 +10,8 @@ TITLE = "m128_drop"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_drop.png"
 
-dpDropVersion = 1.2
+DP_DROP_VERSION = 1.3
+
 
 class Drop(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

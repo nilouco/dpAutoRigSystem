@@ -10,7 +10,7 @@ TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 ICON = '/Icons/dp_freezeTransform.png'
 
-dpFreezeTransform_Version = 1.4
+DP_FREEZETRANSFORM_VERSION = 1.5
 
 
 class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):

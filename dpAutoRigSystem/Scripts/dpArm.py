@@ -8,6 +8,8 @@ TITLE = "m028_arm"
 DESCRIPTION = "m029_armDesc"
 ICON = "/Icons/dp_arm.png"
 
+DP_ARM_VERSION = 2.0
+
 
 def Arm(dpUIinst):
     """ This function will create all guides needed to compose an arm.

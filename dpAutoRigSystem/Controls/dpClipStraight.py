@@ -10,7 +10,8 @@ TITLE = "m109_clipStraight"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipStraight.png"
 
-dpClipStraightVersion = 1.2
+DP_CLIPSTRAIGHT_VERSION = 1.3
+
 
 class ClipStraight(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

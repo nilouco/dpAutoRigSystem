@@ -10,7 +10,8 @@ TITLE = "m110_circle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_circle.png"
 
-dpCircleVersion = 1.2
+DP_CIRCLE_VERSION = 1.3
+
 
 class Circle(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

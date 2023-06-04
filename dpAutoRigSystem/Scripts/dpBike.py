@@ -8,6 +8,8 @@ TITLE = "m165_bike"
 DESCRIPTION = "m166_bikeDesc"
 ICON = "/Icons/dp_bike.png"
 
+DP_BIKE_VERSION = 2.0
+
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
     """ Ask user the detail level we'll create the guides by a confirm dialog box window.

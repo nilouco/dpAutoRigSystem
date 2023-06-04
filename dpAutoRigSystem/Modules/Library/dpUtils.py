@@ -15,6 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
+DP_UTILS_VERSION = 2.0
 
 # UTILS functions:
 def findEnv(key, path):

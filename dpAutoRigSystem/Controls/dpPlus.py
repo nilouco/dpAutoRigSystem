@@ -10,7 +10,8 @@ TITLE = "m131_plus"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_plus.png"
 
-dpPlusVersion = 1.2
+DP_PLUS_VERSION = 1.3
+
 
 class Plus(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

@@ -10,7 +10,8 @@ TITLE = "m115_locator"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_locator.png"
 
-dpLocatorVersion = 1.2
+DP_LOCATOR_VERSION = 1.3
+
 
 class Locator(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

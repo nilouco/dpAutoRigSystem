@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
 from importlib import reload
 reload(dpBaseControlClass)
@@ -10,7 +11,8 @@ TITLE = "m177_diamondFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamondFlat.png"
 
-dpDiamondFlatVersion = 1.4
+DP_DIAMONDFLAT_VERSION = 1.5
+
 
 class DiamondFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

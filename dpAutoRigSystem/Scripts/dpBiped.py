@@ -8,6 +8,7 @@ TITLE = "m026_biped"
 DESCRIPTION = "m027_bipedDesc"
 ICON = "/Icons/dp_biped.png"
 
+DP_BIPED_VERSION = 2.0
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):

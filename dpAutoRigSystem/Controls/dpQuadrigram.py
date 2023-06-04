@@ -10,7 +10,8 @@ TITLE = "m120_quadrigram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_quadrigram.png"
 
-dpQuadrigramVersion = 1.2
+DP_QUADRIGRAM_VERSION = 1.3
+
 
 class Quadrigram(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

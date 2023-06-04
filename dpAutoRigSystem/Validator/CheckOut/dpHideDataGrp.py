@@ -11,7 +11,8 @@ TITLE = "v028_hideDataGrp"
 DESCRIPTION = "v029_hideDataGrpDesc"
 ICON = "/Icons/dp_hideDataGrp.png"
 
-dpHideDataGrp_Version = 1.0
+DP_HIDEDATAGRP_VERSION = 1.1
+
 
 class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

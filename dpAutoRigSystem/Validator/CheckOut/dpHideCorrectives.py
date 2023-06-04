@@ -11,7 +11,8 @@ TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
 ICON = "/Icons/dp_hideCorrectives.png"
 
-dpHideCorrective = 1.0
+DP_HIDECORRECTIVES_VERSION = 1.1
+
 
 class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

@@ -10,7 +10,8 @@ TITLE = "m106_clip"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clip.png"
 
-dpClipVersion = 1.2
+DP_CLIP_VERSION = 1.3
+
 
 class Clip(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

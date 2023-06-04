@@ -10,7 +10,7 @@ TITLE = "v001_template"
 DESCRIPTION = "v002_templateDesc"
 ICON = "/Icons/dp_validatorTemplate.png"
 
-dpValidatorTemplate_Version = 1.0
+DP_VALIDATORTEMPLATE_VERSION = 1.1
 
 class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,8 +36,6 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
         self.verifyMode = verifyMode
         self.cleanUpToStart()
         
-        
-
         # ---
         # --- validator code --- beginning
         if objList:
@@ -78,24 +76,8 @@ class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
         # --- validator code --- end
         # ---
 
-
-
         # finishing
         self.updateButtonColors()
-self.reportLog()
-self.endProgressBar()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

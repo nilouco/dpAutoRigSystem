@@ -10,15 +10,14 @@ import shutil
 import os
 import sys
 
-
-DPPACKAGER_VERSION = 1.6
-
-
 RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
 CAM_ROTX = -10
 CAM_ROTY = 30
 CTRL_LAYER = "Ctrl_Lyr"
+
+DPPACKAGER_VERSION = 1.6
+
 
 class Packager(object):
 

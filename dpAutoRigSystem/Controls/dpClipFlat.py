@@ -10,7 +10,8 @@ TITLE = "m107_clipFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipFlat.png"
 
-dpClipFlatVersion = 1.2
+DP_CLIPFLAT_VERSION = 1.3
+
 
 class ClipFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

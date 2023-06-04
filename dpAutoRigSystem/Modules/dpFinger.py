@@ -11,6 +11,7 @@ TITLE = "m007_finger"
 DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
 
+DP_FINGER_VERSION = 2.0
 
 class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):

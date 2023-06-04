@@ -10,7 +10,8 @@ TITLE = "m134_piramid"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_piramid.png"
 
-dpPiramidVersion = 1.2
+DP_PIRAMID_VERSION = 1.3
+
 
 class Piramid(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

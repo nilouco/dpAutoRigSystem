@@ -10,7 +10,8 @@ TITLE = "m124_curvedCircleUp"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_curvedCircleUp.png"
 
-dpCurvedCircleUpVersion = 1.2
+DP_CURVEDCIRCLEUP_VERSION = 1.3
+
 
 class CurvedCircleUp(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

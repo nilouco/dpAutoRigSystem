@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
 from importlib import reload
 reload(dpBaseControlClass)
@@ -10,7 +11,8 @@ TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_eyeFlat.png"
 
-dpEyeVersion = 1.0
+DP_EYEFLAT_VERSION = 1.1
+
 
 class EyeFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

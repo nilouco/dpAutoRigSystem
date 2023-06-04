@@ -10,7 +10,8 @@ TITLE = "m129_crushed"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_crushed.png"
 
-dpCrushedVersion = 1.2
+DP_CRUSHED_VERSION = 1.3
+
 
 class Crushed(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

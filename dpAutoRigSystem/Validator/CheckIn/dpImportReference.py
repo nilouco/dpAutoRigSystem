@@ -10,7 +10,8 @@ TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
 ICON = "/Icons/dp_importReference.png"
 
-dpImportReference_Version = 1.1
+DP_IMPORTREFERENCE_VERSION = 1.2
+
 
 class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

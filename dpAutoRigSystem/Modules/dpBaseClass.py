@@ -11,6 +11,9 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
+
+DP_STARTCLASS_VERSION = 2.0
+
 class StartClass(object):
     def __init__(self, dpUIinst, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.

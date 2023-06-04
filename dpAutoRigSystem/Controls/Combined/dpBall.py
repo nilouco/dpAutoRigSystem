@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
 from importlib import reload
 reload(dpBaseControlClass)
@@ -10,7 +11,8 @@ TITLE = "m116_ball"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ball.png"
 
-dpBallVersion = 1.2
+DP_BALL_VERSION = 1.3
+
 
 class Ball(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

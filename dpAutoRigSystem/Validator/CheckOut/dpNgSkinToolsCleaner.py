@@ -10,7 +10,8 @@ TITLE = "v026_ngskintoolsCleaner"
 DESCRIPTION = "v027_ngskintoolsCleanerDesc"
 ICON = "/Icons/dp_ngskintoolsCleaner.png"
 
-dpNgSkinToolsCleaner_Version = 1.0
+DP_NGSKINTOOLSCLEANER_VERSION = 1.1
+
 
 class NgSkinToolsCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

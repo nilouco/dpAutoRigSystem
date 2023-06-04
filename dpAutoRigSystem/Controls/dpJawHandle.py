@@ -10,7 +10,8 @@ TITLE = "m132_jawHandle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_jawHandle.png"
 
-dpJawHandleVersion = 1.2
+DP_JAWHANDLE_VERSION = 1.3
+
 
 class JawHandle(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

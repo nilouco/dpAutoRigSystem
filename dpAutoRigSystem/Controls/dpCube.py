@@ -10,7 +10,8 @@ TITLE = "m111_cube"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_cube.png"
 
-dpCubeVersion = 1.2
+DP_CUBE_VERSION = 1.3
+
 
 class Cube(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

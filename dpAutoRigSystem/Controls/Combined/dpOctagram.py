@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
 from importlib import reload
 reload(dpBaseControlClass)
@@ -10,7 +11,8 @@ TITLE = "m104_octagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_octagram.png"
 
-dpOctagramVersion = 1.2
+DP_OCTAGRAM_VERSION = 1.3
+
 
 class Octagram(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

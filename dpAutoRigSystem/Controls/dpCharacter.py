@@ -10,7 +10,8 @@ TITLE = "m125_character"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_character.png"
 
-dpCharacterVersion = 1.2
+DP_CHARACTER_VERSION = 1.3
+
 
 class Character(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

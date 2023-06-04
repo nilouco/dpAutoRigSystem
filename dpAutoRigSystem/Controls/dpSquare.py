@@ -10,7 +10,8 @@ TITLE = "m100_square"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_square.png"
 
-dpSquareVersion = 1.2
+DP_SQUARE_VERSION = 1.3
+
 
 class Square(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

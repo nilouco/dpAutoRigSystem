@@ -10,7 +10,8 @@ TITLE = "v030_colorSetCleaner"
 DESCRIPTION = "v031_colorSetCleanerDesc"
 ICON = "/Icons/dp_colorSetCleaner.png"
 
-dpColorSetCleaner_Version = 1.0
+DP_COLORSETCLEANER_VERSION = 1.1
+
 
 class ColorSetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

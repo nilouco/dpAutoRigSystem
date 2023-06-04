@@ -10,7 +10,8 @@ TITLE = "m130_roundUp"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_roundUp.png"
 
-dpRoundUpVersion = 1.2
+DP_ROUNDUP_VERSION = 1.3
+
 
 class RoundUp(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

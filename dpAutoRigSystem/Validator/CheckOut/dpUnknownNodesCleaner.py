@@ -10,7 +10,8 @@ TITLE = "v058_unknownNodesCleaner"
 DESCRIPTION = "v059_unknownNodesCleanerDesc"
 ICON = "/Icons/dp_unknownNodesCleaner.png"
 
-dpUnknownNodesCleaner_Version = 1.0
+DP_UNKNOWNNODESCLEANER_VERSION = 1.1
+
 
 class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

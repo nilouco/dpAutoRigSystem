@@ -10,7 +10,8 @@ TITLE = "v046_brokenNetCleaner"
 DESCRIPTION = "v047_brokenNetCleanerDesc"
 ICON = "/Icons/dp_brokenNetCleaner.png"
 
-dpBrokenNetCleanerCleaner_Version = 1.0
+DP_BROKENNETCLEANER_VERSION = 1.1
+
 
 class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

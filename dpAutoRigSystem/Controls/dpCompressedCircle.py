@@ -10,7 +10,8 @@ TITLE = "m119_compressedCircle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_compressedCircle.png"
 
-dpCompressedCircleVersion = 1.2
+DP_COMPRESSEDCIRCLE_VERSION = 1.3
+
 
 class CompressedCircle(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

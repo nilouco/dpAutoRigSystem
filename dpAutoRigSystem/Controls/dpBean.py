@@ -10,7 +10,8 @@ TITLE = "m127_bean"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_bean.png"
 
-dpBeanVersion = 1.2
+DP_BEAN_VERSION = 1.3
+
 
 class Bean(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

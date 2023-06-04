@@ -12,6 +12,8 @@ TITLE = "m153_suspension"
 DESCRIPTION = "m154_suspensionDesc"
 ICON = "/Icons/dp_suspension.png"
 
+DP_SUSPENSION_VERSION = 2.0
+
 
 class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

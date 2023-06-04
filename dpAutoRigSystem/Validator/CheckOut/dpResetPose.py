@@ -10,8 +10,6 @@ TITLE = "v032_resetPose"
 DESCRIPTION = "v033_resetPoseDesc"
 ICON = "/Icons/dp_resetPose.png"
 
-dpResetPose_Version = 1.2
-
 TO_IGNORE = ["rotateOrder", "pinGuide", "editMode"]
 ATTR_TYPE = {
                 # boolean
@@ -27,6 +25,9 @@ ATTR_TYPE = {
                 "doubleAngle" : 2,
                 "doubleLinear" : 2
             }
+
+DP_RESETPOSE_VERSION = 1.3
+
 
 class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

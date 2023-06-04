@@ -11,6 +11,8 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
+DP_FOOT_VERSION = 2.0
+
 
 class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):

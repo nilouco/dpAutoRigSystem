@@ -12,6 +12,8 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
+DP_HEAD_VERSION = 2.0
+
 
 class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

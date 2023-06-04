@@ -6,11 +6,10 @@ import time
 from functools import partial
 from ..Modules.Library import dpUtils
 
-
-DPPIPELINER_VERSION = 1.6
-
 PIPE_FOLDER = "_dpPipeline"
 PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1104147293478846555/3IdA5ipiG-nqpv1dfg6Q4zWt-Oo-q-EtUisq5z9UpsroW07-NMLTrjJNzAibkUD48TZX"
+
+DPPIPELINER_VERSION = 1.6
 
 
 class Pipeliner(object):

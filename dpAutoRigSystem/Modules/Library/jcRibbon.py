@@ -19,8 +19,9 @@ from . import dpUtils
 from . import dpControls
 
 
-class RibbonClass(object):
+DP_RIBBONCLASS_VERSION = 2.0
 
+class RibbonClass(object):
     def __init__(self, dpUIinst, ctrlRadius, curveDegree, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
