@@ -2,8 +2,6 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 from ...Modules.Library import dpUtils
-from importlib import reload
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "TargetCleaner"

@@ -1,9 +1,8 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ... Modules.Library import dpUtils
-from importlib import reload
-reload(dpBaseValidatorClass)
+from ...Modules.Library import dpUtils
+
 
 # global variables to this module:    
 CLASS_NAME = "HideCorrectives"

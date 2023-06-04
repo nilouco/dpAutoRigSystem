@@ -45,7 +45,7 @@ class DiamondFlat(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        squareInstance = self.dpUIinst.initControlModule('dpSquare', self.controlsGuideDir)
+        squareInstance = self.dpUIinst.initExtraModule('dpSquare', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve1+".rotateZ", 45)

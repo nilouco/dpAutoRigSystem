@@ -1,11 +1,9 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ... Modules.Library import dpUtils
+from ...Modules.Library import dpUtils
 import json
 import os
-from importlib import reload
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "ControlsHierarchy"

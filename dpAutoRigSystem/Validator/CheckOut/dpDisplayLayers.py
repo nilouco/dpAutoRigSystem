@@ -1,10 +1,7 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-from maya import mel
 from ...Modules.Library import dpUtils
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "DisplayLayers"

@@ -20,7 +20,7 @@ DPPACKAGER_VERSION = 1.6
 
 
 class Packager(object):
-
+    
     def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
         """ Create a zipped file with given filePath and fileName replacing the extention (.ma or .mb) to .zip
             Add date at the end of the file if it's given.

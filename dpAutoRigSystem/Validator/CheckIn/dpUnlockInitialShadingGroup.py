@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "UnlockInitialShadingGroup"

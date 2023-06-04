@@ -2,8 +2,6 @@
 from maya import cmds
 import os
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "VaccineCleaner"

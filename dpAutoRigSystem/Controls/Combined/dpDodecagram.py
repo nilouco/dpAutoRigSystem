@@ -45,7 +45,7 @@ class Dodecagram(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        hexagonInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
+        hexagonInstance = self.dpUIinst.initExtraModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = hexagonInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = hexagonInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

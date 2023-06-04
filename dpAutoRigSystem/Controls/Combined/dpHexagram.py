@@ -45,7 +45,7 @@ class Hexagram(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        triangleInstance = self.dpUIinst.initControlModule('dpTriangle', self.controlsGuideDir)
+        triangleInstance = self.dpUIinst.initExtraModule('dpTriangle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = triangleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = triangleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

@@ -45,8 +45,8 @@ class EyeFlat(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        lenFlatInstance = self.dpUIinst.initControlModule('dpLens', self.controlsGuideDir)
-        circleFlatInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
+        lenFlatInstance = self.dpUIinst.initExtraModule('dpLens', self.controlsGuideDir)
+        circleFlatInstance = self.dpUIinst.initExtraModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = lenFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circleFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

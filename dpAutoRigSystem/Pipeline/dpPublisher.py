@@ -1,14 +1,11 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from functools import partial
-import os
 from ..Modules.Library import dpUtils
 from . import dpPipeliner
 from . import dpPackager
-from importlib import reload
-reload(dpPipeliner)
-reload(dpPackager)
+from functools import partial
+import os
 
 DPPUBLISHER_VERSION = 1.5
 
@@ -19,11 +16,9 @@ class Publisher(object):
         """
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.langDic = dpUIinst.langDic
-        self.langName = dpUIinst.langName
         self.ui = ui
         self.verbose = verbose
-        self.publisherName = self.langDic[self.langName]['m046_publisher']
+        self.publisherName = self.dpUIinst.lang['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
         self.pipeliner = dpPipeliner.Pipeliner()
@@ -44,10 +39,10 @@ class Publisher(object):
             Return the saved file path or False if canceled.
         """
         shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        saveName = self.langDic[self.langName]['i222_save']
-        saveAsName = self.langDic[self.langName]['i223_saveAs']
-        cancelName = self.langDic[self.langName]['i132_cancel']
-        confirmResult = cmds.confirmDialog(title=self.publisherName, message=self.langDic[self.langName]['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
+        saveName = self.dpUIinst.lang['i222_save']
+        saveAsName = self.dpUIinst.lang['i223_saveAs']
+        cancelName = self.dpUIinst.lang['i132_cancel']
+        confirmResult = cmds.confirmDialog(title=self.publisherName, message=self.dpUIinst.lang['i201_saveScene'], button=[saveName, saveAsName, cancelName], defaultButton=saveName, cancelButton=cancelName, dismissString=cancelName)
         if confirmResult == cancelName:
             return False
         else:
@@ -84,15 +79,15 @@ class Publisher(object):
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
             cmds.separator(style="none", height=20, parent=publisherLayout)
             # fields
-            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.langDic[self.langName]['i220_filePath'], text='', buttonLabel=self.langDic[self.langName]['i187_load'], buttonCommand=self.userLoadFilePath, adjustableColumn=2, changeCommand=self.editPublishPath, parent=publisherLayout)
-            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.langDic[self.langName]['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-            self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.langDic[self.langName]['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
-            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.langDic[self.langName]['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
+            self.filePathFBG = cmds.textFieldButtonGrp('filePathFBG', label=self.dpUIinst.lang['i220_filePath'], text='', buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.userLoadFilePath, adjustableColumn=2, changeCommand=self.editPublishPath, parent=publisherLayout)
+            self.fileNameTFG = cmds.textFieldGrp('fileNameTFG', label=self.dpUIinst.lang['i221_fileName'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
+            self.commentTFG = cmds.textFieldGrp('commentTFG', label=self.dpUIinst.lang['i219_comments'], text='', adjustableColumn=2, editable=True, parent=publisherLayout)
+            self.verifyValidatorsCB = cmds.checkBox("verifyValidatorsCB", label=self.dpUIinst.lang['i217_verifyChecked'], align="left", height=20, value=True, parent=publisherLayout)
             # buttons
             publisherBPLayout = cmds.paneLayout('publisherBPLayout', configuration='vertical3', paneSize=[(1, 20, 20), (2, 20, 20), (3, 50, 20)], parent=publisherLayout)
             cmds.button(label="Pipeliner", command=partial(self.pipeliner.mainUI, self.dpUIinst), parent=publisherBPLayout)
-            cmds.button('diagnoseBT', label=self.langDic[self.langName]['i224_diagnose'], command=partial(self.runDiagnosing), height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
-            cmds.button('publishBT', label=self.langDic[self.langName]['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
+            cmds.button('diagnoseBT', label=self.dpUIinst.lang['i224_diagnose'], command=partial(self.runDiagnosing), height=30, backgroundColor=(0.5, 0.5, 0.5), parent=publisherBPLayout)
+            cmds.button('publishBT', label=self.dpUIinst.lang['i216_publish'], command=partial(self.runPublishing, self.ui, self.verbose), height=30, backgroundColor=(0.75, 0.75, 0.75), parent=publisherBPLayout)
 
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
@@ -155,7 +150,7 @@ class Publisher(object):
     def userLoadFilePath(self, *args):
         """ Ask user to load a file path.
         """
-        dialogResult = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.langDic[self.langName]['i187_load'])
+        dialogResult = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.dpUIinst.lang['i187_load'])
         if dialogResult:
             self.setPublishFilePath(dialogResult[0])
 
@@ -212,7 +207,7 @@ class Publisher(object):
         if toCheckValidatorList:
             validationResultDataList = self.dpUIinst.runSelectedValidators(toCheckValidatorList, verifyMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
-                stoppedMessage = self.langDic[self.langName]['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
+                stoppedMessage = self.dpUIinst.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
                 return stoppedMessage
         return False
         
@@ -225,7 +220,7 @@ class Publisher(object):
             mel.eval('warning \"'+validatorsResult+'\";')
             cmds.progressWindow(endProgress=True)
         else:
-            validatorsResult = self.langDic[self.langName]['v007_allOk']
+            validatorsResult = self.dpUIinst.lang['v007_allOk']
         self.dpUIinst.info('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
 
 
@@ -314,7 +309,7 @@ class Publisher(object):
                         builtVersion = self.dpUIinst.dpARVersion
 
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i227_getImage'], isInterruptable=False)
+                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['i227_getImage'], isInterruptable=False)
 
                     # publishing file
                     # create folders to publish file if needed
@@ -322,7 +317,7 @@ class Publisher(object):
                         try:
                             os.makedirs(self.pipeliner.pipeData['publishPath'])
                         except:
-                            self.abortPublishing(self.langDic[self.langName]['v022_noFilePath'])
+                            self.abortPublishing(self.dpUIinst.lang['v022_noFilePath'])
                     
                     # mount folders
                     if self.pipeliner.pipeData['b_deliver']:
@@ -333,7 +328,7 @@ class Publisher(object):
                                 self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.today)
                     cmds.progressWindow(endProgress=True)
                     progressAmount += 1
-                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.langDic[self.langName]['i225_savingFile'], isInterruptable=False)
+                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['i225_savingFile'], isInterruptable=False)
                     
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
@@ -342,7 +337,7 @@ class Publisher(object):
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
                         progressAmount += 1
-                        cmds.progressWindow(edit=True, progress=progressAmount, status=self.langDic[self.langName]['i226_exportFiles'], isInterruptable=False)
+                        cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['i226_exportFiles'], isInterruptable=False)
 
                         if self.pipeliner.pipeData['toClientPath']:
                             # toClient
@@ -362,7 +357,7 @@ class Publisher(object):
                             messageText = publishLog["Scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["Comment"]+"*"
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
-                                print(self.langDic[self.langName][result])
+                                print(self.dpUIinst.lang[result])
 
                     # publishing callback
                     if self.pipeliner.pipeData['s_callback']:
@@ -375,9 +370,9 @@ class Publisher(object):
                 dpUtils.closeUI('dpPublisherWindow')
 
             else:
-                mel.eval('warning \"'+self.langDic[self.langName]['v021_noFileName']+'\";')
+                mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')
         else:
-            mel.eval('warning \"'+self.langDic[self.langName]['v022_noFilePath']+'\";')
+            mel.eval('warning \"'+self.dpUIinst.lang['v022_noFilePath']+'\";')
 
 
     def abortPublishing(self, raison=None, *args):
@@ -409,8 +404,8 @@ class Publisher(object):
         # create UI layout and elements:
         succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
         cmds.separator(style="none", height=20, parent=succesLayout)
-        cmds.text(label=self.langDic[self.langName]['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
+        cmds.text(label=self.dpUIinst.lang['v023_successPublished'], font='boldLabelFont', parent=succesLayout)
         cmds.separator(style="none", height=20, parent=succesLayout)
         cmds.text(label=publishedFile, parent=succesLayout)
         cmds.separator(style="none", height=20, parent=succesLayout)
-        cmds.text(label=self.langDic[self.langName]['i018_thanks'], parent=succesLayout)
+        cmds.text(label=self.dpUIinst.lang['i018_thanks'], parent=succesLayout)

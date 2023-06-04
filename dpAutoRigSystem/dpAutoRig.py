@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.39"
-DPAR_UPDATELOG = "N560 - Added new check-in validator to clean-up geometry history."
+DPAR_VERSION_PY3 = "4.02.40"
+DPAR_UPDATELOG = "N614 - Refactoring Validator file\nN687 - Simplify self.lang.\nN513 - Review module versions"
 
 
 
@@ -294,7 +294,6 @@ class DP_AutoRig_UI(object):
         #print self.pDockCtrl
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
-        
         
 
     def deleteExistWindow(self, *args):
@@ -1243,7 +1242,7 @@ class DP_AutoRig_UI(object):
         
         # creating a basic layout for guide buttons:
         if guideDir == CONTROLS or guideDir == COMBINED.replace("/", "."):
-            controlInstance = self.initControlModule(guideModule, guideDir)
+            controlInstance = self.initExtraModule(guideModule, guideDir)
             cmds.iconTextButton(image=iconDir, label=guideName, annotation=guideName, height=32, width=32, command=partial(self.installControlModule, controlInstance, True), parent=self.allUIs[layout])
             self.controlInstanceList.append(controlInstance)
         else:
@@ -1262,10 +1261,7 @@ class DP_AutoRig_UI(object):
             elif guideDir == EXTRAS:
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
-                if guideDir:
-                    validatorInstance = self.initExtraModule(guideModule, guideDir)
-                else:
-                    validatorInstance = self.initValidatorModule(guideModule, path)
+                validatorInstance = self.initExtraModule(guideModule, guideDir)
                 validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
                 verifyBT = cmds.button(label=self.langDic[self.langName]["i210_verify"], width=45, command=partial(validatorInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 fixBT = cmds.button(label=self.langDic[self.langName]["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
@@ -1319,13 +1315,16 @@ class DP_AutoRig_UI(object):
         return guideInstance
     
     
-    def initExtraModule(self, guideModule, guideDir, *args):
+    def initExtraModule(self, guideModule, guideDir=None, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
-        # especific import command for guides storing theses guides modules in a variable:
-        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
-        self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+        if guideDir:
+            # especific import command for guides storing theses guides modules in a variable:
+            basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+            self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
+        else:
+            self.guide = __import__(guideModule, {}, {}, [guideModule])
         reload(self.guide)
         # get the CLASS_NAME from extraModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
@@ -1334,7 +1333,7 @@ class DP_AutoRig_UI(object):
         return guideInstance
     
 
-    def initValidatorModule(self, guideModule, path, *args):
+    def initValidatorModule(self, guideModule, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
@@ -1345,13 +1344,6 @@ class DP_AutoRig_UI(object):
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this extraModule as an Instance:
         guideInstance = guideClass(self)
-        return guideInstance
-
-
-    def initControlModule(self, guideModule, guideDir, *args):
-        """ Call initExtraModule because it's the same code.
-        """
-        guideInstance = self.initExtraModule(guideModule, guideDir)
         return guideInstance
     
     

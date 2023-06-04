@@ -45,7 +45,7 @@ class OvalDisc(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        ellipseInstance = self.dpUIinst.initControlModule('dpEllipse', self.controlsGuideDir)
+        ellipseInstance = self.dpUIinst.initExtraModule('dpEllipse', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = ellipseInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = ellipseInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

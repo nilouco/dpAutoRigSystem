@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "ValidatorTemplate"
@@ -11,6 +9,7 @@ DESCRIPTION = "v002_templateDesc"
 ICON = "/Icons/dp_validatorTemplate.png"
 
 DP_VALIDATORTEMPLATE_VERSION = 1.1
+
 
 class ValidatorTemplate(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

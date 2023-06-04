@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
 # global variables to this module:    
 CLASS_NAME = "DuplicatedName"
@@ -11,6 +9,7 @@ DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 
 DP_DUPLICATEDNAME_VERSION = 1.2
+
 
 class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

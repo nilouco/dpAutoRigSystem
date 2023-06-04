@@ -45,7 +45,7 @@ class Arrow(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        arrowFlatInstance = self.dpUIinst.initControlModule('dpArrowFlat', self.controlsGuideDir)
+        arrowFlatInstance = self.dpUIinst.initExtraModule('dpArrowFlat', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = arrowFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = arrowFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

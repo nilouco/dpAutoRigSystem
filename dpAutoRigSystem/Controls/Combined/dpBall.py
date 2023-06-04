@@ -45,7 +45,7 @@ class Ball(dpBaseControlClass.ControlStartClass):
         """ Combine controls in order to return it.
         """
         # load module instance
-        circleInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
+        circleInstance = self.dpUIinst.initExtraModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

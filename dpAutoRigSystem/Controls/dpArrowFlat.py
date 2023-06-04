@@ -12,6 +12,7 @@ ICON = "/Icons/dp_arrowFlat.png"
 
 DP_ARROWFLAT_VERSION = 1.3
 
+
 class ArrowFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
