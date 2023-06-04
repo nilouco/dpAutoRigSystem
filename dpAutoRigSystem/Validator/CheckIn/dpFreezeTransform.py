@@ -22,6 +22,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         kwargs['ICON'] = ICON
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
 
+
     def runValidator(self, verifyMode=True, objList=None, *args):
         ''' Main method to process this validator instructions.
             It's in verify mode by default.
@@ -34,7 +35,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         '''
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
 
         # ---
         # --- validator code --- beginning
@@ -57,7 +58,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
             return True
 
         def canNotFreezeMsg(obj):
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v017_freezeError'] + obj+'.')
+            self.messageList.append(self.dpUIinst.lang['v017_freezeError'] + obj+'.')
 
         allObjectList = []
         toFixList = []
@@ -78,7 +79,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 if cmds.objExists(obj):
                     # run for translates and rotates
                     frozenTR = checkFrozenObject(obj, zeroAttrList, 0)
@@ -91,7 +92,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
                     else:
                         self.foundIssueList.append(True)
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v018_foundTransform']+obj)
+                        self.messageList.append(self.dpUIinst.lang['v018_foundTransform']+obj)
                         toFixList.append((obj, idx))
             if not self.verifyMode and len(toFixList) > 0: #one item to fix
                 for obj in toFixList:
@@ -101,7 +102,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
                             if checkFrozenObject(obj[0], zeroAttrList, 0) and checkFrozenObject(obj[0], oneAttrList, 1):
                                 self.foundIssueList[obj[1]] = False
                                 self.resultOkList[obj[1]] = True
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v019_frozenTransform']+obj[0])
+                                self.messageList.append(self.dpUIinst.lang['v019_frozenTransform']+obj[0])
                             else:
                                 raise Exception('Freeze Tranform Failed')
                         except:
@@ -113,17 +114,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         # ---
 
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-    def startValidation(self, *args):
-        ''' Procedures to start the validation cleaning old data.
-        '''
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-    def finishValidation(self, *args):
-        ''' Call main base methods to finish the validation of this class.
-        '''
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

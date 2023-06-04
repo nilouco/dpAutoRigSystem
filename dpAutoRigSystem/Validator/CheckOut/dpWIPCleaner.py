@@ -35,10 +35,8 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
-        
-
         # ---
         # --- validator code --- beginning
         wipGrp = None
@@ -55,7 +53,7 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
             if self.verbose:
                 # Update progress window
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
             self.checkedObjList.append(wipGrp)
             wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
             if wipChildrenList:
@@ -66,10 +64,10 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     try:
                         cmds.delete(wipChildrenList)
                         self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+wipGrp)
+                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+wipGrp)
                     except:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+wipGrp)
+                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+wipGrp)
             else:
                 self.foundIssueList.append(False)
                 self.resultOkList.append(True)
@@ -77,26 +75,12 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
             self.checkedObjList.append("")
             self.foundIssueList.append(False)
             self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v011_notWIP'])
+            self.messageList.append(self.dpUIinst.lang['v011_notWIP'])
         # --- validator code --- end
         # ---
 
-
-
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

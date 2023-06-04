@@ -34,7 +34,7 @@ class SelectAllControls(object):
             allGrpList = self.dpCountAllGrp()
             if allGrpList:
                 if len(allGrpList) > 1:
-                    self.allGrp = cmds.confirmDialog(title=self.dpUIinst.langDic[self.dpUIinst.langName]["m166_selAllControls"], message=self.dpUIinst.langDic[self.dpUIinst.langName]["m168_wichAllGrp"], button=allGrpList)
+                    self.allGrp = cmds.confirmDialog(title=self.dpUIinst.lang["m166_selAllControls"], message=self.dpUIinst.lang["m168_wichAllGrp"], button=allGrpList)
                 else:
                     self.allGrp = self.dpCheckAllGrp(self.allGrp)
                 if self.allGrp:
@@ -46,7 +46,7 @@ class SelectAllControls(object):
         if callAction:
             self.dpSelectAllCtrls(self.allGrp)
         else:
-            mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]["e019_notFoundAllGrp"]+"\";")
+            mel.eval("warning \""+self.dpUIinst.lang["e019_notFoundAllGrp"]+"\";")
     
     
     def dpCountAllGrp(self, *args):
@@ -80,9 +80,9 @@ class SelectAllControls(object):
                             else:
                                 ctrlsToSelectList.append(ctrlName)
                     cmds.select(ctrlsToSelectList)
-                    print(self.dpUIinst.langDic[self.dpUIinst.langName]["m169_selectedCtrls"]+str(ctrlsToSelectList))
+                    print(self.dpUIinst.lang["m169_selectedCtrls"]+str(ctrlsToSelectList))
             else:
-                mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]["e019_notFoundAllGrp"]+"\";")
+                mel.eval("warning \""+self.dpUIinst.lang["e019_notFoundAllGrp"]+"\";")
     
     
     def dpFindAllGrpBySelection(self, *args):

@@ -149,7 +149,7 @@ class ControlStartClass:
                     self.ctrls.transferShape(True, True, self.cvCurve, destinationList, True)
             else:
                 cmds.delete(self.cvCurve)
-                mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['e011_notSelShape']+"\";")
+                mel.eval("warning \""+self.dpUIinst.lang['e011_notSelShape']+"\";")
     
     
     def cvCreate(self, useUI, cvID, cvName='Control_Ctrl', cvSize=1.0, cvDegree=1, cvDirection='+Y', cvRot=(0, 0, 0), cvAction=1, dpGuide=False, combine=False, *args):

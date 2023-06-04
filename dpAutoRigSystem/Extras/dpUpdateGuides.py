@@ -34,7 +34,7 @@ class UpdateGuides(object):
             # Get all info nedeed and store in updateData dictionary
             self.getGuidesToUpdateData()
         else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_GuideNotFound']+'\\n\";')
         if self.ui:
             # Open the UI
             self.updateGuidesUI()
@@ -50,20 +50,20 @@ class UpdateGuides(object):
         newData = self.listNewAttr()
         cmds.window('updateSummary', title="Update Summary")
         updateSummaryCL = cmds.columnLayout('updateSummaryCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateSummary')
-        cmds.text(label=str(len(self.updateData))+' '+self.dpUIinst.langDic[self.dpUIinst.langName]['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
+        cmds.text(label=str(len(self.updateData))+' '+self.dpUIinst.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
         if newData:
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m190_newAttrFound'], align='center', parent=updateSummaryCL)
+            cmds.text(label=self.dpUIinst.lang['m190_newAttrFound'], align='center', parent=updateSummaryCL)
             updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummaryCL)
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
+            cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
+            cmds.text(label=self.dpUIinst.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
             for guide in newData:
                 for newAttr in newData[guide]:
                     cmds.text(label=guide, align='left', parent=updateSummaryRC)
                     cmds.text(label=newAttr, align='center', parent=updateSummaryRC)
         cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m192_askOldGuides'], align='center', parent=updateSummaryCL)
+        cmds.text(label=self.dpUIinst.lang['m192_askOldGuides'], align='center', parent=updateSummaryCL)
         cmds.separator(style='none', height=10, parent=updateSummaryCL)
-        cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m193_deleteOldGuides'], command=self.doDelete, backgroundColor=(1.0, 0.6, 0.4), parent=updateSummaryCL)
+        cmds.button(label=self.dpUIinst.lang['m193_deleteOldGuides'], command=self.doDelete, backgroundColor=(1.0, 0.6, 0.4), parent=updateSummaryCL)
         cmds.separator(style='none', height=10, parent=updateSummaryCL)
         cmds.showWindow('updateSummary')
 
@@ -81,20 +81,20 @@ class UpdateGuides(object):
         self.closeExistWin('updateGuidesWindow')
         cmds.window('updateGuidesWindow', title="Guides Info")
         updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
-        cmds.text(label='DPAR '+self.dpUIinst.langDic[self.dpUIinst.langName]['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
+        cmds.text(label='DPAR '+self.dpUIinst.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
         if len(self.updateData) > 0:
             updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesCL)
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+            cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
+            cmds.text(label=self.dpUIinst.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
+            cmds.text(label=self.dpUIinst.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
             for guide in self.updateData:
                 cmds.text(label=guide, align='left', parent=updateGuidesBaseRCL)
                 cmds.text(label=str(self.updateData[guide]['attributes']['customName']), align='center', parent=updateGuidesBaseRCL)
                 cmds.text(label=self.updateData[guide]['attributes']['dpARVersion'], align='left', parent=updateGuidesBaseRCL)
             cmds.separator(style='none', height=10, parent=updateGuidesBaseRCL)
-            cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
+            cmds.button(label=self.dpUIinst.lang['m186_updateGuides'], command=self.doUpdate, backgroundColor=(0.6, 1.0, 0.7), parent=updateGuidesCL)
         else:
-            cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
+            cmds.text(label=self.dpUIinst.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
         cmds.separator(style='none', height=10, parent=updateGuidesCL)
         cmds.window('updateGuidesWindow', edit=True, height=1)
         cmds.showWindow('updateGuidesWindow')
@@ -143,43 +143,43 @@ class UpdateGuides(object):
 
     def translateLimbStyleValue(self, enumValue):
         if enumValue == 1:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped']
+            return self.dpUIinst.lang['m026_biped']
         elif enumValue == 2:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped']
+            return self.dpUIinst.lang['m037_quadruped']
         elif enumValue == 3:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']
+            return self.dpUIinst.lang['m043_quadSpring']
         elif enumValue == 4:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']
+            return self.dpUIinst.lang['m155_quadrupedExtra']
         else:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']
+            return self.dpUIinst.lang['m042_default']
 
 
     def translateSpineStyleValue(self, enumValue):
         if enumValue == 1:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped']
+            return self.dpUIinst.lang['m026_biped']
         else:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']
+            return self.dpUIinst.lang['m042_default']
     
 
     def translateLimbTypeValue(self, enumValue):
         if enumValue == 1:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m030_leg']
+            return self.dpUIinst.lang['m030_leg']
         else:
-            return self.dpUIinst.langDic[self.dpUIinst.langName]['m028_arm']
+            return self.dpUIinst.lang['m028_arm']
 
 
     def setAttrValue(self, dpGuide, attr, value):
         try:
             cmds.setAttr(dpGuide+'.'+attr, value)
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
 
 
     def setAttrStrValue(self, dpGuide, attr, value):
         try:
             cmds.setAttr(dpGuide+'.'+attr, value, type='string')
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
     
 
     def setEyelidGuideAttribute(self, dpGuide, value):
@@ -382,7 +382,7 @@ class UpdateGuides(object):
                 try:
                     cmds.parent(self.updateData[guide]['newGuide'], newParentFinal)
                 except:
-                    mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
+                    mel.eval('print \"dpAR: '+self.dpUIinst.lang['m196_parentNotFound']+' '+self.updateData[guide]['newGuide']+'\\n\";')
             if self.ui:
                 cmds.refresh()
 
@@ -396,7 +396,7 @@ class UpdateGuides(object):
                     try:
                         cmds.parent(retainGuide, newParentFinal, 1)
                     except:
-                        mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
+                        mel.eval('print \"dpAR: '+self.dpUIinst.lang['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
     
 
     def sendTransformsToListEnd(self, elementList):
@@ -493,7 +493,7 @@ class UpdateGuides(object):
         try:
             cmds.delete(*self.updateData.keys())
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.langDic[self.dpUIinst.langName]['e000_GuideNotFound']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_GuideNotFound']+'\\n\";')
         
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
@@ -510,30 +510,30 @@ class UpdateGuides(object):
         self.closeExistWin('updateGuidesWindow')
         if self.ui:
             # Starts progress bar feedback
-            cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m198_renameOldGuides'])
+            cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status=self.dpUIinst.lang['m198_renameOldGuides'])
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
-        self.setProgressBar(1, self.dpUIinst.langDic[self.dpUIinst.langName]['m199_creatingNewGuides'])
+        self.setProgressBar(1, self.dpUIinst.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.createNewGuides()
-        self.setProgressBar(2, self.dpUIinst.langDic[self.dpUIinst.langName]['m200_setAttrs'])
+        self.setProgressBar(2, self.dpUIinst.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
         self.setNewNonTransformAttr()
-        self.setProgressBar(3, self.dpUIinst.langDic[self.dpUIinst.langName]['m201_parentGuides'])
+        self.setProgressBar(3, self.dpUIinst.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parentNewGuides()
-        self.setProgressBar(4, self.dpUIinst.langDic[self.dpUIinst.langName]['m202_setTranforms'])
+        self.setProgressBar(4, self.dpUIinst.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
         self.setNewBaseGuidesTransAttr()
-        self.setProgressBar(5, self.dpUIinst.langDic[self.dpUIinst.langName]['m203_setChildGuides'])
+        self.setProgressBar(5, self.dpUIinst.lang['m203_setChildGuides'])
         # Set all children attributes
         self.setChildrenGuides()
-        self.setProgressBar(6, self.dpUIinst.langDic[self.dpUIinst.langName]['m201_parentGuides'])
+        self.setProgressBar(6, self.dpUIinst.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parentRetainGuides()
         cmds.select(clear=True)
         if self.ui:
-            self.setProgressBar(7, self.dpUIinst.langDic[self.dpUIinst.langName]['m204_finish'])
+            self.setProgressBar(7, self.dpUIinst.lang['m204_finish'])
             # Ends progress bar feedback
             cmds.progressWindow(endProgress=True)
             # Calls for summary window

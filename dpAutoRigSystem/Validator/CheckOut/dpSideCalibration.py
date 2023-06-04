@@ -34,7 +34,7 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
         # ---
         # --- validator code --- beginning
@@ -50,7 +50,7 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 # conditional to check here
                 if cmds.objExists(item+".calibrationList"):
                     if item[1] == "_": #side: because L_CtrlName or R_CtrlName have "_" as second letter.
@@ -84,37 +84,22 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
                                                         cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                     else:
                                                         # check for left, top or front side to use it as priority node:
-                                                        if item[0] == self.dpUIinst.langDic[self.dpUIinst.langName]['p002_left'] or item[0] == self.dpUIinst.langDic[self.dpUIinst.langName]['p004_top'] or item[0] == self.dpUIinst.langDic[self.dpUIinst.langName]['p006_front']:
+                                                        if item[0] == self.dpUIinst.lang['p002_left'] or item[0] == self.dpUIinst.lang['p004_top'] or item[0] == self.dpUIinst.lang['p006_front']:
                                                             cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                         else:
                                                             cmds.setAttr(item+"."+attr, pairCurrentValue)
                                                     self.resultOkList.append(True)
-                                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item+"."+attr)
+                                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
                                                 except:
                                                     self.resultOkList.append(False)
-                                                    self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item+"."+attr)
+                                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

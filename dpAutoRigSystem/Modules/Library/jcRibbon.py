@@ -27,19 +27,19 @@ class RibbonClass(object):
         self.ctrlRadius = ctrlRadius
         self.curveDegree = curveDegree
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
-        self.limbManualVVAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['m019_limb'].lower()+"Manual_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c031_volumeVariation']
-        self.limbVVAttr       = self.dpUIinst.langDic[self.dpUIinst.langName]['m019_limb'].lower()+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c031_volumeVariation']
-        self.limbMinVVAttr    = self.dpUIinst.langDic[self.dpUIinst.langName]['m019_limb'].lower()+"Min_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c031_volumeVariation']
-        self.limbLengthAttr   = self.dpUIinst.langDic[self.dpUIinst.langName]['c113_length']
+        self.limbManualVVAttr = self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation']
+        self.limbVVAttr       = self.dpUIinst.lang['m019_limb'].lower()+"_"+self.dpUIinst.lang['c031_volumeVariation']
+        self.limbMinVVAttr    = self.dpUIinst.lang['m019_limb'].lower()+"Min_"+self.dpUIinst.lang['c031_volumeVariation']
+        self.limbLengthAttr   = self.dpUIinst.lang['c113_length']
         
         
     def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
-        cornerName = self.dpUIinst.langDic[self.dpUIinst.langName]['c007_leg_corner']
+        cornerName = self.dpUIinst.lang['c007_leg_corner']
         if arm:
-            cornerName = self.dpUIinst.langDic[self.dpUIinst.langName]['c002_arm_corner']
+            cornerName = self.dpUIinst.lang['c002_arm_corner']
         articNumber = 1
         if addArtic:
             articNumber = 2
@@ -795,8 +795,8 @@ class RibbonClass(object):
             retDict['twistBoneMD'] = twistBoneMD
         
         # autoRotate:
-        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e002_matrixPluginNotFound'])
+        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             upTwistBoneMD = dpUtils.twistBoneMatrix(top_Loc[0], top_Loc[3], name+"_Top_TwistBone")
             bottomTwistBoneMD = dpUtils.twistBoneMatrix(bttm_Loc[0], bttm_Loc[3], name+"_Bottom_TwistBone")

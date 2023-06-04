@@ -169,21 +169,21 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
 
                 # declaring attributes reading from dictionary:
-                ankleRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c009_leg_extrem']
-                middleRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c017_revFoot_middle']
-                outsideRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c010_revFoot_A']
-                insideRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c011_revFoot_B']
-                heelRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c012_revFoot_C']
-                toeRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c013_revFoot_D']
-                ballRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c014_revFoot_E']
-                footRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c015_revFoot_F']
-                sideRFAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c016_revFoot_G']
-                rfRoll = self.dpUIinst.langDic[self.dpUIinst.langName]['c018_revFoot_roll'].capitalize()
-                rfSpin = self.dpUIinst.langDic[self.dpUIinst.langName]['c019_revFoot_spin'].capitalize()
-                rfTurn = self.dpUIinst.langDic[self.dpUIinst.langName]['c020_revFoot_turn'].capitalize()
-                rfAngle = self.dpUIinst.langDic[self.dpUIinst.langName]['c102_angle'].capitalize()
-                rfPlant = self.dpUIinst.langDic[self.dpUIinst.langName]['c103_plant'].capitalize()
-                showCtrlsAttr = self.dpUIinst.langDic[self.dpUIinst.langName]['c021_showControls']
+                ankleRFAttr = self.dpUIinst.lang['c009_leg_extrem']
+                middleRFAttr = self.dpUIinst.lang['c017_revFoot_middle']
+                outsideRFAttr = self.dpUIinst.lang['c010_revFoot_A']
+                insideRFAttr = self.dpUIinst.lang['c011_revFoot_B']
+                heelRFAttr = self.dpUIinst.lang['c012_revFoot_C']
+                toeRFAttr = self.dpUIinst.lang['c013_revFoot_D']
+                ballRFAttr = self.dpUIinst.lang['c014_revFoot_E']
+                footRFAttr = self.dpUIinst.lang['c015_revFoot_F']
+                sideRFAttr = self.dpUIinst.lang['c016_revFoot_G']
+                rfRoll = self.dpUIinst.lang['c018_revFoot_roll'].capitalize()
+                rfSpin = self.dpUIinst.lang['c019_revFoot_spin'].capitalize()
+                rfTurn = self.dpUIinst.lang['c020_revFoot_turn'].capitalize()
+                rfAngle = self.dpUIinst.lang['c102_angle'].capitalize()
+                rfPlant = self.dpUIinst.lang['c103_plant'].capitalize()
+                showCtrlsAttr = self.dpUIinst.lang['c021_showControls']
 
                 # creating joints:
                 cmds.select(clear=True)
@@ -262,13 +262,13 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(ikHandleMiddleList[0]+'.visibility', 0)
 
                 # creating Fk controls:
-                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z")
+                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z")
                 self.footCtrlList.append(self.footCtrl)
                 cmds.setAttr(self.footCtrl+".rotateOrder", 1)
 
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
 
-                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
+                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)
@@ -284,7 +284,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # mount hierarchy:
                 cmds.parent(self.footCtrlZeroList[1], self.RFDCtrl, absolute=True)
                 cmds.parent(ikHandleMiddleList[0], self.middleFootCtrl, absolute=True)
-                self.toLimbIkHandleGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c009_leg_extrem']+"_Grp")
+                self.toLimbIkHandleGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Grp")
                 self.toLimbIkHandleGrpList.append(self.toLimbIkHandleGrp)
                 cmds.parent(ikHandleAnkleList[0], self.toLimbIkHandleGrp, self.RFECtrl, absolute=True)
                 cmds.makeIdentity(self.toLimbIkHandleGrp, apply=True, translate=True, rotate=True, scale=True)

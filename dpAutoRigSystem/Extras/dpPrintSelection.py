@@ -30,7 +30,7 @@ class PrintSelection(object):
             if self.resultDic:
                 self.dpPrintResults(self.resultDic)
         else:
-            mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\";")
+            mel.eval("warning \""+self.dpUIinst.lang['i042_notSelection']+"\";")
     
     
     def dpDefineDic(self, selList, *args):
@@ -61,4 +61,4 @@ class PrintSelection(object):
             print(resultDic['string'])
             print("-------")
         else:
-            mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\";")
+            mel.eval("warning \""+self.dpUIinst.lang['i042_notSelection']+"\";")

@@ -154,13 +154,13 @@ class MatchMesh(object):
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
                     
                     if not cancelled:
-                        print(self.dpUIinst.langDic[self.dpUIinst.langName]['i035_transfData'], self.dpUIinst.langDic[self.dpUIinst.langName]['i036_from'].upper(), ":", fromMesh, ",", self.dpUIinst.langDic[self.dpUIinst.langName]['i037_to'].upper(), ":", toMesh)
+                        print(self.dpUIinst.lang['i035_transfData'], self.dpUIinst.lang['i036_from'].upper(), ":", fromMesh, ",", self.dpUIinst.lang['i037_to'].upper(), ":", toMesh)
                     else:
-                        print(self.dpUIinst.langDic[self.dpUIinst.langName]['i038_canceled'])
+                        print(self.dpUIinst.lang['i038_canceled'])
                     
                 else:
-                    mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i039_notMatchDif']+"\";")
+                    mel.eval("warning \""+self.dpUIinst.lang['i039_notMatchDif']+"\";")
                 cmds.select(selList)
             
             else:
-                mel.eval("warning \""+self.dpUIinst.langDic[self.dpUIinst.langName]['i040_notMatchSel']+"\";")
+                mel.eval("warning \""+self.dpUIinst.lang['i040_notMatchSel']+"\";")

@@ -15,7 +15,7 @@ class Isolate(object):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.rootName = "Root"
-        self.isolateName = self.dpUIinst.langDic[self.dpUIinst.langName]['m095_isolate']
+        self.isolateName = self.dpUIinst.lang['m095_isolate']
         
         # base item to isolate
         self.rootCtrl = self.rootName+"_Ctrl"
@@ -61,7 +61,7 @@ class Isolate(object):
         if len(nodeList) == 3:
             for nodeName in nodeList:
                 if not cmds.objExists(nodeName):
-                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['e004_objNotExist'], nodeName)
+                    print(self.dpUIinst.lang['e004_objNotExist'], nodeName)
                     return
         # call scripted function
         self.dpIsolate(self.isolateName, nodeList)

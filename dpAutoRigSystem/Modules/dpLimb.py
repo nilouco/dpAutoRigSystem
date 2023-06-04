@@ -82,13 +82,13 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
-        cmds.addAttr(self.moduleGrp, longName="type", attributeType='enum', enumName=self.dpUIinst.langDic[self.dpUIinst.langName]['m028_arm']+':'+self.dpUIinst.langDic[self.dpUIinst.langName]['m030_leg'])
+        cmds.addAttr(self.moduleGrp, longName="type", attributeType='enum', enumName=self.dpUIinst.lang['m028_arm']+':'+self.dpUIinst.lang['m030_leg'])
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="hasBend", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".hasBend", 1)
         cmds.addAttr(self.moduleGrp, longName="numBendJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".numBendJoints", 5)
-        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']+':'+self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped']+':'+self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped']+':'+self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']+':'+self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra'])
+        cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.dpUIinst.lang['m042_default']+':'+self.dpUIinst.lang['m026_biped']+':'+self.dpUIinst.lang['m037_quadruped']+':'+self.dpUIinst.lang['m043_quadSpring']+':'+self.dpUIinst.lang['m155_quadrupedExtra'])
         cmds.addAttr(self.moduleGrp, longName="alignWorld", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".alignWorld", 1)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
@@ -195,21 +195,21 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
         # if there is a type attribute:
         self.typeLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 77, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedModuleColumn")
-        cmds.text(self.dpUIinst.langDic[self.dpUIinst.langName]['m021_type'], parent=self.typeLayout)
+        cmds.text(self.dpUIinst.lang['m021_type'], parent=self.typeLayout)
         self.typeMenu = cmds.optionMenu("typeMenu", label='', changeCommand=self.changeType, parent=self.typeLayout)
-        typeMenuItemList = [self.dpUIinst.langDic[self.dpUIinst.langName]['m028_arm'], self.dpUIinst.langDic[self.dpUIinst.langName]['m030_leg']]
+        typeMenuItemList = [self.dpUIinst.lang['m028_arm'], self.dpUIinst.lang['m030_leg']]
         for item in typeMenuItemList:
             cmds.menuItem(label=item, parent=self.typeMenu)
         # read from guide attribute the current value to type:
         currentType = cmds.getAttr(self.moduleGrp+".type")
         cmds.optionMenu(self.typeMenu, edit=True, select=int(currentType+1))
-        self.reOrientBT = cmds.button(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m022_reOrient'], annotation=self.dpUIinst.langDic[self.dpUIinst.langName]['m023_reOrientDesc'], command=self.reOrientGuide, parent=self.typeLayout)
+        self.reOrientBT = cmds.button(label=self.dpUIinst.lang['m022_reOrient'], annotation=self.dpUIinst.lang['m023_reOrientDesc'], command=self.reOrientGuide, parent=self.typeLayout)
 
         # style layout:
         self.styleLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 50, 50, 70), columnAlign=[(1, 'right'), (2, 'left'), (3, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (3, 'both', 10)], parent="selectedModuleColumn")
-        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m041_style'], visible=True, parent=self.styleLayout)
+        cmds.text(label=self.dpUIinst.lang['m041_style'], visible=True, parent=self.styleLayout)
         self.styleMenu = cmds.optionMenu("styleMenu", label='', changeCommand=self.changeStyle, parent=self.styleLayout)
-        styleMenuItemList = [self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'], self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped'], self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'], self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'], self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']]
+        styleMenuItemList = [self.dpUIinst.lang['m042_default'], self.dpUIinst.lang['m026_biped'], self.dpUIinst.lang['m037_quadruped'], self.dpUIinst.lang['m043_quadSpring'], self.dpUIinst.lang['m155_quadrupedExtra']]
         for item in styleMenuItemList:
             cmds.menuItem(label=item, parent=self.styleMenu)
         # read from guide attribute the current value to style:
@@ -219,7 +219,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # bend layout:
         self.bendMainLayout = cmds.rowColumnLayout("bendMainLayout", numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="selectedModuleColumn")
         self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent=self.bendMainLayout)
-        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m044_addBend'], visible=True, parent=self.bendLayout)
+        cmds.text(label=self.dpUIinst.lang['m044_addBend'], visible=True, parent=self.bendLayout)
         self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
         self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
         bendNumMenuItemList = [3, 5, 7]
@@ -233,11 +233,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 break
         # additional ribbon joint:
         self.hasAdditional = self.getHasAdditional()
-        self.additionalCB = cmds.checkBox("additionalCB", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m180_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
+        self.additionalCB = cmds.checkBox("additionalCB", label=self.dpUIinst.lang['m180_additional'], value=self.hasAdditional, changeCommand=self.changeAdditional, parent=self.bendMainLayout)
         
         # align world layout:
         self.alignWorldLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent="selectedModuleColumn")
-        cmds.text(label=self.dpUIinst.langDic[self.dpUIinst.langName]['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
+        cmds.text(label=self.dpUIinst.lang['m080_alignWorld'], visible=True, parent=self.alignWorldLayout)
         self.alignWorldCB = cmds.checkBox(value=self.getAlignWorld(), label=' ', ofc=partial(self.setAlignWorld, 0), onc=partial(self.setAlignWorld, 1), parent=self.alignWorldLayout)
 
         
@@ -271,23 +271,23 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         self.cvCornerBLoc = self.guideName+"_CornerB"
         # for Default style:
-        if style == self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'] or style == 0:
+        if style == self.dpUIinst.lang['m042_default'] or style == 0:
             cmds.setAttr(self.cvCornerBLoc+".visibility", 0)
             cmds.setAttr(self.moduleGrp+".style", 0)
         # for Biped style:
-        if style == self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped'] or style == 1:
+        if style == self.dpUIinst.lang['m026_biped'] or style == 1:
             cmds.setAttr(self.cvCornerBLoc+".visibility", 0)
             cmds.setAttr(self.moduleGrp+".style", 1)
         # for Quadruped style:
-        if style == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or style == 2:
+        if style == self.dpUIinst.lang['m037_quadruped'] or style == 2:
             cmds.setAttr(self.cvCornerBLoc+".visibility", 1)
             cmds.setAttr(self.moduleGrp+".style", 2)
         # for Quadruped Spring style:
-        if style == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or style == 3:
+        if style == self.dpUIinst.lang['m043_quadSpring'] or style == 3:
             cmds.setAttr(self.cvCornerBLoc+".visibility", 1)
             cmds.setAttr(self.moduleGrp+".style", 3)
         # for Quadruped Extra style:
-        if style == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra'] or style == 4:
+        if style == self.dpUIinst.lang['m155_quadrupedExtra'] or style == 4:
             cmds.setAttr(self.cvCornerBLoc+".visibility", 1)
             cmds.setAttr(self.moduleGrp+".style", 4)
         
@@ -318,7 +318,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(guideNode+"."+tAttr, 0)
 
         # for Arm type:
-        if type == self.dpUIinst.langDic[self.dpUIinst.langName]['m028_arm'] or type == 0:
+        if type == self.dpUIinst.lang['m028_arm'] or type == 0:
             cmds.setAttr(self.moduleGrp+".type", 0)
             cmds.setAttr(self.cvBeforeLoc+".translateX", -1)
             cmds.setAttr(self.cvBeforeLoc+".translateZ", -4)
@@ -335,7 +335,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.setLockCornerAttr(ARM)
 
         # for Leg type:
-        elif type == self.dpUIinst.langDic[self.dpUIinst.langName]['m030_leg'] or type == 1:
+        elif type == self.dpUIinst.lang['m030_leg'] or type == 1:
             cmds.setAttr(self.moduleGrp+".type", 1)
             cmds.setAttr(self.cvBeforeLoc+".translateY", 1)
             cmds.setAttr(self.cvBeforeLoc+".translateZ", -2)
@@ -427,11 +427,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         invertList = [[], ["invertRY"], [], []]
         elif kneeB: #kneeB
             presetList = [{}, {"calibrateTX":0.1, "calibrateTZ":-0.6, "calibrateRY":-45}, {"calibrateTX":-0.4, "calibrateTZ":0.8, "calibrateRY":-65}, {"calibrateTX":0.3, "calibrateTZ":0.8, "calibrateRY":65}]
-            if self.dpUIinst.langDic[self.dpUIinst.langName]['c057_back'] in self.userGuideName:
+            if self.dpUIinst.lang['c057_back'] in self.userGuideName:
                 invertList = [[], [], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
             if s == 1:
                 invertList = [[], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"], ["invertTX", "invertRY", "invertRZ"]]
-                if self.dpUIinst.langDic[self.dpUIinst.langName]['c057_back'] in self.userGuideName:
+                if self.dpUIinst.lang['c057_back'] in self.userGuideName:
                     invertList = [[], [], [], []]
         elif extrem: #wrist/ankle
             presetList = [{}, {"calibrateTX":0.7, "calibrateRY":-30}, {"calibrateTX":-0.7, "calibrateRY":30}, {"calibrateTY":0.7, "calibrateRX":30}, {"calibrateTY":-0.7, "calibrateRX":-30}]
@@ -498,23 +498,23 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # getting type of limb:
                 enumType = cmds.getAttr(self.moduleGrp+'.type')
                 if enumType == 0:
-                    self.limbType = self.dpUIinst.langDic[self.dpUIinst.langName]['m028_arm']
+                    self.limbType = self.dpUIinst.lang['m028_arm']
                     self.limbTypeName = ARM
                 elif enumType == 1:
-                    self.limbType = self.dpUIinst.langDic[self.dpUIinst.langName]['m030_leg']
+                    self.limbType = self.dpUIinst.lang['m030_leg']
                     self.limbTypeName = LEG
                 # getting style of the limb:
                 enumStyle = cmds.getAttr(self.moduleGrp+'.style')
                 if enumStyle == 0:
-                    self.limbStyle = self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']
+                    self.limbStyle = self.dpUIinst.lang['m042_default']
                 elif enumStyle == 1:
-                    self.limbStyle = self.dpUIinst.langDic[self.dpUIinst.langName]['m026_biped']
+                    self.limbStyle = self.dpUIinst.lang['m026_biped']
                 elif enumStyle == 2:
-                    self.limbStyle = self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped']
+                    self.limbStyle = self.dpUIinst.lang['m037_quadruped']
                 elif enumStyle == 3:
-                    self.limbStyle = self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']
+                    self.limbStyle = self.dpUIinst.lang['m043_quadSpring']
                 elif enumStyle == 4:
-                    self.limbStyle = self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']
+                    self.limbStyle = self.dpUIinst.lang['m155_quadrupedExtra']
 
                 # re-declaring guide names:
                 self.cvBeforeLoc = side+self.userGuideName+"_Guide_Before"
@@ -527,20 +527,20 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # getting names from dic:
                 if self.limbTypeName == ARM:
-                    beforeName = self.dpUIinst.langDic[self.dpUIinst.langName]['c000_arm_before']
-                    mainName = self.dpUIinst.langDic[self.dpUIinst.langName]['c001_arm_main']
-                    cornerName = self.dpUIinst.langDic[self.dpUIinst.langName]['c002_arm_corner']
-                    cornerBName = self.dpUIinst.langDic[self.dpUIinst.langName]['c003_arm_cornerB']
-                    extremName = self.dpUIinst.langDic[self.dpUIinst.langName]['c004_arm_extrem']
+                    beforeName = self.dpUIinst.lang['c000_arm_before']
+                    mainName = self.dpUIinst.lang['c001_arm_main']
+                    cornerName = self.dpUIinst.lang['c002_arm_corner']
+                    cornerBName = self.dpUIinst.lang['c003_arm_cornerB']
+                    extremName = self.dpUIinst.lang['c004_arm_extrem']
                 else:
-                    beforeName = self.dpUIinst.langDic[self.dpUIinst.langName]['c005_leg_before']
-                    mainName = self.dpUIinst.langDic[self.dpUIinst.langName]['c006_leg_main']
-                    cornerName = self.dpUIinst.langDic[self.dpUIinst.langName]['c007_leg_corner']
-                    cornerBName = self.dpUIinst.langDic[self.dpUIinst.langName]['c008_leg_cornerB']
-                    extremName = self.dpUIinst.langDic[self.dpUIinst.langName]['c009_leg_extrem']
+                    beforeName = self.dpUIinst.lang['c005_leg_before']
+                    mainName = self.dpUIinst.lang['c006_leg_main']
+                    cornerName = self.dpUIinst.lang['c007_leg_corner']
+                    cornerBName = self.dpUIinst.lang['c008_leg_cornerB']
+                    extremName = self.dpUIinst.lang['c009_leg_extrem']
 
                 # mount cvLocList and jNameList:
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     self.cvLocList = [self.cvBeforeLoc, self.cvMainLoc, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc]
                     self.jNameList = [beforeName, mainName, cornerName, cornerBName, extremName]
                 else:
@@ -676,7 +676,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
                 cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'Fk_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.addAttr(self.worldRef, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c113_length'], attributeType='float', defaultValue=1)
+                cmds.addAttr(self.worldRef, longName=self.dpUIinst.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
                 self.worldRefShapeList.append(self.worldRefShape)
@@ -693,10 +693,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.shoulderRefGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderRefGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PoC")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderRefGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PaC")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], self.fkIsolateRevNode+".inputX", force=True)
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], self.fkIsolateRevNode+".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.masterCtrlRef+"W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
@@ -747,7 +747,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # fix stretch calcule to work with reverseFoot
                 self.ikStretchExtremLoc = cmds.group(empty=True, name=side+self.userGuideName+"_"+extremName+"_Ik_Loc_Grp")
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     cmds.delete(cmds.parentConstraint(self.skinJointList[3], self.ikStretchExtremLoc, maintainOffset=False)) #snap to kneeB
                 else:    
                     cmds.delete(cmds.parentConstraint(self.cvExtremLoc, self.ikStretchExtremLoc, maintainOffset=False))
@@ -766,7 +766,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # verify if user wants to apply the good mirror orientation:
                 if s == 1:
-                    if self.limbStyle != self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']:
+                    if self.limbStyle != self.dpUIinst.lang['m042_default']:
                         # these options is valides for Biped, Quadruped, Quadruped Spring and Quadruped Extra
                         if self.mirrorAxis != 'off':
                             for axis in self.mirrorAxis:
@@ -786,7 +786,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     self.ikStretchExtremLocList.append(None)                    
                 else:
                     self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
@@ -800,9 +800,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating ikHandles:
                 # verify the limb style:
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']:
+                if self.limbStyle == self.dpUIinst.lang['m043_quadSpring']:
                     # verify if the ikSpringSolver plugin is loaded, if not, then load it
-                    loadedIkSpring = dpUtils.checkLoadedPlugin("ikSpringSolver", self.dpUIinst.langDic[self.dpUIinst.langName]['e013_cantLoadIkSpringSolver'])
+                    loadedIkSpring = dpUtils.checkLoadedPlugin("ikSpringSolver", self.dpUIinst.lang['e013_cantLoadIkSpringSolver'])
                     if loadedIkSpring:
                         if not cmds.objExists('ikSpringSolver'):
                             cmds.createNode('ikSpringSolver', name='ikSpringSolver')
@@ -815,7 +815,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         ikHandleMainList = cmds.ikHandle(name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_IKH", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 2], solver='ikRPsolver')
                         ikHandleNotStretchList = cmds.ikHandle(name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_NotStretch_IKH", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
                         ikHandleACList = cmds.ikHandle(name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_AC_IKH", startJoint=self.ikACJointList[1], endEffector=self.ikACJointList[len(self.ikACJointList) - 2], solver='ikRPsolver')
-                elif self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                elif self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     # creating double ikHandle in order to get an extra control for lower articulation in Quadruped Extra Control:
                     ikHandleMainList = cmds.ikHandle(name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_IKH", startJoint=self.ikJointList[1], endEffector=self.ikJointList[len(self.ikJointList) - 3], solver='ikRPsolver')
                     ikHandleNotStretchList = cmds.ikHandle(name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_NotStretch_IKH", startJoint=self.ikNSJointList[1], endEffector=self.ikNSJointList[len(self.ikNSJointList) - 2], solver='ikRPsolver')
@@ -849,7 +849,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(ikHandleACList[0], ikHandleACGrp)
 
                 # setup quadruped extra control:
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     cmds.rename(ikHandleExtraList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_Extra_Eff")
                     self.quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z")
                     if s == 1:
@@ -873,7 +873,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.ikExtremCtrl+".alignWorld", alignWorldRev+".inputX", force=True)
                     if s == 0:
                         self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
-                    elif self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']:
+                    elif self.limbStyle == self.dpUIinst.lang['m042_default']:
                         if self.limbTypeName == ARM:
                             # get right side to alignWorld. It'll be a little glitch, but it seems be accordilly with the mirror using arm default setting. Recommended use biped limbStyle instead.
                             self.origRotList = self.getOriginalRotate(self.ikExtremCtrl)
@@ -892,9 +892,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(ikHandleMainList[0], ikHandleExtraGrp, maintainOffset=False))
                 cmds.parent(ikHandleMainList[0], ikHandleExtraGrp)
                 cmds.parent(ikHandleExtraGrp, self.ikHandleToRFGrp)
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     cmds.parent(ikHandleExtraGrp, ikStretchExtremLocZero, self.quadExtraCtrl)
-                elif self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']:
+                elif self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring']:
                     cmds.parent(ikStretchExtremLocZero, self.ikHandleToRFGrp)
                     cmds.parentConstraint(ikHandleExtraGrp, ikStretchExtremLocZero, skipRotate=("x", "y", "z"), maintainOffset=True, name=ikStretchExtremLocZero+"_PaC")
                 self.ikHandleConst = cmds.pointConstraint(self.ikExtremSubCtrl, ikHandleExtraGrp, maintainOffset=True, name=ikHandleGrp+"_PoC")[0]
@@ -1008,15 +1008,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.pointConstraint(self.ikExtremSubCtrl, poleVectorUpLocGrp, maintainOffset=False, name=poleVectorUpLocGrp+"_PaC")
                 
                 # working with autoOrient of poleVector:
-                cmds.addAttr(self.ikCornerCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
+                cmds.addAttr(self.ikCornerCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                 if self.limbTypeName == ARM:
-                    cmds.setAttr(self.ikCornerCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], 0)
-                    cmds.addAttr(self.ikCornerCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], edit=True, defaultValue=0)
+                    cmds.setAttr(self.ikCornerCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], 0)
+                    cmds.addAttr(self.ikCornerCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], edit=True, defaultValue=0)
                 upLocOrientConst = cmds.parentConstraint(self.ikExtremCtrl, self.rootCtrlRef, poleVectorUpLocGrp, skipTranslate=["x", "y", "z"], maintainOffset=True, name=poleVectorUpLocGrp+"_OrC")[0]
                 cmds.setAttr(upLocOrientConst+".interpType", 2) #shortest
                 upLocOrientRev = cmds.createNode('reverse', name=side+self.userGuideName+"_UpLocOrient_Rev")
-                cmds.connectAttr(self.ikCornerCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], upLocOrientRev+".inputX", force=True)
-                cmds.connectAttr(self.ikCornerCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], upLocOrientConst+"."+self.ikExtremCtrl+"W0", force=True)
+                cmds.connectAttr(self.ikCornerCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], upLocOrientRev+".inputX", force=True)
+                cmds.connectAttr(self.ikCornerCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], upLocOrientConst+"."+self.ikExtremCtrl+"W0", force=True)
                 cmds.connectAttr(upLocOrientRev+'.outputX', upLocOrientConst+"."+self.rootCtrlRef+"W1", force=True)
                 cmds.aimConstraint(self.ikExtremSubCtrl, poleVectorAimLoc, worldUpType="object", worldUpObject=poleVectorUpLoc, aimVector=(0, 0, 1), upVector=(1, 0, 0), maintainOffset=False, name=poleVectorUpLoc+"_AiC")
                 cmds.parentConstraint(poleVectorAimLoc, self.cornerGrp, maintainOffset=True, name=self.cornerGrp+"_PaC")
@@ -1027,7 +1027,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.ikCornerCtrl+'.pin', poleVectorPinPC+"."+self.masterCtrlRef+"W0", force=True)
                 
                 # quadExtraCtrl autoOrient setup:
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, defaultValue=1, keyable=True)
                     cmds.setAttr(self.quadExtraCtrl+".autoOrient", 0)
                     quadExtraRotNull = cmds.group(name=self.quadExtraCtrl+"_AutoOrient_Null", empty=True)
@@ -1055,14 +1055,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating attributes:
                 cmds.addAttr(self.ikExtremCtrl, longName="startChainLength", attributeType='float', defaultValue=jointChainLengthValue, keyable=False)
                 cmds.addAttr(self.ikExtremCtrl, longName="stretchable", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=True)
-                cmds.addAttr(self.ikExtremCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c113_length'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
+                cmds.addAttr(self.ikExtremCtrl, longName=self.dpUIinst.lang['c113_length'], attributeType='float', minValue=0.001, defaultValue=1, keyable=True)
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['startChainLength'])
 
                 # creating distance betweens, multiplyDivides and reverse nodes:
                 self.distBetweenList = dpUtils.distanceBet(self.ikJointList[1], self.ikStretchExtremLoc, name=side+self.userGuideName+"_"+kNameList[1]+"_DistBet", keep=True)
                 cmds.setAttr(self.distBetweenList[5]+"."+self.distBetweenList[4]+"W1", 0)
                 cmds.parent(self.distBetweenList[2], self.distBetweenList[3], self.distBetweenList[4], distBetGrp)
-                cmds.connectAttr(self.ikExtremCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c113_length'], self.worldRef+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c113_length'], force=True)
+                cmds.connectAttr(self.ikExtremCtrl+"."+self.dpUIinst.lang['c113_length'], self.worldRef+"."+self.dpUIinst.lang['c113_length'], force=True)
                 cmds.parentConstraint(self.skinJointList[0], self.distBetweenList[4], maintainOffset=True, name=self.distBetweenList[4]+"_PaC")
 
                 # (James) if we use the ribbon controls we won't implement the forearm control
@@ -1070,8 +1070,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # create the forearm control if limb type is arm and there is not bend (ribbon) implementation:
                 if self.limbTypeName == ARM and self.getHasBend() == False:
                     # create forearm joint:
-                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.dpUIinst.langDic[self.dpUIinst.langName][ 'c030_forearm']+self.jSufixList[0])[0]
-                    dpUtils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][ 'c030_forearm'])
+                    forearmJnt = cmds.duplicate(self.skinJointList[2], name=side+self.userGuideName+ "_" +self.dpUIinst.lang[ 'c030_forearm']+self.jSufixList[0])[0]
+                    dpUtils.setJointLabel(forearmJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang[ 'c030_forearm'])
                     # delete its children:
                     childList = cmds.listRelatives(forearmJnt, children=True, fullPath=True)
                     cmds.delete(childList)
@@ -1086,19 +1086,19 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         forearmDistZ = -(tempDist / 3)
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
-                    forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c030_forearm']+"_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
-                    forearmGrp = cmds.group(forearmCtrl, name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c030_forearm']+"_Grp")
-                    forearmZero = cmds.group(forearmGrp, name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c030_forearm']+"_Zero_0_Grp")
+                    forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
+                    forearmGrp = cmds.group(forearmCtrl, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Grp")
+                    forearmZero = cmds.group(forearmGrp, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Zero_0_Grp")
                     tempToDelete = cmds.parentConstraint(forearmJnt, forearmZero, maintainOffset=False)
                     cmds.delete(tempToDelete)
                     cmds.parentConstraint(self.skinJointList[2], forearmZero, maintainOffset=True, name=forearmZero+"_PaC")
                     cmds.orientConstraint(forearmCtrl, forearmJnt, skip=["x", "y"], maintainOffset=True, name=forearmJnt+"_OrC")
                     # create attribute to forearm autoRotate:
-                    cmds.addAttr(forearmCtrl, longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
+                    cmds.addAttr(forearmCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
                     self.ctrls.setLockHide([forearmCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # make rotate connections:
-                    forearmMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName][ 'c030_forearm']+"_MD")
-                    cmds.connectAttr(forearmCtrl+'.'+self.dpUIinst.langDic[self.dpUIinst.langName]['c033_autoOrient'], forearmMD+'.input1X')
+                    forearmMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang[ 'c030_forearm']+"_MD")
+                    cmds.connectAttr(forearmCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], forearmMD+'.input1X')
                     cmds.connectAttr(self.skinJointList[3]+'.rotateZ', forearmMD+'.input2X')
                     cmds.connectAttr(forearmMD+'.outputX', forearmGrp+'.rotateZ')
 
@@ -1112,21 +1112,21 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
 
                 # work with scalable extrem hand or foot:
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'], at="double", min=0.001, dv=1)
-                cmds.setAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'], edit=True, keyable=True)
-                cmds.setAttr(self.ikExtremCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'], edit=True, keyable=True)
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.lang['c040_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.dpUIinst.lang['c040_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.setAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.lang['c040_uniformScale'], edit=True, keyable=True)
+                cmds.setAttr(self.ikExtremCtrl+"."+self.dpUIinst.lang['c040_uniformScale'], edit=True, keyable=True)
                 # add scale multiplier attribute
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
-                ikScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize()+'_Ik_MD')
-                fkScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize()+'_Fk_MD')
-                cmds.connectAttr(self.ikExtremCtrl+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'], ikScaleMD+".input1X", force=True)
-                cmds.connectAttr(self.ikExtremCtrl+"." +self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize(), ikScaleMD+".input2X", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'], fkScaleMD+".input1X", force=True)
-                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize(), fkScaleMD+".input2X", force=True)
+                cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
+                cmds.addAttr(self.ikExtremCtrl, ln=self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
+                ikScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side+self.userGuideName+"_"+self.dpUIinst.lang['c105_multiplier'].capitalize()+'_Ik_MD')
+                fkScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side+self.userGuideName+"_"+self.dpUIinst.lang['c105_multiplier'].capitalize()+'_Fk_MD')
+                cmds.connectAttr(self.ikExtremCtrl+"."+self.dpUIinst.lang['c040_uniformScale'], ikScaleMD+".input1X", force=True)
+                cmds.connectAttr(self.ikExtremCtrl+"." +self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), ikScaleMD+".input2X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.lang['c040_uniformScale'], fkScaleMD+".input1X", force=True)
+                cmds.connectAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), fkScaleMD+".input2X", force=True)
                 # integrate uniformScale and scaleMultiplier attributes
-                uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'][0].capitalize()+self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale'][1:]+"_BC")
+                uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.dpUIinst.lang['c040_uniformScale'][0].capitalize()+self.dpUIinst.lang['c040_uniformScale'][1:]+"_BC")
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleZ", force=True)
@@ -1140,15 +1140,15 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(fkScaleMD+'.outputX', uniBlend+'.color1R', force=True)
                 cmds.connectAttr(ikScaleMD+'.outputX', uniBlend+'.color2R', force=True)
                 
-                if self.limbStyle != self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default']:
-                    if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']:
+                if self.limbStyle != self.dpUIinst.lang['m042_default']:
+                    if self.limbStyle == self.dpUIinst.lang['m043_quadSpring']:
                         # fix the group for the ikSpringSolver to avoid Maya bug about rotation from masterCtrl :P
                         cmds.parent(self.ikJointList[1], world=True)
                         self.fixIkSpringSolverGrp = cmds.group(self.ikJointList[1], name=side+self.userGuideName+"_IkFixSpringSolver_Grp")
                         self.fixIkSpringSolverGrpList.append(self.fixIkSpringSolverGrp)
                         cmds.setAttr(self.fixIkSpringSolverGrp+".visibility", 0)
                         cmds.parentConstraint(self.ikJointList[0], self.ikJointList[1], maintainOffset=True, name=self.ikJointList[1]+"_PaC")
-                    if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring']:
+                    if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring']:
                         # tell main script to create parent constraint from chestA to ikCtrl for front legs
                         self.quadFrontLegList.append(self.ikExtremCtrlOrientGrp)
 
@@ -1217,7 +1217,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         loadedRibbon = True
                     except Exception as e:
                         print(e)
-                        print(self.dpUIinst.langDic[self.dpUIinst.langName]['e012_cantLoadRibbon'])
+                        print(self.dpUIinst.lang['e012_cantLoadRibbon'])
                     
                     if loadedRibbon:
                         num = self.getBendJoints()
@@ -1235,7 +1235,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                         cmds.delete(cmds.parentConstraint(iniJoint, loc, mo=False, w=1))
 
-                        if name == self.dpUIinst.langDic[self.dpUIinst.langName]['c006_leg_main']:  # leg
+                        if name == self.dpUIinst.lang['c006_leg_main']:  # leg
                             if s == 0:  # left side (or first side = original)
                                 cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(1, 0, 0)))
                             else:
@@ -1272,8 +1272,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         
                         # implementing auto rotate twist bones:
                         # check if we have loaded the quatNode.mll Maya plugin in order to create quatToEuler node, also decomposeMatrix from matrixNodes:
-                        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e002_matrixPluginNotFound'])
+                        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+                        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
                         if loadedQuatNode and loadedMatrixPlugin:
                             twistBoneMD = self.bendGrps['twistBoneMD']
                             shoulderChildLoc = cmds.spaceLocator(name=twistBoneMD+"_Child_Loc")[0]
@@ -1294,8 +1294,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             
                 # auto clavicle:
                 # loading Maya matrix node
-                loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e014_cantLoadQuatNode'])
-                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.langDic[self.dpUIinst.langName]['e002_matrixPluginNotFound'])
+                loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
                 if loadedQuatNode and loadedMatrixPlugin:
                     # create auto clavicle group:
                     self.clavicleCtrlGrp = cmds.group(name=self.fkCtrlList[0]+"_Grp", empty=True)
@@ -1309,7 +1309,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     
                     # create auto clavicle attribute:
-                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
+                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
                     
                     # ik auto clavicle locators:
                     acIkUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Up_Loc")[0]
@@ -1423,9 +1423,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(acInvMD+".outputX", acMD+".input1X", force=True)
                     cmds.connectAttr(acInvMD+".outputY", acMD+".input1Y", force=True)
                     cmds.connectAttr(acInvMD+".outputZ", acMD+".input1Z", force=True)
-                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], acMD+".input2X", force=True)
-                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], acMD+".input2Y", force=True)
-                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow'], acMD+".input2Z", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.lang['c032_follow'], acMD+".input2X", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.lang['c032_follow'], acMD+".input2Y", force=True)
+                    cmds.connectAttr(self.fkCtrlList[0]+"."+self.dpUIinst.lang['c032_follow'], acMD+".input2Z", force=True)
                     if self.limbTypeName == ARM:
                         cmds.connectAttr(acMD+".outputX", self.clavicleCtrlGrp+".rotateZ", force=True)
                         cmds.connectAttr(acMD+".outputY", self.clavicleCtrlGrp+".rotateX", force=True)
@@ -1464,8 +1464,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             dpUtils.setJointLabel(cmds.listRelatives(self.bendJointList[numBendJnt])[0], s+jointLabelAdd, 18, self.userGuideName+"_"+cornerNumber+"_"+cornerName)
                             jar = cmds.rename(cmds.listRelatives(self.bendJointList[numBendJnt])[0], side+self.userGuideName+"_"+cornerNumber+"_"+cornerName+"_Jar")
                             self.cornerJntList.append(jar)
-                            if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
-                                if self.dpUIinst.langDic[self.dpUIinst.langName]['c056_front'] in self.userGuideName:
+                            if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
+                                if self.dpUIinst.lang['c056_front'] in self.userGuideName:
                                     if s == 0:
                                         cmds.setAttr(self.cornerJntList[0]+".rotateX", 0)
                                     else:
@@ -1493,8 +1493,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.cornerJntList[0]+".rotateZ", -90)
                         else:
                             cmds.setAttr(self.cornerJntList[0]+".rotateY", 90)
-                            if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
-                                if self.dpUIinst.langDic[self.dpUIinst.langName]['c056_front'] in self.userGuideName:
+                            if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
+                                if self.dpUIinst.lang['c056_front'] in self.userGuideName:
                                     cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
                                 else:
                                     cmds.setAttr(self.cornerJntList[0]+".rotateX", 0)
@@ -1509,9 +1509,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.cornerJntList[0]+".rotateZ", 90)
                         else:
                             cmds.setAttr(self.cornerJntList[0]+".rotateY", -90)
-                            if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                            if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                                 cmds.setAttr(self.cornerJntList[0]+".rotateZ", 180)
-                                if self.dpUIinst.langDic[self.dpUIinst.langName]['c056_front'] in self.userGuideName:
+                                if self.dpUIinst.lang['c056_front'] in self.userGuideName:
                                     cmds.setAttr(self.cornerJntList[0]+".rotateX", 180)
                             else:
                                 cmds.setAttr(self.cornerJntList[0]+".rotateX", 90)
@@ -1568,9 +1568,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.setupJcrControls(self.cornerJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerName, cornerCorrectiveNetList, cornerCalibratePresetList, invertList)
 
                         # quadruped kneeB
-                        if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                        if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                             kneeBCorrectiveNetList = [None]
-                            if self.dpUIinst.langDic[self.dpUIinst.langName]['c056_front'] in self.userGuideName:
+                            if self.dpUIinst.lang['c056_front'] in self.userGuideName:
                                 kneeBCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-4], self.skinJointList[-3], side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchUp", 1, 1, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchUp", 1, 1, -80]))
                             else:
                                 kneeBCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-4], self.skinJointList[-3], side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-3]+"B_PitchDown", 1, 1, 80]))
@@ -1581,11 +1581,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             self.setupJcrControls(kneeBJntList, s, jointLabelAdd, self.userGuideName+"_"+cornerNumber+"_"+cornerBName, kneeBCorrectiveNetList, kneeBCalibratePresetList, invertList)
                             # fix quadruped front and back jar rotation
                             cmds.setAttr(kneeBJntList[0]+".rotateY", -90)
-                            if self.dpUIinst.langDic[self.dpUIinst.langName]['c056_front'] in self.userGuideName:
+                            if self.dpUIinst.lang['c056_front'] in self.userGuideName:
                                 if s == 1:
                                     cmds.setAttr(kneeBJntList[0]+".rotateX", 180)
                                     cmds.setAttr(kneeBJntList[0]+".scaleX", -1)
-                            elif self.dpUIinst.langDic[self.dpUIinst.langName]['c057_back'] in self.userGuideName:
+                            elif self.dpUIinst.lang['c057_back'] in self.userGuideName:
                                 if s == 0:
                                     cmds.setAttr(kneeBJntList[0]+".rotateX", 180)
                                     cmds.setAttr(kneeBJntList[0]+".scaleX", -1)
@@ -1616,7 +1616,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2])
                         dpUtils.setJointLabel(self.cornerJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerName)
                         cmds.rename(self.cornerJntList[0], side+self.userGuideName+"_01_"+cornerName+"_Jar")
-                        if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m037_quadruped'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m043_quadSpring'] or self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                        if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                             cornerBJntList = dpUtils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False)
                             dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
@@ -1659,19 +1659,19 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [
-                                            self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize(),
-                                            "softIk_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']
+                                            self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(),
+                                            "softIk_"+self.dpUIinst.lang['c111_calibrate']
                     ]
                 else: #leg
                     ikExtremCalibrationList = [
-                                            self.dpUIinst.langDic[self.dpUIinst.langName]['c015_revFoot_F']+self.dpUIinst.langDic[self.dpUIinst.langName]['c018_revFoot_roll'].capitalize()+self.dpUIinst.langDic[self.dpUIinst.langName]['c102_angle'].capitalize(),
-                                            self.dpUIinst.langDic[self.dpUIinst.langName]['c015_revFoot_F']+self.dpUIinst.langDic[self.dpUIinst.langName]['c018_revFoot_roll'].capitalize()+self.dpUIinst.langDic[self.dpUIinst.langName]['c103_plant'].capitalize(),
-                                            self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize(),
-                                            "softIk_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c111_calibrate']
+                                            self.dpUIinst.lang['c015_revFoot_F']+self.dpUIinst.lang['c018_revFoot_roll'].capitalize()+self.dpUIinst.lang['c102_angle'].capitalize(),
+                                            self.dpUIinst.lang['c015_revFoot_F']+self.dpUIinst.lang['c018_revFoot_roll'].capitalize()+self.dpUIinst.lang['c103_plant'].capitalize(),
+                                            self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(),
+                                            "softIk_"+self.dpUIinst.lang['c111_calibrate']
                     ]
-                fkExtremCalibrationList = [self.dpUIinst.langDic[self.dpUIinst.langName]['c040_uniformScale']+self.dpUIinst.langDic[self.dpUIinst.langName]['c105_multiplier'].capitalize()]
-                fkBeforeCalibrationList = [self.dpUIinst.langDic[self.dpUIinst.langName]['c032_follow']]
-                if self.limbStyle == self.dpUIinst.langDic[self.dpUIinst.langName]['m155_quadrupedExtra']:
+                fkExtremCalibrationList = [self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize()]
+                fkBeforeCalibrationList = [self.dpUIinst.lang['c032_follow']]
+                if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     self.ctrls.setCalibrationAttr(self.quadExtraCtrl, ['autoOrient'])
                 self.ctrls.setCalibrationAttr(self.ikExtremCtrl, ikExtremCalibrationList)
                 self.ctrls.setCalibrationAttr(self.fkCtrlList[-1], fkExtremCalibrationList)
@@ -1728,7 +1728,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "integrateOrigFromList": self.integrateOrigFromList,
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
                 "ikFkNetworkList": self.ikFkNetworkList,
-                "limbManualVolume": self.dpUIinst.langDic[self.dpUIinst.langName]['m019_limb'].lower()+"Manual_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c031_volumeVariation'],
+                "limbManualVolume": self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
                 "rootCtrlRefList": self.rootCtrlRefList,

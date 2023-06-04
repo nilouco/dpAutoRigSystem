@@ -31,7 +31,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             shapeList = cmds.listRelatives(transform, shapes=True)
         except Exception as e:
             print(e)
-            self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v070_duplicateName']} {transform}")
+            self.messageList.append(f"{self.dpUIinst.lang['v070_duplicateName']} {transform}")
             return False
         if shapeList:
             for shape in shapeList:
@@ -95,11 +95,11 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
     def logInfo(self, informationDictionary):
         for ctrl in informationDictionary:
             if informationDictionary[ctrl][0] == None:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} {self.dpUIinst.lang['v065_addedSonOf']} {informationDictionary[ctrl][1]}")
             elif informationDictionary[ctrl][1] == None:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v066_wasRemoved']}")
+                self.messageList.append(f"{ctrl} {self.dpUIinst.lang['v066_wasRemoved']}")
             else:
-                self.messageList.append(f"{ctrl} {self.dpUIinst.langDic[self.dpUIinst.langName]['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
+                self.messageList.append(f"{ctrl} {self.dpUIinst.lang['v067_changedParent']} {informationDictionary[ctrl][0]}, new parent: {informationDictionary[ctrl][1]}")
 
     def compareHierarchy(self, originalHierarchy, newHierarchy):
         if originalHierarchy != newHierarchy:
@@ -107,7 +107,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             self.logInfo(infoDic)
             return False
         else:
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v068_matchingHierarchies'])
+            self.messageList.append(self.dpUIinst.lang['v068_matchingHierarchies'])
             return True
 
     def changeIntVersionToString(self, int):
@@ -173,7 +173,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}.json"
         with open (finalSaveFilePath, "w") as json_file:
             json.dump(dicToJson, json_file)
-        self.messageList.append(f"{self.dpUIinst.langDic[self.dpUIinst.langName]['v069_exportedFile']} {finalSaveFilePath}")
+        self.messageList.append(f"{self.dpUIinst.lang['v069_exportedFile']} {finalSaveFilePath}")
     
     def checkIfdpTeam(self):
         length = len(self.currentFileName)
@@ -191,7 +191,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
         # ---
         # --- validator code --- beginning
@@ -213,8 +213,10 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             self.checkedObjList.append(str(rootNode))
             self.foundIssueList.append(False)
             self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v062_globalMissing'])
-            self.finishValidation()
+            self.messageList.append(self.dpUIinst.lang['v062_globalMissing'])
+            self.updateButtonColors()
+            self.reportLog()
+            self.endProgressBar()
             return self.dataLogDic
 
         currentFileHierarchyDic = self.raiseHierarchy(rootNode)
@@ -227,7 +229,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
             self.checkedObjList.append(lastHierarchyFilePath)
         else:
             self.checkedObjList.append("Controls Hierarchy")
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v063_firstHierarchy'])
+            self.messageList.append(self.dpUIinst.lang['v063_firstHierarchy'])
 
         if self.verifyMode:
             if isHierarchySame:
@@ -248,9 +250,11 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
                 self.checkedObjList.append("Scene")
                 self.foundIssueList.append(True)
                 self.resultOkList.append(False)
-                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['v064_hierarchy'])
-                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
-                self.finishValidation()
+                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+" "+self.dpUIinst.lang['v064_hierarchy'])
+                self.messageList.append(self.dpUIinst.lang['i201_saveScene'])
+                self.updateButtonColors()
+                self.reportLog()
+                self.endProgressBar()
                 return self.dataLogDic
             
 
@@ -258,19 +262,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         # ---
 
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

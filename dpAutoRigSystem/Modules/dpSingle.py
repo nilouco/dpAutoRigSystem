@@ -175,18 +175,18 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.curveDegree = 1
                 # work with curve shape and rotation cases:
                 indirectSkinRot = (0, 0, 0)
-                if self.dpUIinst.langDic[self.dpUIinst.langName]['c058_main'] in self.userGuideName:
+                if self.dpUIinst.lang['c058_main'] in self.userGuideName:
                     ctrlTypeID = "id_054_SingleMain"
                     if len(sideList) > 1:
-                        if self.dpUIinst.langDic[self.dpUIinst.langName]['c041_eyebrow'] in self.userGuideName:
+                        if self.dpUIinst.lang['c041_eyebrow'] in self.userGuideName:
                             indirectSkinRot = (0, 0, -90)
                         else:
                             indirectSkinRot = (0, 0, 90)
                 else:
                     ctrlTypeID = "id_029_SingleIndSkin"
-                    if self.dpUIinst.langDic[self.dpUIinst.langName]['c045_lower'] in self.userGuideName:
+                    if self.dpUIinst.lang['c045_lower'] in self.userGuideName:
                         indirectSkinRot=(0, 0, 180)
-                    elif self.dpUIinst.langDic[self.dpUIinst.langName]['c043_corner'] in self.userGuideName:
+                    elif self.dpUIinst.lang['c043_corner'] in self.userGuideName:
                         if "00" in self.userGuideName:
                             indirectSkinRot=(0, 0, 90)
                         else:
@@ -223,13 +223,13 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
-                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c046_holder']+"_Grp")
+                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.lang['c046_holder']+"_Grp")
                         self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.dpUIinst.langDic[self.dpUIinst.langName]['c046_holder']+"_Jis"))
+                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.dpUIinst.lang['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.getHasSDKLocator():
-                            if not self.dpUIinst.langDic[self.dpUIinst.langName]['c058_main'] in self.userGuideName:
+                            if not self.dpUIinst.lang['c058_main'] in self.userGuideName:
                                 # this one will be used to receive inputs from sdk locator:
                                 sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
                                 sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]
