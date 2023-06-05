@@ -10,7 +10,6 @@ TITLE = "m051_headDef"
 DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
-
 DP_HEADDEFORMER_VERSION = 2.14
 
 

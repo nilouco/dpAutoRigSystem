@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "NgSkinToolsCleaner"
 TITLE = "v026_ngskintoolsCleaner"
 DESCRIPTION = "v027_ngskintoolsCleanerDesc"

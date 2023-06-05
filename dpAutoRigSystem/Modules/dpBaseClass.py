@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-
 from .Library import dpControls
 from .Library import dpUtils
 from ..Extras import dpCorrectionManager
@@ -13,6 +12,7 @@ class RigType(object):
 
 
 DP_STARTCLASS_VERSION = 2.0
+
 
 class StartClass(object):
     def __init__(self, dpUIinst, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):

@@ -5,7 +5,6 @@ from functools import partial
 from dpAutoRigSystem.Modules.Library import dpControls
 from dpAutoRigSystem.Modules.Library import dpUtils
 
-
 # global variables to this module:    
 CLASS_NAME = "Zipper"
 TITLE = "m061_zipper"

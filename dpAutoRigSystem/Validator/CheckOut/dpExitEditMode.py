@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "ExitEditMode"
 TITLE = "v034_exitEditMode"
 DESCRIPTION = "v035_exitEditModeDesc"

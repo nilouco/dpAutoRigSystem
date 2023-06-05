@@ -7,7 +7,7 @@ from . import dpPackager
 from functools import partial
 import os
 
-DPPUBLISHER_VERSION = 1.5
+DP_PUBLISHER_VERSION = 1.5
 
 
 class Publisher(object):

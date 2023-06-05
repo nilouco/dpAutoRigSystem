@@ -2,7 +2,6 @@ from maya import cmds
 from maya import mel
 from ..Modules.Library import dpUtils
 
-
 # global variables to this module:    
 CLASS_NAME = "UpdateGuides"
 TITLE = "m186_updateGuides"

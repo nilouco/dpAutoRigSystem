@@ -3,7 +3,7 @@ from maya import cmds
 from .. import dpBaseValidatorClass
 from ...Modules.Library import dpUtils
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "WIPCleaner"
 TITLE = "v009_wipCleaner"
 DESCRIPTION = "v010_wipCleanerDesc"

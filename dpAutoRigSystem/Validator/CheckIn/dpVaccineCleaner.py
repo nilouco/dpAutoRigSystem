@@ -1,9 +1,9 @@
 # importing libraries:
 from maya import cmds
-import os
 from .. import dpBaseValidatorClass
+import os
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "VaccineCleaner"
 TITLE = "v052_vaccineCleaner"
 DESCRIPTION = "v053_vaccineCleanerDesc"

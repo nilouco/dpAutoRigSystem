@@ -1,10 +1,8 @@
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:    
 CLASS_NAME = "Eye"
@@ -17,6 +15,9 @@ IRIS = "iris"
 PUPIL = "pupil"
 SPEC = "specular"
 PIVOT = "lidPivot"
+
+DP_EYE_VERSION = 2.0
+
 
 class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self,  *args, **kwargs):

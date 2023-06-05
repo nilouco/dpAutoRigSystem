@@ -33,7 +33,6 @@ DP_SOFTIK_VERSION = 2.0
 
 
 class SoftIkClass(object):
-
     def __init__(self, dpUIinst, *args):
         # defining variables:
         self.dpUIinst = dpUIinst

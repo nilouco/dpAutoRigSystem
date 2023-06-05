@@ -4,7 +4,7 @@ from .. import dpBaseValidatorClass
 from ...Modules.Library import dpUtils
 
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "HideCorrectives"
 TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"

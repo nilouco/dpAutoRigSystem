@@ -3,7 +3,7 @@ from maya import cmds
 from .. import dpBaseValidatorClass
 from ...Modules.Library import dpUtils
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "DisplayLayers"
 TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"

@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "SideCalibration"
 TITLE = "v044_sideCalibration"
 DESCRIPTION = "v045_sideCalibrationDesc"

@@ -16,7 +16,7 @@ CAM_ROTX = -10
 CAM_ROTY = 30
 CTRL_LAYER = "Ctrl_Lyr"
 
-DPPACKAGER_VERSION = 1.6
+DP_PACKAGER_VERSION = 1.6
 
 
 class Packager(object):

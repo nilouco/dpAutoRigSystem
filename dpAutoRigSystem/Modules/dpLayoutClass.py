@@ -1,11 +1,7 @@
 # importing libraries:
-from functools import partial
-
 from maya import cmds
-
 from .Library import dpUtils
-from importlib import reload
-reload(dpUtils)
+from functools import partial
 
 DP_LAYOUTCLASS_VERSION = 2.0
 

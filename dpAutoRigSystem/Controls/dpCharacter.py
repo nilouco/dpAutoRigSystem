@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Character"

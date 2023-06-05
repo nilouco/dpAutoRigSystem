@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
 
 # global variables to this module:    
 CLASS_NAME = "Isolate"
@@ -9,6 +8,7 @@ DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
 
 DP_ISOLATE_VERSION = 1.2
+
 
 class Isolate(object):
     def __init__(self, dpUIinst, *args):

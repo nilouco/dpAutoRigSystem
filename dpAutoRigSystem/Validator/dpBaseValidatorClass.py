@@ -4,7 +4,7 @@ from ..Modules.Library import dpUtils
 import time
 import getpass
 
-
+# global variables to this module:
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
 CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)

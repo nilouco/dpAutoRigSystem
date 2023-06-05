@@ -2,13 +2,14 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "NamespaceCleaner"
 TITLE = "v038_namespaceCleaner"
 DESCRIPTION = "v039_namespaceCleanerDesc"
 ICON = "/Icons/dp_namespaceCleaner.png"
 
 DP_NAMESPACECLEANER_VERSION = 1.1
+
 
 class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):

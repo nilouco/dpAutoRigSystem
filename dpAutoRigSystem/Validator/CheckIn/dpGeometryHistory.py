@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "GeometryHistory"
 TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"

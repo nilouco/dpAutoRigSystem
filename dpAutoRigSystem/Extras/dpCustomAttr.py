@@ -3,7 +3,6 @@ from maya import cmds
 from ..Modules.Library import dpUtils
 from functools import partial
 
-
 # global variables to this module:
 CLASS_NAME = "CustomAttr"
 TITLE = "m212_customAttr"

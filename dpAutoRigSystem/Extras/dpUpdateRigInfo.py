@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 
-
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
 TITLE = "m057_updateRigInfo"

@@ -2,8 +2,6 @@
 from maya import cmds
 from maya import mel
 from ..Modules.Library import dpUtils
-from importlib import reload
-reload(dpUtils)
 
 # global variables to this module:    
 CLASS_NAME = "CopySkin"

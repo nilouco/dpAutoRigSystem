@@ -6,7 +6,6 @@ from . import dpRivet
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 
-
 # global variables to this module:    
 CLASS_NAME = "CorrectionManager"
 TITLE = "m068_correctionManager"

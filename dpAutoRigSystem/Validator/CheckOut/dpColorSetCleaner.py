@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "ColorSetCleaner"
 TITLE = "v030_colorSetCleaner"
 DESCRIPTION = "v031_colorSetCleanerDesc"

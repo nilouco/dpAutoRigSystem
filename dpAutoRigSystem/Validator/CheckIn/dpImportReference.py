@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "ImportReference"
 TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"

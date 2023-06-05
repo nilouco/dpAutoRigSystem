@@ -2,8 +2,6 @@
 from maya import cmds
 from maya import mel
 from .. import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "EyeFlat"

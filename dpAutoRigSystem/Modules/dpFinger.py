@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
@@ -12,6 +11,7 @@ DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
 
 DP_FINGER_VERSION = 2.0
+
 
 class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def __init__(self, *args, **kwargs):

@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "BrokenNetCleaner"
 TITLE = "v046_brokenNetCleaner"
 DESCRIPTION = "v047_brokenNetCleanerDesc"

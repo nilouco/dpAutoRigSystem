@@ -1,14 +1,13 @@
 # importing libraries:
 from maya import cmds
-import math
-from importlib import reload
-from functools import partial
 from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
 from .Library import dpSoftIk
 from ..Extras import dpCorrectionManager
-
+from functools import partial
+from importlib import reload
+import math
 
 # global variables to this module:
 CLASS_NAME = "Limb"

@@ -3,7 +3,6 @@ from maya import cmds
 from maya import mel
 import os
 import json
-from functools import partial
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 

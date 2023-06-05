@@ -5,7 +5,7 @@ from ...Modules.Library import dpUtils
 import json
 import os
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "ControlsHierarchy"
 TITLE = "v060_controlsHierarchy"
 DESCRIPTION = "v061_controlsHierarchyDesc"

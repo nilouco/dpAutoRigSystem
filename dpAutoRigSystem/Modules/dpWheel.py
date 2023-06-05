@@ -5,11 +5,9 @@
 
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:    
 CLASS_NAME = "Wheel"

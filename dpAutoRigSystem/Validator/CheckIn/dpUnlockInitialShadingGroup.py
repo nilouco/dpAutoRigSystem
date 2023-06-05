@@ -2,7 +2,7 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "UnlockInitialShadingGroup"
 TITLE = "v048_unlockIniShadGrp"
 DESCRIPTION = "v049_unlockIniShadGrpDesc"
