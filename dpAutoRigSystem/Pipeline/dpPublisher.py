@@ -399,7 +399,7 @@ class Publisher(object):
         # window
         winWidth  = 250
         winHeight = 130
-        cmds.window('dpSuccessPublishedWindow', title=self.publisherName+" "+str(DPPUBLISHER_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window('dpSuccessPublishedWindow', title=self.publisherName+" "+str(DP_PUBLISHER_VERSION), widthHeight=(winWidth, winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         cmds.showWindow('dpSuccessPublishedWindow')
         # create UI layout and elements:
         succesLayout = cmds.columnLayout('succesLayout', adjustableColumn=True, columnOffset=("both", 10))
