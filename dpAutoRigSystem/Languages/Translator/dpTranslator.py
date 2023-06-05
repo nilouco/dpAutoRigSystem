@@ -17,8 +17,8 @@ class Translator(object):
         self.dpUIinst = dpUIinst
         self.langDic = langDic
         self.langName = langName
-        self.translatorString = "dpAutoRigSystem - "+self.langDic[self.langName]['t000_translator']
-        self.sourceLangList = list(self.langDic[self.langName])
+        self.translatorString = "dpAutoRigSystem - "+self.dpUIinst.lang['t000_translator']
+        self.sourceLangList = list(self.dpUIinst.lang)
         self.keyLen = len(self.sourceLangList) - 1
         self.langIndexStart = 7 #after userInfo
         self.langIndex = self.langIndexStart
@@ -55,7 +55,7 @@ class Translator(object):
             if not currentText == None:
                 if not currentText == "":
                     if not currentText == " ":
-                        if not currentText == self.langDic[self.langName]['t007_writeText']:
+                        if not currentText == self.dpUIinst.lang['t007_writeText']:
                             sourceText = cmds.scrollField(self.sourceTextSF, query=True, text=True)
                             
                             if sourceText.startswith("\n"):
@@ -87,7 +87,7 @@ class Translator(object):
                 self.newLangList[self.langIndex] = currentText
                 self.dpTranslatorForward()
             else:
-                cmds.scrollField(self.newLangTextSF, edit=True, text=self.langDic[self.langName]['t007_writeText'])
+                cmds.scrollField(self.newLangTextSF, edit=True, text=self.dpUIinst.lang['t007_writeText'])
         else:
             self.dpTranslatorForward()
     
@@ -153,13 +153,13 @@ class Translator(object):
         """
         # give info:
         greetingsDialog = cmds.confirmDialog(
-                                            title=self.langDic[self.langName]['t000_translator'],
-                                            message=self.langDic[self.langName]['t001_greeting'],
-                                            button=[self.langDic[self.langName]['i131_ok'], self.langDic[self.langName]['i132_cancel']],
-                                            defaultButton=self.langDic[self.langName]['i131_ok'],
-                                            cancelButton=self.langDic[self.langName]['i132_cancel'],
-                                            dismissString=self.langDic[self.langName]['i132_cancel'])
-        if greetingsDialog == self.langDic[self.langName]['i131_ok']:
+                                            title=self.dpUIinst.lang['t000_translator'],
+                                            message=self.dpUIinst.lang['t001_greeting'],
+                                            button=[self.dpUIinst.lang['i131_ok'], self.dpUIinst.lang['i132_cancel']],
+                                            defaultButton=self.dpUIinst.lang['i131_ok'],
+                                            cancelButton=self.dpUIinst.lang['i132_cancel'],
+                                            dismissString=self.dpUIinst.lang['i132_cancel'])
+        if greetingsDialog == self.dpUIinst.lang['i131_ok']:
             self.dpGetUserInfoUI()
     
     
@@ -192,19 +192,19 @@ class Translator(object):
             date = str(datetime.datetime.now().date())
             
             # verify if we have an existing language with the same name:
-            confirmSameLangName = self.langDic[self.langName]['i071_yes']
+            confirmSameLangName = self.dpUIinst.lang['i071_yes']
             if self.newLangName in self.langDic:
                 confirmSameLangName = cmds.confirmDialog(
-                                                        title=self.langDic[self.langName]['t000_translator'],
-                                                        message=self.langDic[self.langName]['i135_existingName'], 
-                                                        button=[self.langDic[self.langName]['i071_yes'], self.langDic[self.langName]['i072_no']], 
-                                                        defaultButton=self.langDic[self.langName]['i071_yes'], 
-                                                        cancelButton=self.langDic[self.langName]['i072_no'], 
-                                                        dismissString=self.langDic[self.langName]['i072_no'])
-            if confirmSameLangName == self.langDic[self.langName]['i071_yes']:
+                                                        title=self.dpUIinst.lang['t000_translator'],
+                                                        message=self.dpUIinst.lang['i135_existingName'], 
+                                                        button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], 
+                                                        defaultButton=self.dpUIinst.lang['i071_yes'], 
+                                                        cancelButton=self.dpUIinst.lang['i072_no'], 
+                                                        dismissString=self.dpUIinst.lang['i072_no'])
+            if confirmSameLangName == self.dpUIinst.lang['i071_yes']:
                 # starting newLangList appends:
                 self.newLangList.append(self.authorName)
-                self.newLangList.append(self.langDic[self.langName]['_collaborators'])
+                self.newLangList.append(self.dpUIinst.lang['_collaborators'])
                 self.newLangList.append(contactName)
                 self.newLangList.append(date)
                 self.newLangList.append(self.newLangName)
@@ -228,11 +228,11 @@ class Translator(object):
         dpARTranslatorWin1 = cmds.window('dpARTranslatorWin1', title=self.translatorString, iconName='dpAutoRig', widthHeight=(500, 180), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=True)
         dpARTranslatorLayout1 = cmds.columnLayout('dpARTranslatorLayout1', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent=dpARTranslatorWin1)
         cmds.separator(style='none', parent=dpARTranslatorLayout1)
-        self.authorTFG = cmds.textFieldGrp('authorTFG', label=self.langDic[self.langName]['t002_yourName'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        self.emailTFG = cmds.textFieldGrp('emailTFG', label=self.langDic[self.langName]['t003_emailContact'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        self.websiteTFG = cmds.textFieldGrp('websiteTFG', label=self.langDic[self.langName]['t004_websiteContact'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        self.newLanguageTFG = cmds.textFieldGrp('newLanguageTFG', label=self.langDic[self.langName]['t005_langName'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
-        cmds.button('startTranslationBT', label=self.langDic[self.langName]['t006_startTranslator'], command=self.dpCollectUserInfo, parent=dpARTranslatorLayout1)
+        self.authorTFG = cmds.textFieldGrp('authorTFG', label=self.dpUIinst.lang['t002_yourName'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
+        self.emailTFG = cmds.textFieldGrp('emailTFG', label=self.dpUIinst.lang['t003_emailContact'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
+        self.websiteTFG = cmds.textFieldGrp('websiteTFG', label=self.dpUIinst.lang['t004_websiteContact'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
+        self.newLanguageTFG = cmds.textFieldGrp('newLanguageTFG', label=self.dpUIinst.lang['t005_langName'], text='', adjustableColumn2=1, parent=dpARTranslatorLayout1)
+        cmds.button('startTranslationBT', label=self.dpUIinst.lang['t006_startTranslator'], command=self.dpCollectUserInfo, parent=dpARTranslatorLayout1)
         # show UI:
         cmds.showWindow(dpARTranslatorWin1)
     
@@ -242,7 +242,7 @@ class Translator(object):
         """
         cmds.text(self.curIndexTxt, edit=True, label=str(self.langIndex))
         cmds.text(self.keyIDTxt, edit=True, label=self.sourceLangList[self.langIndex])
-        cmds.scrollField(self.sourceTextSF, edit=True, text=self.langDic[self.langName][self.sourceLangList[self.langIndex]])
+        cmds.scrollField(self.sourceTextSF, edit=True, text=self.dpUIinst.lang[self.sourceLangList[self.langIndex]])
         
         if self.langIndex == self.keyLen:
             cmds.scrollField(self.newLangTextSF, edit=True, text='')
@@ -254,26 +254,26 @@ class Translator(object):
         # case indexID for each type:
         footerText = ""
         if self.sourceLangList[self.langIndex].startswith("_"):
-            curKeyType = self.langDic[self.langName]['i013_info']
+            curKeyType = self.dpUIinst.lang['i013_info']
         elif self.sourceLangList[self.langIndex].startswith("a"):
-            curKeyType = self.langDic[self.langName]['i153_presentation']
+            curKeyType = self.dpUIinst.lang['i153_presentation']
         elif self.sourceLangList[self.langIndex].startswith("b"):
-            curKeyType = self.langDic[self.langName]['i139_bug']
+            curKeyType = self.dpUIinst.lang['i139_bug']
         elif self.sourceLangList[self.langIndex].startswith("c"):
-            curKeyType = self.langDic[self.langName]['i140_control']
-            footerText = self.langDic[self.langName]['i152_noSpecialChar']
+            curKeyType = self.dpUIinst.lang['i140_control']
+            footerText = self.dpUIinst.lang['i152_noSpecialChar']
         elif self.sourceLangList[self.langIndex].startswith("e"):
-            curKeyType = self.langDic[self.langName]['i141_error']
+            curKeyType = self.dpUIinst.lang['i141_error']
         elif self.sourceLangList[self.langIndex].startswith("i"):
-            curKeyType = self.langDic[self.langName]['i142_interface']
+            curKeyType = self.dpUIinst.lang['i142_interface']
         elif self.sourceLangList[self.langIndex].startswith("m"):
-            curKeyType = self.langDic[self.langName]['i143_module']
+            curKeyType = self.dpUIinst.lang['i143_module']
         elif self.sourceLangList[self.langIndex].startswith("p"):
-            curKeyType = self.langDic[self.langName]['i144_prefix']
+            curKeyType = self.dpUIinst.lang['i144_prefix']
         elif self.sourceLangList[self.langIndex].startswith("t"):
-            curKeyType = self.langDic[self.langName]['t000_translator']
+            curKeyType = self.dpUIinst.lang['t000_translator']
         elif self.sourceLangList[self.langIndex].startswith("v"):
-            curKeyType = self.langDic[self.langName]['v000_validator']
+            curKeyType = self.dpUIinst.lang['v000_validator']
         
         # update UI elements:
         cmds.text(self.keyTypeTxt, edit=True, label=curKeyType)
@@ -291,21 +291,21 @@ class Translator(object):
         dpARTranslatorLayout = cmds.columnLayout('dpARTranslatorLayout', adjustableColumn=True, columnOffset=('both', 10), rowSpacing=10, parent=dpARTranslatorWin2)
         cmds.separator(style='none', parent=dpARTranslatorLayout)
         langNameLayout = cmds.rowColumnLayout('langNameLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langNameTxt', label=self.langDic[self.langName]['i151_language']+":", parent=langNameLayout)
+        cmds.text('langNameTxt', label=self.dpUIinst.lang['i151_language']+":", parent=langNameLayout)
         cmds.text('newLangNameTxt', label=self.newLangName, parent=langNameLayout)
         # counter:
         counterLayout = cmds.rowColumnLayout('counterLayout', numberOfColumns=4, columnWidth=[(1, 70), (2, 20), (3, 10), (4, 30)], columnAlign=[(1, 'right'), (2, 'left'), (3, 'center'), (4, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0), (3, 'left', 5), (4, 'left', 5)], parent=dpARTranslatorLayout)
-        cmds.text('sentenceTxt', label=self.langDic[self.langName]['i136_sentence']+":", parent=counterLayout)
+        cmds.text('sentenceTxt', label=self.dpUIinst.lang['i136_sentence']+":", parent=counterLayout)
         self.curIndexTxt = cmds.text('curIndexTxt', label='0', parent=counterLayout)
         cmds.text('counterHifenTxt', label='/', parent=counterLayout)
         cmds.text('keyLenTxt', label=self.keyLen, parent=counterLayout)
         # lang Key Type:
         langKeyTypeLayout = cmds.rowColumnLayout('langKeyTypeLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langKeyTypeTxt', label=self.langDic[self.langName]['i138_type']+":", parent=langKeyTypeLayout)
+        cmds.text('langKeyTypeTxt', label=self.dpUIinst.lang['i138_type']+":", parent=langKeyTypeLayout)
         self.keyTypeTxt = cmds.text('keyTypeTxt', label='0', parent=langKeyTypeLayout)
         # lang Key ID:
         langKeyLayout = cmds.rowColumnLayout('langKeyLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 200)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 5), (2, 'left', 0)], parent=dpARTranslatorLayout)
-        cmds.text('langKeyIDTxt', label=self.langDic[self.langName]['i137_id']+":", parent=langKeyLayout)
+        cmds.text('langKeyIDTxt', label=self.dpUIinst.lang['i137_id']+":", parent=langKeyLayout)
         self.keyIDTxt = cmds.text('keyIDTxt', label='0', parent=langKeyLayout)
         # translator text scrollFields:
         textsPL = cmds.paneLayout('textsPL', configuration='horizontal2', parent=dpARTranslatorLayout)
@@ -314,10 +314,10 @@ class Translator(object):
         self.extraInfoTxt = cmds.text('extraInfoTxt', label='', parent=dpARTranslatorLayout)
         # translator buttons:
         buttonsPL = cmds.paneLayout('buttonsPL', configuration='vertical3', parent=dpARTranslatorLayout)
-        self.backBT = cmds.button('backBT', label=self.langDic[self.langName]['i145_back'], backgroundColor=(0.3, 0.6, 0.7), command=self.dpTranslatorBack, parent=buttonsPL)
-        self.sameBT = cmds.button('sameBT', label=self.langDic[self.langName]['i146_same'], backgroundColor=(0.2, 0.8, 0.9), command=self.dpTranslatorSame, parent=buttonsPL)
-        self.nextBT = cmds.button('nextBT', label=self.langDic[self.langName]['i147_next'], backgroundColor=(0.1, 0.9, 1.0), command=self.dpTranslatorNext, parent=buttonsPL)
-        self.finishBT = cmds.button('finishBT', label=self.langDic[self.langName]['i148_finish'], backgroundColor=(0.8, 0.8, 0.8), enable=False, command=self.dpTranslatorFinish, parent=dpARTranslatorLayout)
+        self.backBT = cmds.button('backBT', label=self.dpUIinst.lang['i145_back'], backgroundColor=(0.3, 0.6, 0.7), command=self.dpTranslatorBack, parent=buttonsPL)
+        self.sameBT = cmds.button('sameBT', label=self.dpUIinst.lang['i146_same'], backgroundColor=(0.2, 0.8, 0.9), command=self.dpTranslatorSame, parent=buttonsPL)
+        self.nextBT = cmds.button('nextBT', label=self.dpUIinst.lang['i147_next'], backgroundColor=(0.1, 0.9, 1.0), command=self.dpTranslatorNext, parent=buttonsPL)
+        self.finishBT = cmds.button('finishBT', label=self.dpUIinst.lang['i148_finish'], backgroundColor=(0.8, 0.8, 0.8), enable=False, command=self.dpTranslatorFinish, parent=dpARTranslatorLayout)
         cmds.separator(style='none', parent=dpARTranslatorLayout)
         cmds.showWindow(dpARTranslatorWin2)
         
