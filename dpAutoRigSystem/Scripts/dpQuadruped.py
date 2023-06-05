@@ -33,34 +33,34 @@ def Quadruped(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
-        bipedStyleName = dpUIinst.langDic[dpUIinst.langName]['m026_biped']
-        quadrupedStyleName = dpUIinst.langDic[dpUIinst.langName]['m155_quadrupedExtra']
+        doingName = dpUIinst.lang['m094_doing']
+        bipedStyleName = dpUIinst.lang['m026_biped']
+        quadrupedStyleName = dpUIinst.lang['m155_quadrupedExtra']
         # part names:
-        spineName = dpUIinst.langDic[dpUIinst.langName]['m011_spine']
-        headName = dpUIinst.langDic[dpUIinst.langName]['c024_head']
-        eyeName = dpUIinst.langDic[dpUIinst.langName]['c036_eye']
-        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
-        footName = dpUIinst.langDic[dpUIinst.langName]['c038_foot']
-        earName = dpUIinst.langDic[dpUIinst.langName]['m040_ear']
-        upperTeethName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']
-        upperTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
-        upperTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m075_upperTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_revFoot_G'].capitalize()
-        lowerTeethName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']
-        lowerTeethMiddleName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c029_middle'].capitalize()
-        lowerTeethSideName = dpUIinst.langDic[dpUIinst.langName]['m076_lowerTeeth']+dpUIinst.langDic[dpUIinst.langName]['c016_revFoot_G'].capitalize()
-        noseName = dpUIinst.langDic[dpUIinst.langName]['m078_nose']
-        tongueName = dpUIinst.langDic[dpUIinst.langName]['m077_tongue']
-        tailName = dpUIinst.langDic[dpUIinst.langName]['m039_tail']
-        toeName = dpUIinst.langDic[dpUIinst.langName]['c013_revFoot_D'].capitalize()
-        frontName = dpUIinst.langDic[dpUIinst.langName]['c056_front']
-        backName = dpUIinst.langDic[dpUIinst.langName]['c057_back']
-        simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
-        complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
-        cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']
-        userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
-        breathName = dpUIinst.langDic[dpUIinst.langName]['c095_breath']
-        bellyName = dpUIinst.langDic[dpUIinst.langName]['c096_belly']
+        spineName = dpUIinst.lang['m011_spine']
+        headName = dpUIinst.lang['c024_head']
+        eyeName = dpUIinst.lang['c036_eye']
+        legName = dpUIinst.lang['m030_leg'].capitalize()
+        footName = dpUIinst.lang['c038_foot']
+        earName = dpUIinst.lang['m040_ear']
+        upperTeethName = dpUIinst.lang['m075_upperTeeth']
+        upperTeethMiddleName = dpUIinst.lang['m075_upperTeeth']+dpUIinst.lang['c029_middle'].capitalize()
+        upperTeethSideName = dpUIinst.lang['m075_upperTeeth']+dpUIinst.lang['c016_revFoot_G'].capitalize()
+        lowerTeethName = dpUIinst.lang['m076_lowerTeeth']
+        lowerTeethMiddleName = dpUIinst.lang['m076_lowerTeeth']+dpUIinst.lang['c029_middle'].capitalize()
+        lowerTeethSideName = dpUIinst.lang['m076_lowerTeeth']+dpUIinst.lang['c016_revFoot_G'].capitalize()
+        noseName = dpUIinst.lang['m078_nose']
+        tongueName = dpUIinst.lang['m077_tongue']
+        tailName = dpUIinst.lang['m039_tail']
+        toeName = dpUIinst.lang['c013_revFoot_D'].capitalize()
+        frontName = dpUIinst.lang['c056_front']
+        backName = dpUIinst.lang['c057_back']
+        simple   = dpUIinst.lang['i175_simple']
+        complete = dpUIinst.lang['i176_complete']
+        cancel   = dpUIinst.lang['i132_cancel']
+        userMessage = dpUIinst.lang['i177_chooseMessage']
+        breathName = dpUIinst.lang['c095_breath']
+        bellyName = dpUIinst.lang['c096_belly']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -709,7 +709,7 @@ def Quadruped(dpUIinst):
             
             # select spineGuide_Base:
             cmds.select(spineInstance.moduleGrp)
-            print(dpUIinst.langDic[dpUIinst.langName]['m090_createdQuadruped'])
+            print(dpUIinst.lang['m090_createdQuadruped'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

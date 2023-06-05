@@ -21,14 +21,14 @@ def Arm(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
+        doingName = dpUIinst.lang['m094_doing']
         # part names:
-        armName = dpUIinst.langDic[dpUIinst.langName]['c037_arm']
-        fingerIndexName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m032_index']
-        fingerMiddleName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m033_middle']
-        fingerRingName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m034_ring']
-        fingerPinkyName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m035_pinky']
-        fingerThumbName = dpUIinst.langDic[dpUIinst.langName]['m007_finger']+"_"+dpUIinst.langDic[dpUIinst.langName]['m036_thumb']
+        armName = dpUIinst.lang['c037_arm']
+        fingerIndexName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m032_index']
+        fingerMiddleName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m033_middle']
+        fingerRingName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m034_ring']
+        fingerPinkyName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m035_pinky']
+        fingerThumbName = dpUIinst.lang['m007_finger']+"_"+dpUIinst.lang['m036_thumb']
     
         # Starting progress window
         progressAmount = 0
@@ -62,11 +62,11 @@ def Arm(dpUIinst):
         cmds.setAttr(armBaseGuide+".displayAnnotation", 0)
         cmds.setAttr(armLimbInstance.cvExtremLoc+".translateZ", 7)
         cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
-        armLimbInstance.changeStyle(dpUIinst.langDic[dpUIinst.langName]['m026_biped'])
+        armLimbInstance.changeStyle(dpUIinst.lang['m026_biped'])
         
         # Update progress window
         progressAmount += 1
-        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dpUIinst.langDic[dpUIinst.langName]['m007_finger']))
+        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dpUIinst.lang['m007_finger']))
         
         # edit finger guides:
         fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
@@ -95,7 +95,7 @@ def Arm(dpUIinst):
 
         # select the armGuide_Base:
         cmds.select(armBaseGuide)
-        print(dpUIinst.langDic[dpUIinst.langName]['m091_createdArm'])
+        print(dpUIinst.lang['m091_createdArm'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
