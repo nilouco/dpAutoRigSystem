@@ -73,7 +73,7 @@ class Publisher(object):
             # window
             publisher_winWidth  = 450
             publisher_winHeight = 200
-            cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(DPPUBLISHER_VERSION), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            cmds.window('dpPublisherWindow', title=self.publisherName+" "+str(DP_PUBLISHER_VERSION), widthHeight=(publisher_winWidth, publisher_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
             cmds.showWindow('dpPublisherWindow')
             # create UI layout and elements:
             publisherLayout = cmds.columnLayout('publisherLayout', adjustableColumn=True, columnOffset=("both", 10))
