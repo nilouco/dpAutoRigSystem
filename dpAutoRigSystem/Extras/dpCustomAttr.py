@@ -118,7 +118,7 @@ class CustomAttr(object):
         for a, attr in enumerate(ATTR_LIST):
             cmds.button("addButton"+str(a), label=attr, backgroundColor=(0.6, 0.6, 0.6), command=partial(self.addAttr, a), parent=addAttrLayout)
             cmds.separator(style='none', height=5, parent=addAttrLayout)
-        cmds.separator(style='single', height=10, parent=addAttrLayout)
+        cmds.separator(style='in', height=10, parent=addAttrLayout)
         cmds.text("customAddTxt", label=self.dpUIinst.lang['m212_customAttr']+":", align="left", height=30, parent=addAttrLayout)
         self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustumAttrTFG", label="", text="", buttonLabel=self.dpUIinst.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom", False), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
         cmds.showWindow(self.addWindowName)

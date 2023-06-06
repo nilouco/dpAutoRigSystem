@@ -1428,7 +1428,7 @@ class ControlClass(object):
         cmds.text("attributeTxt", label=self.dpUIinst.lang['i275_attribute'], font='boldLabelFont', parent=firstRL)
         cmds.text("defaultTxt", label=self.dpUIinst.lang['m042_default'], font='boldLabelFont', parent=firstRL)
         cmds.text("currentTxt", label=self.dpUIinst.lang['i276_current'], font='boldLabelFont', parent=firstRL)
-        cmds.separator(style='single', height=10, parent=dvMainLayout)
+        cmds.separator(style='in', height=10, parent=dvMainLayout)
         self.defaultValueLayout = cmds.scrollLayout('defaultValueMainLayout', width=350, height=200, parent=dvMainLayout)
         self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
         self.populateSelectedControls()
@@ -1461,7 +1461,7 @@ class ControlClass(object):
                         cmds.floatField(value=cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), precision=3, changeCommand=partial(self.setDefaultValue, ctrl, attr))
                         # current value
                         cmds.floatField(value=cmds.getAttr(ctrl+"."+attr), precision=3, changeCommand=partial(self.setCurrentValue, ctrl, attr))
-                    cmds.separator(style='single', height=10, parent=self.dvSelectedLayout)
+                    cmds.separator(style='in', height=10, parent=self.dvSelectedLayout)
 
 
     def selectControl(self, ctrl, refreshUI=False, *args):
