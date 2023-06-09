@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "PinSide"
@@ -10,7 +7,7 @@ TITLE = "m209_pinSide"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_pinSide.png"
 
-dpPinSideVersion = 1.0
+DP_PINSIDE_VERSION = 1.1
 
 class PinSide(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

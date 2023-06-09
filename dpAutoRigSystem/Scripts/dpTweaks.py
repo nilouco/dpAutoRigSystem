@@ -8,6 +8,7 @@ TITLE = "m081_tweaks"
 DESCRIPTION = "m082_tweaksDesc"
 ICON = "/Icons/dp_tweaks.png"
 
+DP_TWEAKS_VERSION = 2.0
 
 
 def getUserDetail(opt1, opt2, cancel, default, userMessage):
@@ -31,20 +32,20 @@ def Tweaks(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
+        doingName = dpUIinst.lang['m094_doing']
         # part names:
-        mainName = dpUIinst.langDic[dpUIinst.langName]['c058_main']
-        tweaksName = dpUIinst.langDic[dpUIinst.langName]['m081_tweaks']
-        middleName = dpUIinst.langDic[dpUIinst.langName]['c029_middle']
-        eyebrowName = dpUIinst.langDic[dpUIinst.langName]['c041_eyebrow']
-        eyelidName = dpUIinst.langDic[dpUIinst.langName]['c042_eyelid']
-        cornerName = dpUIinst.langDic[dpUIinst.langName]['c043_corner']
-        upperName = dpUIinst.langDic[dpUIinst.langName]['c044_upper']
-        lowerName = dpUIinst.langDic[dpUIinst.langName]['c045_lower']
-        lipName = dpUIinst.langDic[dpUIinst.langName]['c039_lip']
-        holderName = dpUIinst.langDic[dpUIinst.langName]['c046_holder']
-        squintName = dpUIinst.langDic[dpUIinst.langName]['c054_squint']
-        cheekName = dpUIinst.langDic[dpUIinst.langName]['c055_cheek']
+        mainName = dpUIinst.lang['c058_main']
+        tweaksName = dpUIinst.lang['m081_tweaks']
+        middleName = dpUIinst.lang['c029_middle']
+        eyebrowName = dpUIinst.lang['c041_eyebrow']
+        eyelidName = dpUIinst.lang['c042_eyelid']
+        cornerName = dpUIinst.lang['c043_corner']
+        upperName = dpUIinst.lang['c044_upper']
+        lowerName = dpUIinst.lang['c045_lower']
+        lipName = dpUIinst.lang['c039_lip']
+        holderName = dpUIinst.lang['c046_holder']
+        squintName = dpUIinst.lang['c054_squint']
+        cheekName = dpUIinst.lang['c055_cheek']
         
         holderMainName = tweaksName+"_"+holderName+"_"+mainName
         # eyebrows names:
@@ -81,15 +82,15 @@ def Tweaks(dpUIinst):
         lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
         
         # kind guides:
-        simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
-        complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
-        cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']
-        userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
+        simple   = dpUIinst.lang['i175_simple']
+        complete = dpUIinst.lang['i176_complete']
+        cancel   = dpUIinst.lang['i132_cancel']
+        userMessage = dpUIinst.lang['i177_chooseMessage']
         
         # use indirect skinning or joints:
-        indSkin     = dpUIinst.langDic[dpUIinst.langName]['i180_indirectSkin']+"\n"+dpUIinst.langDic[dpUIinst.langName]['i185_animation']
-        faceJoint   = dpUIinst.langDic[dpUIinst.langName]['i181_facialJoint']+"\n"+dpUIinst.langDic[dpUIinst.langName]['i186_gaming']
-        faceMessage = dpUIinst.langDic[dpUIinst.langName]['i182_facialMessage']
+        indSkin     = dpUIinst.lang['i180_indirectSkin']+"\n"+dpUIinst.lang['i185_animation']
+        faceJoint   = dpUIinst.lang['i181_facialJoint']+"\n"+dpUIinst.lang['i186_gaming']
+        faceMessage = dpUIinst.lang['i182_facialMessage']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, complete, userMessage)
@@ -110,7 +111,7 @@ def Tweaks(dpUIinst):
             
                 # Starting progress window
                 progressAmount = 0
-                cmds.progressWindow(title='Tweaks Guides', progress=progressAmount, status=dpUIinst.langDic[dpUIinst.langName]['m094_doing']+': 0%', isInterruptable=False)
+                cmds.progressWindow(title='Tweaks Guides', progress=progressAmount, status=dpUIinst.lang['m094_doing']+': 0%', isInterruptable=False)
                 
                 
                 # Update progress window
@@ -407,7 +408,7 @@ def Tweaks(dpUIinst):
                 cmds.progressWindow(endProgress=True)
 
                 cmds.select(holderMainInstance.moduleGrp)
-                print(dpUIinst.langDic[dpUIinst.langName]['m093_createdTweaks'])
+                print(dpUIinst.lang['m093_createdTweaks'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

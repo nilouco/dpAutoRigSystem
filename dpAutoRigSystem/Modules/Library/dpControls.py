@@ -25,18 +25,19 @@ dic_colors = {
     "none": 0,
 }
 
+DP_CONTROLS_VERSION = 2.0
+
+
 class ControlClass(object):
 
-    def __init__(self, dpUIinst, presetDic, presetName, moduleGrp=None, *args):
+    def __init__(self, dpUIinst, moduleGrp=None, *args):
         """ Initialize the module class defining variables to use creating preset controls.
         """
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.presetDic = presetDic
-        self.presetName = presetName
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
-        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, self.dpUIinst.langDic, self.dpUIinst.langName, self.dpUIinst.presetDic, self.dpUIinst.presetName, ui=False, verbose=False)
+        self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
 
@@ -250,7 +251,7 @@ class ControlClass(object):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.presetDic[self.presetName][ctrlType]['type']
+        ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['type']
         return ctrlModule
         
         
@@ -258,7 +259,7 @@ class ControlClass(object):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
-        ctrlModule = self.presetDic[self.presetName][ctrlType]['degree']
+        ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['degree']
         return ctrlModule
 
 
@@ -481,7 +482,7 @@ class ControlClass(object):
             if selList:
                 sourceItem = selList[0]
             else:
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]["e015_selectToCopyAttr"])
+                print(self.dpUIinst.lang["e015_selectToCopyAttr"])
         if cmds.objExists(sourceItem):
             if not attrList:
                 # getting channelBox selected attributes:
@@ -498,7 +499,7 @@ class ControlClass(object):
                         value = cmds.getAttr(sourceItem+'.'+attr)
                         self.attrValueDic[attr] = value
                 if verbose:
-                    print(self.dpUIinst.langDic[self.dpUIinst.langName]["i125_copiedAttr"])
+                    print(self.dpUIinst.lang["i125_copiedAttr"])
         return self.attrValueDic
     
     
@@ -520,9 +521,9 @@ class ControlClass(object):
                         except:
                             pass
                             if verbose:
-                                print(self.dpUIinst.langDic[self.dpUIinst.langName]["e016_notPastedAttr"], attr)
+                                print(self.dpUIinst.lang["e016_notPastedAttr"], attr)
             if verbose:
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]["i126_pastedAttr"])
+                print(self.dpUIinst.lang["i126_pastedAttr"])
     
     
     def copyAndPasteAttr(self, verbose=False, *args):
@@ -687,11 +688,11 @@ class ControlClass(object):
         resultQuestion = cmds.confirmDialog(
                                         title=titleText,
                                         message=messageText, 
-                                        button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no']], 
-                                        defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes'], 
-                                        cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'], 
-                                        dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i072_no'])
-        if resultQuestion == self.dpUIinst.langDic[self.dpUIinst.langName]['i071_yes']:
+                                        button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], 
+                                        defaultButton=self.dpUIinst.lang['i071_yes'], 
+                                        cancelButton=self.dpUIinst.lang['i072_no'], 
+                                        dismissString=self.dpUIinst.lang['i072_no'])
+        if resultQuestion == self.dpUIinst.lang['i071_yes']:
             return True
         return False
     
@@ -707,18 +708,18 @@ class ControlClass(object):
                     ctrlList.append(item)
         if ctrlList:
             resultDialog = cmds.promptDialog(
-                                            title=self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'],
-                                            message=self.dpUIinst.langDic[self.dpUIinst.langName]['i130_presetName'],
-                                            button=[self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok'], self.dpUIinst.langDic[self.dpUIinst.langName]['i132_cancel']],
-                                            defaultButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok'],
-                                            cancelButton=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_cancel'],
-                                            dismissString=self.dpUIinst.langDic[self.dpUIinst.langName]['i132_cancel'])
-            if resultDialog == self.dpUIinst.langDic[self.dpUIinst.langName]['i131_ok']:
+                                            title=self.dpUIinst.lang['i129_createPreset'],
+                                            message=self.dpUIinst.lang['i130_presetName'],
+                                            button=[self.dpUIinst.lang['i131_ok'], self.dpUIinst.lang['i132_cancel']],
+                                            defaultButton=self.dpUIinst.lang['i131_ok'],
+                                            cancelButton=self.dpUIinst.lang['i132_cancel'],
+                                            dismissString=self.dpUIinst.lang['i132_cancel'])
+            if resultDialog == self.dpUIinst.lang['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
                 confirmSameName = True
                 if resultName in self.presetDic:
-                    confirmSameName = self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['i129_createPreset'], self.dpUIinst.langDic[self.dpUIinst.langName]['i135_existingName'])
+                    confirmSameName = self.confirmAskUser(self.dpUIinst.lang['i129_createPreset'], self.dpUIinst.lang['i135_existingName'])
                 if confirmSameName:
                     author = getpass.getuser()
                     date = str(datetime.datetime.now().date())
@@ -738,10 +739,10 @@ class ControlClass(object):
                                 ctrl_Degree = cmds.getAttr(ctrlNode+".degree")
                                 resultString += ',"'+ctrl_ID+'":{"type":"'+ctrl_Type+'","degree":'+str(ctrl_Degree)+'}'
                     # check if we got all controlIDs:
-                    for j, pID in enumerate(self.presetDic[self.presetName]):
+                    for j, pID in enumerate(self.dpUIinst.ctrlPreset):
                         if not pID in ctrlIDList:
                             # get missing controlIDs from current preset:
-                            resultString += ',"'+pID+'":{"type":"'+self.presetDic[self.presetName][pID]["type"]+'","degree":'+str(self.presetDic[self.presetName][pID]["degree"])+'}'
+                            resultString += ',"'+pID+'":{"type":"'+self.dpUIinst.ctrlPreset[pID]["type"]+'","degree":'+str(self.dpUIinst.ctrlPreset[pID]["degree"])+'}'
                     resultString += "}"
         return resultString
     
@@ -944,11 +945,11 @@ class ControlClass(object):
         importCalibrationNamespace = "dpImportCalibration"
         sourceRefNodeList = []
         # get user file to import calibration from
-        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.langDic[self.dpUIinst.langName]['i196_import']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'])
+        importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.lang['i196_import']+" "+self.dpUIinst.lang['i193_calibration'])
         if not importCalibrationPath:
             return
         progressAmount = 0
-        cmds.progressWindow(title=importCalibrationNamespace, progress=progressAmount, status='0% - '+self.dpUIinst.langDic[self.dpUIinst.langName]['i214_refFile'], isInterruptable=False)
+        cmds.progressWindow(title=importCalibrationNamespace, progress=progressAmount, status='0% - '+self.dpUIinst.lang['i214_refFile'], isInterruptable=False)
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
@@ -958,7 +959,7 @@ class ControlClass(object):
             maxProcess = len(refNodeList)
             for item in refNodeList:
                 progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(repr(progressAmount)+' - '+self.dpUIinst.langDic[self.dpUIinst.langName]['i215_setAttr']))
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(repr(progressAmount)+' - '+self.dpUIinst.lang['i215_setAttr']))
                 if cmds.objExists(item+".calibrationList"):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
@@ -988,7 +989,7 @@ class ControlClass(object):
                             self.mirrorCalibration(selectedNode, fromPrefix, toPrefix)
                 else:
                     # ask to run for all nodes:
-                    if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i193_calibration'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i197_mirrorAll']):
+                    if self.confirmAskUser(self.dpUIinst.lang['m010_mirror']+" "+self.dpUIinst.lang['i193_calibration'], self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['i197_mirrorAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         if allNodeList:
                             for node in allNodeList:
@@ -1000,7 +1001,7 @@ class ControlClass(object):
                     if cmds.objExists(destinationNode):
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
+            print(self.dpUIinst.lang['i198_mirrorPrefix'])
 
 
     def transferCalibration(self, sourceItem=False, destinationList=False, attrList=False, verbose=True, *args):
@@ -1019,9 +1020,9 @@ class ControlClass(object):
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i195_transferedCalib'], sourceItem, destinationList, attrList)
+                print(self.dpUIinst.lang['i195_transferedCalib'], sourceItem, destinationList, attrList)
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection'])
+            print(self.dpUIinst.lang['i042_notSelection'])
 
 
     def setCalibrationAttr(self, nodeName, attrList, *args):
@@ -1066,7 +1067,7 @@ class ControlClass(object):
         """
         currentPath = cmds.file(query=True, sceneName=True)
         if not currentPath:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+            print(self.dpUIinst.lang['i201_saveScene'])
             return
         
         if not nodeList:
@@ -1128,7 +1129,7 @@ class ControlClass(object):
                     print('Exported shapes to: {0}'.format(path))
                 cmds.undoInfo(closeChunk=True)
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+            print(self.dpUIinst.lang['i202_noControls'])
 
 
     def importShape(self, nodeList=None, path=None, recharge=False, *args):
@@ -1143,13 +1144,13 @@ class ControlClass(object):
             if recharge:
                 currentPath = cmds.file(query=True, sceneName=True)
                 if not currentPath:
-                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+                    print(self.dpUIinst.lang['i201_saveScene'])
                     return
                 dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
                 dpShapeFile = "/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
                 path = dpFolder+dpShapeFile
                 if not os.path.exists(path):
-                    print (self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+                    print (self.dpUIinst.lang['i202_noControls'])
                     return
             elif not path:
                 pathList = cmds.fileDialog2(fileMode=1, caption="Import Shapes")
@@ -1157,7 +1158,7 @@ class ControlClass(object):
                     path = pathList[0]
             if path:
                 if not os.path.exists(path):
-                    print(self.dpUIinst.langDic[self.dpUIinst.langName]['e004_objNotExist']+path)
+                    print(self.dpUIinst.lang['e004_objNotExist']+path)
                 else:
                     # create a file reference:
                     cmds.file(path, reference=True, namespace=importShapeNamespace)
@@ -1173,7 +1174,7 @@ class ControlClass(object):
                     cmds.file(path, removeReference=True)
                     print("Imported shapes: {0}".format(path))
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i202_noControls'])
+            print(self.dpUIinst.lang['i202_noControls'])
 
 
     def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
@@ -1342,18 +1343,18 @@ class ControlClass(object):
                             self.mirrorShape(selectedNode, fromPrefix, toPrefix, axis)
                 else:
                     # ask to run for all nodes:
-                    if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i265_mirrorShapeAll']):
+                    if self.confirmAskUser(self.dpUIinst.lang['m010_mirror']+" "+self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['i265_mirrorShapeAll']):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
                             # Starting progress window
                             maxProcess = len(allNodeList)
                             progressAmount = 0
-                            cmds.progressWindow(title=self.dpUIinst.langDic[self.dpUIinst.langName]['m010_mirror'], maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape'], isInterruptable=False)
+                            cmds.progressWindow(title=self.dpUIinst.lang['m010_mirror'], maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['m067_shape'], isInterruptable=False)
                             for node in allNodeList:
                                 progressAmount += 1
                                 if node in allControlList:
-                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.langDic[self.dpUIinst.langName]['m067_shape']+" "+node, isInterruptable=False)                                   
+                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['m067_shape']+" "+node, isInterruptable=False)                                   
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
                         cmds.progressWindow(endProgress=True)
@@ -1370,7 +1371,7 @@ class ControlClass(object):
                         self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=duplicatedSource, destinationList=[destinationNode], keepColor=True, force=True)
                         cmds.delete(mirrorShapeGrp)
         else:
-            print(self.dpUIinst.langDic[self.dpUIinst.langName]['i198_mirrorPrefix'])
+            print(self.dpUIinst.lang['i198_mirrorPrefix'])
 
 
     def setupDefaultValues(self, resetMode=True, ctrlList=None, *args):
@@ -1382,7 +1383,7 @@ class ControlClass(object):
             nodeToRunList = self.getSelectedControls()
             if not nodeToRunList:
                 # ask to run for all nodes:
-                if self.confirmAskUser(self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues'], self.dpUIinst.langDic[self.dpUIinst.langName]['i042_notSelection']+"\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['i273_runAllNodes']):
+                if self.confirmAskUser(self.dpUIinst.lang['i270_defaultValues'], self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['i273_runAllNodes']):
                     nodeToRunList = self.getControlList()
         else:
             nodeToRunList = self.getControlList()
@@ -1413,21 +1414,21 @@ class ControlClass(object):
         # window
         defaultValueOption_winWidth  = 430
         defaultValueOption_winHeight = 300
-        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.langDic[self.dpUIinst.langName]['i270_defaultValues']+" "+self.dpUIinst.langDic[self.dpUIinst.langName]['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+        cmds.window(self.defaultValueWindowName, title=self.dpUIinst.lang['i270_defaultValues']+" "+self.dpUIinst.lang['i274_editor'], widthHeight=(defaultValueOption_winWidth, defaultValueOption_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         dvMainLayout = cmds.columnLayout('dvMainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueWindowName)
         cmds.separator(style='none', height=5, parent=dvMainLayout)
         dvHeaderLayout = cmds.rowColumnLayout('dvHeaderLayout', numberOfColumns=3, columnWidth=[(1, 150), (2, 10), (3, 180)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'center')], columnAttach=[(1, 'both', 5), (2, 'both', 2), (3, 'both', 5)], adjustableColumn=2, parent=dvMainLayout)
-        cmds.button("editSelectedCtrlBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i011_editSelected'], command=self.populateSelectedControls, parent=dvHeaderLayout)
+        cmds.button("editSelectedCtrlBT", label=self.dpUIinst.lang['i011_editSelected'], command=self.populateSelectedControls, parent=dvHeaderLayout)
         cmds.separator(style='none', height=30, parent=dvHeaderLayout)
-        cmds.button("selectAllBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m166_selAllControls'], command=partial(self.selectAllControls, True), parent=dvHeaderLayout)
+        cmds.button("selectAllBT", label=self.dpUIinst.lang['m166_selAllControls'], command=partial(self.selectAllControls, True), parent=dvHeaderLayout)
         FirstCL = cmds.columnLayout('FirstSL',  adjustableColumn=True, columnOffset=("both", 10), parent=dvMainLayout)
         firstRL = cmds.rowLayout("firstRL", numberOfColumns=4, columnWidth4=(150, 100, 50, 50), height=32, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2)], parent=FirstCL)
-        cmds.text("controllerTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i111_controller'], font='boldLabelFont', align="center", parent=firstRL)
-        cmds.text("attributeTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i275_attribute'], font='boldLabelFont', parent=firstRL)
-        cmds.text("defaultTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['m042_default'], font='boldLabelFont', parent=firstRL)
-        cmds.text("currentTxt", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i276_current'], font='boldLabelFont', parent=firstRL)
-        cmds.separator(style='single', height=10, parent=dvMainLayout)
+        cmds.text("controllerTxt", label=self.dpUIinst.lang['i111_controller'], font='boldLabelFont', align="center", parent=firstRL)
+        cmds.text("attributeTxt", label=self.dpUIinst.lang['i275_attribute'], font='boldLabelFont', parent=firstRL)
+        cmds.text("defaultTxt", label=self.dpUIinst.lang['m042_default'], font='boldLabelFont', parent=firstRL)
+        cmds.text("currentTxt", label=self.dpUIinst.lang['i276_current'], font='boldLabelFont', parent=firstRL)
+        cmds.separator(style='in', height=10, parent=dvMainLayout)
         self.defaultValueLayout = cmds.scrollLayout('defaultValueMainLayout', width=350, height=200, parent=dvMainLayout)
         self.dvSelectedLayout = cmds.columnLayout('dvSelectedLayout', adjustableColumn=True, columnOffset=("both", 10), parent=self.defaultValueLayout)
         self.populateSelectedControls()
@@ -1460,7 +1461,7 @@ class ControlClass(object):
                         cmds.floatField(value=cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), precision=3, changeCommand=partial(self.setDefaultValue, ctrl, attr))
                         # current value
                         cmds.floatField(value=cmds.getAttr(ctrl+"."+attr), precision=3, changeCommand=partial(self.setCurrentValue, ctrl, attr))
-                    cmds.separator(style='single', height=10, parent=self.dvSelectedLayout)
+                    cmds.separator(style='in', height=10, parent=self.dvSelectedLayout)
 
 
     def selectControl(self, ctrl, refreshUI=False, *args):

@@ -8,6 +8,7 @@ TITLE = "m030_leg"
 DESCRIPTION = "m031_legDesc"
 ICON = "/Icons/dp_leg.png"
 
+DP_LEG_VERSION = 2.0
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -31,15 +32,15 @@ def Leg(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
+        doingName = dpUIinst.lang['m094_doing']
         # part names:
-        legName = dpUIinst.langDic[dpUIinst.langName]['m030_leg'].capitalize()
-        footName = dpUIinst.langDic[dpUIinst.langName]['c038_foot']
-        toeName = dpUIinst.langDic[dpUIinst.langName]['c013_revFoot_D'].capitalize()
-        simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
-        complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
-        cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']
-        userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
+        legName = dpUIinst.lang['m030_leg'].capitalize()
+        footName = dpUIinst.lang['c038_foot']
+        toeName = dpUIinst.lang['c013_revFoot_D'].capitalize()
+        simple   = dpUIinst.lang['i175_simple']
+        complete = dpUIinst.lang['i176_complete']
+        cancel   = dpUIinst.lang['i132_cancel']
+        userMessage = dpUIinst.lang['i177_chooseMessage']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -72,7 +73,7 @@ def Leg(dpUIinst):
             cmds.setAttr(legBaseGuide+".translateY", 10)
             cmds.setAttr(legBaseGuide+".rotateX", 0)
             cmds.setAttr(legLimbInstance.radiusCtrl+".translateX", 1.5)
-            legLimbInstance.changeStyle(dpUIinst.langDic[dpUIinst.langName]['m026_biped'])
+            legLimbInstance.changeStyle(dpUIinst.lang['m026_biped'])
             
             # edit location of leg ankle guide:
             cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
@@ -223,7 +224,7 @@ def Leg(dpUIinst):
 
             # select the legGuide_Base:
             cmds.select(legBaseGuide)
-            print(dpUIinst.langDic[dpUIinst.langName]['m092_createdLeg'])
+            print(dpUIinst.lang['m092_createdLeg'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

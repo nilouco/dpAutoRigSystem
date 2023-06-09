@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "ClipFlat"
@@ -10,7 +7,8 @@ TITLE = "m107_clipFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipFlat.png"
 
-dpClipFlatVersion = 1.2
+DP_CLIPFLAT_VERSION = 1.3
+
 
 class ClipFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

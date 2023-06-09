@@ -8,13 +8,13 @@ TITLE = "m166_selAllControls"
 DESCRIPTION = "m167_selAllControlsDesc"
 ICON = "/Icons/dp_selAllControls.png"
 
+DP_SELECTALLCONTROLS_VERSION = 2.0
+
 
 class SelectAllControls(object):
-    def __init__(self, dpUIinst, langDic, langName, *args):
+    def __init__(self, dpUIinst, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
-        self.langDic = langDic
-        self.langName = langName
         self.allGrp = "All_Grp"
         self.masterAttr = "masterGrp"
         self.ctrlsAttr = "controlList"
@@ -34,7 +34,7 @@ class SelectAllControls(object):
             allGrpList = self.dpCountAllGrp()
             if allGrpList:
                 if len(allGrpList) > 1:
-                    self.allGrp = cmds.confirmDialog(title=self.langDic[self.langName]["m166_selAllControls"], message=self.langDic[self.langName]["m168_wichAllGrp"], button=allGrpList)
+                    self.allGrp = cmds.confirmDialog(title=self.dpUIinst.lang["m166_selAllControls"], message=self.dpUIinst.lang["m168_wichAllGrp"], button=allGrpList)
                 else:
                     self.allGrp = self.dpCheckAllGrp(self.allGrp)
                 if self.allGrp:
@@ -46,7 +46,7 @@ class SelectAllControls(object):
         if callAction:
             self.dpSelectAllCtrls(self.allGrp)
         else:
-            mel.eval("warning \""+self.langDic[self.langName]["e019_notFoundAllGrp"]+"\";")
+            mel.eval("warning \""+self.dpUIinst.lang["e019_notFoundAllGrp"]+"\";")
     
     
     def dpCountAllGrp(self, *args):
@@ -80,9 +80,9 @@ class SelectAllControls(object):
                             else:
                                 ctrlsToSelectList.append(ctrlName)
                     cmds.select(ctrlsToSelectList)
-                    print(self.langDic[self.langName]["m169_selectedCtrls"]+str(ctrlsToSelectList))
+                    print(self.dpUIinst.lang["m169_selectedCtrls"]+str(ctrlsToSelectList))
             else:
-                mel.eval("warning \""+self.langDic[self.langName]["e019_notFoundAllGrp"]+"\";")
+                mel.eval("warning \""+self.dpUIinst.lang["e019_notFoundAllGrp"]+"\";")
     
     
     def dpFindAllGrpBySelection(self, *args):

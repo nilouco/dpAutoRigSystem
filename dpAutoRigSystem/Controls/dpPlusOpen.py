@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "PlusOpen"
@@ -10,7 +7,8 @@ TITLE = "m207_plusOpen"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_plusOpen.png"
 
-dpPlusOpenVersion = 1.0
+DP_PLUSOPEN_VERSION = 1.1
+
 
 class PlusOpen(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

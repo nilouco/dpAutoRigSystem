@@ -1,18 +1,16 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-from maya import mel
 from ...Modules.Library import dpUtils
-reload(dpBaseValidatorClass)
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "DisplayLayers"
 TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-dpDisplayLayers_Version = 1.0
+DP_DISPLAYLAYERS_VERSION = 1.1
+
 
 class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,7 +34,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
         # ---
         # --- validator code --- beginning
@@ -80,7 +78,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                             if self.verbose:
                                 # Update progress window
                                 progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                             missingGeoList = list(set(allGeoList) - set(itemsInGeoLayerList))
                             remainingGeoList = list(set(itemsInGeoLayerList) - set(allGeoList))
                             missingCtrlList = list(set(self.allCtrlsList) - set(itemsInCtrlLayerList))
@@ -90,41 +88,26 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                                 self.verifyFixMode(toFixList)
                         else:
                             # Empty layer
-                            self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v056_emptyLayers']])
+                            self.verifyFixMode([self.dpUIinst.lang['v056_emptyLayers']])
                     else:
                         # Layer configuration
-                        self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v057_layerConfiguration']])
+                        self.verifyFixMode([self.dpUIinst.lang['v057_layerConfiguration']])
                 else:
                     # No display layer
-                    self.verifyFixMode([self.dpUIinst.langDic[self.dpUIinst.langName]['v054_displayLayers']])
+                    self.verifyFixMode([self.dpUIinst.lang['v054_displayLayers']])
             else:
                 # Extra Lyr to delete
                 self.verifyFixMode(self.extraLayerToDelete)
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
 
     def createDisplayLayers(self, *args):
@@ -210,7 +193,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                         if i == len(itemList) - 1:
                             self.createDisplayLayers()    
                         self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
+                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                     except:#fix
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
+                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)

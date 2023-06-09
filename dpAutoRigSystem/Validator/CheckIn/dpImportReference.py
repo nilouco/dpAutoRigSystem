@@ -1,16 +1,15 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "ImportReference"
 TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
 ICON = "/Icons/dp_importReference.png"
 
-dpImportReference_Version = 1.1
+DP_IMPORTREFERENCE_VERSION = 1.2
+
 
 class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -34,7 +33,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
         # ---
         # --- validator code --- beginning
@@ -49,7 +48,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 self.checkedObjList.append(reference)
                 self.foundIssueList.append(True)
             if self.verifyMode:
@@ -57,30 +56,15 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
             else: #fix
                 self.importReference()
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
 
     def importReference(self, *args):
@@ -96,12 +80,12 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
                         try:
                             cmds.file(ref, importReference=True)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+ref)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+ref)
                             self.importReference()
                             break
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+ref)
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+ref)
                     else:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+ref)
+                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+ref)

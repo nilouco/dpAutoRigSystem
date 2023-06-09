@@ -1,16 +1,15 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "DuplicatedName"
 TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 
-dpDuplicatedName_Version = 1.1
+DP_DUPLICATEDNAME_VERSION = 1.2
+
 
 class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -34,8 +33,7 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
-        
+        self.cleanUpToStart()
         
         # ---
         # --- validator code --- beginning
@@ -80,7 +78,7 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
                     if self.verbose:
                         # Update progress window
                         progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                     # use another list without the first element to compare it the item repeats
                     anotherList = shortNameList[i+1:]
                     for item in anotherList:
@@ -96,33 +94,17 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
                                         cmds.rename(orderedObjList[i], obj+str(n))
                                         n += 1
                                         self.resultOkList.append(True)
-                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+orderedObjList[i])
+                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+orderedObjList[i])
                                     except:
                                         self.resultOkList.append(False)
-                                        self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+orderedObjList[i])
+                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+orderedObjList[i])
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
-
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

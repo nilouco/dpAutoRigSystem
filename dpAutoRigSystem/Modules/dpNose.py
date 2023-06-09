@@ -1,16 +1,16 @@
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:
 CLASS_NAME = "Nose"
 TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 ICON = "/Icons/dp_nose.png"
+
+DP_NOSE_VERSION = 2.0
 
 
 class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -335,25 +335,25 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.cvEndJoint    = side+self.userGuideName+"_Guide_JointEnd"
                 
                 # generating naming:
-                leftSideName  = self.langDic[self.langName]['p002_left']
-                rightSideName = self.langDic[self.langName]['p003_right']
+                leftSideName  = self.dpUIinst.lang['p002_left']
+                rightSideName = self.dpUIinst.lang['p003_right']
                 if self.addFlip:
-                    leftSideName = self.langDic[self.langName]['c123_outer']
-                    rightSideName = self.langDic[self.langName]['c122_inner']
-                middleJntName    = side+self.userGuideName+"_%02d_"%(n+1)+self.langDic[self.langName]['c029_middle']+"_Jnt"
-                tipJntName       = side+self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c120_tip']+"_Jnt"
-                bottomJntName    = side+self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c100_bottom']+"_Jnt"
-                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+leftSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
-                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+rightSideName+"_"+self.langDic[self.langName]['c121_side']+"_Jnt"
-                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+leftSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
-                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+rightSideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Jnt"
-                middleCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c029_middle']+"_Ctrl"
-                tipCtrlName      = side+self.userGuideName+"_"+self.langDic[self.langName]['c120_tip']+"_Ctrl"
-                bottomCtrlName   = side+self.userGuideName+"_"+self.langDic[self.langName]['c100_bottom']+"_Ctrl"
-                lSideCtrlName    = leftSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
-                rSideCtrlName    = rightSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['c121_side']+"_Ctrl"
-                lNostrilCtrlName = leftSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
-                rNostrilCtrlName = rightSideName+"_"+side+self.userGuideName+"_"+self.langDic[self.langName]['m079_nostril']+"_Ctrl"
+                    leftSideName = self.dpUIinst.lang['c123_outer']
+                    rightSideName = self.dpUIinst.lang['c122_inner']
+                middleJntName    = side+self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle']+"_Jnt"
+                tipJntName       = side+self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip']+"_Jnt"
+                bottomJntName    = side+self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom']+"_Jnt"
+                lSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+leftSideName+"_"+self.dpUIinst.lang['c121_side']+"_Jnt"
+                rSideJntName     = side+self.userGuideName+"_%02d_"%(n+3)+rightSideName+"_"+self.dpUIinst.lang['c121_side']+"_Jnt"
+                lNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+leftSideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Jnt"
+                rNostrilJntName  = side+self.userGuideName+"_%02d_"%(n+4)+rightSideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Jnt"
+                middleCtrlName   = side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+"_Ctrl"
+                tipCtrlName      = side+self.userGuideName+"_"+self.dpUIinst.lang['c120_tip']+"_Ctrl"
+                bottomCtrlName   = side+self.userGuideName+"_"+self.dpUIinst.lang['c100_bottom']+"_Ctrl"
+                lSideCtrlName    = leftSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['c121_side']+"_Ctrl"
+                rSideCtrlName    = rightSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['c121_side']+"_Ctrl"
+                lNostrilCtrlName = leftSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Ctrl"
+                rNostrilCtrlName = rightSideName+"_"+side+self.userGuideName+"_"+self.dpUIinst.lang['m079_nostril']+"_Ctrl"
                 
                 # creating joints:
                 self.middleJnt = cmds.joint(name=middleJntName, scaleCompensate=False)
@@ -375,14 +375,14 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if cmds.objExists(dpARJoint):
                         cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                dpUtils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.langDic[self.langName]['c029_middle'])
-                dpUtils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c120_tip'])
-                dpUtils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.langDic[self.langName]['c100_bottom'])
-                dpUtils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.langDic[self.langName]['c121_side'])
-                dpUtils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.langDic[self.langName]['c121_side'])
+                dpUtils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle'])
+                dpUtils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip'])
+                dpUtils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom'])
+                dpUtils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
+                dpUtils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
                 if self.addNostril:
-                    dpUtils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
-                    dpUtils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.langDic[self.langName]['m079_nostril'])
+                    dpUtils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
+                    dpUtils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
                 
                 # creating controls:
                 self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree)

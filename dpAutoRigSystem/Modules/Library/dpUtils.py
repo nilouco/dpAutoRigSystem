@@ -15,6 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
+DP_UTILS_VERSION = 2.0
 
 # UTILS functions:
 def findEnv(key, path):
@@ -963,13 +964,13 @@ def dpCreateValidatorPreset(dpUIinst):
     validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList + dpUIinst.checkAddOnsInstanceList
     if validatorsList:
         resultDialog = cmds.promptDialog(
-                                            title=dpUIinst.langDic[dpUIinst.langName]['i129_createPreset'],
-                                            message=dpUIinst.langDic[dpUIinst.langName]['i130_presetName'],
-                                            button=[dpUIinst.langDic[dpUIinst.langName]['i131_ok'], dpUIinst.langDic[dpUIinst.langName]['i132_cancel']],
-                                            defaultButton=dpUIinst.langDic[dpUIinst.langName]['i131_ok'],
-                                            cancelButton=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'],
-                                            dismissString=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'])
-        if resultDialog == dpUIinst.langDic[dpUIinst.langName]['i131_ok']:
+                                            title=dpUIinst.lang['i129_createPreset'],
+                                            message=dpUIinst.lang['i130_presetName'],
+                                            button=[dpUIinst.lang['i131_ok'], dpUIinst.lang['i132_cancel']],
+                                            defaultButton=dpUIinst.lang['i131_ok'],
+                                            cancelButton=dpUIinst.lang['i132_cancel'],
+                                            dismissString=dpUIinst.lang['i132_cancel'])
+        if resultDialog == dpUIinst.lang['i131_ok']:
             resultName = cmds.promptDialog(query=True, text=True)
             resultName = resultName[0].upper()+resultName[1:]
             author = getpass.getuser()

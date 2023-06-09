@@ -10,18 +10,17 @@ import shutil
 import os
 import sys
 
-
-DPPACKAGER_VERSION = 1.6
-
-
 RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
 CAM_ROTX = -10
 CAM_ROTY = 30
 CTRL_LAYER = "Ctrl_Lyr"
 
-class Packager(object):
+DP_PACKAGER_VERSION = 1.6
 
+
+class Packager(object):
+    
     def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
         """ Create a zipped file with given filePath and fileName replacing the extention (.ma or .mb) to .zip
             Add date at the end of the file if it's given.

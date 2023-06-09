@@ -1,16 +1,16 @@
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:    
 CLASS_NAME = "FkLine"
 TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
+
+DP_FKLINE_VERSION = 2.0
 
 
 class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):

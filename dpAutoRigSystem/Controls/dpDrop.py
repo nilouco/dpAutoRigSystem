@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Drop"
@@ -10,7 +7,8 @@ TITLE = "m128_drop"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_drop.png"
 
-dpDropVersion = 1.2
+DP_DROP_VERSION = 1.3
+
 
 class Drop(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

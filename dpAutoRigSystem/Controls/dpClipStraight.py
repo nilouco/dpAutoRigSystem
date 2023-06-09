@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "ClipStraight"
@@ -10,7 +7,8 @@ TITLE = "m109_clipStraight"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_clipStraight.png"
 
-dpClipStraightVersion = 1.2
+DP_CLIPSTRAIGHT_VERSION = 1.3
+
 
 class ClipStraight(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

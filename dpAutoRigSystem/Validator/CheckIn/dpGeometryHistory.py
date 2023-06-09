@@ -1,16 +1,15 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "GeometryHistory"
 TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 ICON = "/Icons/dp_geometryHistory.png"
 
-dpGeometryHistory_Version = 1.0
+DP_GEOMETRYHISTORY_VERSION = 1.1
+
 
 class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -34,8 +33,7 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
-                
+        self.cleanUpToStart()
 
         # ---
         # --- validator code --- beginning
@@ -69,7 +67,7 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
                     if self.verbose:
                     # Update progress window
                         progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                     self.checkedObjList.append(geo)
                     self.foundIssueList.append(True)
                     if self.verifyMode:
@@ -79,33 +77,17 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
                             # Delete history
                             cmds.delete(geo, constructionHistory=True)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+geo)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+geo)
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+geo)
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+geo)
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
-
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

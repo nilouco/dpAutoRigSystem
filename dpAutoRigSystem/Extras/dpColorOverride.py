@@ -9,15 +9,12 @@ TITLE = "m047_colorOver"
 DESCRIPTION = "m048_coloOverDesc"
 ICON = "/Icons/dp_colorOverride.png"
 
-DPCO_VERSION = "2.1"
+DP_COLOROVERRIDE_VERSION = 2.2
+
 
 class ColorOverride(object):
-    def __init__(self, dpUIinst, presetDic, presetName, *args, **kwargs):
-        # defining variables
-        self.dpUIinst = dpUIinst
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+    def __init__(self, dpUIinst, *args, **kwargs):
+        self.ctrls = dpControls.ControlClass(dpUIinst)
         # call main function
         self.dpColorizeUI(self)
 
@@ -51,7 +48,7 @@ class ColorOverride(object):
             cmds.deleteUI('dpColorOverrideWindow', window=True)
         colorOverride_winWidth  = 170
         colorOverride_winHeight = 115
-        dpColorOverrideWin = cmds.window('dpColorOverrideWindow', title='Color Override '+DPCO_VERSION, iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpColorOverrideWin = cmds.window('dpColorOverrideWindow', title='Color Override '+str(DP_COLOROVERRIDE_VERSION), iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         
         # creating layout:
         colorTabLayout = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=dpColorOverrideWin)

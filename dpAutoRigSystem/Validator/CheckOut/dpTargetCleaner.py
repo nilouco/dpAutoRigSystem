@@ -2,18 +2,17 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 from ...Modules.Library import dpUtils
-from importlib import reload
-reload(dpBaseValidatorClass)
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "TargetCleaner"
 TITLE = "v012_targetCleaner"
 DESCRIPTION = "v013_targetCleanerDesc"
 ICON = "/Icons/dp_targetCleaner.png"
 
-dpTargetCleaner_Version = 1.6
-
 DPKEEPITATTR = "dpKeepIt"
+
+DP_TARGETCLEANER_VERSION = 1.7
+
 
 class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -37,10 +36,8 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
-        
-
         # ---
         # --- validator code --- beginning
         if objList:
@@ -66,7 +63,7 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                         try:
                             inputDeformerList = cmds.findDeformers(item)
                         except:
-                            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['i075_moreOne']+": "+item)
+                            self.messageList.append(self.dpUIinst.lang['i075_moreOne']+": "+item)
                             inputDeformerList = False
                         if inputDeformerList:
                             for deformerNode in inputDeformerList:
@@ -85,7 +82,7 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 if cmds.objExists(item):
                     self.checkedObjList.append(item)
                     if not item in exceptionList:
@@ -101,40 +98,23 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                                     if not brotherList:
                                         cmds.delete(fatherItemList[0])
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
                     else:
                         self.foundIssueList.append(False)
                         self.resultOkList.append(True)
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
-
-
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)
 
 
     def keepGrp(self, grpList, *args):

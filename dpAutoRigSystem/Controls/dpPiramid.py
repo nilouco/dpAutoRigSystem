@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Piramid"
@@ -10,7 +7,8 @@ TITLE = "m134_piramid"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_piramid.png"
 
-dpPiramidVersion = 1.2
+DP_PIRAMID_VERSION = 1.3
+
 
 class Piramid(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
