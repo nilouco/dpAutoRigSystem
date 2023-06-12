@@ -18,6 +18,7 @@
 from maya import cmds
 from maya import mel
 from functools import partial
+from ..Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -28,7 +29,7 @@ ICON = "/Icons/dp_rivet.png"
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DP_RIVET_VERSION = 1.4
+DP_RIVET_VERSION = 1.5
 
 
 class Rivet(object):
@@ -91,6 +92,9 @@ class Rivet(object):
         rotateLayout = cmds.rowColumnLayout('rotateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=rotateLayout)
         self.invertRCB = cmds.checkBox('invertRCB', label=self.dpUIinst.lang["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
+        faceToRivetLayout = cmds.columnLayout('faceToRivetLayout', columnOffset=("left", 10), parent=rivetLayout)
+        # Correct label to use dictionary
+        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, parent=faceToRivetLayout) 
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
