@@ -124,9 +124,10 @@ class Rivet(object):
         addInvert = cmds.checkBox(self.addInvertCB, query=True, value=True)
         invT = cmds.checkBox(self.invertTCB, query=True, value=True)
         invR = cmds.checkBox(self.invertRCB, query=True, value=True)
-        
+        faceToRivet = cmds.checkBox(self.faceToRivetCB, query=True, value=True)
+
         # call run function to create Rivet setup using UI values
-        self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, RIVET_GRP, True)
+        self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.dpCloseRivetUi()
     
     
@@ -272,7 +273,7 @@ class Rivet(object):
                     cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
         """ Create the Rivet setup.
             Returns follicle node.
         """
@@ -315,6 +316,10 @@ class Rivet(object):
             if self.scalableGrp:
                 cmds.parent(self.rivetGrp, self.scalableGrp)
             
+        # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
+        if faceToRivet:
+            geoToAttach = self.extractFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+
         # get shape to attach:
         if cmds.objExists(geoToAttach):
             self.shapeToAttachList = cmds.ls(geoToAttach, dag=True, shapes=True)
@@ -488,3 +493,137 @@ class Rivet(object):
         
         cmds.select(clear=True)
         return folTransf
+    
+
+    def extractGeoToRivet(self, geo, *args):
+        """ Turn off skinCluster and blendShape envelope if exists, duplicate the selected geometry
+            apply initial shading and remove it from any display layer
+        """ 
+        # Get the history to turn off envelopes if exists
+        histList = cmds.listHistory(geo)
+        shapeList = cmds.listRelatives(geo, shapes=True)
+        attrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
+        if shapeList:
+            # check if there's a skinCluster node connected to the first selected item
+            checkSkin = self.dpCheckNodeExists(shapeList, "skinCluster")
+            checkBs = self.dpCheckNodeExists(shapeList, "blendShape")
+            if checkSkin == 1:
+                skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
+                cmds.setAttr(skinClusterNode + ".envelope",0)
+            if checkBs == 2:
+                blendShapeNode = cmds.ls(histList, type="blendShape")[0]
+                cmds.setAttr(blendShapeNode+ ".envelope",0)            
+            # Duplicate geometry after turn off skinCluster and blendShape. 
+            toRivetGeo = cmds.duplicate(geo)[0]
+            # Unparenting
+            try:
+                cmds.parent(toRivetGeo, world=True)
+            except Exception as e:
+                print(e)
+            # Unlock attributes and apply initialShading
+            for attr in attrList:
+                cmds.setAttr(toRivetGeo+"."+attr, lock=False)
+            cmds.sets (toRivetGeo, edit=True,  forceElement = "initialShadingGroup")
+            cmds.editDisplayLayerMembers ("defaultLayer", toRivetGeo, nr = False)
+            # Renaming
+            toRivetName = dpUtils.extractSuffix(geo)
+            if "|" in toRivetName:
+                toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+            toRivetGeo = cmds.rename(toRivetGeo, toRivetName+"_FaceToRivet_Geo")
+            # Turning on nodes
+            if checkSkin == 1:
+                cmds.setAttr(skinClusterNode + ".envelope",1)
+            if checkSkin == 2:
+                cmds.setAttr(blendShapeNode+".envelope", 1)
+            return toRivetGeo
+    
+    
+    def extractFaceToRivet(self, controls, geometry, growMultiplier, origGeo, *args):
+        """ Get the pivot coordinates from each control to get the nearest face from control to the geometry
+            After the initial selection it will grow 4 times by default
+            It uses delta to delete the extra faces, than wrap it to the original model and 
+            move the geometry and wrap Base to Models_Grp
+        """
+        # Get the pivot's coordinates from each control.
+        pivots = {}
+        for control in controls:
+            pivot = cmds.xform(control, query=True, translation=True, worldSpace=True)
+            pivots[control] = pivot
+        # Get the coordinates from geometry faces.
+        faceList = cmds.ls(geometry + '.f[:]', flatten=True)
+        faceCoordinates = []
+        for face in faceList:
+            vertexCoords = cmds.xform(face, query=True, translation=True, worldSpace=True)
+            avgCoordinates = [
+                sum(vertexCoords[i::3]) / len(vertexCoords[i::3])
+                for i in range(3)
+            ]
+            faceCoordinates.append(avgCoordinates)
+        # Select the neareest face from each pivot.
+        for control, pivot in pivots.items():
+            nearestFace = None
+            minimalDistance = None
+            for i, coord in enumerate(faceCoordinates):
+                distance = sum((coord[j] - pivot[j])**2 for j in range(3)) ** 0.5
+                if minimalDistance is None or distance < minimalDistance:
+                    minimalDistance = distance
+                    nearestFace = faceList[i]
+            if nearestFace:
+                cmds.select(nearestFace, add=True)
+        # Select the faces and growUp selection.
+        cmds.selectMode(component=True)
+        cmds.selectType(facet=True)
+        growMultiplier = growMultiplier - 1
+        if growMultiplier > 0:
+            for i in range(0, growMultiplier):
+                cmds.GrowPolygonSelectionRegion()
+        # Delta to delete unnecessary faces.
+        selectedFaceList = cmds.ls(selection=True, flatten=True)
+        allFaceList = cmds.ls(geometry + '.f[*]', flatten=True)
+        nonSelectedFaceList = list(set(allFaceList) - set(selectedFaceList))
+        cmds.delete(nonSelectedFaceList)
+        # AutoProjection for new UV and order selection to use dpRivet.
+        cmds.polyAutoProjection(geometry, constructionHistory=False)
+        cmds.selectMode(object=True)
+        # Create Wrap
+        cmds.select([geometry, origGeo])
+        mel.eval("CreateWrap;")
+        hist = cmds.listHistory(geometry)
+        wrapList = cmds.ls(hist, type="wrap")[0]
+        # Renaming
+        toRivetName = dpUtils.extractSuffix(geometry)
+        if "|" in toRivetName:
+            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
+        baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
+        baseTransform = baseShape.replace("Shape", "")
+        # Remove from displayLayers
+        cmds.editDisplayLayerMembers ("defaultLayer", baseTransform, nr = False)
+        # Parent in modelsGrp
+        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        if modelGrp:
+            cmds.parent(geometry, baseShape, modelGrp)
+        return geometry
+
+
+    def dpCheckNodeExists(self, shapeList, type, *args):
+        """ Verify if there's a skinCluster or blendShape node in the list of history of the shape.
+            Return 1 if there's skinCluster.
+            Return 2 if there's blendShape node
+            Return -1 if there's another node with the same name.
+        """
+        for shapeNode in shapeList:
+            if not shapeNode.endswith("Orig"):
+                try:
+                    histList = cmds.listHistory(shapeNode)
+                    if histList:
+                        for histItem in histList:
+                            if type == "skinCluster":
+                                if cmds.objectType(histItem) == "skinCluster":
+                                    return 1
+                            if type == "blendShape":
+                                if cmds.objectType(histItem) == "blendShape":
+                                    return 2
+                except:
+                    return -1
+        return False

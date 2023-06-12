@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.40"
-DPAR_UPDATELOG = "N614 - Refactoring Validator file\nN687 - Simplify self.lang.\nN513 - Review module versions"
+DPAR_VERSION_PY3 = "4.02.41"
+DPAR_UPDATELOG = "N156 - Created new feature in dpRivet\nIt will help to create a new geometry\n to attach rivets"
 
 
 
