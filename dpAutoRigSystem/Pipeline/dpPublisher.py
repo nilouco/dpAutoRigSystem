@@ -347,6 +347,8 @@ class Publisher(object):
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
+                            # open folder
+                            self.packager.openFolder(self.pipeliner.pipeData['toClientPath'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])

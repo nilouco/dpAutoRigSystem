@@ -9,6 +9,8 @@ import zipfile
 import shutil
 import os
 import sys
+import subprocess
+import platform
 
 RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
@@ -288,3 +290,16 @@ class Packager(object):
             return result
         except:
             pass
+
+
+    def openFolder(self, path, *args):
+        """ Just open a folder in exporer, finder, etc if it exists.
+        """
+        if os.path.exists(path):
+            if platform.system() == "Windows":
+                os.startfile(path)
+            elif platform.system() == "Darwin": #Mac
+                subprocess.Popen(['open', path])
+            else: #Unix, Linux
+                subprocess.Popen(['xdg-open', path])
+        #Move it to dpUtils?
