@@ -16,7 +16,7 @@ CAM_ROTX = -10
 CAM_ROTY = 30
 CTRL_LAYER = "Ctrl_Lyr"
 
-DP_PACKAGER_VERSION = 1.6
+DP_PACKAGER_VERSION = 1.7
 
 
 class Packager(object):
@@ -76,6 +76,7 @@ class Packager(object):
     def imager(self, pipeData, dpARVersion, date, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
         """ Save a rigging preview screenShot file with the given informations.
             Thanks Caio Hidaka for the help in this code!
+            Returns the image preview path.
         """
         mayaVersion = cmds.about(installedVersion=True)
         # store current user settings
@@ -207,6 +208,7 @@ class Packager(object):
         # force persp viewport to show file as default view options
         activeEditor = cmds.playblast(activeEditor=True)
         cmds.modelEditor(activeEditor, edit=True, displayAppearance='smoothShaded', xray=False, wireframeOnShaded=False, occlusionCulling=False, shadows=False, polymeshes=True, pivots=False, nurbsCurves=True, jointXray=False, displayTextures=False, useDefaultMaterial=False, activeComponentsXray=False)
+        return exportPath
 
 
     def toHistory(self, scenePath, fileShortName, destinationFolder, *args):
