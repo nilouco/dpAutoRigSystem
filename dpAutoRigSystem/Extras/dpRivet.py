@@ -505,17 +505,16 @@ class Rivet(object):
         # Get the history to turn off envelopes if exists
         histList = cmds.listHistory(geo)
         shapeList = cmds.listRelatives(geo, shapes=True)
-        attrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"]
         if shapeList:
             # check if there's a skinCluster node connected to the first selected item
             checkSkin = self.dpCheckNodeExists(shapeList, "skinCluster")
-            checkBs = self.dpCheckNodeExists(shapeList, "blendShape")
+            checkBS = self.dpCheckNodeExists(shapeList, "blendShape")
             if checkSkin == 1:
                 skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
-                cmds.setAttr(skinClusterNode + ".envelope",0)
-            if checkBs == 2:
+                cmds.setAttr(skinClusterNode+".envelope", 0)
+            if checkBS == 2:
                 blendShapeNode = cmds.ls(histList, type="blendShape")[0]
-                cmds.setAttr(blendShapeNode+ ".envelope",0)            
+                cmds.setAttr(blendShapeNode+".envelope", 0)
             # Duplicate geometry after turn off skinCluster and blendShape. 
             toRivetGeo = cmds.duplicate(geo)[0]
             # Unparenting
@@ -524,10 +523,10 @@ class Rivet(object):
             except Exception as e:
                 print(e)
             # Unlock attributes and apply initialShading
-            for attr in attrList:
-                cmds.setAttr(toRivetGeo+"."+attr, lock=False)
-            cmds.sets (toRivetGeo, edit=True,  forceElement = "initialShadingGroup")
-            cmds.editDisplayLayerMembers ("defaultLayer", toRivetGeo, nr = False)
+            self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
+            cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
+            cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
+            self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
             # Renaming
             toRivetName = dpUtils.extractSuffix(geo)
             if "|" in toRivetName:
@@ -535,38 +534,38 @@ class Rivet(object):
             toRivetGeo = cmds.rename(toRivetGeo, toRivetName+"_FaceToRivet_Geo")
             # Turning on nodes
             if checkSkin == 1:
-                cmds.setAttr(skinClusterNode + ".envelope",1)
-            if checkSkin == 2:
+                cmds.setAttr(skinClusterNode+".envelope", 1)
+            if checkBS == 2:
                 cmds.setAttr(blendShapeNode+".envelope", 1)
             return toRivetGeo
     
     
-    def extractFaceToRivet(self, controls, geometry, growMultiplier, origGeo, *args):
+    def extractFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
         """ Get the pivot coordinates from each control to get the nearest face from control to the geometry
             After the initial selection it will grow 4 times by default
             It uses delta to delete the extra faces, than wrap it to the original model and 
             move the geometry and wrap Base to Models_Grp
         """
         # Get the pivot's coordinates from each control.
-        pivots = {}
-        for control in controls:
+        pivotList = {}
+        for control in controlList:
             pivot = cmds.xform(control, query=True, translation=True, worldSpace=True)
-            pivots[control] = pivot
+            pivotList[control] = pivot
         # Get the coordinates from geometry faces.
-        faceList = cmds.ls(geometry + '.f[:]', flatten=True)
-        faceCoordinates = []
+        faceList = cmds.ls(geometry+".f[:]", flatten=True)
+        faceCoordinateList = []
         for face in faceList:
-            vertexCoords = cmds.xform(face, query=True, translation=True, worldSpace=True)
+            vertexCoordList = cmds.xform(face, query=True, translation=True, worldSpace=True)
             avgCoordinates = [
-                sum(vertexCoords[i::3]) / len(vertexCoords[i::3])
+                sum(vertexCoordList[i::3]) / len(vertexCoordList[i::3])
                 for i in range(3)
             ]
-            faceCoordinates.append(avgCoordinates)
+            faceCoordinateList.append(avgCoordinates)
         # Select the neareest face from each pivot.
-        for control, pivot in pivots.items():
+        for control, pivot in pivotList.items():
             nearestFace = None
             minimalDistance = None
-            for i, coord in enumerate(faceCoordinates):
+            for i, coord in enumerate(faceCoordinateList):
                 distance = sum((coord[j] - pivot[j])**2 for j in range(3)) ** 0.5
                 if minimalDistance is None or distance < minimalDistance:
                     minimalDistance = distance
@@ -582,7 +581,7 @@ class Rivet(object):
                 cmds.GrowPolygonSelectionRegion()
         # Delta to delete unnecessary faces.
         selectedFaceList = cmds.ls(selection=True, flatten=True)
-        allFaceList = cmds.ls(geometry + '.f[*]', flatten=True)
+        allFaceList = cmds.ls(geometry+".f[*]", flatten=True)
         nonSelectedFaceList = list(set(allFaceList) - set(selectedFaceList))
         cmds.delete(nonSelectedFaceList)
         # AutoProjection for new UV and order selection to use dpRivet.
@@ -601,7 +600,7 @@ class Rivet(object):
         baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
         baseTransform = baseShape.replace("Shape", "")
         # Remove from displayLayers
-        cmds.editDisplayLayerMembers ("defaultLayer", baseTransform, nr = False)
+        cmds.editDisplayLayerMembers("defaultLayer", baseTransform, noRecurse=False)
         # Parent in modelsGrp
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
