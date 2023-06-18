@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.02.41"
-DPAR_UPDATELOG = "N702 - Callback conform.\nN678 - Open toClient folder after publish."
+DPAR_UPDATELOG = "N702 - Callback conform.\nN678 - Open toClient folder after publish.\nN677 - Fix ExportLogDicToJson path."
 
 
 

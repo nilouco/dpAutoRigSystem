@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.0
+DP_UTILS_VERSION = 2.1
 
 # UTILS functions:
 def findEnv(key, path):
@@ -940,8 +940,7 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
     currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     if not path:
         path = cmds.file(query=True, sceneName=True)
-        if not path:
-            return False
+    if path:
         dpFolder = path[:path.rfind("/")]
         if subFolder:
             dpFolder = dpFolder+"/"+subFolder
@@ -950,6 +949,8 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
         if not name:
             name = path[path.rfind("/")+1:path.rfind(".")]
         pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
+    else:
+        return False
     print("\nLog file", pathFile)
     outFile = open(pathFile, "w")
     json.dump(dic, outFile, indent=4)
