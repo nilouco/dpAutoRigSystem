@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.0
+DP_UTILS_VERSION = 2.1
 
 # UTILS functions:
 def findEnv(key, path):
@@ -247,6 +247,7 @@ def zeroOut(transformList=[], offset=False):
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:
                     try:
+                        cmds.setAttr(zeroGrp+"."+zUserAttr, lock=False)
                         cmds.deleteAttr(zeroGrp+"."+zUserAttr)
                     except:
                         pass
