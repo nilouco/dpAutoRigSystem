@@ -25,7 +25,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.0
+DP_CONTROLS_VERSION = 2.1
 
 
 class ControlClass(object):
@@ -293,6 +293,8 @@ class ControlClass(object):
         if controlInstance:
             # create curve
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
+            # tag as controller
+            cmds.controller(curve, isController=True)
             if corrective:
                 self.addCorrectiveAttrs(curve)
             return curve

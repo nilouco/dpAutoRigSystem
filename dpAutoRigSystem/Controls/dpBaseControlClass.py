@@ -4,7 +4,7 @@ from maya import mel
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 
-DP_CONTROLSTARTCLASS_VERSION = 2.0
+DP_CONTROLSTARTCLASS_VERSION = 2.1
 
 
 class ControlStartClass:
@@ -96,6 +96,7 @@ class ControlStartClass:
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
         self.ctrls.renameShape([cvCurve])
         self.ctrls.displayRotateOrderAttr([cvCurve])
+        cmds.controller(cvCurve, isController=True) #tag as controller
         return cvCurve
     
     

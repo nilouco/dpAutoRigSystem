@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.40"
-DPAR_UPDATELOG = "N614 - Refactoring Validator file\nN687 - Simplify self.lang.\nN513 - Review module versions"
+DPAR_VERSION_PY3 = "4.02.43"
+DPAR_UPDATELOG = "N064 - Tag as controller."
 
 
 
