@@ -227,6 +227,7 @@ class Packager(object):
             for item in sceneList:
                 self.removeExistingArchived(destinationFolder, item)
                 shutil.move(scenePath+"/"+item, destinationFolder)
+        shutil.copy2(scenePath+"/"+fileShortName, destinationFolder)
 
     
     def toDropbox(self, file, toPath, *args):
