@@ -11,6 +11,8 @@
 #        Brecht Debaene, for showing me how to hook up a follicle
 #        robthebloke.org, for sharing the knowlege.
 #
+#   Also thanks to Caio Hidaka for the FaceToRivet implementation.
+#
 ###
 
 
@@ -29,7 +31,7 @@ ICON = "/Icons/dp_rivet.png"
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DP_RIVET_VERSION = 1.5
+DP_RIVET_VERSION = 1.6
 
 
 class Rivet(object):
@@ -528,10 +530,7 @@ class Rivet(object):
             cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
             self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
             # Renaming
-            toRivetName = dpUtils.extractSuffix(geo)
-            if "|" in toRivetName:
-                toRivetName = toRivetName[toRivetName.rfind("|")+1:]
-            toRivetGeo = cmds.rename(toRivetGeo, toRivetName+"_FaceToRivet_Geo")
+            toRivetGeo = cmds.rename(toRivetGeo, self.getFaceToRivetGeoName(geo))
             # Turning on nodes
             if checkSkin == 1:
                 cmds.setAttr(skinClusterNode+".envelope", 1)
@@ -539,6 +538,23 @@ class Rivet(object):
                 cmds.setAttr(blendShapeNode+".envelope", 1)
             return toRivetGeo
     
+
+    def getFaceToRivetGeoName(self, geo, *args):
+        """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
+            Returns the suggested name.
+        """
+        toRivetName = dpUtils.extractSuffix(geo)
+        if "|" in toRivetName:
+            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        i = 0
+        done = False
+        while done == False:
+            if not cmds.objExists(toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"):
+                done = True
+            else:
+                i += 1
+        return toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
+
     
     def extractFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
         """ Get the pivot coordinates from each control to get the nearest face from control to the geometry
@@ -598,9 +614,10 @@ class Rivet(object):
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
         baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
-        baseTransform = baseShape.replace("Shape", "")
+        baseShape = cmds.rename(baseShape, toRivetName+"_Base")
+        self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
         # Remove from displayLayers
-        cmds.editDisplayLayerMembers("defaultLayer", baseTransform, noRecurse=False)
+        cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         # Parent in modelsGrp
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
