@@ -2,7 +2,6 @@
 from maya import cmds
 from . import dpUtils
 from ...Validator.CheckOut import dpResetPose
-from ...Extras import dpCustomAttr
 from functools import partial
 import os
 import getpass
@@ -26,7 +25,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.1
+DP_CONTROLS_VERSION = 2.0
 
 
 class ControlClass(object):
@@ -39,7 +38,6 @@ class ControlClass(object):
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
-        self.customAttr = dpCustomAttr.CustomAttr(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
 
@@ -295,10 +293,6 @@ class ControlClass(object):
         if controlInstance:
             # create curve
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
-            # tag as controller
-            cmds.controller(curve, isController=True)
-            # dpID
-            self.customAttr.addAttr(0, [curve])
             if corrective:
                 self.addCorrectiveAttrs(curve)
             return curve
