@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.41"
-DPAR_UPDATELOG = "N156 - Created new feature in dpRivet\nIt will help to create a new geometry\n to attach rivets"
+DPAR_VERSION_PY3 = "4.02.42"
+DPAR_UPDATELOG = "N702 - Callback conform.\nN678 - Open toClient folder after publish.\nN677 - Fix ExportLogDicToJson path.\nN681 - Copy current wip file to dpHist for backup."
 
 
 
@@ -1536,10 +1536,10 @@ class DP_AutoRig_UI(object):
         logText = ""
         if publishLog:
             logText = "\nPublisher"
-            logText += "\nScene: "+publishLog["Scene"]
-            logText += "\nPublished: "+publishLog["Published"]
-            logText += "\nExported: "+publishLog["ExportPath"]
-            logText += "\nComment: "+publishLog["Comment"]+"\n"
+            logText += "\nScene: "+publishLog["scene"]
+            logText += "\nPublished: "+publishLog["published"]
+            logText += "\nExported: "+publishLog["exportPath"]
+            logText += "\nComments: "+publishLog["comments"]+"\n"
         if validatorInstList:
             progressAmount = 0
             maxProcess = len(validatorInstList)
