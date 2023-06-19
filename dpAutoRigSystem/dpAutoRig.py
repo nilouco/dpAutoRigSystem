@@ -1536,10 +1536,10 @@ class DP_AutoRig_UI(object):
         logText = ""
         if publishLog:
             logText = "\nPublisher"
-            logText += "\nScene: "+publishLog["Scene"]
-            logText += "\nPublished: "+publishLog["Published"]
-            logText += "\nExported: "+publishLog["ExportPath"]
-            logText += "\nComment: "+publishLog["Comment"]+"\n"
+            logText += "\nScene: "+publishLog["scene"]
+            logText += "\nPublished: "+publishLog["published"]
+            logText += "\nExported: "+publishLog["exportPath"]
+            logText += "\nComments: "+publishLog["comments"]+"\n"
         if validatorInstList:
             progressAmount = 0
             maxProcess = len(validatorInstList)
