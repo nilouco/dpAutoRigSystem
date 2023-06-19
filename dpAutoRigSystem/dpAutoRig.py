@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.42"
-DPAR_UPDATELOG = "N702 - Callback conform.\nN678 - Open toClient folder after publish.\nN677 - Fix ExportLogDicToJson path.\nN681 - Copy current wip file to dpHist for backup."
+DPAR_VERSION_PY3 = "4.02.43"
+DPAR_UPDATELOG = "N064 - Tag as controller."
 
 
 
