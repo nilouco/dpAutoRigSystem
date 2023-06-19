@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Quadrigram"
@@ -10,7 +7,8 @@ TITLE = "m120_quadrigram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_quadrigram.png"
 
-dpQuadrigramVersion = 1.2
+DP_QUADRIGRAM_VERSION = 1.3
+
 
 class Quadrigram(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

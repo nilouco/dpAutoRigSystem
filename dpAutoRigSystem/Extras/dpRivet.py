@@ -11,6 +11,8 @@
 #        Brecht Debaene, for showing me how to hook up a follicle
 #        robthebloke.org, for sharing the knowlege.
 #
+#   Also thanks to Caio Hidaka for the FaceToRivet implementation.
+#
 ###
 
 
@@ -18,6 +20,7 @@
 from maya import cmds
 from maya import mel
 from functools import partial
+from ..Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -25,17 +28,16 @@ TITLE = "m083_rivet"
 DESCRIPTION = "m084_rivetDesc"
 ICON = "/Icons/dp_rivet.png"
 
-
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DPRV_VERSION = "1.3"
+DP_RIVET_VERSION = 1.6
+
 
 class Rivet(object):
-    def __init__(self, dpUIinst, langDic, langName, ui=True, *args, **kwargs):
+    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # declaring variables
-        self.langDic = langDic
-        self.langName = langName
+        self.dpUIinst = dpUIinst
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None
@@ -45,6 +47,7 @@ class Rivet(object):
             self.dpRivetUI()
             # try to fill UI items from selection
             self.dpFillUI()
+
 
     def dpCloseRivetUi(self, *args):
         if cmds.window('dpRivetWindow', query=True, exists=True):
@@ -58,42 +61,44 @@ class Rivet(object):
         self.dpCloseRivetUi()
         rivet_winWidth  = 305
         rivet_winHeight = 470
-        dpRivetWin = cmds.window('dpRivetWindow', title=self.langDic[self.langName]["m083_rivet"]+" "+DPRV_VERSION, widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpRivetWin = cmds.window('dpRivetWindow', title=self.dpUIinst.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
         rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10))
-        cmds.text(label=self.langDic[self.langName]["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.dpUIinst.lang["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=rivetLayout)
-        cmds.button(label=self.langDic[self.langName]["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
+        cmds.button(label=self.dpUIinst.lang["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
         self.geoToAttachTF = cmds.textField('geoToAttachTF', width=180, text="", changeCommand=partial(self.dpLoadGeoToAttach, None, True), parent=doubleLayout)
         uvSetLayout = cmds.rowColumnLayout('uvSetLayout', numberOfColumns=2, columnWidth=[(1, 110), (2, 210)], columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'right', 1), (2, 'left', 10)], parent=rivetLayout)
         cmds.text(label="UV Set:", font='obliqueLabelFont', parent=uvSetLayout)
         self.uvSetTF = cmds.textField('uvSetTF', width=180, text="", editable=False, parent=uvSetLayout)
         cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.langDic[self.langName]["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.dpUIinst.lang["m147_itemsFollowGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         itemsLayout = cmds.columnLayout('itemsLayout', columnOffset=('left', 10), width=310, parent=rivetLayout)
         self.itemScrollList = cmds.textScrollList('itemScrollList', width=290, height=100, allowMultiSelection=True, parent=itemsLayout)
         cmds.separator(style='none', height=5, parent=itemsLayout)
         middleLayout = cmds.rowColumnLayout('middleLayout', numberOfColumns=2, columnWidth=[(1, 150), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 0)], parent=itemsLayout)
-        cmds.button(label=self.langDic[self.langName]["i045_add"], annotation=self.langDic[self.langName]["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
-        cmds.button(label=self.langDic[self.langName]["i046_remove"], annotation=self.langDic[self.langName]["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
+        cmds.button(label=self.dpUIinst.lang["i045_add"], annotation=self.dpUIinst.lang["i045_add"], width=140, command=self.dpAddSelect, parent=middleLayout)
+        cmds.button(label=self.dpUIinst.lang["i046_remove"], annotation=self.dpUIinst.lang["i046_remove"], width=140, command=self.dpRemoveSelect, parent=middleLayout)
         cmds.separator(style='in', height=15, width=300, parent=rivetLayout)
-        cmds.text(label=self.langDic[self.langName]["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
+        cmds.text(label=self.dpUIinst.lang["i002_options"]+":", height=30, font='boldLabelFont', parent=rivetLayout)
         fatherLayout = cmds.columnLayout('fatherLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.attachTCB = cmds.checkBox('attachTCB', label=self.langDic[self.langName]["m148_attach"]+" Translate", value=True, parent=fatherLayout)
-        self.attachRCB = cmds.checkBox('attachRCB', label=self.langDic[self.langName]["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
-        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.langDic[self.langName]["m149_createGroupConst"], value=True, parent=fatherLayout)
+        self.attachTCB = cmds.checkBox('attachTCB', label=self.dpUIinst.lang["m148_attach"]+" Translate", value=True, parent=fatherLayout)
+        self.attachRCB = cmds.checkBox('attachRCB', label=self.dpUIinst.lang["m148_attach"]+" Rotate", value=False, parent=fatherLayout)
+        self.fatherGrpCB = cmds.checkBox('fahterGrpCB', label=self.dpUIinst.lang["m149_createGroupConst"], value=True, parent=fatherLayout)
         invertLayout = cmds.columnLayout('invertLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.langDic[self.langName]["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
+        self.addInvertCB = cmds.checkBox('addInvertCB', label=self.dpUIinst.lang["m150_avoidDoubleTransf"], height=20, value=True, changeCommand=self.dpChangeInvert, parent=invertLayout)
         translateLayout = cmds.rowColumnLayout('translateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=translateLayout)
-        self.invertTCB = cmds.checkBox('invertTCB', label=self.langDic[self.langName]["m151_invert"]+" Translate", value=True, parent=translateLayout)
+        self.invertTCB = cmds.checkBox('invertTCB', label=self.dpUIinst.lang["m151_invert"]+" Translate", value=True, parent=translateLayout)
         rotateLayout = cmds.rowColumnLayout('rotateLayout', numberOfColumns=2, columnWidth=[(1, 30), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 5)], height=20, parent=rivetLayout)
         cmds.separator(style='none', parent=rotateLayout)
-        self.invertRCB = cmds.checkBox('invertRCB', label=self.langDic[self.langName]["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
+        self.invertRCB = cmds.checkBox('invertRCB', label=self.dpUIinst.lang["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
+        faceToRivetLayout = cmds.columnLayout('faceToRivetLayout', columnOffset=("left", 10), parent=rivetLayout)
+        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, parent=faceToRivetLayout) 
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
-        cmds.button(label=self.langDic[self.langName]["i158_create"]+" "+self.langDic[self.langName]["m083_rivet"], annotation=self.langDic[self.langName]["i158_create"]+" "+self.langDic[self.langName]["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
+        cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
         
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
@@ -124,9 +129,10 @@ class Rivet(object):
         addInvert = cmds.checkBox(self.addInvertCB, query=True, value=True)
         invT = cmds.checkBox(self.invertTCB, query=True, value=True)
         invR = cmds.checkBox(self.invertRCB, query=True, value=True)
-        
+        faceToRivet = cmds.checkBox(self.faceToRivetCB, query=True, value=True)
+
         # call run function to create Rivet setup using UI values
-        self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, RIVET_GRP, True)
+        self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.dpCloseRivetUi()
     
     
@@ -272,7 +278,7 @@ class Rivet(object):
                     cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
         """ Create the Rivet setup.
             Returns follicle node.
         """
@@ -315,6 +321,10 @@ class Rivet(object):
             if self.scalableGrp:
                 cmds.parent(self.rivetGrp, self.scalableGrp)
             
+        # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
+        if faceToRivet:
+            geoToAttach = self.extractFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+
         # get shape to attach:
         if cmds.objExists(geoToAttach):
             self.shapeToAttachList = cmds.ls(geoToAttach, dag=True, shapes=True)
@@ -488,3 +498,151 @@ class Rivet(object):
         
         cmds.select(clear=True)
         return folTransf
+    
+
+    def extractGeoToRivet(self, geo, *args):
+        """ Turn off skinCluster and blendShape envelope if exists, duplicate the selected geometry
+            apply initial shading and remove it from any display layer
+        """ 
+        # Get the history to turn off envelopes if exists
+        histList = cmds.listHistory(geo)
+        shapeList = cmds.listRelatives(geo, shapes=True)
+        if shapeList:
+            # check if there's a skinCluster node connected to the first selected item
+            checkSkin = self.dpCheckNodeExists(shapeList, "skinCluster")
+            checkBS = self.dpCheckNodeExists(shapeList, "blendShape")
+            if checkSkin == 1:
+                skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
+                cmds.setAttr(skinClusterNode+".envelope", 0)
+            if checkBS == 2:
+                blendShapeNode = cmds.ls(histList, type="blendShape")[0]
+                cmds.setAttr(blendShapeNode+".envelope", 0)
+            # Duplicate geometry after turn off skinCluster and blendShape. 
+            toRivetGeo = cmds.duplicate(geo)[0]
+            # Unparenting
+            try:
+                cmds.parent(toRivetGeo, world=True)
+            except Exception as e:
+                print(e)
+            # Unlock attributes and apply initialShading
+            self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
+            cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
+            cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
+            self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
+            # Renaming
+            toRivetGeo = cmds.rename(toRivetGeo, self.getFaceToRivetGeoName(geo))
+            # Turning on nodes
+            if checkSkin == 1:
+                cmds.setAttr(skinClusterNode+".envelope", 1)
+            if checkBS == 2:
+                cmds.setAttr(blendShapeNode+".envelope", 1)
+            return toRivetGeo
+    
+
+    def getFaceToRivetGeoName(self, geo, *args):
+        """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
+            Returns the suggested name.
+        """
+        toRivetName = dpUtils.extractSuffix(geo)
+        if "|" in toRivetName:
+            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        i = 0
+        done = False
+        while done == False:
+            if not cmds.objExists(toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"):
+                done = True
+            else:
+                i += 1
+        return toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
+
+    
+    def extractFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
+        """ Get the pivot coordinates from each control to get the nearest face from control to the geometry
+            After the initial selection it will grow 4 times by default
+            It uses delta to delete the extra faces, than wrap it to the original model and 
+            move the geometry and wrap Base to Models_Grp
+        """
+        # Get the pivot's coordinates from each control.
+        pivotList = {}
+        for control in controlList:
+            pivot = cmds.xform(control, query=True, translation=True, worldSpace=True)
+            pivotList[control] = pivot
+        # Get the coordinates from geometry faces.
+        faceList = cmds.ls(geometry+".f[:]", flatten=True)
+        faceCoordinateList = []
+        for face in faceList:
+            vertexCoordList = cmds.xform(face, query=True, translation=True, worldSpace=True)
+            avgCoordinates = [
+                sum(vertexCoordList[i::3]) / len(vertexCoordList[i::3])
+                for i in range(3)
+            ]
+            faceCoordinateList.append(avgCoordinates)
+        # Select the neareest face from each pivot.
+        for control, pivot in pivotList.items():
+            nearestFace = None
+            minimalDistance = None
+            for i, coord in enumerate(faceCoordinateList):
+                distance = sum((coord[j] - pivot[j])**2 for j in range(3)) ** 0.5
+                if minimalDistance is None or distance < minimalDistance:
+                    minimalDistance = distance
+                    nearestFace = faceList[i]
+            if nearestFace:
+                cmds.select(nearestFace, add=True)
+        # Select the faces and growUp selection.
+        cmds.selectMode(component=True)
+        cmds.selectType(facet=True)
+        growMultiplier = growMultiplier - 1
+        if growMultiplier > 0:
+            for i in range(0, growMultiplier):
+                cmds.GrowPolygonSelectionRegion()
+        # Delta to delete unnecessary faces.
+        selectedFaceList = cmds.ls(selection=True, flatten=True)
+        allFaceList = cmds.ls(geometry+".f[*]", flatten=True)
+        nonSelectedFaceList = list(set(allFaceList) - set(selectedFaceList))
+        cmds.delete(nonSelectedFaceList)
+        # AutoProjection for new UV and order selection to use dpRivet.
+        cmds.polyAutoProjection(geometry, constructionHistory=False)
+        cmds.selectMode(object=True)
+        # Create Wrap
+        cmds.select([geometry, origGeo])
+        mel.eval("CreateWrap;")
+        hist = cmds.listHistory(geometry)
+        wrapList = cmds.ls(hist, type="wrap")[0]
+        # Renaming
+        toRivetName = dpUtils.extractSuffix(geometry)
+        if "|" in toRivetName:
+            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
+        baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
+        baseShape = cmds.rename(baseShape, toRivetName+"_Base")
+        self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
+        # Remove from displayLayers
+        cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
+        # Parent in modelsGrp
+        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        if modelGrp:
+            cmds.parent(geometry, baseShape, modelGrp)
+        return geometry
+
+
+    def dpCheckNodeExists(self, shapeList, type, *args):
+        """ Verify if there's a skinCluster or blendShape node in the list of history of the shape.
+            Return 1 if there's skinCluster.
+            Return 2 if there's blendShape node
+            Return -1 if there's another node with the same name.
+        """
+        for shapeNode in shapeList:
+            if not shapeNode.endswith("Orig"):
+                try:
+                    histList = cmds.listHistory(shapeNode)
+                    if histList:
+                        for histItem in histList:
+                            if type == "skinCluster":
+                                if cmds.objectType(histItem) == "skinCluster":
+                                    return 1
+                            if type == "blendShape":
+                                if cmds.objectType(histItem) == "blendShape":
+                                    return 2
+                except:
+                    return -1
+        return False

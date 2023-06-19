@@ -8,6 +8,8 @@ TITLE = "m165_bike"
 DESCRIPTION = "m166_bikeDesc"
 ICON = "/Icons/dp_bike.png"
 
+DP_BIKE_VERSION = 2.0
+
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
     """ Ask user the detail level we'll create the guides by a confirm dialog box window.
@@ -30,28 +32,28 @@ def Bike(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
+        doingName = dpUIinst.lang['m094_doing']
         # part names:
-        chassisName = dpUIinst.langDic[dpUIinst.langName]['c091_chassis']
-        sterringHandleName = dpUIinst.langDic[dpUIinst.langName]['m158_steering']+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        sterringName = dpUIinst.langDic[dpUIinst.langName]['m158_steering']+dpUIinst.langDic[dpUIinst.langName]['m162_wheelShape']
-        hornName = dpUIinst.langDic[dpUIinst.langName]['c081_horn']
-        frontWheelName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['m156_wheel']
-        backWheelName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['m156_wheel']
-        frontSuspensionName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['m153_suspension']
-        backSuspensionName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['m153_suspension']
-        seatName = dpUIinst.langDic[dpUIinst.langName]['c088_seat']
-        mirrorName = dpUIinst.langDic[dpUIinst.langName]['m010_mirror']
-        pedalName = dpUIinst.langDic[dpUIinst.langName]['c089_pedal']
-        leftPedalName = dpUIinst.langDic[dpUIinst.langName]['p002_left']+"_"+dpUIinst.langDic[dpUIinst.langName]['c089_pedal']
-        rightPedalName = dpUIinst.langDic[dpUIinst.langName]['p003_right']+"_"+dpUIinst.langDic[dpUIinst.langName]['c089_pedal']
-        leverName = dpUIinst.langDic[dpUIinst.langName]['c090_lever']
-        frontBasketName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c094_basket']
-        backBasketName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c094_basket']
-        simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
-        complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
-        cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']
-        userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
+        chassisName = dpUIinst.lang['c091_chassis']
+        sterringHandleName = dpUIinst.lang['m158_steering']+dpUIinst.lang['c078_handle']
+        sterringName = dpUIinst.lang['m158_steering']+dpUIinst.lang['m162_wheelShape']
+        hornName = dpUIinst.lang['c081_horn']
+        frontWheelName = dpUIinst.lang['c056_front']+dpUIinst.lang['m156_wheel']
+        backWheelName = dpUIinst.lang['c057_back']+dpUIinst.lang['m156_wheel']
+        frontSuspensionName = dpUIinst.lang['c056_front']+dpUIinst.lang['m153_suspension']
+        backSuspensionName = dpUIinst.lang['c057_back']+dpUIinst.lang['m153_suspension']
+        seatName = dpUIinst.lang['c088_seat']
+        mirrorName = dpUIinst.lang['m010_mirror']
+        pedalName = dpUIinst.lang['c089_pedal']
+        leftPedalName = dpUIinst.lang['p002_left']+"_"+dpUIinst.lang['c089_pedal']
+        rightPedalName = dpUIinst.lang['p003_right']+"_"+dpUIinst.lang['c089_pedal']
+        leverName = dpUIinst.lang['c090_lever']
+        frontBasketName = dpUIinst.lang['c056_front']+dpUIinst.lang['c094_basket']
+        backBasketName = dpUIinst.lang['c057_back']+dpUIinst.lang['c094_basket']
+        simple   = dpUIinst.lang['i175_simple']
+        complete = dpUIinst.lang['i176_complete']
+        cancel   = dpUIinst.lang['i132_cancel']
+        userMessage = dpUIinst.lang['i177_chooseMessage']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -373,7 +375,7 @@ def Bike(dpUIinst):
             
             # select spineGuide_Base:
             cmds.select(chassisInstance.moduleGrp)
-            print(dpUIinst.langDic[dpUIinst.langName]['m168_createdBike'])
+            print(dpUIinst.lang['m168_createdBike'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

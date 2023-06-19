@@ -1,12 +1,13 @@
 # importing libraries:
 from maya import cmds
 
-
 # global variables to this module:    
 CLASS_NAME = "UpdateRigInfo"
 TITLE = "m057_updateRigInfo"
 DESCRIPTION = "m058_updateRigInfoDesc"
 ICON = "/Icons/dp_updateRigInfo.png"
+
+DP_UPDATERIGINFO_VERSION = 2.0
 
 
 class UpdateRigInfo(object):

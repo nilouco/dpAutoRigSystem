@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "SpitFlat"
@@ -10,7 +7,8 @@ TITLE = "m118_spitFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_spitFlat.png"
 
-dpSpitFlatVersion = 1.2
+DP_SPITFLAT_VERSION = 1.3
+
 
 class SpitFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

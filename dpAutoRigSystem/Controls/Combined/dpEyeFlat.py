@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "EyeFlat"
@@ -10,7 +9,8 @@ TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_eyeFlat.png"
 
-dpEyeVersion = 1.0
+DP_EYEFLAT_VERSION = 1.1
+
 
 class EyeFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,15 +36,15 @@ class EyeFlat(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
         # load module instance
-        lenFlatInstance = self.dpUIinst.initControlModule('dpLens', self.controlsGuideDir)
-        circleFlatInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
+        lenFlatInstance = self.dpUIinst.initExtraModule('dpLens', self.controlsGuideDir)
+        circleFlatInstance = self.dpUIinst.initExtraModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = lenFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circleFlatInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

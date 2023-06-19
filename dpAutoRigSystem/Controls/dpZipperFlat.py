@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "ZipperFlat"
@@ -10,7 +7,8 @@ TITLE = "m175_zipperFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_zipperFlat.png"
 
-dpZipperFlatVersion = 1.2
+DP_ZIPPERFLAT_VERSION = 1.3
+
 
 class ZipperFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

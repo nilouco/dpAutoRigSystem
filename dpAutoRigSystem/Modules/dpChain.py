@@ -1,16 +1,16 @@
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:    
 CLASS_NAME = "Chain"
 TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
+
+DP_CHAIN_VERSION = 2.0
 
 
 class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -173,9 +173,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # look at aim constraint:
         aimConst = cmds.aimConstraint(ikToAimCtrl, fakeLoc, ikCtrlZero, worldUpType="object", worldUpObject=upLoc, aimVector=(0, 0, zDir), upVector=(0, 1, 0), maintainOffset=True, name=ikCtrlZero+"_AiC")[0]
         if autoOrient:
-            cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
+            cmds.connectAttr(ikCtrl+"."+self.dpUIinst.lang['c033_autoOrient'], aimConst+"."+ikToAimCtrl+"W0", force=True)
             aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
-            cmds.connectAttr(ikCtrl+"."+self.langDic[self.langName]['c033_autoOrient'], aimRev+".inputX", force=True)
+            cmds.connectAttr(ikCtrl+"."+self.dpUIinst.lang['c033_autoOrient'], aimRev+".inputX", force=True)
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
 
 
@@ -309,9 +309,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if n == (self.nJoints-1):
                     self.toParentExtremCtrl = self.ctrls.cvControl("id_083_ChainToParent", ctrlName=side+self.userGuideName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree)
                     cmds.addAttr(self.toParentExtremCtrl, longName="stretchable", minValue=0, maxValue=1, attributeType="float", defaultValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName=self.langDic[self.langName]['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
-                    cmds.addAttr(self.toParentExtremCtrl, longName="active"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), attributeType="bool", defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName="min"+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", minValue=0, defaultValue=0.01, maxValue=1, keyable=True)
+                    cmds.addAttr(self.toParentExtremCtrl, longName=self.dpUIinst.lang['c118_active']+self.dpUIinst.lang['c031_volumeVariation'], attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=True)
                     cmds.parent(self.toParentExtremCtrl, origGrp)
                     cmds.setAttr(self.toParentExtremCtrl+".translateZ", self.ctrlRadius)
                     if s == 1:
@@ -436,8 +436,8 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 cmds.setAttr(ikCtrlMainZero+".scaleZ", -1)
 
                         # loading Maya matrix node
-                        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.langDic[self.langName]['e014_cantLoadQuatNode'])
-                        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.langDic[self.langName]['e002_matrixPluginNotFound'])
+                        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+                        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
                         if loadedQuatNode and loadedMatrixPlugin:
                             # setup extract rotateZ from ikCtrlMain using worldSpace matrix by quaternion:
                             ikMainLoc = cmds.spaceLocator(name=side+self.userGuideName+"_Ik_Main_Loc")[0]
@@ -462,7 +462,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parentConstraint(ikCtrl, clusterNode, maintainOffset=True, name=clusterNode+"_PaC")
 
                     if c == 4: #last
-                        cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                        cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
                         self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_Last_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
@@ -482,7 +482,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         else:
                             self.ctrls.setLockHide([ikCtrl], ["rx", "ry", "rz", "sx", "sy", "sz", "v", "ro"])
                     else: #first
-                        cmds.addAttr(ikCtrl, longName=self.langDic[self.langName]['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
+                        cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                 
                 # ik controls position:
@@ -550,9 +550,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 vvScaleCompensateMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_VV_ScaleCompensate_MD")
                 vvClp = cmds.createNode('clamp', name=side+self.userGuideName+"_VV_Clp")
                 cmds.setAttr(vvClp+".maxR", 1000)
-                cmds.connectAttr(self.toParentExtremCtrl+'.'+self.langDic[self.langName]['c031_volumeVariation'], vvBC+'.blender', force=True)
-                cmds.connectAttr(self.toParentExtremCtrl+".active"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), vvCond+'.firstTerm', force=True)
-                cmds.connectAttr(self.toParentExtremCtrl+".min"+self.langDic[self.langName]['c031_volumeVariation'].capitalize(), vvClp+'.min.minR', force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+'.'+self.dpUIinst.lang['c031_volumeVariation'], vvBC+'.blender', force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+"."+self.dpUIinst.lang['c118_active']+self.dpUIinst.lang['c031_volumeVariation'], vvCond+'.firstTerm', force=True)
+                cmds.connectAttr(self.toParentExtremCtrl+".min"+self.dpUIinst.lang['c031_volumeVariation'], vvClp+'.min.minR', force=True)
                 cmds.connectAttr(vvBC+'.outputR', vvClp+'.input.inputR', force=True)
                 cmds.connectAttr(vvClp+'.output.outputR', vvCond+'.colorIfTrueR', force=True)
                 cmds.connectAttr(vvScaleCompensateMD+".outputX", vvBC+'.color1R', force=True)

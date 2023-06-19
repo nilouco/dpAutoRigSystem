@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Dodecagram"
@@ -10,7 +9,8 @@ TITLE = "m114_dodecagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_dodecagram.png"
 
-dpDodecagramVersion = 1.2
+DP_DODECAGRAM_VERSION = 1.3
+
 
 class Dodecagram(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,14 +36,14 @@ class Dodecagram(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
         # load module instance
-        hexagonInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
+        hexagonInstance = self.dpUIinst.initExtraModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = hexagonInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = hexagonInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

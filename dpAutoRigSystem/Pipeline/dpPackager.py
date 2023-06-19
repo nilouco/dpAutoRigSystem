@@ -2,13 +2,15 @@
 from maya import cmds
 from maya import mel
 from ..Modules.Library import dpUtils
+from urllib import request
+from importlib import reload
+import json
 import zipfile
 import shutil
 import os
-
-
-DPPACKAGER_VERSION = 1.3
-
+import sys
+import subprocess
+import platform
 
 RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
@@ -16,8 +18,11 @@ CAM_ROTX = -10
 CAM_ROTY = 30
 CTRL_LAYER = "Ctrl_Lyr"
 
-class Packager(object):
+DP_PACKAGER_VERSION = 1.7
 
+
+class Packager(object):
+    
     def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
         """ Create a zipped file with given filePath and fileName replacing the extention (.ma or .mb) to .zip
             Add date at the end of the file if it's given.
@@ -73,6 +78,7 @@ class Packager(object):
     def imager(self, pipeData, dpARVersion, date, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
         """ Save a rigging preview screenShot file with the given informations.
             Thanks Caio Hidaka for the help in this code!
+            Returns the image preview path.
         """
         mayaVersion = cmds.about(installedVersion=True)
         # store current user settings
@@ -85,12 +91,16 @@ class Packager(object):
         currentBGBottomColorList = self.getDisplayRGBColorList('backgroundBottom')
         
         # save hudList to hide:
+        h = 0
         currentHUDVisList = []
         hudList = cmds.headsUpDisplay(listHeadsUpDisplays=True)
         for item in hudList:
             currentHUDVis = cmds.headsUpDisplay(item, query=True, visible=True)
             currentHUDVisList.append(currentHUDVis)
             cmds.headsUpDisplay(item, edit=True, visible=False)
+            currentSection = cmds.headsUpDisplay(item, query=True, section=True)
+            if currentSection == 0:
+                h += 1
         camAttrVisList = []
         camAttrList = ["displayGateMask", "displayResolution", "displayFilmGate", "displayFieldChart", "displaySafeAction", "displaySafeTitle", "displayFilmPivot", "displayFilmOrigin", "depthOfField"]
         for attr in camAttrList:
@@ -116,9 +126,9 @@ class Packager(object):
         cmds.displayRGBColor('backgroundBottom', 0.42, 0.42, 0.42)
 
         # file information messages
-        cmds.headsUpDisplay('HudRigPreviewTxt10', section=0, block=10, labelFontSize="large", allowOverlap=True, label="") #starting by 10 to avoid default Maya's HUD already existing
-        cmds.headsUpDisplay('HudRigPreviewTxt11', section=0, block=11, labelFontSize="large", allowOverlap=True, label=rigPreview)
-        b = 12
+        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+1), section=0, block=(h+1), labelFontSize="large", allowOverlap=True, label="")
+        cmds.headsUpDisplay('HudRigPreviewTxt'+str(h+2), section=0, block=(h+2), labelFontSize="large", allowOverlap=True, label=rigPreview)
+        b = h+3
         if pipeData['b_i_maya']:
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(b), section=0, block=b, labelFontSize="large", allowOverlap=True, label=mayaVersion)
             b += 1
@@ -176,7 +186,6 @@ class Packager(object):
         # clean up the UI
         cmds.deleteUI(dpImagerPanel, panel=True)
         dpUtils.closeUI("dpImagerWindow")
-        
         # back scene preferences to stored status
         cmds.camera(cam, edit=True, aspectRatio=1.5)
         cmds.grid(toggle=currentGrid)
@@ -190,7 +199,7 @@ class Packager(object):
         for i in range(len(hudList)):
             cmds.headsUpDisplay(hudList[i], edit=True, visible=currentHUDVisList[i])
         # remove hud texts
-        for n in range(10, b):
+        for n in range((h+1), b):
             cmds.headsUpDisplay('HudRigPreviewTxt'+str(n), remove=True)
         for c in range(len(camAttrList)):
             cmds.setAttr(cam+"."+camAttrList[c], camAttrVisList[c])
@@ -201,6 +210,7 @@ class Packager(object):
         # force persp viewport to show file as default view options
         activeEditor = cmds.playblast(activeEditor=True)
         cmds.modelEditor(activeEditor, edit=True, displayAppearance='smoothShaded', xray=False, wireframeOnShaded=False, occlusionCulling=False, shadows=False, polymeshes=True, pivots=False, nurbsCurves=True, jointXray=False, displayTextures=False, useDefaultMaterial=False, activeComponentsXray=False)
+        return exportPath
 
 
     def toHistory(self, scenePath, fileShortName, destinationFolder, *args):
@@ -217,6 +227,7 @@ class Packager(object):
             for item in sceneList:
                 self.removeExistingArchived(destinationFolder, item)
                 shutil.move(scenePath+"/"+item, destinationFolder)
+        shutil.copy2(scenePath+"/"+fileShortName, destinationFolder)
 
     
     def toDropbox(self, file, toPath, *args):
@@ -246,3 +257,50 @@ class Packager(object):
         """
         if os.path.isfile(filePath+"/"+fileName):
             os.remove(filePath+"/"+fileName)
+
+    
+    def toDiscord(self, webhook, messageText, *args):
+        """ This method will send the given message text string to the Discord webhook.
+        """
+        if webhook and messageText:
+            messageDic = {"content": messageText}
+            messageData = json.dumps(messageDic).encode("utf8")
+            try:
+                req = request.Request(webhook, messageData, {"content-type": "application/json"})
+                req.add_header("user-agent", "dpAR Discord Webhook")
+                request.urlopen(req)
+            except:
+                return 'i088_internetFail'
+        else:
+            return 'i279_didntSend'
+
+
+    def toCallback(self, callbackPath, callbackFile, data=None, *args):
+        """ Just eval the Python callback object.
+            Call main method.
+            Returns its result.
+        """
+        if not callbackPath in sys.path:
+           sys.path.append(callbackPath)
+        try:
+            #import dpPublishCallback
+            dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
+            reload(dpCallback)
+            callback = dpCallback.Callback()
+            result = callback.main(data)
+            return result
+        except:
+            pass
+
+
+    def openFolder(self, path, *args):
+        """ Just open a folder in exporer, finder, etc if it exists.
+        """
+        if os.path.exists(path):
+            if platform.system() == "Windows":
+                os.startfile(path)
+            elif platform.system() == "Darwin": #Mac
+                subprocess.Popen(['open', path])
+            else: #Unix, Linux
+                subprocess.Popen(['xdg-open', path])
+        #Move it to dpUtils?

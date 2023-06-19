@@ -1,17 +1,16 @@
 # importing libraries:
 from maya import cmds
-from maya import OpenMaya as om
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:    
 CLASS_NAME = "Single"
 TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
+
+DP_SINGLE_VERSION = 2.0
 
 
 class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -175,18 +174,18 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.curveDegree = 1
                 # work with curve shape and rotation cases:
                 indirectSkinRot = (0, 0, 0)
-                if self.langDic[self.langName]['c058_main'] in self.userGuideName:
+                if self.dpUIinst.lang['c058_main'] in self.userGuideName:
                     ctrlTypeID = "id_054_SingleMain"
                     if len(sideList) > 1:
-                        if self.langDic[self.langName]['c041_eyebrow'] in self.userGuideName:
+                        if self.dpUIinst.lang['c041_eyebrow'] in self.userGuideName:
                             indirectSkinRot = (0, 0, -90)
                         else:
                             indirectSkinRot = (0, 0, 90)
                 else:
                     ctrlTypeID = "id_029_SingleIndSkin"
-                    if self.langDic[self.langName]['c045_lower'] in self.userGuideName:
+                    if self.dpUIinst.lang['c045_lower'] in self.userGuideName:
                         indirectSkinRot=(0, 0, 180)
-                    elif self.langDic[self.langName]['c043_corner'] in self.userGuideName:
+                    elif self.dpUIinst.lang['c043_corner'] in self.userGuideName:
                         if "00" in self.userGuideName:
                             indirectSkinRot=(0, 0, 90)
                         else:
@@ -207,8 +206,8 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.setAttr(zeroOutCtrlGrp+".scaleY", -1)
                         cmds.setAttr(zeroOutCtrlGrp+".scaleZ", -1)
                 if not self.getHasIndirectSkin():
-                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                    cmds.setAttr(self.singleCtrl+".scaleCompensate", 1, channelBox=True)
+                    cmds.addAttr(self.singleCtrl, longName='scaleCompensate', attributeType="short", minValue=0, maxValue=1, defaultValue=1, keyable=False)
+                    cmds.setAttr(self.singleCtrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(self.singleCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                 if self.getHasIndirectSkin():
                     # create fatherJoints in order to zeroOut the skinning joint:
@@ -223,13 +222,13 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(self.singleCtrl+'.'+attr, self.jnt+'.'+attr)
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
-                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.langDic[self.langName]['c046_holder']+"_Grp")
+                        self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.lang['c046_holder']+"_Grp")
                         self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
-                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.langDic[self.langName]['c046_holder']+"_Jis"))
+                        self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.dpUIinst.lang['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
                     else:
                         if self.getHasSDKLocator():
-                            if not self.langDic[self.langName]['c058_main'] in self.userGuideName:
+                            if not self.dpUIinst.lang['c058_main'] in self.userGuideName:
                                 # this one will be used to receive inputs from sdk locator:
                                 sdkJisName = self.jnt.replace("_Jnt", "_SDK_Jis")
                                 sdkJis = cmds.duplicate(self.jnt, name=sdkJisName)[0]

@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Character"
@@ -10,7 +7,8 @@ TITLE = "m125_character"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_character.png"
 
-dpCharacterVersion = 1.2
+DP_CHARACTER_VERSION = 1.3
+
 
 class Character(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

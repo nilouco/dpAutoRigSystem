@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Ball"
@@ -10,7 +9,8 @@ TITLE = "m116_ball"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ball.png"
 
-dpBallVersion = 1.2
+DP_BALL_VERSION = 1.3
+
 
 class Ball(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,14 +36,14 @@ class Ball(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
         # load module instance
-        circleInstance = self.dpUIinst.initControlModule('dpCircle', self.controlsGuideDir)
+        circleInstance = self.dpUIinst.initExtraModule('dpCircle', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         curve2 = circleInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)

@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "SteeringShape"
@@ -10,7 +7,8 @@ TITLE = "m161_steeringShape"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_steeringShape.png"
 
-dpSteeringShapeVersion = 1.1
+DP_STEERINGSHAPE_VERSION = 1.2
+
 
 class SteeringShape(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

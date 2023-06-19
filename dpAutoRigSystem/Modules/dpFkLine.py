@@ -1,16 +1,16 @@
 # importing libraries:
 from maya import cmds
-
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
-
 
 # global variables to this module:    
 CLASS_NAME = "FkLine"
 TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
+
+DP_FKLINE_VERSION = 2.0
 
 
 class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -220,8 +220,8 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleX", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleY", -1)
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
-                    cmds.addAttr(self.jntCtrl, longName='scaleCompensate', attributeType="bool", keyable=False)
-                    cmds.setAttr(self.jntCtrl+".scaleCompensate", 1, channelBox=True)
+                    cmds.addAttr(self.jntCtrl, longName='scaleCompensate', attributeType="short", minValue=0, defaultValue=1, maxValue=1, keyable=False)
+                    cmds.setAttr(self.jntCtrl+".scaleCompensate", channelBox=True)
                     cmds.connectAttr(self.jntCtrl+".scaleCompensate", self.jnt+".segmentScaleCompensate", force=True)
                     if n == 0:
                         dpUtils.originedFrom(objName=self.jntCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)

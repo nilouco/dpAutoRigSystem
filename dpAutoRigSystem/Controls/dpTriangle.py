@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Triangle"
@@ -10,7 +7,8 @@ TITLE = "m102_triangle"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_triangle.png"
 
-dpTriangleVersion = 1.2
+DP_TRIANGLE_VERSION = 1.3
+
 
 class Triangle(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

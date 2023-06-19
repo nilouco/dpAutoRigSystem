@@ -8,6 +8,8 @@ TITLE = "m163_car"
 DESCRIPTION = "m164_carDesc"
 ICON = "/Icons/dp_car.png"
 
+DP_CAR_VERSION = 2.0
+
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
     """ Ask user the detail level we'll create the guides by a confirm dialog box window.
@@ -30,49 +32,49 @@ def Car(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.langDic[dpUIinst.langName]['m094_doing']
+        doingName = dpUIinst.lang['m094_doing']
         # part names:
-        chassisName = dpUIinst.langDic[dpUIinst.langName]['c091_chassis']
-        sterringHandleName = dpUIinst.langDic[dpUIinst.langName]['m158_steering']+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        sterringName = dpUIinst.langDic[dpUIinst.langName]['m158_steering']+dpUIinst.langDic[dpUIinst.langName]['m162_wheelShape']
-        hornName = dpUIinst.langDic[dpUIinst.langName]['c081_horn']
-        frontWheelName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['m156_wheel']
-        backWheelName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['m156_wheel']
-        frontSuspensionName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['m153_suspension']
-        backSuspensionName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['m153_suspension']
-        frontDoorName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c072_door']
-        backDoorName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c072_door']
-        frontDoorHandleName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c072_door']+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        backDoorHandleName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c072_door']+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        frontWiperAName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c073_wiper']+"_A"
-        frontWiperBName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c073_wiper']+"_B"
-        backWiperName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c073_wiper']
-        trunkName = dpUIinst.langDic[dpUIinst.langName]['c074_trunk']
-        gasName = dpUIinst.langDic[dpUIinst.langName]['c075_gas']
-        hoodName = dpUIinst.langDic[dpUIinst.langName]['c076_hood']
-        sunRoofName = dpUIinst.langDic[dpUIinst.langName]['c077_sunRoof']
-        antennaName = dpUIinst.langDic[dpUIinst.langName]['c080_antenna']
-        leftTurnHandleName = dpUIinst.langDic[dpUIinst.langName]['p002_left']+"_"+dpUIinst.langDic[dpUIinst.langName]['c082_turn']+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        rightTurnHandleName = dpUIinst.langDic[dpUIinst.langName]['p003_right']+"_"+dpUIinst.langDic[dpUIinst.langName]['c082_turn']+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        gearLeverName = dpUIinst.langDic[dpUIinst.langName]['c083_gear']+dpUIinst.langDic[dpUIinst.langName]['c090_lever']
-        breakName = dpUIinst.langDic[dpUIinst.langName]['c084_brake']
-        handBreakName = dpUIinst.langDic[dpUIinst.langName]['c092_hand']+dpUIinst.langDic[dpUIinst.langName]['c084_brake']
-        acceleratorName = dpUIinst.langDic[dpUIinst.langName]['c085_accelerator']
-        clutchName = dpUIinst.langDic[dpUIinst.langName]['c086_clutch']
-        dashboardAName = dpUIinst.langDic[dpUIinst.langName]['c087_dashboard']+"_A"
-        dashboardBName = dpUIinst.langDic[dpUIinst.langName]['c087_dashboard']+"_B"
-        frontSeatName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c088_seat']
-        backSeatName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c088_seat']
-        frontDoorInsideHandleName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c072_door']+dpUIinst.langDic[dpUIinst.langName]['c011_revFoot_B'].capitalize()+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        backDoorInsideHandleName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c072_door']+dpUIinst.langDic[dpUIinst.langName]['c011_revFoot_B'].capitalize()+dpUIinst.langDic[dpUIinst.langName]['c078_handle']
-        frontDoorWindowName = dpUIinst.langDic[dpUIinst.langName]['c056_front']+dpUIinst.langDic[dpUIinst.langName]['c072_door']+dpUIinst.langDic[dpUIinst.langName]['c079_window']
-        backDoorWindowName = dpUIinst.langDic[dpUIinst.langName]['c057_back']+dpUIinst.langDic[dpUIinst.langName]['c072_door']+dpUIinst.langDic[dpUIinst.langName]['c079_window']
-        mirrorName = dpUIinst.langDic[dpUIinst.langName]['m010_mirror']
-        insideMirrorName = dpUIinst.langDic[dpUIinst.langName]['c011_revFoot_B']+dpUIinst.langDic[dpUIinst.langName]['m010_mirror']
-        simple   = dpUIinst.langDic[dpUIinst.langName]['i175_simple']
-        complete = dpUIinst.langDic[dpUIinst.langName]['i176_complete']
-        cancel   = dpUIinst.langDic[dpUIinst.langName]['i132_cancel']
-        userMessage = dpUIinst.langDic[dpUIinst.langName]['i177_chooseMessage']
+        chassisName = dpUIinst.lang['c091_chassis']
+        sterringHandleName = dpUIinst.lang['m158_steering']+dpUIinst.lang['c078_handle']
+        sterringName = dpUIinst.lang['m158_steering']+dpUIinst.lang['m162_wheelShape']
+        hornName = dpUIinst.lang['c081_horn']
+        frontWheelName = dpUIinst.lang['c056_front']+dpUIinst.lang['m156_wheel']
+        backWheelName = dpUIinst.lang['c057_back']+dpUIinst.lang['m156_wheel']
+        frontSuspensionName = dpUIinst.lang['c056_front']+dpUIinst.lang['m153_suspension']
+        backSuspensionName = dpUIinst.lang['c057_back']+dpUIinst.lang['m153_suspension']
+        frontDoorName = dpUIinst.lang['c056_front']+dpUIinst.lang['c072_door']
+        backDoorName = dpUIinst.lang['c057_back']+dpUIinst.lang['c072_door']
+        frontDoorHandleName = dpUIinst.lang['c056_front']+dpUIinst.lang['c072_door']+dpUIinst.lang['c078_handle']
+        backDoorHandleName = dpUIinst.lang['c057_back']+dpUIinst.lang['c072_door']+dpUIinst.lang['c078_handle']
+        frontWiperAName = dpUIinst.lang['c056_front']+dpUIinst.lang['c073_wiper']+"_A"
+        frontWiperBName = dpUIinst.lang['c056_front']+dpUIinst.lang['c073_wiper']+"_B"
+        backWiperName = dpUIinst.lang['c057_back']+dpUIinst.lang['c073_wiper']
+        trunkName = dpUIinst.lang['c074_trunk']
+        gasName = dpUIinst.lang['c075_gas']
+        hoodName = dpUIinst.lang['c076_hood']
+        sunRoofName = dpUIinst.lang['c077_sunRoof']
+        antennaName = dpUIinst.lang['c080_antenna']
+        leftTurnHandleName = dpUIinst.lang['p002_left']+"_"+dpUIinst.lang['c082_turn']+dpUIinst.lang['c078_handle']
+        rightTurnHandleName = dpUIinst.lang['p003_right']+"_"+dpUIinst.lang['c082_turn']+dpUIinst.lang['c078_handle']
+        gearLeverName = dpUIinst.lang['c083_gear']+dpUIinst.lang['c090_lever']
+        breakName = dpUIinst.lang['c084_brake']
+        handBreakName = dpUIinst.lang['c092_hand']+dpUIinst.lang['c084_brake']
+        acceleratorName = dpUIinst.lang['c085_accelerator']
+        clutchName = dpUIinst.lang['c086_clutch']
+        dashboardAName = dpUIinst.lang['c087_dashboard']+"_A"
+        dashboardBName = dpUIinst.lang['c087_dashboard']+"_B"
+        frontSeatName = dpUIinst.lang['c056_front']+dpUIinst.lang['c088_seat']
+        backSeatName = dpUIinst.lang['c057_back']+dpUIinst.lang['c088_seat']
+        frontDoorInsideHandleName = dpUIinst.lang['c056_front']+dpUIinst.lang['c072_door']+dpUIinst.lang['c011_revFoot_B'].capitalize()+dpUIinst.lang['c078_handle']
+        backDoorInsideHandleName = dpUIinst.lang['c057_back']+dpUIinst.lang['c072_door']+dpUIinst.lang['c011_revFoot_B'].capitalize()+dpUIinst.lang['c078_handle']
+        frontDoorWindowName = dpUIinst.lang['c056_front']+dpUIinst.lang['c072_door']+dpUIinst.lang['c079_window']
+        backDoorWindowName = dpUIinst.lang['c057_back']+dpUIinst.lang['c072_door']+dpUIinst.lang['c079_window']
+        mirrorName = dpUIinst.lang['m010_mirror']
+        insideMirrorName = dpUIinst.lang['c011_revFoot_B']+dpUIinst.lang['m010_mirror']
+        simple   = dpUIinst.lang['i175_simple']
+        complete = dpUIinst.lang['i176_complete']
+        cancel   = dpUIinst.lang['i132_cancel']
+        userMessage = dpUIinst.lang['i177_chooseMessage']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -816,7 +818,7 @@ def Car(dpUIinst):
             
             # select spineGuide_Base:
             cmds.select(chassisInstance.moduleGrp)
-            print(dpUIinst.langDic[dpUIinst.langName]['m167_createdCar'])
+            print(dpUIinst.lang['m167_createdCar'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.langDic[dpUIinst.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

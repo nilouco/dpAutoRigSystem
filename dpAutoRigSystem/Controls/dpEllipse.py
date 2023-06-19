@@ -1,8 +1,5 @@
 # importing libraries:
-from maya import cmds
 from . import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "Ellipse"
@@ -10,7 +7,8 @@ TITLE = "m122_ellipse"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ellipse.png"
 
-dpEllipseVersion = 1.2
+DP_ELLIPSE_VERSION = 1.3
+
 
 class Ellipse(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

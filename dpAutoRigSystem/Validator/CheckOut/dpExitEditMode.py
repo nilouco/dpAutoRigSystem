@@ -1,16 +1,15 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from importlib import reload
-reload(dpBaseValidatorClass)
 
-# global variables to this module:    
+# global variables to this module:
 CLASS_NAME = "ExitEditMode"
 TITLE = "v034_exitEditMode"
 DESCRIPTION = "v035_exitEditModeDesc"
 ICON = "/Icons/dp_exitEditMode.png"
 
-dpExitEditMode_Version = 1.0
+DP_EXITEDITMODE_VERSION = 1.1
+
 
 class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
@@ -34,7 +33,7 @@ class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
         """
         # starting
         self.verifyMode = verifyMode
-        self.startValidation()
+        self.cleanUpToStart()
         
         # ---
         # --- validator code --- beginning
@@ -49,7 +48,7 @@ class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': '+repr(progressAmount)))
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 # conditional to check here
                 if cmds.objExists(item+".editMode"):
                     if cmds.getAttr(item+".editMode") == 1:
@@ -69,32 +68,17 @@ class ExitEditMode(dpBaseValidatorClass.ValidatorStartClass):
                                 # set edit mode off
                                 cmds.setAttr(item+".editMode", 0)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v004_fixed']+": "+item)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v005_cantFix']+": "+item)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
         else:
-            self.checkedObjList.append("")
-            self.foundIssueList.append(False)
-            self.resultOkList.append(True)
-            self.messageList.append(self.dpUIinst.langDic[self.dpUIinst.langName]['v014_notFoundNodes'])
+            self.notFoundNodes()
         # --- validator code --- end
         # ---
 
         # finishing
-        self.finishValidation()
+        self.updateButtonColors()
+        self.reportLog()
+        self.endProgressBar()
         return self.dataLogDic
-
-
-    def startValidation(self, *args):
-        """ Procedures to start the validation cleaning old data.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.cleanUpToStart(self)
-
-
-    def finishValidation(self, *args):
-        """ Call main base methods to finish the validation of this class.
-        """
-        dpBaseValidatorClass.ValidatorStartClass.updateButtonColors(self)
-        dpBaseValidatorClass.ValidatorStartClass.reportLog(self)
-        dpBaseValidatorClass.ValidatorStartClass.endProgressBar(self)

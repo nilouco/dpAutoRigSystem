@@ -4,15 +4,17 @@ from ..Modules.Library import dpUtils
 import time
 import getpass
 
-
+# global variables to this module:
 DEFAULT_COLOR = (0.5, 0.5, 0.5)
 CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
 
+DP_VALIDATORSTARTCLASS_VERSION = 2.0
 
-class ValidatorStartClass:
-    def __init__(self, dpUIinst, langDic, langName, presetDic, presetName, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
+
+class ValidatorStartClass(object):
+    def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON, ui=True, verbose=True):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -60,7 +62,7 @@ class ValidatorStartClass:
             cmds.deleteUI('dpInfoWindow', window=True)
         if self.verbose:
             # Starting progress window
-            cmds.progressWindow(title="dpValidator", progress=0, status=self.dpUIinst.langDic[self.dpUIinst.langName][self.title]+': 0%', isInterruptable=False)
+            cmds.progressWindow(title="dpValidator", progress=0, status=self.dpUIinst.lang[self.title]+': 0%', isInterruptable=False)
 
 
     def updateButtonColors(self, *args):
@@ -97,13 +99,13 @@ class ValidatorStartClass:
         """
         thisTime = str(time.asctime(time.localtime(time.time())))
         # texts
-        nameText = self.dpUIinst.langDic[self.dpUIinst.langName]['m006_name']
-        titleText = self.dpUIinst.langDic[self.dpUIinst.langName][self.title]
-        modeText = self.dpUIinst.langDic[self.dpUIinst.langName]['v003_mode']
-        fixText = self.dpUIinst.langDic[self.dpUIinst.langName]['c052_fix'].upper()
-        verifyText = self.dpUIinst.langDic[self.dpUIinst.langName]['i210_verify'].upper()
-        foundIssueText = self.dpUIinst.langDic[self.dpUIinst.langName]['v006_foundIssue']
-        everythingOkText = self.dpUIinst.langDic[self.dpUIinst.langName]['v007_allOk']
+        nameText = self.dpUIinst.lang['m006_name']
+        titleText = self.dpUIinst.lang[self.title]
+        modeText = self.dpUIinst.lang['v003_mode']
+        fixText = self.dpUIinst.lang['c052_fix'].upper()
+        verifyText = self.dpUIinst.lang['i210_verify'].upper()
+        foundIssueText = self.dpUIinst.lang['v006_foundIssue']
+        everythingOkText = self.dpUIinst.lang['v007_allOk']
         # header
         logText = "\n"+nameText+": "+titleText+"\n"
         # mode
@@ -140,11 +142,20 @@ class ValidatorStartClass:
         # verbose call info window
         if self.verbose:
             self.dpUIinst.info('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.langDic[self.dpUIinst.langName]['v000_validator']+"\n"+thisTime+"\n"+logText)
+            print("\n-------------\n"+self.dpUIinst.lang['v000_validator']+"\n"+thisTime+"\n"+logText)
             if not dpUtils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
-                print(self.dpUIinst.langDic[self.dpUIinst.langName]['i201_saveScene'])
+                print(self.dpUIinst.lang['i201_saveScene'])
 
 
     def endProgressBar(self, *args):
         if self.verbose:
             cmds.progressWindow(endProgress=True)
+
+    
+    def notFoundNodes(self, *args):
+        """ Set dataLog when don't have any objects to verify.
+        """
+        self.checkedObjList.append("")
+        self.foundIssueList.append(False)
+        self.resultOkList.append(True)
+        self.messageList.append(self.dpUIinst.lang['v014_notFoundNodes'])

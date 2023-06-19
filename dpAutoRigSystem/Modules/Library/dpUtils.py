@@ -15,6 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
+DP_UTILS_VERSION = 2.1
 
 # UTILS functions:
 def findEnv(key, path):
@@ -246,6 +247,7 @@ def zeroOut(transformList=[], offset=False):
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:
                     try:
+                        cmds.setAttr(zeroGrp+"."+zUserAttr, lock=False)
                         cmds.deleteAttr(zeroGrp+"."+zUserAttr)
                     except:
                         pass
@@ -939,8 +941,7 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
     currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     if not path:
         path = cmds.file(query=True, sceneName=True)
-        if not path:
-            return False
+    if path:
         dpFolder = path[:path.rfind("/")]
         if subFolder:
             dpFolder = dpFolder+"/"+subFolder
@@ -949,6 +950,8 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
         if not name:
             name = path[path.rfind("/")+1:path.rfind(".")]
         pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
+    else:
+        return False
     print("\nLog file", pathFile)
     outFile = open(pathFile, "w")
     json.dump(dic, outFile, indent=4)
@@ -963,13 +966,13 @@ def dpCreateValidatorPreset(dpUIinst):
     validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList + dpUIinst.checkAddOnsInstanceList
     if validatorsList:
         resultDialog = cmds.promptDialog(
-                                            title=dpUIinst.langDic[dpUIinst.langName]['i129_createPreset'],
-                                            message=dpUIinst.langDic[dpUIinst.langName]['i130_presetName'],
-                                            button=[dpUIinst.langDic[dpUIinst.langName]['i131_ok'], dpUIinst.langDic[dpUIinst.langName]['i132_cancel']],
-                                            defaultButton=dpUIinst.langDic[dpUIinst.langName]['i131_ok'],
-                                            cancelButton=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'],
-                                            dismissString=dpUIinst.langDic[dpUIinst.langName]['i132_cancel'])
-        if resultDialog == dpUIinst.langDic[dpUIinst.langName]['i131_ok']:
+                                            title=dpUIinst.lang['i129_createPreset'],
+                                            message=dpUIinst.lang['i130_presetName'],
+                                            button=[dpUIinst.lang['i131_ok'], dpUIinst.lang['i132_cancel']],
+                                            defaultButton=dpUIinst.lang['i131_ok'],
+                                            cancelButton=dpUIinst.lang['i132_cancel'],
+                                            dismissString=dpUIinst.lang['i132_cancel'])
+        if resultDialog == dpUIinst.lang['i131_ok']:
             resultName = cmds.promptDialog(query=True, text=True)
             resultName = resultName[0].upper()+resultName[1:]
             author = getpass.getuser()
@@ -995,3 +998,14 @@ def generateID(name):
         now = str(round(time.time()*10000000000000))
         word = ("dp"+str(name)).encode('utf-8').hex()
         return word+"."+now
+
+
+def checkSavedScene():
+    """ Check if the current scene is saved to return True.
+        Otherwise return False.
+    """
+    scenePath = cmds.file(query=True, sceneName=True)
+    modifiedScene = cmds.file(query=True, modified=True)
+    if not scenePath or modifiedScene:
+        return False
+    return True

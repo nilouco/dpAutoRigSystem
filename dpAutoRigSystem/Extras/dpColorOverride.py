@@ -9,15 +9,13 @@ TITLE = "m047_colorOver"
 DESCRIPTION = "m048_coloOverDesc"
 ICON = "/Icons/dp_colorOverride.png"
 
-DPCO_VERSION = "2.2"
+DP_COLOROVERRIDE_VERSION = 2.2
+
 
 class ColorOverride(object):
-    def __init__(self, dpUIinst, presetDic, presetName, *args, **kwargs):
-        # defining variables
+    def __init__(self, dpUIinst, *args, **kwargs):
         self.dpUIinst = dpUIinst
-        self.presetDic = presetDic
-        self.presetName = presetName
-        self.ctrls = dpControls.ControlClass(self.dpUIinst, self.presetDic, self.presetName)
+        self.ctrls = dpControls.ControlClass(dpUIinst)
         # call main function
         self.dpColorizeUI(self)
 
@@ -59,7 +57,7 @@ class ColorOverride(object):
             cmds.deleteUI('dpColorOverrideWindow', window=True)
         colorOverride_winWidth  = 170
         colorOverride_winHeight = 115
-        dpColorOverrideWin = cmds.window('dpColorOverrideWindow', title='Color Override '+DPCO_VERSION, iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpColorOverrideWin = cmds.window('dpColorOverrideWindow', title='Color Override '+str(DP_COLOROVERRIDE_VERSION), iconName='dpColorOverride', widthHeight=(colorOverride_winWidth, colorOverride_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
         
         # creating layout:
         colorTabLayout = cmds.tabLayout('colorTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=dpColorOverrideWin)
@@ -74,13 +72,13 @@ class ColorOverride(object):
         colorRGBLayout = cmds.columnLayout('colorRGBLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorRGBLayout)
         self.colorRGBSlider = cmds.colorSliderGrp('colorRGBSlider', label='Color', columnAlign3=('right', 'left', 'left'), columnWidth3=(30, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=self.dpSetColorRGBToSelect, parent=colorRGBLayout)
-        cmds.button("removeOverrideColorBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i046_remove'], command=self.ctrls.removeColor, parent=colorRGBLayout)
+        cmds.button("removeOverrideColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.ctrls.removeColor, parent=colorRGBLayout)
         
         # Outliner layout:
         colorOutlinerLayout = cmds.columnLayout('colorOutlinerLayout', adjustableColumn=True, columnAlign='left', rowSpacing=10, parent=colorTabLayout)
         cmds.separator(height=10, style='none', parent=colorOutlinerLayout)
         self.colorOutlinerSlider = cmds.colorSliderGrp('colorOutlinerSlider', label='Outliner', columnAlign3=('right', 'left', 'left'), columnWidth3=(45, 60, 50), columnOffset3=(10, 10, 10), rgbValue=(0, 0, 0), changeCommand=self.dpSetColorOutlinerToSelect, parent=colorOutlinerLayout)
-        cmds.button("removeOutlinerColorBT", label=self.dpUIinst.langDic[self.dpUIinst.langName]['i046_remove'], command=self.ctrls.removeColor, parent=colorOutlinerLayout)
+        cmds.button("removeOutlinerColorBT", label=self.dpUIinst.lang['i046_remove'], command=self.ctrls.removeColor, parent=colorOutlinerLayout)
 
         # renaming tabLayouts:
         cmds.tabLayout(colorTabLayout, edit=True, tabLabel=((colorIndexLayout, "Index"), (colorRGBLayout, "RGB"), (colorOutlinerLayout, "Outliner")))

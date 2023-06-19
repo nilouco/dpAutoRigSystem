@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseControlClass
-from importlib import reload
-reload(dpBaseControlClass)
 
 # global variables to this module:    
 CLASS_NAME = "DiamondFlat"
@@ -10,7 +9,8 @@ TITLE = "m177_diamondFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamondFlat.png"
 
-dpDiamondFlatVersion = 1.4
+DP_DIAMONDFLAT_VERSION = 1.5
+
 
 class DiamondFlat(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):
@@ -36,14 +36,14 @@ class DiamondFlat(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.langDic[self.langName]['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
         """ Combine controls in order to return it.
         """
         # load module instance
-        squareInstance = self.dpUIinst.initControlModule('dpSquare', self.controlsGuideDir)
+        squareInstance = self.dpUIinst.initExtraModule('dpSquare', self.controlsGuideDir)
         # creating curve shapes:
         curve1 = squareInstance.cvMain(False, cvID, cvName, cvSize, cvDegree)
         cmds.setAttr(curve1+".rotateZ", 45)
