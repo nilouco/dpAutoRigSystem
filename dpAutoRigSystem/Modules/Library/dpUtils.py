@@ -247,6 +247,7 @@ def zeroOut(transformList=[], offset=False):
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:
                     try:
+                        cmds.setAttr(zeroGrp+"."+zUserAttr, lock=False)
                         cmds.deleteAttr(zeroGrp+"."+zUserAttr)
                     except:
                         pass

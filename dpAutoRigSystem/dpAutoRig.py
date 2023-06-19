@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.43"
-DPAR_UPDATELOG = "N064 - Tag as controller."
+DPAR_VERSION_PY3 = "4.02.44"
+DPAR_UPDATELOG = "N644 - Implemented dpID for all controllers."
 
 
 

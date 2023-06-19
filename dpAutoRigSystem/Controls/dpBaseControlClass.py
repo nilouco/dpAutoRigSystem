@@ -3,6 +3,7 @@ from maya import cmds
 from maya import mel
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
+from ..Extras import dpCustomAttr
 
 DP_CONTROLSTARTCLASS_VERSION = 2.1
 
@@ -29,6 +30,7 @@ class ControlStartClass:
         self.controlsGuideDir = 'Controls'
         self.suffix = "Ctrl"
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.customAttr = dpCustomAttr.CustomAttr(self.dpUIinst, ui=False, verbose=False)
     
     
     def getControlUIValues(self, cvName='', *args):
@@ -97,6 +99,7 @@ class ControlStartClass:
         self.ctrls.renameShape([cvCurve])
         self.ctrls.displayRotateOrderAttr([cvCurve])
         cmds.controller(cvCurve, isController=True) #tag as controller
+        self.customAttr.addAttr(0, [cvCurve]) #dpID
         return cvCurve
     
     
