@@ -357,7 +357,7 @@ class Publisher(object):
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
-                            messageText = publishLog["scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["comments"]+"*"
+                            messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
                                 print(self.dpUIinst.lang[result])
@@ -366,7 +366,8 @@ class Publisher(object):
                     if self.pipeliner.pipeData['s_callback']:
                         if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
                             callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'], self.pipeliner.pipeData)
-                            print("Callback result =", callbackResult)
+                            if callbackResult:
+                                print("Callback result =", callbackResult)
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)

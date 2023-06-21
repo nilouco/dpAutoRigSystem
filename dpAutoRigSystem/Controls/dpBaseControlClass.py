@@ -98,7 +98,6 @@ class ControlStartClass:
         self.addControlInfo(cvCurve, dpGuide=dpGuide)
         self.ctrls.renameShape([cvCurve])
         self.ctrls.displayRotateOrderAttr([cvCurve])
-        cmds.controller(cvCurve, isController=True) #tag as controller
         self.customAttr.addAttr(0, [cvCurve]) #dpID
         return cvCurve
     
