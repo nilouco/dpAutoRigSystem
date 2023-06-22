@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.45"
-DPAR_UPDATELOG = "N665 - Outliner color tool.\nN132 - Colorize main outliner nodes."
+DPAR_VERSION_PY3 = "4.02.46"
+DPAR_UPDATELOG = "N707 Controller tag checkout validator."
 
 
 
