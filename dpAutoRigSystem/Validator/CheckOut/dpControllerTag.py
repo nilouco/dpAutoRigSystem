@@ -54,10 +54,11 @@ class ControllerTag(dpBaseValidatorClass.ValidatorStartClass):
                 if not cmds.controller(item, query=True, isController=True):
                     # found issue here
                     if not firstFixed:
-                        self.checkedObjList.append(item)
+                        self.checkedObjList.append(item+" + controllers")
                         self.foundIssueList.append(True)
                     if self.verifyMode:
                         self.resultOkList.append(False)
+                        self.messageList.append(self.dpUIinst.lang['v075_missingControllerTags'])
                         break
                     else: #fix
                         try:
