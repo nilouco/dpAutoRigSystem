@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.46"
-DPAR_UPDATELOG = "N707 Controller tag checkout validator."
+DPAR_VERSION_PY3 = "4.02.47"
+DPAR_UPDATELOG = "N712 Fixed HideCorrective Validator."
 
 
 
