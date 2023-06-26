@@ -10,7 +10,7 @@ TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
 ICON = "/Icons/dp_hideCorrectives.png"
 
-DP_HIDECORRECTIVES_VERSION = 1.1
+DP_HIDECORRECTIVES_VERSION = 1.2
 
 
 class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
@@ -62,6 +62,7 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
                         self.resultOkList.append(False)
                     else: #fix
                         try:
+                            cmds.setAttr(item, 0)
                             cmds.setAttr(item, lock=True, channelBox=False)
                             self.resultOkList.append(True)
                             self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
