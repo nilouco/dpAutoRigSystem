@@ -16,6 +16,7 @@ RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
 CAM_ROTX = -10
 CAM_ROTY = 30
+CAM_ROTZ = 0
 CTRL_LAYER = "Ctrl_Lyr"
 
 DP_PACKAGER_VERSION = 1.7
@@ -39,13 +40,14 @@ class Packager(object):
         return destinationFolder+"/"+zipName
         
 
-    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, focusIt=None, *args):
+    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, rotZ=CAM_ROTZ, focusIt=None, *args):
         """ Prepare the given camera to frame correctly the viewport to publish.
         """
         mel.eval('setNamedPanelLayout "Single Perspective View"; updateToolbox(); findNewCurrentModelView;')
         # set up rotation
         cmds.setAttr(cam+".rotateX", rotX)
         cmds.setAttr(cam+".rotateY", rotY)
+        cmds.setAttr(cam+".rotateZ", rotZ)
         # frame all
         cmds.viewFit(allObjects=True)
         posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
