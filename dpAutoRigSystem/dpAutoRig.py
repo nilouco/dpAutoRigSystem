@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.47"
-DPAR_UPDATELOG = "N712 Fixed HideCorrective Validator."
+DPAR_VERSION_PY3 = "4.02.48"
+DPAR_UPDATELOG = "N713 Fixed camera rotateZ zero\nfor rigging image preview."
 
 
 
