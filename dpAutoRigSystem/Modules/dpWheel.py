@@ -15,7 +15,7 @@ TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 
-DP_WHEEL_VERSION = 2.0
+DP_WHEEL_VERSION = 2.1
 
 
 class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -207,8 +207,9 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # create controls:
                 self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                self.ctrls.transferShape(deleteSource = False, clearDestinationShapes=False, sourceItem= self.ctrls.cvControl("m107_clipFlat", side+self.userGuideName+"_"+self.dpUIinst.lang['m107_clipFlat']+"_Ctrl", r = self.ctrlRadius, d=self.curveDegree, rot = (90, 0, 0) ), destinationList=self.wheelCtrl)
-                
+                print("BEFOREE++++++++++++++++++++++++++++++")
+                self.ctrls.transferShape(deleteSource = False, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("ClipFlat", side+self.userGuideName+"_"+self.dpUIinst.lang['m107_clipFlat']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot = (0, 0, 0) ), destinationList=self.wheelCtrl, keepColor=False)
+                print("AFTERR*****************************************************")
                 self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree)
                 self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
                 self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
