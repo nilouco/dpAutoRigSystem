@@ -282,6 +282,11 @@ class DP_AutoRig_UI(object):
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
             print("Exception:", e)
+            try:
+                # error logging
+                self.packager.toDiscord(dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), DPAR_VERSION_PY3+": "+str(e))
+            except:
+                pass
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
             return
