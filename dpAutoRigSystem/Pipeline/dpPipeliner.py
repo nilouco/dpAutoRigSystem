@@ -7,9 +7,9 @@ import json
 import time
 
 PIPE_FOLDER = "_dpPipeline"
-PUBLISHED_WEBHOOK = "https://discord.com/api/webhooks/1104147293478846555/3IdA5ipiG-nqpv1dfg6Q4zWt-Oo-q-EtUisq5z9UpsroW07-NMLTrjJNzAibkUD48TZX"
+DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.6
+DP_PIPELINER_VERSION = 1.7
 
 
 class Pipeliner(object):
@@ -21,6 +21,7 @@ class Pipeliner(object):
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.webhookFile = "dpWebhook.json"
+        self.hookFile = "dpHook.json"
         self.callbackFile = "dpPublishCallback.py"
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
@@ -56,16 +57,29 @@ class Pipeliner(object):
                     return content['path']
         return False
         
-
-    def getPipelineInfo(self, *args):
-        """ Read the json info file and return the merged pipeData and it's content if it exists.
+    
+    def updateDataByJsonPath(self, jsonPath, *args):
+        """ Read the json file and return the merged pipeData and it's content if it exists.
         """
-        self.jsonInfoPath = os.path.join(self.pipeData['path'], self.infoFile).replace("\\", "/")
-        if os.path.exists(self.jsonInfoPath):
-            content = self.getJsonContent(self.jsonInfoPath)
+        if os.path.exists(jsonPath):
+            content = self.getJsonContent(jsonPath)
             if content:
                 self.pipeData.update(content)
                 return content
+            
+
+    def getPipelineInfo(self, *args):
+        """ Load PipelineInfo data and returns it.
+        """
+        jsonInfoPath = os.path.join(self.pipeData['path'], self.infoFile).replace("\\", "/")
+        return self.updateDataByJsonPath(jsonInfoPath)
+
+
+    def getHookInfo(self, *args):
+        """ Load Hook data and returns it.
+        """
+        jsonHookPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hookFile).replace("\\", "/")
+        return self.updateDataByJsonPath(jsonHookPath)
 
 
     def getInfoByPath(self, field, dependent, path=None, cut=False, *args):
@@ -233,6 +247,7 @@ class Pipeliner(object):
                 self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
             else:
                 print('Not found', self.infoFile)
+        self.getHookInfo()
         return self.pipeData
 
 
@@ -504,12 +519,15 @@ class Pipeliner(object):
                     self.pipeData['publishedWebhook'] = self.pipeData['s_webhook']
                 else: 
                     self.jsonWebhookPath = os.path.join(self.pipeData['path'], self.webhookFile).replace("\\", "/")
+                    wh = None
                     if os.path.exists(self.jsonWebhookPath):
                         content = self.getJsonContent(self.jsonWebhookPath)
                         if content:
-                            self.pipeData['publishedWebhook'] = content['webhook']
+                            wh = content['webhook']
                     else:
-                        self.pipeData['publishedWebhook'] = PUBLISHED_WEBHOOK
+                        wh = self.pipeData['h001_publishing']
+                    if wh:
+                        self.pipeData['publishedWebhook'] = dpUtils.mountWH(DISCORD_URL, wh)
             # callback
             if not self.pipeData['s_callback']:
                 callback = os.path.join(self.pipeData['path'], self.callbackFile)

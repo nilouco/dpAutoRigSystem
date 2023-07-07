@@ -15,7 +15,8 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.1
+DP_UTILS_VERSION = 2.2
+
 
 # UTILS functions:
 def findEnv(key, path):
@@ -1009,3 +1010,9 @@ def checkSavedScene():
     if not scenePath or modifiedScene:
         return False
     return True
+
+
+def mountWH(start, end):
+    """ Mount and return path.
+    """
+    return "{}{}{}".format(start, "/", end)
