@@ -305,4 +305,6 @@ class Packager(object):
                 subprocess.Popen(['open', path])
             else: #Unix, Linux
                 subprocess.Popen(['xdg-open', path])
-        #Move it to dpUtils?
+        #
+        #TODO
+        # Move it to dpUtils?

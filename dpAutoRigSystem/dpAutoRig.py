@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.48"
-DPAR_UPDATELOG = "N713 Fixed camera rotateZ zero\nfor rigging image preview."
+DPAR_VERSION_PY3 = "4.02.49"
+DPAR_UPDATELOG = "N691 - Error log."
 
 
 
@@ -140,7 +140,6 @@ DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
-LOCATION_WEBHOOK = "https://discord.com/api/webhooks/1104146750085812335/WPY3GD8J9ooEyUfDaGGjLBxT43l7meG7rINKtAApo0NTfeajvYw_uKeEz2vS-ypr_Uhm"
 LOCATION_URL = "https://ipinfo.io/json"
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
@@ -283,6 +282,11 @@ class DP_AutoRig_UI(object):
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
             print("Exception:", e)
+            try:
+                # error logging
+                self.packager.toDiscord(dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), DPAR_VERSION_PY3+": "+str(e))
+            except:
+                pass
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
             return
@@ -1925,7 +1929,8 @@ class DP_AutoRig_UI(object):
             infoData['dpAR'] = DPAR_VERSION_PY3
             #print(infoData)
             if infoData:
-                self.packager.toDiscord(LOCATION_WEBHOOK, str(infoData))
+                wh = dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
+                self.packager.toDiscord(wh, str(infoData))
 
     
     def checkTermsAndCond(self, *args):
