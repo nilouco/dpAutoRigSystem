@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.49"
-DPAR_UPDATELOG = "N691 - Error log."
+DPAR_VERSION_PY3 = "4.02.50"
+DPAR_UPDATELOG = "N717 - Updated validator icons."
 
 
 
