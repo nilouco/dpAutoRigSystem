@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.02.50"
-DPAR_UPDATELOG = "N717 - Updated validator icons."
+DPAR_VERSION_PY3 = "4.03.00"
+DPAR_UPDATELOG = "Released 4.03.00 version.\nThanks!"
 
 
 
