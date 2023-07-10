@@ -15,7 +15,7 @@ ATTR_LIST = [ATTR_DPID, "dpDoNotSkinIt", "dpKeepIt", "dpIgnoreIt", "dpControl"]
 IGNORE_LIST = ['persp', 'top', 'front', 'side']
 DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 
-DP_CUSTOMATTR_VERSION = 1.1
+DP_CUSTOMATTR_VERSION = 1.2
 
 
 class CustomAttr(object):
@@ -120,7 +120,7 @@ class CustomAttr(object):
             cmds.separator(style='none', height=5, parent=addAttrLayout)
         cmds.separator(style='in', height=10, parent=addAttrLayout)
         cmds.text("customAddTxt", label=self.dpUIinst.lang['m212_customAttr']+":", align="left", height=30, parent=addAttrLayout)
-        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustumAttrTFG", label="", text="", buttonLabel=self.dpUIinst.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom", False), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
+        self.addCustomAttrTFG = cmds.textFieldButtonGrp("addCustomAttrTFG", label="", text="", buttonLabel=self.dpUIinst.lang['i045_add'], buttonCommand=partial(self.addAttr, "custom", False), adjustableColumn=2, columnWidth=[(1, 0), (2, 50), (3, 30)], parent=addAttrLayout)
         cmds.showWindow(self.addWindowName)
 
 
@@ -146,6 +146,7 @@ class CustomAttr(object):
                                     attr = attr[:point]+attr[point].capitalize()+attr[point+1:]
                             else:
                                 attr = None
+                            cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
                 elif attrIndex == 0: #dpID
                     if not cmds.objExists(item+"."+ATTR_DPID):
                         id = dpUtils.generateID(item)
@@ -157,9 +158,6 @@ class CustomAttr(object):
                     if not cmds.objExists(item+"."+attr):
                         cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
                         cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
-            if self.ui:
-                if cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, exists=True):
-                    cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
 
 
     def removeAttrUI(self, *args):
