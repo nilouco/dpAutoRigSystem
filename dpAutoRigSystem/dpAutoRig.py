@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.00"
-DPAR_UPDATELOG = "Released 4.03.00 version.\nThanks!"
+DPAR_VERSION_PY3 = "4.03.01"
+DPAR_UPDATELOG = "Fixed update dpID custom attribute UI."
 
 
 
