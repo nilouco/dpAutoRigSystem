@@ -3,7 +3,7 @@ from maya import cmds
 from .Library import dpUtils
 from functools import partial
 
-DP_LAYOUTCLASS_VERSION = 2.0
+DP_LAYOUTCLASS_VERSION = 2.1
 
 
 class LayoutClass(object):
@@ -500,7 +500,7 @@ class LayoutClass(object):
             cmds.delete(self.previewMirrorGrpName)
         
         # verify if there is not any guide module in the guideMirrorGrp and then delete it:
-        self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
+        self.guideMirrorGrp = self.dpUIinst.guideMirrorGrp
         dpUtils.clearNodeGrp(nodeGrpName=self.guideMirrorGrp, attrFind='guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
