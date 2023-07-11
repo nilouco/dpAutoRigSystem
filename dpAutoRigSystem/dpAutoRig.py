@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.01"
-DPAR_UPDATELOG = "Fixed update dpID custom attribute UI."
+DPAR_VERSION_PY3 = "4.03.02"
+DPAR_UPDATELOG = "N715 - Outliner cleaner validator."
 
 
 
@@ -170,6 +170,7 @@ class DP_AutoRig_UI(object):
         self.checkAddOnsInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
+        self.guideMirrorGrp = GUIDEMIRROR_GRP
         self.userDefAutoCheckUpdate = 1
         self.userDefAgreeTerms = 1
         self.dpData = DPDATA
@@ -1144,10 +1145,10 @@ class DP_AutoRig_UI(object):
             dpAR_Temp_Grp
             dpAR_GuideMirror_Grp
         """
-        if cmds.objExists(TEMP_GRP):
-            cmds.setAttr(TEMP_GRP+".hiddenInOutliner", value)
-        if cmds.objExists(GUIDEMIRROR_GRP):
-            cmds.setAttr(GUIDEMIRROR_GRP+".hiddenInOutliner", value)
+        if cmds.objExists(self.tempGrp):
+            cmds.setAttr(self.tempGrp+".hiddenInOutliner", value)
+        if cmds.objExists(self.guideMirrorGrp):
+            cmds.setAttr(self.guideMirrorGrp+".hiddenInOutliner", value)
         mel.eval('source AEdagNodeCommon;')
         mel.eval('AEdagNodeCommonRefreshOutliners();')
     
@@ -2273,8 +2274,8 @@ class DP_AutoRig_UI(object):
             maxProcess = len(self.modulesToBeRiggedList)
             
             # clear all duplicated names in order to run without find same names if they exists:
-            if cmds.objExists("dpAR_GuideMirror_Grp"):
-                cmds.delete("dpAR_GuideMirror_Grp")
+            if cmds.objExists(self.guideMirrorGrp):
+                cmds.delete(self.guideMirrorGrp)
             
             # regenerate mirror information for all guides:
             for guideModule in self.modulesToBeRiggedList:
@@ -3076,7 +3077,6 @@ class DP_AutoRig_UI(object):
                     cmds.confirmDialog(title=self.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
         # re-declaring guideMirror and previewMirror groups:
-        self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
         if cmds.objExists(self.guideMirrorGrp):
             cmds.delete(self.guideMirrorGrp)
         
