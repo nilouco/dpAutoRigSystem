@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.02"
-DPAR_UPDATELOG = "N715 - Outliner cleaner validator."
+DPAR_VERSION_PY3 = "4.03.03"
+DPAR_UPDATELOG = "N701 - Rigging old rigged module fixed issue."
 
 
 
@@ -1440,6 +1440,7 @@ class DP_AutoRig_UI(object):
             Use a recursive method to remove imported of imported guides.
         """
         importedNamespaceList = []
+        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
         currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
