@@ -19,7 +19,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.0
+DP_LIMB_VERSION = 2.1
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -57,6 +57,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.rootCtrlRefList = []
         self.softIkCalibrateList = []
         self.correctiveCtrlGrpList = []
+        self.ankleArticList = []
+        self.ankleCorrectiveList = []
 
 
     def createModuleLayout(self, *args):
@@ -787,8 +789,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
+                exposeCornerName = cornerName+"_Jxt"
                 if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
-                    self.ikStretchExtremLocList.append(None)                    
+                    self.ikStretchExtremLocList.append(None)
+                    exposeCornerName = cornerBName+"_Jnt"
                 else:
                     self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
@@ -1608,6 +1612,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.setAttr(jaxRotZMD+".input2Z", 2)
                         cmds.connectAttr(orientConnection, jaxRotZMD+".input1Z", force=True)
                         cmds.connectAttr(jaxRotZMD+".outputZ", extremJax+".rotateZ", force=True)
+                        # expose ankle data to be replaced by foot connections when integrating modules
+                        self.ankleArticList.append([extremJax, extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
+                        self.ankleCorrectiveList.append(extremCorrectiveNetList)
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
@@ -1621,6 +1628,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cornerBJntList = dpUtils.articulationJoint(self.skinJointList[2], self.skinJointList[3], doScale=False)
                             dpUtils.setJointLabel(cornerBJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+cornerBName)
                             cmds.rename(cornerBJntList[0], side+self.userGuideName+"_01_"+cornerBName+"_Jar")
+                        self.ankleArticList.append([cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0], extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
+                        self.ankleCorrectiveList.append(None)
                     if s == 1:
                         for jar in [beforeJntList[0], mainJntList[0], extremJntList[0]]:
                             cmds.setAttr(jar+".rotateX", 180)
@@ -1630,6 +1639,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     dpUtils.setJointLabel(extremJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+extremNumber+"_"+extremName)
                     cmds.rename(mainJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
                     cmds.rename(extremJntList[0], side+self.userGuideName+"_"+extremNumber+"_"+extremName+"_Jar")
+                else:
+                    self.ankleArticList.append(None)
+                    self.ankleCorrectiveList.append(None)
 
                 # softIk:
                 self.softIkCalibrateList.append(self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef))
@@ -1734,6 +1746,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "masterCtrlRefList": self.masterCtrlRefList,
                 "rootCtrlRefList": self.rootCtrlRefList,
                 "softIkCalibrateList": self.softIkCalibrateList,
-                "correctiveCtrlGrpList": self.correctiveCtrlGrpList
+                "correctiveCtrlGrpList": self.correctiveCtrlGrpList,
+                "addArticJoint": self.addArticJoint,
+                "addCorrective": self.addCorrective, 
+                "ankleArticList": self.ankleArticList,
+                "ankleCorrectiveList": self.ankleCorrectiveList
             }
         }
