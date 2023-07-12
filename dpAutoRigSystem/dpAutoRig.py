@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.03"
-DPAR_UPDATELOG = "N701 - Rigging old rigged module fixed issue."
+DPAR_VERSION_PY3 = "4.03.04"
+DPAR_UPDATELOG = "N639 - Fixed Leg and Foot integration issue.\nNow ankle works well with correctives."
 
 
 
@@ -2518,6 +2518,10 @@ class DP_AutoRig_UI(object):
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
+                                    addArticJoint         = self.integratedTaskDic[fatherGuide]['addArticJoint']
+                                    addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
+                                    ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
+                                    ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
                                     cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
@@ -2533,6 +2537,23 @@ class DP_AutoRig_UI(object):
                                             cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
+                                        # reconnect correctly the interation for ankle and correctives
+                                        if addArticJoint:
+                                            cmds.delete(ankleArticList[1])
+                                            if addCorrective:
+                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
+                                                for netNode in ankleCorrectiveList:
+                                                    if netNode:
+                                                        if cmds.objExists(netNode):
+                                                            actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
+                                                            if actionLocList:
+                                                                cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
+                                                                actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
+                                                                cmds.delete(actionLocGrp+"_PaC")
+                                                                cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC")
+                                            else:
+                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
+                                            cmds.setAttr(oc+".interpType", 0) #noFlip
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
