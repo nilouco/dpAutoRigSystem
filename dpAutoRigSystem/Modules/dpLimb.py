@@ -19,7 +19,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.1
+DP_LIMB_VERSION = 2.2
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -34,6 +34,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
         #Declare variable
         self.integratedActionsDic = {}
+        self.bendGrps = None
         #Returned data from the dictionnary
         self.ikExtremCtrlList = []
         self.ikExtremCtrlZeroList = []
@@ -1296,7 +1297,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         if s == 0: #left
                             cmds.setAttr(upCtrl+".invert", 1)
                             cmds.setAttr(downCtrl+".invert", 1)
-            
+
                 # auto clavicle:
                 # loading Maya matrix node
                 loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
@@ -1637,11 +1638,30 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     dpUtils.setJointLabel(beforeJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+beforeName)
                     dpUtils.setJointLabel(mainJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+firstNumber+"_"+mainName)
                     dpUtils.setJointLabel(extremJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+extremNumber+"_"+extremName)
-                    cmds.rename(mainJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
-                    cmds.rename(extremJntList[0], side+self.userGuideName+"_"+extremNumber+"_"+extremName+"_Jar")
+                    mainJntList[0] = cmds.rename(mainJntList[0], side+self.userGuideName+"_"+firstNumber+"_"+mainName+"_Jar")
+                    extremJntList[0] = cmds.rename(extremJntList[0], side+self.userGuideName+"_"+extremNumber+"_"+extremName+"_Jar")
                 else:
                     self.ankleArticList.append(None)
                     self.ankleCorrectiveList.append(None)
+
+                # add main sub controller
+                if self.addArticJoint:
+                    if self.getHasBend():
+                        if self.bendGrps:
+                            mainJar = mainJntList[0]
+                            mainJax = cmds.listRelatives(mainJntList[0], parent=True, type="joint")[0]
+                            mainSubCtrl = self.ctrls.cvControl("id_095_LimbMainSub", ctrlName=side+self.userGuideName+"_"+mainName+"_Sub_Ctrl", r=(self.ctrlRadius * 0.9), d=self.curveDegree)
+                            self.ctrls.setLockHide([mainSubCtrl], ["sx", "sy", "sz", "v"])
+                            self.ctrls.setSubControlDisplay(self.fkCtrlList[0], mainSubCtrl, 0)
+                            mainSubCtrlZero = dpUtils.zeroOut([mainSubCtrl])[0]
+                            cmds.delete(self.bendGrps['bottomPosPaC'][1])
+                            pac1 = cmds.parentConstraint(mainJax, mainSubCtrlZero, maintainOffset=False, name=mainSubCtrlZero+"_PaC")[0]
+                            pac2 = cmds.parentConstraint(mainSubCtrl, mainJar, maintainOffset=True, name=mainJar+"_PaC")[0]
+                            pac3 = cmds.parentConstraint(mainJar, self.bendGrps['bottomPosPaC'][0], maintainOffset=True, name=self.bendGrps['bottomPosPaC'][0]+"_PaC")[0]
+                            cmds.setAttr(pac1+".interpType", 0) #noFlip
+                            cmds.setAttr(pac2+".interpType", 0) #noFlip
+                            cmds.setAttr(pac3+".interpType", 0) #noFlip
+                            cmds.parent(mainSubCtrlZero, self.toCtrlHookGrp)
 
                 # softIk:
                 self.softIkCalibrateList.append(self.softIk.createSoftIk(side+self.userGuideName, self.ikExtremCtrl, ikHandleMainList[0], self.ikJointList[1:4], self.skinJointList[1:4], self.distBetweenList[1], self.worldRef))
