@@ -790,7 +790,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
                 cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
-                exposeCornerName = cornerName+"_Jxt"
+                exposeCornerName = cornerName+"_Jnt"
+                if self.getHasBend():
+                    exposeCornerName = cornerName+"_Jxt"
                 if self.limbStyle == self.dpUIinst.lang['m037_quadruped'] or self.limbStyle == self.dpUIinst.lang['m043_quadSpring'] or self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     self.ikStretchExtremLocList.append(None)
                     exposeCornerName = cornerBName+"_Jnt"
@@ -1555,7 +1557,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         beforeCorrectiveNetList = [None]
                         beforeCorrectiveNetList.append(self.setupCorrectiveNet(self.fkCtrlList[0], self.toScalableHookGrp, self.skinJointList[0], side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60, isLeg, [side+self.userGuideName+"_"+self.jNameList[0]+"_PitchUp", 1, 1, 60]))
                         beforeCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, True, False, False, False, False)
-                        beforeJxt = cmds.duplicate(self.skinJointList[0], name=side+self.userGuideName+"_"+jName+"_Jxt")[0]
+                        beforeJxt = cmds.duplicate(self.skinJointList[0], name=side+self.userGuideName+"_"+self.jNameList[0]+"_Jxt")[0]
                         cmds.delete(cmds.listRelatives(beforeJxt, children=True, allDescendents=True, fullPath=True))
                         beforeJntList = dpUtils.articulationJoint(beforeJxt, self.skinJointList[0], 1, [(0.3*self.ctrlRadius, 0, 0.3*self.ctrlRadius)])
                         self.setupJcrControls(beforeJntList, s, jointLabelAdd, self.userGuideName+"_"+beforeNumber+"_"+beforeName, beforeCorrectiveNetList, beforeCalibratePresetList, invertList)
@@ -1619,7 +1621,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
-                        mainJntList = dpUtils.articulationJoint(self.skinJointList[0], self.skinJointList[1])
+                        mainJntList = dpUtils.articulationJoint(self.shoulderRefGrp, self.skinJointList[1])
                         if not self.cornerJntList:
                             self.cornerJntList = dpUtils.articulationJoint(self.skinJointList[1], self.skinJointList[2], doScale=False)
                         extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2])
