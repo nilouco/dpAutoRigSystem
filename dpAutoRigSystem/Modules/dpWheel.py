@@ -207,15 +207,12 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # create controls:
                 self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                print("BEFOREE++++++++++++++++++++++++++++++")
-                print("wheelCtrl===========", self.wheelCtrl)
-                # self.clipShape = self.ctrls.cvControl("ClipFlat", side+self.userGuideName+"_"+self.dpUIinst.lang['m107_clipFlat']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot = (0, 0, 0) )
-                # self.ctrls.transferShape(deleteSource = False, clearDestinationShapes=False, sourceItem=self.clipShape, destinationList=[self.wheelCtrl], keepColor=False)
+                # add clip shape on wheel shape
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 0) ), destinationList=[self.wheelCtrl], keepColor=False)
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 90) ), destinationList=[self.wheelCtrl], keepColor=False)
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 180) ), destinationList=[self.wheelCtrl], keepColor=False)
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 270) ), destinationList=[self.wheelCtrl], keepColor=False)
-                print("AFTERR*****************************************************")
+                # create defaults controls shape
                 self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree)
                 self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
                 self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
