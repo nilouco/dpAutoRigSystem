@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.04"
-DPAR_UPDATELOG = "N639 - Fixed Leg and Foot integration issue.\nNow ankle works well with correctives."
+DPAR_VERSION_PY3 = "4.03.07"
+DPAR_UPDATELOG = "N565 - New check-in validator\nto unlock normals in the geometry."
 
 
 
