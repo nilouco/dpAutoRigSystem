@@ -2564,10 +2564,16 @@ class DP_AutoRig_UI(object):
                                         if not cmds.objExists(ikCtrl+'.'+attr):
                                             attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
                                             keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
                                             channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
+                                            attrMinValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, minValue=True)
+                                            attrMaxValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, maxValue=True)
                                             cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
+                                            if not attrMinValue == None:
+                                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, minValue=attrMinValue)
+                                            if not attrMaxValue == None:
+                                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, maxValue=attrMaxValue)
                                             cmds.setAttr(ikCtrl+'.'+attr, currentValue)
                                             if not keyableStatus:
                                                 cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
