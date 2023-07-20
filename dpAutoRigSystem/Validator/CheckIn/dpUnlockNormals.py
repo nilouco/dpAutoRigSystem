@@ -44,27 +44,27 @@ class UnlockNormals(dpBaseValidatorClass.ValidatorStartClass):
         if allMeshList:
             progressAmount = 0
             maxProcess = len(allMeshList)
-            for obj in allMeshList:
+            for mesh in allMeshList:
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                if cmds.objExists(obj):
-                    lockedList = cmds.polyNormalPerVertex(obj+".vtx[*]", query=True, freezeNormal=True)
+                if cmds.objExists(mesh):
+                    lockedList = cmds.polyNormalPerVertex(mesh+".vtx[*]", query=True, freezeNormal=True)
                     # check if there's any locked normal
                     if True in lockedList:
-                        self.checkedObjList.append(obj)
+                        self.checkedObjList.append(mesh)
                         self.foundIssueList.append(True)
                         if self.verifyMode:
                             self.resultOkList.append(False)
                         else: #fix
                             try:
-                                cmds.polyNormalPerVertex(obj+".vtx[*]", unFreezeNormal=True)
+                                cmds.polyNormalPerVertex(mesh+".vtx[*]", unFreezeNormal=True)
                                 self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+obj)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
                             except:
                                 self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+obj)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
     
         else:
             self.notFoundNodes()
