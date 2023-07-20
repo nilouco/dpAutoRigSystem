@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.06"
-DPAR_UPDATELOG = "N682 - Limit reverseFoot showControls attribute."
+DPAR_VERSION_PY3 = "4.03.07"
+DPAR_UPDATELOG = "N565 - New check-in validator\nto unlock normals in the geometry."
 
 
 
