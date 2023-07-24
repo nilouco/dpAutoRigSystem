@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.07"
-DPAR_UPDATELOG = "N565 - New check-in validator\nto unlock normals in the geometry."
+DPAR_VERSION_PY3 = "4.03.08"
+DPAR_UPDATELOG = "N719 - Added scroll to update guides interface."
 
 
 
