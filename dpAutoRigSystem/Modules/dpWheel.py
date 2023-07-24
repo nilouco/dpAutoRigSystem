@@ -209,6 +209,8 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
                 # add clip shape on wheel shape
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 0) ), destinationList=[self.wheelCtrl], keepColor=False)
+                print(self.wheelCtrl)
+                cmds.cluster(self.wheelCtrl+"1Shape"+".cv[0:1]")
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 90) ), destinationList=[self.wheelCtrl], keepColor=False)
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 180) ), destinationList=[self.wheelCtrl], keepColor=False)
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*1.5, d=self.curveDegree, rot = (0, 0, 270) ), destinationList=[self.wheelCtrl], keepColor=False)
