@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.05"
+DPAR_VERSION_PY3 = "4.03.08"
 DPAR_UPDATELOG = "N623 - Added clip shape in wheel control"
 
 
