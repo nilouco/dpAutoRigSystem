@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.08"
-DPAR_UPDATELOG = "N719 - Added scroll to update guides interface."
+DPAR_VERSION_PY3 = "4.03.09"
+DPAR_UPDATELOG = "N623 - Added clip shape in wheel control"
 
 
 
