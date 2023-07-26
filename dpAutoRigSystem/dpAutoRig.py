@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.06"
+DPAR_VERSION_PY3 = "4.03.10"
 DPAR_UPDATELOG = "N724 - Shape IO progress window."
 
 
