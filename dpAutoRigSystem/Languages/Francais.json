@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-07-10",
+    "_updated"       : "2023-07-25",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -443,6 +443,8 @@
     "i282_termsCondDesc"   : "Bienvenue dans les Termes et Conditions\nde ce script open source de rigging dans Maya,\nfourni comme un outil gratuit pour aider la communauté.\nEn utilisant cet outil, l'utilisateur s'engage\nà essayer d'avoir un rig de haute qualité et\nà toujours faire preuve de respect envers les autres professionnels.\nNous croyons en la création d'un monde beau et harmonieux\ndans lequel on peut travailler et vivre. Cet outil est\ndisponible pour un usage personnel, éducatif ou professionnel.\nVeuillez noter qu'à des fins statistiques, certaines informations\npeuvent être collectées, telles que la géolocalisation, le nom du fichier,\nle nom de l'ordinateur ou le nom de l'utilisateur, par exemple.\nCependant, ces informations ne seront jamais partagées\navec des autres et seront uniquement utilisées pour\naméliorer les fonctionnalités de l'outil.\nMerci d'avoir utilisé notre outil de rigging,\nnous espérons qu'il vous aidera\nà créer un travail encore meilleur.",
     "i283_pivot"           : "Pivot",
     "i284_sCallbackAnn"    : "Callback ce Python code init method après\ntérminer la publication.\nC'est utile pour continuer le processus de\nla pipeline.",
+    "i285_alreadySkinned"  : "La géométrie est déjà skinnée, désolé.",
+    "i286_displaySkinLog"  : "Montrer log window",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

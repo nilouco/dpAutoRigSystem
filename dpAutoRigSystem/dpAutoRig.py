@@ -516,7 +516,8 @@ class DP_AutoRig_UI(object):
         allGeoms   = cmds.radioButton( label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
         selGeoms   = cmds.radioButton( label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
-        cmds.separator(style="none", height=19, parent=self.allUIs["colSkinRightA"])
+        self.allUIs["displaySkinLogWin"] = cmds.checkBox('displaySkinLogWin', label=self.lang['i286_displaySkinLog'], align='left', value=1, parent=self.allUIs["colSkinRightA"])
+        #cmds.separator(style="none", height=19, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
@@ -3152,10 +3153,13 @@ class DP_AutoRig_UI(object):
     def skinFromUI(self, mode=None, *args):
         """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
         """
+        # log window
+        logWin = cmds.checkBox(self.allUIs["displaySkinLogWin"], query=True, value=True)
+
         # get joints to be skinned:
-        uiJointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
+        uiJointSkinList = cmds.textScrollList(self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
         if not uiJointSkinList:
-            uiJointSkinList = cmds.textScrollList( self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
+            uiJointSkinList = cmds.textScrollList(self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
         
         # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
         jointSkinList, jointNotExistingList = [], []
@@ -3193,10 +3197,13 @@ class DP_AutoRig_UI(object):
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
                 print(self.lang['i077_skinned'] + ', '.join(geomSkinList))
-                self.info('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                if logWin:
+                    self.info('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
                 cmds.select(geomSkinList)
         else:
             print(self.lang['i029_skinNothing'])
-            self.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
+            if logWin:
+                self.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
+
 
     ###################### End: Skinning.
