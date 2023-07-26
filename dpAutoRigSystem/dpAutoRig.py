@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.12"
-DPAR_UPDATELOG = "N693 - Skinning a renamed mesh fixed issue."
+DPAR_VERSION_PY3 = "4.03.13"
+DPAR_UPDATELOG = "N627 - SoftSmile new blendShape target."
 
 
 
@@ -3204,5 +3204,6 @@ class DP_AutoRig_UI(object):
             print(self.lang['i029_skinNothing'])
             if logWin:
                 self.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
+
 
     ###################### End: Skinning.
