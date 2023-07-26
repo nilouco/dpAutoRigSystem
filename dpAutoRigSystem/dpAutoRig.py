@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.11"
-DPAR_UPDATELOG = "N694 - Change Limb poleVector\npin attribute to integer."
+DPAR_VERSION_PY3 = "4.03.13"
+DPAR_UPDATELOG = "N627 - SoftSmile new blendShape target."
 
 
 
@@ -3126,7 +3126,7 @@ class DP_AutoRig_UI(object):
     
     ###################### Start: Skinning.
     
-    def validateGeoList(self, geoList, *args):
+    def validateGeoList(self, geoList, mode=None, *args):
         """ Check if the geometry list from UI is good to be skinned, because we can get issue if the display long name is not used.
         """
         if geoList:
@@ -3134,6 +3134,19 @@ class DP_AutoRig_UI(object):
                 if item in geoList[:i]:
                     self.info('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
                     return False
+                elif not cmds.objExists(item):
+                    self.info('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
+                    return False
+                elif not mode:
+                    try:
+                        inputDeformerList = cmds.findDeformers(item)
+                        if inputDeformerList:
+                            for deformerNode in inputDeformerList:
+                                if cmds.objectType(deformerNode) == "skinCluster":
+                                    self.info('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
+                                    return False
+                    except:
+                        pass
         return True
     
     def skinFromUI(self, mode=None, *args):
@@ -3161,12 +3174,12 @@ class DP_AutoRig_UI(object):
                 jointSkinList = None
         
         # get geometries to be skinned:
-        geomSkinList = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
+        geomSkinList = cmds.textScrollList(self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
         if not geomSkinList:
-            geomSkinList = cmds.textScrollList( self.allUIs["modelsTextScrollLayout"], query=True, allItems=True)
+            geomSkinList = cmds.textScrollList(self.allUIs["modelsTextScrollLayout"], query=True, allItems=True)
         
         # check if we have repeated listed geometries in case of the user choose to not display long names:
-        if self.validateGeoList(geomSkinList):
+        if self.validateGeoList(geomSkinList, mode):
             if jointSkinList and geomSkinList:
                 for geomSkin in geomSkinList:
                     if (mode == "Add"):
@@ -3180,7 +3193,10 @@ class DP_AutoRig_UI(object):
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
                 print(self.lang['i077_skinned'] + ', '.join(geomSkinList))
+                self.info('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                cmds.select(geomSkinList)
         else:
             print(self.lang['i029_skinNothing'])
+            self.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
 
     ###################### End: Skinning.

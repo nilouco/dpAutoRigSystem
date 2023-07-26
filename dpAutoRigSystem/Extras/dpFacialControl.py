@@ -21,7 +21,7 @@ MOUTH_TGTLIST = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
 LIPS_TGTLIST = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
 SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"]
 GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"]
-FACE_TGTLIST = ["L_Puff", "R_Puff", "Pucker", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
+FACE_TGTLIST = ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
 TYPE_BS = "typeBS"
 TYPE_JOINTS = "typeJoints"
 MIDDLE = "Middle"
@@ -29,7 +29,7 @@ SIDED = "Sided"
 PRESETS = "Presets"
 FACIALPRESET = "FacialJoints"
 
-DP_FACIALCONTROL_VERSION = 1.4
+DP_FACIALCONTROL_VERSION = 1.5
 
 
 class FacialControl(object):
