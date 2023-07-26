@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.09"
-DPAR_UPDATELOG = "N623 - Added clip shape in wheel control"
+DPAR_VERSION_PY3 = "4.03.11"
+DPAR_UPDATELOG = "N694 - Change Limb poleVector\npin attribute to integer."
 
 
 

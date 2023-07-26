@@ -26,7 +26,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.0
+DP_CONTROLS_VERSION = 2.1
 
 
 class ControlClass(object):
@@ -41,6 +41,7 @@ class ControlClass(object):
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
+        self.doingName = self.dpUIinst.lang['m094_doing']
 
 
     # CONTROLS functions:
@@ -1078,7 +1079,7 @@ class ControlClass(object):
         return nodeList
 
 
-    def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, *args):
+    def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
@@ -1105,6 +1106,11 @@ class ControlClass(object):
                     if pathList:
                         path = pathList[0] 
             if path:
+                if ui:
+                    # Starting progress window
+                    progressAmount = 0
+                    cmds.progressWindow(title=self.dpUIinst.lang['i164_export'], progress=progressAmount, status=self.doingName+': 0%', isInterruptable=False)
+                    maxProcess = len(nodeList)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1112,6 +1118,10 @@ class ControlClass(object):
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
                 for item in nodeList:
+                    if ui:
+                        # Update progress window
+                        progressAmount += 1
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.doingName+': ' + repr(progressAmount) + ' Shape'))
                     snapshotName = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
@@ -1151,9 +1161,12 @@ class ControlClass(object):
                 cmds.undoInfo(closeChunk=True)
         else:
             print(self.dpUIinst.lang['i202_noControls'])
+        if ui:
+            # Close progress window
+            cmds.progressWindow(endProgress=True)
 
 
-    def importShape(self, nodeList=None, path=None, recharge=False, *args):
+    def importShape(self, nodeList=None, path=None, recharge=False, ui=True, *args):
         """ Import control shapes from an external loaded Maya file.
             If not get an user defined parameter for a node list, it will import all shapes.
             If the recharge parameter is True, it will use the default path as current location inside dpShapeIO directory.
@@ -1186,7 +1199,16 @@ class ControlClass(object):
                     refNode = cmds.file(path, referenceNode=True, query=True)
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
+                        if ui:
+                            # Starting progress window
+                            progressAmount = 0
+                            cmds.progressWindow(title=self.dpUIinst.lang['i196_import'], progress=progressAmount, status=self.doingName+': 0%', isInterruptable=False)
+                            maxProcess = len(refNodeList)
                         for sourceRefNode in refNodeList:
+                            if ui:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.doingName+': ' + repr(progressAmount) + ' Shape'))
                             if cmds.objectType(sourceRefNode) == "transform":
                                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destinationNode):
@@ -1196,6 +1218,9 @@ class ControlClass(object):
                     print("Imported shapes: {0}".format(path))
         else:
             print(self.dpUIinst.lang['i202_noControls'])
+        if ui:
+            # Close progress window
+            cmds.progressWindow(endProgress=True)
 
 
     def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
