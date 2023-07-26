@@ -82,7 +82,8 @@ class UpdateGuides(object):
         updateGuidesCL = cmds.columnLayout('updateGuidesCL', adjustableColumn=1, rowSpacing=10, columnOffset=("both", 10), parent='updateGuidesWindow')
         cmds.text(label='DPAR '+self.dpUIinst.lang['m194_currentVersion']+' '+str(self.currentDpArVersion), height=30, align="center", parent=updateGuidesCL)
         if len(self.updateData) > 0:
-            updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesCL)
+            updateGuidesSL = cmds.scrollLayout('updateGuidesSL', width=330, height=400, parent=updateGuidesCL)
+            updateGuidesBaseRCL = cmds.rowColumnLayout('updateGuidesBaseRCL', numberOfColumns=3, columnSpacing=[(1, 0), (2, 20), (3, 20)], adjustableColumn=2, parent=updateGuidesSL)
             cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateGuidesBaseRCL)
             cmds.text(label=self.dpUIinst.lang['m006_name'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
             cmds.text(label=self.dpUIinst.lang['m205_version'], align='center', font='boldLabelFont', parent=updateGuidesBaseRCL)
