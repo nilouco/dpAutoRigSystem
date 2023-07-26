@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-05-30",
+    "_updated"       : "2023-07-17",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -672,6 +672,7 @@
     "m223_preview"              : "Pré-visualização",
     "m224_rename"               : "Renomear",
     "m225_selectAnything"       : "Select anything to continue, please.",
+    "m226_createFaceToRivet"    : "Criar geometria FaceToRivet",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -763,6 +764,13 @@
     "v069_exportedFile"           : "Arquivo exportado:",
     "v070_duplicateName"          : "Possível item com nome duplicado na hierarquia de nodes:",
     "v071_geometryHistory"        : "Histórico de geometria",
-    "v072_geometryHistoryDesc"    : "Esse validador limpará os históricos de deformação das geometrias."
+    "v072_geometryHistoryDesc"    : "Esse validador limpará os históricos de deformação das geometrias.",
+    "v073_controllerTag"          : "Controller tag",
+    "v074_controllerTagDesc"      : "Esse validador tag como controller todos os dpControls.",
+    "v075_missingControllerTags"  : "Faltando controller tags.",
+    "v076_outlinerCleaner"        : "Outliner limpador",
+    "v077_outlinerCleanerDesc"    : "Esse validador limpará os nodes do dpAutoRigSystem\nque estejam em desuso na outliner.\nServe para excluir lixos deixados por guias deletadas,\npor exemplo dpAR_GuideMirror_Grp.",
+    "v078_unlockNormals"          : "Desbloquear Normais",
+    "v079_unlockNormalsDesc"      : "Este validador irá desbloquear as normais das geometrias."
 
 }

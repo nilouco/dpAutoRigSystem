@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-05-30",
+    "_updated"       : "2023-07-17",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -672,6 +672,7 @@
     "m223_preview"              : "Aperçu",
     "m224_rename"               : "Rénomer",
     "m225_selectAnything"       : "Select anything to continue, please.",
+    "m226_createFaceToRivet"    : "Creer une géométrie FaceToRivet",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -763,6 +764,13 @@
     "v069_exportedFile"           : "Fichier exporté:",
     "v070_duplicateName"          : "Élément possible avec un nom en double dans la hiérarchie des nodus:",
     "v071_geometryHistory"        : "Histoire de la géométrie",
-    "v072_geometryHistoryDesc"    : "Ce validateur nettoiera l'historique du déformateur de géométrie."
+    "v072_geometryHistoryDesc"    : "Ce validateur nettoiera l'historique du déformateur de géométrie.",
+    "v073_controllerTag"          : "Controller tag",
+    "v074_controllerTagDesc"      : "Ce validateur tag as controller tous les dpControls.",
+    "v075_missingControllerTags"  : "N'est pas trouvé des controller tags.",
+    "v076_outlinerCleaner"        : "Outliner nettoyeur",
+    "v077_outlinerCleanerDesc"    : "Ce validateur nettoiera les nodes du dpAutoRigSystem\nqui ne sont pas utiles dans l'outliner.\nIl va nous servir pour effacer des déchets d'ancien guides,\npar exemple dpAR_GuideMirror_Grp.",
+    "v078_unlockNormals"          : "Débloquer Normals",
+    "v079_unlockNormalsDesc"      : "Ce validateur débloquera les normales des géométries."
 
 }

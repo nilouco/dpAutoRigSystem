@@ -1,19 +1,17 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
-
 
 # global variables to this module:
-CLASS_NAME = "HideCorrectives"
-TITLE = "v036_hideCorrectives"
-DESCRIPTION = "v037_hideCorrectivesDesc"
-ICON = "/Icons/dp_hideCorrectives.png"
+CLASS_NAME = "ControllerTag"
+TITLE = "v073_controllerTag"
+DESCRIPTION = "v074_controllerTagDesc"
+ICON = "/Icons/dp_controllerTag.png"
 
-DP_HIDECORRECTIVES_VERSION = 1.2
+DP_CONTROLLERTAG_VERSION = 1.0
 
 
-class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
+class ControllerTag(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -39,50 +37,47 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
         
         # ---
         # --- validator code --- beginning
-        optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
-        if optionCtrl:
-            if objList:
-                toCheckList = cmds.attributeQuery('correctiveCtrls', node=objList[0], exists=True)
-            else:
-                toCheckList = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
-            if toCheckList:
-                progressAmount = 0
-                maxProcess = 1
+        if objList:
+            toCheckList = objList
+        else:
+            toCheckList = self.dpUIinst.ctrls.getControlList()
+        if toCheckList:
+            progressAmount = 0
+            maxProcess = len(toCheckList)
+            firstFixed = False
+            for item in toCheckList:
                 if self.verbose:
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                item = optionCtrl+".correctiveCtrls"
                 # conditional to check here
-                checkChannelBox = cmds.getAttr(item, channelBox=True)
-                if checkChannelBox:
-                    self.checkedObjList.append(item)
-                    self.foundIssueList.append(True)
+                if not cmds.controller(item, query=True, isController=True):
+                    # found issue here
+                    if not firstFixed:
+                        self.checkedObjList.append(item+" + controllers")
+                        self.foundIssueList.append(True)
                     if self.verifyMode:
                         self.resultOkList.append(False)
+                        self.messageList.append(self.dpUIinst.lang['v075_missingControllerTags'])
+                        break
                     else: #fix
                         try:
-                            cmds.setAttr(item, 0)
-                            cmds.setAttr(item, lock=True, channelBox=False)
-                            self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            # tag as controller
+                            cmds.controller(item, isController=True)
+                            if not firstFixed:
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": Controllers.")
+                                firstFixed = True
                         except:
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                else:
-                    self.notFoundNodes()
         else:
             self.notFoundNodes()
-
         # --- validator code --- end
         # ---
-
 
         # finishing
         self.updateButtonColors()
         self.reportLog()
         self.endProgressBar()
         return self.dataLogDic
-    
-
-    

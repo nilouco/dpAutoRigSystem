@@ -140,7 +140,6 @@ DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
 DPAR_MASTERURL = "https://github.com/nilouco/dpAutoRigSystem/zipball/master/"
 DPAR_WHATSCHANGED = "https://github.com/nilouco/dpAutoRigSystem/commits/master"
 DONATE = "https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=nilouco%40gmail.com&item_name=Support+dpAutoRigSystem+and+Tutorials+by+Danilo+Pinheiro+%28nilouco%29&currency_code="
-LOCATION_WEBHOOK = "https://discord.com/api/webhooks/1104146750085812335/WPY3GD8J9ooEyUfDaGGjLBxT43l7meG7rINKtAApo0NTfeajvYw_uKeEz2vS-ypr_Uhm"
 LOCATION_URL = "https://ipinfo.io/json"
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
@@ -171,6 +170,7 @@ class DP_AutoRig_UI(object):
         self.checkAddOnsInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
+        self.guideMirrorGrp = GUIDEMIRROR_GRP
         self.userDefAutoCheckUpdate = 1
         self.userDefAgreeTerms = 1
         self.dpData = DPDATA
@@ -283,6 +283,11 @@ class DP_AutoRig_UI(object):
         except Exception as e:
             print("Error: dpAutoRig UI window !!!\n")
             print("Exception:", e)
+            try:
+                # error logging
+                self.packager.toDiscord(dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), DPAR_VERSION_PY3+": "+str(e))
+            except:
+                pass
             print(self.langDic[self.langName]['i008_errorUI'])
             clearDPARLoadingWindow()
             return
@@ -1140,10 +1145,10 @@ class DP_AutoRig_UI(object):
             dpAR_Temp_Grp
             dpAR_GuideMirror_Grp
         """
-        if cmds.objExists(TEMP_GRP):
-            cmds.setAttr(TEMP_GRP+".hiddenInOutliner", value)
-        if cmds.objExists(GUIDEMIRROR_GRP):
-            cmds.setAttr(GUIDEMIRROR_GRP+".hiddenInOutliner", value)
+        if cmds.objExists(self.tempGrp):
+            cmds.setAttr(self.tempGrp+".hiddenInOutliner", value)
+        if cmds.objExists(self.guideMirrorGrp):
+            cmds.setAttr(self.guideMirrorGrp+".hiddenInOutliner", value)
         mel.eval('source AEdagNodeCommon;')
         mel.eval('AEdagNodeCommonRefreshOutliners();')
     
@@ -1435,6 +1440,7 @@ class DP_AutoRig_UI(object):
             Use a recursive method to remove imported of imported guides.
         """
         importedNamespaceList = []
+        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
         currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
@@ -1536,10 +1542,10 @@ class DP_AutoRig_UI(object):
         logText = ""
         if publishLog:
             logText = "\nPublisher"
-            logText += "\nScene: "+publishLog["Scene"]
-            logText += "\nPublished: "+publishLog["Published"]
-            logText += "\nExported: "+publishLog["ExportPath"]
-            logText += "\nComment: "+publishLog["Comment"]+"\n"
+            logText += "\nScene: "+publishLog["scene"]
+            logText += "\nPublished: "+publishLog["published"]
+            logText += "\nExported: "+publishLog["exportPath"]
+            logText += "\nComments: "+publishLog["comments"]+"\n"
         if validatorInstList:
             progressAmount = 0
             maxProcess = len(validatorInstList)
@@ -1925,7 +1931,8 @@ class DP_AutoRig_UI(object):
             infoData['dpAR'] = DPAR_VERSION_PY3
             #print(infoData)
             if infoData:
-                self.packager.toDiscord(LOCATION_WEBHOOK, str(infoData))
+                wh = dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
+                self.packager.toDiscord(wh, str(infoData))
 
     
     def checkTermsAndCond(self, *args):
@@ -2061,6 +2068,8 @@ class DP_AutoRig_UI(object):
             # module counts:
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
+            # set outliner color
+            self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True)
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
@@ -2081,6 +2090,10 @@ class DP_AutoRig_UI(object):
         self.scalableGrp    = self.getBaseGrp("scalableGrp", self.prefix+"Scalable_Grp")
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
         self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
+        # set outliner color
+        self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True)
+        self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True)
+        self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True)
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
@@ -2262,8 +2275,8 @@ class DP_AutoRig_UI(object):
             maxProcess = len(self.modulesToBeRiggedList)
             
             # clear all duplicated names in order to run without find same names if they exists:
-            if cmds.objExists("dpAR_GuideMirror_Grp"):
-                cmds.delete("dpAR_GuideMirror_Grp")
+            if cmds.objExists(self.guideMirrorGrp):
+                cmds.delete(self.guideMirrorGrp)
             
             # regenerate mirror information for all guides:
             for guideModule in self.modulesToBeRiggedList:
@@ -2309,7 +2322,7 @@ class DP_AutoRig_UI(object):
                     self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
             
             #Colorize all controller in yellow as a base
-            if (bColorize):
+            if bColorize:
                 aBCtrl = [self.globalCtrl, self.rootCtrl, self.optionCtrl]
                 aAllCtrls = cmds.ls("*_Ctrl")
                 lPattern = re.compile(self.lang['p002_left'] + '_.*._Ctrl')
@@ -2505,6 +2518,10 @@ class DP_AutoRig_UI(object):
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
                                     ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
+                                    addArticJoint         = self.integratedTaskDic[fatherGuide]['addArticJoint']
+                                    addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
+                                    ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
+                                    ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
                                     cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
@@ -2520,6 +2537,23 @@ class DP_AutoRig_UI(object):
                                             cmds.parent(ikStretchExtremLoc, ballRFList, absolute=True)
                                         if cmds.objExists(extremJnt+".dpAR_joint"):
                                             cmds.deleteAttr(extremJnt+".dpAR_joint")
+                                        # reconnect correctly the interation for ankle and correctives
+                                        if addArticJoint:
+                                            cmds.delete(ankleArticList[1])
+                                            if addCorrective:
+                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
+                                                for netNode in ankleCorrectiveList:
+                                                    if netNode:
+                                                        if cmds.objExists(netNode):
+                                                            actionLocList = cmds.listConnections(netNode+".actionLoc", destination=False, source=True)
+                                                            if actionLocList:
+                                                                cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
+                                                                actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
+                                                                cmds.delete(actionLocGrp+"_PaC")
+                                                                cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC")
+                                            else:
+                                                oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
+                                            cmds.setAttr(oc+".interpType", 0) #noFlip
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
@@ -2530,10 +2564,16 @@ class DP_AutoRig_UI(object):
                                         if not cmds.objExists(ikCtrl+'.'+attr):
                                             attrType = cmds.getAttr(revFootCtrl+'.'+attr, type=True)
                                             currentValue = cmds.getAttr(revFootCtrl+'.'+attr)
-                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
                                             keyableStatus = cmds.getAttr(revFootCtrl+'.'+attr, keyable=True)
                                             channelBoxStatus = cmds.getAttr(revFootCtrl+'.'+attr, channelBox=True)
+                                            defValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, defaultValue=True)
+                                            attrMinValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, minValue=True)
+                                            attrMaxValue = cmds.addAttr(revFootCtrl+'.'+attr, query=True, maxValue=True)
                                             cmds.addAttr(ikCtrl, longName=attr, attributeType=attrType, keyable=keyableStatus, defaultValue=defValue)
+                                            if not attrMinValue == None:
+                                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, minValue=attrMinValue)
+                                            if not attrMaxValue == None:
+                                                cmds.addAttr(ikCtrl+'.'+attr, edit=True, maxValue=attrMaxValue)
                                             cmds.setAttr(ikCtrl+'.'+attr, currentValue)
                                             if not keyableStatus:
                                                 cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
@@ -3065,7 +3105,6 @@ class DP_AutoRig_UI(object):
                     cmds.confirmDialog(title=self.lang['i078_detectedBug'], message=self.bugMessage, button=["OK"])
 
         # re-declaring guideMirror and previewMirror groups:
-        self.guideMirrorGrp = 'dpAR_GuideMirror_Grp'
         if cmds.objExists(self.guideMirrorGrp):
             cmds.delete(self.guideMirrorGrp)
         

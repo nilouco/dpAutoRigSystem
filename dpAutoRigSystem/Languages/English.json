@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-05-30",
+    "_updated"       : "2023-07-17",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -672,6 +672,7 @@
     "m223_preview"              : "Preview",
     "m224_rename"               : "Rename",
     "m225_selectAnything"       : "Select anything to continue, please.",
+    "m226_createFaceToRivet"    : "Create FaceToRivet geometry",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -764,6 +765,13 @@
     "v069_exportedFile"           : "Exported file:",
     "v070_duplicateName"          : "Possible duplicated item on nodes hierarchy:",
     "v071_geometryHistory"        : "Geometry History",
-    "v072_geometryHistoryDesc"    : "This validator will clean-up the geometry deformer history."
+    "v072_geometryHistoryDesc"    : "This validator will clean-up the geometry deformer history.",
+    "v073_controllerTag"          : "Controller tag",
+    "v074_controllerTagDesc"      : "This validator tag as controller all dpControls.",
+    "v075_missingControllerTags"  : "Missing controller tags.",
+    "v076_outlinerCleaner"        : "Outliner cleaner",
+    "v077_outlinerCleanerDesc"    : "This validator will clean-up the dpAutoRigSystem not used nodes in the outliner.\nIt's useful to delete garbages from deleted guides,\nfor example dpAR_GuideMirror_Grp.",
+    "v078_unlockNormals"          : "Unlock Normals",
+    "v079_unlockNormalsDesc"      : "This validator will unlock normals from the geometries."
     
 }

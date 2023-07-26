@@ -15,7 +15,8 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.0
+DP_UTILS_VERSION = 2.3
+
 
 # UTILS functions:
 def findEnv(key, path):
@@ -90,7 +91,7 @@ def findAllModules(path, dir):
     """ Find all modules in the directory.
         Return a list of all module names (without '.py' extension).
     """
-    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner"]
+    baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
     allPyFilesList = findAllFiles(path, dir, ".py")
     moduleList = []
     # removing "__init__":
@@ -247,6 +248,7 @@ def zeroOut(transformList=[], offset=False):
             if zeroUserAttrList:
                 for zUserAttr in zeroUserAttrList:
                     try:
+                        cmds.setAttr(zeroGrp+"."+zUserAttr, lock=False)
                         cmds.deleteAttr(zeroGrp+"."+zUserAttr)
                     except:
                         pass
@@ -803,7 +805,7 @@ def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcr
                 jointList.append(jcr)
             cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
             oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
-            cmds.setAttr(oc+".interpType", 2) #Shortest
+            cmds.setAttr(oc+".interpType", 0) #noFlip
             if doScale:
                 cmds.scaleConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_ScC")
             return jointList
@@ -940,8 +942,7 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
     currentTime = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
     if not path:
         path = cmds.file(query=True, sceneName=True)
-        if not path:
-            return False
+    if path:
         dpFolder = path[:path.rfind("/")]
         if subFolder:
             dpFolder = dpFolder+"/"+subFolder
@@ -950,6 +951,8 @@ def exportLogDicToJson(dic, name=None, path=None, subFolder=None):
         if not name:
             name = path[path.rfind("/")+1:path.rfind(".")]
         pathFile = dpFolder+"/dpLog_"+name+"_"+currentTime+".json"
+    else:
+        return False
     print("\nLog file", pathFile)
     outFile = open(pathFile, "w")
     json.dump(dic, outFile, indent=4)
@@ -1007,3 +1010,9 @@ def checkSavedScene():
     if not scenePath or modifiedScene:
         return False
     return True
+
+
+def mountWH(start, end):
+    """ Mount and return path.
+    """
+    return "{}{}{}".format(start, "/", end)

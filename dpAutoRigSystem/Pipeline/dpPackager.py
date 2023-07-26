@@ -9,14 +9,17 @@ import zipfile
 import shutil
 import os
 import sys
+import subprocess
+import platform
 
 RIGPREVIEW = "Rigging Preview"
 CAMERA = "persp"
 CAM_ROTX = -10
 CAM_ROTY = 30
+CAM_ROTZ = 0
 CTRL_LAYER = "Ctrl_Lyr"
 
-DP_PACKAGER_VERSION = 1.6
+DP_PACKAGER_VERSION = 1.7
 
 
 class Packager(object):
@@ -37,13 +40,14 @@ class Packager(object):
         return destinationFolder+"/"+zipName
         
 
-    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, focusIt=None, *args):
+    def frameCameraToPublish(self, cam=CAMERA, rotX=CAM_ROTX, rotY=CAM_ROTY, rotZ=CAM_ROTZ, focusIt=None, *args):
         """ Prepare the given camera to frame correctly the viewport to publish.
         """
         mel.eval('setNamedPanelLayout "Single Perspective View"; updateToolbox(); findNewCurrentModelView;')
         # set up rotation
         cmds.setAttr(cam+".rotateX", rotX)
         cmds.setAttr(cam+".rotateY", rotY)
+        cmds.setAttr(cam+".rotateZ", rotZ)
         # frame all
         cmds.viewFit(allObjects=True)
         posList = cmds.xform(cam, query=True, translation=True, worldSpace=True)
@@ -76,6 +80,7 @@ class Packager(object):
     def imager(self, pipeData, dpARVersion, date, rigPreview=RIGPREVIEW, cam=CAMERA, *args):
         """ Save a rigging preview screenShot file with the given informations.
             Thanks Caio Hidaka for the help in this code!
+            Returns the image preview path.
         """
         mayaVersion = cmds.about(installedVersion=True)
         # store current user settings
@@ -207,6 +212,7 @@ class Packager(object):
         # force persp viewport to show file as default view options
         activeEditor = cmds.playblast(activeEditor=True)
         cmds.modelEditor(activeEditor, edit=True, displayAppearance='smoothShaded', xray=False, wireframeOnShaded=False, occlusionCulling=False, shadows=False, polymeshes=True, pivots=False, nurbsCurves=True, jointXray=False, displayTextures=False, useDefaultMaterial=False, activeComponentsXray=False)
+        return exportPath
 
 
     def toHistory(self, scenePath, fileShortName, destinationFolder, *args):
@@ -223,6 +229,7 @@ class Packager(object):
             for item in sceneList:
                 self.removeExistingArchived(destinationFolder, item)
                 shutil.move(scenePath+"/"+item, destinationFolder)
+        shutil.copy2(scenePath+"/"+fileShortName, destinationFolder)
 
     
     def toDropbox(self, file, toPath, *args):
@@ -286,3 +293,18 @@ class Packager(object):
             return result
         except:
             pass
+
+
+    def openFolder(self, path, *args):
+        """ Just open a folder in exporer, finder, etc if it exists.
+        """
+        if os.path.exists(path):
+            if platform.system() == "Windows":
+                os.startfile(path)
+            elif platform.system() == "Darwin": #Mac
+                subprocess.Popen(['open', path])
+            else: #Unix, Linux
+                subprocess.Popen(['xdg-open', path])
+        #
+        #TODO
+        # Move it to dpUtils?

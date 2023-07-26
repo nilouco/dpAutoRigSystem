@@ -7,7 +7,7 @@ from . import dpPackager
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.5
+DP_PUBLISHER_VERSION = 1.6
 
 
 class Publisher(object):
@@ -252,18 +252,19 @@ class Publisher(object):
             if publishFileName:
                 # start logging
                 publishLog = {}
-                publishLog["Scene"] = self.pipeliner.pipeData['sceneName']
+                publishLog["scene"] = self.pipeliner.pipeData['sceneName']
                 if not publishFileName[-3:-1] == ".m":
                     publishFileName += ".m"+self.pipeliner.pipeData['sceneName'][-1]
-                publishLog["Published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
-                publishLog["ExportPath"] = self.pipeliner.pipeData['f_drive']+"/"+self.pipeliner.pipeData['f_studio']+"/"+self.pipeliner.pipeData['f_project']+"/"+self.pipeliner.pipeData['f_toClient']+"/"+self.pipeliner.today
+                self.pipeliner.pipeData['publishFileName'] = publishFileName
+                publishLog["published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
+                publishLog["exportPath"] = self.pipeliner.pipeData['f_drive']+"/"+self.pipeliner.pipeData['f_studio']+"/"+self.pipeliner.pipeData['f_project']+"/"+self.pipeliner.pipeData['f_toClient']+"/"+self.pipeliner.today
                 # comments
-                publishLog["Comment"] = ""
+                publishLog["comments"] = ""
                 commentValue = comments
                 if fromUI and not comments:
                     commentValue = cmds.textFieldGrp(self.commentTFG, query=True, text=True)
                 if commentValue:
-                    publishLog["Comment"] = commentValue
+                    publishLog["comments"] = commentValue
                 
                 # checking validators
                 validatorsResult = False
@@ -325,7 +326,7 @@ class Publisher(object):
                         if self.pipeliner.pipeData['toClientPath']:
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
-                                self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.today)
+                                self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.today)
                     cmds.progressWindow(endProgress=True)
                     progressAmount += 1
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['i225_savingFile'], isInterruptable=False)
@@ -346,6 +347,8 @@ class Publisher(object):
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
+                            # open folder
+                            self.packager.openFolder(self.pipeliner.pipeData['toClientPath'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
@@ -354,7 +357,7 @@ class Publisher(object):
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
-                            messageText = publishLog["Scene"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+publishFileName+"**\n*"+publishLog["Comment"]+"*"
+                            messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
                                 print(self.dpUIinst.lang[result])
@@ -363,7 +366,8 @@ class Publisher(object):
                     if self.pipeliner.pipeData['s_callback']:
                         if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
                             callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'], self.pipeliner.pipeData)
-                            print("Callback result =", callbackResult)
+                            if callbackResult:
+                                print("Callback result =", callbackResult)
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
