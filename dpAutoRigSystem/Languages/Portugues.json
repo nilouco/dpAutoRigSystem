@@ -771,8 +771,6 @@
     "v074_controllerTagDesc"      : "Esse validador tag como controller todos os dpControls.",
     "v075_missingControllerTags"  : "Faltando controller tags.",
     "v076_outlinerCleaner"        : "Outliner limpador",
-    "v077_outlinerCleanerDesc"    : "Esse validador limpará os nodes do dpAutoRigSystem\nque estejam em desuso na outliner.\nServe para excluir lixos deixados por guias deletadas,\npor exemplo dpAR_GuideMirror_Grp.",
-    "v078_unlockNormals"          : "Desbloquear Normais",
-    "v079_unlockNormalsDesc"      : "Este validador irá desbloquear as normais das geometrias."
+    "v077_outlinerCleanerDesc"    : "Esse validador limpará os nodes do dpAutoRigSystem\nque estejam em desuso na outliner.\nServe para excluir lixos deixados por guias deletadas,\npor exemplo dpAR_GuideMirror_Grp."
 
 }
