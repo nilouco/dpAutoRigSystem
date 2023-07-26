@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.06"
-DPAR_UPDATELOG = "N682 - Limit reverseFoot showControls attribute."
+DPAR_UPDATELOG = "N724 - Shape IO progress window."
 
 
 
