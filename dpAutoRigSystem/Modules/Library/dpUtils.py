@@ -805,7 +805,7 @@ def articulationJoint(fatherNode, brotherNode, jcrNumber=0, jcrPosList=None, jcr
                 jointList.append(jcr)
             cmds.pointConstraint(brotherNode, jax, maintainOffset=True, name=jarName+"_PoC")[0]
             oc = cmds.orientConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_OrC")[0]
-            cmds.setAttr(oc+".interpType", 0) #noFlip
+            cmds.setAttr(oc+".interpType", 2) #shortest
             if doScale:
                 cmds.scaleConstraint(fatherNode, brotherNode, jax, maintainOffset=True, name=jarName+"_ScC")
             return jointList

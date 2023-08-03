@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.13"
-DPAR_UPDATELOG = "N627 - SoftSmile new blendShape target."
+DPAR_VERSION_PY3 = "4.03.14"
+DPAR_UPDATELOG = "N626 - Fixed Jar interpolation type\nconstraint issue."
 
 
 
