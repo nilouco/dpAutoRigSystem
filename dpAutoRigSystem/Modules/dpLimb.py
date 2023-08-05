@@ -1014,6 +1014,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(poleVectorUpLoc+".translateZ", -self.ctrlRadius)
                 cmds.delete(cmds.pointConstraint(self.cvMainLoc, poleVectorAimLoc, maintainOffset=False))
                 cmds.pointConstraint(self.ikExtremSubCtrl, poleVectorUpLocGrp, maintainOffset=False, name=poleVectorUpLocGrp+"_PaC")
+                for axis in axisList:
+                    cmds.connectAttr(self.worldRef+".scaleX", poleVectorLocatorsGrp+".scale"+axis, force=True)
                 
                 # working with autoOrient of poleVector:
                 cmds.addAttr(self.ikCornerCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType='float', minValue=0, maxValue=1, defaultValue=0.75, keyable=True)
