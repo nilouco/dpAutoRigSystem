@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.15"
-DPAR_UPDATELOG = "N625 - Fixed scalable poleVector."
+DPAR_VERSION_PY3 = "4.03.16"
+DPAR_UPDATELOG = "N732 - Back new wheel control shapes."
 
 
 
