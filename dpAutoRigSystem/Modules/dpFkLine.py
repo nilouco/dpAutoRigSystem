@@ -10,7 +10,7 @@ TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
 
-DP_FKLINE_VERSION = 2.0
+DP_FKLINE_VERSION = 2.1
 
 
 class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -41,6 +41,12 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".mainControls", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
+        cmds.setAttr(self.moduleGrp+".nMain", 1)
         
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -128,10 +134,44 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
+            self.changeMainCtrlsNumber(0)
             # re-build the preview mirror:
             dpLayoutClass.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
     
+
+    def changeMainCtrlsNumber(self, enteredNCtrls, *args):
+        """ Edit the number of main controllers in the guide.
+        """
+        dpUtils.useDefaultRenderLayer()
+        # get the number of main controllers entered by user:
+        if enteredNCtrls == 0:
+            try:
+                self.nMainCtrlAttr = cmds.intField(self.nMainCtrlIF, query=True, value=True)
+            except:
+                return
+        else:
+            self.nMainCtrlAttr = enteredNCtrls
+        # limit range
+        if self.nMainCtrlAttr >= self.currentNJoints:
+            self.nMainCtrlAttr = self.currentNJoints - 1
+            cmds.intField(self.nMainCtrlIF, edit=True, value=self.nMainCtrlAttr)
+        cmds.setAttr(self.moduleGrp+".nMain", self.nMainCtrlAttr)
+
+
+    def enableMainCtrls(self, value, *args):
+        """ Just enable or disable the main controllers int field UI.
+        """
+        cmds.intField(self.nMainCtrlIF, edit=True, editable=value)
+        cmds.checkBox(self.mainCtrlsCB, edit=True, editable=True)
+
+
+    def setAddMainCtrls(self, value, *args):
+        """ Just store the main controllers checkBox value and enable the int field.
+        """
+        cmds.setAttr(self.moduleGrp+".mainControls", value)
+        self.enableMainCtrls(value)
+
     
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
