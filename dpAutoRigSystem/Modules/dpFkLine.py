@@ -292,6 +292,39 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         # create end joint:
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
+                
+
+                #WIP
+                
+                if cmds.getAttr(self.base+".mainControls"):
+                    print("self.nJoints = ", self.nJoints)
+                    totalToAddMain = 1
+                    self.nMain = cmds.getAttr(self.base+".nMain")
+                    print("self.nMain = ", self.nMain)
+                    
+                    if self.nMain > 1:
+                        totalToAddMain = int(self.nJoints/self.nMain)
+                    print("totalToAddMain ==", totalToAddMain )
+
+                    for m in range(0, self.nMain):
+                        print ("m= ----- ", m)
+                        
+                        startAt = m*totalToAddMain
+                        endAt = (m+1)*totalToAddMain
+                        
+                        if m == self.nMain-1:
+                            endAt = self.nJoints
+                        for n in range(startAt, endAt):
+                            print ("n=", n)
+
+                            if n == startAt:
+                                # create a main controller
+                                print ("creating a main controller here")
+
+
+
+
+
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Scalable_Grp")
