@@ -100,5 +100,5 @@
     "id_093_HeadSub"         : {"type" : "BallonFlat",       "degree" : 3},
     "id_094_LimbExtremSub"   : {"type" : "Ball",             "degree" : 3},
     "id_095_LimbMainSub"     : {"type" : "Ball",             "degree" : 3},
-    "id_096_FkLineMain"      : {"type" : "Ball",             "degree" : 3}
+    "id_096_FkLineMain"      : {"type" : "Circle",           "degree" : 3}
 }

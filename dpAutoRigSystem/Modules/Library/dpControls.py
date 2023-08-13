@@ -1364,8 +1364,9 @@ class ControlClass(object):
     def setSubControlDisplay(self, ctrl, subCtrl, defValue, *args):
         """ Set the shapes visibility of sub control.
         """
-        cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="short", minValue=0, maxValue=1, defaultValue=defValue)
-        cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
+        if not cmds.objExists(ctrl+".subControlDisplay"):
+            cmds.addAttr(ctrl, longName="subControlDisplay", attributeType="short", minValue=0, maxValue=1, defaultValue=defValue)
+            cmds.setAttr(ctrl+".subControlDisplay", channelBox=True)
         subShapeList = cmds.listRelatives(subCtrl, children=True, type="shape")
         if subShapeList:
             for subShapeNode in subShapeList:

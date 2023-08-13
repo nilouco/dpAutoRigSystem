@@ -177,6 +177,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
+            axisList = ['X', 'Y', 'Z']
             try:
                 hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
             except:
@@ -292,39 +293,46 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         # create end joint:
                         self.endJoint = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                         cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJoint, maintainOffset=False))
-                
-
-                #WIP
-                
+                # work with main controllers
                 if cmds.getAttr(self.base+".mainControls"):
-                    print("self.nJoints = ", self.nJoints)
+                    # getting and calculating values
                     totalToAddMain = 1
                     self.nMain = cmds.getAttr(self.base+".nMain")
-                    print("self.nMain = ", self.nMain)
-                    
                     if self.nMain > 1:
                         totalToAddMain = int(self.nJoints/self.nMain)
-                    print("totalToAddMain ==", totalToAddMain )
-
+                    # run throgh the chain
                     for m in range(0, self.nMain):
-                        print ("m= ----- ", m)
-                        
                         startAt = m*totalToAddMain
                         endAt = (m+1)*totalToAddMain
-                        
                         if m == self.nMain-1:
                             endAt = self.nJoints
                         for n in range(startAt, endAt):
-                            print ("n=", n)
-
+                            currentCtrl = side+self.userGuideName+"_%02d_Ctrl"%(n)
+                            currentCtrlZero = currentCtrl+"_Zero_0_Grp"
                             if n == startAt:
                                 # create a main controller
-                                print ("creating a main controller here")
-
-
-
-
-
+                                mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree)
+                                self.ctrls.colorShape([mainCtrl], "cyan")
+                                cmds.addAttr(mainCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                                # position
+                                cmds.parent(mainCtrl, currentCtrlZero)
+                                cmds.makeIdentity(mainCtrl, apply=False, translate=True, rotate=True, scale=True)
+                                cmds.parent(currentCtrl, mainCtrl)
+                                # intensity utilities
+                                rIntensityMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_R_Main_MD")
+                                for axis in axisList:
+                                    cmds.connectAttr(mainCtrl+".rotate"+axis, rIntensityMD+".input1"+axis, force=True)
+                                    cmds.connectAttr(mainCtrl+"."+self.dpUIinst.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
+                            else:
+                                # offseting sub controllers
+                                offsetGrp = cmds.group(name=currentCtrl+"_Offset_Grp", empty=True)
+                                cmds.parent(offsetGrp, currentCtrlZero)
+                                cmds.makeIdentity(offsetGrp, apply=False, translate=True, rotate=True, scale=True)
+                                cmds.parent(currentCtrl, offsetGrp)
+                                for axis in axisList:
+                                    cmds.connectAttr(rIntensityMD+".output"+axis, offsetGrp+".rotate"+axis, force=True)
+                            # display sub controllers shapes
+                            self.ctrls.setSubControlDisplay(mainCtrl, currentCtrl, 0)
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.ctrlZeroGrp, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], name=side+self.userGuideName+"_Scalable_Grp")
