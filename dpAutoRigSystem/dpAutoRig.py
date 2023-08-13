@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.16"
-DPAR_UPDATELOG = "N732 - Back new wheel control shapes."
+DPAR_VERSION_PY3 = "4.03.17"
+DPAR_UPDATELOG = "N734 - FkLine sub controllers."
 
 
 

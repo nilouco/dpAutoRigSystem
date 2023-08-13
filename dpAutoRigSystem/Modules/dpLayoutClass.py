@@ -3,7 +3,7 @@ from maya import cmds
 from .Library import dpUtils
 from functools import partial
 
-DP_LAYOUTCLASS_VERSION = 2.1
+DP_LAYOUTCLASS_VERSION = 2.2
 
 
 class LayoutClass(object):
@@ -135,6 +135,7 @@ class LayoutClass(object):
                 self.articulationExists = cmds.objExists(self.moduleGrp+".articulation")
                 self.nostrilExists = cmds.objExists(self.moduleGrp+".nostril")
                 self.correctiveExists = cmds.objExists(self.moduleGrp+".corrective")
+                self.nMainCtrlAttrExists = cmds.objExists(self.moduleGrp+".mainControls")
                 
                 # UI
                 # edit label of frame layout:
@@ -145,20 +146,20 @@ class LayoutClass(object):
                 # re-create segment layout:
                 self.segDelColumn = cmds.rowLayout('segDelColumn', numberOfColumns=4, columnWidth4=(100, 140, 50, 75), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
                 if self.nJointsAttrExists:
-                    nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
-                    if nJointsAttr > 0:
+                    self.nJointsAttr = cmds.getAttr(self.moduleGrp+".nJoints")
+                    if self.nJointsAttr > 0:
                         self.nSegmentsText = cmds.text(label=self.dpUIinst.lang['m003_segments'], parent=self.segDelColumn)
-                        self.nJointsIF = cmds.intField(value=nJointsAttr, minValue=1, changeCommand=partial(self.changeJointNumber, 0), parent=self.segDelColumn)
+                        self.nJointsIF = cmds.intField(value=self.nJointsAttr, minValue=1, changeCommand=partial(self.changeJointNumber, 0), parent=self.segDelColumn)
                     else:
                         self.nSegmentsText = cmds.text(label=self.dpUIinst.lang['m003_segments'], parent=self.segDelColumn)
-                        self.nJointsIF = cmds.intField(value=nJointsAttr, minValue=0, editable=False, parent=self.segDelColumn)
+                        self.nJointsIF = cmds.intField(value=self.nJointsAttr, minValue=0, editable=False, parent=self.segDelColumn)
                 else:
                     cmds.text(" ", parent=self.segDelColumn)
                     cmds.text(" ", parent=self.segDelColumn)
                 # create Delete button:
                 self.deleteButton = cmds.button(label=self.dpUIinst.lang['m005_delete'], command=self.deleteModule, backgroundColor=(1.0, 0.7, 0.7), parent=self.segDelColumn)
                 self.duplicateButton = cmds.button(label=self.dpUIinst.lang['m070_duplicate'], command=self.duplicateModule, backgroundColor=(0.7, 0.6, 0.8), annotation=self.dpUIinst.lang['i068_CtrlD'], parent=self.segDelColumn)
-                
+
                 # reCreate mirror layout:
                 self.doubleRigColumn = cmds.rowLayout('doubleRigColumn', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
                 cmds.text(self.dpUIinst.lang['m010_mirror'], parent=self.doubleRigColumn)
@@ -333,7 +334,21 @@ class LayoutClass(object):
                     cmds.text(self.dpUIinst.lang['c124_corrective'].capitalize(), parent=self.correctiveLayout)
                     correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
                     self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
-                
+
+                # create main controllers layout:
+                if self.nJointsAttrExists:
+                    if self.nMainCtrlAttrExists:
+                        if self.nJointsAttr > 0:
+                            self.mainCtrlColumn = cmds.rowLayout('mainCtrlColumn', numberOfColumns=2, columnWidth2=(100, 100), columnAlign=[(1, 'right'), (2, 'left')], adjustableColumn=2, columnAttach=[(1, 'right', 2), (2, 'left', 2)], parent="selectedModuleColumn" )
+                            hasMain = cmds.getAttr(self.moduleGrp+".mainControls")
+                            nMainCtrlAttr = cmds.getAttr(self.moduleGrp+".nMain")
+                            if self.nJointsAttr > 1:
+                                self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
+                                self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=hasMain, parent=self.mainCtrlColumn)
+                            else:
+                                self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=False, enable=False, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
+                                self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
+
             except:
                 pass
     
