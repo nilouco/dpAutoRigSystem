@@ -90,30 +90,30 @@ def Bike(dpUIinst):
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+handlebarName))
             
             # create fork instance:
-            HandlebarInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            handlebarInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing fork base guide informations:
-            HandlebarInstance.editUserName(handlebarName)
-            cmds.setAttr(HandlebarInstance.moduleGrp+".translateY", 13.4)
-            cmds.setAttr(HandlebarInstance.moduleGrp+".translateZ", 4.7)
-            cmds.setAttr(HandlebarInstance.moduleGrp+".rotateX", 71)
-            cmds.setAttr(HandlebarInstance.annotation+".translateY", 2)
+            handlebarInstance.editUserName(handlebarName)
+            cmds.setAttr(handlebarInstance.moduleGrp+".translateY", 13.4)
+            cmds.setAttr(handlebarInstance.moduleGrp+".translateZ", 4.7)
+            cmds.setAttr(handlebarInstance.moduleGrp+".rotateX", 71)
+            cmds.setAttr(handlebarInstance.annotation+".translateY", 2)
 
             
             # parent fork guide to Handlebar guide:
-            cmds.parent(HandlebarInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
+            cmds.parent(handlebarInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
 
             # create fkLine module instance:
-            ForkInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            forkInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing fkLine base guide informations:
-            ForkInstance.editUserName(forkName)
-            cmds.setAttr(ForkInstance.moduleGrp+".translateY", 10.7)
-            cmds.setAttr(ForkInstance.moduleGrp+".translateZ", 6)
-            cmds.setAttr(ForkInstance.moduleGrp+".rotateX", -19)
-            cmds.setAttr(ForkInstance.radiusCtrl+".translateX", 1.1)
+            forkInstance.editUserName(forkName)
+            cmds.setAttr(forkInstance.moduleGrp+".translateY", 10.7)
+            cmds.setAttr(forkInstance.moduleGrp+".translateZ", 6)
+            cmds.setAttr(forkInstance.moduleGrp+".rotateX", -19)
+            cmds.setAttr(forkInstance.radiusCtrl+".translateX", 1.1)
 
             
             # parent fork guide to handlebar guide:
-            cmds.parent(ForkInstance.moduleGrp, HandlebarInstance.moduleGrp, absolute=True)
+            cmds.parent(forkInstance.moduleGrp, handlebarInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -186,7 +186,7 @@ def Bike(dpUIinst):
             cmds.setAttr(frontWheelInstance.cvOutsideLoc+".translateZ", -0.35)
             
             # parent front wheel guide to fork guide:
-            cmds.parent(frontWheelInstance.moduleGrp, ForkInstance.moduleGrp, absolute=True)
+            cmds.parent(frontWheelInstance.moduleGrp, forkInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -249,7 +249,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(hornInstance.radiusCtrl+".translateX", 0.7)
                 
                 # parent horn guide to Handlebar guide:
-                cmds.parent(hornInstance.moduleGrp, HandlebarInstance.cvJointLoc, absolute=True)
+                cmds.parent(hornInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -264,7 +264,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(frontSuspensionInstance.moduleGrp+".rotateX", -110)
                 cmds.setAttr(frontSuspensionInstance.radiusCtrl+".translateX", 0.7)
                 # edit fatherB attribut for frontSuspension module guide?
-                cmds.setAttr(frontSuspensionInstance.moduleGrp+".fatherB", ForkInstance.moduleGrp, type='string')
+                cmds.setAttr(frontSuspensionInstance.moduleGrp+".fatherB", forkInstance.moduleGrp, type='string')
                 
                 # parent front suspension guide to front wheel guide:
                 cmds.parent(frontSuspensionInstance.moduleGrp, frontWheelInstance.moduleGrp, absolute=True)
@@ -311,7 +311,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateZ", 0.5)
                 
                 # parent mirror guide to handlebar guide:
-                cmds.parent(mirrorInstance.moduleGrp, HandlebarInstance.cvJointLoc, absolute=True)
+                cmds.parent(mirrorInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -332,7 +332,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(leverInstance.radiusCtrl+".translateX",0.8)
                 
                 # parent lever guide to handlebar guide:
-                cmds.parent(leverInstance.moduleGrp, HandlebarInstance.cvJointLoc, absolute=True)
+                cmds.parent(leverInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
