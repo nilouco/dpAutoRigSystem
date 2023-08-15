@@ -8,7 +8,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DP_UPDATEGUIDES_VERSION = 1.3
+DP_UPDATEGUIDES_VERSION = 1.4
 
 
 class UpdateGuides(object):
@@ -394,7 +394,7 @@ class UpdateGuides(object):
                 if hasParent != None:
                     newParentFinal = self.retrieveNewParent(hasParent)
                     try:
-                        cmds.parent(retainGuide, newParentFinal, 1)
+                        cmds.parent(retainGuide, newParentFinal)
                     except:
                         mel.eval('print \"dpAR: '+self.dpUIinst.lang['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
     
