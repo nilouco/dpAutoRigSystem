@@ -35,8 +35,8 @@ def Bike(dpUIinst):
         doingName = dpUIinst.lang['m094_doing']
         # part names:
         chassisName = dpUIinst.lang['c091_chassis']
-        sterringHandleName = dpUIinst.lang['m158_steering']+dpUIinst.lang['c078_handle']
-        sterringName = dpUIinst.lang['m158_steering']+dpUIinst.lang['m162_wheelShape']
+        forkName = dpUIinst.lang['m228_fork']+dpUIinst.lang['c078_handle']
+        handlebarName = dpUIinst.lang['m227_handlebar']+dpUIinst.lang['m162_wheelShape']
         hornName = dpUIinst.lang['c081_horn']
         frontWheelName = dpUIinst.lang['c056_front']+dpUIinst.lang['m156_wheel']
         backWheelName = dpUIinst.lang['c057_back']+dpUIinst.lang['m156_wheel']
@@ -82,37 +82,39 @@ def Bike(dpUIinst):
             
             # Update progress window
             progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sterringHandleName))
-            
-            # woking with STEERING HANDLE system:
-            # create fkLine module instance:
-            steeringHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-            # editing steering base guide informations:
-            steeringHandleInstance.editUserName(sterringHandleName)
-            cmds.setAttr(steeringHandleInstance.moduleGrp+".translateY", 11.7)
-            cmds.setAttr(steeringHandleInstance.moduleGrp+".translateZ", 5.1)
-            cmds.setAttr(steeringHandleInstance.moduleGrp+".rotateX", -19)
-            cmds.setAttr(steeringHandleInstance.radiusCtrl+".translateX", 1.1)
-            
-            # parent steering handle guide to chassis guide:
-            cmds.parent(steeringHandleInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+forkName))
+    
             
             # Update progress window
             progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sterringName))
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+handlebarName))
             
             # woking with STEERING system:
             # create steering module instance:
-            steeringInstance = dpUIinst.initGuide('dpSteering', guideDir)
+            steeringInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing steering base guide informations:
-            steeringInstance.editUserName(sterringName)
+            steeringInstance.editUserName(handlebarName)
             cmds.setAttr(steeringInstance.moduleGrp+".translateY", 12.7)
             cmds.setAttr(steeringInstance.moduleGrp+".translateZ", 4.7)
             cmds.setAttr(steeringInstance.moduleGrp+".rotateX", 71)
             cmds.setAttr(steeringInstance.annotation+".translateY", 2)
             
             # parent steering guide to steering handle guide:
-            cmds.parent(steeringInstance.moduleGrp, steeringHandleInstance.moduleGrp, absolute=True)
+            cmds.parent(steeringInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
+            # cmds.parent(steeringHandleInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
+
+            # woking with STEERING HANDLE system:
+            # create fkLine module instance:
+            steeringHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            # editing steering base guide informations:
+            steeringHandleInstance.editUserName(forkName)
+            cmds.setAttr(steeringHandleInstance.moduleGrp+".translateY", 11.7)
+            cmds.setAttr(steeringHandleInstance.moduleGrp+".translateZ", 5.1)
+            cmds.setAttr(steeringHandleInstance.moduleGrp+".rotateX", -19)
+            cmds.setAttr(steeringHandleInstance.radiusCtrl+".translateX", 1.1)
+            
+            # parent steering handle guide to chassis guide:
+            cmds.parent(steeringHandleInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -185,7 +187,7 @@ def Bike(dpUIinst):
             cmds.setAttr(frontWheelInstance.cvOutsideLoc+".translateZ", -0.35)
             
             # parent front wheel guide to steering base guide:
-            cmds.parent(frontWheelInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
+            cmds.parent(frontWheelInstance.moduleGrp, steeringHandleInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -205,8 +207,8 @@ def Bike(dpUIinst):
             cmds.setAttr(backWheelInstance.cvInsideLoc+".translateZ", 0.35)
             cmds.setAttr(backWheelInstance.cvOutsideLoc+".translateZ", -0.35)
             
-            # parent front wheel guide to steering base guide:
-            cmds.parent(backWheelInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
+            # parent back wheel guide to steering base guide:
+            cmds.parent(backWheelInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -263,7 +265,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(frontSuspensionInstance.moduleGrp+".rotateX", -110)
                 cmds.setAttr(frontSuspensionInstance.radiusCtrl+".translateX", 0.7)
                 # edit fatherB attribut for frontSuspension module guide?
-                cmds.setAttr(frontSuspensionInstance.moduleGrp+".fatherB", chassisInstance.moduleGrp, type='string')
+                cmds.setAttr(frontSuspensionInstance.moduleGrp+".fatherB", steeringHandleInstance.moduleGrp, type='string')
                 
                 # parent front suspension guide to front wheel guide:
                 cmds.parent(frontSuspensionInstance.moduleGrp, frontWheelInstance.moduleGrp, absolute=True)

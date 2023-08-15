@@ -675,6 +675,8 @@
     "m224_rename"               : "Rename",
     "m225_selectAnything"       : "Select anything to continue, please.",
     "m226_createFaceToRivet"    : "Create FaceToRivet geometry",
+    "m227_handlebar"            : "Handlebar",
+    "m228_fork"                 : "Fork",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
