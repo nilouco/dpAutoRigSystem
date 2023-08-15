@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.17"
-DPAR_UPDATELOG = "N734 - FkLine sub controllers."
+DPAR_VERSION_PY3 = "4.03.18"
+DPAR_UPDATELOG = "N492 - Bike steering wheel pivot."
 
 
 

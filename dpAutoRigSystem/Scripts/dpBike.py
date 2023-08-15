@@ -8,7 +8,7 @@ TITLE = "m165_bike"
 DESCRIPTION = "m166_bikeDesc"
 ICON = "/Icons/dp_bike.png"
 
-DP_BIKE_VERSION = 2.0
+DP_BIKE_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -35,8 +35,8 @@ def Bike(dpUIinst):
         doingName = dpUIinst.lang['m094_doing']
         # part names:
         chassisName = dpUIinst.lang['c091_chassis']
-        sterringHandleName = dpUIinst.lang['m158_steering']+dpUIinst.lang['c078_handle']
-        sterringName = dpUIinst.lang['m158_steering']+dpUIinst.lang['m162_wheelShape']
+        forkName = dpUIinst.lang['m229_fork']
+        handlebarName = dpUIinst.lang['m228_handlebar']
         hornName = dpUIinst.lang['c081_horn']
         frontWheelName = dpUIinst.lang['c056_front']+dpUIinst.lang['m156_wheel']
         backWheelName = dpUIinst.lang['c057_back']+dpUIinst.lang['m156_wheel']
@@ -82,37 +82,38 @@ def Bike(dpUIinst):
             
             # Update progress window
             progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sterringHandleName))
-            
-            # woking with STEERING HANDLE system:
-            # create fkLine module instance:
-            steeringHandleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
-            # editing steering base guide informations:
-            steeringHandleInstance.editUserName(sterringHandleName)
-            cmds.setAttr(steeringHandleInstance.moduleGrp+".translateY", 11.7)
-            cmds.setAttr(steeringHandleInstance.moduleGrp+".translateZ", 5.1)
-            cmds.setAttr(steeringHandleInstance.moduleGrp+".rotateX", -19)
-            cmds.setAttr(steeringHandleInstance.radiusCtrl+".translateX", 1.1)
-            
-            # parent steering handle guide to chassis guide:
-            cmds.parent(steeringHandleInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+forkName))
+    
             
             # Update progress window
             progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sterringName))
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+handlebarName))
             
-            # woking with STEERING system:
-            # create steering module instance:
-            steeringInstance = dpUIinst.initGuide('dpSteering', guideDir)
-            # editing steering base guide informations:
-            steeringInstance.editUserName(sterringName)
-            cmds.setAttr(steeringInstance.moduleGrp+".translateY", 12.7)
-            cmds.setAttr(steeringInstance.moduleGrp+".translateZ", 4.7)
-            cmds.setAttr(steeringInstance.moduleGrp+".rotateX", 71)
-            cmds.setAttr(steeringInstance.annotation+".translateY", 2)
+            # create fork instance:
+            handlebarInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            # editing fork base guide informations:
+            handlebarInstance.editUserName(handlebarName)
+            cmds.setAttr(handlebarInstance.moduleGrp+".translateY", 13.4)
+            cmds.setAttr(handlebarInstance.moduleGrp+".translateZ", 4.7)
+            cmds.setAttr(handlebarInstance.moduleGrp+".rotateX", 71)
+            cmds.setAttr(handlebarInstance.annotation+".translateY", 2)
+
             
-            # parent steering guide to steering handle guide:
-            cmds.parent(steeringInstance.moduleGrp, steeringHandleInstance.moduleGrp, absolute=True)
+            # parent fork guide to Handlebar guide:
+            cmds.parent(handlebarInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
+
+            # create fkLine module instance:
+            forkInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+            # editing fkLine base guide informations:
+            forkInstance.editUserName(forkName)
+            cmds.setAttr(forkInstance.moduleGrp+".translateY", 10.7)
+            cmds.setAttr(forkInstance.moduleGrp+".translateZ", 6)
+            cmds.setAttr(forkInstance.moduleGrp+".rotateX", -19)
+            cmds.setAttr(forkInstance.radiusCtrl+".translateX", 1.1)
+
+            
+            # parent fork guide to handlebar guide:
+            cmds.parent(forkInstance.moduleGrp, handlebarInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -129,7 +130,7 @@ def Bike(dpUIinst):
             cmds.setAttr(pedalInstance.radiusCtrl+".translateX", 1.5)
             cmds.setAttr(pedalInstance.moduleGrp+".steering", 0)
             
-            # parent pedal wheel guide to steering base guide:
+            # parent pedal wheel guide to chassis guide:
             cmds.parent(pedalInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
             
             # Update progress window
@@ -179,13 +180,13 @@ def Bike(dpUIinst):
             cmds.setAttr(frontWheelInstance.moduleGrp+".translateZ", 8.4)
             cmds.setAttr(frontWheelInstance.moduleGrp+".rotateY", -90)
             cmds.setAttr(frontWheelInstance.radiusCtrl+".translateX", 4.7)
-            cmds.setAttr(frontWheelInstance.moduleGrp+".steering", 1)
+            cmds.setAttr(frontWheelInstance.moduleGrp+".steering", 0)
             # edit location of inside and outiside guide:
             cmds.setAttr(frontWheelInstance.cvInsideLoc+".translateZ", 0.35)
             cmds.setAttr(frontWheelInstance.cvOutsideLoc+".translateZ", -0.35)
             
-            # parent front wheel guide to steering base guide:
-            cmds.parent(frontWheelInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
+            # parent front wheel guide to fork guide:
+            cmds.parent(frontWheelInstance.moduleGrp, forkInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -205,8 +206,8 @@ def Bike(dpUIinst):
             cmds.setAttr(backWheelInstance.cvInsideLoc+".translateZ", 0.35)
             cmds.setAttr(backWheelInstance.cvOutsideLoc+".translateZ", -0.35)
             
-            # parent front wheel guide to steering base guide:
-            cmds.parent(backWheelInstance.moduleGrp, steeringInstance.moduleGrp, absolute=True)
+            # parent back wheel guide to chassis guide:
+            cmds.parent(backWheelInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
             
             # Update progress window
             progressAmount += 1
@@ -241,14 +242,14 @@ def Bike(dpUIinst):
                 hornInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing eyeLookAt base guide informations:
                 hornInstance.editUserName(hornName)
-                cmds.setAttr(hornInstance.moduleGrp+".translateX", -0.64)
+                cmds.setAttr(hornInstance.moduleGrp+".translateX", -1.64)
                 cmds.setAttr(hornInstance.moduleGrp+".translateY", 13.3)
                 cmds.setAttr(hornInstance.moduleGrp+".translateZ", 4.5)
                 cmds.setAttr(hornInstance.moduleGrp+".rotateX", 17)
                 cmds.setAttr(hornInstance.radiusCtrl+".translateX", 0.7)
                 
-                # parent horn guide to steering guide:
-                cmds.parent(hornInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
+                # parent horn guide to Handlebar guide:
+                cmds.parent(hornInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -263,7 +264,7 @@ def Bike(dpUIinst):
                 cmds.setAttr(frontSuspensionInstance.moduleGrp+".rotateX", -110)
                 cmds.setAttr(frontSuspensionInstance.radiusCtrl+".translateX", 0.7)
                 # edit fatherB attribut for frontSuspension module guide?
-                cmds.setAttr(frontSuspensionInstance.moduleGrp+".fatherB", chassisInstance.moduleGrp, type='string')
+                cmds.setAttr(frontSuspensionInstance.moduleGrp+".fatherB", forkInstance.moduleGrp, type='string')
                 
                 # parent front suspension guide to front wheel guide:
                 cmds.parent(frontSuspensionInstance.moduleGrp, frontWheelInstance.moduleGrp, absolute=True)
@@ -309,8 +310,8 @@ def Bike(dpUIinst):
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateX", 1.2)
                 cmds.setAttr(mirrorInstance.cvJointLoc+".translateZ", 0.5)
                 
-                # parent mirror guide to steering guide:
-                cmds.parent(mirrorInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
+                # parent mirror guide to handlebar guide:
+                cmds.parent(mirrorInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -330,8 +331,8 @@ def Bike(dpUIinst):
                 cmds.setAttr(leverInstance.moduleGrp+".rotateY", 10)
                 cmds.setAttr(leverInstance.radiusCtrl+".translateX",0.8)
                 
-                # parent lever guide to steering guide:
-                cmds.parent(leverInstance.moduleGrp, steeringInstance.cvJointLoc, absolute=True)
+                # parent lever guide to handlebar guide:
+                cmds.parent(leverInstance.moduleGrp, handlebarInstance.cvJointLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
