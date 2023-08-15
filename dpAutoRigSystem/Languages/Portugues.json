@@ -675,8 +675,8 @@
     "m224_rename"               : "Renomear",
     "m225_selectAnything"       : "Select anything to continue, please.",
     "m226_createFaceToRivet"    : "Criar geometria FaceToRivet",
-    "m227_handlebar"            : "Guidao",
-    "m228_fork"                 : "Garfo",
+    "m228_handlebar"            : "Guidao",
+    "m229_fork"                 : "Garfo",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
