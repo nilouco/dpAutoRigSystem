@@ -35,8 +35,8 @@ def Bike(dpUIinst):
         doingName = dpUIinst.lang['m094_doing']
         # part names:
         chassisName = dpUIinst.lang['c091_chassis']
-        forkName = dpUIinst.lang['m228_fork']+dpUIinst.lang['c078_handle']
-        handlebarName = dpUIinst.lang['m227_handlebar']+dpUIinst.lang['m162_wheelShape']
+        forkName = dpUIinst.lang['m228_fork']
+        handlebarName = dpUIinst.lang['m227_handlebar']
         hornName = dpUIinst.lang['c081_horn']
         frontWheelName = dpUIinst.lang['c056_front']+dpUIinst.lang['m156_wheel']
         backWheelName = dpUIinst.lang['c057_back']+dpUIinst.lang['m156_wheel']
