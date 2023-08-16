@@ -170,13 +170,18 @@ class UpdateGuides(object):
 
     def setAttrValue(self, dpGuide, attr, value):
         try:
+            isLocked = cmds.getAttr(dpGuide+'.'+attr, lock=True)
+            cmds.setAttr(dpGuide+'.'+attr, lock=False)
             cmds.setAttr(dpGuide+'.'+attr, value)
+            if isLocked:
+                cmds.setAttr(dpGuide+'.'+attr, lock=True)
         except:
             mel.eval('print \"dpAR: '+self.dpUIinst.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
 
 
     def setAttrStrValue(self, dpGuide, attr, value):
         try:
+            cmds.setAttr(dpGuide+'.'+attr, lock=False)
             cmds.setAttr(dpGuide+'.'+attr, value, type='string')
         except:
             mel.eval('print \"dpAR: '+self.dpUIinst.lang['m195_couldNotBeSet']+' '+dpGuide+'.'+attr+'\\n\";')
