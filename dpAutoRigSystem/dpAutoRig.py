@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.18"
+DPAR_VERSION_PY3 = "4.03.19"
 DPAR_UPDATELOG = "N727 - Current version guides\nchildren of old guides."
 
 
