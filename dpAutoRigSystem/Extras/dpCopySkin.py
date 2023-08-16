@@ -19,69 +19,50 @@ class CopySkin(object):
         # call main function
         self.dpMain(self)
     
+    
     def dpMain(self, *args):
         """ Main function to analise and call copy skin process. 
         """
-        selList = cmds.ls(selection=True)
+        selList = cmds.ls(selection=True, long=True)
         if selList and len(selList) > 1:
             # get first selected item
             sourceItem = selList[0]
             # get other selected items
             destinationList = selList[1:]
-            # validade unique node name
-            if len(cmds.ls(sourceItem)) == 1:
-                shapeList = cmds.listRelatives(sourceItem, shapes=True)
-                if shapeList:
-                    # check if there's a skinCluster node connected to the first selected item
-                    checkSkin = self.dpCheckSkinCluster(shapeList)
-                    if checkSkin == True:
-                        # get joints influence from skinCluster
-                        skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
-                        if skinInfList:
-                            # call copySkin function
-                            self.dpCopySkin(sourceItem, destinationList, skinInfList)
-                    elif checkSkin == -1:
-                        mel.eval("warning \""+self.dpUIinst.lang["i163_sameName"]+" "+sourceItem+"\";")
-                    else:
-                        print(self.dpUIinst.lang['e007_notSkinFound'])
+            shapeList = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
+            if shapeList:
+                # check if there's a skinCluster node connected to the first selected item
+                checkSkin = self.checkExistingSkinClusterNode(shapeList)
+                if checkSkin == True:
+                    # get joints influence from skinCluster
+                    skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
+                    if skinInfList:
+                        skinMethodToUse = cmds.skinCluster(sourceItem, query=True, skinMethod=True)
+                        # call copySkin function
+                        self.dpCopySkin(sourceItem, destinationList, skinInfList, skinMethodToUse)
                 else:
-                    print(self.dpUIinst.lang['e006_firstSkinnedGeo'])
+                    mel.eval("warning \""+self.dpUIinst.lang['e007_notSkinFound']+"\";")
             else:
-                mel.eval("warning \""+self.dpUIinst.lang["i163_sameName"]+" "+sourceItem+"\";")
+                mel.eval("warning \""+self.dpUIinst.lang['e006_firstSkinnedGeo']+"\";")
         else:
-            print(self.dpUIinst.lang['e005_selectOneObj'])
+            mel.eval("warning \""+self.dpUIinst.lang['e005_selectOneObj']+"\";")
 
-
-    def dpCheckSkinCluster(self, shapeList, *args):
-        """ Verify if there's a skinCluster node in the list of history of the shape.
-            Return True if yes.
-            Return False if no.
-            Return -1 if there's another node with the same name.
-        """
-        for shapeNode in shapeList:
-            if not shapeNode.endswith("Orig"):
-                try:
-                    histList = cmds.listHistory(shapeNode)
-                    if histList:
-                        for histItem in histList:
-                            if cmds.objectType(histItem) == "skinCluster":
-                                return True
-                except:
-                    return -1
-        return False
     
-    
-    def deleteExistingSkinClusterNode(self, item, *args):
+    def checkExistingSkinClusterNode(self, item, deleteIt=False, *args):
         """ Delete existing skinCluster node if there's one
         """
+        result = False
         inputDeformerList = cmds.findDeformers(item)
         if inputDeformerList:
             for deformerNode in inputDeformerList:
                 if cmds.objectType(deformerNode) == "skinCluster":
-                    cmds.delete(deformerNode)
+                    if deleteIt:
+                        cmds.delete(deformerNode)
+                    result = True
+        return result
 
 
-    def dpCopySkin(self, sourceItem, destinationList, skinInfList, *args):
+    def dpCopySkin(self, sourceItem, destinationList, skinInfList, skinMethodToUse=0, *args):
         """ Do the copy skin from sourceItem to destinationList using the skinInfList.
         """
         for item in destinationList:
@@ -89,12 +70,12 @@ class CopySkin(object):
             skinClusterName = dpUtils.extractSuffix(item)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
-            self.deleteExistingSkinClusterNode(item)
+            self.checkExistingSkinClusterNode(item, True)
             # create skinCluster node
-            cmds.skinCluster(skinInfList, item, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=0)
+            cmds.skinCluster(skinInfList, item, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)
             cmds.select(sourceItem)
             cmds.select(item, toggle=True)
             # copy skin weights from sourceItem to item node
             cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
             # log result
-            print(self.dpUIinst.lang['i083_copiedSkin'], sourceItem, item)
+            mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+item+"\";")
