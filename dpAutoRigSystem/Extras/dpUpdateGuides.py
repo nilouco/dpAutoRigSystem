@@ -229,7 +229,7 @@ class UpdateGuides(object):
         """ Verify if we have specific attribute cases to work with each kind of module guides.
             Ignore known attributes.
         """
-        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion']
+        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
         if attr not in ignoreList:
             if attr == 'nJoints':
                 currentInstance = self.getNewGuideInstance(dpGuide)
@@ -254,6 +254,8 @@ class UpdateGuides(object):
             elif attr == 'rigType':
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.rigType = value
+                self.setAttrStrValue(dpGuide, attr, value)
+            elif attr == 'lockedList' and value != '':
                 self.setAttrStrValue(dpGuide, attr, value)
             # EYE ATTRIBUTES
             elif attr == 'eyelid':
