@@ -9,7 +9,7 @@ TITLE = "m097_copySkin"
 DESCRIPTION = "m098_copySkinDesc"
 ICON = "/Icons/dp_copySkin.png"
 
-DP_COPYSKIN_VERSION = 1.4
+DP_COPYSKIN_VERSION = 1.5
 
 
 class CopySkin(object):
@@ -71,6 +71,16 @@ class CopySkin(object):
         return False
     
     
+    def deleteExistingSkinClusterNode(self, item, *args):
+        """ Delete existing skinCluster node if there's one
+        """
+        inputDeformerList = cmds.findDeformers(item)
+        if inputDeformerList:
+            for deformerNode in inputDeformerList:
+                if cmds.objectType(deformerNode) == "skinCluster":
+                    cmds.delete(deformerNode)
+
+
     def dpCopySkin(self, sourceItem, destinationList, skinInfList, *args):
         """ Do the copy skin from sourceItem to destinationList using the skinInfList.
         """
@@ -79,6 +89,7 @@ class CopySkin(object):
             skinClusterName = dpUtils.extractSuffix(item)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
+            self.deleteExistingSkinClusterNode(item)
             # create skinCluster node
             cmds.skinCluster(skinInfList, item, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=0)
             cmds.select(sourceItem)
