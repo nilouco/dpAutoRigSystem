@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.18"
-DPAR_UPDATELOG = "N492 - Bike steering wheel pivot."
+DPAR_VERSION_PY3 = "4.03.19"
+DPAR_UPDATELOG = "N736 - Fixed display layer validator\n when there's duplicated name in the scene."
 
 
 

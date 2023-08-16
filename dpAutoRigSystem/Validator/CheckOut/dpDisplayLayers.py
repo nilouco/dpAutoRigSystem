@@ -9,7 +9,7 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-DP_DISPLAYLAYERS_VERSION = 1.1
+DP_DISPLAYLAYERS_VERSION = 1.2
 
 
 class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
@@ -69,7 +69,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
                     layersConfiguration = [geoLyrVisibility, geoLyrHideOnPlayback, geolLyrDisplayType, ctrlLyrVisibility, ctrlLyrHideOnPlayback, ctrlLyrDisplayType]
                     # Check layers configuration
                     if layersConfiguration == layersConfigurationCheckList:
-                        itemsInGeoLayerList = cmds.editDisplayLayerMembers(self.geoLayerName, query=True)
+                        itemsInGeoLayerList = cmds.editDisplayLayerMembers(self.geoLayerName, fullNames=True, query=True)
                         itemsInCtrlLayerList = cmds.editDisplayLayerMembers(self.ctrlLayerName, query=True)
                         # Check layers members
                         if itemsInGeoLayerList and itemsInCtrlLayerList:
@@ -159,16 +159,17 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         renderGrp = dpUtils.getNodeByMessage("renderGrp")
         proxyGrp = dpUtils.getNodeByMessage("proxyGrp")
         if renderGrp and proxyGrp:
-            renderGrpShapesList = cmds.listRelatives(renderGrp, allDescendents=True, type="mesh") or []
-            proxyGrpShapesList = cmds.listRelatives(proxyGrp, allDescendents=True, type="mesh") or []
+            renderGrpShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
+            proxyGrpShapesList = cmds.listRelatives(proxyGrp, allDescendents=True, fullPath=True, type="mesh") or []
             allShapesList = list(set(renderGrpShapesList + proxyGrpShapesList))
             allGeoList = []
             if allShapesList:
                 for shape in allShapesList:
                     if not "Orig" in shape:
                         try:
-                            transform = cmds.listRelatives(shape, parent=True)[0]
+                            transform = cmds.listRelatives(shape, fullPath=True, parent=True)[0]
                             # Get the transform only
+                            print(transform)
                             allGeoList.append(transform)
                         except:
                             pass
