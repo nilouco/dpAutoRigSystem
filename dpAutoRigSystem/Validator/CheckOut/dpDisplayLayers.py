@@ -166,13 +166,10 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
             if allShapesList:
                 for shape in allShapesList:
                     if not "Orig" in shape:
-                        try:
-                            transform = cmds.listRelatives(shape, fullPath=True, parent=True)[0]
+                        transformList = cmds.listRelatives(shape, fullPath=True, parent=True)
+                        if transformList:
                             # Get the transform only
-                            print(transform)
-                            allGeoList.append(transform)
-                        except:
-                            pass
+                            allGeoList.append(transformList[0])
             return allGeoList
 
 
