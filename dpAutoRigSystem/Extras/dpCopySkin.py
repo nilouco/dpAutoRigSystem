@@ -39,7 +39,7 @@ class CopySkin(object):
                     if skinInfList:
                         skinMethodToUse = cmds.skinCluster(sourceItem, query=True, skinMethod=True)
                         # call copySkin function
-                        self.dpCopySkin(sourceItem, destinationList, skinInfList, skinMethodToUse)
+                        self.dpCopySkin([sourceItem], destinationList, skinInfList, skinMethodToUse)
                 else:
                     mel.eval("warning \""+self.dpUIinst.lang['e007_notSkinFound']+"\";")
             else:
@@ -62,20 +62,25 @@ class CopySkin(object):
         return result
 
 
-    def dpCopySkin(self, sourceItem, destinationList, skinInfList, skinMethodToUse=0, *args):
+    def dpCopySkin(self, sourceList, destinationList, skinInfList=None, skinMethodToUse=0, oneSource=True, *args):
         """ Do the copy skin from sourceItem to destinationList using the skinInfList.
         """
-        for item in destinationList:
-            # get correct naming
-            skinClusterName = dpUtils.extractSuffix(item)
-            if "|" in skinClusterName:
-                skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
-            self.checkExistingSkinClusterNode(item, True)
-            # create skinCluster node
-            cmds.skinCluster(skinInfList, item, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)
-            cmds.select(sourceItem)
-            cmds.select(item, toggle=True)
-            # copy skin weights from sourceItem to item node
-            cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
-            # log result
-            mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+item+"\";")
+        for sourceItem in sourceList:
+            for item in destinationList:
+                # get correct naming
+                skinClusterName = dpUtils.extractSuffix(item)
+                if "|" in skinClusterName:
+                    skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
+                self.checkExistingSkinClusterNode(item, True)
+                if not skinInfList:
+                    skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
+                # create skinCluster node
+                cmds.skinCluster(skinInfList, item, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)
+                cmds.select(sourceItem)
+                cmds.select(item, toggle=True)
+                # copy skin weights from sourceItem to item node
+                cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
+                # log result
+                mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+item+"\"; ")
+            if oneSource:
+                return
