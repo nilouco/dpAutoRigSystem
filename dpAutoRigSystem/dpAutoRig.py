@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.18"
-DPAR_UPDATELOG = "N492 - Bike steering wheel pivot."
+DPAR_VERSION_PY3 = "4.03.21"
+DPAR_UPDATELOG = "N318 - Copy skin tool to existing skinCluster.\nN383 - Check skinCluster method to copy.\nN650 - Transfer skinning by code.\nN737 - Copy skin of duplicated name."
 
 
 
