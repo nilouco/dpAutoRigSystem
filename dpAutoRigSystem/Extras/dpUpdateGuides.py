@@ -98,6 +98,7 @@ class UpdateGuides(object):
             cmds.text(label=self.dpUIinst.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
         cmds.separator(style='none', height=10, parent=updateGuidesCL)
         cmds.window('updateGuidesWindow', edit=True, height=1)
+        cmds.select(clear=True)
         cmds.showWindow('updateGuidesWindow')
 
 
@@ -431,7 +432,7 @@ class UpdateGuides(object):
             if attr in oldGuideAttrDic:
                 currentValue = self.getAttrValue(newGuide, attr)
                 if isinstance(oldGuideAttrDic[attr], tuple):
-                    if currentValue != oldGuideAttrDic[attr][0]:
+                    if currentValue != oldGuideAttrDic[attr][0] or oldGuideAttrDic[attr][1]:
                         self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr][0], oldGuideAttrDic[attr][1])
                 else:
                     if currentValue != oldGuideAttrDic[attr]:
