@@ -52,7 +52,8 @@ class UpdateGuides(object):
         cmds.text(label=str(len(self.updateData))+' '+self.dpUIinst.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
         if newData:
             cmds.text(label=self.dpUIinst.lang['m190_newAttrFound'], align='center', parent=updateSummaryCL)
-            updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummaryCL)
+            updateSummarySL = cmds.scrollLayout('updateSummarySL', width=330, height=400, parent=updateSummaryCL)
+            updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummarySL)
             cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
             cmds.text(label=self.dpUIinst.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
             for guide in newData:
@@ -131,7 +132,7 @@ class UpdateGuides(object):
     def getAttrValue(self, dpGuide, attr, locked=False):
         if locked:
             try:
-                return cmds.getAttr(dpGuide+'.'+attr, locked=True)
+                return cmds.getAttr(dpGuide+'.'+attr, lock=True)
             except:
                 return False
         else:
@@ -429,7 +430,7 @@ class UpdateGuides(object):
         for attr in newGuideAttrList:
             if attr in oldGuideAttrDic:
                 currentValue = self.getAttrValue(newGuide, attr)
-                if type(oldGuideAttrDic[attr]) == 'tuple':
+                if isinstance(oldGuideAttrDic[attr], tuple):
                     if currentValue != oldGuideAttrDic[attr][0]:
                         self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr][0], oldGuideAttrDic[attr][1])
                 else:
