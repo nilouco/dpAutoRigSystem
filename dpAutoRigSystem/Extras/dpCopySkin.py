@@ -74,12 +74,12 @@ class CopySkin(object):
                         if sourceItem[sourceItem.rfind("|")+1:] == item[item.rfind("|")+1:]:
                             if self.checkExistingSkinClusterNode(sourceItem):
                                 self.dpCopySkin(sourceItem, item)
-                            else:
+                            elif self.checkExistingSkinClusterNode(item):
                                 self.dpCopySkin(item, sourceItem)
                             # To avoid repeat the same item in the same given list
-                            ranList.append(sourceItem)
                             ranList.append(item)
                             break
+                    ranList.append(sourceItem)
 
 
     def dpCopySkin(self, sourceItem, destinationItem, *args):
