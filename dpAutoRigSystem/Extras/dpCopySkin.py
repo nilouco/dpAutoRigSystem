@@ -55,6 +55,7 @@ class CopySkin(object):
                     if deleteIt:
                         cmds.delete(deformerNode)
                     result = True
+                    break
         return result
 
 
@@ -101,3 +102,7 @@ class CopySkin(object):
         cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
         # log result
         mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
+
+
+# TODO
+# deformerOrder
