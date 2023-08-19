@@ -45,17 +45,20 @@ class CopySkin(object):
 
 
     def checkExistingSkinClusterNode(self, item, deleteIt=False, *args):
-        """ Delete existing skinCluster node if there's one
+        """ Return a list with:
+                True/False if there's/not a skinCluster.
+                The current deformer list by default.
+                A list with existing skinCluster nodes.
+            Delete existing skinCluster node if there's one.
         """
-        result = False
-        inputDeformerList = cmds.findDeformers(item)
+        result = [False, None, None]
+        inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
         if inputDeformerList:
-            for deformerNode in inputDeformerList:
-                if cmds.objectType(deformerNode) == "skinCluster":
-                    if deleteIt:
-                        cmds.delete(deformerNode)
-                    result = True
-                    break
+            skinClusterList = cmds.ls(inputDeformerList, type="skinCluster")
+            if skinClusterList:
+                if deleteIt:
+                    cmds.delete(skinClusterList)
+                result = [True, inputDeformerList, skinClusterList]
         return result
 
 
@@ -72,9 +75,9 @@ class CopySkin(object):
                 if not sourceItem in ranList:
                     for item in reversed(destinationList): #to avoid find the same item in the same given list
                         if sourceItem[sourceItem.rfind("|")+1:] == item[item.rfind("|")+1:]:
-                            if self.checkExistingSkinClusterNode(sourceItem):
+                            if self.checkExistingSkinClusterNode(sourceItem)[0]:
                                 self.dpCopySkin(sourceItem, item)
-                            elif self.checkExistingSkinClusterNode(item):
+                            elif self.checkExistingSkinClusterNode(item)[0]:
                                 self.dpCopySkin(item, sourceItem)
                             # To avoid repeat the same item in the same given list
                             ranList.append(item)
@@ -86,23 +89,33 @@ class CopySkin(object):
         """ Copty the skin from sourceItem to destinationItem.
             It will get skinInfList and skinMethod by source.
         """
+        i = 0
         # get correct naming
         skinClusterName = dpUtils.extractSuffix(destinationItem)
         if "|" in skinClusterName:
             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
         # clean-up current destination skinCluster
-        self.checkExistingSkinClusterNode(destinationItem, True)
-        skinInfList = cmds.skinCluster(sourceItem, query=True, influence=True)
-        skinMethodToUse = cmds.skinCluster(sourceItem, query=True, skinMethod=True)
-        # create skinCluster node
-        cmds.skinCluster(skinInfList, destinationItem, name=skinClusterName+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)
-        cmds.select(sourceItem)
-        cmds.select(destinationItem, toggle=True)
-        # copy skin weights from sourceItem to item node
-        cmds.copySkinWeights(noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
+        destDefList = self.checkExistingSkinClusterNode(destinationItem, True)
+        sourceDefList = self.checkExistingSkinClusterNode(sourceItem)[2]
+        for sourceDef in sourceDefList:
+            skinInfList = cmds.skinCluster(sourceDef, query=True, influence=True)
+            skinMethodToUse = cmds.skinCluster(sourceDef, query=True, skinMethod=True)
+            # create skinCluster node
+            if i == 0: #Mayas 2022 and 2023 versions
+                newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
+            elif cmds.about(version=True) >= "2024": #accepting multiple skinClusters
+                newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, multi=True, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
+            # copy skin weights from source to destination
+            cmds.copySkinWeights(sourceSkin=sourceDef, destinationSkin=newSkinClusterNode, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
+            # deformer order
+            if destDefList[0]:
+                if destDefList[2]:
+                    for d, destItem in enumerate(destDefList[1]):
+                        if not cmds.objExists(destItem):
+                            if destItem in destDefList[2]: #it's an old skinCluster node
+                                if d > 0:
+                                    if cmds.objExists(destDefList[1][d-1]): #avoid deleted multiple skinCluster issue
+                                        cmds.reorderDeformers(destDefList[1][d-1], newSkinClusterNode, destinationItem)
+            i += 1
         # log result
         mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
-
-
-# TODO
-# deformerOrder
