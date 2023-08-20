@@ -85,11 +85,24 @@ class CopySkin(object):
                     ranList.append(sourceItem)
 
 
+    def getDeformerOrder(self, defList, *args):
+        """ Find and return the latest old skinCluster deformer order index for the given list.
+            It's useful to reorder the deformers and place the new skinCluster to the correct position of deformation.
+        """
+        for d, destItem in enumerate(defList[1]):
+            if not cmds.objExists(destItem):
+                if destItem in defList[2]: #it's an old skinCluster node
+                    if d > 0:
+                        return d
+        return 0
+
+
     def dpCopySkin(self, sourceItem, destinationItem, *args):
         """ Copty the skin from sourceItem to destinationItem.
             It will get skinInfList and skinMethod by source.
         """
         i = 0
+        defOrderIdx = None
         # get correct naming
         skinClusterName = dpUtils.extractSuffix(destinationItem)
         if "|" in skinClusterName:
@@ -97,25 +110,21 @@ class CopySkin(object):
         # clean-up current destination skinCluster
         destDefList = self.checkExistingSkinClusterNode(destinationItem, True)
         sourceDefList = self.checkExistingSkinClusterNode(sourceItem)[2]
-        for sourceDef in sourceDefList:
+        if destDefList[0] and destDefList[2]:
+            defOrderIdx = self.getDeformerOrder(destDefList)
+        for sourceDef in reversed(sourceDefList): #create reversed to have the multiple skinClusters in the good deformer order
             skinInfList = cmds.skinCluster(sourceDef, query=True, influence=True)
             skinMethodToUse = cmds.skinCluster(sourceDef, query=True, skinMethod=True)
             # create skinCluster node
-            if i == 0: #Mayas 2022 and 2023 versions
+            if i == 0: #Maya 2022 and 2023 versions
                 newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
             elif cmds.about(version=True) >= "2024": #accepting multiple skinClusters
                 newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, multi=True, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
             # copy skin weights from source to destination
             cmds.copySkinWeights(sourceSkin=sourceDef, destinationSkin=newSkinClusterNode, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
             # deformer order
-            if destDefList[0]:
-                if destDefList[2]:
-                    for d, destItem in enumerate(destDefList[1]):
-                        if not cmds.objExists(destItem):
-                            if destItem in destDefList[2]: #it's an old skinCluster node
-                                if d > 0:
-                                    if cmds.objExists(destDefList[1][d-1]): #avoid deleted multiple skinCluster issue
-                                        cmds.reorderDeformers(destDefList[1][d-1], newSkinClusterNode, destinationItem)
+            if defOrderIdx:
+                cmds.reorderDeformers(destDefList[1][defOrderIdx-1], newSkinClusterNode, destinationItem)
             i += 1
         # log result
         mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
