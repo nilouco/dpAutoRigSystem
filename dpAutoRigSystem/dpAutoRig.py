@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.20"
-DPAR_UPDATELOG = "N727 - Current version guides\nchildren of old guides."
+DPAR_VERSION_PY3 = "4.03.21"
+DPAR_UPDATELOG = "N318 - Copy skin tool to existing skinCluster.\nN383 - Check skinCluster method to copy.\nN650 - Transfer skinning by code.\nN669 - Conform Maya2024 multiplies skinCluster.\nN737 - Copy skin of duplicated name."
 
 
 
