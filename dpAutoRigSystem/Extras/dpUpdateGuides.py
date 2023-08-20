@@ -8,7 +8,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DP_UPDATEGUIDES_VERSION = 1.3
+DP_UPDATEGUIDES_VERSION = 1.4
 
 
 class UpdateGuides(object):
@@ -52,7 +52,8 @@ class UpdateGuides(object):
         cmds.text(label=str(len(self.updateData))+' '+self.dpUIinst.lang['m189_guidesUpdatedSuccess'], align='center', height=30, parent=updateSummaryCL)
         if newData:
             cmds.text(label=self.dpUIinst.lang['m190_newAttrFound'], align='center', parent=updateSummaryCL)
-            updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummaryCL)
+            updateSummarySL = cmds.scrollLayout('updateSummarySL', width=330, height=400, parent=updateSummaryCL)
+            updateSummaryRC = cmds.rowColumnLayout('updateSummaryRC', numberOfColumns=2, adjustableColumn=2, columnSpacing=[(1, 0), (2, 20)], parent=updateSummarySL)
             cmds.text(label=self.dpUIinst.lang['i205_guide'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
             cmds.text(label=self.dpUIinst.lang['m191_newAttr'], align='center', font='boldLabelFont', height=30, parent=updateSummaryRC)
             for guide in newData:
@@ -97,6 +98,7 @@ class UpdateGuides(object):
             cmds.text(label=self.dpUIinst.lang['m188_noGuidesToUpdate'], align='left', parent=updateGuidesCL)
         cmds.separator(style='none', height=10, parent=updateGuidesCL)
         cmds.window('updateGuidesWindow', edit=True, height=1)
+        cmds.select(clear=True)
         cmds.showWindow('updateGuidesWindow')
 
 
@@ -128,11 +130,17 @@ class UpdateGuides(object):
         return resultList
 
 
-    def getAttrValue(self, dpGuide, attr):
-        try:
-            return cmds.getAttr(dpGuide+'.'+attr, silent=True)
-        except:
-            return ''
+    def getAttrValue(self, dpGuide, attr, locked=False):
+        if locked:
+            try:
+                return cmds.getAttr(dpGuide+'.'+attr, lock=True)
+            except:
+                return False
+        else:
+            try:
+                return cmds.getAttr(dpGuide+'.'+attr, silent=True)
+            except:
+                return ''
     
 
     def getNewGuideInstance(self, newGuideName):
@@ -225,11 +233,11 @@ class UpdateGuides(object):
             self.setAttrStrValue(dpGuide, attr, value)
             
 
-    def setGuideAttributes(self, dpGuide, attr, value):
+    def setGuideAttributes(self, dpGuide, attr, value, lock=False):
         """ Verify if we have specific attribute cases to work with each kind of module guides.
             Ignore known attributes.
         """
-        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion']
+        ignoreList = ['version', 'controlID', 'className', 'direction', 'pinGuideConstraint', 'moduleNamespace', 'customName', 'moduleInstanceInfo', 'hookNode', 'guideObjectInfo', 'dpARVersion', 'dpID']
         if attr not in ignoreList:
             if attr == 'nJoints':
                 currentInstance = self.getNewGuideInstance(dpGuide)
@@ -255,6 +263,8 @@ class UpdateGuides(object):
                 currentInstance = self.getNewGuideInstance(dpGuide)
                 currentInstance.rigType = value
                 self.setAttrStrValue(dpGuide, attr, value)
+            elif attr == 'lockedList' and value != '':
+                self.setAttrStrValue(dpGuide, attr, value)
             # EYE ATTRIBUTES
             elif attr == 'eyelid':
                 self.setEyelidGuideAttribute(dpGuide, value)
@@ -274,6 +284,8 @@ class UpdateGuides(object):
                 self.checkSetNewGuideToAttr(dpGuide, attr, value)
             else:
                 self.setAttrValue(dpGuide, attr, value)
+            if lock:
+                cmds.setAttr(f'{dpGuide}.{attr}', lock=True)
             if self.ui:
                 cmds.refresh()
     
@@ -305,7 +317,18 @@ class UpdateGuides(object):
         childrenList = self.filterNotNurbsCurveAndTransform(childrenList)
         childrenList = self.filterAnotation(childrenList)
         return childrenList
-
+    
+    def splitTransformAttrValues(self, guide, attrList):
+        nonTransformDic = {}
+        transformDic = {}
+        for attribute in attrList:
+            attributeValue = self.getAttrValue(guide, attribute)
+            if attribute in self.TRANSFORM_LIST:
+                attributeValueLocked = self.getAttrValue(guide, attribute, True)
+                transformDic[attribute] = (attributeValue, attributeValueLocked)
+            else:
+                nonTransformDic[attribute] = attributeValue
+        return nonTransformDic, transformDic
 
     def getGuidesToUpdateData(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
@@ -320,10 +343,7 @@ class UpdateGuides(object):
                 self.updateData[baseGuide] = {}
                 guideAttrList = self.listKeyUserAttr(baseGuide)
                 # Create de attributes dictionary for each baseGuide
-                self.updateData[baseGuide]['attributes'] = {}
-                for attribute in guideAttrList:
-                    attributeValue = self.getAttrValue(baseGuide, attribute)
-                    self.updateData[baseGuide]['attributes'][attribute] = attributeValue
+                self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
 
                 self.updateData[baseGuide]['idx'] = instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])
                 
@@ -332,10 +352,9 @@ class UpdateGuides(object):
                 childrenList = self.listChildren(baseGuide)
                 for child in childrenList:
                     self.updateData[baseGuide]['children'][child] = {'attributes': {}}
+                    self.updateData[baseGuide]['children'][child] = {'transformAttributes': {}}
                     guideAttrList = self.listKeyUserAttr(child)
-                    for attribute in guideAttrList:
-                        attributeValue = self.getAttrValue(child, attribute)
-                        self.updateData[baseGuide]['children'][child]['attributes'][attribute] = attributeValue
+                    self.updateData[baseGuide]['children'][child]['attributes'], self.updateData[baseGuide]['children'][child]['transformAttributes'] = self.splitTransformAttrValues(child, guideAttrList)
             else:
                 self.guidesToReParentDict[baseGuide] = self.getGuideParent(baseGuide)
 
@@ -394,7 +413,7 @@ class UpdateGuides(object):
                 if hasParent != None:
                     newParentFinal = self.retrieveNewParent(hasParent)
                     try:
-                        cmds.parent(retainGuide, newParentFinal, 1)
+                        cmds.parent(retainGuide, newParentFinal)
                     except:
                         mel.eval('print \"dpAR: '+self.dpUIinst.lang['m197_notPossibleParent']+' '+retainGuide+'\\n\";')
     
@@ -407,24 +426,22 @@ class UpdateGuides(object):
 
     def copyAttrFromGuides(self, newGuide, oldGuideAttrDic):
         newGuideAttrList = self.listKeyUserAttr(newGuide)
-        if 'translateX' in newGuideAttrList and 'rotateX' in newGuideAttrList:
-            self.sendTransformsToListEnd(newGuideAttrList)
-        # For each attribute in the new guide check if exists equivalent in the old one, and if its value is different, in that case
+        # For each attribute in the new guide check if exists equivalent in the old one, and check if the value is different, in that case
         # set the new guide attr value to the old one.
         for attr in newGuideAttrList:
             if attr in oldGuideAttrDic:
                 currentValue = self.getAttrValue(newGuide, attr)
-                if currentValue != oldGuideAttrDic[attr]:
-                    self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr])
+                if isinstance(oldGuideAttrDic[attr], tuple):
+                    if currentValue != oldGuideAttrDic[attr][0] or oldGuideAttrDic[attr][1]:
+                        self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr][0], oldGuideAttrDic[attr][1])
+                else:
+                    if currentValue != oldGuideAttrDic[attr]:
+                        self.setGuideAttributes(newGuide, attr, oldGuideAttrDic[attr])
 
 
-    def setNewBaseGuidesTransAttr(self):
+    def setNewGuideAttr(self, attributesSet):
         for guide in self.updateData:
-            onlyTransformDic = {}
-            for attr in self.TRANSFORM_LIST:
-                if attr in self.updateData[guide]['attributes']:
-                    onlyTransformDic[attr] = self.updateData[guide]['attributes'][attr]
-            self.copyAttrFromGuides(self.updateData[guide]['newGuide'], onlyTransformDic)
+            self.copyAttrFromGuides(self.updateData[guide]['newGuide'], self.updateData[guide][attributesSet])
     
 
     def filterChildrenFromAnotherBase(self, childrenList, baseGuide):
@@ -448,7 +465,9 @@ class UpdateGuides(object):
             oldGuideChildrenOnlyList = list(map(lambda name : name.split(':')[1], oldGuideChildrenList))
             for i, newChild in enumerate(newGuideChildrenList):
                 if newGuideChildrenOnlyList[i] in oldGuideChildrenOnlyList:
-                    self.copyAttrFromGuides(newChild, self.updateData[guide]['children'][guide.split(':')[0]+':'+newGuideChildrenOnlyList[i]]['attributes'])
+                    guideName = self.updateData[guide]['children'][guide.split(':')[0]+':'+newGuideChildrenOnlyList[i]]
+                    self.copyAttrFromGuides(newChild, guideName['attributes'])
+                    self.copyAttrFromGuides(newChild, guideName['transformAttributes'])
     
 
     def listNewAttr(self):
@@ -457,7 +476,7 @@ class UpdateGuides(object):
         """
         newDataDic = {}
         for guide in self.updateData:
-            oldGuideSet = set(self.updateData[guide]['attributes'])
+            oldGuideSet = set(self.updateData[guide]['attributes']) | set(self.updateData[guide]['transformAttributes'])
             newGuideSet = set(self.listKeyUserAttr(self.updateData[guide]['newGuide']))
             newAttributesSet = newGuideSet - oldGuideSet
             if len(newAttributesSet) > 0:
@@ -472,13 +491,7 @@ class UpdateGuides(object):
             return newDataDic
     
 
-    def setNewNonTransformAttr(self):
-        nonTransformDic = {}
-        for guide in self.updateData:
-            for attr in self.updateData[guide]['attributes']:
-                if attr not in self.TRANSFORM_LIST:
-                    nonTransformDic[attr] = self.updateData[guide]['attributes'][attr]
-            self.copyAttrFromGuides(self.updateData[guide]['newGuide'], nonTransformDic)
+
 
 
     def doDelete(self, *args):
@@ -518,13 +531,13 @@ class UpdateGuides(object):
         self.createNewGuides()
         self.setProgressBar(2, self.dpUIinst.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
-        self.setNewNonTransformAttr()
+        self.setNewGuideAttr('attributes')
         self.setProgressBar(3, self.dpUIinst.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parentNewGuides()
         self.setProgressBar(4, self.dpUIinst.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
-        self.setNewBaseGuidesTransAttr()
+        self.setNewGuideAttr('transformAttributes')
         self.setProgressBar(5, self.dpUIinst.lang['m203_setChildGuides'])
         # Set all children attributes
         self.setChildrenGuides()
