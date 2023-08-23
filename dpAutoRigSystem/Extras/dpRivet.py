@@ -613,7 +613,7 @@ class Rivet(object):
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
         componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
-        cmds.rename(componentMatchNode, toRivetName+"_CompMatch")
+        cmds.rename(componentMatchNode, toRivetName+"_CpM")
         # Parent in modelsGrp
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
