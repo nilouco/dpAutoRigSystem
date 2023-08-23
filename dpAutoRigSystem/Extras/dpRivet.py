@@ -31,7 +31,7 @@ ICON = "/Icons/dp_rivet.png"
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
 
-DP_RIVET_VERSION = 1.6
+DP_RIVET_VERSION = 1.7
 
 
 class Rivet(object):
@@ -323,7 +323,7 @@ class Rivet(object):
             
         # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
         if faceToRivet:
-            geoToAttach = self.extractFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+            geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
 
         # get shape to attach:
         if cmds.objExists(geoToAttach):
@@ -556,7 +556,7 @@ class Rivet(object):
         return toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
 
     
-    def extractFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
+    def createFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
         """ Get the pivot coordinates from each control to get the nearest face from control to the geometry
             After the initial selection it will grow 4 times by default
             It uses delta to delete the extra faces, than wrap it to the original model and 
@@ -603,25 +603,21 @@ class Rivet(object):
         # AutoProjection for new UV and order selection to use dpRivet.
         cmds.polyAutoProjection(geometry, constructionHistory=False)
         cmds.selectMode(object=True)
-        # Create Wrap
-        cmds.select([geometry, origGeo])
-        mel.eval("CreateWrap;")
-        hist = cmds.listHistory(geometry)
-        wrapList = cmds.ls(hist, type="wrap")[0]
+        # Create morph deformer
+        self.applyMorphDeformer(geometry, origGeo)
         # Renaming
+        hist = cmds.listHistory(geometry)
+        morphList = cmds.ls(hist, type="morph")[0]
         toRivetName = dpUtils.extractSuffix(geometry)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
-        wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
-        baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
-        baseShape = cmds.rename(baseShape, toRivetName+"_Base")
-        self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
-        # Remove from displayLayers
-        cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
+        morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
+        componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
+        cmds.rename(componentMatchNode, toRivetName+"_CompMatch")
         # Parent in modelsGrp
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
-            cmds.parent(geometry, baseShape, modelGrp)
+            cmds.parent(geometry, modelGrp)
         return geometry
 
 
@@ -646,3 +642,28 @@ class Rivet(object):
                 except:
                     return -1
         return False
+    
+                    
+    def applyMorphDeformer(self, morphGeo, targetGeo, *args):
+        """ Apply morphDeform from morphGeo(FaceToRivet) to targetGeo(Source)
+        """
+        targetList = cmds.ls(targetGeo, dag=True, shapes=True)
+        targetShape = targetList[0]
+        targetOrig = self.findOrig(targetList)
+        morphDeformer = cmds.deformer(morphGeo, type="morph")[0]
+        cmds.setAttr(morphDeformer+".useComponentLookup", 1)
+        cmds.connectAttr(targetShape+".worldMesh[0]", morphDeformer+".morphTarget[0]")
+        componentMatchNode = cmds.createNode("componentMatch")
+        cmds.connectAttr(componentMatchNode+".componentLookup", morphDeformer+".componentLookupList[0].componentLookup")
+        morphOrigOutMesh = cmds.listConnections(morphDeformer+".originalGeometry[0]", source=True, destination=False, plugs=True)[0]
+        cmds.connectAttr(morphOrigOutMesh, componentMatchNode+".inputGeometry")
+        cmds.connectAttr(targetOrig+".outMesh", componentMatchNode+".targetGeometry")
+        
+
+    def findOrig(self, geoList, *args):
+        """ Return the orig of the shapeList
+        """
+        if geoList:
+            for item in geoList:
+                if item.endswith("Orig"):
+                    return item
