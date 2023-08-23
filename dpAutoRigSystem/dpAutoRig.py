@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.21"
-DPAR_UPDATELOG = "N318 - Copy skin tool to existing skinCluster.\nN383 - Check skinCluster method to copy.\nN650 - Transfer skinning by code.\nN669 - Conform Maya2024 multiplies skinCluster.\nN737 - Copy skin of duplicated name."
+DPAR_VERSION_PY3 = "4.03.22"
+DPAR_UPDATELOG = "N337 CopySkin from Extra to Skinning tab."
 
 
 
@@ -80,6 +80,7 @@ try:
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
     from .Pipeline import dpPackager
+    from .Deform import dpSkinning
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
@@ -90,6 +91,7 @@ try:
     reload(dpPipeliner)
     reload(dpPackager)
     reload(dpCustomAttr)
+    reload(dpSkinning)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -396,6 +398,7 @@ class DP_AutoRig_UI(object):
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
         self.customAttr = dpCustomAttr.CustomAttr(self, False)
+        self.skin = dpSkinning.Skinning(self)
         # --
 
         # creating tabs - mainTabLayout:
@@ -526,10 +529,10 @@ class DP_AutoRig_UI(object):
         #footerB - columnLayout:
         self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinningTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
-        self.allUIs["skinButton"] = cmds.button("skinButton", label=self.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
+        self.allUIs["skinButton"] = cmds.button("skinButton", label=self.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skin.skinFromUI), parent=self.allUIs["footerB"])
         self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["footerB"])
-        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
-        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skin.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skin.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.lang['i025_joints']+" 0 "+self.lang['i024_geometries'], parent=self.allUIs["footerB"])
@@ -3123,87 +3126,3 @@ class DP_AutoRig_UI(object):
         
     
     ###################### End: Rigging Modules Instances.
-    
-    
-    ###################### Start: Skinning.
-    
-    def validateGeoList(self, geoList, mode=None, *args):
-        """ Check if the geometry list from UI is good to be skinned, because we can get issue if the display long name is not used.
-        """
-        if geoList:
-            for i, item in enumerate(geoList):
-                if item in geoList[:i]:
-                    self.info('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
-                    return False
-                elif not cmds.objExists(item):
-                    self.info('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
-                    return False
-                elif not mode:
-                    try:
-                        inputDeformerList = cmds.findDeformers(item)
-                        if inputDeformerList:
-                            for deformerNode in inputDeformerList:
-                                if cmds.objectType(deformerNode) == "skinCluster":
-                                    self.info('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
-                                    return False
-                    except:
-                        pass
-        return True
-    
-    def skinFromUI(self, mode=None, *args):
-        """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
-        """
-        # log window
-        logWin = cmds.checkBox(self.allUIs["displaySkinLogWin"], query=True, value=True)
-
-        # get joints to be skinned:
-        uiJointSkinList = cmds.textScrollList(self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
-        if not uiJointSkinList:
-            uiJointSkinList = cmds.textScrollList(self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
-        
-        # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
-        jointSkinList, jointNotExistingList = [], []
-        if uiJointSkinList:
-            for item in uiJointSkinList:
-                if cmds.objExists(item):
-                    jointSkinList.append(item)
-                else:
-                    jointNotExistingList.append(item)
-        if jointNotExistingList:
-            notExistingJointMessage = self.lang['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.lang['i070_continueSkin']
-            btYes = self.lang['i071_yes']
-            btNo = self.lang['i072_no']
-            confirmSkinning = cmds.confirmDialog(title='Confirm Skinning', message=notExistingJointMessage, button=[btYes,btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
-            if confirmSkinning == btNo:
-                jointSkinList = None
-        
-        # get geometries to be skinned:
-        geomSkinList = cmds.textScrollList(self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
-        if not geomSkinList:
-            geomSkinList = cmds.textScrollList(self.allUIs["modelsTextScrollLayout"], query=True, allItems=True)
-        
-        # check if we have repeated listed geometries in case of the user choose to not display long names:
-        if self.validateGeoList(geomSkinList, mode):
-            if jointSkinList and geomSkinList:
-                for geomSkin in geomSkinList:
-                    if (mode == "Add"):
-                        cmds.skinCluster(geomSkin, edit=True, addInfluence=jointSkinList, toSelectedBones=True, lockWeights=True, weight=0.0)
-                    elif (mode == "Remove"):
-                        cmds.skinCluster(geomSkin, edit=True, removeInfluence=jointSkinList, toSelectedBones=True)
-                    else: # None = create a new skinCluster node
-                        baseName = dpUtils.extractSuffix(geomSkin)
-                        skinClusterName = baseName+"_SC"
-                        if "|" in skinClusterName:
-                            skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
-                        cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
-                print(self.lang['i077_skinned'] + ', '.join(geomSkinList))
-                if logWin:
-                    self.info('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
-                cmds.select(geomSkinList)
-        else:
-            print(self.lang['i029_skinNothing'])
-            if logWin:
-                self.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
-
-
-    ###################### End: Skinning.
