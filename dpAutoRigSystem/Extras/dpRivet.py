@@ -651,6 +651,10 @@ class Rivet(object):
         targetList = cmds.ls(targetGeo, dag=True, shapes=True)
         targetShape = targetList[0]
         targetOrig = self.findOrig(targetList)
+        if not targetOrig:
+            cmds.delete(cmds.cluster(targetGeo, name="ToOrig_ClsTemp"))
+            targetList = cmds.ls(targetGeo, dag=True, shapes=True)
+            targetOrig = self.findOrig(targetList)
         morphDeformer = cmds.deformer(morphGeo, type="morph")[0]
         cmds.setAttr(morphDeformer+".useComponentLookup", 1)
         cmds.connectAttr(targetShape+".worldMesh[0]", morphDeformer+".morphTarget[0]")
@@ -659,7 +663,7 @@ class Rivet(object):
         morphOrigOutMesh = cmds.listConnections(morphDeformer+".originalGeometry[0]", source=True, destination=False, plugs=True)[0]
         cmds.connectAttr(morphOrigOutMesh, componentMatchNode+".inputGeometry")
         cmds.connectAttr(targetOrig+".outMesh", componentMatchNode+".targetGeometry")
-        
+
 
     def findOrig(self, geoList, *args):
         """ Return the orig of the shapeList
