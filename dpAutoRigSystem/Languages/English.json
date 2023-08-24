@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-08-15",
+    "_updated"       : "2023-08-24",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -445,6 +445,10 @@
     "i284_sCallbackAnn"    : "Callback this Python code init method after\nfinish the publishing.\nIt's useful to run next process in the pipeline.",
     "i285_alreadySkinned"  : "The geometry is already skinned, sorry.",
     "i286_displaySkinLog"  : "Display log window",
+    "i287_copy"            : "Copy",
+    "i288_copySkinDesc"    : "It'll copy the skinning from\nthe first selected and skinned geometry\nto the other selected meshes.",
+    "i289_sameNameSkinDesc": "It'll copy the skinning of meshes with the same name.\nIt's very useful to update the models in the rig.",
+    "i290_oneSource"       : "One Source",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -542,8 +546,8 @@
     "m094_doing"                : "Doing",
     "m095_isolate"              : "Isolate",
     "m096_isolateDesc"          : "This script will create an Isolate setup.\nNeed 3 nodes selected\nor it'll use the Root_Ctrl.",
-    "m097_copySkin"             : "Copy Skin",
-    "m098_copySkinDesc"         : "This script will copy the skinning from\nthe first selected and skinned geometry\nto the others selected.",
+    "m097_00000000"             : "NOT USED HERE",
+    "m098_000000000000"         : "NOT USED HERE",
     "m099_cvControlDesc"        : "This class will create a curve shape\nin order to be used as a control.",
     "m100_square"               : "Square",
     "m101_smile"                : "Smile",

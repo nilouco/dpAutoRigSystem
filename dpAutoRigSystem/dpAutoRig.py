@@ -502,7 +502,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["skinLists2Layout"] = cmds.paneLayout("skinLists2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCreateFL"])
         
         #colSkinLeftA - columnLayout:
-        self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=190, parent=self.allUIs["skinLists2Layout"])
+        self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         # radio buttons:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints   = cmds.radioButton( label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
@@ -519,13 +519,13 @@ class DP_AutoRig_UI(object):
         cmds.setParent(self.allUIs["skinCreateFL"])
         
         #colSkinRightA - columnLayout:
-        self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=190, parent=self.allUIs["skinLists2Layout"])
+        self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
         allGeoms   = cmds.radioButton( label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
         selGeoms   = cmds.radioButton( label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["displaySkinLogWin"] = cmds.checkBox('displaySkinLogWin', label=self.lang['i286_displaySkinLog'], align='left', value=1, parent=self.allUIs["colSkinRightA"])
-        #cmds.separator(style="none", height=19, parent=self.allUIs["colSkinRightA"])
+        cmds.separator(style="none", height=2, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinRightA"] )
         cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
@@ -541,6 +541,12 @@ class DP_AutoRig_UI(object):
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.lang['i025_joints']+" 0 "+self.lang['i024_geometries'], parent=self.allUIs["footerB"])
+        
+        #skinCopy - layout
+        self.allUIs["skinCopyFL"] = cmds.frameLayout('skinCopyFL', label=self.lang['i287_copy']+" Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
+        self.allUIs["skinCopy2Layout"] = cmds.paneLayout("skinCopy2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCopyFL"])
+        self.allUIs["skinCopyOneSourceBT"] = cmds.button("skinCopyOneSourceBT", label=self.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=self.skin.copySkinFromOneSource, annotation=self.lang['i288_copySkinDesc'], parent=self.allUIs["skinCopy2Layout"])
+        self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=self.skin.copySkinSameName, annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
         cmds.setParent( self.allUIs["mainTabLayout"] )
         
         # edit formLayout in order to get a good scalable window:

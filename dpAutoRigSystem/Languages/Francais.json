@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-08-15",
+    "_updated"       : "2023-08-24",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -445,6 +445,10 @@
     "i284_sCallbackAnn"    : "Callback ce Python code init method après\ntérminer la publication.\nC'est utile pour continuer le processus de\nla pipeline.",
     "i285_alreadySkinned"  : "La géométrie est déjà skinnée, désolé.",
     "i286_displaySkinLog"  : "Montrer log window",
+    "i287_copy"            : "Copier",
+    "i288_copySkinDesc"    : "Ça va copier le skinning du premier selectionné\npour les autres selectinnés après.",
+    "i289_sameNameSkinDesc": "Ça va copier le skinning entre les meshes de même noms.\nC'est très utile pour mettre à jour des modèles dans le rig.",
+    "i290_oneSource"       : "Une Origine",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -542,8 +546,8 @@
     "m094_doing"                : "En faire",
     "m095_isolate"              : "Isolé",
     "m096_isolateDesc"          : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés\nou il va utiliser le Root_Ctrl.",
-    "m097_copySkin"             : "Copier le Skin",
-    "m098_copySkinDesc"         : "Celuici va copier le skinning de\nune premiere geometrie skinée pour\nles outres selectionées.",
+    "m097_00000000"             : "NOT USED HERE",
+    "m098_000000000000"         : "NOT USED HERE",
     "m099_cvControlDesc"        : "Il va créer une curve\npour être utilisé comme controleur.",
     "m100_square"               : "Carré",
     "m101_smile"                : "Sourire",
