@@ -520,10 +520,8 @@ class Rivet(object):
             # Duplicate geometry after turn off skinCluster and blendShape. 
             toRivetGeo = cmds.duplicate(geo)[0]
             # Unparenting
-            try:
+            if cmds.listRelatives(toRivetGeo, allParents=True):
                 cmds.parent(toRivetGeo, world=True)
-            except Exception as e:
-                print(e)
             # Unlock attributes and apply initialShading
             self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
             cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
@@ -589,6 +587,7 @@ class Rivet(object):
             if nearestFace:
                 cmds.select(nearestFace, add=True)
         # Select the faces and growUp selection.
+        cmds.scriptEditorInfo(edit=True, suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
         cmds.selectMode(component=True)
         cmds.selectType(facet=True)
         growMultiplier = growMultiplier - 1
@@ -599,10 +598,12 @@ class Rivet(object):
         selectedFaceList = cmds.ls(selection=True, flatten=True)
         allFaceList = cmds.ls(geometry+".f[*]", flatten=True)
         nonSelectedFaceList = list(set(allFaceList) - set(selectedFaceList))
-        cmds.delete(nonSelectedFaceList)
+        if nonSelectedFaceList:
+            cmds.delete(nonSelectedFaceList)
         # AutoProjection for new UV and order selection to use dpRivet.
         cmds.polyAutoProjection(geometry, constructionHistory=False)
         cmds.selectMode(object=True)
+        cmds.scriptEditorInfo(edit=True, suppressWarnings=False, suppressInfo=True, suppressErrors=False, suppressResults=False)
         # Create morph deformer
         self.applyMorphDeformer(geometry, origGeo)
         # Renaming
