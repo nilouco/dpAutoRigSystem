@@ -394,7 +394,7 @@ class Rivet(object):
                     mel.eval("error \"Canceled process: items to be Rivet can't be animated or have locked attributes, sorry.\";")
                     return
             
-            # workarount to avoid closestPoint node ignores transformations.
+            # workaround to avoid closestPoint node ignores transformations.
             # then we need to duplicate, unlock attributes and freezeTransformation:
             dupGeo = cmds.duplicate(geoToAttach, name=geoToAttach+"_dpRivet_TEMP_Geo")[0]
             # unlock attr:
@@ -519,6 +519,7 @@ class Rivet(object):
                 cmds.setAttr(blendShapeNode+".envelope", 0)
             # Duplicate geometry after turn off skinCluster and blendShape. 
             toRivetGeo = cmds.duplicate(geo)[0]
+            dpUtils.removeUserDefinedAttr(toRivetGeo)
             # Unparenting
             if cmds.listRelatives(toRivetGeo, allParents=True):
                 cmds.parent(toRivetGeo, world=True)
@@ -587,7 +588,7 @@ class Rivet(object):
             if nearestFace:
                 cmds.select(nearestFace, add=True)
         # Select the faces and growUp selection.
-        cmds.scriptEditorInfo(edit=True, suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
+#        cmds.scriptEditorInfo(edit=True, suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
         cmds.selectMode(component=True)
         cmds.selectType(facet=True)
         growMultiplier = growMultiplier - 1
@@ -603,7 +604,7 @@ class Rivet(object):
         # AutoProjection for new UV and order selection to use dpRivet.
         cmds.polyAutoProjection(geometry, constructionHistory=False)
         cmds.selectMode(object=True)
-        cmds.scriptEditorInfo(edit=True, suppressWarnings=False, suppressInfo=True, suppressErrors=False, suppressResults=False)
+#        cmds.scriptEditorInfo(edit=True, suppressWarnings=False, suppressInfo=True, suppressErrors=False, suppressResults=False)
         # Create morph deformer
         self.applyMorphDeformer(geometry, origGeo)
         # Renaming

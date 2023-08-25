@@ -220,6 +220,19 @@ def useDefaultRenderLayer():
         cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 
+def removeUserDefinedAttr(node):
+    """ Just remove all user defined attributes for the given node.
+    """
+    userDefAttrList = cmds.listAttr(node, userDefined=True)
+    if userDefAttrList:
+        for userDefAttr in userDefAttrList:
+            try:
+                cmds.setAttr(node+"."+userDefAttr, lock=False)
+                cmds.deleteAttr(node+"."+userDefAttr)
+            except:
+                pass
+
+
 def zeroOut(transformList=[], offset=False):
     """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
         If don't have a transformList given, try to get the current selection.
@@ -244,14 +257,7 @@ def zeroOut(transformList=[], offset=False):
                         if not cmds.objExists(transformName+suffix):
                             needAddNumber = False
             zeroGrp = cmds.duplicate(transform, name=transformName+suffix)[0]
-            zeroUserAttrList = cmds.listAttr(zeroGrp, userDefined=True)
-            if zeroUserAttrList:
-                for zUserAttr in zeroUserAttrList:
-                    try:
-                        cmds.setAttr(zeroGrp+"."+zUserAttr, lock=False)
-                        cmds.deleteAttr(zeroGrp+"."+zUserAttr)
-                    except:
-                        pass
+            removeUserDefinedAttr(zeroGrp)
             allChildrenList = cmds.listRelatives(zeroGrp, allDescendents=True, children=True, fullPath=True)
             if allChildrenList:
                 cmds.delete(allChildrenList)
