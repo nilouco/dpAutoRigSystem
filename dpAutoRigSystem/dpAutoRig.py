@@ -505,8 +505,8 @@ class DP_AutoRig_UI(object):
         self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         # radio buttons:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
-        allJoints   = cmds.radioButton( label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
-        dpARJoints  = cmds.radioButton( label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
+        allJoints  = cmds.radioButton(label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints)
+        dpARJoints = cmds.radioButton(label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints)
         self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
@@ -515,20 +515,20 @@ class DP_AutoRig_UI(object):
         self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
         self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinLeftA"] )
-        cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
+        cmds.radioCollection(self.allUIs["jntCollection"], edit=True, select=dpARJoints)
         cmds.setParent(self.allUIs["skinCreateFL"])
         
         #colSkinRightA - columnLayout:
         self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
-        allGeoms   = cmds.radioButton( label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
-        selGeoms   = cmds.radioButton( label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
+        allGeoms = cmds.radioButton(label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms)
+        selGeoms = cmds.radioButton(label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms)
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["displaySkinLogWin"] = cmds.checkBox('displaySkinLogWin', label=self.lang['i286_displaySkinLog'], align='left', value=1, parent=self.allUIs["colSkinRightA"])
         cmds.separator(style="none", height=2, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinRightA"] )
-        cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
+        cmds.radioCollection(self.allUIs["geomCollection"], edit=True, select=selGeoms)
         cmds.setParent(self.allUIs["skinCreateFL"])
         
         #footerB - columnLayout:
@@ -544,9 +544,13 @@ class DP_AutoRig_UI(object):
         
         #skinCopy - layout
         self.allUIs["skinCopyFL"] = cmds.frameLayout('skinCopyFL', label=self.lang['i287_copy']+" Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
+        self.allUIs["skinSurfAssociationCollection"] = cmds.radioCollection('skinSurfAssociationCollection', parent=self.allUIs["skinCopyFL"])
+        closestPoint = cmds.radioButton(label="closestPoint", annotation="closestPoint")
+        uvSpace      = cmds.radioButton(label="uvSpace", annotation="uvSpace")
         self.allUIs["skinCopy2Layout"] = cmds.paneLayout("skinCopy2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCopyFL"])
-        self.allUIs["skinCopyOneSourceBT"] = cmds.button("skinCopyOneSourceBT", label=self.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=self.skin.copySkinFromOneSource, annotation=self.lang['i288_copySkinDesc'], parent=self.allUIs["skinCopy2Layout"])
-        self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=self.skin.copySkinSameName, annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
+        self.allUIs["skinCopyOneSourceBT"] = cmds.button("skinCopyOneSourceBT", label=self.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.skin.copySkinFromOneSource, None, True), annotation=self.lang['i288_copySkinDesc'], parent=self.allUIs["skinCopy2Layout"])
+        self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.copySkinSameName, None, True), annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
+        cmds.radioCollection(self.allUIs["skinSurfAssociationCollection"], edit=True, select=closestPoint)
         cmds.setParent( self.allUIs["mainTabLayout"] )
         
         # edit formLayout in order to get a good scalable window:

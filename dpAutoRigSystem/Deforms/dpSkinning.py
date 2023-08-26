@@ -112,14 +112,14 @@ class Skinning(object):
         return result
 
 
-    def serializeCopySkin(self, sourceList, destinationList, oneSource=True, *args):
+    def serializeCopySkin(self, sourceList, destinationList, oneSource=True, byUVs=False, *args):
         """ Serialize the copy skinning for one source or not.
         """
         ranList = []
         for sourceItem in sourceList:
             if oneSource:
                 for item in destinationList:
-                    self.runCopySkin(sourceItem, item)
+                    self.runCopySkin(sourceItem, item, byUVs)
                 return
             else:
                 if not sourceItem in ranList:
@@ -127,9 +127,9 @@ class Skinning(object):
                         if not sourceItem == item:
                             if sourceItem[sourceItem.rfind("|")+1:] == item[item.rfind("|")+1:]:
                                 if self.checkExistingSkinClusterNode(sourceItem)[0]:
-                                    self.runCopySkin(sourceItem, item)
+                                    self.runCopySkin(sourceItem, item, byUVs)
                                 elif self.checkExistingSkinClusterNode(item)[0]:
-                                    self.runCopySkin(item, sourceItem)
+                                    self.runCopySkin(item, sourceItem, byUVs)
                                 # To avoid repeat the same item in the same given list
                                 ranList.append(item)
                                 break
@@ -148,7 +148,7 @@ class Skinning(object):
         return 0
 
 
-    def runCopySkin(self, sourceItem, destinationItem, *args):
+    def runCopySkin(self, sourceItem, destinationItem, byUVs=False, *args):
         """ Copy the skin from sourceItem to destinationItem.
             It will get skinInfList and skinMethod by source.
         """
@@ -173,7 +173,12 @@ class Skinning(object):
                 elif cmds.about(version=True) >= "2024": #accepting multiple skinClusters
                     newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, multi=True, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
                 # copy skin weights from source to destination
-                cmds.copySkinWeights(sourceSkin=sourceDef, destinationSkin=newSkinClusterNode, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
+                if byUVs:
+                    sourceUVMap = cmds.polyUVSet(sourceItem, query=True, allUVSets=True)[0]
+                    destinationUVMap = cmds.polyUVSet(destinationItem, query=True, allUVSets=True)[0]
+                    cmds.copySkinWeights(sourceSkin=sourceDef, destinationSkin=newSkinClusterNode, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"], uvSpace=[sourceUVMap, destinationUVMap])
+                else:
+                    cmds.copySkinWeights(sourceSkin=sourceDef, destinationSkin=newSkinClusterNode, noMirror=True, surfaceAssociation="closestPoint", influenceAssociation=["label", "oneToOne", "closestJoint"])
                 # deformer order
                 if defOrderIdx:
                     cmds.reorderDeformers(destDefList[1][defOrderIdx-1], newSkinClusterNode, destinationItem)
@@ -182,21 +187,24 @@ class Skinning(object):
         mel.eval("print \""+self.dpUIinst.lang['i083_copiedSkin']+" "+sourceItem+" "+destinationItem+"\"; ")
 
 
-    def copySkinFromOneSource(self, *args):
+    def copySkinFromOneSource(self, objList=None, ui=False, byUVs=False, *args):
         """ Main function to analise and call copy skin process. 
         """
-        selList = cmds.ls(selection=True, long=True, type="transform")
-        if selList and len(selList) > 1:
+        if not objList:
+            objList = cmds.ls(selection=True, long=True, type="transform")
+        if objList and len(objList) > 1:
             # get first selected item
-            sourceItem = selList[0]
+            sourceItem = objList[0]
             # get other selected items
-            destinationList = selList[1:]
+            destinationList = objList[1:]
             shapeList = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
             if shapeList:
                 # check if there's a skinCluster node connected to the first selected item
                 if self.checkExistingSkinClusterNode(shapeList):
+                    if ui:
+                        byUVs = self.getByUVsFromUI()
                     # call copySkin function
-                    self.serializeCopySkin([sourceItem], destinationList)
+                    self.serializeCopySkin([sourceItem], destinationList, True, byUVs)
                 else:
                     mel.eval("warning \""+self.dpUIinst.lang['e007_notSkinFound']+"\";")
             else:
@@ -205,7 +213,7 @@ class Skinning(object):
             mel.eval("warning \""+self.dpUIinst.lang['e005_selectOneObj']+"\";")
 
 
-    def copySkinSameName(self, objList=None, *args):
+    def copySkinSameName(self, objList=None, ui=False, byUVs=False, *args):
         """ Copy the skinning between meshes with the same name, selected or not or using the given list.
         """
         if not objList:
@@ -213,4 +221,15 @@ class Skinning(object):
             if not objList:
                 objList = cmds.ls(selection=False, long=True, type="transform")
         if objList:
-            self.serializeCopySkin(objList, objList, oneSource=False)
+            if ui:
+                byUVs = self.getByUVsFromUI()
+            self.serializeCopySkin(objList, objList, False, byUVs)
+
+
+    def getByUVsFromUI(self, *args):
+        """ Read the radioCollection, verify its annotation and return True if found selected uvSpace.
+        """
+        skinSurfAssociationCollection = cmds.radioCollection(self.dpUIinst.allUIs["skinSurfAssociationCollection"], query=True, select=True)
+        annot = cmds.radioButton(skinSurfAssociationCollection, query=True, annotation=True)
+        if annot == "uvSpace":
+            return True
