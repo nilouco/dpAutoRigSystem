@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.21"
-DPAR_UPDATELOG = "N318 - Copy skin tool to existing skinCluster.\nN383 - Check skinCluster method to copy.\nN650 - Transfer skinning by code.\nN669 - Conform Maya2024 multiplies skinCluster.\nN737 - Copy skin of duplicated name."
+DPAR_VERSION_PY3 = "4.03.22"
+DPAR_UPDATELOG = "N337 CopySkin from Extra to Skinning tab.\nAdded options for surface association and\ncopy from one source or multiply itens with same name."
 
 
 
@@ -80,6 +80,7 @@ try:
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
     from .Pipeline import dpPackager
+    from .Deforms import dpSkinning
     from importlib import reload
     reload(dpUtils)
     reload(dpControls)
@@ -90,6 +91,7 @@ try:
     reload(dpPipeliner)
     reload(dpPackager)
     reload(dpCustomAttr)
+    reload(dpSkinning)
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
@@ -396,6 +398,7 @@ class DP_AutoRig_UI(object):
         self.ctrls = dpControls.ControlClass(self)
         self.publisher = dpPublisher.Publisher(self)
         self.customAttr = dpCustomAttr.CustomAttr(self, False)
+        self.skin = dpSkinning.Skinning(self)
         # --
 
         # creating tabs - mainTabLayout:
@@ -492,13 +495,18 @@ class DP_AutoRig_UI(object):
         
         # interface of Skinning tab:
         self.allUIs["skinningTabLayout"] = cmds.formLayout('skinningTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # skinMainLayout - scrollLayout:
+        self.allUIs["skinMainLayout"] = cmds.scrollLayout('skinMainLayout', parent=self.allUIs["skinningTabLayout"])
+        self.allUIs["skinLayout"] = cmds.columnLayout('skinLayout', adjustableColumn=True, rowSpacing=10, parent=self.allUIs['skinMainLayout'])
+        self.allUIs["skinCreateFL"] = cmds.frameLayout('skinCreateFL', label=self.lang['i158_create']+" SkinCluster", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
+        self.allUIs["skinLists2Layout"] = cmds.paneLayout("skinLists2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCreateFL"])
         
         #colSkinLeftA - columnLayout:
-        self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=190, parent=self.allUIs["skinningTabLayout"])
+        self.allUIs["colSkinLeftA"] = cmds.columnLayout('colSkinLeftA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         # radio buttons:
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
-        allJoints   = cmds.radioButton( label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints )
-        dpARJoints  = cmds.radioButton( label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints )
+        allJoints  = cmds.radioButton(label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints)
+        dpARJoints = cmds.radioButton(label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints)
         self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
@@ -506,41 +514,48 @@ class DP_AutoRig_UI(object):
         self.allUIs["_JcrCB"] = cmds.checkBox('_JcrCB', label="Jcr", annotation="Skinned Corrective Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JisCB"] = cmds.checkBox('_JisCB', label="Jis", annotation="Indirect Skinning Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["jointNameTF"] = cmds.textField('jointNameTF', width=30, changeCommand=self.populateJoints, parent=self.allUIs["colSkinLeftA"])
-        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
-        cmds.radioCollection( self.allUIs["jntCollection"], edit=True, select=dpARJoints )
-        cmds.setParent(self.allUIs["skinningTabLayout"])
+        self.allUIs["jntTextScrollLayout"] = cmds.textScrollList( 'jntTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinLeftA"] )
+        cmds.radioCollection(self.allUIs["jntCollection"], edit=True, select=dpARJoints)
+        cmds.setParent(self.allUIs["skinCreateFL"])
         
         #colSkinRightA - columnLayout:
-        self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=190, parent=self.allUIs["skinningTabLayout"])
+        self.allUIs["colSkinRightA"] = cmds.columnLayout('colSkinRightA', adjustableColumn=True, width=170, parent=self.allUIs["skinLists2Layout"])
         self.allUIs["geomCollection"] = cmds.radioCollection('geomCollection', parent=self.allUIs["colSkinRightA"])
-        allGeoms   = cmds.radioButton( label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms )
-        selGeoms   = cmds.radioButton( label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms )
+        allGeoms = cmds.radioButton(label=self.lang['i026_listAllJnts'], annotation="allGeoms", onCommand=self.populateGeoms)
+        selGeoms = cmds.radioButton(label=self.lang['i027_listSelJnts'], annotation="selGeoms", onCommand=self.populateGeoms)
         self.allUIs["geoLongName"] = cmds.checkBox('geoLongName', label=self.lang['i073_displayLongName'], align='left', value=1, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
         self.allUIs["displaySkinLogWin"] = cmds.checkBox('displaySkinLogWin', label=self.lang['i286_displaySkinLog'], align='left', value=1, parent=self.allUIs["colSkinRightA"])
-        #cmds.separator(style="none", height=19, parent=self.allUIs["colSkinRightA"])
+        cmds.separator(style="none", height=2, parent=self.allUIs["colSkinRightA"])
         self.allUIs["geoNameTF"] = cmds.textField('geoNameTF', width=30, changeCommand=self.populateGeoms, parent=self.allUIs["colSkinRightA"])
-        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["skinningTabLayout"] )
-        cmds.radioCollection( self.allUIs["geomCollection"], edit=True, select=selGeoms )
-        cmds.setParent(self.allUIs["skinningTabLayout"])
+        self.allUIs["modelsTextScrollLayout"] = cmds.textScrollList( 'modelsTextScrollLayout', width=30, height=500, allowMultiSelection=True, selectCommand=self.actualizeSkinFooter, parent=self.allUIs["colSkinRightA"] )
+        cmds.radioCollection(self.allUIs["geomCollection"], edit=True, select=selGeoms)
+        cmds.setParent(self.allUIs["skinCreateFL"])
         
         #footerB - columnLayout:
-        self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinningTabLayout"])
+        self.allUIs["footerB"] = cmds.columnLayout('footerB', adjustableColumn=True, parent=self.allUIs["skinCreateFL"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerB"])
-        self.allUIs["skinButton"] = cmds.button("skinButton", label=self.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skinFromUI), parent=self.allUIs["footerB"])
+        self.allUIs["skinButton"] = cmds.button("skinButton", label=self.lang['i028_skinButton'], backgroundColor=(0.5, 0.8, 0.8), command=partial(self.skin.skinFromUI), parent=self.allUIs["footerB"])
         self.allUIs["footerAddRem"] = cmds.paneLayout("footerAddRem", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["footerB"])
-        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
-        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["addSkinButton"] = cmds.button("addSkinButton", label=self.lang['i063_skinAddBtn'], backgroundColor=(0.7, 0.9, 0.9), command=partial(self.skin.skinFromUI, "Add"), parent=self.allUIs["footerAddRem"])
+        self.allUIs["removeSkinButton"] = cmds.button("removeSkinButton", label=self.lang['i064_skinRemBtn'], backgroundColor=(0.1, 0.3, 0.3), command=partial(self.skin.skinFromUI, "Remove"), parent=self.allUIs["footerAddRem"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerB"])
         # this text will be actualized by the number of joints and geometries in the textScrollLists for skinning:
         self.allUIs["footerBText"] = cmds.text('footerBText', align='center', label="0 "+self.lang['i025_joints']+" 0 "+self.lang['i024_geometries'], parent=self.allUIs["footerB"])
+        
+        #skinCopy - layout
+        self.allUIs["skinCopyFL"] = cmds.frameLayout('skinCopyFL', label=self.lang['i287_copy']+" Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
+        self.allUIs["skinSurfAssociationCollection"] = cmds.radioCollection('skinSurfAssociationCollection', parent=self.allUIs["skinCopyFL"])
+        closestPoint = cmds.radioButton(label="closestPoint", annotation="closestPoint")
+        uvSpace      = cmds.radioButton(label="uvSpace", annotation="uvSpace")
+        self.allUIs["skinCopy2Layout"] = cmds.paneLayout("skinCopy2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCopyFL"])
+        self.allUIs["skinCopyOneSourceBT"] = cmds.button("skinCopyOneSourceBT", label=self.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.skin.copySkinFromOneSource, None, True), annotation=self.lang['i288_copySkinDesc'], parent=self.allUIs["skinCopy2Layout"])
+        self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.copySkinSameName, None, True), annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
+        cmds.radioCollection(self.allUIs["skinSurfAssociationCollection"], edit=True, select=closestPoint)
         cmds.setParent( self.allUIs["mainTabLayout"] )
         
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["skinningTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["colSkinLeftA"], 'top', 5), (self.allUIs["colSkinLeftA"], 'left', 5), (self.allUIs["colSkinRightA"], 'top', 5), (self.allUIs["colSkinRightA"], 'right', 5), (self.allUIs["footerB"], 'left', 5), (self.allUIs["footerB"], 'bottom', 5), (self.allUIs["footerB"], 'right', 5), (self.allUIs["modelsTextScrollLayout"], 'right', 5), (self.allUIs["jntTextScrollLayout"], 'left', 5)],
-                        attachControl=[(self.allUIs["colSkinRightA"], 'left', 5, self.allUIs["colSkinLeftA"]), (self.allUIs["modelsTextScrollLayout"], 'bottom', 5, self.allUIs["footerB"]), (self.allUIs["modelsTextScrollLayout"], 'top', 5, self.allUIs["colSkinRightA"]), (self.allUIs["modelsTextScrollLayout"], 'left', 5, self.allUIs["colSkinLeftA"]), (self.allUIs["jntTextScrollLayout"], 'bottom', 5, self.allUIs["footerB"]), (self.allUIs["jntTextScrollLayout"], 'top', 5, self.allUIs["colSkinLeftA"]), (self.allUIs["jntTextScrollLayout"], 'right', 5, self.allUIs["colSkinRightA"])],
-                        attachPosition=[(self.allUIs["colSkinLeftA"], 'right', 5, 50), (self.allUIs["colSkinRightA"], 'left', 5, 50), (self.allUIs["jntTextScrollLayout"], 'right', 3, 50), (self.allUIs["modelsTextScrollLayout"], 'left', 3, 50)],
-                        attachNone=[(self.allUIs["footerB"], 'top')]
+                        attachForm=[(self.allUIs["skinMainLayout"], 'top', 20), (self.allUIs["skinMainLayout"], 'left', 5), (self.allUIs["skinMainLayout"], 'right', 5), (self.allUIs["skinMainLayout"], 'bottom', 5)]
                         )
         
         # populate the joint and geometries lists:
@@ -3123,87 +3138,3 @@ class DP_AutoRig_UI(object):
         
     
     ###################### End: Rigging Modules Instances.
-    
-    
-    ###################### Start: Skinning.
-    
-    def validateGeoList(self, geoList, mode=None, *args):
-        """ Check if the geometry list from UI is good to be skinned, because we can get issue if the display long name is not used.
-        """
-        if geoList:
-            for i, item in enumerate(geoList):
-                if item in geoList[:i]:
-                    self.info('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
-                    return False
-                elif not cmds.objExists(item):
-                    self.info('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
-                    return False
-                elif not mode:
-                    try:
-                        inputDeformerList = cmds.findDeformers(item)
-                        if inputDeformerList:
-                            for deformerNode in inputDeformerList:
-                                if cmds.objectType(deformerNode) == "skinCluster":
-                                    self.info('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
-                                    return False
-                    except:
-                        pass
-        return True
-    
-    def skinFromUI(self, mode=None, *args):
-        """ Skin the geometries using the joints, reading from UI the selected items of the textScrollLists or getting all items if nothing selected.
-        """
-        # log window
-        logWin = cmds.checkBox(self.allUIs["displaySkinLogWin"], query=True, value=True)
-
-        # get joints to be skinned:
-        uiJointSkinList = cmds.textScrollList(self.allUIs["jntTextScrollLayout"], query=True, selectItem=True)
-        if not uiJointSkinList:
-            uiJointSkinList = cmds.textScrollList(self.allUIs["jntTextScrollLayout"], query=True, allItems=True)
-        
-        # check if all items in jointSkinList exists, then if not, show dialog box to skinWithoutNotExisting or Cancel
-        jointSkinList, jointNotExistingList = [], []
-        if uiJointSkinList:
-            for item in uiJointSkinList:
-                if cmds.objExists(item):
-                    jointSkinList.append(item)
-                else:
-                    jointNotExistingList.append(item)
-        if jointNotExistingList:
-            notExistingJointMessage = self.lang['i069_notSkinJoint'] +"\n\n"+ ", ".join(str(jntNotExitst) for jntNotExitst in jointNotExistingList) +"\n\n"+ self.lang['i070_continueSkin']
-            btYes = self.lang['i071_yes']
-            btNo = self.lang['i072_no']
-            confirmSkinning = cmds.confirmDialog(title='Confirm Skinning', message=notExistingJointMessage, button=[btYes,btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
-            if confirmSkinning == btNo:
-                jointSkinList = None
-        
-        # get geometries to be skinned:
-        geomSkinList = cmds.textScrollList(self.allUIs["modelsTextScrollLayout"], query=True, selectItem=True)
-        if not geomSkinList:
-            geomSkinList = cmds.textScrollList(self.allUIs["modelsTextScrollLayout"], query=True, allItems=True)
-        
-        # check if we have repeated listed geometries in case of the user choose to not display long names:
-        if self.validateGeoList(geomSkinList, mode):
-            if jointSkinList and geomSkinList:
-                for geomSkin in geomSkinList:
-                    if (mode == "Add"):
-                        cmds.skinCluster(geomSkin, edit=True, addInfluence=jointSkinList, toSelectedBones=True, lockWeights=True, weight=0.0)
-                    elif (mode == "Remove"):
-                        cmds.skinCluster(geomSkin, edit=True, removeInfluence=jointSkinList, toSelectedBones=True)
-                    else: # None = create a new skinCluster node
-                        baseName = dpUtils.extractSuffix(geomSkin)
-                        skinClusterName = baseName+"_SC"
-                        if "|" in skinClusterName:
-                            skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
-                        cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
-                print(self.lang['i077_skinned'] + ', '.join(geomSkinList))
-                if logWin:
-                    self.info('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
-                cmds.select(geomSkinList)
-        else:
-            print(self.lang['i029_skinNothing'])
-            if logWin:
-                self.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
-
-
-    ###################### End: Skinning.
