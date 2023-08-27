@@ -780,6 +780,8 @@
     "v076_outlinerCleaner"        : "Outliner limpador",
     "v077_outlinerCleanerDesc"    : "Esse validador limpará os nodes do dpAutoRigSystem\nque estejam em desuso na outliner.\nServe para excluir lixos deixados por guias deletadas,\npor exemplo dpAR_GuideMirror_Grp.",
     "v078_unlockNormals"          : "Desbloquear Normais",
-    "v079_unlockNormalsDesc"      : "Esse validador vai desbloquear as normais de geometrias."
+    "v079_unlockNormalsDesc"      : "Esse validador vai desbloquear as normais de geometrias.",
+    "v082_unusedSkinCleaner"      : "Skinning não usados limpador",
+    "v083_unusedSkinCleanerDesc"  : "Esse validador vai remover influencias de skinning não usadas."
 
 }
