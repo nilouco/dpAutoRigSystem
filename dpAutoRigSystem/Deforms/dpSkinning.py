@@ -113,13 +113,20 @@ class Skinning(object):
 
 
     def serializeCopySkin(self, sourceList, destinationList, oneSource=True, byUVs=False, *args):
-        """ Serialize the copy skinning for one source or not.
+        """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
+        maxProcess = len(destinationList)
+        progressAmount = 0
+        cmds.progressWindow(title=self.dpUIinst.lang['i287_copy']+" Skinning", progress=progressAmount, status='Skinning: 0%', isInterruptable=False)
         for sourceItem in sourceList:
+            # Update progress window
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('Skinning: '+repr(progressAmount)))
             if oneSource:
                 for item in destinationList:
                     self.runCopySkin(sourceItem, item, byUVs)
+                cmds.progressWindow(endProgress=True)
                 return
             else:
                 if not sourceItem in ranList:
@@ -134,6 +141,7 @@ class Skinning(object):
                                 ranList.append(item)
                                 break
                     ranList.append(sourceItem)
+        cmds.progressWindow(endProgress=True)
 
 
     def getDeformerOrder(self, defList, *args):

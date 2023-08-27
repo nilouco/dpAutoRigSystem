@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-08-24",
+    "_updated"       : "2023-08-27",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -674,10 +674,10 @@
     "m219_replace"              : "Substituir",
     "m220_sequence"             : "Sequência",
     "m221_padding"              : "Preenchemento",
-    "m222_name"                 : "Name",
+    "m222_name"                 : "Nome",
     "m223_preview"              : "Pré-visualização",
     "m224_rename"               : "Renomear",
-    "m225_selectAnything"       : "Select anything to continue, please.",
+    "m225_selectAnything"       : "Selecione alguma coisa para continuar, por favor.",
     "m226_createFaceToRivet"    : "Criar geometria FaceToRivet",
     "m227_mainCtrls"            : "Controles principais",
     "m228_handlebar"            : "Guidao",

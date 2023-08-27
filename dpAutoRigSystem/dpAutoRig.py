@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.22"
-DPAR_UPDATELOG = "N337 CopySkin from Extra to Skinning tab."
+DPAR_UPDATELOG = "N337 CopySkin from Extra to Skinning tab.\nAdded options for surface association and\ncopy from one source or multiply itens with same name."
 
 
 
