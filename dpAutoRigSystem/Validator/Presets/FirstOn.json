@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-07-26",
+    "_updated"    : "2023-08-27",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
@@ -16,6 +16,7 @@
 
     "BrokenNetCleaner"          : false,
     "ColorSetCleaner"           : false,
+    "ControllerTag"             : false,
     "ControlsHierarchy"         : false,
     "DisplayLayers"             : false,
     "ExitEditMode"              : false,
@@ -23,10 +24,11 @@
     "HideDataGrp"               : false,
     "KeyframeCleaner"           : false,
     "NgSkinToolsCleaner"        : false,
+    "OutlinerCleaner"           : false,
     "ResetPose"                 : false,
     "SideCalibration"           : false,
     "TargetCleaner"             : false,
     "UnknownNodesCleaner"       : false,
+    "UnusedSkinCleaner"         : false,
     "WIPCleaner"                : false
-
 }
