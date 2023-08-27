@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.22"
-DPAR_UPDATELOG = "N337 CopySkin from Extra to Skinning tab.\nAdded options for surface association and\ncopy from one source or multiply itens with same name."
+DPAR_VERSION_PY3 = "4.03.25"
+DPAR_UPDATELOG = "N502 Disable old dpControl attributes.\nCleaned for Single Holders and Ribbon MidCtrls."
 
 
 

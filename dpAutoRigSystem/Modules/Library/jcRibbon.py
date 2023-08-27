@@ -513,6 +513,7 @@ class RibbonClass(object):
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
         mid_Ctrl = self.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
+        dpUtils.removeUserDefinedAttr(mid_Ctrl)
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
         cmds.delete(cmds.parentConstraint(midCtrl, mid_Ctrl, mo=0))
