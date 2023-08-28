@@ -25,6 +25,7 @@
     "KeyframeCleaner"           : true,
     "NgSkinToolsCleaner"        : true,
     "OutlinerCleaner"           : true,
+    "RenderNodeCleaner"         : true,
     "ResetPose"                 : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
