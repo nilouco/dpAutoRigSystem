@@ -1,7 +1,5 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
-import os
 from .. import dpBaseValidatorClass
 
 # global variables to this module:
@@ -10,7 +8,7 @@ TITLE = "v082_unusedSkinCleaner"
 DESCRIPTION = "v083_unusedSkinCleanerDesc"
 ICON = "/Icons/dp_unusedSkinCleaner.png"
 
-DP_UNUSEDSKINCLEANER_VERSION = 1.0
+DP_UNUSEDSKINCLEANER_VERSION = 1.1
 
 
 class UnusedSkinCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -61,19 +59,15 @@ class UnusedSkinCleaner(dpBaseValidatorClass.ValidatorStartClass):
                         self.resultOkList.append(False)
                     else: #fix
                         try:
-                            # loading mel script with the needed procedure
-                            mel.eval("source \"cleanUpScene\";")
-                            
-                            #https://discourse.techart.online/t/python-optimizescenesize/15341/5
-                            if "MAYA_TESTING_CLEANUP" not in os.environ:
-                                os.environ["MAYA_TESTING_CLEANUP"] = "enable"
-                                mel.eval("scOpt_performOneCleanup( {\"unusedSkinInfsOption\"} );")
-                                del os.environ["MAYA_TESTING_CLEANUP"]
-                            else:
-                                mel.eval("scOpt_performOneCleanup( {\"unusedSkinInfsOption\"} );")
-                            
+                            toRemoveJointList = []
+                            for jointNode in influenceList:
+                                if not jointNode in weightedInfluenceList:
+                                    if not jointNode in toRemoveJointList:
+                                        toRemoveJointList.append(jointNode)
+                            if toRemoveJointList:
+                                cmds.skinCluster(item, edit=True, removeInfluence=toRemoveJointList, toSelectedBones=True)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(len(toRemoveJointList))+" joints")
                         except:
                             self.resultOkList.append(False)
                             self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
