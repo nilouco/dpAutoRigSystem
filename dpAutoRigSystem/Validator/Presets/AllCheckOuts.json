@@ -2,7 +2,7 @@
     "_preset"     : "AllCheckOuts",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2023-01-26",
-    "_updated"    : "2023-08-27",
+    "_updated"    : "2023-08-28",
 
     "DuplicatedName"            : false,
     "FreezeTransform"           : false,
@@ -25,11 +25,11 @@
     "KeyframeCleaner"           : true,
     "NgSkinToolsCleaner"        : true,
     "OutlinerCleaner"           : true,
-    "RenderNodeCleaner"         : true,
     "ResetPose"                 : true,
     "SideCalibration"           : true,
     "TargetCleaner"             : true,
     "UnknownNodesCleaner"       : true,
+    "UnusedNodeCleaner"         : true,
     "UnusedSkinCleaner"         : true,
     "WIPCleaner"                : true
 

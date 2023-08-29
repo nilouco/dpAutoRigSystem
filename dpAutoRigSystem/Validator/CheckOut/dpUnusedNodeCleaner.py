@@ -4,15 +4,15 @@ from maya import mel
 from .. import dpBaseValidatorClass
 
 # global variables to this module:
-CLASS_NAME = "RenderNodeCleaner"
-TITLE = "v084_renderNodeCleaner"
-DESCRIPTION = "v085_renderNodeCleanerDesc"
-ICON = "/Icons/dp_renderNodeCleaner.png"
+CLASS_NAME = "UnusedNodeCleaner"
+TITLE = "v084_unusedNodeCleaner"
+DESCRIPTION = "v085_unusedNodeCleanerDesc"
+ICON = "/Icons/dp_unusedNodeCleaner.png"
 
-DP_RENDERNODECLEANER_VERSION = 1.0
+DP_UNUSEDNODECLEANER_VERSION = 1.0
 
 
-class RenderNodeCleaner(dpBaseValidatorClass.ValidatorStartClass):
+class UnusedNodeCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME

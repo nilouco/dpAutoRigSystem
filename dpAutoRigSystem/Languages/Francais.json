@@ -783,7 +783,7 @@
     "v079_unlockNormalsDesc"      : "Ce validateur va débloquer les normals de géometries.",
     "v082_unusedSkinCleaner"      : "Skin non utilisés nettoyeur",
     "v083_unusedSkinCleanerDesc"  : "Ce validateur va remover les influences de skinning non utilisés.",
-    "v084_renderNodeCleaner"      : "Render node nettoyeur",
-    "v085_renderNodeCleanerDesc"  : "Ce validateur va nettoyer des rendering nodes non necessáires dans le fichier."
+    "v084_unusedNodeCleaner"      : "Node non utilisés nettoyeur",
+    "v085_unusedNodeCleanerDesc"  : "Ce validateur va nettoyer des rendering nodes non necessáires dans le fichier."
 
 }

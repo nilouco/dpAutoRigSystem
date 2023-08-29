@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.24"
-DPAR_UPDATELOG = "N739 Added Rendering nodes cleaner\nas a new check-out validator."
+DPAR_UPDATELOG = "N739 Added Unused nodes cleaner\nas a new check-out validator."
 
 
 

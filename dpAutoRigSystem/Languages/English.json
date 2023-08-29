@@ -784,6 +784,6 @@
     "v079_unlockNormalsDesc"      : "This validator will unlock normals from the geometries.",
     "v082_unusedSkinCleaner"      : "Unused skin cleaner",
     "v083_unusedSkinCleanerDesc"  : "This validator will remove unused skin influences.",
-    "v084_renderNodeCleaner"      : "Render node cleaner",
-    "v085_renderNodeCleanerDesc"  : "This validator will remove unecessary rendering nodes."
+    "v084_unusedNodeCleaner"      : "Unused node cleaner",
+    "v085_unusedNodeCleanerDesc"  : "This validator will remove unecessary rendering nodes."
 }
