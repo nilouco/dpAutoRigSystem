@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.23"
-DPAR_UPDATELOG = "N729 Added Unused Skin Influence Cleaner\nas a new check-out validator.\nN740 Refactoring not using OptimizeSceneSize."
+DPAR_VERSION_PY3 = "4.03.24"
+DPAR_UPDATELOG = "N739 Added Unused nodes cleaner\nas a new check-out validator."
 
 
 
