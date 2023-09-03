@@ -346,8 +346,9 @@ class LayoutClass(object):
                                 self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=hasMain, parent=self.mainCtrlColumn)
                             else:
-                                self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=False, enable=False, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
+                                self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
+                                cmds.setAttr(self.moduleGrp+".mainControls", 0)
 
             except:
                 pass

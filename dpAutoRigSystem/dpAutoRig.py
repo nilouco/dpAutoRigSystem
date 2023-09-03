@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.24"
-DPAR_UPDATELOG = "N739 Added Unused nodes cleaner\nas a new check-out validator."
+DPAR_VERSION_PY3 = "4.03.25"
+DPAR_UPDATELOG = "N738 - FkLine back to 1 segment error fixed."
 
 
 
