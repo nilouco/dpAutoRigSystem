@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.26"
-DPAR_UPDATELOG = "N720 - Added new Ik_First_Ctrl to Chain module.\n722 - Chain volume variation off scale issue fixed.\nN735 - Chain fk sub controllers."
+DPAR_VERSION_PY3 = "4.03.27"
+DPAR_UPDATELOG = "N733 Limb wrist max rotate flipping enhancement."
 
 
 
@@ -507,7 +507,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints  = cmds.radioButton(label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints)
         dpARJoints = cmds.radioButton(label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints)
-        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
+        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=3, columnWidth=[(1, 45), (2, 45), (3, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
@@ -2609,7 +2609,7 @@ class DP_AutoRig_UI(object):
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
-                            rootCtrlRefList = self.integratedTaskDic[moduleDic]['rootCtrlRefList']
+                            rootCtrlRefList   = self.integratedTaskDic[moduleDic]['rootCtrlRefList']
                             softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList']
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:

@@ -19,7 +19,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.2
+DP_LIMB_VERSION = 2.3
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -1233,6 +1233,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         num = self.getBendJoints()
                         iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'
                         corner = side+self.userGuideName+"_"+cornerName+'_Jnt'
+                        cornerJxt = side+self.userGuideName+"_"+cornerName+'_Jxt'
                         splited = self.userGuideName.split('_')
                         prefix = ''.join(side)
                         name = ''
@@ -1254,7 +1255,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                         if self.limbTypeName == ARM:
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, cornerJxt, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         else:
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
