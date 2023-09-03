@@ -52,6 +52,12 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".mainControls", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
+        cmds.setAttr(self.moduleGrp+".nMain", 1)
         
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -140,6 +146,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
+                self.changeMainCtrlsNumber(0)
                 # re-build the preview mirror:
                 dpLayoutClass.LayoutClass.createPreviewMirror(self)
             cmds.select(self.moduleGrp)
@@ -322,11 +329,11 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # invert scale for right side before:
                 if s == 1:
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleX", -1)
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleY", -1)
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleZ", -1)
                     # fix flipping issue for right side:
                     for f in range(1, len(self.fkCtrlList)):
+                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleX", -1)
+                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleY", -1)
+                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleZ", -1)
                         attrList = ["tx", "ty", "tz", "rx", "ry", "rz"]
                         for attr in attrList:
                             attrValue = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
@@ -613,6 +620,10 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(lastScaleBC+".outputG", self.skinJointList[-2]+'.scaleY', force=True)
                 cmds.connectAttr(lastScaleBC+".outputB", self.skinJointList[-2]+'.scaleZ', force=True)
 
+                # work with main fk controllers
+                if cmds.getAttr(self.base+".mainControls"):
+                    self.addFkMainCtrls(side, self.fkCtrlList)
+                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, name=side+self.userGuideName+"_Scalable_Grp")

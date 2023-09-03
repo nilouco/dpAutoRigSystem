@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.26"
-DPAR_UPDATELOG = "N720 - Added new Ik_First_Ctrl to Chain module.\n722 - Chain volume variation off scale issue fixed."
+DPAR_UPDATELOG = "N720 - Added new Ik_First_Ctrl to Chain module.\n722 - Chain volume variation off scale issue fixed.\nN735 - Chain fk sub controllers."
 
 
 
