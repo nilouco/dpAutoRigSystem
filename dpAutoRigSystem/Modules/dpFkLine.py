@@ -10,7 +10,7 @@ TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
 
-DP_FKLINE_VERSION = 2.1
+DP_FKLINE_VERSION = 2.2
 
 
 class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -155,6 +155,9 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # limit range
         if self.nMainCtrlAttr >= self.currentNJoints:
             self.nMainCtrlAttr = self.currentNJoints - 1
+            if self.nMainCtrlAttr == 0:
+                self.nMainCtrlAttr = 1
+                cmds.checkBox(self.mainCtrlsCB, edit=True, editable=False)
             cmds.intField(self.nMainCtrlIF, edit=True, value=self.nMainCtrlAttr)
         cmds.setAttr(self.moduleGrp+".nMain", self.nMainCtrlAttr)
 
