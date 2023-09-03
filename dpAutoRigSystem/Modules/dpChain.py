@@ -571,9 +571,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.worldRef+".scaleX", vvMD+'.input1X', force=True)
                 cmds.connectAttr(self.worldRef+".scaleX", vvCond+'.colorIfFalseR', force=True)
                 cmds.connectAttr(self.worldRef+".scaleX", vvScaleCompensateMD+'.input2X', force=True)
+                cmds.connectAttr(self.worldRef+".scaleX", vvBC+'.color2.color2R', force=True)
                 cmds.connectAttr(stretchBC+".output.outputR", vvMD+'.input2X', force=True)
                 cmds.setAttr(vvMD+'.operation', 2)
-                cmds.setAttr(vvBC+'.color2R', 1)
                 cmds.setAttr(vvCond+".secondTerm", 1)
                 #output volumeVariation values to joint scale axis:
                 for j in range(0, len(self.skinJointList)-2):
