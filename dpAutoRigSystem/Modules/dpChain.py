@@ -10,7 +10,7 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
-DP_CHAIN_VERSION = 2.0
+DP_CHAIN_VERSION = 2.1
 
 
 class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -465,7 +465,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
-                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_Last_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
+                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
                         self.ctrls.colorShape([self.ikCtrlLast], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
                         ikCtrlLastZero = dpUtils.zeroOut([self.ikCtrlLast])[0]
@@ -484,14 +484,25 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     else: #first
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
+                        # first ik control:
+                        self.ikCtrlFirst = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
+                        self.ctrls.colorShape([self.ikCtrlFirst], 'cyan')
+                        cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlFirst, maintainOffset=False))
+                        ikCtrlFirstZero = dpUtils.zeroOut([self.ikCtrlFirst])[0]
+                        cmds.parent(ikCtrlFirstZero, self.ikCtrlMain)
+                        cmds.parent(ikCtrlZero, self.ikCtrlFirst)
+                        self.ctrls.setLockHide([self.ikCtrlFirst], ["v"])
+                        cmds.connectAttr(self.ikCtrlFirst+".scaleX", self.ikJointList[0]+".scaleX", force=True)
+                        cmds.connectAttr(self.ikCtrlFirst+".scaleY", self.ikJointList[0]+".scaleY", force=True)
+                        cmds.connectAttr(self.ikCtrlFirst+".scaleZ", self.ikJointList[0]+".scaleZ", force=True)
                 
                 # ik controls position:
-                cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")
-                cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlLast, self.ikCtrlZeroList[2], maintainOffset=True, name=self.ikCtrlZeroList[2]+"_PoC")
+                cmds.pointConstraint(self.ikCtrlFirst, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")
+                cmds.pointConstraint(self.ikCtrlFirst, self.ikCtrlLast, self.ikCtrlZeroList[2], maintainOffset=True, name=self.ikCtrlZeroList[2]+"_PoC")
                 cmds.pointConstraint(self.ikCtrlList[2], self.ikCtrlLast, self.ikCtrlZeroList[3], maintainOffset=True, name=self.ikCtrlZeroList[3]+"_PoC")
                 
                 # ik controls orientation:
-                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlMain, 0, self.ikCtrlList[1], self.ikCtrlMain)
+                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlFirst, 0, self.ikCtrlList[1], self.ikCtrlFirst)
                 lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2], self.ikCtrlLast)
                 midUpLoc, midFakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 13, self.ikCtrlList[2], self.ikCtrlList[2], False)
                 lastMidLoc = cmds.duplicate(lastFakeLoc, name=lastFakeLoc.replace("Fake", "Middle"))[0]
