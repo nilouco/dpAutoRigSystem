@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.27"
-DPAR_UPDATELOG = "N733 Limb wrist max rotate flipping enhancement."
+DPAR_VERSION_PY3 = "4.03.28"
+DPAR_UPDATELOG = "N753 Limb ankle flip fix."
 
 
 
@@ -2569,7 +2569,7 @@ class DP_AutoRig_UI(object):
                                                                 cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC")
                                             else:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
-                                            cmds.setAttr(oc+".interpType", 0) #noFlip
+                                            cmds.setAttr(oc+".interpType", 2) #shortest
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
