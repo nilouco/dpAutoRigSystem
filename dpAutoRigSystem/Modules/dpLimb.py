@@ -60,6 +60,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.correctiveCtrlGrpList = []
         self.ankleArticList = []
         self.ankleCorrectiveList = []
+        self.jaxRotZMDList = []
 
 
     def createModuleLayout(self, *args):
@@ -1621,6 +1622,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         # expose ankle data to be replaced by foot connections when integrating modules
                         self.ankleArticList.append([extremJax, extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(extremCorrectiveNetList)
+                        self.jaxRotZMDList.append(jaxRotZMD)
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
@@ -1637,6 +1639,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.ankleArticList.append([cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0], extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(None)
                         cmds.setAttr(beforeJntList[0]+"_OrC.interpType", 1) #average
+                        self.jaxRotZMDList.append(None)
                     if s == 1:
                         for jar in [beforeJntList[0], mainJntList[0], extremJntList[0]]:
                             cmds.setAttr(jar+".rotateX", 180)
@@ -1776,6 +1779,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "addArticJoint": self.addArticJoint,
                 "addCorrective": self.addCorrective, 
                 "ankleArticList": self.ankleArticList,
-                "ankleCorrectiveList": self.ankleCorrectiveList
+                "ankleCorrectiveList": self.ankleCorrectiveList,
+                "jaxRotZMDList": self.jaxRotZMDList
             }
         }
