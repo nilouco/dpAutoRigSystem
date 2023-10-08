@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.28"
-DPAR_UPDATELOG = "N753 Limb ankle flip fix."
+DPAR_VERSION_PY3 = "4.03.29"
+DPAR_UPDATELOG = "N754 Limb constraints fixes."
 
 
 
@@ -2538,6 +2538,7 @@ class DP_AutoRig_UI(object):
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
                                     ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
                                     ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
+                                    jaxRotZMDList         = self.integratedTaskDic[fatherGuide]['jaxRotZMDList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
                                     cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
@@ -2556,8 +2557,19 @@ class DP_AutoRig_UI(object):
                                         # reconnect correctly the interation for ankle and correctives
                                         if addArticJoint:
                                             cmds.delete(ankleArticList[1])
+                                            # workaround to avoid orientConstraint offset issue
+                                            footJntFather = cmds.listRelatives(footJnt, parent=True)[0]
+                                            cmds.delete(cmds.listRelatives(footJnt, children=True, type="parentConstraint")[0])
+                                            footJntChildrenList = cmds.listRelatives(footJnt, children=True)
+                                            cmds.parent(footJntChildrenList, world=True)
+                                            cmds.parent(footJnt, extremJnt, relative=True)
+                                            cmds.makeIdentity(footJnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
+                                            cmds.parent(footJnt, footJntFather)
+                                            cmds.parent(footJntChildrenList, footJnt)
+                                            cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")
                                             if addCorrective:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
+                                                cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList+".input1Z", force=True)
                                                 for netNode in ankleCorrectiveList:
                                                     if netNode:
                                                         if cmds.objExists(netNode):
