@@ -18,7 +18,7 @@ from maya import cmds
 from . import dpUtils
 from . import dpControls
 
-DP_RIBBONCLASS_VERSION = 2.1
+DP_RIBBONCLASS_VERSION = 2.2
 
 
 class RibbonClass(object):
@@ -229,7 +229,7 @@ class RibbonClass(object):
         
         if iniJxt:
             if cmds.objExists(iniJxt):
-                pac = cmds.parentConstraint(iniJxt, downLimb['bendGrpList'][0], mo=False, name=downLimb['bendGrpList'][0]+"_PaC")[0]
+                pac = cmds.parentConstraint(iniJxt, downLimb['bendGrpList'][0], mo=True, name=downLimb['bendGrpList'][0]+"_PaC")[0]
                 cmds.setAttr(pac+".interpType", 2) #shortest
                 cmds.setAttr(pac+"."+iniJxt+"W1", 0.3)
 
