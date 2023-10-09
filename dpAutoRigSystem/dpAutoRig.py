@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.29"
-DPAR_UPDATELOG = "N754 Limb constraints fixes."
+DPAR_VERSION_PY3 = "4.03.30"
+DPAR_UPDATELOG = "N750 Delete locked unknown nodes."
 
 
 

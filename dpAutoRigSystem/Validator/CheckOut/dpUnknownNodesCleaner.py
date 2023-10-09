@@ -8,7 +8,7 @@ TITLE = "v058_unknownNodesCleaner"
 DESCRIPTION = "v059_unknownNodesCleanerDesc"
 ICON = "/Icons/dp_unknownNodesCleaner.png"
 
-DP_UNKNOWNNODESCLEANER_VERSION = 1.1
+DP_UNKNOWNNODESCLEANER_VERSION = 1.2
 
 
 class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -57,6 +57,7 @@ class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 else: #fix
                     try:
                         if cmds.objExists(item):
+                            cmds.lockNode(item, lock=False)
                             cmds.delete(item)
                         self.resultOkList.append(True)
                         self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
