@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.29"
-DPAR_UPDATELOG = "N754 Limb constraints fixes."
+DPAR_VERSION_PY3 = "4.03.31"
+DPAR_UPDATELOG = "N751 SideCalibration fixed issue if attribute\ndoesn't exists."
 
 
 
