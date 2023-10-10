@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.30"
-DPAR_UPDATELOG = "N750 Delete locked unknown nodes."
+DPAR_VERSION_PY3 = "4.03.31"
+DPAR_UPDATELOG = "N751 SideCalibration fixed issue if attribute\ndoesn't exists."
 
 
 
