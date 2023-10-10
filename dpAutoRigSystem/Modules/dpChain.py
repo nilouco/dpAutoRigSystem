@@ -10,7 +10,7 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
-DP_CHAIN_VERSION = 2.1
+DP_CHAIN_VERSION = 2.2
 
 
 class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -52,6 +52,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="dynamic", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".dynamic", 0)
 
         cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".mainControls", 0)
@@ -152,7 +155,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(self.moduleGrp)
         else:
             self.changeJointNumber(5)
-    
+
 
     def setupAimLocators(self, side, toUpParent, ikNumb, ikFakeCtrl, toFakeParent, hasFake=True, *args):
         """ Creates the up and fake locators to use in the aimConstraint.
