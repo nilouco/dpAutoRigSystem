@@ -216,17 +216,17 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             else:
                 cmds.delete(item)
         # hairSystem
-        dpHairSystemNode = None
+        mel.eval("DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;")
         cmds.select(mainCrv+"Shape")
+        dpHairSystemNode = None
         allTransfList = cmds.ls(selection=False, type="transform")
         if allTransfList:
             for transform in allTransfList:
                 if cmds.objExists(transform+".dpHairSystem"):
                     dpHairSystemNode = transform
-                    cmds.select(dpHairSystemNode, add=True)
                     break
-        mel.eval('MakeCurvesDynamic;')
         if not dpHairSystemNode:
+            mel.eval("assignNewHairSystem;")
             # rename nodes
             if cmds.objExists("hairSystem1"):
                 cmds.rename("hairSystem1", "dpHairSystem")
@@ -241,6 +241,12 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             fxGrp = dpUtils.getNodeByMessage("fxGrp")
             if fxGrp:
                 cmds.parent("dpNucleus", "dpHairSystem", "dpHairSystemOutputCurves", fxGrp)
+            if cmds.objExists("hairSystem1Follicles"):
+                cmds.delete("hairSystem1Follicles")
+        else:
+            mel.eval('assignHairSystem '+dpHairSystemNode+';')
+            if cmds.objExists("dpHairSystemFollicles"):
+                cmds.delete("dpHairSystemFollicles")
         cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ikStaticDataGrp, children=True, allDescendents=True, type="follicle")[0], parent=True)[0], dynName+"_Dyn_Fol")
         dynCrv = cmds.rename("dpHairSystemOutputCurves|curve1", dynName+"_Dyn_Crv")
         # ikHandle
