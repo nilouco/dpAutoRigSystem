@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
@@ -189,6 +190,67 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
 
 
+    def createDynamicChain(self, dynName, rebuildCrvSpans=20, *args):
+        """ This is like a patch to add a dynamic setup to the Chain.
+        """
+        # curve
+        mainCrv = cmds.duplicate(self.ikSplineList[2], name=dynName+"_Main_Crv")[0]
+        cmds.delete(mainCrv+"ShapeOrig")
+        cmds.rebuildCurve(mainCrv, constructionHistory=False, replaceOriginal=True, rebuildType=False, endKnots=True, keepRange=False, keepControlPoints=False, keepEndPoints=True, keepTangents=False, spans=rebuildCrvSpans, degree=3, tolerance=0.01)
+        cmds.skinCluster(self.skinJointList, mainCrv, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=dynName+"_Main_Crv_SC")
+        # dynamic joints
+        firstDynJnt = dynName+"_00_Dyn_Jnt"
+        dynJntList = cmds.duplicate(dynName+"_00_Jnt", name=firstDynJnt, fullPath=True)
+        for item in reversed(dynJntList):
+            if cmds.objectType(item) == "joint":
+                if "_JEnd" in item:
+                    cmds.rename(item, item[item.rfind("|")+1:].replace("_JEnd", "_Dyn_JEnd"))
+                    continue
+                elif "_Jax" in item:
+                    cmds.delete(item)
+                    continue
+                dynLabel = cmds.getAttr(item+".otherType")+"_Dyn"
+                cmds.setAttr(item+".otherType", dynLabel, type="string")
+                if not "_Dyn" in item[item.rfind("|")+1:]:
+                    cmds.rename(item, item[item.rfind("|")+1:].replace("_Jnt", "_Dyn_Jnt"))
+            else:
+                cmds.delete(item)
+        # hairSystem
+        dpHairSystemNode = None
+        cmds.select(mainCrv+"Shape")
+        allTransfList = cmds.ls(selection=False, type="transform")
+        if allTransfList:
+            for transform in allTransfList:
+                if cmds.objExists(transform+".dpHairSystem"):
+                    dpHairSystemNode = transform
+                    cmds.select(dpHairSystemNode, add=True)
+                    break
+        mel.eval('MakeCurvesDynamic;')
+        if not dpHairSystemNode:
+            # rename nodes
+            if cmds.objExists("hairSystem1"):
+                cmds.rename("hairSystem1", "dpHairSystem")
+            dpHairSystemNode = "dpHairSystemShape"
+            cmds.addAttr(dpHairSystemNode, longName="dpHairSystem", attributeType="bool", defaultValue=1)
+            if cmds.objExists("nucleus1"):
+                cmds.rename("nucleus1", "dpNucleus")
+                cmds.addAttr(dpHairSystemNode, longName="dpNucleus", attributeType="bool", defaultValue=1)
+            if cmds.objExists("hairSystem1OutputCurves"):
+                cmds.rename("hairSystem1OutputCurves", "dpHairSystemOutputCurves")
+            # parent nodes
+            fxGrp = dpUtils.getNodeByMessage("fxGrp")
+            if fxGrp:
+                cmds.parent("dpNucleus", "dpHairSystem", "dpHairSystemOutputCurves", fxGrp)
+        cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ikStaticDataGrp, children=True, allDescendents=True, type="follicle")[0], parent=True)[0], dynName+"_Dyn_Fol")
+        dynCrv = cmds.rename("dpHairSystemOutputCurves|curve1", dynName+"_Dyn_Crv")
+        # ikHandle
+        dynJntList = sorted(cmds.listRelatives(firstDynJnt, children=True, allDescendents=True))
+        ikSplineList = cmds.ikHandle(startJoint=firstDynJnt, endEffector=dynJntList[-2], name=dynName+"_Dyn_IkH", solver="ikSplineSolver", parentCurve=False, curve=dynCrv, createCurve=False) #[Handle, Effector]
+        ikSplineList[1] = cmds.rename(ikSplineList[1], dynName+"_Dyn_Eff")
+        cmds.parent(ikSplineList[0], self.ikStaticDataGrp)
+        cmds.select(clear=True)
+
+
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -199,6 +261,8 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
+            # dynamic:
+            self.addDynamic = self.getModuleAttr("dynamic")
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -395,11 +459,11 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
 
                 # ik spline:
-                ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
-                ikSplineList[1] = cmds.rename(ikSplineList[1], side+self.userGuideName+"_Eff")
-                ikSplineList[2] = cmds.rename(ikSplineList[2], side+self.userGuideName+"_IkC")
-                self.ikSplineHandle = ikSplineList[0]
-                self.ikSplineCurve = ikSplineList[2]
+                self.ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
+                self.ikSplineList[1] = cmds.rename(self.ikSplineList[1], side+self.userGuideName+"_Eff")
+                self.ikSplineList[2] = cmds.rename(self.ikSplineList[2], side+self.userGuideName+"_IkC")
+                self.ikSplineHandle = self.ikSplineList[0]
+                self.ikSplineCurve = self.ikSplineList[2]
                 # ik clusters:
                 self.ikClusterList = []
                 self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[0:1]", name=side+self.userGuideName+"_Ik_0_Cls")[1]) #[Deform, Handle]
@@ -530,10 +594,10 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], 1, False)
                     cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, -1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
                 
-                self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
+                self.ikStaticDataGrp = cmds.group(self.ikSplineList[0], self.ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
                 # ik stretch:
-                curveInfoNode = cmds.arclen(ikSplineList[2], constructionHistory=True)
+                curveInfoNode = cmds.arclen(self.ikSplineList[2], constructionHistory=True)
                 curveInfoNode = cmds.rename(curveInfoNode, side+self.userGuideName+"_Ik_CurveInfo")
                 # create stretch nodes:
                 ikNormalizeMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Normalize_MD")
@@ -631,6 +695,12 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, name=side+self.userGuideName+"_Scalable_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.ikStaticDataGrp, ikMainLocGrp, name=side+self.userGuideName+"_Static_Grp")
+                
+                # dynamic
+                if self.addDynamic:
+                    self.createDynamicChain(side+self.userGuideName)
+                    cmds.xform(self.toCtrlHookGrp, pivots=cmds.xform(self.ikCtrlMain, worldSpace=True, rotatePivot=True, query=True))
+
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)
