@@ -241,6 +241,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             fxGrp = dpUtils.getNodeByMessage("fxGrp")
             if fxGrp:
                 cmds.parent("dpNucleus", "dpHairSystem", "dpHairSystemOutputCurves", fxGrp)
+                self.ctrls.colorShape([fxGrp], [0.9, 0.6, 1], outliner=True)
             if cmds.objExists("hairSystem1Follicles"):
                 cmds.delete("hairSystem1Follicles")
         else:
