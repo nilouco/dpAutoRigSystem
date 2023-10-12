@@ -21,6 +21,7 @@ from maya import cmds
 from maya import mel
 from functools import partial
 from ..Modules.Library import dpUtils
+from ..Modules.Library import dpControls
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -38,6 +39,7 @@ class Rivet(object):
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # declaring variables
         self.dpUIinst = dpUIinst
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None
@@ -324,6 +326,9 @@ class Rivet(object):
         # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
         if faceToRivet:
             geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+            modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+            if modelGrp:
+                self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
 
         # get shape to attach:
         if cmds.objExists(geoToAttach):
