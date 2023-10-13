@@ -254,11 +254,19 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.skinJointList[0]+".visibility", 0)
         
         # setup new blend joints
-        for j, newJnt in enumerate(newSkinJntList[:-1]):
-            for sAttr in ['sx', 'sy', 'sz']:
-                cmds.connectAttr(self.skinJointList[j]+"."+sAttr, newJnt+"."+sAttr, force=True)
-        print(dynName[0].lower()+dynName[1:])
         dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", (dynName[0].lower()+dynName[1:]), self.worldRef)
+        dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
+        cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
+        cmds.connectAttr(dynJntList[0]+".scaleY", dynStretchBC+".color1G", force=True)
+        cmds.connectAttr(dynJntList[0]+".scaleZ", dynStretchBC+".color1B", force=True)
+        cmds.connectAttr(self.skinJointList[0]+".scaleX", dynStretchBC+".color2R", force=True)
+        cmds.connectAttr(self.skinJointList[0]+".scaleY", dynStretchBC+".color2G", force=True)
+        cmds.connectAttr(self.skinJointList[0]+".scaleZ", dynStretchBC+".color2B", force=True)
+        cmds.connectAttr(self.worldRef+"."+(dynName[0].lower()+dynName[1:])+"Dyn_ikFkBlend", dynStretchBC+".blender", force=True)
+        for j, jnt in enumerate(newSkinJntList[:-1]):
+            cmds.connectAttr(dynStretchBC+".outputR", newSkinJntList[j]+".scaleX", force=True)
+            cmds.connectAttr(dynStretchBC+".outputG", newSkinJntList[j]+".scaleY", force=True)
+            cmds.connectAttr(dynStretchBC+".outputB", newSkinJntList[j]+".scaleZ", force=True)
 
         # hairSystem
         mel.eval("DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;")
