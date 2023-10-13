@@ -190,6 +190,41 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
 
 
+    def clearRenameJointChain(self, jntList, fromName, toName, clear=True, *args):
+        """ Clean up joint chain and rename it as well.
+            Return the renamed list.
+        """
+        renamedList = []
+        for item in reversed(jntList):
+            if cmds.objectType(item) == "joint":
+                if "_JEnd" in item:
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_JEnd", toName+"_JEnd"))
+                    renamedList.append(newName)
+                    continue
+                elif "_Jax" in item:
+                    if clear:
+                        cmds.delete(item)
+                    continue
+                if not toName in item[item.rfind("|")+1:]:
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace(fromName, toName))
+                    renamedList.append(newName)
+            else:
+                if clear:
+                    cmds.delete(item)
+        return list(reversed(renamedList))
+
+
+    def clearUserDefinedAttr(self, jointList, *args):
+        """ TODO change to call dpUtils done function after branchativa publishing.
+        """
+        for jnt in jointList:
+            userDefAttrList = cmds.listAttr(jnt, userDefined=True)
+            if userDefAttrList:
+                for userDefAttr in userDefAttrList:
+                    cmds.setAttr(jnt+"."+userDefAttr, lock=False)
+                    cmds.deleteAttr(jnt+"."+userDefAttr)
+
+
     def createDynamicChain(self, dynName, rebuildCrvSpans=20, *args):
         """ This is like a patch to add a dynamic setup to the Chain.
         """
@@ -198,23 +233,36 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.delete(mainCrv+"ShapeOrig")
         cmds.rebuildCurve(mainCrv, constructionHistory=False, replaceOriginal=True, rebuildType=False, endKnots=True, keepRange=False, keepControlPoints=False, keepEndPoints=True, keepTangents=False, spans=rebuildCrvSpans, degree=3, tolerance=0.01)
         cmds.skinCluster(self.skinJointList, mainCrv, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=dynName+"_Main_Crv_SC")
+
         # dynamic joints
         firstDynJnt = dynName+"_00_Dyn_Jnt"
-        dynJntList = cmds.duplicate(dynName+"_00_Jnt", name=firstDynJnt, fullPath=True)
-        for item in reversed(dynJntList):
-            if cmds.objectType(item) == "joint":
-                if "_JEnd" in item:
-                    cmds.rename(item, item[item.rfind("|")+1:].replace("_JEnd", "_Dyn_JEnd"))
-                    continue
-                elif "_Jax" in item:
-                    cmds.delete(item)
-                    continue
-                dynLabel = cmds.getAttr(item+".otherType")+"_Dyn"
-                cmds.setAttr(item+".otherType", dynLabel, type="string")
-                if not "_Dyn" in item[item.rfind("|")+1:]:
-                    cmds.rename(item, item[item.rfind("|")+1:].replace("_Jnt", "_Dyn_Jnt"))
-            else:
-                cmds.delete(item)
+        dynJntList = cmds.duplicate(dynName+"_00_Fk_Jxt", name=firstDynJnt, fullPath=True)
+        newSkinJntList = cmds.duplicate(dynName+"_00_Jnt", name=dynName+"_00_Jnt_First", fullPath=True)
+        skinJntList = cmds.ls(self.skinJointList[0], long=True)
+        skinJntChildrenList = cmds.listRelatives(self.skinJointList[0], children=True, allDescendents=True, fullPath=True, type="joint")
+        skinJntList.extend(sorted(skinJntChildrenList))
+        dynJntList = self.clearRenameJointChain(dynJntList, "_Fk", "_Dyn")
+        dynJntList.insert(0, firstDynJnt)
+        self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
+        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_JEnd")
+        self.clearUserDefinedAttr(self.skinJointList[:-1]) # to be changed to call dpUtils function instead.
+        newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
+        cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
+        newSkinJntList = [dynName+"_00_Jnt"]
+        newSkinJntList.extend(sorted(cmds.listRelatives(dynName+"_00_Jnt", children=True, allDescendents=True)))
+        dpUtils.clearJointLabel(self.skinJointList)
+
+        print("ikfkList =", self.skinJointList[:-1])
+        print("dynList  =", dynJntList[:-1])
+        print("skinList =", newSkinJntList[:-1])
+
+        # setup new blend joints
+        for j, newJnt in enumerate(newSkinJntList[:-1]):
+            for sAttr in ['sx', 'sy', 'sz']:
+                cmds.connectAttr(self.skinJointList[j]+"."+sAttr, newJnt+"."+sAttr, force=True)
+            
+        
+
         # hairSystem
         mel.eval("DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;")
         cmds.select(mainCrv+"Shape")
@@ -251,7 +299,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ikStaticDataGrp, children=True, allDescendents=True, type="follicle")[0], parent=True)[0], dynName+"_Dyn_Fol")
         dynCrv = cmds.rename("dpHairSystemOutputCurves|curve1", dynName+"_Dyn_Crv")
         # ikHandle
-        dynJntList = sorted(cmds.listRelatives(firstDynJnt, children=True, allDescendents=True))
+        
         ikSplineList = cmds.ikHandle(startJoint=firstDynJnt, endEffector=dynJntList[-2], name=dynName+"_Dyn_IkH", solver="ikSplineSolver", parentCurve=False, curve=dynCrv, createCurve=False) #[Handle, Effector]
         ikSplineList[1] = cmds.rename(ikSplineList[1], dynName+"_Dyn_Eff")
         cmds.parent(ikSplineList[0], self.ikStaticDataGrp)
@@ -443,7 +491,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+"Fk_ikFkBlend", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 if not cmds.objExists(self.worldRef+'.globalStretch'):
                     cmds.addAttr(self.worldRef, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.worldRefList.append(self.worldRef)
@@ -457,12 +505,12 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(parentConst+".interpType", 2) #shortest
                     if n == 0:
                         revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
-                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', revNode+".inputX", force=True)
+                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", revNode+".inputX", force=True)
                     else:
                         revNode = side+self.userGuideName+"_IkFkBlend_Rev"
                     self.ikFkRevList.append(revNode)
                     # connecting ikFkBlend using the reverse node:
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', parentConst+"."+self.fkJointList[n]+"W1", force=True)
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", parentConst+"."+self.fkJointList[n]+"W1", force=True)
                     cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
 
                 # ik spline:
@@ -625,7 +673,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(ikStretchRevNode+".outputX", stretchBC+".blender", force=True)
                 # work with worldRef node:
                 if cmds.objExists(self.worldRef):
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', ikStretchRevNode+".inputX", force=True)
+                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", ikStretchRevNode+".inputX", force=True)
                     cmds.connectAttr(self.worldRef+".globalStretch", globalStretchBC+".blender", force=True)
                     cmds.connectAttr(self.worldRef+".scaleX", globalStretchBC+".color2.color2R", force=True)
                     cmds.connectAttr(self.worldRef+".scaleX", stretchableBC+".color2.color2R", force=True)
@@ -662,7 +710,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(vvCond+".outColorR", self.skinJointList[j]+".scaleY", force=True)
 
                 # connecting visibilities:
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', self.fkZeroGrpList[0] + ".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", self.fkZeroGrpList[0] + ".visibility", force=True)
                 cmds.connectAttr(self.ikFkRevList[0]+".outputX", self.ikCtrlGrp+".visibility", force=True)
                 self.ctrls.setLockHide(self.fkCtrlList, ['v'], l=False)
                 self.ctrls.setLockHide(self.ikCtrlList, ['v'], l=False)
@@ -671,7 +719,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 fkLastScaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_LastScale_Fk_MD")
                 ikLastScaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_LastScale_Ik_MD")
                 lastScaleBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_LastScale_BC")
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', lastScaleBC+".blender", force=True)
+                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", lastScaleBC+".blender", force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleX", fkLastScaleCompensateMD+'.input1X', force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleY", fkLastScaleCompensateMD+'.input1Y', force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleZ", fkLastScaleCompensateMD+'.input1Z', force=True)

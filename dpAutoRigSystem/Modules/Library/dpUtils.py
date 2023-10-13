@@ -1016,3 +1016,13 @@ def mountWH(start, end):
     """ Mount and return path.
     """
     return "{}{}{}".format(start, "/", end)
+
+
+def clearJointLabel(jointList):
+    """ Just remove the current joint label if it exists.
+    """
+    if jointList:
+        for jnt in jointList:
+            if cmds.objExists(jnt):
+                cmds.setAttr(jnt+".otherType", "", type="string")
+                cmds.setAttr(jnt+".type", 0)
