@@ -251,17 +251,14 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         newSkinJntList = [dynName+"_00_Jnt"]
         newSkinJntList.extend(sorted(cmds.listRelatives(dynName+"_00_Jnt", children=True, allDescendents=True)))
         dpUtils.clearJointLabel(self.skinJointList)
-
-        print("ikfkList =", self.skinJointList[:-1])
-        print("dynList  =", dynJntList[:-1])
-        print("skinList =", newSkinJntList[:-1])
-
+        cmds.setAttr(self.skinJointList[0]+".visibility", 0)
+        
         # setup new blend joints
         for j, newJnt in enumerate(newSkinJntList[:-1]):
             for sAttr in ['sx', 'sy', 'sz']:
                 cmds.connectAttr(self.skinJointList[j]+"."+sAttr, newJnt+"."+sAttr, force=True)
-            
-        
+        print(dynName[0].lower()+dynName[1:])
+        dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", (dynName[0].lower()+dynName[1:]), self.worldRef)
 
         # hairSystem
         mel.eval("DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;")
@@ -491,7 +488,6 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+"Fk_ikFkBlend", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 if not cmds.objExists(self.worldRef+'.globalStretch'):
                     cmds.addAttr(self.worldRef, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.worldRefList.append(self.worldRef)
@@ -499,19 +495,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.worldRefShapeList.append(self.worldRefShape)
 
                 # create constraint in order to blend ikFk:
-                self.ikFkRevList = []
-                for n in range(0, self.nJoints):
-                    parentConst = cmds.parentConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=self.skinJointList[n]+"_IkFkBlend_PaC")[0]
-                    cmds.setAttr(parentConst+".interpType", 2) #shortest
-                    if n == 0:
-                        revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
-                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", revNode+".inputX", force=True)
-                    else:
-                        revNode = side+self.userGuideName+"_IkFkBlend_Rev"
-                    self.ikFkRevList.append(revNode)
-                    # connecting ikFkBlend using the reverse node:
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", parentConst+"."+self.fkJointList[n]+"W1", force=True)
-                    cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
+                dpUtils.createJointBlend(self.ikJointList, self.fkJointList, self.skinJointList, "Fk_ikFkBlend", (sideLower+self.userGuideName), self.worldRef)
 
                 # ik spline:
                 self.ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
@@ -711,7 +695,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # connecting visibilities:
                 cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", self.fkZeroGrpList[0] + ".visibility", force=True)
-                cmds.connectAttr(self.ikFkRevList[0]+".outputX", self.ikCtrlGrp+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", self.ikCtrlGrp+".visibility", force=True)
                 self.ctrls.setLockHide(self.fkCtrlList, ['v'], l=False)
                 self.ctrls.setLockHide(self.ikCtrlList, ['v'], l=False)
                 

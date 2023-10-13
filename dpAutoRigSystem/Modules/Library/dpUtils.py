@@ -1026,3 +1026,20 @@ def clearJointLabel(jointList):
             if cmds.objExists(jnt):
                 cmds.setAttr(jnt+".otherType", "", type="string")
                 cmds.setAttr(jnt+".type", 0)
+
+
+def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef):
+    """ Create an Ik Fk Blend setup for joint chain.
+    """
+    for n in range(len(jointListA)):
+        parentConst = cmds.parentConstraint(jointListA[n], jointListB[n], jointListC[n], maintainOffset=True, name=jointListC[n]+"_"+attrName+"_PaC")[0]
+        cmds.setAttr(parentConst+".interpType", 2) #shortest
+        if n == 0:
+            revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
+            cmds.addAttr(worldRef, longName=attrStartName+attrName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+            cmds.addAttr(worldRef, longName=attrStartName+attrName+"RevOutputX", attributeType="float", keyable=False)
+            cmds.connectAttr(worldRef+"."+attrStartName+attrName, revNode+".inputX", force=True)
+            cmds.connectAttr(revNode+".outputX", worldRef+"."+attrStartName+attrName+"RevOutputX", force=True)
+        # connecting ikFkBlend using the reverse node:
+        cmds.connectAttr(worldRef+"."+attrStartName+attrName, parentConst+"."+jointListB[n]+"W1", force=True)
+        cmds.connectAttr(worldRef+"."+attrStartName+attrName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
