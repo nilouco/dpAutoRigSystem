@@ -496,9 +496,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
-                sideLower = side
-                if side:
-                    sideLower = side[0].lower()
+                attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
                 toCornerBendList = []
                 # getting type of limb:
                 enumType = cmds.getAttr(self.moduleGrp+'.type')
@@ -705,7 +703,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
-                dpUtils.createJointBlend(self.ikJointList[1:], self.fkJointList[1:], self.skinJointList[1:], "Fk_ikFkBlend", (sideLower+self.userGuideName), self.worldRef)
+                ikFkRevNode = dpUtils.createJointBlend(self.ikJointList[1:], self.fkJointList[1:], self.skinJointList[1:], "Fk_ikFkBlend", attrNameLower, self.worldRef)
 
                 # organize the ikFkBlend from before to limb:
                 cmds.parentConstraint(self.fkCtrlList[0], self.ikJointList[0], maintainOffset=True, name=self.ikJointList[0]+"_PaC")
@@ -789,9 +787,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', self.zeroFkCtrlList[1]+".visibility", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", self.ikCornerCtrlZero+".visibility", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", self.ikExtremCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', self.zeroFkCtrlList[1]+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikCornerCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikExtremCtrlZero+".visibility", force=True)
                 self.ctrls.setLockHide([self.ikCornerCtrl], ['v'], l=False)
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz', 'v'])
 
@@ -859,7 +857,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(ikHandleExtraList[0]+".visibility", 0)
                     cmds.addAttr(self.quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
-                    cmds.connectAttr(side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"+".outputX", quadExtraCtrlZero+".visibility", force=True)
+                    cmds.connectAttr(ikFkRevNode+".outputX", quadExtraCtrlZero+".visibility", force=True)
                     self.ctrls.setLockHide([self.quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
                 
                 # working with world axis orientation for limb extrem ik controls
@@ -1108,7 +1106,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # offset parent constraint
                 parentConstToRFOffset = cmds.parentConstraint(self.ikExtremSubCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot+"_PaC")[0]
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
 
                 # work with scalable extrem hand or foot:
                 cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.lang['c040_uniformScale'], at="double", min=0.001, dv=1)
@@ -1135,7 +1133,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleZ", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', uniBlend+".blender", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', uniBlend+".blender", force=True)
                 cmds.connectAttr(fkScaleMD+'.outputX', uniBlend+'.color1R', force=True)
                 cmds.connectAttr(ikScaleMD+'.outputX', uniBlend+'.color2R', force=True)
                 
@@ -1154,19 +1152,19 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # work with not stretch ik setup:
                 ikStretchableMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side+self.userGuideName+"_IkStretchable_MD")
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchableMD+".input1X", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", ikStretchableMD+".input2X", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchableMD+".input2X", force=True)
 
                 ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side+self.userGuideName+"_IkStretchCtrl_Cnd")
                 cmds.setAttr(ikStretchCtrlCnd+".secondTerm", 1)
                 cmds.setAttr(ikStretchCtrlCnd+".operation", 3)
                 cmds.connectAttr(ikStretchableMD+".outputX", ikStretchCtrlCnd+".colorIfFalseR", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", ikStretchCtrlCnd+".colorIfTrueR", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchCtrlCnd+".colorIfTrueR", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchCtrlCnd+".firstTerm", force=True)
                 cmds.connectAttr(ikStretchCtrlCnd+".outColorR", parentConstToRFOffset+"."+self.ikExtremSubCtrl+"W0", force=True)
 
                 ikStretchDifPMA = cmds.shadingNode('plusMinusAverage', asUtility=True, name=side+self.userGuideName+"_Stretch_Dif_PMA")
                 cmds.setAttr(ikStretchDifPMA+".operation", 2)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", ikStretchDifPMA+".input1D[0]", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchDifPMA+".input1D[0]", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchDifPMA+".input1D[1]", force=True)
 
                 ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side+self.userGuideName+"_IkStretch_Cnd")
@@ -1412,8 +1410,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateX", acBC+".color2R", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateY", acBC+".color2G", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateZ", acBC+".color2B", force=True)
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", acBC+".blender", force=True)
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", acInvBC+".blender", force=True)
+                    cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", acBC+".blender", force=True)
+                    cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", acInvBC+".blender", force=True)
                     cmds.connectAttr(acBC+".output.outputR", acInvMD+".input1X", force=True)
                     cmds.connectAttr(acBC+".output.outputG", acInvMD+".input1Y", force=True)
                     cmds.connectAttr(acBC+".output.outputB", acInvMD+".input1Z", force=True)

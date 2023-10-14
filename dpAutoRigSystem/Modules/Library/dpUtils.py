@@ -1030,16 +1030,29 @@ def clearJointLabel(jointList):
 
 def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef):
     """ Create an Ik Fk Blend setup for joint chain.
+        Return the created reverse node.
     """
+    attrCompName = attrStartName[0].lower()+attrStartName[1:]+attrName
     for n in range(len(jointListA)):
         parentConst = cmds.parentConstraint(jointListA[n], jointListB[n], jointListC[n], maintainOffset=True, name=jointListC[n]+"_"+attrName+"_PaC")[0]
         cmds.setAttr(parentConst+".interpType", 2) #shortest
         if n == 0:
             revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
-            cmds.addAttr(worldRef, longName=attrStartName+attrName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-            cmds.addAttr(worldRef, longName=attrStartName+attrName+"RevOutputX", attributeType="float", keyable=False)
-            cmds.connectAttr(worldRef+"."+attrStartName+attrName, revNode+".inputX", force=True)
-            cmds.connectAttr(revNode+".outputX", worldRef+"."+attrStartName+attrName+"RevOutputX", force=True)
+            cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+            cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
+            cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
+            cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
         # connecting ikFkBlend using the reverse node:
-        cmds.connectAttr(worldRef+"."+attrStartName+attrName, parentConst+"."+jointListB[n]+"W1", force=True)
-        cmds.connectAttr(worldRef+"."+attrStartName+attrName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
+        cmds.connectAttr(worldRef+"."+attrCompName, parentConst+"."+jointListB[n]+"W1", force=True)
+        cmds.connectAttr(worldRef+"."+attrCompName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
+    return revNode
+
+
+def getAttrNameLower(side, name):
+    """ Return the composed name for attributes starting with lower case.
+    """
+    attrNameLower = name
+    if side:
+        attrNameLower = side[0]+name
+    attrNameLower = attrNameLower[0].lower()+attrNameLower[1:]
+    return attrNameLower

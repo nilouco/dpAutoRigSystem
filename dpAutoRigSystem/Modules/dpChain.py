@@ -24,6 +24,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
         self.worldRefList = []
         self.worldRefShapeList = []
+        self.currentNJoints = 5
     
     
     def createModuleLayout(self, *args):
@@ -228,6 +229,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def createDynamicChain(self, dynName, rebuildCrvSpans=20, *args):
         """ This is like a patch to add a dynamic setup to the Chain.
         """
+        dynNameLower = dynName[0].lower()+dynName[1:]
+        if dynNameLower[1] == "_":
+            dynNameLower = dynName[0].lower()+dynName[2:]
         # curve
         mainCrv = cmds.duplicate(self.ikSplineList[2], name=dynName+"_Main_Crv")[0]
         cmds.delete(mainCrv+"ShapeOrig")
@@ -254,7 +258,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.skinJointList[0]+".visibility", 0)
         
         # setup new blend joints
-        dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", (dynName[0].lower()+dynName[1:]), self.worldRef)
+        dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef)
         dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
         cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
         cmds.connectAttr(dynJntList[0]+".scaleY", dynStretchBC+".color1G", force=True)
@@ -262,7 +266,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.connectAttr(self.skinJointList[0]+".scaleX", dynStretchBC+".color2R", force=True)
         cmds.connectAttr(self.skinJointList[0]+".scaleY", dynStretchBC+".color2G", force=True)
         cmds.connectAttr(self.skinJointList[0]+".scaleZ", dynStretchBC+".color2B", force=True)
-        cmds.connectAttr(self.worldRef+"."+(dynName[0].lower()+dynName[1:])+"Dyn_ikFkBlend", dynStretchBC+".blender", force=True)
+        cmds.connectAttr(self.worldRef+"."+dynNameLower+"Dyn_ikFkBlend", dynStretchBC+".blender", force=True)
         for j, jnt in enumerate(newSkinJntList[:-1]):
             cmds.connectAttr(dynStretchBC+".outputR", newSkinJntList[j]+".scaleX", force=True)
             cmds.connectAttr(dynStretchBC+".outputG", newSkinJntList[j]+".scaleY", force=True)
@@ -368,9 +372,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
-                sideLower = side
-                if side:
-                    sideLower = side[0].lower()
+                attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
@@ -503,7 +505,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.worldRefShapeList.append(self.worldRefShape)
 
                 # create constraint in order to blend ikFk:
-                dpUtils.createJointBlend(self.ikJointList, self.fkJointList, self.skinJointList, "Fk_ikFkBlend", (sideLower+self.userGuideName), self.worldRef)
+                dpUtils.createJointBlend(self.ikJointList, self.fkJointList, self.skinJointList, "Fk_ikFkBlend", attrNameLower, self.worldRef)
 
                 # ik spline:
                 self.ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
@@ -665,7 +667,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(ikStretchRevNode+".outputX", stretchBC+".blender", force=True)
                 # work with worldRef node:
                 if cmds.objExists(self.worldRef):
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", ikStretchRevNode+".inputX", force=True)
+                    cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", ikStretchRevNode+".inputX", force=True)
                     cmds.connectAttr(self.worldRef+".globalStretch", globalStretchBC+".blender", force=True)
                     cmds.connectAttr(self.worldRef+".scaleX", globalStretchBC+".color2.color2R", force=True)
                     cmds.connectAttr(self.worldRef+".scaleX", stretchableBC+".color2.color2R", force=True)
@@ -702,8 +704,8 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(vvCond+".outColorR", self.skinJointList[j]+".scaleY", force=True)
 
                 # connecting visibilities:
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", self.fkZeroGrpList[0] + ".visibility", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlendRevOutputX", self.ikCtrlGrp+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", self.fkZeroGrpList[0] + ".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikCtrlGrp+".visibility", force=True)
                 self.ctrls.setLockHide(self.fkCtrlList, ['v'], l=False)
                 self.ctrls.setLockHide(self.ikCtrlList, ['v'], l=False)
                 
@@ -711,7 +713,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 fkLastScaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_LastScale_Fk_MD")
                 ikLastScaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_LastScale_Ik_MD")
                 lastScaleBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_LastScale_BC")
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", lastScaleBC+".blender", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", lastScaleBC+".blender", force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleX", fkLastScaleCompensateMD+'.input1X', force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleY", fkLastScaleCompensateMD+'.input1Y', force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleZ", fkLastScaleCompensateMD+'.input1Z', force=True)
