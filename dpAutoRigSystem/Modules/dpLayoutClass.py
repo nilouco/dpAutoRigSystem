@@ -3,7 +3,7 @@ from maya import cmds
 from .Library import dpUtils
 from functools import partial
 
-DP_LAYOUTCLASS_VERSION = 2.2
+DP_LAYOUTCLASS_VERSION = 2.3
 
 
 class LayoutClass(object):

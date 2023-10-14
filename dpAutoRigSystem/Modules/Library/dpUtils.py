@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.3
+DP_UTILS_VERSION = 2.4
 
 
 # UTILS functions:
