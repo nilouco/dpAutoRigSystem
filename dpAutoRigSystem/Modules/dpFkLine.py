@@ -10,7 +10,7 @@ TITLE = "m001_fkLine"
 DESCRIPTION = "m002_fkLineDesc"
 ICON = "/Icons/dp_fkLine.png"
 
-DP_FKLINE_VERSION = 2.3
+DP_FKLINE_VERSION = 2.4
 
 
 class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -21,6 +21,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
+        self.currentNJoints = 1
     
     
     def createModuleLayout(self, *args):

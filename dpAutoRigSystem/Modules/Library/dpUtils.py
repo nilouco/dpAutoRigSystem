@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.3
+DP_UTILS_VERSION = 2.4
 
 
 # UTILS functions:
@@ -1016,3 +1016,43 @@ def mountWH(start, end):
     """ Mount and return path.
     """
     return "{}{}{}".format(start, "/", end)
+
+
+def clearJointLabel(jointList):
+    """ Just remove the current joint label if it exists.
+    """
+    if jointList:
+        for jnt in jointList:
+            if cmds.objExists(jnt):
+                cmds.setAttr(jnt+".otherType", "", type="string")
+                cmds.setAttr(jnt+".type", 0)
+
+
+def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef):
+    """ Create an Ik Fk Blend setup for joint chain.
+        Return the created reverse node.
+    """
+    attrCompName = attrStartName[0].lower()+attrStartName[1:]+attrName
+    for n in range(len(jointListA)):
+        parentConst = cmds.parentConstraint(jointListA[n], jointListB[n], jointListC[n], maintainOffset=True, name=jointListC[n]+"_"+attrName+"_PaC")[0]
+        cmds.setAttr(parentConst+".interpType", 2) #shortest
+        if n == 0:
+            revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
+            cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+            cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
+            cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
+            cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
+        # connecting ikFkBlend using the reverse node:
+        cmds.connectAttr(worldRef+"."+attrCompName, parentConst+"."+jointListB[n]+"W1", force=True)
+        cmds.connectAttr(worldRef+"."+attrCompName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
+    return revNode
+
+
+def getAttrNameLower(side, name):
+    """ Return the composed name for attributes starting with lower case.
+    """
+    attrNameLower = name
+    if side:
+        attrNameLower = side[0]+name
+    attrNameLower = attrNameLower[0].lower()+attrNameLower[1:]
+    return attrNameLower

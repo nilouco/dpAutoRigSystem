@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.31"
-DPAR_UPDATELOG = "N751 SideCalibration fixed issue if attribute\ndoesn't exists."
+DPAR_VERSION_PY3 = "4.03.32"
+DPAR_UPDATELOG = "N384 Dynamic Chain."
 
 
 
@@ -2864,9 +2864,9 @@ class DP_AutoRig_UI(object):
                         # integrate the Single module with another Single as a father:
                         if moduleType == SINGLE:
                             # connect Option_Ctrl display attribute to the visibility:
-                            if not cmds.objExists(self.optionCtrl+"."+self.lang['m081_tweaks']):
-                                cmds.addAttr(self.optionCtrl, longName=self.lang['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                cmds.setAttr(self.optionCtrl+"."+self.lang['m081_tweaks'], channelBox=True)
+                            if not cmds.objExists(self.optionCtrl+"."+self.lang['m081_tweaks'].lower()):
+                                cmds.addAttr(self.optionCtrl, longName=self.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                cmds.setAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), channelBox=True)
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2876,7 +2876,7 @@ class DP_AutoRig_UI(object):
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ctrlGrp = self.integratedTaskDic[moduleDic]["ctrlGrpList"][s]
-                                cmds.connectAttr(self.optionCtrl+"."+self.lang['m081_tweaks'], ctrlGrp+".visibility", force=True)
+                                cmds.connectAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             if fatherModule == SINGLE:
@@ -3050,7 +3050,7 @@ class DP_AutoRig_UI(object):
                 # defining attribute name strings:
                 generalAttr = self.lang['c066_general']
                 vvAttr = self.lang['c031_volumeVariation']
-                spineAttr = self.lang['m011_spine']
+                spineAttr = self.lang['m011_spine'].lower()
                 limbAttr = self.lang['m019_limb'].lower()
                 armAttr = self.lang['m028_arm']
                 legAttr = self.lang['m030_leg']
@@ -3110,14 +3110,17 @@ class DP_AutoRig_UI(object):
                                 cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
                             
                 # list desirable Option_Ctrl attributes order:
-                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', vvAttr,
-                spineAttr+'_active', spineAttr, spineAttr+'1_active', spineAttr+'1', spineAttr+'2_active', spineAttr+'2',
+                desiredAttrList = [generalAttr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', vvAttr,
+                spineAttr+'Active', spineAttr, spineAttr+'1Active', spineAttr+'1', spineAttr+'2Active', spineAttr+'2',
                 limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'1Fk', spineAttr+'2Fk', 
                 leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
-                armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk",
+                armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk", armAttr.lower()+"Fk", legAttr.lower()+"Fk", leftAttr+armAttr.lower()+"Fk", rightAttr+armAttr.lower()+"Fk",
                 leftAttr+legAttr+"Fk", rightAttr+legAttr+"Fk", leftAttr+legAttr+frontAttr+"Fk", rightAttr+legAttr+frontAttr+"Fk", leftAttr+legAttr+backAttr+"Fk", rightAttr+legAttr+backAttr+"Fk",
                 armAttr+'Fk1', legAttr+'Fk1', leftAttr+armAttr+'Fk1', rightAttr+armAttr+'Fk1', leftAttr+legAttr+'Fk1', rightAttr+legAttr+'Fk1',
                 leftAttr+legAttr+frontAttr+'Fk1', rightAttr+legAttr+frontAttr+'Fk1', leftAttr+legAttr+backAttr+'Fk1', rightAttr+legAttr+backAttr+'Fk1',
+                'tailFk', 'tailDyn', 'tail1Fk', 'tail1Dyn', 'tailFk1', 'tailDyn1', leftAttr+'TailFk', leftAttr+'TailFk1', rightAttr+'TailFk', rightAttr+'TailFk1', leftAttr+'TailDyn', leftAttr+'TailDyn1', rightAttr+'TailDyn', rightAttr+'TailDyn1',
+                'hairFk', 'hairDyn', 'hair1Fk', 'hair1Dyn', 'hairFk1', 'hairDyn1', leftAttr+'HairFk', leftAttr+'HairFk1', rightAttr+'HairFk', rightAttr+'HairFk1', leftAttr+'HairDyn', leftAttr+'HairDyn1', rightAttr+'HairDyn', rightAttr+'HairDyn1',
+                'dpAR_1Fk', 'dpAR_1Dyn', 'dpAR_2Fk', 'dpAR_2Dyn', 'dpAR_1Fk1', 'dpAR_1Dyn1', leftAttr+'dpAR_1Fk', leftAttr+'dpAR_1Fk1', rightAttr+'dpAR_1Fk', rightAttr+'dpAR_1Fk1', leftAttr+'dpAR_1Dyn', leftAttr+'dpAR_1Dyn1', rightAttr+'dpAR_1Dyn', rightAttr+'dpAR_1Dyn1',
                 'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
