@@ -10,7 +10,7 @@ CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
 
-DP_VALIDATORSTARTCLASS_VERSION = 2.0
+DP_VALIDATORSTARTCLASS_VERSION = 2.1
 
 
 class ValidatorStartClass(object):
@@ -152,10 +152,10 @@ class ValidatorStartClass(object):
             cmds.progressWindow(endProgress=True)
 
     
-    def notFoundNodes(self, *args):
+    def notFoundNodes(self, item=None, *args):
         """ Set dataLog when don't have any objects to verify.
         """
-        self.checkedObjList.append("")
+        self.checkedObjList.append(item)
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
         self.messageList.append(self.dpUIinst.lang['v014_notFoundNodes'])
