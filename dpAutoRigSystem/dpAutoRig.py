@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.32"
-DPAR_UPDATELOG = "N384 Dynamic Chain."
+DPAR_VERSION_PY3 = "4.03.33"
+DPAR_UPDATELOG = "N742 Proxy creator checkout validator."
 
 
 

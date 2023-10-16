@@ -41,6 +41,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         
         # ---
         # --- validator code --- beginning
+        self.skinClusterList = []
         proxyGrp = None
         if objList:
             proxyGrp = objList[0]
@@ -51,12 +52,6 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                     proxyGrp = "Proxy_Grp"
         if proxyGrp:
             if not cmds.objExists(proxyGrp+"."+PROXIED):
-                if self.verbose:
-                    # Update progress window
-                    cmds.progressWindow(edit=True, maxValue=1, progress=1, status=(self.dpUIinst.lang[self.title]+': '+repr(1)))
-                
-
-                # find meshes to generate proxy
                 meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
                 if not meshList:
                     renderGrp = dpUtils.getNodeByMessage("renderGrp")
@@ -66,40 +61,39 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                     if renderGrp:
                         meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
                 if meshList:
+                    # find meshes to generate proxy
                     toProxyList = []
                     for mesh in meshList:
                         meshTransform = cmds.listRelatives(mesh, parent=True, type="transform")
                         if meshTransform:
                             if not meshTransform[0] in toProxyList:
-                                if not cmds.objExists(meshTransform[0]+"."+NO_PROXY) and not cmds.objExists(meshTransform[0]+"."+PROXIED):
-                                    toProxyList.append(meshTransform[0])
+                                if not cmds.objExists(meshTransform[0]+"."+NO_PROXY):
+                                    if not cmds.objExists(meshTransform[0]+"."+PROXIED):
+                                        if cmds.getAttr(meshTransform[0]+".visibility"):
+                                            toProxyList.append(meshTransform[0])
                     if toProxyList:
-
-                        print("toProxyList =", toProxyList)
-
+                        progressAmount = 0
+                        maxProcess = len(toProxyList)
+                        if self.verbose:
+                            # Update progress window
+                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                         self.checkedObjList.append(proxyGrp)
                         self.foundIssueList.append(True)
                         if self.verifyMode:
                             self.resultOkList.append(False)
                         else: #fix
-                            #try:
-
-                                #
-                                # WIP
-                                #
-                                
-                                # 
-                                #
+#                            try:
                                 for sourceTransform in toProxyList:
+                                    # Update progress window
+                                    progressAmount += 1
+                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' '+sourceTransform))
                                     self.createProxy(sourceTransform, proxyGrp)
-                                
                                 self.proxyIntegration(proxyGrp)
-                                
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+proxyGrp)
-                            #except:
-                            #    self.resultOkList.append(False)
-                            #    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
+#                            except:
+#                                self.resultOkList.append(False)
+#                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
                     else:
                         self.foundIssueList.append(False)
                         self.resultOkList.append(True)
@@ -122,16 +116,67 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
     def createProxy(self, source, grp, *args):
         """ Creates a proxy setup from the given source transform and put it into the given grp group.
         """
-        print("WIP: createProxy = ", source, grp)
-        cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
-        #
-        # WIP
-        #
-        
-
-
-
-
+        try:
+            inputDeformerList = cmds.findDeformers(source)
+        except:
+            return
+        skinClusterNode = None
+        if inputDeformerList:
+            for deformerNode in inputDeformerList:
+                if cmds.objectType(deformerNode) == "skinCluster":
+                    skinClusterNode = deformerNode
+                    break
+        if skinClusterNode:
+            self.skinClusterList.append(skinClusterNode)
+            weightedInfluenceList = cmds.skinCluster(skinClusterNode, query=True, weightedInfluence=True)
+            if weightedInfluenceList:
+                gotVertexList = []
+                for jnt in weightedInfluenceList:
+                    skinnedVertexList = []
+                    nodeVertexList = []
+                    vertexList = cmds.ls(source+".vtx[*]", flatten=True)
+                    for i, idx in enumerate(vertexList):
+                        if not i in gotVertexList:
+                            # Query not working on Maya as expected:
+                            #perc = cmds.skinPercent(skinClusterNode, source+".vtx["+str(i)+"]", transform=jnt, ignoreBelow=1.0, query=True, value=True)
+                            percList = cmds.skinPercent(skinClusterNode, source+".vtx["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
+                            if percList:
+                                if jnt in percList:
+                                    skinnedVertexList.append(i)
+                                    gotVertexList.append(i)
+                    if skinnedVertexList:
+                        vertexList = [w.replace(source+".vtx[", "") for w in vertexList]
+                        vertexList = [int(w.replace("]", "")) for w in vertexList]
+                        if vertexList:
+                            for v in reversed(skinnedVertexList):
+                                vertexList.pop(v)
+                        if vertexList:
+                            for n in vertexList:
+                                nodeVertexList.append(source+".vtx["+str(n)+"]")
+                        if nodeVertexList:
+                            faceList = cmds.polyListComponentConversion(nodeVertexList, fromVertex=True, toFace=True)
+                            if faceList:
+                                dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
+                                for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
+                                    if "Orig" in dupItem:
+                                        cmds.delete(dupItem)
+                                faceDupList = [w.replace(source, dup) for w in faceList]
+                                cmds.delete(faceDupList)
+                                self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
+                                cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
+                                cmds.parent(dup, jnt)
+                                cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
+                                cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
+                                cmds.parent(dup, grp)
+                                dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
+                                self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                                drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
+                                if drawOverrideList:
+                                    # remove from display layer
+                                    cmds.disconnectAttr(drawOverrideList[0], dup+".drawOverride")
+                                cmds.setAttr(dup+".overrideEnabled", 1)
+                                cmds.setAttr(dup+".overrideDisplayType", 2) #reference
+            cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
         sourceParent = cmds.listRelatives(source, parent=True, type="transform")
         if sourceParent:
             if sourceParent[0] == grp:
@@ -143,14 +188,40 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         """
         if not cmds.objExists(grp+"."+PROXIED):
             cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
+        
+        #
+        # WIP
+        #
+        #
+        optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
+        if optionCtrl:
+            # prepare optionCtrl to deformers connections
+            cmds.setAttr(optionCtrl+".proxy", channelBox=True)
+            cmds.addAttr(optionCtrl, longName="proxyRevOutput", attributeType="bool")
+            proxyRev = cmds.createNode("reverse", name="Proxy_Rev")
+            cmds.connectAttr(optionCtrl+".proxy", proxyRev+".inputX", force=True)
+            cmds.connectAttr(proxyRev+".outputX", optionCtrl+".proxyRevOutput", force=True)
+            deformerList = self.skinClusterList
+            defList = ["blendShape", "wrap", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
+            for deform in defList:
+                deformerList.extend(cmds.ls(type=deform))
+            if deformerList:
+                for deformNode in deformerList:
+                    try:
+                        cmds.connectAttr(optionCtrl+".proxyRevOutput", deformNode+".envelope")
+                    except:
+                        pass #maybe it already has a connection from another node
 
+
+        self.dpUIinst.ctrls.colorShape([grp], [1, 0.5, 0.5], outliner=True) #red
 
         #
         # TODO
         #
-        # def envelope zero (blendShapes, skinClusters, etc...)
+        # 
         # hide tweaks
         # hide facial ctrls
         # hide mesh/Render_grp
-        # optionCtrl attr proxy
-        # outliner color
+        # don't have the same face for more than one proxy/jnt ? how to avoid proxy holes/distance pieces ?
+        # 
+        # 
