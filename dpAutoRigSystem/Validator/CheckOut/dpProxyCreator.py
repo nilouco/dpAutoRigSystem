@@ -132,50 +132,46 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
             if weightedInfluenceList:
                 gotVertexList = []
                 for jnt in weightedInfluenceList:
-                    skinnedVertexList = []
-                    nodeVertexList = []
-                    vertexList = cmds.ls(source+".vtx[*]", flatten=True)
-                    for i, idx in enumerate(vertexList):
+                    skinnedFaceList = []
+                    nodeFaceList = []
+                    faceList = cmds.ls(source+".f[*]", flatten=True)
+                    for i, idx in enumerate(faceList):
                         if not i in gotVertexList:
-                            # Query not working on Maya as expected:
-                            #perc = cmds.skinPercent(skinClusterNode, source+".vtx["+str(i)+"]", transform=jnt, ignoreBelow=1.0, query=True, value=True)
-                            percList = cmds.skinPercent(skinClusterNode, source+".vtx["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
+                            percList = cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
                             if percList:
                                 if jnt in percList:
-                                    skinnedVertexList.append(i)
+                                    skinnedFaceList.append(i)
                                     gotVertexList.append(i)
-                    if skinnedVertexList:
-                        vertexList = [w.replace(source+".vtx[", "") for w in vertexList]
-                        vertexList = [int(w.replace("]", "")) for w in vertexList]
-                        if vertexList:
-                            for v in reversed(skinnedVertexList):
-                                vertexList.pop(v)
-                        if vertexList:
-                            for n in vertexList:
-                                nodeVertexList.append(source+".vtx["+str(n)+"]")
-                        if nodeVertexList:
-                            faceList = cmds.polyListComponentConversion(nodeVertexList, fromVertex=True, toFace=True)
-                            if faceList:
-                                dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
-                                for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
-                                    if "Orig" in dupItem:
-                                        cmds.delete(dupItem)
-                                faceDupList = [w.replace(source, dup) for w in faceList]
-                                cmds.delete(faceDupList)
-                                self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
-                                cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
-                                cmds.parent(dup, jnt)
-                                cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
-                                cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
-                                cmds.parent(dup, grp)
-                                dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
-                                self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                                drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
-                                if drawOverrideList:
-                                    # remove from display layer
-                                    cmds.disconnectAttr(drawOverrideList[0], dup+".drawOverride")
-                                cmds.setAttr(dup+".overrideEnabled", 1)
-                                cmds.setAttr(dup+".overrideDisplayType", 2) #reference
+                    if skinnedFaceList:
+                        faceList = [w.replace(source+".f[", "") for w in faceList]
+                        faceList = [int(w.replace("]", "")) for w in faceList]
+                        if faceList:
+                            for v in reversed(skinnedFaceList):
+                                faceList.pop(v)
+                        if faceList:
+                            for n in faceList:
+                                nodeFaceList.append(source+".f["+str(n)+"]")
+                        if nodeFaceList:
+                            dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
+                            for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
+                                if "Orig" in dupItem:
+                                    cmds.delete(dupItem)
+                            faceDupList = [w.replace(source, dup) for w in nodeFaceList]
+                            cmds.delete(faceDupList)
+                            self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
+                            cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
+                            cmds.parent(dup, jnt)
+                            cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
+                            cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
+                            cmds.parent(dup, grp)
+                            dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
+                            self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                            drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
+                            if drawOverrideList:
+                                # remove from display layer
+                                cmds.disconnectAttr(drawOverrideList[0], dup+".drawOverride")
+                            cmds.setAttr(dup+".overrideEnabled", 1)
+                            cmds.setAttr(dup+".overrideDisplayType", 2) #reference
             cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
         sourceParent = cmds.listRelatives(source, parent=True, type="transform")
         if sourceParent:
@@ -208,7 +204,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
             if deformerList:
                 for deformNode in deformerList:
                     try:
-                        cmds.connectAttr(optionCtrl+".proxyRevOutput", deformNode+".envelope")
+                        cmds.connectAttr(optionCtrl+".proxyRevOutput", deformNode+".envelope") #don't force it please
                     except:
                         pass #maybe it already has a connection from another node
 
@@ -222,6 +218,5 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         # hide tweaks
         # hide facial ctrls
         # hide mesh/Render_grp
-        # don't have the same face for more than one proxy/jnt ? how to avoid proxy holes/distance pieces ?
         # 
         # 
