@@ -82,7 +82,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                         if self.verifyMode:
                             self.resultOkList.append(False)
                         else: #fix
-#                            try:
+                            try:
                                 for sourceTransform in toProxyList:
                                     # Update progress window
                                     progressAmount += 1
@@ -91,9 +91,9 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                                 self.proxyIntegration(proxyGrp)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+proxyGrp)
-#                            except:
-#                                self.resultOkList.append(False)
-#                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+proxyGrp)
                     else:
                         self.foundIssueList.append(False)
                         self.resultOkList.append(True)
@@ -184,11 +184,6 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         """
         if not cmds.objExists(grp+"."+PROXIED):
             cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
-        
-        #
-        # WIP
-        #
-        #
         optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
         if optionCtrl:
             # prepare optionCtrl to deformers connections
@@ -207,16 +202,30 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                         cmds.connectAttr(optionCtrl+".proxyRevOutput", deformNode+".envelope") #don't force it please
                     except:
                         pass #maybe it already has a connection from another node
-
-
+            # hide controllers and meshes
+            self.connectProxyVis(optionCtrl, "mesh")
+            self.connectProxyVis(optionCtrl, "tweaks")
+            self.connectProxyVis(optionCtrl, "Tweaks") #fixed camelCase for earlier rig versions v4.03.32
+            self.connectProxyVis(optionCtrl, suffixName="Facial_Ctrls_Grp")
+            self.connectProxyVis(optionCtrl, suffixName="Deformer_Ctrl_Grp")
         self.dpUIinst.ctrls.colorShape([grp], [1, 0.5, 0.5], outliner=True) #red
 
-        #
-        # TODO
-        #
-        # 
-        # hide tweaks
-        # hide facial ctrls
-        # hide mesh/Render_grp
-        # 
-        # 
+
+    def connectProxyVis(self, ctrl, attr=None, suffixName=None, *args):
+        """ Create a reverseNode to plug it to the inverse visibility proxy option to the matching nodes.
+        """
+        if attr or suffixName:
+            if attr:
+                if cmds.objExists(ctrl+"."+attr):
+                    connectList = cmds.listConnections(ctrl+"."+attr, source=False, destination=True, plugs=True) #list before connect on it
+                    visMD = cmds.createNode("multiplyDivide", name="Proxy_"+(attr[0].upper()+attr[1:])+"_Vis_MD")
+                    cmds.connectAttr(ctrl+".proxyRevOutput", visMD+".input1X", force=True)
+                    cmds.connectAttr(ctrl+"."+attr, visMD+".input2X", force=True)
+                    if connectList:
+                        for plugDest in connectList:
+                            cmds.connectAttr(visMD+".outputX", plugDest, force=True)
+            else:
+                allNodesList = cmds.ls("*"+suffixName, selection=False)
+                if allNodesList:
+                    for item in allNodesList:
+                        cmds.connectAttr(ctrl+".proxyRevOutput", item+".visibility", force=True)

@@ -1064,5 +1064,4 @@ def setAttrValues(itemList, attrList, valueList):
     if itemList and attrList and valueList:
         for item in itemList:
             for attr, value in zip(attrList, valueList):
-                print(item, attr, value)
                 cmds.setAttr(item+"."+attr, value)
