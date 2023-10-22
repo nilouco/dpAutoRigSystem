@@ -162,7 +162,10 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                             self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
                             cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
                             cmds.parent(dup, jnt)
+                            cmds.scriptEditorInfo(suppressWarnings=True)
                             cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
+                            cmds.scriptEditorInfo(suppressWarnings=False)
+                            self.checkReverseNormal(dup, jnt)
                             cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
                             cmds.parent(dup, grp)
                             dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
@@ -239,3 +242,12 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         visList = cmds.listConnections(sourceMesh+".visibility", source=True, destination=False, plugs=True)
         if visList:
             cmds.connectAttr(visList[0], proxyMesh+".visibility", force=True)
+
+
+    def checkReverseNormal(self, dup, jnt, *args):
+        """ Verify if there're negative scale joint attributes and reverse the normal mesh if true.
+        """
+        for axis in ['sx', 'sy', 'sz']:
+            if cmds.getAttr(jnt+'.'+axis) < 0:
+                cmds.polyNormal(dup, normalMode=0, userNormalMode=0, constructionHistory=False)
+                break
