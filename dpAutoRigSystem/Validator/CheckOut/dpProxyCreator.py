@@ -70,8 +70,8 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                                 if not meshTransform[0] in toProxyList:
                                     if not cmds.objExists(meshTransform[0]+"."+NO_PROXY):
                                         if not cmds.objExists(meshTransform[0]+"."+PROXIED):
-                                            if cmds.getAttr(meshTransform[0]+".visibility"):
-                                                toProxyList.append(meshTransform[0])
+                                            #if cmds.getAttr(meshTransform[0]+".visibility"):
+                                            toProxyList.append(meshTransform[0])
                     if toProxyList:
                         progressAmount = 0
                         maxProcess = len(toProxyList)
@@ -173,6 +173,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                                 cmds.disconnectAttr(drawOverrideList[0], dup+".drawOverride")
                             cmds.setAttr(dup+".overrideEnabled", 1)
                             cmds.setAttr(dup+".overrideDisplayType", 2) #reference
+                            self.reconnectVisibility(source, dup)
             cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
         sourceParent = cmds.listRelatives(source, parent=True, type="transform")
         if sourceParent:
@@ -230,3 +231,11 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                 if allNodesList:
                     for item in allNodesList:
                         cmds.connectAttr(ctrl+".proxyRevOutput", item+".visibility", force=True)
+
+
+    def reconnectVisibility(self, sourceMesh, proxyMesh, *args):
+        """ Check if there's sourceMesh visibility connection then connect the new proxyMesh visibility too, if so.
+        """
+        visList = cmds.listConnections(sourceMesh+".visibility", source=True, destination=False, plugs=True)
+        if visList:
+            cmds.connectAttr(visList[0], proxyMesh+".visibility", force=True)
