@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.4
+DP_UTILS_VERSION = 2.5
 
 
 # UTILS functions:
@@ -1056,3 +1056,12 @@ def getAttrNameLower(side, name):
         attrNameLower = side[0]+name
     attrNameLower = attrNameLower[0].lower()+attrNameLower[1:]
     return attrNameLower
+
+
+def setAttrValues(itemList, attrList, valueList):
+    """ Just set the attribute values for the given lists.
+    """
+    if itemList and attrList and valueList:
+        for item in itemList:
+            for attr, value in zip(attrList, valueList):
+                cmds.setAttr(item+"."+attr, value)

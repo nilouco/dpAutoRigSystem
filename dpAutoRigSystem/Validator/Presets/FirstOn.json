@@ -2,7 +2,7 @@
     "_preset"     : "FirstOn",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2022-09-12",
-    "_updated"    : "2023-08-28",
+    "_updated"    : "2023-10-22",
 
     "DuplicatedName"            : true,
     "FreezeTransform"           : false,
@@ -25,6 +25,7 @@
     "KeyframeCleaner"           : false,
     "NgSkinToolsCleaner"        : false,
     "OutlinerCleaner"           : false,
+    "ProxyCreator"              : false,
     "ResetPose"                 : false,
     "SideCalibration"           : false,
     "TargetCleaner"             : false,
