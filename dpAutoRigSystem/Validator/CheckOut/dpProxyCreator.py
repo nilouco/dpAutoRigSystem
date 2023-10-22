@@ -64,13 +64,14 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                     # find meshes to generate proxy
                     toProxyList = []
                     for mesh in meshList:
-                        meshTransform = cmds.listRelatives(mesh, parent=True, type="transform")
-                        if meshTransform:
-                            if not meshTransform[0] in toProxyList:
-                                if not cmds.objExists(meshTransform[0]+"."+NO_PROXY):
-                                    if not cmds.objExists(meshTransform[0]+"."+PROXIED):
-                                        if cmds.getAttr(meshTransform[0]+".visibility"):
-                                            toProxyList.append(meshTransform[0])
+                        if len(cmds.ls(mesh)) == 1:
+                            meshTransform = cmds.listRelatives(mesh, parent=True, type="transform")
+                            if meshTransform:
+                                if not meshTransform[0] in toProxyList:
+                                    if not cmds.objExists(meshTransform[0]+"."+NO_PROXY):
+                                        if not cmds.objExists(meshTransform[0]+"."+PROXIED):
+                                            if cmds.getAttr(meshTransform[0]+".visibility"):
+                                                toProxyList.append(meshTransform[0])
                     if toProxyList:
                         progressAmount = 0
                         maxProcess = len(toProxyList)
