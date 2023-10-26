@@ -94,7 +94,7 @@ class RibbonClass(object):
             self.cornerJxt = cmds.joint(name=prefix+myName+'_Corner_Jxt', scaleCompensate=False)
             self.cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt', scaleCompensate=False, radius=1.5)
             cmds.setAttr(self.cornerJxt+".segmentScaleCompensate", 1)
-            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 1)
+            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 0) #jar
             cmds.addAttr(self.cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
             cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
             cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
