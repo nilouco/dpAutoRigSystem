@@ -15,7 +15,7 @@ ICON = "/Icons/dp_correctionManager.png"
 ANGLE = "Angle"
 DISTANCE = "Distance"
 
-DP_CORRECTIONMANAGER_VERSION = 2.6
+DP_CORRECTIONMANAGER_VERSION = 2.7
 
 
 class CorrectionManager(object):
@@ -344,7 +344,7 @@ class CorrectionManager(object):
             cmds.connectAttr(toAttach+".message", loc+".inputNode", force=True)
             grp = dpUtils.zeroOut([loc])[0]
             if toRivet:
-                rivetNode = self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, useOffset=False)
+                rivetNode = self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, False, useOffset=False)
                 cmds.addAttr(self.net, longName=toAttach+"_Rivet", attributeType="message")
                 cmds.connectAttr(rivetNode+".message", self.net+"."+toAttach+"_Rivet", force=True)
             else:
@@ -400,7 +400,7 @@ class CorrectionManager(object):
                     if fromUI:
                         toRivet = cmds.checkBox(self.rivetCB, query=True, value=True)
                     if toRivet:
-                        self.dpRivetInst = dpRivet.Rivet(self.dpUIinst, self.dpUIinst.langDic, self.dpUIinst.langName, False)
+                        self.dpRivetInst = dpRivet.Rivet(self.dpUIinst, False)
 
                     # create the container of the system data using a network node
                     self.net = cmds.createNode("network", name=name)
