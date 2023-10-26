@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.34"
-DPAR_UPDATELOG = "N765 - Display Layer working well when\nRender_Grp is renamed or empty."
+DPAR_VERSION_PY3 = "4.03.35"
+DPAR_UPDATELOG = "N762 - Limb corner jar scaleCompensate off.\nN763 - Wrist subCtrl with translate and stretchable."
 
 
 

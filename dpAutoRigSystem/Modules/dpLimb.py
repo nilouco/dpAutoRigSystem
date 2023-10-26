@@ -19,7 +19,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.5
+DP_LIMB_VERSION = 2.6
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -714,7 +714,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating ik controls:
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                 self.ikExtremSubCtrl = self.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                self.ctrls.setLockHide([self.ikExtremSubCtrl], ["tx", "ty", "tz", "sx", "sy", "sz", "v"])
+                self.ctrls.setLockHide([self.ikExtremSubCtrl], ["sx", "sy", "sz", "v"])
                 self.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
                 cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
                 
@@ -776,7 +776,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
-                cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
+                cmds.parent(ikStretchExtremLocZero, self.ikExtremSubCtrl, absolute=True)
                 exposeCornerName = cornerName+"_Jnt"
                 if self.getHasBend():
                     exposeCornerName = cornerName+"_Jxt"
