@@ -9,7 +9,7 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-DP_DISPLAYLAYERS_VERSION = 1.2
+DP_DISPLAYLAYERS_VERSION = 1.3
 
 
 class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
@@ -154,14 +154,18 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
 
 
     def getGeometryTranform(self, *args):
-        """ Get all transform nodes from Render_Grp and Proxy_Grp. If finds nothing, it will return an empty list.
+        """ Get all transform nodes from Render_Grp or convention geometry group name.
+            If it finds nothing, it will return an empty list.
         """
+        meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
         renderGrp = dpUtils.getNodeByMessage("renderGrp")
-        proxyGrp = dpUtils.getNodeByMessage("proxyGrp")
-        if renderGrp and proxyGrp:
-            renderGrpShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
-            proxyGrpShapesList = cmds.listRelatives(proxyGrp, allDescendents=True, fullPath=True, type="mesh") or []
-            allShapesList = list(set(renderGrpShapesList + proxyGrpShapesList))
+        if renderGrp:
+            allShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
+            for meshGrp in meshGrpList:
+                if cmds.objExists(meshGrp):
+                    meshGrpShapesList = cmds.listRelatives(meshGrp, allDescendents=True, fullPath=True, type="mesh") or []
+                    if meshGrpShapesList:
+                        allShapesList = list(set(allShapesList + meshGrpShapesList))
             allGeoList = []
             if allShapesList:
                 for shape in allShapesList:
