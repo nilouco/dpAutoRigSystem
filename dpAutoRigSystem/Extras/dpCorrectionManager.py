@@ -418,7 +418,7 @@ class CorrectionManager(object):
                     cmds.addAttr(self.net, longName="outputStart", attributeType="float", defaultValue=0)
                     cmds.addAttr(self.net, longName="outputEnd", attributeType="float", defaultValue=1)
                     # add serialization attributes
-                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisXCnd", "angleAxisYZCnd", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
+                    messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "extractAngleMM", "extractAngleDM", "extractAngleQtE", "extractAngleMD", "angleAxisChc", "smallerThanOneCnd", "overZeroCnd", "interpolationPMA", "inputRmV", "outputSR"]
                     if correctType == self.distanceName:
                         messageAttrList = ["correctionDataGrp", "originalLoc", "actionLoc", "correctiveMD", "outputRmV", "distanceBet", "distanceAllCnd", "distanceAxisExtractPMA", "distanceAxisXCnd", "distanceAxisYZCnd", "interpolationPMA", "distanceScaleMD"]
                     for messageAttr in messageAttrList:
@@ -458,8 +458,13 @@ class CorrectionManager(object):
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
                         extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")
                         extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
-                        angleAxisXCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_AxisX_Cnd")
-                        angleAxisYZCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_AxisYZ_Cnd")
+
+                        #TODO 
+                        #
+                        # workaround to generate UnitConversion nodes before connect to Choice node (passing by a temporary MultiplyDivide)
+                        #
+                        angleAxisChc = cmds.createNode("choice", name=correctionName+"_ExtractAngle_Axis_Chc")
+                        
                         smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
                         overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
                         inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
@@ -470,7 +475,6 @@ class CorrectionManager(object):
                         cmds.setAttr(overZeroCnd+".secondTerm", 0)
                         cmds.setAttr(overZeroCnd+".colorIfFalseR", 0)
                         cmds.setAttr(overZeroCnd+".operation", 3) #greater or equal
-                        cmds.setAttr(angleAxisYZCnd+".secondTerm", 1) #Y
                         cmds.connectAttr(actionLoc+".worldMatrix[0]", extractAngleMM+".matrixIn[0]", force=True)
                         cmds.connectAttr(originalLoc+".worldInverseMatrix[0]", extractAngleMM+".matrixIn[1]", force=True)
                         cmds.connectAttr(extractAngleMM+".matrixSum", extractAngleDM+".inputMatrix", force=True)
@@ -488,15 +492,15 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
                         cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
                         # axis setup
-                        cmds.connectAttr(self.net+".axis", angleAxisXCnd+".firstTerm", force=True)
-                        cmds.connectAttr(self.net+".axis", angleAxisYZCnd+".firstTerm", force=True)
+
+                        cmds.connectAttr(extractAngleQtE+".outputRotateX", angleAxisChc+".input[0]", force=True)
+                        cmds.connectAttr(extractAngleQtE+".outputRotateY", angleAxisChc+".input[1]", force=True)
+                        cmds.connectAttr(extractAngleQtE+".outputRotateZ", angleAxisChc+".input[2]", force=True)
+                        cmds.connectAttr(self.net+".axis", angleAxisChc+".selector", force=True)
+                        cmds.connectAttr(angleAxisChc+".output", inputRmV+".inputValue", force=True)
                         cmds.connectAttr(inputRmV+".outValue", extractAngleMD+".input1X", force=True)
-                        cmds.connectAttr(extractAngleQtE+".outputRotateX", angleAxisXCnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(extractAngleQtE+".outputRotateY", angleAxisYZCnd+".colorIfTrueR", force=True)
-                        cmds.connectAttr(extractAngleQtE+".outputRotateZ", angleAxisYZCnd+".colorIfFalseR", force=True)
-                        cmds.connectAttr(angleAxisYZCnd+".outColorR", angleAxisXCnd+".colorIfFalseR", force=True)
-                        cmds.connectAttr(angleAxisXCnd+".outColorR", inputRmV+".inputValue", force=True)
-                        cmds.connectAttr(angleAxisXCnd+".outColorR", self.net+".inputValue", force=True)
+                        
+                        cmds.connectAttr(angleAxisChc+".output", self.net+".inputValue", force=True)
                         cmds.setAttr(self.net+".inputValue", lock=True)
                         # axis order setup
                         cmds.connectAttr(self.net+".inputEnd", extractAngleMD+".input2X", force=True) #it'll be updated when changing angle
@@ -517,8 +521,7 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleDM+".message", self.net+".extractAngleDM", force=True)
                         cmds.connectAttr(extractAngleQtE+".message", self.net+".extractAngleQtE", force=True)
                         cmds.connectAttr(extractAngleMD+".message", self.net+".extractAngleMD", force=True)
-                        cmds.connectAttr(angleAxisXCnd+".message", self.net+".angleAxisXCnd", force=True)
-                        cmds.connectAttr(angleAxisYZCnd+".message", self.net+".angleAxisYZCnd", force=True)
+                        cmds.connectAttr(angleAxisChc+".message", self.net+".angleAxisChc", force=True)
                         cmds.connectAttr(smallerThanOneCnd+".message", self.net+".smallerThanOneCnd", force=True)
                         cmds.connectAttr(overZeroCnd+".message", self.net+".overZeroCnd", force=True)
                         cmds.connectAttr(inputRmV+".message", self.net+".inputRmV", force=True)
