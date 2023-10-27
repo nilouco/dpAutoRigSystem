@@ -458,13 +458,9 @@ class CorrectionManager(object):
                         extractAngleDM = cmds.createNode("decomposeMatrix", name=correctionName+"_ExtractAngle_DM")
                         extractAngleQtE = cmds.createNode("quatToEuler", name=correctionName+"_ExtractAngle_QtE")
                         extractAngleMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_MD")
-
-                        #TODO 
-                        #
                         # workaround to generate UnitConversion nodes before connect to Choice node (passing by a temporary MultiplyDivide)
-                        #
+                        angleUnitConversionMD = cmds.createNode("multiplyDivide", name=correctionName+"_ExtractAngle_UnitConversion_MD")
                         angleAxisChc = cmds.createNode("choice", name=correctionName+"_ExtractAngle_Axis_Chc")
-                        
                         smallerThanOneCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_SmallerThanOne_Cnd")
                         overZeroCnd = cmds.createNode("condition", name=correctionName+"_ExtractAngle_OverZero_Cnd")
                         inputRmV = cmds.createNode("remapValue", name=correctionName+"_Input_RmV")
@@ -492,14 +488,16 @@ class CorrectionManager(object):
                         cmds.connectAttr(extractAngleDM+".outputQuatZ", extractAngleQtE+".inputQuatZ", force=True)
                         cmds.connectAttr(extractAngleDM+".outputQuatW", extractAngleQtE+".inputQuatW", force=True)
                         # axis setup
-
-                        cmds.connectAttr(extractAngleQtE+".outputRotateX", angleAxisChc+".input[0]", force=True)
-                        cmds.connectAttr(extractAngleQtE+".outputRotateY", angleAxisChc+".input[1]", force=True)
-                        cmds.connectAttr(extractAngleQtE+".outputRotateZ", angleAxisChc+".input[2]", force=True)
+                        cmds.connectAttr(extractAngleQtE+".outputRotateX", angleUnitConversionMD+".input1X", force=True)
+                        cmds.connectAttr(extractAngleQtE+".outputRotateY", angleUnitConversionMD+".input1Y", force=True)
+                        cmds.connectAttr(extractAngleQtE+".outputRotateZ", angleUnitConversionMD+".input1Z", force=True)
+                        cmds.connectAttr(cmds.listConnections(angleUnitConversionMD+".input1X", source=True, destination=False, plugs=True)[0], angleAxisChc+".input[0]", force=True)
+                        cmds.connectAttr(cmds.listConnections(angleUnitConversionMD+".input1Y", source=True, destination=False, plugs=True)[0], angleAxisChc+".input[1]", force=True)
+                        cmds.connectAttr(cmds.listConnections(angleUnitConversionMD+".input1Z", source=True, destination=False, plugs=True)[0], angleAxisChc+".input[2]", force=True)
+                        cmds.delete(angleUnitConversionMD)
                         cmds.connectAttr(self.net+".axis", angleAxisChc+".selector", force=True)
                         cmds.connectAttr(angleAxisChc+".output", inputRmV+".inputValue", force=True)
                         cmds.connectAttr(inputRmV+".outValue", extractAngleMD+".input1X", force=True)
-                        
                         cmds.connectAttr(angleAxisChc+".output", self.net+".inputValue", force=True)
                         cmds.setAttr(self.net+".inputValue", lock=True)
                         # axis order setup
