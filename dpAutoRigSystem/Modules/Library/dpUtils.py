@@ -902,10 +902,44 @@ def resolveName(name, suffix, *args):
     return baseName, name
 
 
-def magnitude(vector, *args):
+def magnitude(v, *args):
     """ Returns the square root of the sum of power 2 from a given vector.
     """
-    return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))
+    return math.sqrt(pow(v[0], 2)+pow(v[1], 2)+pow(v[2], 2))
+
+
+def normalizeVector(v):
+    """ Returns the normalized given vector.
+    """
+    vMag = magnitude(v)
+    return [v[i]/vMag for i in range(len(v))]
+
+
+def distanceVectors(u, v):
+    """ Returns the distance between 2 given points.
+    """
+    return math.sqrt((v[0]-u[0])**2+(v[1]-u[1])**2+(v[2]-u[2])**2)
+
+
+def addVectors(u, v):
+    """ Returns the addition of 2 given vectors.
+    """
+    return [u[i]+v[i] for i in range(len(u))]
+
+
+def subVectors(u, v):
+    """ Returns the substration of 2 given vectors.
+    """
+    return [u[i]-v[i] for i in range(len(u))]
+
+
+def multVectors(u, v):
+    return [u[i]*v[i] for i in range(len(u))]
+
+def multiScalarVector(u, scalar):
+    """
+    """
+    return [u[i]*scalar for i in range(len(u))]
 
 
 def jointChainLength(jointList):
