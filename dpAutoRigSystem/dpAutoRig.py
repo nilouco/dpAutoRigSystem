@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.22"
-DPAR_UPDATELOG = "N730 - dpRivet replace wrapDeformer to morphDeformer."
+DPAR_VERSION_PY3 = "4.03.37"
+DPAR_UPDATELOG = "N730 - Added feature on dpRivet to /nchoose between wrapDeformer or morphDeformer/n when using faceToRivet."
 
 
 
