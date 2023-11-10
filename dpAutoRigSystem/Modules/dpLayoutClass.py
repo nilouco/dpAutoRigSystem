@@ -3,7 +3,7 @@ from maya import cmds
 from .Library import dpUtils
 from functools import partial
 
-DP_LAYOUTCLASS_VERSION = 2.2
+DP_LAYOUTCLASS_VERSION = 2.3
 
 
 class LayoutClass(object):
@@ -136,6 +136,7 @@ class LayoutClass(object):
                 self.nostrilExists = cmds.objExists(self.moduleGrp+".nostril")
                 self.correctiveExists = cmds.objExists(self.moduleGrp+".corrective")
                 self.nMainCtrlAttrExists = cmds.objExists(self.moduleGrp+".mainControls")
+                self.dynamicExists = cmds.objExists(self.moduleGrp+".dynamic")
                 
                 # UI
                 # edit label of frame layout:
@@ -335,6 +336,13 @@ class LayoutClass(object):
                     correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
                     self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
 
+                # create dynamic layout:
+                if self.dynamicExists:
+                    self.dynamicLayout = cmds.rowLayout('dynamicLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    cmds.text(self.dpUIinst.lang['m097_dynamic'], parent=self.dynamicLayout)
+                    dynamicValue = cmds.getAttr(self.moduleGrp+".dynamic")
+                    self.dynamicCB = cmds.checkBox(label="", value=dynamicValue, changeCommand=self.changeDynamic, parent=self.dynamicLayout)
+
                 # create main controllers layout:
                 if self.nJointsAttrExists:
                     if self.nMainCtrlAttrExists:
@@ -346,8 +354,9 @@ class LayoutClass(object):
                                 self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=hasMain, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=hasMain, parent=self.mainCtrlColumn)
                             else:
-                                self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=False, enable=False, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
+                                self.mainCtrlsCB = cmds.checkBox(label=self.dpUIinst.lang['m227_mainCtrls'], value=False, enable=True, changeCommand=self.setAddMainCtrls, parent=self.mainCtrlColumn)
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
+                                cmds.setAttr(self.moduleGrp+".mainControls", 0)
 
             except:
                 pass
@@ -507,6 +516,12 @@ class LayoutClass(object):
             else:
                 cmds.setAttr(self.moduleGrp+".degree", 1)
     
+
+    def changeDynamic(self, *args):
+        """ Set the attribute value for dynamic.
+        """
+        cmds.setAttr(self.moduleGrp+".dynamic", cmds.checkBox(self.dynamicCB, query=True, value=True))
+
     
     def createPreviewMirror(self, *args):
         # re-declaring guideMirror and previewMirror groups:

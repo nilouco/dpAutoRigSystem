@@ -5,10 +5,10 @@ from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
 from ..Extras import dpCustomAttr
 
-DP_CONTROLSTARTCLASS_VERSION = 2.1
+DP_CONTROLSTARTCLASS_VERSION = 2.2
 
 
-class ControlStartClass:
+class ControlStartClass(object):
     def __init__(self, dpUIinst, CLASS_NAME, TITLE, DESCRIPTION, ICON):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """

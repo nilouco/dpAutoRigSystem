@@ -10,7 +10,7 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
-DP_SPINE_VERSION = 2.0
+DP_SPINE_VERSION = 2.1
 
 
 class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -26,6 +26,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.integratedActionsDic = {}
         self.cvJointLoc = None
         self.shapeSizeCH = None
+        self.currentNJoints = 3
 
         # List of returned data:
         self.aHipsAList = []
@@ -216,6 +217,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 chestName = self.dpUIinst.lang['c028_chest']
             # run for all sides
             for s, side in enumerate(sideList):
+                attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 # get the number of joints to be created:
@@ -240,15 +242,15 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
                 self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+chestName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
-                cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_active_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
-                cmds.addAttr(self.hipsACtrl, longName=side+self.userGuideName+'Fk_ikFkBlend', attributeType="float", min=0, max=1, defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Fk_ikFkBlend', attributeType="float", min=0, max=1, defaultValue=1, keyable=True)
                 self.aHipsAList.append(self.hipsACtrl)
-                self.aVolVariationAttrList.append(side+self.userGuideName+'_'+self.dpUIinst.lang['c031_volumeVariation'])
-                self.aActVolVariationAttrList.append(side+self.userGuideName+'_active_'+self.dpUIinst.lang['c031_volumeVariation'])
-                self.aMScaleVolVariationAttrList.append(side+self.userGuideName+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'])
-                self.aIkFkBlendAttrList.append(side+self.userGuideName+'Fk_ikFkBlend')
+                self.aVolVariationAttrList.append(attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'])
+                self.aActVolVariationAttrList.append(attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'])
+                self.aMScaleVolVariationAttrList.append(attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'])
+                self.aIkFkBlendAttrList.append(attrNameLower+'Fk_ikFkBlend')
                 
                 # base and end controls:
                 self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
@@ -415,13 +417,13 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(rbnMD+'.operation', 2)
                 # create a blendColor, a condition and a multiplyDivide in order to get the correct result value of volumeVariation:
                 rbnBlendColors = cmds.createNode('blendColors', name=side+self.userGuideName+"_Rbn_BC")
-                cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'_'+self.dpUIinst.lang['c031_volumeVariation'], rbnBlendColors+'.blender')
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'], rbnBlendColors+'.blender')
                 rbnCond = cmds.createNode('condition', name=side+self.userGuideName+'_Rbn_Cond')
-                cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'_active_'+self.dpUIinst.lang['c031_volumeVariation'], rbnCond+'.firstTerm')
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'], rbnCond+'.firstTerm')
                 cmds.connectAttr(rbnBlendColors+'.outputR', rbnCond+'.colorIfTrueR')
                 cmds.connectAttr(rbnMD+'.outputX', rbnBlendColors+'.color1R')
                 rbnVVMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rbn_VV_MD")
-                cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], rbnVVMD+'.input2X')
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], rbnVVMD+'.input2X')
                 cmds.connectAttr(rbnVVMD+'.outputX', rbnCond+'.colorIfFalseR')
                 cmds.setAttr(rbnVVMD+'.operation', 2)
                 cmds.setAttr(rbnBlendColors+'.color2R', 1)
@@ -488,7 +490,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_PaC")[0]
                     cmds.connectAttr(self.middleFkCtrl+"."+self.dpUIinst.lang['c049_intensity'], middleIntBC+".color1R", force=True)
                     cmds.connectAttr(self.middleCtrl+"."+self.dpUIinst.lang['c049_intensity'], middleIntBC+".color2R", force=True)
-                    cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', middleIntBC+".blender", force=True)
+                    cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', middleIntBC+".blender", force=True)
                     cmds.connectAttr(middleIntBC+".outputR", middleIntPC+"."+self.middleCtrl+"W0", force=True)
                     cmds.connectAttr(self.middleCtrl+"."+self.dpUIinst.lang['c049_intensity'], intRevNode+".inputX", force=True)
                     cmds.connectAttr(intRevNode+".outputX", middleIntPC+"."+jointFather+"W1", force=True)
@@ -501,9 +503,9 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.middleCtrlGrpPC = cmds.parentConstraint(self.middleCtrlZero, self.middleFkCtrl, self.middleCtrlGrp, maintainOffset=True, name=self.middleCtrlGrp+"_IkFkBlend_PaC")[0]
                     if n == 1:
                         self.revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
-                        cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.revNode+".inputX", force=True)
+                        cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.revNode+".inputX", force=True)
                     # connecting ikFkBlend using the reverse node:
-                    cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.middleCtrlGrpPC+"."+self.middleFkCtrl+"W1", force=True)
+                    cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.middleCtrlGrpPC+"."+self.middleFkCtrl+"W1", force=True)
                     cmds.connectAttr(self.revNode+'.outputX', self.middleCtrlGrpPC+"."+self.middleCtrlZero+"W0", force=True)
                     # ikFkBlend visibility:
                     cmds.connectAttr(self.revNode+'.outputX', self.middleCtrlZero+".visibility", force=True)
@@ -513,12 +515,12 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 chestBCtrlShape = cmds.listRelatives(self.chestBCtrl, children=True, type="shape")[0]
                 cmds.parent(self.chestFkCtrlZero, self.middleFkCtrl)
                 self.chestCtrlGrpPC = cmds.parentConstraint(self.chestBZero, self.chestFkCtrl, self.chestBGrp, maintainOffset=True, name=self.chestBGrp+"_IkFkBlend_PaC")[0]
-                cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.chestCtrlGrpPC+"."+self.chestFkCtrl+"W1", force=True)
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestCtrlGrpPC+"."+self.chestFkCtrl+"W1", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', self.chestCtrlGrpPC+"."+self.chestBZero+"W0", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', chestACtrlShape+".visibility", force=True)
                 cmds.connectAttr(self.revNode+'.outputX', chestBCtrlShape+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
-                cmds.connectAttr(self.hipsACtrl+'.'+side+self.userGuideName+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
                 
                 # update spine volume variation setup
                 currentVV = cmds.getAttr(rbnMD+'.outputX')

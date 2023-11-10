@@ -11,7 +11,7 @@ class RigType(object):
     default = "unknown" #Support old guide system
 
 
-DP_STARTCLASS_VERSION = 2.0
+DP_STARTCLASS_VERSION = 2.1
 
 
 class StartClass(object):
@@ -315,7 +315,87 @@ class StartClass(object):
                                 cmds.setAttr(jcrCtrl+"."+invertAttr, 1)
                                 cmds.addAttr(jcrCtrl+"."+invertAttr, edit=True, defaultValue=1)
 
+
+    def changeMainCtrlsNumber(self, enteredNCtrls, *args):
+        """ Edit the number of main controllers in the guide.
+        """
+        dpUtils.useDefaultRenderLayer()
+        # get the number of main controllers entered by user:
+        if enteredNCtrls == 0:
+            try:
+                self.nMainCtrlAttr = cmds.intField(self.nMainCtrlIF, query=True, value=True)
+            except:
+                return
+        else:
+            self.nMainCtrlAttr = enteredNCtrls
+        # limit range
+        if self.nMainCtrlAttr >= self.currentNJoints:
+            self.nMainCtrlAttr = self.currentNJoints - 1
+            if self.nMainCtrlAttr == 0:
+                self.nMainCtrlAttr = 1
+                cmds.checkBox(self.mainCtrlsCB, edit=True, editable=False)
+            cmds.intField(self.nMainCtrlIF, edit=True, value=self.nMainCtrlAttr)
+        cmds.setAttr(self.moduleGrp+".nMain", self.nMainCtrlAttr)
+
+
+    def enableMainCtrls(self, value, *args):
+        """ Just enable or disable the main controllers int field UI.
+        """
+        cmds.intField(self.nMainCtrlIF, edit=True, editable=value)
+        cmds.checkBox(self.mainCtrlsCB, edit=True, editable=True)
+
+
+    def setAddMainCtrls(self, value, *args):
+        """ Just store the main controllers checkBox value and enable the int field.
+        """
+        cmds.setAttr(self.moduleGrp+".mainControls", value)
+        self.enableMainCtrls(value)
+
+
+    def addFkMainCtrls(self, side, ctrlList, *args):
+        """ Implement the fk main controllers.
+        """
+        axisList = ['X', 'Y', 'Z']
+        # getting and calculating values
+        totalToAddMain = 1
+        self.nMain = cmds.getAttr(self.base+".nMain")
+        if self.nMain > 1:
+            totalToAddMain = int(self.nJoints/self.nMain)
+        # run throgh the chain
+        for m in range(0, self.nMain):
+            startAt = m*totalToAddMain
+            endAt = (m+1)*totalToAddMain
+            if m == self.nMain-1:
+                endAt = self.nJoints
+            for n in range(startAt, endAt):
+                currentCtrl = ctrlList[n]
+                currentCtrlZero = cmds.listRelatives(currentCtrl, parent=True)[0]
+                if n == startAt:
+                    # create a main controller
+                    mainCtrl = self.ctrls.cvControl("id_096_FkLineMain", side+self.userGuideName+"_%02d_Main_Fk_Ctrl"%(n), r=self.ctrlRadius*1.2, d=self.curveDegree)
+                    self.ctrls.colorShape([mainCtrl], "cyan")
+                    cmds.addAttr(mainCtrl, longName=self.dpUIinst.lang['c049_intensity'], attributeType="float", minValue=0, defaultValue=1, maxValue=1, keyable=True)
+                    # position
+                    cmds.parent(mainCtrl, currentCtrlZero)
+                    cmds.makeIdentity(mainCtrl, apply=False, translate=True, rotate=True, scale=True)
+                    cmds.parent(currentCtrl, mainCtrl)
+                    # intensity utilities
+                    rIntensityMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_R_Main_MD")
+                    for axis in axisList:
+                        cmds.connectAttr(mainCtrl+".rotate"+axis, rIntensityMD+".input1"+axis, force=True)
+                        cmds.connectAttr(mainCtrl+"."+self.dpUIinst.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
+                else:
+                    # offseting sub controllers
+                    offsetGrp = cmds.group(name=currentCtrl+"_Offset_Grp", empty=True)
+                    cmds.parent(offsetGrp, currentCtrlZero)
+                    cmds.makeIdentity(offsetGrp, apply=False, translate=True, rotate=True, scale=True)
+                    cmds.parent(currentCtrl, offsetGrp)
+                    for axis in axisList:
+                        cmds.connectAttr(rIntensityMD+".output"+axis, offsetGrp+".rotate"+axis, force=True)
+                # display sub controllers shapes
+                self.ctrls.setSubControlDisplay(mainCtrl, currentCtrl, 0)
     
+
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
             Delete the moduleLayout, guide and namespaces for this module.
