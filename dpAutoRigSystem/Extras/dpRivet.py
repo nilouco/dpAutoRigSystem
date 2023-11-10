@@ -668,7 +668,9 @@ class Rivet(object):
             targetList = cmds.ls(targetGeo, dag=True, shapes=True)
             targetOrig = self.findOrig(targetList)
         morphDeformer = cmds.deformer(morphGeo, type="morph")[0]
+        cmds.setAttr(morphDeformer+".morphMode", 1)
         cmds.setAttr(morphDeformer+".useComponentLookup", 1)
+        cmds.setAttr(morphDeformer+".morphSpace", 0)
         cmds.connectAttr(targetShape+".worldMesh[0]", morphDeformer+".morphTarget[0]")
         componentMatchNode = cmds.createNode("componentMatch")
         cmds.connectAttr(componentMatchNode+".componentLookup", morphDeformer+".componentLookupList[0].componentLookup")
