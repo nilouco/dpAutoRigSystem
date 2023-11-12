@@ -14,8 +14,9 @@ from maya import cmds
 from maya.api import OpenMaya
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
+import math
 
-DP_IKFKSNAP_VERSION = 1.0
+DP_IKFKSNAP_VERSION = 2.0
 
 
 ####
@@ -46,13 +47,13 @@ class IkFkSnap(object):
         self.ikJntList = ["dpAR_1_Shoulder_Ik_Jxt", "dpAR_1_Elbow_Ik_Jxt", "dpAR_1_Wrist_Ik_Jxt"]
         self.attr = "dpAR_1Fk"
         self.clavicleCtrl = "dpAR_1_Clavicle_Ctrl"
+        self.autoClavicleGrp = "dpAR_1_Clavicle_Ctrl_Grp"
         ###
 
         
         # store the initial ikFk extrem offset
-        ikM = OpenMaya.MMatrix(cmds.getAttr(self.ikCtrl+".worldMatrix[0]"))
-        fkIM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldInverseMatrix[0]"))
-        self.extremOffsetMatrix = ikM * fkIM
+        self.extremOffsetMatrix = self.getOffsetMatrix(self.ikCtrl, self.fkCtrlList[-1])
+        
         print("self.extremOffsetMatrix = ", self.extremOffsetMatrix)
 
 
@@ -60,12 +61,74 @@ class IkFkSnap(object):
         if ui:
             self.dpIkFkSnapUI(self)
     
-    
+
+    def getOffsetMatrix(self, wm, wim, *args):
+        """
+        """
+        aM = OpenMaya.MMatrix(cmds.getAttr(wm+".worldMatrix[0]"))
+        bM = OpenMaya.MMatrix(cmds.getAttr(wim+".worldInverseMatrix[0]"))
+        return (aM * bM)
+
+
+    def getOffsetXform(self, wm, wim, *args):
+        """
+        """
+        aM = OpenMaya.MMatrix(cmds.getAttr(wm+".xformMatrix"))
+        bM = OpenMaya.MMatrix(cmds.getAttr(wim+".xformMatrix"))
+        return (aM * bM)
+
+
     def dpCloseIkFkSnapUI(self, *args):
         if cmds.window('dpIkFkSnapWindow', query=True, exists=True):
             cmds.deleteUI('dpIkFkSnapWindow', window=True)
     
     
+    def bakeAutoClavicle(self, *args):
+        """
+        """
+
+        self.autoClavOffset = self.getOffsetXform(self.clavicleCtrl, self.autoClavicleGrp)
+        print("self.autoClavOffset = ", self.autoClavOffset)
+
+        cmds.xform(self.clavicleCtrl, matrix=list(self.autoClavOffset), worldSpace=False)
+        cmds.xform(self.clavicleCtrl, translation=[0, 0, 0], worldSpace=False)
+
+        #cmds.xform(self.clavicleCtrl, matrix=list(self.autoClavOffset), worldSpace=False)
+        #cmds.xform(self.clavicleCtrl, translation=[0, 0, 0], worldSpace=False)
+        
+            
+        #for attr in ['rx', 'ry', 'rz']:
+        #    cmds.setAttr(self.clavicleCtrl+"."+attr, (cmds.getAttr(self.clavicleCtrl+"."+attr)+cmds.getAttr(self.autoClavicleGrp+"."+attr)))
+
+        # Part 1: Get a MTransformationMatrix from an object for the sake of the example.
+        # You can use your own MTransformationMatrix if it already exists of course.
+        # get a MDagPath for our node:
+#        selList = OpenMaya.MSelectionList() # make a sel list # MSelectionList
+#        selList.add(self.clavicleCtrl) # add our node by name
+#        mDagPath = selList.getDagPath(0) # fill the dag path with our node
+        # Create a MFnTransform object for our MDagPath,
+        # and extract a MTransformationMatrix from it:
+#        transformFunc = OpenMaya.MFnTransform(mDagPath) # MFnTransform
+#        mTransformMtx = transformFunc.transformation() # MTransformationMatrix
+        #-------------------------------------------
+        # Part 2, get the euler values
+        # Get an MEulerRotation object
+#        eulerRot = OpenMaya.MEulerRotation
+#        eulerRot.add(mTransformMtx) # MEulerRotation
+        # note, we *don't* have to set the rot order here...
+        # Convert from radians to degrees:
+#        angles = [math.degrees(angle) for angle in (eulerRot.x, eulerRot.y, eulerRot.z)]
+#        print(angles, "MTransformationMatrix")
+
+
+        
+
+        
+
+        # reset autoClavicle rotateValues to zero default
+
+
+
     def dpIkFkSnapUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
@@ -89,15 +152,26 @@ class IkFkSnap(object):
     def snapIkToFk(self, *args):
         """
         """
+        # bake autoClavicle to controller
+        if cmds.getAttr(self.clavicleCtrl+".follow"):
+            self.bakeAutoClavicle()
+
+
+
         #cmds.setAttr(self.optCtrl+"."+self.attr, 0) #ik
-        #followValue = cmds.getAttr(self.clavicleCtrl+".follow")
-        #cmds.setAttr(self.clavicleCtrl+".follow", 0)
+        followValue = cmds.getAttr(self.clavicleCtrl+".follow")
+        cmds.setAttr(self.clavicleCtrl+".follow", 0)
+
+        if not cmds.getAttr(self.fkCtrlList[0]+".follow") == 1:
+            cmds.setAttr(self.fkCtrlList[0]+".follow", 1)
 
         for ctrl, jnt in zip(self.fkCtrlList, self.ikJntList):
             cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
 
         #if followValue:
         #    cmds.setAttr(self.clavicleCtrl+".follow", followValue)
+        #if fkFollowValue:
+        #    cmds.setAttr(self.fkCtrlList[0]+".follow", fkFollowValue)
         cmds.setAttr(self.optCtrl+"."+self.attr, 1) #fk
 
     
@@ -105,9 +179,11 @@ class IkFkSnap(object):
         """
         """
         print("WIP")
+        if cmds.getAttr(self.clavicleCtrl+".follow"):
+            self.bakeAutoClavicle()
 
-        #followValue = cmds.getAttr(self.clavicleCtrl+".follow")
-        #cmds.setAttr(self.clavicleCtrl+".follow", 0)
+        followValue = cmds.getAttr(self.clavicleCtrl+".follow")
+        cmds.setAttr(self.clavicleCtrl+".follow", 0)
 
         # extrem ctrl
         fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
