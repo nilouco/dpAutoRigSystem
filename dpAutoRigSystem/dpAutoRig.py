@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.36"
-DPAR_UPDATELOG = "N759 - CorrectionManager rivet\ncall argument issue fixed.\nN490 - CorrectionManager extract axis\nusing choice node."
+DPAR_VERSION_PY3 = "4.03.37"
+DPAR_UPDATELOG = "N730 - Added feature on dpRivet to\nchoose between wrapDeformer or morphDeformer\n when using faceToRivet."
 
 
 
@@ -2085,7 +2085,7 @@ class DP_AutoRig_UI(object):
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
             # set outliner color
-            self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True)
+            self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True) #white
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
@@ -2107,9 +2107,9 @@ class DP_AutoRig_UI(object):
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
         self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
         # set outliner color
-        self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True)
-        self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True)
-        self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True)
+        self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True) #blue
+        self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
+        self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True) #orange
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
