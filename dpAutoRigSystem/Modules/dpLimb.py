@@ -19,7 +19,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.6
+DP_LIMB_VERSION = 2.7
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -695,7 +695,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.shoulderRefGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderRefGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PoC")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderRefGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PaC")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], self.fkIsolateRevNode+".inputX", force=True)
@@ -1307,7 +1307,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     
                     # create auto clavicle attribute:
-                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
+                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0, keyable=True)
                     
                     # ik auto clavicle locators:
                     acIkUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Up_Loc")[0]

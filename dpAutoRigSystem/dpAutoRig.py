@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.36"
-DPAR_UPDATELOG = "N759 - CorrectionManager rivet\ncall argument issue fixed.\nN490 - CorrectionManager extract axis\nusing choice node."
+DPAR_VERSION_PY3 = "4.03.39"
+DPAR_UPDATELOG = "N767 - IkFkSnap."
 
 
 

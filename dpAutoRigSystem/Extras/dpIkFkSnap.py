@@ -14,7 +14,6 @@ from maya import cmds
 from maya.api import OpenMaya
 from ..Modules.Library import dpControls
 from ..Modules.Library import dpUtils
-import math
 
 DP_IKFKSNAP_VERSION = 2.0
 
@@ -50,12 +49,8 @@ class IkFkSnap(object):
         self.autoClavicleGrp = "dpAR_1_Clavicle_Ctrl_Grp"
         ###
 
-        
         # store the initial ikFk extrem offset
         self.extremOffsetMatrix = self.getOffsetMatrix(self.ikCtrl, self.fkCtrlList[-1])
-        
-        print("self.extremOffsetMatrix = ", self.extremOffsetMatrix)
-
 
         # call main function
         if ui:
@@ -86,47 +81,9 @@ class IkFkSnap(object):
     def bakeAutoClavicle(self, *args):
         """
         """
-
         self.autoClavOffset = self.getOffsetXform(self.clavicleCtrl, self.autoClavicleGrp)
-        print("self.autoClavOffset = ", self.autoClavOffset)
-
         cmds.xform(self.clavicleCtrl, matrix=list(self.autoClavOffset), worldSpace=False)
         cmds.xform(self.clavicleCtrl, translation=[0, 0, 0], worldSpace=False)
-
-        #cmds.xform(self.clavicleCtrl, matrix=list(self.autoClavOffset), worldSpace=False)
-        #cmds.xform(self.clavicleCtrl, translation=[0, 0, 0], worldSpace=False)
-        
-            
-        #for attr in ['rx', 'ry', 'rz']:
-        #    cmds.setAttr(self.clavicleCtrl+"."+attr, (cmds.getAttr(self.clavicleCtrl+"."+attr)+cmds.getAttr(self.autoClavicleGrp+"."+attr)))
-
-        # Part 1: Get a MTransformationMatrix from an object for the sake of the example.
-        # You can use your own MTransformationMatrix if it already exists of course.
-        # get a MDagPath for our node:
-#        selList = OpenMaya.MSelectionList() # make a sel list # MSelectionList
-#        selList.add(self.clavicleCtrl) # add our node by name
-#        mDagPath = selList.getDagPath(0) # fill the dag path with our node
-        # Create a MFnTransform object for our MDagPath,
-        # and extract a MTransformationMatrix from it:
-#        transformFunc = OpenMaya.MFnTransform(mDagPath) # MFnTransform
-#        mTransformMtx = transformFunc.transformation() # MTransformationMatrix
-        #-------------------------------------------
-        # Part 2, get the euler values
-        # Get an MEulerRotation object
-#        eulerRot = OpenMaya.MEulerRotation
-#        eulerRot.add(mTransformMtx) # MEulerRotation
-        # note, we *don't* have to set the rot order here...
-        # Convert from radians to degrees:
-#        angles = [math.degrees(angle) for angle in (eulerRot.x, eulerRot.y, eulerRot.z)]
-#        print(angles, "MTransformationMatrix")
-
-
-        
-
-        
-
-        # reset autoClavicle rotateValues to zero default
-
 
 
     def dpIkFkSnapUI(self, *args):
@@ -156,10 +113,6 @@ class IkFkSnap(object):
         if cmds.getAttr(self.clavicleCtrl+".follow"):
             self.bakeAutoClavicle()
 
-
-
-        #cmds.setAttr(self.optCtrl+"."+self.attr, 0) #ik
-        followValue = cmds.getAttr(self.clavicleCtrl+".follow")
         cmds.setAttr(self.clavicleCtrl+".follow", 0)
 
         if not cmds.getAttr(self.fkCtrlList[0]+".follow") == 1:
@@ -168,21 +121,15 @@ class IkFkSnap(object):
         for ctrl, jnt in zip(self.fkCtrlList, self.ikJntList):
             cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
 
-        #if followValue:
-        #    cmds.setAttr(self.clavicleCtrl+".follow", followValue)
-        #if fkFollowValue:
-        #    cmds.setAttr(self.fkCtrlList[0]+".follow", fkFollowValue)
         cmds.setAttr(self.optCtrl+"."+self.attr, 1) #fk
 
     
     def snapFkToIk(self, *args):
         """
         """
-        print("WIP")
         if cmds.getAttr(self.clavicleCtrl+".follow"):
             self.bakeAutoClavicle()
 
-        followValue = cmds.getAttr(self.clavicleCtrl+".follow")
         cmds.setAttr(self.clavicleCtrl+".follow", 0)
 
         # extrem ctrl
@@ -204,17 +151,15 @@ class IkFkSnap(object):
 
         cmds.xform(self.poleVector, translation=posSwivel, worldSpace=True)
         
-        #if followValue:
-        #    cmds.setAttr(self.clavicleCtrl+".follow", followValue)
         cmds.setAttr(self.optCtrl+"."+self.attr, 0) #ik
-        return
-
 
         # Reset footroll attributes
-        if hasattr(self, 'footRollAtts'): # Hack: libSerialization don't write the attribute if it's empty wich can cause a crash
-            for att in self.footRollAtts:
-                att.set(0)
-
+        userDefAttrList = cmds.listAttr(self.ikCtrl, userDefined=True, keyable=True)
+        if userDefAttrList:
+            for attr in userDefAttrList:
+                if self.dpUIinst.lang['c018_revFoot_roll'] in attr or self.dpUIinst.lang['c019_revFoot_spin'] in attr or self.dpUIinst.lang['c020_revFoot_turn'] in attr:
+                    cmds.setAttr(self.ikCtrl+"."+attr, 0)
+    
 
     def _get_swivel_middle(self, posS, posM, posE):
         fLengthS = dpUtils.distanceVectors(posM, posS)
