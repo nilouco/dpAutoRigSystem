@@ -46,7 +46,6 @@ class IkFkSnap(object):
         self.ikJntList = ["dpAR_1_Shoulder_Ik_Jxt", "dpAR_1_Elbow_Ik_Jxt", "dpAR_1_Wrist_Ik_Jxt"]
         self.attr = "dpAR_1Fk"
         self.clavicleCtrl = "dpAR_1_Clavicle_Ctrl"
-        self.autoClavicleGrp = "dpAR_1_Clavicle_Ctrl_Grp"
         ###
 
         # store the initial ikFk extrem offset
@@ -58,7 +57,7 @@ class IkFkSnap(object):
     
 
     def getOffsetMatrix(self, wm, wim, *args):
-        """
+        """ Return the offset matrix (multiplied matrices) from given world and inverse matrices.
         """
         aM = OpenMaya.MMatrix(cmds.getAttr(wm+".worldMatrix[0]"))
         bM = OpenMaya.MMatrix(cmds.getAttr(wim+".worldInverseMatrix[0]"))
@@ -66,7 +65,7 @@ class IkFkSnap(object):
 
 
     def getOffsetXform(self, wm, wim, *args):
-        """
+        """ Return the offset xform matrix (multiplied matrices) from given xform matrices.
         """
         aM = OpenMaya.MMatrix(cmds.getAttr(wm+".xformMatrix"))
         bM = OpenMaya.MMatrix(cmds.getAttr(wim+".xformMatrix"))
@@ -76,14 +75,21 @@ class IkFkSnap(object):
     def dpCloseIkFkSnapUI(self, *args):
         if cmds.window('dpIkFkSnapWindow', query=True, exists=True):
             cmds.deleteUI('dpIkFkSnapWindow', window=True)
-    
-    
-    def bakeAutoClavicle(self, *args):
+
+
+    def bakeFollowRotation(self, ctrl, *args):
+        """ Set clavicle rotation from offset xform calculus.
+            Also set rotation keyframe.
         """
-        """
-        self.autoClavOffset = self.getOffsetXform(self.clavicleCtrl, self.autoClavicleGrp)
-        cmds.xform(self.clavicleCtrl, matrix=list(self.autoClavOffset), worldSpace=False)
-        cmds.xform(self.clavicleCtrl, translation=[0, 0, 0], worldSpace=False)
+        if cmds.objExists(ctrl+".followAttrName"): #stored attribute name to avoid run procedure without dpAR language dictionary
+            followAttr = cmds.getAttr(ctrl+".followAttrName")
+            if cmds.getAttr(ctrl+"."+followAttr):
+                ctrlOffset = self.getOffsetXform(ctrl, cmds.listRelatives(ctrl, parent=True, type="transform")[0])
+                cmds.xform(ctrl, matrix=list(ctrlOffset), worldSpace=False)
+                cmds.xform(ctrl, translation=[0, 0, 0], worldSpace=False)
+                # disable autoClavicle and keyframe it
+                cmds.setAttr(ctrl+"."+followAttr, 0)
+                cmds.setKeyframe(ctrl, attribute=("rotateX", "rotateY", "rotateZ", followAttr))
 
 
     def dpIkFkSnapUI(self, *args):
@@ -107,61 +113,50 @@ class IkFkSnap(object):
 
 
     def snapIkToFk(self, *args):
+        """ Switch from ik to fk keeping the same position.
         """
-        """
-        # bake autoClavicle to controller
-        if cmds.getAttr(self.clavicleCtrl+".follow"):
-            self.bakeAutoClavicle()
-
-        cmds.setAttr(self.clavicleCtrl+".follow", 0)
-
-        if not cmds.getAttr(self.fkCtrlList[0]+".follow") == 1:
-            cmds.setAttr(self.fkCtrlList[0]+".follow", 1)
-
+        self.bakeFollowRotation(self.clavicleCtrl)
+        self.bakeFollowRotation(self.fkCtrlList[0])
+        # snap fk ctrl to ik jnt
         for ctrl, jnt in zip(self.fkCtrlList, self.ikJntList):
             cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
-
+        # change to fk
         cmds.setAttr(self.optCtrl+"."+self.attr, 1) #fk
 
-    
+
     def snapFkToIk(self, *args):
+        """ Switch from fk to ik keeping the same position.
         """
-        """
-        if cmds.getAttr(self.clavicleCtrl+".follow"):
-            self.bakeAutoClavicle()
-
-        cmds.setAttr(self.clavicleCtrl+".follow", 0)
-
+        self.bakeFollowRotation(self.clavicleCtrl)
         # extrem ctrl
         fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
         toIkM = self.extremOffsetMatrix * fkM
         cmds.xform(self.ikCtrl, matrix=list(toIkM), worldSpace=True)
-
         # poleVector ctrl
         posRef = cmds.xform(self.fkCtrlList[1], translation=True, query=True, worldSpace=True)
         posS = cmds.xform(self.fkCtrlList[0], translation=True, query=True, worldSpace=True)
         posM = posRef
         posE = cmds.xform(self.fkCtrlList[-1], translation=True, query=True, worldSpace=True)
-        posRefPos = self._get_swivel_middle(posS, posM, posE)
+        posRefPos = self.getSwivelMiddle(posS, posM, posE)
         posDir = dpUtils.subVectors(posM, posRefPos)
         dpUtils.normalizeVector(posDir)
         fSwivelDistance = dpUtils.distanceVectors(posS, posE)
         posSwivel = dpUtils.addVectors(dpUtils.multiScalarVector(posDir, fSwivelDistance), posRef)
         #posSwivel = [posDir[0]*fSwivelDistance+posRef[0], posDir[1]*fSwivelDistance+posRef[1], posDir[2]*fSwivelDistance+posRef[2]]
-
         cmds.xform(self.poleVector, translation=posSwivel, worldSpace=True)
-        
-        cmds.setAttr(self.optCtrl+"."+self.attr, 0) #ik
-
-        # Reset footroll attributes
+        # reset footRoll attributes
         userDefAttrList = cmds.listAttr(self.ikCtrl, userDefined=True, keyable=True)
         if userDefAttrList:
             for attr in userDefAttrList:
                 if self.dpUIinst.lang['c018_revFoot_roll'] in attr or self.dpUIinst.lang['c019_revFoot_spin'] in attr or self.dpUIinst.lang['c020_revFoot_turn'] in attr:
                     cmds.setAttr(self.ikCtrl+"."+attr, 0)
+        # change to ik
+        cmds.setAttr(self.optCtrl+"."+self.attr, 0) #ik
     
 
-    def _get_swivel_middle(self, posS, posM, posE):
+    def getSwivelMiddle(self, posS, posM, posE):
+        """ Return the middle position from given start, middle and end vectors to find poleVector placement.
+        """
         fLengthS = dpUtils.distanceVectors(posM, posS)
         fLengthE = dpUtils.distanceVectors(posM, posE)
         fLengthRatio = fLengthS / (fLengthS+fLengthE)

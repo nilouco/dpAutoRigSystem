@@ -26,7 +26,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.1
+DP_CONTROLS_VERSION = 2.2
 
 
 class ControlClass(object):
@@ -83,10 +83,8 @@ class ControlClass(object):
             cmds.setAttr(item+".outlinerColor.outlinerColorR", color[0])
             cmds.setAttr(item+".outlinerColor.outlinerColorG", color[1])
             cmds.setAttr(item+".outlinerColor.outlinerColorB", color[2])
-            try:
-                mel.eval("AEdagNodeCommonRefreshOutliners;")
-            except:
-                pass
+            mel.eval('source AEdagNodeCommon;')
+            mel.eval("AEdagNodeCommonRefreshOutliners();")
         else:
             # set override as enable:
             cmds.setAttr(item+".overrideEnabled", 1)
