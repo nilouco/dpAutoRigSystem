@@ -378,10 +378,9 @@ class ControlClass(object):
         # create Option_Ctrl Text:
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-            try:
-                cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Source Sans Pro", text="Option Ctrl", constructionHistory=False)[0]
-            except:
-                cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Arial", text="Option Ctrl", constructionHistory=False)[0]
+            cmds.scriptEditorInfo(suppressWarnings=True)
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="Option Ctrl", constructionHistory=False)[0]
+            cmds.scriptEditorInfo(suppressWarnings=False)
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
             if txtShapeList:
                 for s, shape in enumerate(txtShapeList):

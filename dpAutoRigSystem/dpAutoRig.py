@@ -2532,7 +2532,6 @@ class DP_AutoRig_UI(object):
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
-                                    ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     addArticJoint         = self.integratedTaskDic[fatherGuide]['addArticJoint']
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
@@ -2606,9 +2605,6 @@ class DP_AutoRig_UI(object):
                                             if not keyableStatus:
                                                 cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
                                             cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
-                                    if ikFkNetworkList:
-                                        lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
-                                        cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
                                     revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
                                     self.customAttr.removeAttr("dpControl", [revFootCtrlOld])
                         
@@ -2617,7 +2613,6 @@ class DP_AutoRig_UI(object):
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
-                            ikFkNetworkList   = self.integratedTaskDic[moduleDic]['ikFkNetworkList']
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
@@ -2649,19 +2644,6 @@ class DP_AutoRig_UI(object):
                                 if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
                                     cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
                                 
-                                # update ikFkNetwork:
-                                if ikFkNetworkList:
-                                    netIndex = 1
-                                    optionCtrlAttrList = cmds.listAttr(self.optionCtrl, visible=True, scalar=True, keyable=True)
-                                    for optAttr in optionCtrlAttrList:
-                                        if "_IkFkBlend" in optAttr:
-                                            cmds.connectAttr(self.optionCtrl+'.'+optAttr, ikFkNetworkList[w]+'.attState', force=True)
-                                    limbAttrList = cmds.listAttr(ikCtrlList[w], visible=True, scalar=True, keyable=True, userDefined=True)
-                                    for limbAttr in limbAttrList:
-                                        if "_" in limbAttr:
-                                            cmds.connectAttr(ikCtrlList[w]+'.'+limbAttr, ikFkNetworkList[w]+'.footRollAtts['+str(netIndex)+']', force=True)
-                                            netIndex = netIndex + 1
-
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
@@ -3070,11 +3052,14 @@ class DP_AutoRig_UI(object):
                         cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
                         cmds.setAttr(self.optionCtrl+"."+vvAttr, lock=True)
                 
-                # Only create if a IkFk attribute is found
+                # Only create if an IkFk attribute is found
                 if not cmds.objExists(self.optionCtrl+".ikFkBlend"):
                     if cmds.listAttr(self.optionCtrl, string="*ikFk*"):
                         cmds.addAttr(self.optionCtrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
                         cmds.setAttr(self.optionCtrl+".ikFkBlend", lock=True)
+                
+                if cmds.objExists(self.optionCtrl+".ikFkSnap"):
+                    cmds.setAttr(self.optionCtrl+".ikFkSnap", keyable=False, channelBox=True)
                 
                 if not cmds.objExists(self.optionCtrl+".display"):
                     cmds.addAttr(self.optionCtrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
@@ -3112,7 +3097,7 @@ class DP_AutoRig_UI(object):
                 # list desirable Option_Ctrl attributes order:
                 desiredAttrList = [generalAttr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', vvAttr,
                 spineAttr+'Active', spineAttr, spineAttr+'1Active', spineAttr+'1', spineAttr+'2Active', spineAttr+'2',
-                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'1Fk', spineAttr+'2Fk', 
+                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', 'ikFkSnap', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'1Fk', spineAttr+'2Fk', 
                 leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
                 armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk", armAttr.lower()+"Fk", legAttr.lower()+"Fk", leftAttr+armAttr.lower()+"Fk", rightAttr+armAttr.lower()+"Fk",
                 leftAttr+legAttr+"Fk", rightAttr+legAttr+"Fk", leftAttr+legAttr+frontAttr+"Fk", rightAttr+legAttr+frontAttr+"Fk", leftAttr+legAttr+backAttr+"Fk", rightAttr+legAttr+backAttr+"Fk",

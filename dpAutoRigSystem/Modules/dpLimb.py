@@ -49,7 +49,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
         self.ikStretchExtremLocList = []
-        self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
         self.origRotList = []
@@ -687,6 +686,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                cmds.addAttr(self.worldRef, longName="ikFkSnap", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.dpUIinst.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
@@ -1766,7 +1766,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "quadFrontLegList": self.quadFrontLegList,
                 "integrateOrigFromList": self.integrateOrigFromList,
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
-                "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
