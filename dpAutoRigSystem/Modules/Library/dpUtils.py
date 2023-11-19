@@ -1074,6 +1074,8 @@ def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName
             revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
             cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
             cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
+            cmds.addAttr(worldRef, longName="ikFkBlendAttrName", dataType="string")
+            cmds.setAttr(worldRef+".ikFkBlendAttrName", attrCompName, type="string")
             cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
             cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
         # connecting ikFkBlend using the reverse node:

@@ -4,6 +4,7 @@ from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
 from .Library import dpSoftIk
+from .Library import dpIkFkSnap
 from ..Extras import dpCorrectionManager
 from functools import partial
 from importlib import reload
@@ -1694,6 +1695,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.ikExtremCtrl+".stretchable", rfStretchableCnd+".firstTerm", force=True)
                     cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
                     cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
+                
+                # ikFkSnap
+                dpIkFkSnap.IkFkSnapClass(self.dpUIinst, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl], self.ikJointList)
                 
                 # calibration attribute:
                 if self.limbTypeName == ARM:
