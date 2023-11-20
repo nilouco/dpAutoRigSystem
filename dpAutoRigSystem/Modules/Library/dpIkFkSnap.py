@@ -19,9 +19,8 @@ DP_IKFKSNAP_VERSION = 2.0
 
 
 class IkFkSnapClass(object):
-    def __init__(self, dpUIinst, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, ui=True, *args):
+    def __init__(self, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, ui=True, *args):
         # defining variables:
-        self.dpUIinst = dpUIinst
         self.worldRef = worldRef
         self.ikFkBlendAttr = cmds.getAttr(self.worldRef+".ikFkBlendAttrName")
         self.ikBeforeCtrl = fkCtrlList[0]
@@ -29,6 +28,7 @@ class IkFkSnapClass(object):
         self.ikExtremCtrl = ikCtrlList[1]
         self.fkCtrlList = fkCtrlList[1:]
         self.ikJointList = ikJointList[1:-1]
+        self.revFootAttrList = revFootAttrList
         # calculate the initial ikFk extrem offset
         self.extremOffsetMatrix = self.getOffsetMatrix(self.ikExtremCtrl, self.fkCtrlList[-1])
         # store data
@@ -37,14 +37,6 @@ class IkFkSnapClass(object):
         
         # TODO build scriptNode
         
-
-        ## to del
-        self.ikFkBlendAttr = self.ikFkBlendAttr[:self.ikFkBlendAttr.rfind("Fk_")+2]
-        print("ikFkBlendAttr = ", self.ikFkBlendAttr)
-        ##
-        self.optCtrl = "Option_Ctrl"
-        ###
-
 
         # call main function
         if ui:
@@ -158,24 +150,37 @@ class IkFkSnapClass(object):
 ####
 
 
+    def changeIkFkAttr(self, ikFkValue, *args):
+        """ 0 = ik
+            1 = fk
+        """
+        plugged = cmds.listConnections(self.worldRef+"."+self.ikFkBlendAttr, source=True, destination=False, plugs=True)
+        if plugged:
+            cmds.setAttr(plugged[0], ikFkValue)
+        else:
+            cmds.setAttr(self.worldRef+"."+self.ikFkBlendAttr, ikFkValue)
+
 
     def snapIkToFk(self, *args):
         """ Switch from ik to fk keeping the same position.
         """
-        if cmds.getAttr(cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]+".ikFkSnap"):
+        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
             self.bakeFollowRotation(self.fkCtrlList[0])
             # snap fk ctrl to ik jnt
             for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
                 cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
             # change to fk
-            cmds.setAttr(self.optCtrl+"."+self.ikFkBlendAttr, 1) #fk
+            self.changeIkFkAttr(1)
+            
 
 
     def snapFkToIk(self, *args):
         """ Switch from fk to ik keeping the same position.
         """
-        if cmds.getAttr(cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]+".ikFkSnap"):
+        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
             # extrem ctrl
             fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
@@ -197,10 +202,11 @@ class IkFkSnapClass(object):
             userDefAttrList = cmds.listAttr(self.ikExtremCtrl, userDefined=True, keyable=True)
             if userDefAttrList:
                 for attr in userDefAttrList:
-                    if self.dpUIinst.lang['c018_revFoot_roll'] in attr or self.dpUIinst.lang['c019_revFoot_spin'] in attr or self.dpUIinst.lang['c020_revFoot_turn'] in attr:
-                        cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
+                    for revFootAttr in self.revFootAttrList:
+                        if revFootAttr in attr:
+                            cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
             # change to ik
-            cmds.setAttr(self.optCtrl+"."+self.ikFkBlendAttr, 0) #ik
+            self.changeIkFkAttr(0)
     
 
     def getSwivelMiddle(self, posS, posM, posE):
