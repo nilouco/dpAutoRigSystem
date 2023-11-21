@@ -141,14 +141,14 @@ class IkFkSnapClass(object):
             toIkM = self.extremOffsetMatrix * fkM
             cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
             # poleVector ctrl
-            posRef = cmds.xform(self.fkCtrlList[1], translation=True, query=True, worldSpace=True)
-            posS = cmds.xform(self.fkCtrlList[0], translation=True, query=True, worldSpace=True)
+            posRef = cmds.xform(self.fkCtrlList[1], rotatePivot=True, query=True, worldSpace=True)
+            posS = cmds.xform(self.fkCtrlList[0], rotatePivot=True, query=True, worldSpace=True)
             posM = posRef
-            posE = cmds.xform(self.fkCtrlList[-1], translation=True, query=True, worldSpace=True)
+            posE = cmds.xform(self.fkCtrlList[-1], rotatePivot=True, query=True, worldSpace=True)
             posRefPos = self.getSwivelMiddle(posS, posM, posE)
             posDir = self.utilsSubVectors(posM, posRefPos)
             self.utilsNormalizeVector(posDir)
-            fSwivelDistance = self.utilsDistanceVectors(posS, posE)
+            fSwivelDistance = self.utilsDistanceVectors(posS, posE) / cmds.getAttr(self.worldRef+".scaleX")
             posSwivel = self.utilsAddVectors(self.utilsMultiScalarVector(posDir, fSwivelDistance), posRef)
             cmds.xform(self.ikPoleVectorCtrl, translation=posSwivel, worldSpace=True)
             # reset footRoll attributes
