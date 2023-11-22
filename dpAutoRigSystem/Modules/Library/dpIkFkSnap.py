@@ -202,12 +202,22 @@ class IkFkSnapClass(object):
         if cmds.objExists(ctrl+".followAttrName"): #stored attribute name to avoid run procedure without dpAR language dictionary
             followAttr = cmds.getAttr(ctrl+".followAttrName")
             if cmds.getAttr(ctrl+"."+followAttr):
-                ctrlOffset = self.getOffsetXform(ctrl, cmds.listRelatives(ctrl, parent=True, type="transform")[0])
+                father = cmds.listRelatives(ctrl, parent=True, type="transform")[0]
+                negativeScale = cmds.getAttr(father+".scaleX")
+                if negativeScale == -1:
+                    cmds.setAttr(father+".scaleX", 1)
+                    cmds.setAttr(father+".scaleY", 1)
+                    cmds.setAttr(father+".scaleZ", 1)
+                ctrlOffset = self.getOffsetXform(ctrl, father)
                 cmds.xform(ctrl, matrix=list(ctrlOffset), worldSpace=False)
                 cmds.xform(ctrl, translation=[0, 0, 0], worldSpace=False)
                 # disable autoClavicle and keyframe it
                 cmds.setAttr(ctrl+"."+followAttr, 0)
                 cmds.setKeyframe(ctrl, attribute=("rotateX", "rotateY", "rotateZ", followAttr))
+                if negativeScale == -1:
+                    cmds.setAttr(father+".scaleX", -1)
+                    cmds.setAttr(father+".scaleY", -1)
+                    cmds.setAttr(father+".scaleZ", -1)
 
 
     ###
