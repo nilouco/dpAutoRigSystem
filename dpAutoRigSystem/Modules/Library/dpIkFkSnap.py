@@ -19,16 +19,18 @@ DP_IKFKSNAP_VERSION = 2.0
 
 
 class IkFkSnapClass(object):
-    def __init__(self, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, *args):
+    def __init__(self, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, *args):
         # defining variables:
         self.worldRef = worldRef
         self.ikFkBlendAttr = cmds.getAttr(self.worldRef+".ikFkBlendAttrName")
         self.ikBeforeCtrl = fkCtrlList[0]
         self.ikPoleVectorCtrl = ikCtrlList[0]
         self.ikExtremCtrl = ikCtrlList[1]
+        self.ikExtremSubCtrl = ikCtrlList[2]
         self.fkCtrlList = fkCtrlList[1:]
         self.ikJointList = ikJointList[1:-1]
         self.revFootAttrList = revFootAttrList
+        self.uniformScaleAttr = uniformScaleAttr
         # calculate the initial ikFk extrem offset
         self.extremOffsetMatrix = self.getOffsetMatrix(self.ikExtremCtrl, self.fkCtrlList[-1])
         # store data
@@ -119,6 +121,7 @@ class IkFkSnapClass(object):
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
             self.bakeFollowRotation(self.fkCtrlList[0])
+            self.transferAttrFromTo(self.ikExtremCtrl, self.fkCtrlList[2], [self.uniformScaleAttr])
             # snap fk ctrl to ik jnt
             for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
                 cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
@@ -133,8 +136,9 @@ class IkFkSnapClass(object):
 #        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
-            if cmds.objExists(self.ikExtremCtrl+".twist"):
-                cmds.setAttr(self.ikExtremCtrl+".twist", 0)
+            self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
+            self.zeroKeyAttrValue(self.ikExtremSubCtrl, ["tx", "ty", "tz", "rx", "ry", "rz"])
+            self.transferAttrFromTo(self.fkCtrlList[2], self.ikExtremCtrl, [self.uniformScaleAttr])
             # extrem ctrl
             fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
             toIkM = self.extremOffsetMatrix * fkM
@@ -220,6 +224,28 @@ class IkFkSnapClass(object):
                     cmds.setAttr(father+".scaleX", -1)
                     cmds.setAttr(father+".scaleY", -1)
                     cmds.setAttr(father+".scaleZ", -1)
+
+
+    def zeroKeyAttrValue(self, ctrl, attrList, *args):
+        """
+        """
+        for attr in attrList:
+            if cmds.objExists(ctrl+"."+attr):
+                if cmds.getAttr(ctrl+"."+attr):
+                    cmds.setAttr(ctrl+"."+attr, 0)
+                    cmds.setKeyframe(ctrl, attribute=attr)
+
+
+    def transferAttrFromTo(self, fromCtrl, toCtrl, attrList):
+        """
+        """
+        for attr in attrList:
+            if cmds.objExists(fromCtrl+"."+attr) and cmds.objExists(toCtrl+"."+attr):
+                fromValue = cmds.getAttr(fromCtrl+"."+attr)
+                toValue = cmds.getAttr(toCtrl+"."+attr)
+                if not fromValue == toValue:
+                    cmds.setAttr(toCtrl+"."+attr, fromValue)
+                    cmds.setKeyframe(toCtrl, attribute=attr)
 
 
     ###
