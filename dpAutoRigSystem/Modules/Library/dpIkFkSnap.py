@@ -84,11 +84,8 @@ class IkFkSnapClass(object):
         """
         """
         self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
-        print("YESSSSS, changed ikFk attr here", self.ikFkSnapNet)
         self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
-        print("self.ikFkState =", self.ikFkState)
         currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
-        
         if self.ikFkState == 0: #ik
             if currentValue >= 0.001:
                 self.changeIkFkAttr(0, False)
@@ -140,17 +137,43 @@ class IkFkSnapClass(object):
             fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
             toIkM = self.extremOffsetMatrix * fkM
             cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
+            
             # poleVector ctrl
-            posRef = cmds.xform(self.fkCtrlList[1], rotatePivot=True, query=True, worldSpace=True)
-            posS = cmds.xform(self.fkCtrlList[0], rotatePivot=True, query=True, worldSpace=True)
-            posM = posRef
-            posE = cmds.xform(self.fkCtrlList[-1], rotatePivot=True, query=True, worldSpace=True)
-            posRefPos = self.getSwivelMiddle(posS, posM, posE)
-            posDir = self.utilsSubVectors(posM, posRefPos)
-            self.utilsNormalizeVector(posDir)
-            fSwivelDistance = self.utilsDistanceVectors(posS, posE) / cmds.getAttr(self.worldRef+".scaleX")
-            posSwivel = self.utilsAddVectors(self.utilsMultiScalarVector(posDir, fSwivelDistance), posRef)
-            cmds.xform(self.ikPoleVectorCtrl, translation=posSwivel, worldSpace=True)
+            # get joint chain positions
+            startPos  = cmds.xform(self.fkCtrlList[0], query=True, worldSpace=True, rotatePivot=True) #shoulder, leg
+            cornerPos = cmds.xform(self.fkCtrlList[1], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
+            endPos    = cmds.xform(self.fkCtrlList[2], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
+            # calculate distances (joint lenghts)
+            upperLimbLen = self.utilsDistanceVectors(startPos, cornerPos)
+            lowerLimbLen = self.utilsDistanceVectors(cornerPos, endPos)
+            chainLen = upperLimbLen+lowerLimbLen
+            # ratio of placement of the middle joint
+            pvRatio = upperLimbLen / chainLen
+            # calculate the position of the base middle locator
+            pvBasePosX = (endPos[0] - startPos[0]) * pvRatio+startPos[0]
+            pvBasePosY = (endPos[1] - startPos[1]) * pvRatio+startPos[1]
+            pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio+startPos[2]
+            # working with vectors
+            cornerBasePosX = cornerPos[0] - pvBasePosX
+            cornerBasePosY = cornerPos[1] - pvBasePosY
+            cornerBasePosZ = cornerPos[2] - pvBasePosZ
+            # magnitude of the vector
+            magDir = math.sqrt(cornerBasePosX**2+cornerBasePosY**2+cornerBasePosZ**2)
+            # normalize the vector
+            normalDirX = cornerBasePosX / magDir
+            normalDirY = cornerBasePosY / magDir
+            normalDirZ = cornerBasePosZ / magDir
+            # calculate the poleVector position by multiplying the unitary vector by the chain length
+            pvDistX = normalDirX * chainLen
+            pvDistY = normalDirY * chainLen
+            pvDistZ = normalDirZ * chainLen
+            # get the poleVector position
+            pvPosX = pvBasePosX+pvDistX
+            pvPosY = pvBasePosY+pvDistY
+            pvPosZ = pvBasePosZ+pvDistZ
+            # place poleVector controller in the correct position
+            cmds.move(pvPosX, pvPosY, pvPosZ, self.ikPoleVectorCtrl, objectSpace=False, worldSpaceDistance=True)
+            
             # reset footRoll attributes
             userDefAttrList = cmds.listAttr(self.ikExtremCtrl, userDefined=True, keyable=True)
             if userDefAttrList:
@@ -161,15 +184,7 @@ class IkFkSnapClass(object):
             # change to fk
 #            self.changeIkFkAttr(0)
 #            cmds.setAttr(self.ikFkSnapNet+".ikFkState", 0)
-    
 
-    def getSwivelMiddle(self, posS, posM, posE):
-        """ Return the middle position from given start, middle and end vectors to find poleVector placement.
-        """
-        fLengthS = self.utilsDistanceVectors(posM, posS)
-        fLengthE = self.utilsDistanceVectors(posM, posE)
-        fLengthRatio = fLengthS / (fLengthS+fLengthE)
-        return self.utilsAddVectors(self.utilsMultiScalarVector(self.utilsSubVectors(posE, posS), fLengthRatio), posS)
 
 
     def getOffsetXform(self, wm, wim, *args):
@@ -199,38 +214,7 @@ class IkFkSnapClass(object):
     # Code from dpUtils
     ###
 
-    def utilsMagnitude(self, v, *args):
-        """ Returns the square root of the sum of power 2 from a given vector.
-        """
-        return math.sqrt(pow(v[0], 2)+pow(v[1], 2)+pow(v[2], 2))
-    
-    
-    def utilsNormalizeVector(self, v, *args):
-        """ Returns the normalized given vector.
-        """
-        vMag = self.utilsMagnitude(v)
-        return [v[i]/vMag for i in range(len(v))]
-    
-
     def utilsDistanceVectors(serlf, u, v, *args):
         """ Returns the distance between 2 given points.
         """
         return math.sqrt((v[0]-u[0])**2+(v[1]-u[1])**2+(v[2]-u[2])**2)
-
-
-    def utilsAddVectors(self, u, v, *args):
-        """ Returns the addition of 2 given vectors.
-        """
-        return [u[i]+v[i] for i in range(len(u))]
-        
-        
-    def utilsSubVectors(self, u, v, *args):
-        """ Returns the substration of 2 given vectors.
-        """
-        return [u[i]-v[i] for i in range(len(u))]
-        
-
-    def utilsMultiScalarVector(self, u, scalar, *args):
-        """ Returns the vector scaled by a scalar number.
-        """
-        return [u[i]*scalar for i in range(len(u))]
