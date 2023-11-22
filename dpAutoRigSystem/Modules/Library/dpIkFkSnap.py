@@ -133,6 +133,8 @@ class IkFkSnapClass(object):
 #        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
+            if cmds.objExists(self.ikExtremCtrl+".twist"):
+                cmds.setAttr(self.ikExtremCtrl+".twist", 0)
             # extrem ctrl
             fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
             toIkM = self.extremOffsetMatrix * fkM
