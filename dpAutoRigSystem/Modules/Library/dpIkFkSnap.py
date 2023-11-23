@@ -118,7 +118,6 @@ class IkFkSnapClass(object):
     def snapIkToFk(self, *args):
         """ Switch from ik to fk keeping the same position.
         """
-#        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
             self.bakeFollowRotation(self.fkCtrlList[0])
@@ -126,15 +125,11 @@ class IkFkSnapClass(object):
             # snap fk ctrl to ik jnt
             for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
                 cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
-            # change to ik
-#            self.changeIkFkAttr(1)
-#            cmds.setAttr(self.ikFkSnapNet+".ikFkState", 1)
             
 
     def snapFkToIk(self, *args):
         """ Switch from fk to ik keeping the same position.
         """
-#        self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.bakeFollowRotation(self.ikBeforeCtrl)
             self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
@@ -146,16 +141,7 @@ class IkFkSnapClass(object):
             cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
             
             # poleVector ctrl
-            # get joint chain positions
-            startPos  = cmds.xform(self.fkCtrlList[0], query=True, worldSpace=True, rotatePivot=True) #shoulder, leg
-            cornerPos = cmds.xform(self.fkCtrlList[1], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
-            endPos    = cmds.xform(self.fkCtrlList[2], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
-            # calculate distances (joint lenghts)
-            upperLimbLen = self.utilsDistanceVectors(startPos, cornerPos)
-            lowerLimbLen = self.utilsDistanceVectors(cornerPos, endPos)
-            chainLen = upperLimbLen+lowerLimbLen
-            # ratio of placement of the middle joint
-            pvRatio = upperLimbLen / chainLen
+            startPos, cornerPos, endPos, chainLen, pvRatio = self.getChainPosition()
             # calculate the position of the base middle locator
             pvBasePosX = (endPos[0] - startPos[0]) * pvRatio+startPos[0]
             pvBasePosY = (endPos[1] - startPos[1]) * pvRatio+startPos[1]
@@ -188,10 +174,6 @@ class IkFkSnapClass(object):
                     for revFootAttr in self.revFootAttrList:
                         if revFootAttr in attr:
                             cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
-            # change to fk
-#            self.changeIkFkAttr(0)
-#            cmds.setAttr(self.ikFkSnapNet+".ikFkState", 0)
-
 
 
     def getOffsetXform(self, wm, wim, *args):
@@ -252,11 +234,30 @@ class IkFkSnapClass(object):
     def resetShear(self, ctrlList, *args):
         """ Set zero to all shear attributes in main controllers affected by possible stretch.
         """
-        for ctrl in ctrlList:
-            cmds.setAttr(ctrl+".shearXY", 0)
-            cmds.setAttr(ctrl+".shearXZ", 0)
-            cmds.setAttr(ctrl+".shearYZ", 0)
-        
+        startLength = cmds.getAttr(self.ikExtremCtrl+".startChainLength")
+        currentLength = self.getChainPosition()[3] #chainLen
+        if currentLength == startLength:
+            for ctrl in ctrlList:
+                cmds.setAttr(ctrl+".shearXY", 0)
+                cmds.setAttr(ctrl+".shearXZ", 0)
+                cmds.setAttr(ctrl+".shearYZ", 0)
+    
+
+    def getChainPosition(self, *args):
+        """ Return the start, coner and end position, the chain lenght and poleVector Ratio values as a list,
+            based on the fkCtrlList.
+        """
+        # get joint chain positions
+        startPos  = cmds.xform(self.fkCtrlList[0], query=True, worldSpace=True, rotatePivot=True) #shoulder, leg
+        cornerPos = cmds.xform(self.fkCtrlList[1], query=True, worldSpace=True, rotatePivot=True) #elbow, knee
+        endPos    = cmds.xform(self.fkCtrlList[2], query=True, worldSpace=True, rotatePivot=True) #wrist, ankle
+        # calculate distances (joint lenghts)
+        upperLimbLen = self.utilsDistanceVectors(startPos, cornerPos)
+        lowerLimbLen = self.utilsDistanceVectors(cornerPos, endPos)
+        chainLen = upperLimbLen+lowerLimbLen
+        # ratio of placement of the middle joint
+        pvRatio = upperLimbLen / chainLen
+        return [startPos, cornerPos, endPos, chainLen, pvRatio]
 
 
     ###
