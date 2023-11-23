@@ -83,7 +83,7 @@ class IkFkSnapClass(object):
 
 
     def jobChangedIkFk(self, *args):
-        """
+        """ Just call snap function to set as well.
         """
         self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
         self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
@@ -98,7 +98,8 @@ class IkFkSnapClass(object):
                 self.changeIkFkAttr(1, False)
                 self.snapFkToIk()
                 self.changeIkFkAttr(0, True)
-        
+        self.resetShear(list(set([self.ikExtremCtrl] + self.fkCtrlList)))
+
 
     def changeIkFkAttr(self, ikFkValue, setState, *args):
         """ 0 = ik
@@ -227,7 +228,7 @@ class IkFkSnapClass(object):
 
 
     def zeroKeyAttrValue(self, ctrl, attrList, *args):
-        """
+        """ Set zero value and keyframe the given attributes in the controller.
         """
         for attr in attrList:
             if cmds.objExists(ctrl+"."+attr):
@@ -237,7 +238,7 @@ class IkFkSnapClass(object):
 
 
     def transferAttrFromTo(self, fromCtrl, toCtrl, attrList):
-        """
+        """ It compares the attributes to transfer values from/to given controllers and keyframe them.
         """
         for attr in attrList:
             if cmds.objExists(fromCtrl+"."+attr) and cmds.objExists(toCtrl+"."+attr):
@@ -246,6 +247,16 @@ class IkFkSnapClass(object):
                 if not fromValue == toValue:
                     cmds.setAttr(toCtrl+"."+attr, fromValue)
                     cmds.setKeyframe(toCtrl, attribute=attr)
+
+
+    def resetShear(self, ctrlList, *args):
+        """ Set zero to all shear attributes in main controllers affected by possible stretch.
+        """
+        for ctrl in ctrlList:
+            cmds.setAttr(ctrl+".shearXY", 0)
+            cmds.setAttr(ctrl+".shearXZ", 0)
+            cmds.setAttr(ctrl+".shearYZ", 0)
+        
 
 
     ###
