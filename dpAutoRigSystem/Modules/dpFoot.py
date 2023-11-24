@@ -10,7 +10,7 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
-DP_FOOT_VERSION = 2.0
+DP_FOOT_VERSION = 2.1
 
 
 class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -414,6 +414,16 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(footPlantCnd+".outColorR", footPlantInvMD+".input1X", force=True)
                     cmds.connectAttr(footPlantInvMD+".outputX", self.footCtrlZeroList[1]+".rotateX", force=True)
                 
+                # create follow attribute to footBall control to space switch to middle control space:
+                cmds.addAttr(self.RFECtrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
+                ballGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Follow_Grp")
+                pacBall = cmds.parentConstraint(self.middleFootCtrl, self.RFDCtrl, ballGrp, mo=True, name=ballGrp+"_PaC")[0]
+                cmds.setAttr(pacBall+".interpType", 0)
+                cmds.connectAttr(self.RFECtrl+".follow", pacBall+"."+self.middleFootCtrl+"W0")
+                revNode = cmds.createNode("reverse", name=self.RFECtrl+"_PaC_Rev")
+                cmds.connectAttr(self.RFECtrl+".follow", revNode+".inputX")
+                cmds.connectAttr(revNode+".outputX", pacBall+"."+self.RFDCtrl+"W1")
+
                 # organizing keyable attributes:
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)
                 
