@@ -12,6 +12,7 @@
 # importing libraries:
 from maya import cmds
 from maya.api import OpenMaya
+from ...Extras import dpCustomAttr
 import math
 
 DP_IKFKSNAP_VERSION = 2.0
@@ -19,7 +20,7 @@ DP_IKFKSNAP_VERSION = 2.0
 
 
 class IkFkSnapClass(object):
-    def __init__(self, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, *args):
+    def __init__(self, dpUIinst, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, *args):
         # defining variables:
         self.netName = netName
         self.worldRef = worldRef
@@ -37,6 +38,9 @@ class IkFkSnapClass(object):
         # store data
         self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
         self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
+        self.customAttr = dpCustomAttr.CustomAttr(dpUIinst, ui=False, verbose=False)
+        self.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
+        self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
         self.storeIkFkSnapData()
         if dpDev:
             cmds.scriptJob(attributeChange=(self.worldRef+"."+self.ikFkBlendAttr, self.jobChangedIkFk), killWithScene=True, compressUndo=True)
@@ -63,6 +67,7 @@ class IkFkSnapClass(object):
         # add
         cmds.addAttr(self.ikFkSnapNet, longName="dpNetwork", attributeType="bool")
         cmds.addAttr(self.ikFkSnapNet, longName="dpIkFkSnapNet", attributeType="bool")
+        cmds.addAttr(self.ikFkSnapNet, longName="dpIkFkSnapNetName", dataType="string")
         cmds.addAttr(self.ikFkSnapNet, longName="ikFkState", attributeType="short")
         cmds.addAttr(self.ikFkSnapNet, longName="worldRef", attributeType="message")
         cmds.addAttr(self.ikFkSnapNet, longName="ikBeforeCtrl", attributeType="message")
@@ -79,6 +84,7 @@ class IkFkSnapClass(object):
         # set
         cmds.setAttr(self.ikFkSnapNet+".dpNetwork", 1)
         cmds.setAttr(self.ikFkSnapNet+".dpIkFkSnapNet", 1)
+        cmds.setAttr(self.ikFkSnapNet+".dpIkFkSnapNetName", self.netName, type="string")
         cmds.setAttr(self.ikFkSnapNet+".ikFkState", self.ikFkState)
         cmds.setAttr(self.ikFkSnapNet+".ikFkBlendAttr", self.ikFkBlendAttr, type="string")
         cmds.setAttr(self.ikFkSnapNet+".extremOffset", self.extremOffsetMatrix, type="matrix")
@@ -494,9 +500,16 @@ class IkFkSnap(object):
         """
         return math.sqrt((v[0]-u[0])**2+(v[1]-u[1])**2+(v[2]-u[2])**2)
 
-IkFkSnap("'''+self.ikFkSnapNet+'''")
+# fire scriptNode
+for net in cmds.ls(type="network"):
+    if cmds.objExists(net+".dpNetwork") and cmds.getAttr(net+".dpNetwork") == 1:
+        if cmds.objExists(net+".dpIkFkSnapNet") and cmds.getAttr(net+".dpIkFkSnapNet") == 1:
+            if cmds.objExists(net+".dpID") and cmds.getAttr(net+".dpID") == "'''+self.dpID+'''":
+                IkFkSnap(net)
 '''
         sn = cmds.scriptNode(name=self.netName+'_IkFkSnap_SN', sourceType='python', scriptType=2, beforeScript=ikFkSnapCode)
-        cmds.scriptNode(sn, executeBefore=True)
         cmds.addAttr(self.ikFkSnapNet, longName="ikFkSnapScriptNode", attributeType="message")
+        cmds.addAttr(sn, longName="ikFkSnapNet", attributeType="message")
         cmds.connectAttr(sn+".message", self.ikFkSnapNet+".ikFkSnapScriptNode", force=True)
+        cmds.connectAttr(self.ikFkSnapNet+".message", sn+".ikFkSnapNet", force=True)
+        cmds.scriptNode(sn, executeBefore=True)

@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.39"
-DPAR_UPDATELOG = "N767 - IkFkSnap."
+DPAR_VERSION_PY3 = "4.03.40"
+DPAR_UPDATELOG = "N021 - Auto ikFkSnap\nN059 - AutoClavicle ikFkSnap calculus\nN409 - Detach from PyMEL sqIkFkTools\nN458 - Order adjust not listed ikFkBlend attr\nN484 - Cleanup ikFkNetwork\nN767 - ikFkSnap."
 
 
 
