@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.37"
-DPAR_UPDATELOG = "N730 - Added feature on dpRivet to\nchoose between wrapDeformer or morphDeformer\n when using faceToRivet."
+DPAR_VERSION_PY3 = "4.03.38"
+DPAR_UPDATELOG = "N546 - Added follow attribute to FootBall control\nto space switch to Middle control space."
 
 
 
