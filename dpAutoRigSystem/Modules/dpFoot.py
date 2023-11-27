@@ -10,7 +10,7 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
-DP_FOOT_VERSION = 2.1
+DP_FOOT_VERSION = 2.2
 
 
 class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -244,6 +244,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # reverse foot zero out groups:
                 self.RFEZero = dpUtils.zeroOut([self.RFEGrp])[0]
                 self.RFEZeroExtra = dpUtils.zeroOut([self.RFEZero])[0]
+                self.RFEZeroFollow = dpUtils.zeroOut([self.RFEZero])[0]
                 self.RFDZero = dpUtils.zeroOut([self.RFDGrp])[0]
                 self.RFCZero = dpUtils.zeroOut([self.RFCGrp])[0]
                 self.RFBZero = dpUtils.zeroOut([self.RFBGrp])[0]
@@ -416,8 +417,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # create follow attribute to footBall control to space switch to middle control space:
                 cmds.addAttr(self.RFECtrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
-                footBallGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Follow_Grp")
-                pacFootBall = cmds.parentConstraint(self.middleFootCtrl, self.RFDCtrl, footBallGrp, maintainOffset=True, name=footBallGrp+"_PaC")[0]
+                pacFootBall = cmds.parentConstraint(self.middleFootCtrl, self.RFDCtrl, self.RFEZeroFollow, maintainOffset=True, name=self.RFEZeroFollow+"_PaC")[0]
                 cmds.setAttr(pacFootBall+".interpType", 0)
                 cmds.connectAttr(self.RFECtrl+".follow", pacFootBall+"."+self.middleFootCtrl+"W0")
                 footBallRevNode = cmds.createNode("reverse", name=self.RFECtrl+"_PaC_Rev")

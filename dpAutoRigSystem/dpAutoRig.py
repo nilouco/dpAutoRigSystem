@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.38"
-DPAR_UPDATELOG = "N546 - Added follow attribute to FootBall control\nto space switch to Middle control space."
+DPAR_VERSION_PY3 = "4.03.39"
+DPAR_UPDATELOG = "N775 - Fixed reverseFoot follow issue.\nChanged ball controller shape."
 
 
 
