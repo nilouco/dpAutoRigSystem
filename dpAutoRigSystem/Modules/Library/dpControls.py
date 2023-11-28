@@ -26,7 +26,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.1
+DP_CONTROLS_VERSION = 2.2
 
 
 class ControlClass(object):
@@ -83,10 +83,8 @@ class ControlClass(object):
             cmds.setAttr(item+".outlinerColor.outlinerColorR", color[0])
             cmds.setAttr(item+".outlinerColor.outlinerColorG", color[1])
             cmds.setAttr(item+".outlinerColor.outlinerColorB", color[2])
-            try:
-                mel.eval("AEdagNodeCommonRefreshOutliners;")
-            except:
-                pass
+            mel.eval('source AEdagNodeCommon;')
+            mel.eval("AEdagNodeCommonRefreshOutliners();")
         else:
             # set override as enable:
             cmds.setAttr(item+".overrideEnabled", 1)
@@ -380,10 +378,7 @@ class ControlClass(object):
         # create Option_Ctrl Text:
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-            try:
-                cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Source Sans Pro", text="Option Ctrl", constructionHistory=False)[0]
-            except:
-                cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Arial", text="Option Ctrl", constructionHistory=False)[0]
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="Option Ctrl", constructionHistory=False)[0]
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
             if txtShapeList:
                 for s, shape in enumerate(txtShapeList):

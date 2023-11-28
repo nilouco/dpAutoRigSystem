@@ -7,7 +7,7 @@ TITLE = "m095_isolate"
 DESCRIPTION = "m096_isolateDesc"
 ICON = "/Icons/dp_isolate.png"
 
-DP_ISOLATE_VERSION = 1.2
+DP_ISOLATE_VERSION = 1.3
 
 
 class Isolate(object):
@@ -15,7 +15,7 @@ class Isolate(object):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.rootName = "Root"
-        self.isolateName = self.dpUIinst.lang['m095_isolate']
+        self.isolateName = self.dpUIinst.lang['m095_isolate'].lower()
         
         # base item to isolate
         self.rootCtrl = self.rootName+"_Ctrl"
