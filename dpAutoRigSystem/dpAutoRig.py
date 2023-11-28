@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.37"
-DPAR_UPDATELOG = "N730 - Added feature on dpRivet to\nchoose between wrapDeformer or morphDeformer\n when using faceToRivet."
+DPAR_VERSION_PY3 = "4.03.38"
+DPAR_UPDATELOG = "N067 - Added select all control tab"
 
 
 
@@ -617,6 +617,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.lang['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
+        self.allUIs["selectAllControls"] = cmds.button("selectAllControls", label=self.lang['i291_zeroOut'], backgroundColor=(1.0, 1.0, 1.0), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
         
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
