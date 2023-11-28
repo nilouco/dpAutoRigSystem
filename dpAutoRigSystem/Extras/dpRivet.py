@@ -21,6 +21,7 @@ from maya import cmds
 from maya import mel
 from functools import partial
 from ..Modules.Library import dpUtils
+from ..Modules.Library import dpControls
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -30,18 +31,23 @@ ICON = "/Icons/dp_rivet.png"
 
 MASTER_GRP = "masterGrp"
 RIVET_GRP = "Rivet_Grp"
+MORPH = "Morph"
+WRAP = "Wrap"
 
-DP_RIVET_VERSION = 1.6
+DP_RIVET_VERSION = 1.7
 
 
 class Rivet(object):
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # declaring variables
         self.dpUIinst = dpUIinst
+        self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None
         self.selectedUVSet = None
+        self.morphDeformer = MORPH
+        self.wrapDeformer = WRAP
         # call main function
         if ui:
             self.dpRivetUI()
@@ -95,7 +101,12 @@ class Rivet(object):
         cmds.separator(style='none', parent=rotateLayout)
         self.invertRCB = cmds.checkBox('invertRCB', label=self.dpUIinst.lang["m151_invert"]+" Rotate", value=False, parent=rotateLayout)
         faceToRivetLayout = cmds.columnLayout('faceToRivetLayout', columnOffset=("left", 10), parent=rivetLayout)
-        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, parent=faceToRivetLayout) 
+        self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.dpChangeDeformer, parent=faceToRivetLayout)
+        deformerLayout = cmds.columnLayout('deformerLayout', columnOffset=("left", 20), parent=faceToRivetLayout)
+        self.deformerCollection = cmds.radioCollection('deformerCollection', parent=deformerLayout)
+        self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, collection=self.deformerCollection)
+        self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer, collection=self.deformerCollection)
+        cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
@@ -248,7 +259,12 @@ class Rivet(object):
     def dpChangeInvert(self, value, *args):
         cmds.checkBox(self.invertTCB, edit=True, enable=value)
         cmds.checkBox(self.invertRCB, edit=True, enable=value)
-    
+
+
+    def dpChangeDeformer(self, value, *args):
+        cmds.radioButton(self.morphDeformerRB, edit=True, enable=value)
+        cmds.radioButton(self.wrapDeformerRB, edit=True, enable=value)
+        
     
     def dpInvertAttrTranformation(self, nodeName, invT=True, invR=False, *args):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
@@ -323,7 +339,10 @@ class Rivet(object):
             
         # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
         if faceToRivet:
-            geoToAttach = self.extractFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+            geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+            modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+            if modelGrp:
+                self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
 
         # get shape to attach:
         if cmds.objExists(geoToAttach):
@@ -394,7 +413,7 @@ class Rivet(object):
                     mel.eval("error \"Canceled process: items to be Rivet can't be animated or have locked attributes, sorry.\";")
                     return
             
-            # workarount to avoid closestPoint node ignores transformations.
+            # workaround to avoid closestPoint node ignores transformations.
             # then we need to duplicate, unlock attributes and freezeTransformation:
             dupGeo = cmds.duplicate(geoToAttach, name=geoToAttach+"_dpRivet_TEMP_Geo")[0]
             # unlock attr:
@@ -519,11 +538,10 @@ class Rivet(object):
                 cmds.setAttr(blendShapeNode+".envelope", 0)
             # Duplicate geometry after turn off skinCluster and blendShape. 
             toRivetGeo = cmds.duplicate(geo)[0]
+            dpUtils.removeUserDefinedAttr(toRivetGeo)
             # Unparenting
-            try:
+            if cmds.listRelatives(toRivetGeo, allParents=True):
                 cmds.parent(toRivetGeo, world=True)
-            except Exception as e:
-                print(e)
             # Unlock attributes and apply initialShading
             self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
             cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
@@ -556,11 +574,10 @@ class Rivet(object):
         return toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
 
     
-    def extractFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
-        """ Get the pivot coordinates from each control to get the nearest face from control to the geometry
-            After the initial selection it will grow 4 times by default
-            It uses delta to delete the extra faces, than wrap it to the original model and 
-            move the geometry and wrap Base to Models_Grp
+    def createFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
+        """ Get the pivot coordinates from each control to get the nearest face from control to the geometry.
+            After the initial selection it will grow 4 times by default.
+            It uses delta to delete the extra faces, than glue it to the original model with Morph or Wrap deformer.
         """
         # Get the pivot's coordinates from each control.
         pivotList = {}
@@ -589,6 +606,7 @@ class Rivet(object):
             if nearestFace:
                 cmds.select(nearestFace, add=True)
         # Select the faces and growUp selection.
+        cmds.scriptEditorInfo(edit=True, suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
         cmds.selectMode(component=True)
         cmds.selectType(facet=True)
         growMultiplier = growMultiplier - 1
@@ -599,29 +617,19 @@ class Rivet(object):
         selectedFaceList = cmds.ls(selection=True, flatten=True)
         allFaceList = cmds.ls(geometry+".f[*]", flatten=True)
         nonSelectedFaceList = list(set(allFaceList) - set(selectedFaceList))
-        cmds.delete(nonSelectedFaceList)
+        if nonSelectedFaceList:
+            cmds.delete(nonSelectedFaceList)
         # AutoProjection for new UV and order selection to use dpRivet.
         cmds.polyAutoProjection(geometry, constructionHistory=False)
         cmds.selectMode(object=True)
-        # Create Wrap
-        cmds.select([geometry, origGeo])
-        mel.eval("CreateWrap;")
-        hist = cmds.listHistory(geometry)
-        wrapList = cmds.ls(hist, type="wrap")[0]
-        # Renaming
-        toRivetName = dpUtils.extractSuffix(geometry)
-        if "|" in toRivetName:
-            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
-        wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
-        baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
-        baseShape = cmds.rename(baseShape, toRivetName+"_Base")
-        self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
-        # Remove from displayLayers
-        cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
-        # Parent in modelsGrp
-        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
-        if modelGrp:
-            cmds.parent(geometry, baseShape, modelGrp)
+        cmds.scriptEditorInfo(edit=True, suppressWarnings=False, suppressInfo=True, suppressErrors=False, suppressResults=False)
+        # Create deformer by user selection
+        deformerSelectedRadioButton = cmds.radioCollection(self.deformerCollection, query=True, select=True)
+        deformerSelected = cmds.radioButton(deformerSelectedRadioButton, query=True, annotation=True)
+        if deformerSelected == self.morphDeformer:
+            self.applyMorphDeformer(geometry, origGeo)
+        elif deformerSelected == self.wrapDeformer:
+            self.applyWrapDeformer(geometry, origGeo)
         return geometry
 
 
@@ -646,3 +654,73 @@ class Rivet(object):
                 except:
                     return -1
         return False
+    
+                    
+    def applyMorphDeformer(self, morphGeo, targetGeo, *args):
+        """ Apply morphDeform from morphGeo(FaceToRivet) to targetGeo(Source)
+            Rename and Parent to Models_Grp
+        """
+        targetList = cmds.ls(targetGeo, dag=True, shapes=True)
+        targetShape = targetList[0]
+        targetOrig = self.findOrig(targetList)
+        if not targetOrig:
+            cmds.delete(cmds.cluster(targetGeo, name="ToOrig_ClsTemp"))
+            targetList = cmds.ls(targetGeo, dag=True, shapes=True)
+            targetOrig = self.findOrig(targetList)
+        morphDeformer = cmds.deformer(morphGeo, type="morph")[0]
+        cmds.setAttr(morphDeformer+".morphMode", 1)
+        cmds.setAttr(morphDeformer+".useComponentLookup", 1)
+        cmds.setAttr(morphDeformer+".morphSpace", 0)
+        cmds.connectAttr(targetShape+".worldMesh[0]", morphDeformer+".morphTarget[0]")
+        componentMatchNode = cmds.createNode("componentMatch")
+        cmds.connectAttr(componentMatchNode+".componentLookup", morphDeformer+".componentLookupList[0].componentLookup")
+        morphOrigOutMesh = cmds.listConnections(morphDeformer+".originalGeometry[0]", source=True, destination=False, plugs=True)[0]
+        cmds.connectAttr(morphOrigOutMesh, componentMatchNode+".inputGeometry")
+        cmds.connectAttr(targetOrig+".outMesh", componentMatchNode+".targetGeometry")
+        #Renaming
+        hist = cmds.listHistory(morphGeo)
+        morphList = cmds.ls(hist, type="morph")[0]
+        toRivetName = dpUtils.extractSuffix(morphGeo)
+        if "|" in toRivetName:
+            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
+        componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
+        cmds.rename(componentMatchNode, toRivetName+"_CpM")
+        # Parent in modelsGrp
+        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        if modelGrp:
+            cmds.parent(morphGeo, modelGrp)
+
+
+    def applyWrapDeformer(self, wrapGeo, targetGeo, *args):
+        """ Apply wrapDeformer from wrapGeo(FaceToRivet) to targetGeo(Source)
+            Rename and Parent to Models_Grp
+        """
+        cmds.select([wrapGeo, targetGeo])
+        mel.eval("CreateWrap;")
+        hist = cmds.listHistory(wrapGeo)
+        wrapList = cmds.ls(hist, type="wrap")[0]
+        # Renaming
+        toRivetName = dpUtils.extractSuffix(wrapGeo)
+        if "|" in toRivetName:
+            toRivetName = toRivetName[toRivetName.rfind("|")+1:]
+        wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
+        baseShape = cmds.listConnections(wrapNode+".basePoints")[0]
+        baseShape = cmds.rename(baseShape, toRivetName+"_Base")
+        self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
+        # Remove from displayLayers
+        cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
+        # Parent in modelsGrp
+        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        if modelGrp:
+            cmds.parent(wrapGeo, baseShape, modelGrp)
+        return wrapGeo
+
+
+    def findOrig(self, geoList, *args):
+        """ Return the orig of the shapeList
+        """
+        if geoList:
+            for item in geoList:
+                if item.endswith("Orig"):
+                    return item
