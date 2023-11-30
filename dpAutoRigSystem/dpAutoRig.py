@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.40"
-DPAR_UPDATELOG = "N021 - Auto ikFkSnap\nN059 - AutoClavicle ikFkSnap calculus\nN409 - Detach from PyMEL sqIkFkTools\nN458 - Order adjust not listed ikFkBlend attr\nN484 - Cleanup ikFkNetwork\nN767 - ikFkSnap."
+DPAR_VERSION_PY3 = "4.03.41"
+DPAR_UPDATELOG = "N778 - ProxyCreator fast code."
 
 
 
