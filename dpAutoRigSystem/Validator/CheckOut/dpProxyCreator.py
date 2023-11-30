@@ -2,7 +2,6 @@
 from maya import cmds
 from .. import dpBaseValidatorClass
 from ...Modules.Library import dpUtils
-import time
 
 # global variables to this module:
 CLASS_NAME = "ProxyCreator"
@@ -39,7 +38,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         # starting
         self.verifyMode = verifyMode
         self.cleanUpToStart()
-        t1 = time.time()
+
         # ---
         # --- validator code --- beginning
         self.skinClusterList = []
@@ -107,8 +106,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
             self.notFoundNodes(proxyGrp)
         # --- validator code --- end
         # ---
-        t2 = time.time()
-        print("all time =", t2-t1)
+        
         # finishing
         self.updateButtonColors()
         self.reportLog()
@@ -130,73 +128,40 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                     skinClusterNode = deformerNode
                     break
         if skinClusterNode:
-            
             self.skinClusterList.append(skinClusterNode)
             weightedInfluenceList = cmds.skinCluster(skinClusterNode, query=True, weightedInfluence=True)
             if weightedInfluenceList:
-                
-                a1 = time.time()
-
+                # get data and store it into a dic
                 indexJointDic = {}
-
-#                gotVertexList = []
                 sourceFaceList = cmds.ls(source+".f[*]", flatten=True)
-
-                
                 for i, idx in enumerate(sourceFaceList):
-#                    if not i in gotVertexList:
                     percList = cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
-                    
                     indexJointDic[i] = percList[0]
-                    
                     if not len(percList) == 1:
                         jointValueList = []
                         for item in percList:
                             jointValueList.append(cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=item, query=True))
                         indexJointDic[i] = percList[jointValueList.index(max(jointValueList))]
-                    
-                #print("indexJointDic = ", indexJointDic)
-                
-
-                a2 = time.time()
-                print("got dic =", a2-a1)
-
-                    
-                
-
-                #if jnt in percList:
-                #    skinnedFaceList.append(i)
-                #    gotVertexList.append(i)
-            
                 for jnt in weightedInfluenceList:
-            
                     nodeFaceList = []
                     skinnedFaceList = []
-
+                    # data analisis
                     for j in list(indexJointDic.keys()):
                         if indexJointDic[j] == jnt:
                             skinnedFaceList.append(j)
-                    #print("skinnedFaceList =", skinnedFaceList)
-
-
                     if skinnedFaceList:
+                        # filter lists
                         faceList = [w.replace(source+".f[", "") for w in sourceFaceList]
                         faceList = [int(w.replace("]", "")) for w in faceList]
-
-                        #print("faceList =", faceList)
-
                         if faceList:
                             for v in reversed(skinnedFaceList):
                                 faceList.pop(v)
-                        #print("faceList 2 =", faceList)
                         if faceList:
                             for n in faceList:
                                 nodeFaceList.append(source+".f["+str(n)+"]")
-                        #print("nodeFaceList =", nodeFaceList)
                         if nodeFaceList:
-                            #print("enterede nodeFaceList, source = ", source)
+                            # create proxy geometry
                             dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
-                            #print("enterede nodeFaceList, dup = ", dup)
                             for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
                                 if "Orig" in dupItem:
                                     cmds.delete(dupItem)
