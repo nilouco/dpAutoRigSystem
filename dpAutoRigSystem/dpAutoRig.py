@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.41"
-DPAR_UPDATELOG = "N778 - ProxyCreator fast code."
+DPAR_VERSION_PY3 = "4.03.42"
+DPAR_UPDATELOG = "N502 Disable old dpControl attributes.\nCleaned for Single Holders and Ribbon MidCtrls."
 
 
 
