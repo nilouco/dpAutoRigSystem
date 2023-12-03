@@ -2,8 +2,8 @@
 from maya import cmds
 from maya import mel
 from functools import partial
-from dpAutoRigSystem.Modules.Library import dpControls
-from dpAutoRigSystem.Modules.Library import dpUtils
+from ..Modules.Library import dpControls
+from ..Modules.Library import dpUtils
 
 # global variables to this module:    
 CLASS_NAME = "Zipper"
@@ -14,7 +14,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DP_ZIPPER_VERSION = 2.16
+DP_ZIPPER_VERSION = 2.17
 
 
 class Zipper(object):
@@ -393,6 +393,7 @@ class Zipper(object):
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
             cmds.parent(self.origModel, modelGrp)
+            self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
         renderGrp = dpUtils.getNodeByMessage("renderGrp")
         if renderGrp:
             # avoid reparent deformMesh if already inside RenderGrp:

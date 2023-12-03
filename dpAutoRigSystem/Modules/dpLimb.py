@@ -4,6 +4,7 @@ from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
 from .Library import dpSoftIk
+from .Library import dpIkFkSnap
 from ..Extras import dpCorrectionManager
 from functools import partial
 from importlib import reload
@@ -19,7 +20,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.2
+DP_LIMB_VERSION = 2.7
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -49,7 +50,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
         self.ikStretchExtremLocList = []
-        self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
         self.origRotList = []
@@ -60,26 +60,36 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.correctiveCtrlGrpList = []
         self.ankleArticList = []
         self.ankleCorrectiveList = []
+        self.jaxRotZMDList = []
 
 
     def createModuleLayout(self, *args):
         dpBaseClass.StartClass.createModuleLayout(self)
         dpLayoutClass.LayoutClass.basicModuleLayout(self)
 
+
     def getHasBend(self):
         return cmds.getAttr(self.moduleGrp+".hasBend")
+
 
     def getBendJoints(self):
         return cmds.getAttr(self.moduleGrp+".numBendJoints")
 
+
     def getAlignWorld(self):
         return cmds.getAttr(self.moduleGrp+".alignWorld")
-        
+
+
     def getHasAdditional(self):
         if cmds.objExists(self.moduleGrp+".additional"):
             return cmds.getAttr(self.moduleGrp+".additional")
         else:
             return 0
+
+
+    def addFollowAttrName(self, ctrl, attr, *args):
+        cmds.addAttr(ctrl, longName="followAttrName", dataType="string")
+        cmds.setAttr(ctrl+".followAttrName", attr, type="string")
 
 
     # @dpUtils.profiler
@@ -495,9 +505,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
-                sideLower = side
-                if side:
-                    sideLower = side[0].lower()
+                attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
                 toCornerBendList = []
                 # getting type of limb:
                 enumType = cmds.getAttr(self.moduleGrp+'.type')
@@ -679,7 +687,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'Fk_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.worldRef, longName="ikFkSnap", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.dpUIinst.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
@@ -697,27 +705,17 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.shoulderRefGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderRefGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PoC")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderRefGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PaC")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['m095_isolate'].lower(), attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                self.addFollowAttrName(self.fkCtrlList[1], self.dpUIinst.lang['m095_isolate'].lower())
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], self.fkIsolateRevNode+".inputX", force=True)
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), self.fkIsolateRevNode+".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.masterCtrlRef+"W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
-                self.ikFkRevList = []
-                for n in range(len(self.jNameList)):
-                    if n > 0:
-                        parentConst = cmds.parentConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=side+self.userGuideName+"_"+self.jNameList[n]+"_IkFkBlend_PaC")[0]
-                        if n == 1:
-                            revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev")
-                            cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', revNode+".inputX", force=True)
-                        else:
-                            revNode = side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"
-                        self.ikFkRevList.append(revNode)
-                        # connecting ikFkBlend using the reverse node:
-                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', parentConst+"."+self.fkJointList[n]+"W1", force=True)
-                        cmds.connectAttr(revNode+'.outputX', parentConst+"."+self.ikJointList[n]+"W0", force=True)
+                ikFkRevNode = dpUtils.createJointBlend(self.ikJointList[1:], self.fkJointList[1:], self.skinJointList[1:], "Fk_ikFkBlend", attrNameLower, self.worldRef)
+
                 # organize the ikFkBlend from before to limb:
                 cmds.parentConstraint(self.fkCtrlList[0], self.ikJointList[0], maintainOffset=True, name=self.ikJointList[0]+"_PaC")
                 cmds.parentConstraint(self.fkCtrlList[0], self.ikNSJointList[0], maintainOffset=True, name=self.ikNSJointList[0]+"_PaC")
@@ -727,7 +725,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating ik controls:
                 self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
                 self.ikExtremSubCtrl = self.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                self.ctrls.setLockHide([self.ikExtremSubCtrl], ["tx", "ty", "tz", "sx", "sy", "sz", "v"])
+                self.ctrls.setLockHide([self.ikExtremSubCtrl], ["sx", "sy", "sz", "v"])
                 self.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
                 cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
                 
@@ -789,7 +787,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # to fix quadruped stretch locator after rotated ik extrem controller:
                 ikStretchExtremLocZero = dpUtils.zeroOut([self.ikStretchExtremLoc])[0]
-                cmds.parent(ikStretchExtremLocZero, self.ikExtremCtrl, absolute=True)
+                cmds.parent(ikStretchExtremLocZero, self.ikExtremSubCtrl, absolute=True)
                 exposeCornerName = cornerName+"_Jnt"
                 if self.getHasBend():
                     exposeCornerName = cornerName+"_Jxt"
@@ -800,9 +798,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.ikStretchExtremLocList.append(ikStretchExtremLocZero)
                 
                 # connecting visibilities:
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', self.zeroFkCtrlList[1]+".visibility", force=True)
-                cmds.connectAttr(side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"+".outputX", self.ikCornerCtrlZero+".visibility", force=True)
-                cmds.connectAttr(side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"+".outputX", self.ikExtremCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', self.zeroFkCtrlList[1]+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikCornerCtrlZero+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikExtremCtrlZero+".visibility", force=True)
                 self.ctrls.setLockHide([self.ikCornerCtrl], ['v'], l=False)
                 self.ctrls.setLockHide([self.ikExtremCtrl], ['sx', 'sy', 'sz', 'v'])
 
@@ -870,7 +868,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(ikHandleExtraList[0]+".visibility", 0)
                     cmds.addAttr(self.quadExtraCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.quadExtraCtrl+'.twist', ikHandleExtraList[0]+".twist", force=True)
-                    cmds.connectAttr(side+self.userGuideName+"_"+self.limbType.capitalize()+"_Rev"+".outputX", quadExtraCtrlZero+".visibility", force=True)
+                    cmds.connectAttr(ikFkRevNode+".outputX", quadExtraCtrlZero+".visibility", force=True)
                     self.ctrls.setLockHide([self.quadExtraCtrl], ['sx', 'sy', 'sz', 'v'])
                 
                 # working with world axis orientation for limb extrem ik controls
@@ -1119,7 +1117,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # offset parent constraint
                 parentConstToRFOffset = cmds.parentConstraint(self.ikExtremSubCtrl, self.fkCtrlList[len(self.fkCtrlList) - 1], self.ikNSJointList[-2], self.ikFkBlendGrpToRevFoot, maintainOffset=True, name=self.ikFkBlendGrpToRevFoot+"_PaC")[0]
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
 
                 # work with scalable extrem hand or foot:
                 cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.lang['c040_uniformScale'], at="double", min=0.001, dv=1)
@@ -1146,7 +1144,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", self.ikFkBlendGrpToRevFoot+".scaleZ", force=True)
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'Fk_ikFkBlend', uniBlend+".blender", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', uniBlend+".blender", force=True)
                 cmds.connectAttr(fkScaleMD+'.outputX', uniBlend+'.color1R', force=True)
                 cmds.connectAttr(ikScaleMD+'.outputX', uniBlend+'.color2R', force=True)
                 
@@ -1165,19 +1163,19 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # work with not stretch ik setup:
                 ikStretchableMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side+self.userGuideName+"_IkStretchable_MD")
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchableMD+".input1X", force=True)
-                cmds.connectAttr(revNode+".outputX", ikStretchableMD+".input2X", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchableMD+".input2X", force=True)
 
                 ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side+self.userGuideName+"_IkStretchCtrl_Cnd")
                 cmds.setAttr(ikStretchCtrlCnd+".secondTerm", 1)
                 cmds.setAttr(ikStretchCtrlCnd+".operation", 3)
                 cmds.connectAttr(ikStretchableMD+".outputX", ikStretchCtrlCnd+".colorIfFalseR", force=True)
-                cmds.connectAttr(revNode+".outputX", ikStretchCtrlCnd+".colorIfTrueR", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchCtrlCnd+".colorIfTrueR", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchCtrlCnd+".firstTerm", force=True)
                 cmds.connectAttr(ikStretchCtrlCnd+".outColorR", parentConstToRFOffset+"."+self.ikExtremSubCtrl+"W0", force=True)
 
                 ikStretchDifPMA = cmds.shadingNode('plusMinusAverage', asUtility=True, name=side+self.userGuideName+"_Stretch_Dif_PMA")
                 cmds.setAttr(ikStretchDifPMA+".operation", 2)
-                cmds.connectAttr(revNode+".outputX", ikStretchDifPMA+".input1D[0]", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchDifPMA+".input1D[0]", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchDifPMA+".input1D[1]", force=True)
 
                 ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side+self.userGuideName+"_IkStretch_Cnd")
@@ -1216,7 +1214,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(self.ikACJointList[0])
 
                 # Ribbon feature by James do Carmo, thanks!
-                # not using bend or ikFkSnap systems to quadruped
                 loadedRibbon = False
                 # (James) add bend to limb
                 if self.getHasBend():
@@ -1233,6 +1230,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         num = self.getBendJoints()
                         iniJoint = side+self.userGuideName+"_"+mainName+'_Jnt'
                         corner = side+self.userGuideName+"_"+cornerName+'_Jnt'
+                        cornerJxt = side+self.userGuideName+"_"+cornerName+'_Jxt'
                         splited = self.userGuideName.split('_')
                         prefix = ''.join(side)
                         name = ''
@@ -1254,7 +1252,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.delete(cmds.aimConstraint(corner, loc, mo=False, weight=2, aimVector=(1, 0, 0), upVector=(0, 1, 0), worldUpType="vector", worldUpVector=(0, 1, 0)))
 
                         if self.limbTypeName == ARM:
-                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
+                            self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, cornerJxt, mirror=False, side=s, arm=True, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         else:
                             self.bendGrps = RibbonClass.addRibbonToLimb(prefix, name, loc, iniJoint, 'x', num, mirror=False, side=s, arm=False, worldRef=self.worldRef, jointLabelAdd=jointLabelAdd, addArtic=self.addArticJoint, additional=self.hasAdditional, addCorrect=self.addCorrective, jcrNumber=3, jcrPosList=[(0, 0, -0.25*self.ctrlRadius), (0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius), (-0.2*self.ctrlRadius, 0, 0.4*self.ctrlRadius)])
                         cmds.delete(loc)
@@ -1319,7 +1317,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     
                     # create auto clavicle attribute:
-                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
+                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                    self.addFollowAttrName(self.fkCtrlList[0], self.dpUIinst.lang['c032_follow'])
                     
                     # ik auto clavicle locators:
                     acIkUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Up_Loc")[0]
@@ -1422,8 +1421,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateX", acBC+".color2R", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateY", acBC+".color2G", force=True)
                     cmds.connectAttr(acIkQtE+".outputRotate.outputRotateZ", acBC+".color2B", force=True)
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", acBC+".blender", force=True)
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+"Fk_ikFkBlend", acInvBC+".blender", force=True)
+                    cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", acBC+".blender", force=True)
+                    cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", acInvBC+".blender", force=True)
                     cmds.connectAttr(acBC+".output.outputR", acInvMD+".input1X", force=True)
                     cmds.connectAttr(acBC+".output.outputG", acInvMD+".input1Y", force=True)
                     cmds.connectAttr(acBC+".output.outputB", acInvMD+".input1Z", force=True)
@@ -1604,8 +1603,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         extremCorrectiveNetList = [None]
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 4, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchUp", 1, 1, 80]))
                         extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 4, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_PitchDown", 1, 1, -80]))
-                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
-                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 2, -80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawRight", 0, 0, -80]))
+                        extremCorrectiveNetList.append(self.setupCorrectiveNet(self.toParentExtremCtrl, self.skinJointList[-3], self.skinJointList[-2], side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 2, 80, isLeg, [side+self.userGuideName+"_"+self.jNameList[-1]+"_YawLeft", 0, 0, 80]))
                         extremCalibratePresetList, invertList = self.getCalibratePresetList(s, isLeg, False, False, False, False, True)
                         extremJntList = dpUtils.articulationJoint(self.skinJointList[-3], self.skinJointList[-2], 4, [(0.2*self.ctrlRadius, 0, 0), (-0.2*self.ctrlRadius, 0, 0), (0, 0.2*self.ctrlRadius, 0), (0, -0.2*self.ctrlRadius, 0)])
                         self.setupJcrControls(extremJntList, s, jointLabelAdd, self.userGuideName+"_"+extremNumber+"_"+extremName, extremCorrectiveNetList, extremCalibratePresetList, invertList)
@@ -1620,6 +1619,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         # expose ankle data to be replaced by foot connections when integrating modules
                         self.ankleArticList.append([extremJax, extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(extremCorrectiveNetList)
+                        self.jaxRotZMDList.append(jaxRotZMD)
 
                     else:
                         beforeJntList = dpUtils.articulationJoint(self.toScalableHookGrp, self.skinJointList[0])
@@ -1636,6 +1636,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.ankleArticList.append([cmds.listRelatives(extremJntList[0], parent=True, type="joint")[0], extremJntList[0]+"_OrC", side+self.userGuideName+"_"+exposeCornerName])
                         self.ankleCorrectiveList.append(None)
                         cmds.setAttr(beforeJntList[0]+"_OrC.interpType", 1) #average
+                        self.jaxRotZMDList.append(None)
                     if s == 1:
                         for jar in [beforeJntList[0], mainJntList[0], extremJntList[0]]:
                             cmds.setAttr(jar+".rotateX", 180)
@@ -1693,6 +1694,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.ikExtremCtrl+".stretchable", rfStretchableCnd+".firstTerm", force=True)
                     cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
                     cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
+                
+                # ikFkSnap
+                dpIkFkSnap.IkFkSnapClass(self.dpUIinst, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'])
                 
                 # calibration attribute:
                 if self.limbTypeName == ARM:
@@ -1765,7 +1769,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "quadFrontLegList": self.quadFrontLegList,
                 "integrateOrigFromList": self.integrateOrigFromList,
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
-                "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,
@@ -1775,6 +1778,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "addArticJoint": self.addArticJoint,
                 "addCorrective": self.addCorrective, 
                 "ankleArticList": self.ankleArticList,
-                "ankleCorrectiveList": self.ankleCorrectiveList
+                "ankleCorrectiveList": self.ankleCorrectiveList,
+                "jaxRotZMDList": self.jaxRotZMDList
             }
         }

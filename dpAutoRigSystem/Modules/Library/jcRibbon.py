@@ -18,7 +18,7 @@ from maya import cmds
 from . import dpUtils
 from . import dpControls
 
-DP_RIBBONCLASS_VERSION = 2.0
+DP_RIBBONCLASS_VERSION = 2.2
 
 
 class RibbonClass(object):
@@ -34,7 +34,7 @@ class RibbonClass(object):
         self.limbLengthAttr   = self.dpUIinst.lang['c113_length']
         
         
-    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
+    def addRibbonToLimb(self, prefix='', myName=None, oriLoc=None, iniJnt=None, skipAxis='y', num=5, iniJxt=None, mirror=True, side=0, arm=True, worldRef="worldRef", jointLabelAdd=0, addArtic=True, additional=False, addCorrect=True, jcrNumber=0, jcrPosList=None, jcrRotList=None, *args):
         """ Create the Ribbon system to be added in the Limb module.
             Returns a dictionary with all nodes needed to be integrated.
         """
@@ -94,7 +94,7 @@ class RibbonClass(object):
             self.cornerJxt = cmds.joint(name=prefix+myName+'_Corner_Jxt', scaleCompensate=False)
             self.cornerJnt = cmds.joint(name=prefix+myName+'_Corner_Jnt', scaleCompensate=False, radius=1.5)
             cmds.setAttr(self.cornerJxt+".segmentScaleCompensate", 1)
-            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 1)
+            cmds.setAttr(self.cornerJnt+".segmentScaleCompensate", 0) #jar
             cmds.addAttr(self.cornerJnt, longName="dpAR_joint", attributeType='float', keyable=False)
             cmds.parentConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_PaC")
             cmds.scaleConstraint(self.elbowctrlCtrl, self.cornerJxt, mo=False, name=self.cornerJxt+"_ScC")
@@ -125,7 +125,7 @@ class RibbonClass(object):
         
         if arm:
             upLimb = self.createRibbon(name=prefix+myName+'_Up', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[0], lista[1]], s=side, upCtrl=upctrlCtrl, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Up_'+myName, centerUpDown=1, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
-            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
+            downLimb = self.createRibbon(name=prefix+myName+'_Down', axis=(0, 0, -1), horizontal=True, numJoints=num, iniJxt=iniJxt, v=False, guides=[lista[1], lista[2]], s=side, worldRef=worldRef, jointLabelAdd=jointLabelAdd, jointLabelName='Down_'+myName, centerUpDown=2, addArtic=addArtic, additionalJoint=additional, limbArm=arm)
             cmds.connectAttr(upctrlCtrl+".scaleX", upLimb['extraCtrlGrp']+".scaleX", force=True)
             cmds.connectAttr(upctrlCtrl+".scaleY", upLimb['extraCtrlGrp']+".scaleY", force=True)
             cmds.connectAttr(downctrlCtrl+".scaleX", downLimb['extraCtrlGrp']+".scaleX", force=True)
@@ -227,6 +227,12 @@ class RibbonClass(object):
                 # rename joint
                 cmds.rename(item, item.replace('_Jnt', '_Jxt'))
         
+        if iniJxt:
+            if cmds.objExists(iniJxt):
+                pac = cmds.parentConstraint(iniJxt, downLimb['bendGrpList'][0], mo=True, name=downLimb['bendGrpList'][0]+"_PaC")[0]
+                cmds.setAttr(pac+".interpType", 2) #shortest
+                cmds.setAttr(pac+"."+iniJxt+"W1", 0.3)
+
         # implementing pin setup to ribbon corner offset control:
         if elbowctrlList[2]:
             worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero, mo=True, name=self.elbowctrlZero+"_PaC")[0]
@@ -313,7 +319,7 @@ class RibbonClass(object):
         return [grp, curve, zero]
     
     
-    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, *args):
+    def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, *args):
         """ Main method to create the Ribbon system.
             centerUpDown = [0, 1, 2] # center, up, down ribbon part to change proportionList used in volumeVariation.
             Returns results in a dictionary.
@@ -374,11 +380,11 @@ class RibbonClass(object):
         
         #put the top locators in the same place of the top joint
         cmds.parent(top_Loc[0], fols[len(fols)-1], relative=True)
-        cmds.parent(top_Loc[0], w=True)
+        cmds.parent(top_Loc[0], world=True)
         
         #put the bottom locators in the same place of the bottom joint
         cmds.parent(bttm_Loc[0], fols[0], relative=True)
-        cmds.parent(bttm_Loc[0], w=True)
+        cmds.parent(bttm_Loc[0], world=True)
         cmds.select(clear=True)
         
         #create the joints that will be used to control the ribbon
@@ -498,12 +504,12 @@ class RibbonClass(object):
         #fix the control locators position and orientation
         cmds.parent(top_Loc[0], drv_Jnt[2])
         cmds.setAttr(top_Loc[0]+'.translate', 0, 0, 0)
-        cmds.parent(top_Loc[0], w=True)
+        cmds.parent(top_Loc[0], world=True)
         cmds.setAttr(top_Loc[0]+'.rotate', 0, 0, 0)
         
         cmds.parent(bttm_Loc[0], drv_Jnt[0])
         cmds.setAttr(bttm_Loc[0]+'.translate', 0, 0, 0)
-        cmds.parent(bttm_Loc[0], w=True)
+        cmds.parent(bttm_Loc[0], world=True)
         cmds.setAttr(bttm_Loc[0]+'.rotate', 0, 0, 0)    
         
         cmds.parent(drv_Jnt[2], top_Loc[1])
@@ -755,7 +761,7 @@ class RibbonClass(object):
             top = guides[0]
             bottom = guides[1]
             constr.append(cmds.parentConstraint(top, bttm_Loc[0], mo=False, name=bttm_Loc[0]+"_PaC"))
-            constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_PaC"))
+            constr.append(cmds.parentConstraint(bottom, top_Loc[0], mo=False, name=top_Loc[0]+"_PaC")) #to integrate jxt after
             cmds.delete(cmds.parentConstraint(top, bttm_Loc[3], mo=False))
             cmds.delete(cmds.parentConstraint(bottom, top_Loc[3], mo=False))
             constr.append(cmds.pointConstraint(top, bttm_Loc[3], mo=False, name=bttm_Loc[3]+"_PoC"))

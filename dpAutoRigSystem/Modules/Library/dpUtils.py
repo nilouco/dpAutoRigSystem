@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.3
+DP_UTILS_VERSION = 2.5
 
 
 # UTILS functions:
@@ -220,6 +220,19 @@ def useDefaultRenderLayer():
         cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 
+def removeUserDefinedAttr(node):
+    """ Just remove all user defined attributes for the given node.
+    """
+    userDefAttrList = cmds.listAttr(node, userDefined=True)
+    if userDefAttrList:
+        for userDefAttr in userDefAttrList:
+            try:
+                cmds.setAttr(node+"."+userDefAttr, lock=False)
+                cmds.deleteAttr(node+"."+userDefAttr)
+            except:
+                pass
+
+
 def zeroOut(transformList=[], offset=False):
     """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
         If don't have a transformList given, try to get the current selection.
@@ -244,14 +257,7 @@ def zeroOut(transformList=[], offset=False):
                         if not cmds.objExists(transformName+suffix):
                             needAddNumber = False
             zeroGrp = cmds.duplicate(transform, name=transformName+suffix)[0]
-            zeroUserAttrList = cmds.listAttr(zeroGrp, userDefined=True)
-            if zeroUserAttrList:
-                for zUserAttr in zeroUserAttrList:
-                    try:
-                        cmds.setAttr(zeroGrp+"."+zUserAttr, lock=False)
-                        cmds.deleteAttr(zeroGrp+"."+zUserAttr)
-                    except:
-                        pass
+            removeUserDefinedAttr(zeroGrp)
             allChildrenList = cmds.listRelatives(zeroGrp, allDescendents=True, children=True, fullPath=True)
             if allChildrenList:
                 cmds.delete(allChildrenList)
@@ -902,10 +908,44 @@ def resolveName(name, suffix, *args):
     return baseName, name
 
 
-def magnitude(vector, *args):
+def magnitude(v, *args):
     """ Returns the square root of the sum of power 2 from a given vector.
     """
-    return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))
+    return math.sqrt(pow(v[0], 2)+pow(v[1], 2)+pow(v[2], 2))
+
+
+def normalizeVector(v):
+    """ Returns the normalized given vector.
+    """
+    vMag = magnitude(v)
+    return [v[i]/vMag for i in range(len(v))]
+
+
+def distanceVectors(u, v):
+    """ Returns the distance between 2 given points.
+    """
+    return math.sqrt((v[0]-u[0])**2+(v[1]-u[1])**2+(v[2]-u[2])**2)
+
+
+def addVectors(u, v):
+    """ Returns the addition of 2 given vectors.
+    """
+    return [u[i]+v[i] for i in range(len(u))]
+
+
+def subVectors(u, v):
+    """ Returns the substration of 2 given vectors.
+    """
+    return [u[i]-v[i] for i in range(len(u))]
+
+
+def multVectors(u, v):
+    return [u[i]*v[i] for i in range(len(u))]
+
+def multiScalarVector(u, scalar):
+    """
+    """
+    return [u[i]*scalar for i in range(len(u))]
 
 
 def jointChainLength(jointList):
@@ -1016,3 +1056,54 @@ def mountWH(start, end):
     """ Mount and return path.
     """
     return "{}{}{}".format(start, "/", end)
+
+
+def clearJointLabel(jointList):
+    """ Just remove the current joint label if it exists.
+    """
+    if jointList:
+        for jnt in jointList:
+            if cmds.objExists(jnt):
+                cmds.setAttr(jnt+".otherType", "", type="string")
+                cmds.setAttr(jnt+".type", 0)
+
+
+def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef):
+    """ Create an Ik Fk Blend setup for joint chain.
+        Return the created reverse node.
+    """
+    attrCompName = attrStartName[0].lower()+attrStartName[1:]+attrName
+    for n in range(len(jointListA)):
+        parentConst = cmds.parentConstraint(jointListA[n], jointListB[n], jointListC[n], maintainOffset=True, name=jointListC[n]+"_"+attrName+"_PaC")[0]
+        cmds.setAttr(parentConst+".interpType", 2) #shortest
+        if n == 0:
+            revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
+            cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+            cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
+            cmds.addAttr(worldRef, longName="ikFkBlendAttrName", dataType="string")
+            cmds.setAttr(worldRef+".ikFkBlendAttrName", attrCompName, type="string")
+            cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
+            cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
+        # connecting ikFkBlend using the reverse node:
+        cmds.connectAttr(worldRef+"."+attrCompName, parentConst+"."+jointListB[n]+"W1", force=True)
+        cmds.connectAttr(worldRef+"."+attrCompName+"RevOutputX", parentConst+"."+jointListA[n]+"W0", force=True)
+    return revNode
+
+
+def getAttrNameLower(side, name):
+    """ Return the composed name for attributes starting with lower case.
+    """
+    attrNameLower = name
+    if side:
+        attrNameLower = side[0]+name
+    attrNameLower = attrNameLower[0].lower()+attrNameLower[1:]
+    return attrNameLower
+
+
+def setAttrValues(itemList, attrList, valueList):
+    """ Just set the attribute values for the given lists.
+    """
+    if itemList and attrList and valueList:
+        for item in itemList:
+            for attr, value in zip(attrList, valueList):
+                cmds.setAttr(item+"."+attr, value)

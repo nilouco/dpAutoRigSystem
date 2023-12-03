@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-08-24",
+    "_updated"       : "2023-11-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -136,6 +136,7 @@
     "c122_inner"             : "Inner",
     "c123_outer"             : "Outer",
     "c124_corrective"        : "corrective",
+    "c125_last"              : "Last",
     
     "e000_GuideNotFound"           : "Guide not found in this scene.",
     "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",
@@ -546,7 +547,7 @@
     "m094_doing"                : "Doing",
     "m095_isolate"              : "Isolate",
     "m096_isolateDesc"          : "This script will create an Isolate setup.\nNeed 3 nodes selected\nor it'll use the Root_Ctrl.",
-    "m097_00000000"             : "NOT USED HERE",
+    "m097_dynamic"              : "Dynamic",
     "m098_000000000000"         : "NOT USED HERE",
     "m099_cvControlDesc"        : "This class will create a curve shape\nin order to be used as a control.",
     "m100_square"               : "Square",
@@ -682,6 +683,11 @@
     "m227_mainCtrls"            : "Main controls",
     "m228_handlebar"            : "Handlebar",
     "m229_fork"                 : "Fork",
+    "m230_proxyCreator"         : "Proxy creator",
+    "m231_proxyCreatorDesc"     : "This module will generate a proxy mesh for the current rig.",
+    "m232_morphDeformer"        : "Morph Deformer",
+    "m233_wrapDeformer"         : "Wrap Deformer",
+
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -781,6 +787,9 @@
     "v076_outlinerCleaner"        : "Outliner cleaner",
     "v077_outlinerCleanerDesc"    : "This validator will clean-up the dpAutoRigSystem not used nodes in the outliner.\nIt's useful to delete garbages from deleted guides,\nfor example dpAR_GuideMirror_Grp.",
     "v078_unlockNormals"          : "Unlock Normals",
-    "v079_unlockNormalsDesc"      : "This validator will unlock normals from the geometries."
-    
+    "v079_unlockNormalsDesc"      : "This validator will unlock normals from the geometries.",
+    "v082_unusedSkinCleaner"      : "Unused skin cleaner",
+    "v083_unusedSkinCleanerDesc"  : "This validator will remove unused skin influences.",
+    "v084_unusedNodeCleaner"      : "Unused node cleaner",
+    "v085_unusedNodeCleanerDesc"  : "This validator will remove unecessary rendering nodes."
 }

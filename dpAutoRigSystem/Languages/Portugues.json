@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-08-27",
+    "_updated"       : "2023-11-10",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -136,6 +136,7 @@
     "c122_inner"             : "Interno",
     "c123_outer"             : "Externo",
     "c124_corrective"        : "corretivo",
+    "c125_last"              : "Ultimo",
 
     "e000_GuideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_GuideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -546,7 +547,7 @@
     "m094_doing"                : "Fazendo",
     "m095_isolate"              : "Isolar",
     "m096_isolateDesc"          : "Esse script vai criar um setup de Isolação.\nPrecisa ter 3 nodes selecionados\nou sera criado usando o Root_Ctrl.",
-    "m097_00000000"             : "NOT USED HERE",
+    "m097_dynamic"              : "Dinamica",
     "m098_000000000000"         : "NOT USED HERE",
     "m099_cvControlDesc"        : "Essa classe irá criar um shape de curva\npara ser usado como controle.",
     "m100_square"               : "Quadrado",
@@ -682,6 +683,10 @@
     "m227_mainCtrls"            : "Controles principais",
     "m228_handlebar"            : "Guidao",
     "m229_fork"                 : "Garfo",
+    "m230_proxyCreator"         : "Proxy creador",
+    "m231_proxyCreatorDesc"     : "Esse modulo vai criar uma mesh proxy para o rig atual.",
+    "m232_morphDeformer"        : "Deformador Morph",
+    "m233_wrapDeformer"         : "Deformador Wrap",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -780,6 +785,10 @@
     "v076_outlinerCleaner"        : "Outliner limpador",
     "v077_outlinerCleanerDesc"    : "Esse validador limpará os nodes do dpAutoRigSystem\nque estejam em desuso na outliner.\nServe para excluir lixos deixados por guias deletadas,\npor exemplo dpAR_GuideMirror_Grp.",
     "v078_unlockNormals"          : "Desbloquear Normais",
-    "v079_unlockNormalsDesc"      : "Esse validador vai desbloquear as normais de geometrias."
+    "v079_unlockNormalsDesc"      : "Esse validador vai desbloquear as normais de geometrias.",
+    "v082_unusedSkinCleaner"      : "Skinning não usados limpador",
+    "v083_unusedSkinCleanerDesc"  : "Esse validador vai remover influencias de skinning não usadas.",
+    "v084_unusedNodeCleaner"      : "Node não usados limpador",
+    "v085_unusedNodeCleanerDesc"  : "Esse validador vai remover rendering nodes desnecessários."
 
 }

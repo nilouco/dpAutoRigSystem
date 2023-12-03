@@ -8,7 +8,7 @@ TITLE = "v044_sideCalibration"
 DESCRIPTION = "v045_sideCalibrationDesc"
 ICON = "/Icons/dp_sideCalibration.png"
 
-DP_SIDECALIBRATION_VERSION = 1.1
+DP_SIDECALIBRATION_VERSION = 1.2
 
 
 class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
@@ -65,33 +65,37 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
                                 calibrationList = calibrationAttr.split(";")
                                 if calibrationList:
                                     for attr in calibrationList:
-                                        # current values
-                                        itemCurrentValue = float(format(cmds.getAttr(item+"."+attr),".3f"))
-                                        pairCurrentValue = float(format(cmds.getAttr(pairDic[item]+"."+attr),".3f"))
-                                        if not itemCurrentValue == pairCurrentValue:
-                                            # found issue here
-                                            self.checkedObjList.append(item+"."+attr)
-                                            self.foundIssueList.append(True)
-                                            if self.verifyMode:
-                                                self.resultOkList.append(False)
-                                            else: #fix
-                                                try:
-                                                    # default values (supposed to be the same for the two sides)
-                                                    itemDefaultValue = float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f"))
-                                                    if pairCurrentValue == itemDefaultValue:
-                                                        # pair current value is equal to its default value, so we set the pair value as item current value
-                                                        cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
-                                                    else:
-                                                        # check for left, top or front side to use it as priority node:
-                                                        if item[0] == self.dpUIinst.lang['p002_left'] or item[0] == self.dpUIinst.lang['p004_top'] or item[0] == self.dpUIinst.lang['p006_front']:
+                                        if cmds.objExists(item+"."+attr) and cmds.objExists(pairDic[item]+"."+attr):
+                                            # current values
+                                            itemCurrentValue = float(format(cmds.getAttr(item+"."+attr),".3f"))
+                                            pairCurrentValue = float(format(cmds.getAttr(pairDic[item]+"."+attr),".3f"))
+                                            if not itemCurrentValue == pairCurrentValue:
+                                                # found issue here
+                                                self.checkedObjList.append(item+"."+attr)
+                                                self.foundIssueList.append(True)
+                                                if self.verifyMode:
+                                                    self.resultOkList.append(False)
+                                                else: #fix
+                                                    try:
+                                                        # default values (supposed to be the same for the two sides)
+                                                        itemDefaultValue = float(format(cmds.addAttr(item+"."+attr, query=True, defaultValue=True),".3f"))
+                                                        if pairCurrentValue == itemDefaultValue:
+                                                            # pair current value is equal to its default value, so we set the pair value as item current value
                                                             cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
                                                         else:
-                                                            cmds.setAttr(item+"."+attr, pairCurrentValue)
-                                                    self.resultOkList.append(True)
-                                                    self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
-                                                except:
-                                                    self.resultOkList.append(False)
-                                                    self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
+                                                            # check for left, top or front side to use it as priority node:
+                                                            if item[0] == self.dpUIinst.lang['p002_left'] or item[0] == self.dpUIinst.lang['p004_top'] or item[0] == self.dpUIinst.lang['p006_front']:
+                                                                cmds.setAttr(pairDic[item]+"."+attr, itemCurrentValue)
+                                                            else:
+                                                                cmds.setAttr(item+"."+attr, pairCurrentValue)
+                                                        self.resultOkList.append(True)
+                                                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+"."+attr)
+                                                    except:
+                                                        self.resultOkList.append(False)
+                                                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+"."+attr)
+                                        else:
+                                            self.resultOkList.append(True)
+                                            self.messageList.append(item+"."+attr+" "+self.dpUIinst.lang['i061_notExists'])
         else:
             self.notFoundNodes()
         # --- validator code --- end

@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.25"
+DPAR_VERSION_PY3 = "4.03.42"
 DPAR_UPDATELOG = "N502 Disable old dpControl attributes.\nCleaned for Single Holders and Ribbon MidCtrls."
 
 
@@ -507,7 +507,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["jntCollection"] = cmds.radioCollection('jntCollection', parent=self.allUIs["colSkinLeftA"])
         allJoints  = cmds.radioButton(label=self.lang['i022_listAllJnts'], annotation="allJoints", onCommand=self.populateJoints)
         dpARJoints = cmds.radioButton(label=self.lang['i023_listdpARJnts'], annotation="dpARJoints", onCommand=self.populateJoints)
-        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=4, columnWidth=[(1, 45), (2, 45), (3, 45), (4, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
+        self.allUIs["jointsDisplay"] = cmds.rowColumnLayout('jointsDisplay', numberOfColumns=3, columnWidth=[(1, 45), (2, 45), (3, 45)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10)], parent=self.allUIs["colSkinLeftA"])
         self.allUIs["_JntCB"] = cmds.checkBox('_JntCB', label="Jnt", annotation="Skinned Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JarCB"] = cmds.checkBox('_JarCB', label="Jar", annotation="Skinned Articulation Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
         self.allUIs["_JadCB"] = cmds.checkBox('_JadCB', label="Jad", annotation="Skinned Additional Joints", align='left', value=1, changeCommand=self.populateJoints, parent=self.allUIs["jointsDisplay"])
@@ -2085,7 +2085,7 @@ class DP_AutoRig_UI(object):
             for guideType in self.guideModuleList:
                 cmds.addAttr(self.masterGrp, longName=guideType+"Count", attributeType="long", defaultValue=0)
             # set outliner color
-            self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True)
+            self.ctrls.colorShape([self.masterGrp], [1, 1, 1], outliner=True) #white
 
         # update data
         cmds.setAttr(self.masterGrp+".lastModification", localTime, type="string")
@@ -2107,9 +2107,9 @@ class DP_AutoRig_UI(object):
         self.blendShapesGrp = self.getBaseGrp("blendShapesGrp", self.prefix+"BlendShapes_Grp")
         self.wipGrp         = self.getBaseGrp("wipGrp", self.prefix+"WIP_Grp")
         # set outliner color
-        self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True)
-        self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True)
-        self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True)
+        self.ctrls.colorShape([self.ctrlsGrp], [0, 0.65, 1], outliner=True) #blue
+        self.ctrls.colorShape([self.dataGrp], [1, 1, 0], outliner=True) #yellow
+        self.ctrls.colorShape([self.renderGrp], [1, 0.45, 0], outliner=True) #orange
 
         #Arrange Hierarchy if using an original setup or preserve existing if integrating to another studio setup
         if needCreateAllGrp:
@@ -2532,12 +2532,12 @@ class DP_AutoRig_UI(object):
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
-                                    ikFkNetworkList       = self.integratedTaskDic[fatherGuide]['ikFkNetworkList']
                                     worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     addArticJoint         = self.integratedTaskDic[fatherGuide]['addArticJoint']
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
                                     ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
                                     ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
+                                    jaxRotZMDList         = self.integratedTaskDic[fatherGuide]['jaxRotZMDList'][s]
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
                                     cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
@@ -2556,8 +2556,19 @@ class DP_AutoRig_UI(object):
                                         # reconnect correctly the interation for ankle and correctives
                                         if addArticJoint:
                                             cmds.delete(ankleArticList[1])
+                                            # workaround to avoid orientConstraint offset issue
+                                            footJntFather = cmds.listRelatives(footJnt, parent=True)[0]
+                                            cmds.delete(cmds.listRelatives(footJnt, children=True, type="parentConstraint")[0])
+                                            footJntChildrenList = cmds.listRelatives(footJnt, children=True)
+                                            cmds.parent(footJntChildrenList, world=True)
+                                            cmds.parent(footJnt, extremJnt, relative=True)
+                                            cmds.makeIdentity(footJnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
+                                            cmds.parent(footJnt, footJntFather)
+                                            cmds.parent(footJntChildrenList, footJnt)
+                                            cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")
                                             if addCorrective:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
+                                                cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList+".input1Z", force=True)
                                                 for netNode in ankleCorrectiveList:
                                                     if netNode:
                                                         if cmds.objExists(netNode):
@@ -2569,7 +2580,7 @@ class DP_AutoRig_UI(object):
                                                                 cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC")
                                             else:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
-                                            cmds.setAttr(oc+".interpType", 0) #noFlip
+                                            cmds.setAttr(oc+".interpType", 2) #shortest
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                     cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
                                     # hide this control shape
@@ -2594,9 +2605,6 @@ class DP_AutoRig_UI(object):
                                             if not keyableStatus:
                                                 cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
                                             cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
-                                    if ikFkNetworkList:
-                                        lastIndex = len(cmds.listConnections(ikFkNetworkList[s]+".otherCtrls"))
-                                        cmds.connectAttr(middleFootCtrl+'.message', ikFkNetworkList[s]+'.otherCtrls['+str(lastIndex+5)+']')
                                     revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
                                     self.customAttr.removeAttr("dpControl", [revFootCtrlOld])
                         
@@ -2605,11 +2613,10 @@ class DP_AutoRig_UI(object):
                             # getting limb data:
                             worldRefList      = self.integratedTaskDic[moduleDic]['worldRefList']
                             worldRefShapeList = self.integratedTaskDic[moduleDic]['worldRefShapeList']
-                            ikFkNetworkList   = self.integratedTaskDic[moduleDic]['ikFkNetworkList']
                             ikCtrlList        = self.integratedTaskDic[moduleDic]['ikCtrlList']
                             lvvAttr           = self.integratedTaskDic[moduleDic]['limbManualVolume']
                             masterCtrlRefList = self.integratedTaskDic[moduleDic]['masterCtrlRefList']
-                            rootCtrlRefList = self.integratedTaskDic[moduleDic]['rootCtrlRefList']
+                            rootCtrlRefList   = self.integratedTaskDic[moduleDic]['rootCtrlRefList']
                             softIkCalibList   = self.integratedTaskDic[moduleDic]['softIkCalibrateList']
                             for w, worldRef in enumerate(worldRefList):
                                 # do actions in order to make limb be controlled by optionCtrl:
@@ -2637,19 +2644,6 @@ class DP_AutoRig_UI(object):
                                 if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
                                     cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
                                 
-                                # update ikFkNetwork:
-                                if ikFkNetworkList:
-                                    netIndex = 1
-                                    optionCtrlAttrList = cmds.listAttr(self.optionCtrl, visible=True, scalar=True, keyable=True)
-                                    for optAttr in optionCtrlAttrList:
-                                        if "_IkFkBlend" in optAttr:
-                                            cmds.connectAttr(self.optionCtrl+'.'+optAttr, ikFkNetworkList[w]+'.attState', force=True)
-                                    limbAttrList = cmds.listAttr(ikCtrlList[w], visible=True, scalar=True, keyable=True, userDefined=True)
-                                    for limbAttr in limbAttrList:
-                                        if "_" in limbAttr:
-                                            cmds.connectAttr(ikCtrlList[w]+'.'+limbAttr, ikFkNetworkList[w]+'.footRollAtts['+str(netIndex)+']', force=True)
-                                            netIndex = netIndex + 1
-
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
@@ -2852,9 +2846,9 @@ class DP_AutoRig_UI(object):
                         # integrate the Single module with another Single as a father:
                         if moduleType == SINGLE:
                             # connect Option_Ctrl display attribute to the visibility:
-                            if not cmds.objExists(self.optionCtrl+"."+self.lang['m081_tweaks']):
-                                cmds.addAttr(self.optionCtrl, longName=self.lang['m081_tweaks'], min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
-                                cmds.setAttr(self.optionCtrl+"."+self.lang['m081_tweaks'], channelBox=True)
+                            if not cmds.objExists(self.optionCtrl+"."+self.lang['m081_tweaks'].lower()):
+                                cmds.addAttr(self.optionCtrl, longName=self.lang['m081_tweaks'].lower(), min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
+                                cmds.setAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), channelBox=True)
                             self.itemGuideMirrorAxis     = self.hookDic[moduleDic]['guideMirrorAxis']
                             self.itemGuideMirrorNameList = self.hookDic[moduleDic]['guideMirrorName']
                             # working with item guide mirror:
@@ -2864,7 +2858,7 @@ class DP_AutoRig_UI(object):
                                 self.itemMirrorNameList = self.itemGuideMirrorNameList
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ctrlGrp = self.integratedTaskDic[moduleDic]["ctrlGrpList"][s]
-                                cmds.connectAttr(self.optionCtrl+"."+self.lang['m081_tweaks'], ctrlGrp+".visibility", force=True)
+                                cmds.connectAttr(self.optionCtrl+"."+self.lang['m081_tweaks'].lower(), ctrlGrp+".visibility", force=True)
                             # get father module:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             if fatherModule == SINGLE:
@@ -3038,7 +3032,7 @@ class DP_AutoRig_UI(object):
                 # defining attribute name strings:
                 generalAttr = self.lang['c066_general']
                 vvAttr = self.lang['c031_volumeVariation']
-                spineAttr = self.lang['m011_spine']
+                spineAttr = self.lang['m011_spine'].lower()
                 limbAttr = self.lang['m019_limb'].lower()
                 armAttr = self.lang['m028_arm']
                 legAttr = self.lang['m030_leg']
@@ -3058,11 +3052,14 @@ class DP_AutoRig_UI(object):
                         cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="enum", enumName="----------", keyable=True)
                         cmds.setAttr(self.optionCtrl+"."+vvAttr, lock=True)
                 
-                # Only create if a IkFk attribute is found
+                # Only create if an IkFk attribute is found
                 if not cmds.objExists(self.optionCtrl+".ikFkBlend"):
                     if cmds.listAttr(self.optionCtrl, string="*ikFk*"):
                         cmds.addAttr(self.optionCtrl, longName="ikFkBlend", attributeType="enum", enumName="----------", keyable=True)
                         cmds.setAttr(self.optionCtrl+".ikFkBlend", lock=True)
+                
+                if cmds.objExists(self.optionCtrl+".ikFkSnap"):
+                    cmds.setAttr(self.optionCtrl+".ikFkSnap", keyable=False, channelBox=True)
                 
                 if not cmds.objExists(self.optionCtrl+".display"):
                     cmds.addAttr(self.optionCtrl, longName="display", attributeType="enum", enumName="----------", keyable=True)
@@ -3098,14 +3095,17 @@ class DP_AutoRig_UI(object):
                                 cmds.renameAttr(self.optionCtrl+"."+cAttr, cAttr[:cAttr.find("_"+vvAttr)])
                             
                 # list desirable Option_Ctrl attributes order:
-                desiredAttrList = [generalAttr, 'rigScale', 'rigScaleMultiplier', vvAttr,
-                spineAttr+'_active', spineAttr, spineAttr+'1_active', spineAttr+'1', spineAttr+'2_active', spineAttr+'2',
-                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'1Fk', spineAttr+'2Fk', 
+                desiredAttrList = [generalAttr, 'globalStretch', 'rigScale', 'rigScaleMultiplier', vvAttr,
+                spineAttr+'Active', spineAttr, spineAttr+'1Active', spineAttr+'1', spineAttr+'2Active', spineAttr+'2',
+                limbAttr, limbAttr+'Min', limbAttr+'Manual', 'ikFkBlend', 'ikFkSnap', spineAttr+'Fk', spineAttr+'Fk1', spineAttr+'Fk2', spineAttr+'1Fk', spineAttr+'2Fk', 
                 leftAttr+spineAttr+'Fk', rightAttr+spineAttr+'Fk', leftAttr+spineAttr+'Fk1', rightAttr+spineAttr+'Fk1', leftAttr+spineAttr+'Fk2', rightAttr+spineAttr+'Fk2',
-                armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk",
+                armAttr+"Fk", legAttr+"Fk", leftAttr+armAttr+"Fk", rightAttr+armAttr+"Fk", armAttr.lower()+"Fk", legAttr.lower()+"Fk", leftAttr+armAttr.lower()+"Fk", rightAttr+armAttr.lower()+"Fk",
                 leftAttr+legAttr+"Fk", rightAttr+legAttr+"Fk", leftAttr+legAttr+frontAttr+"Fk", rightAttr+legAttr+frontAttr+"Fk", leftAttr+legAttr+backAttr+"Fk", rightAttr+legAttr+backAttr+"Fk",
                 armAttr+'Fk1', legAttr+'Fk1', leftAttr+armAttr+'Fk1', rightAttr+armAttr+'Fk1', leftAttr+legAttr+'Fk1', rightAttr+legAttr+'Fk1',
                 leftAttr+legAttr+frontAttr+'Fk1', rightAttr+legAttr+frontAttr+'Fk1', leftAttr+legAttr+backAttr+'Fk1', rightAttr+legAttr+backAttr+'Fk1',
+                'tailFk', 'tailDyn', 'tail1Fk', 'tail1Dyn', 'tailFk1', 'tailDyn1', leftAttr+'TailFk', leftAttr+'TailFk1', rightAttr+'TailFk', rightAttr+'TailFk1', leftAttr+'TailDyn', leftAttr+'TailDyn1', rightAttr+'TailDyn', rightAttr+'TailDyn1',
+                'hairFk', 'hairDyn', 'hair1Fk', 'hair1Dyn', 'hairFk1', 'hairDyn1', leftAttr+'HairFk', leftAttr+'HairFk1', rightAttr+'HairFk', rightAttr+'HairFk1', leftAttr+'HairDyn', leftAttr+'HairDyn1', rightAttr+'HairDyn', rightAttr+'HairDyn1',
+                'dpAR_1Fk', 'dpAR_1Dyn', 'dpAR_2Fk', 'dpAR_2Dyn', 'dpAR_1Fk1', 'dpAR_1Dyn1', leftAttr+'dpAR_1Fk', leftAttr+'dpAR_1Fk1', rightAttr+'dpAR_1Fk', rightAttr+'dpAR_1Fk1', leftAttr+'dpAR_1Dyn', leftAttr+'dpAR_1Dyn1', rightAttr+'dpAR_1Dyn', rightAttr+'dpAR_1Dyn1',
                 'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)

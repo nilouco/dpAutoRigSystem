@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
@@ -10,7 +11,7 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
-DP_CHAIN_VERSION = 2.0
+DP_CHAIN_VERSION = 2.2
 
 
 class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -23,6 +24,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
         self.worldRefList = []
         self.worldRefShapeList = []
+        self.currentNJoints = 5
     
     
     def createModuleLayout(self, *args):
@@ -52,6 +54,15 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="dynamic", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".dynamic", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".mainControls", 0)
+
+        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
+        cmds.setAttr(self.moduleGrp+".nMain", 1)
         
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -140,12 +151,13 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
                 self.currentNJoints = self.enteredNJoints
+                self.changeMainCtrlsNumber(0)
                 # re-build the preview mirror:
                 dpLayoutClass.LayoutClass.createPreviewMirror(self)
             cmds.select(self.moduleGrp)
         else:
             self.changeJointNumber(5)
-    
+
 
     def setupAimLocators(self, side, toUpParent, ikNumb, ikFakeCtrl, toFakeParent, hasFake=True, *args):
         """ Creates the up and fake locators to use in the aimConstraint.
@@ -179,6 +191,130 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
 
 
+    def clearRenameJointChain(self, jntList, fromName, toName, clear=True, *args):
+        """ Clean up joint chain and rename it as well.
+            Return the renamed list.
+        """
+        renamedList = []
+        for item in reversed(jntList):
+            if cmds.objectType(item) == "joint":
+                if "_JEnd" in item:
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace("_JEnd", toName+"_JEnd"))
+                    renamedList.append(newName)
+                    continue
+                elif "_Jax" in item:
+                    if clear:
+                        cmds.delete(item)
+                    continue
+                if not toName in item[item.rfind("|")+1:]:
+                    newName = cmds.rename(item, item[item.rfind("|")+1:].replace(fromName, toName))
+                    renamedList.append(newName)
+            else:
+                if clear:
+                    cmds.delete(item)
+        return list(reversed(renamedList))
+
+
+    def clearUserDefinedAttr(self, jointList, *args):
+        """ TODO change to call dpUtils done function after branchativa publishing.
+        """
+        for jnt in jointList:
+            userDefAttrList = cmds.listAttr(jnt, userDefined=True)
+            if userDefAttrList:
+                for userDefAttr in userDefAttrList:
+                    cmds.setAttr(jnt+"."+userDefAttr, lock=False)
+                    cmds.deleteAttr(jnt+"."+userDefAttr)
+
+
+    def createDynamicChain(self, dynName, rebuildCrvSpans=20, *args):
+        """ This is like a patch to add a dynamic setup to the Chain.
+        """
+        dynNameLower = dynName[0].lower()+dynName[1:]
+        if dynNameLower[1] == "_":
+            dynNameLower = dynName[0].lower()+dynName[2:]
+        # curve
+        mainCrv = cmds.duplicate(self.ikSplineList[2], name=dynName+"_Main_Crv")[0]
+        cmds.delete(mainCrv+"ShapeOrig")
+        cmds.rebuildCurve(mainCrv, constructionHistory=False, replaceOriginal=True, rebuildType=False, endKnots=True, keepRange=False, keepControlPoints=False, keepEndPoints=True, keepTangents=False, spans=rebuildCrvSpans, degree=3, tolerance=0.01)
+        cmds.skinCluster(self.skinJointList, mainCrv, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=dynName+"_Main_Crv_SC")
+
+        # dynamic joints
+        firstDynJnt = dynName+"_00_Dyn_Jnt"
+        dynJntList = cmds.duplicate(dynName+"_00_Fk_Jxt", name=firstDynJnt, fullPath=True)
+        newSkinJntList = cmds.duplicate(dynName+"_00_Jnt", name=dynName+"_00_Jnt_First", fullPath=True)
+        skinJntList = cmds.ls(self.skinJointList[0], long=True)
+        skinJntChildrenList = cmds.listRelatives(self.skinJointList[0], children=True, allDescendents=True, fullPath=True, type="joint")
+        skinJntList.extend(sorted(skinJntChildrenList))
+        dynJntList = self.clearRenameJointChain(dynJntList, "_Fk", "_Dyn")
+        dynJntList.insert(0, firstDynJnt)
+        self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
+        cmds.rename(self.skinJointList[-1], dynName+"_IkFk_JEnd")
+        self.clearUserDefinedAttr(self.skinJointList[:-1]) # to be changed to call dpUtils function instead.
+        newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
+        cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
+        newSkinJntList = [dynName+"_00_Jnt"]
+        newSkinJntList.extend(sorted(cmds.listRelatives(dynName+"_00_Jnt", children=True, allDescendents=True)))
+        dpUtils.clearJointLabel(self.skinJointList)
+        cmds.setAttr(self.skinJointList[0]+".visibility", 0)
+        
+        # setup new blend joints
+        dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef)
+        dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
+        cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
+        cmds.connectAttr(dynJntList[0]+".scaleY", dynStretchBC+".color1G", force=True)
+        cmds.connectAttr(dynJntList[0]+".scaleZ", dynStretchBC+".color1B", force=True)
+        cmds.connectAttr(self.skinJointList[0]+".scaleX", dynStretchBC+".color2R", force=True)
+        cmds.connectAttr(self.skinJointList[0]+".scaleY", dynStretchBC+".color2G", force=True)
+        cmds.connectAttr(self.skinJointList[0]+".scaleZ", dynStretchBC+".color2B", force=True)
+        cmds.connectAttr(self.worldRef+"."+dynNameLower+"Dyn_ikFkBlend", dynStretchBC+".blender", force=True)
+        for j, jnt in enumerate(newSkinJntList[:-1]):
+            cmds.connectAttr(dynStretchBC+".outputR", newSkinJntList[j]+".scaleX", force=True)
+            cmds.connectAttr(dynStretchBC+".outputG", newSkinJntList[j]+".scaleY", force=True)
+            cmds.connectAttr(dynStretchBC+".outputB", newSkinJntList[j]+".scaleZ", force=True)
+
+        # hairSystem
+        mel.eval("DynCreateHairMenu MayaWindow|mainHairMenu; HairAssignHairSystemMenu MayaWindow|mainHairMenu|hairAssignHairSystemItem;")
+        cmds.select(mainCrv+"Shape")
+        dpHairSystemNode = None
+        allTransfList = cmds.ls(selection=False, type="transform")
+        if allTransfList:
+            for transform in allTransfList:
+                if cmds.objExists(transform+".dpHairSystem"):
+                    dpHairSystemNode = transform
+                    break
+        if not dpHairSystemNode:
+            mel.eval("assignNewHairSystem;")
+            # rename nodes
+            if cmds.objExists("hairSystem1"):
+                cmds.rename("hairSystem1", "dpHairSystem")
+            dpHairSystemNode = "dpHairSystemShape"
+            cmds.addAttr(dpHairSystemNode, longName="dpHairSystem", attributeType="bool", defaultValue=1)
+            if cmds.objExists("nucleus1"):
+                cmds.rename("nucleus1", "dpNucleus")
+                cmds.addAttr(dpHairSystemNode, longName="dpNucleus", attributeType="bool", defaultValue=1)
+            if cmds.objExists("hairSystem1OutputCurves"):
+                cmds.rename("hairSystem1OutputCurves", "dpHairSystemOutputCurves")
+            # parent nodes
+            fxGrp = dpUtils.getNodeByMessage("fxGrp")
+            if fxGrp:
+                cmds.parent("dpNucleus", "dpHairSystem", "dpHairSystemOutputCurves", fxGrp)
+                self.ctrls.colorShape([fxGrp], [0.9, 0.6, 1], outliner=True)
+            if cmds.objExists("hairSystem1Follicles"):
+                cmds.delete("hairSystem1Follicles")
+        else:
+            mel.eval('assignHairSystem '+dpHairSystemNode+';')
+            if cmds.objExists("dpHairSystemFollicles"):
+                cmds.delete("dpHairSystemFollicles")
+        cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ikStaticDataGrp, children=True, allDescendents=True, type="follicle")[0], parent=True)[0], dynName+"_Dyn_Fol")
+        dynCrv = cmds.rename("dpHairSystemOutputCurves|curve1", dynName+"_Dyn_Crv")
+        # ikHandle
+        
+        ikSplineList = cmds.ikHandle(startJoint=firstDynJnt, endEffector=dynJntList[-2], name=dynName+"_Dyn_IkH", solver="ikSplineSolver", parentCurve=False, curve=dynCrv, createCurve=False) #[Handle, Effector]
+        ikSplineList[1] = cmds.rename(ikSplineList[1], dynName+"_Dyn_Eff")
+        cmds.parent(ikSplineList[0], self.ikStaticDataGrp)
+        cmds.select(clear=True)
+
+
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -189,6 +325,8 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
+            # dynamic:
+            self.addDynamic = self.getModuleAttr("dynamic")
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -234,9 +372,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
-                sideLower = side
-                if side:
-                    sideLower = side[0].lower()
+                attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
@@ -322,11 +458,11 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # invert scale for right side before:
                 if s == 1:
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleX", -1)
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleY", -1)
-                    cmds.setAttr(self.fkCtrlList[0] + ".scaleZ", -1)
                     # fix flipping issue for right side:
                     for f in range(1, len(self.fkCtrlList)):
+                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleX", -1)
+                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleY", -1)
+                        cmds.setAttr(self.fkZeroGrpList[0]+".scaleZ", -1)
                         attrList = ["tx", "ty", "tz", "rx", "ry", "rz"]
                         for attr in attrList:
                             attrValue = cmds.getAttr(self.fkZeroGrpList[f]+"."+attr)
@@ -362,7 +498,6 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_084_ChainWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                cmds.addAttr(self.worldRef, longName=sideLower+self.userGuideName+'_ikFkBlend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 if not cmds.objExists(self.worldRef+'.globalStretch'):
                     cmds.addAttr(self.worldRef, longName='globalStretch', attributeType='float', minValue=0, maxValue=1, defaultValue=1, keyable=True)
                 self.worldRefList.append(self.worldRef)
@@ -370,26 +505,14 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.worldRefShapeList.append(self.worldRefShape)
 
                 # create constraint in order to blend ikFk:
-                self.ikFkRevList = []
-                for n in range(0, self.nJoints):
-                    parentConst = cmds.parentConstraint(self.ikJointList[n], self.fkJointList[n], self.skinJointList[n], maintainOffset=True, name=self.skinJointList[n]+"_IkFkBlend_PaC")[0]
-                    cmds.setAttr(parentConst+".interpType", 2) #shortest
-                    if n == 0:
-                        revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
-                        cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', revNode+".inputX", force=True)
-                    else:
-                        revNode = side+self.userGuideName+"_IkFkBlend_Rev"
-                    self.ikFkRevList.append(revNode)
-                    # connecting ikFkBlend using the reverse node:
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', parentConst+"."+self.fkJointList[n]+"W1", force=True)
-                    cmds.connectAttr(revNode+".outputX", parentConst+"."+self.ikJointList[n]+"W0", force=True)
+                dpUtils.createJointBlend(self.ikJointList, self.fkJointList, self.skinJointList, "Fk_ikFkBlend", attrNameLower, self.worldRef)
 
                 # ik spline:
-                ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
-                ikSplineList[1] = cmds.rename(ikSplineList[1], side+self.userGuideName+"_Eff")
-                ikSplineList[2] = cmds.rename(ikSplineList[2], side+self.userGuideName+"_IkC")
-                self.ikSplineHandle = ikSplineList[0]
-                self.ikSplineCurve = ikSplineList[2]
+                self.ikSplineList = cmds.ikHandle(startJoint=self.ikJointList[0], endEffector=self.ikJointList[-2], name=side+self.userGuideName+"_IkH", solver="ikSplineSolver", parentCurve=False, numSpans=4) #[Handle, Effector, Curve]
+                self.ikSplineList[1] = cmds.rename(self.ikSplineList[1], side+self.userGuideName+"_Eff")
+                self.ikSplineList[2] = cmds.rename(self.ikSplineList[2], side+self.userGuideName+"_IkC")
+                self.ikSplineHandle = self.ikSplineList[0]
+                self.ikSplineCurve = self.ikSplineList[2]
                 # ik clusters:
                 self.ikClusterList = []
                 self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[0:1]", name=side+self.userGuideName+"_Ik_0_Cls")[1]) #[Deform, Handle]
@@ -465,7 +588,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
                         # last ik control:
-                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_Last_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
+                        self.ikCtrlLast = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c125_last']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
                         self.ctrls.colorShape([self.ikCtrlLast], 'cyan')
                         cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlLast, maintainOffset=False))
                         ikCtrlLastZero = dpUtils.zeroOut([self.ikCtrlLast])[0]
@@ -484,14 +607,25 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     else: #first
                         cmds.addAttr(ikCtrl, longName=self.dpUIinst.lang['c033_autoOrient'], attributeType="float", minValue=0, maxValue=1, defaultValue=1, keyable=True)
                         self.ctrls.setLockHide([ikCtrl], ["sx", "sy", "sz", "v"])
+                        # first ik control:
+                        self.ikCtrlFirst = self.ctrls.cvControl("id_087_ChainIkLast", ctrlName=side+self.userGuideName+"_Ik_"+self.dpUIinst.lang['c114_first']+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree)
+                        self.ctrls.colorShape([self.ikCtrlFirst], 'cyan')
+                        cmds.delete(cmds.parentConstraint(ikCtrl, self.ikCtrlFirst, maintainOffset=False))
+                        ikCtrlFirstZero = dpUtils.zeroOut([self.ikCtrlFirst])[0]
+                        cmds.parent(ikCtrlFirstZero, self.ikCtrlMain)
+                        cmds.parent(ikCtrlZero, self.ikCtrlFirst)
+                        self.ctrls.setLockHide([self.ikCtrlFirst], ["v"])
+                        cmds.connectAttr(self.ikCtrlFirst+".scaleX", self.ikJointList[0]+".scaleX", force=True)
+                        cmds.connectAttr(self.ikCtrlFirst+".scaleY", self.ikJointList[0]+".scaleY", force=True)
+                        cmds.connectAttr(self.ikCtrlFirst+".scaleZ", self.ikJointList[0]+".scaleZ", force=True)
                 
                 # ik controls position:
-                cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")
-                cmds.pointConstraint(self.ikCtrlMain, self.ikCtrlLast, self.ikCtrlZeroList[2], maintainOffset=True, name=self.ikCtrlZeroList[2]+"_PoC")
+                cmds.pointConstraint(self.ikCtrlFirst, self.ikCtrlList[2], self.ikCtrlZeroList[1], maintainOffset=True, name=self.ikCtrlZeroList[1]+"_PoC")
+                cmds.pointConstraint(self.ikCtrlFirst, self.ikCtrlLast, self.ikCtrlZeroList[2], maintainOffset=True, name=self.ikCtrlZeroList[2]+"_PoC")
                 cmds.pointConstraint(self.ikCtrlList[2], self.ikCtrlLast, self.ikCtrlZeroList[3], maintainOffset=True, name=self.ikCtrlZeroList[3]+"_PoC")
                 
                 # ik controls orientation:
-                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlMain, 0, self.ikCtrlList[1], self.ikCtrlMain)
+                firstUpLoc, firstFakeLoc = self.setupAimLocators(side, self.ikCtrlFirst, 0, self.ikCtrlList[1], self.ikCtrlFirst)
                 lastUpLoc, lastFakeLoc = self.setupAimLocators(side, self.ikCtrlLast, 4, self.ikCtrlList[-2], self.ikCtrlLast)
                 midUpLoc, midFakeLoc = self.setupAimLocators(side, self.ikCtrlList[2], 13, self.ikCtrlList[2], self.ikCtrlList[2], False)
                 lastMidLoc = cmds.duplicate(lastFakeLoc, name=lastFakeLoc.replace("Fake", "Middle"))[0]
@@ -509,10 +643,10 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.setupAimConst(self.ikCtrlList[3], self.ikCtrlList[2], midUpLoc, midFakeLoc, self.ikCtrlZeroList[3], 1, False)
                     cmds.aimConstraint(lastMidLoc, self.ikCtrlZeroList[2], worldUpType="object", worldUpObject=lastUpLoc, aimVector=(0, 0, -1), upVector=(0, 1, 0), maintainOffset=True, name=self.ikCtrlZeroList[2]+"_AiC")
                 
-                self.ikStaticDataGrp = cmds.group(ikSplineList[0], ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
+                self.ikStaticDataGrp = cmds.group(self.ikSplineList[0], self.ikSplineList[2], name=side+self.userGuideName+"_IkH_Grp")
 
                 # ik stretch:
-                curveInfoNode = cmds.arclen(ikSplineList[2], constructionHistory=True)
+                curveInfoNode = cmds.arclen(self.ikSplineList[2], constructionHistory=True)
                 curveInfoNode = cmds.rename(curveInfoNode, side+self.userGuideName+"_Ik_CurveInfo")
                 # create stretch nodes:
                 ikNormalizeMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Normalize_MD")
@@ -533,7 +667,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(ikStretchRevNode+".outputX", stretchBC+".blender", force=True)
                 # work with worldRef node:
                 if cmds.objExists(self.worldRef):
-                    cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', ikStretchRevNode+".inputX", force=True)
+                    cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", ikStretchRevNode+".inputX", force=True)
                     cmds.connectAttr(self.worldRef+".globalStretch", globalStretchBC+".blender", force=True)
                     cmds.connectAttr(self.worldRef+".scaleX", globalStretchBC+".color2.color2R", force=True)
                     cmds.connectAttr(self.worldRef+".scaleX", stretchableBC+".color2.color2R", force=True)
@@ -560,9 +694,9 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.worldRef+".scaleX", vvMD+'.input1X', force=True)
                 cmds.connectAttr(self.worldRef+".scaleX", vvCond+'.colorIfFalseR', force=True)
                 cmds.connectAttr(self.worldRef+".scaleX", vvScaleCompensateMD+'.input2X', force=True)
+                cmds.connectAttr(self.worldRef+".scaleX", vvBC+'.color2.color2R', force=True)
                 cmds.connectAttr(stretchBC+".output.outputR", vvMD+'.input2X', force=True)
                 cmds.setAttr(vvMD+'.operation', 2)
-                cmds.setAttr(vvBC+'.color2R', 1)
                 cmds.setAttr(vvCond+".secondTerm", 1)
                 #output volumeVariation values to joint scale axis:
                 for j in range(0, len(self.skinJointList)-2):
@@ -570,8 +704,8 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(vvCond+".outColorR", self.skinJointList[j]+".scaleY", force=True)
 
                 # connecting visibilities:
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', self.fkZeroGrpList[0] + ".visibility", force=True)
-                cmds.connectAttr(self.ikFkRevList[0]+".outputX", self.ikCtrlGrp+".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", self.fkZeroGrpList[0] + ".visibility", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikCtrlGrp+".visibility", force=True)
                 self.ctrls.setLockHide(self.fkCtrlList, ['v'], l=False)
                 self.ctrls.setLockHide(self.ikCtrlList, ['v'], l=False)
                 
@@ -579,7 +713,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 fkLastScaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_LastScale_Fk_MD")
                 ikLastScaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_LastScale_Ik_MD")
                 lastScaleBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_LastScale_BC")
-                cmds.connectAttr(self.worldRef+"."+sideLower+self.userGuideName+'_ikFkBlend', lastScaleBC+".blender", force=True)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlend", lastScaleBC+".blender", force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleX", fkLastScaleCompensateMD+'.input1X', force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleY", fkLastScaleCompensateMD+'.input1Y', force=True)
                 cmds.connectAttr(self.fkJointList[-2]+".scaleZ", fkLastScaleCompensateMD+'.input1Z', force=True)
@@ -602,10 +736,20 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(lastScaleBC+".outputG", self.skinJointList[-2]+'.scaleY', force=True)
                 cmds.connectAttr(lastScaleBC+".outputB", self.skinJointList[-2]+'.scaleZ', force=True)
 
+                # work with main fk controllers
+                if cmds.getAttr(self.base+".mainControls"):
+                    self.addFkMainCtrls(side, self.fkCtrlList)
+                
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
                 self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, name=side+self.userGuideName+"_Scalable_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.ikStaticDataGrp, ikMainLocGrp, name=side+self.userGuideName+"_Static_Grp")
+                
+                # dynamic
+                if self.addDynamic:
+                    self.createDynamicChain(side+self.userGuideName)
+                    cmds.xform(self.toCtrlHookGrp, pivots=cmds.xform(self.ikCtrlMain, worldSpace=True, rotatePivot=True, query=True))
+
                 # create a locator in order to avoid delete static group
                 loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
                 cmds.parent(loc, self.toStaticHookGrp, absolute=True)

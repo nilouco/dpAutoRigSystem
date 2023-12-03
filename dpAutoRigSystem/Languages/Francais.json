@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-08-24",
+    "_updated"       : "2023-11-10",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -136,6 +136,7 @@
     "c122_inner"             : "interieure",
     "c123_outer"             : "Exterieur",
     "c124_corrective"        : "corrective",
+    "c125_last"              : "Dernier",
     
     "e000_GuideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_GuideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -546,7 +547,7 @@
     "m094_doing"                : "En faire",
     "m095_isolate"              : "Isolé",
     "m096_isolateDesc"          : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés\nou il va utiliser le Root_Ctrl.",
-    "m097_00000000"             : "NOT USED HERE",
+    "m097_dynamic"              : "Dynamique",
     "m098_000000000000"         : "NOT USED HERE",
     "m099_cvControlDesc"        : "Il va créer une curve\npour être utilisé comme controleur.",
     "m100_square"               : "Carré",
@@ -682,6 +683,10 @@
     "m227_mainCtrls"            : "Controls principaux",
     "m228_handlebar"            : "Guidon",
     "m229_fork"                 : "Fourche",
+    "m230_proxyCreator"         : "Proxy createur",
+    "m231_proxyCreatorDesc"     : "Ce module va creer a mesh proxy pour le rig courant.",
+    "m232_morphDeformer"        : "Déformateur Morph",
+    "m233_wrapDeformer"         : "Déformateur Wrap",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -780,6 +785,10 @@
     "v076_outlinerCleaner"        : "Outliner nettoyeur",
     "v077_outlinerCleanerDesc"    : "Ce validateur nettoiera les nodes du dpAutoRigSystem\nqui ne sont pas utiles dans l'outliner.\nIl va nous servir pour effacer des déchets d'ancien guides,\npar exemple dpAR_GuideMirror_Grp.",
     "v078_unlockNormals"          : "Débloquer les Normals",
-    "v079_unlockNormalsDesc"      : "Ce validateur va débloquer les normals de géometries."
+    "v079_unlockNormalsDesc"      : "Ce validateur va débloquer les normals de géometries.",
+    "v082_unusedSkinCleaner"      : "Skin non utilisés nettoyeur",
+    "v083_unusedSkinCleanerDesc"  : "Ce validateur va remover les influences de skinning non utilisés.",
+    "v084_unusedNodeCleaner"      : "Node non utilisés nettoyeur",
+    "v085_unusedNodeCleanerDesc"  : "Ce validateur va nettoyer des rendering nodes non necessáires dans le fichier."
 
 }

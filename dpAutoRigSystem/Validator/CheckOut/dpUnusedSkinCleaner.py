@@ -3,15 +3,15 @@ from maya import cmds
 from .. import dpBaseValidatorClass
 
 # global variables to this module:
-CLASS_NAME = "UnknownNodesCleaner"
-TITLE = "v058_unknownNodesCleaner"
-DESCRIPTION = "v059_unknownNodesCleanerDesc"
-ICON = "/Icons/dp_unknownNodesCleaner.png"
+CLASS_NAME = "UnusedSkinCleaner"
+TITLE = "v082_unusedSkinCleaner"
+DESCRIPTION = "v083_unusedSkinCleanerDesc"
+ICON = "/Icons/dp_unusedSkinCleaner.png"
 
-DP_UNKNOWNNODESCLEANER_VERSION = 1.2
+DP_UNUSEDSKINCLEANER_VERSION = 1.1
 
 
-class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
+class UnusedSkinCleaner(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -40,7 +40,7 @@ class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             toCheckList = objList
         else:
-            toCheckList = cmds.ls(selection=False, type='unknown')
+            toCheckList = cmds.ls(selection=False, type='skinCluster')
         if toCheckList:
             progressAmount = 0
             maxProcess = len(toCheckList)
@@ -50,20 +50,27 @@ class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 # conditional to check here
-                self.checkedObjList.append(item)
-                self.foundIssueList.append(True)
-                if self.verifyMode:
-                    self.resultOkList.append(False)
-                else: #fix
-                    try:
-                        if cmds.objExists(item):
-                            cmds.lockNode(item, lock=False)
-                            cmds.delete(item)
-                        self.resultOkList.append(True)
-                        self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                    except:
+                influenceList = cmds.skinCluster(item, query=True, influence=True)
+                weightedInfluenceList = cmds.skinCluster(item, query=True, weightedInfluence=True)
+                if not len(influenceList) == len(weightedInfluenceList):
+                    self.checkedObjList.append(item)
+                    self.foundIssueList.append(True)
+                    if self.verifyMode:
                         self.resultOkList.append(False)
-                        self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                    else: #fix
+                        try:
+                            toRemoveJointList = []
+                            for jointNode in influenceList:
+                                if not jointNode in weightedInfluenceList:
+                                    if not jointNode in toRemoveJointList:
+                                        toRemoveJointList.append(jointNode)
+                            if toRemoveJointList:
+                                cmds.skinCluster(item, edit=True, removeInfluence=toRemoveJointList, toSelectedBones=True)
+                            self.resultOkList.append(True)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(len(toRemoveJointList))+" joints")
+                        except:
+                            self.resultOkList.append(False)
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
         else:
             self.notFoundNodes()
         # --- validator code --- end
