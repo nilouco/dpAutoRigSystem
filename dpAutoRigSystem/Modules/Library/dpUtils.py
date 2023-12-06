@@ -226,11 +226,12 @@ def removeUserDefinedAttr(node):
     userDefAttrList = cmds.listAttr(node, userDefined=True)
     if userDefAttrList:
         for userDefAttr in userDefAttrList:
-            try:
-                cmds.setAttr(node+"."+userDefAttr, lock=False)
-                cmds.deleteAttr(node+"."+userDefAttr)
-            except:
-                pass
+            if not "originedFrom" in userDefAttr:
+                try:
+                    cmds.setAttr(node+"."+userDefAttr, lock=False)
+                    cmds.deleteAttr(node+"."+userDefAttr)
+                except:
+                    pass
 
 
 def zeroOut(transformList=[], offset=False):
