@@ -34,7 +34,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 1.7
+DP_RIVET_VERSION = 1.8
 
 
 class Rivet(object):
@@ -48,13 +48,14 @@ class Rivet(object):
         self.selectedUVSet = None
         self.morphDeformer = MORPH
         self.wrapDeformer = WRAP
+        self.mayaVersionRequired = self.checkMayaVersion()
         # call main function
         if ui:
             self.dpRivetUI()
             # try to fill UI items from selection
             self.dpFillUI()
-
-
+            
+            
     def dpCloseRivetUi(self, *args):
         if cmds.window('dpRivetWindow', query=True, exists=True):
             cmds.deleteUI('dpRivetWindow', window=True)
@@ -104,9 +105,14 @@ class Rivet(object):
         self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.dpChangeDeformer, parent=faceToRivetLayout)
         deformerLayout = cmds.columnLayout('deformerLayout', columnOffset=("left", 20), parent=faceToRivetLayout)
         self.deformerCollection = cmds.radioCollection('deformerCollection', parent=deformerLayout)
-        self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, collection=self.deformerCollection)
-        self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer, collection=self.deformerCollection)
-        cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
+        if self.mayaVersionRequired == True:
+            self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, collection=self.deformerCollection)
+            self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer, collection=self.deformerCollection)
+            cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
+        if self.mayaVersionRequired == False:
+            self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=False, collection=self.deformerCollection)
+            self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer,  enable=False, collection=self.deformerCollection)
+            cmds.radioCollection(self.deformerCollection, edit=True, select=self.wrapDeformerRB)
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
@@ -262,10 +268,14 @@ class Rivet(object):
 
 
     def dpChangeDeformer(self, value, *args):
-        cmds.radioButton(self.morphDeformerRB, edit=True, enable=value)
-        cmds.radioButton(self.wrapDeformerRB, edit=True, enable=value)
-        
-    
+        if self.mayaVersionRequired == True:
+            cmds.radioButton(self.morphDeformerRB, edit=True, enable=value)
+            cmds.radioButton(self.wrapDeformerRB, edit=True, enable=value)
+        else:
+            cmds.radioButton(self.morphDeformerRB, edit=True, enable=False)
+            cmds.radioButton(self.wrapDeformerRB, edit=True, enable=False)
+
+
     def dpInvertAttrTranformation(self, nodeName, invT=True, invR=False, *args):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
         """
@@ -724,3 +734,13 @@ class Rivet(object):
             for item in geoList:
                 if item.endswith("Orig"):
                     return item
+                
+
+    def checkMayaVersion(self, *args):
+        mayaVersion = cmds.about(installedVersion=True)
+        installedVersion = float(mayaVersion.split(" ")[-1])
+        minimalVersion = float(2022.3)
+        if installedVersion < minimalVersion:
+            return False
+        else:
+            return True
