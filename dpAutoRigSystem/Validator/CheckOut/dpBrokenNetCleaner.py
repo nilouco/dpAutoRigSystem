@@ -53,7 +53,7 @@ class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"):
                     if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
                         self.cleanUpNetwork(item)
-                if cmds.objExists(item+".worldRef"):
+                elif cmds.objExists(item+".worldRef"):
                     if not cmds.listConnections(item+".worldRef", source=True, destination=False):
                         self.cleanUpNetwork(item)
         else:
