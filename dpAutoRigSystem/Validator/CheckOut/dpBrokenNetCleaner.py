@@ -52,10 +52,10 @@ class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 # conditional to check here
                 if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"):
                     if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
-                        self.cleaUp(item)
+                        self.cleanUpNetwork(item)
                 if cmds.objExists(item+".worldRef"):
                     if not cmds.listConnections(item+".worldRef", source=True, destination=False):
-                        self.cleaUp(item)
+                        self.cleanUpNetwork(item)
         else:
             self.notFoundNodes()
         # --- validator code --- end
@@ -68,7 +68,7 @@ class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         return self.dataLogDic
 
 
-    def cleaUp(self, item, *args):
+    def cleanUpNetwork(self, item, *args):
         self.checkedObjList.append(item)
         self.foundIssueList.append(True)
         if self.verifyMode:
