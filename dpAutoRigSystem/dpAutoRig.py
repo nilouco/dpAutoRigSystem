@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.43"
-DPAR_UPDATELOG = "N780 OriginedFrom fix to tweakers."
+DPAR_VERSION_PY3 = "4.03.44"
+DPAR_UPDATELOG = "N781 Clean-up duplicated IkFkSnap network node."
 
 
 

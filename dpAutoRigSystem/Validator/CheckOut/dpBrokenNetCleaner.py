@@ -8,7 +8,7 @@ TITLE = "v046_brokenNetCleaner"
 DESCRIPTION = "v047_brokenNetCleanerDesc"
 ICON = "/Icons/dp_brokenNetCleaner.png"
 
-DP_BROKENNETCLEANER_VERSION = 1.1
+DP_BROKENNETCLEANER_VERSION = 1.2
 
 
 class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -52,6 +52,21 @@ class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 # conditional to check here
                 if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"):
                     if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
+                        self.checkedObjList.append(item)
+                        self.foundIssueList.append(True)
+                        if self.verifyMode:
+                            self.resultOkList.append(False)
+                        else: #fix
+                            try:
+                                cmds.delete(item)
+                                cmds.select(clear=True)
+                                self.resultOkList.append(True)
+                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            except:
+                                self.resultOkList.append(False)
+                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                elif cmds.objExists(item+".worldRef"):
+                    if not cmds.listConnections(item+".worldRef", source=True, destination=False):
                         self.checkedObjList.append(item)
                         self.foundIssueList.append(True)
                         if self.verifyMode:
