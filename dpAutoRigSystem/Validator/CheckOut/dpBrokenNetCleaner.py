@@ -52,34 +52,10 @@ class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                 # conditional to check here
                 if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"):
                     if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.verifyMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.delete(item)
-                                cmds.select(clear=True)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                            except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
-                elif cmds.objExists(item+".worldRef"):
+                        self.cleaUp(item)
+                if cmds.objExists(item+".worldRef"):
                     if not cmds.listConnections(item+".worldRef", source=True, destination=False):
-                        self.checkedObjList.append(item)
-                        self.foundIssueList.append(True)
-                        if self.verifyMode:
-                            self.resultOkList.append(False)
-                        else: #fix
-                            try:
-                                cmds.delete(item)
-                                cmds.select(clear=True)
-                                self.resultOkList.append(True)
-                                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
-                            except:
-                                self.resultOkList.append(False)
-                                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                        self.cleaUp(item)
         else:
             self.notFoundNodes()
         # --- validator code --- end
@@ -90,3 +66,20 @@ class BrokenNetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         self.reportLog()
         self.endProgressBar()
         return self.dataLogDic
+
+
+    def cleaUp(self, item, *args):
+        self.checkedObjList.append(item)
+        self.foundIssueList.append(True)
+        if self.verifyMode:
+            self.resultOkList.append(False)
+        else: #fix
+            try:
+                cmds.delete(item)
+                cmds.select(clear=True)
+                self.resultOkList.append(True)
+                self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+            except:
+                self.resultOkList.append(False)
+                self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+
