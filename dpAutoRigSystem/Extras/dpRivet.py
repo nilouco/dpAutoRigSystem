@@ -106,13 +106,10 @@ class Rivet(object):
         self.faceToRivetCB = cmds.checkBox('faceToRivetCB', label=self.dpUIinst.lang["m226_createFaceToRivet"], height=20, value=True, changeCommand=self.dpChangeDeformer, parent=faceToRivetLayout)
         deformerLayout = cmds.columnLayout('deformerLayout', columnOffset=("left", 20), parent=faceToRivetLayout)
         self.deformerCollection = cmds.radioCollection('deformerCollection', parent=deformerLayout)
-        if self.mayaVersionRequired == True:
-            self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, collection=self.deformerCollection)
-            self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer, collection=self.deformerCollection)
-            cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
-        if self.mayaVersionRequired == False:
-            self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=False, collection=self.deformerCollection)
-            self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer,  enable=False, collection=self.deformerCollection)
+        self.morphDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m232_morphDeformer"], annotation=self.morphDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
+        self.wrapDeformerRB = cmds.radioButton(label=self.dpUIinst.lang["m233_wrapDeformer"], annotation=self.wrapDeformer, enable=self.mayaVersionRequired, collection=self.deformerCollection)
+        cmds.radioCollection(self.deformerCollection, edit=True, select=self.morphDeformerRB)
+        if not self.mayaVersionRequired:
             cmds.radioCollection(self.deformerCollection, edit=True, select=self.wrapDeformerRB)
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
@@ -269,12 +266,10 @@ class Rivet(object):
 
 
     def dpChangeDeformer(self, value, *args):
-        if self.mayaVersionRequired == True:
-            cmds.radioButton(self.morphDeformerRB, edit=True, enable=value)
-            cmds.radioButton(self.wrapDeformerRB, edit=True, enable=value)
-        else:
-            cmds.radioButton(self.morphDeformerRB, edit=True, enable=False)
-            cmds.radioButton(self.wrapDeformerRB, edit=True, enable=False)
+        if not self.mayaVersionRequired:
+            value = False
+        cmds.radioButton(self.morphDeformerRB, edit=True, enable=value)
+        cmds.radioButton(self.wrapDeformerRB, edit=True, enable=value)
 
 
     def dpInvertAttrTranformation(self, nodeName, invT=True, invR=False, *args):
@@ -741,7 +736,5 @@ class Rivet(object):
         mayaVersion = cmds.about(installedVersion=True)
         installedVersion = float(mayaVersion.split(" ")[-1])
         minimalVersion = float(self.mayaMinimalVersion)
-        if installedVersion < minimalVersion:
-            return False
-        else:
+        if installedVersion > minimalVersion:
             return True
