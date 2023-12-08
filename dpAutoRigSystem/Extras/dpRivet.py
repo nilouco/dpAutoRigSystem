@@ -48,6 +48,7 @@ class Rivet(object):
         self.selectedUVSet = None
         self.morphDeformer = MORPH
         self.wrapDeformer = WRAP
+        self.mayaMinimalVersion = 2022.3
         self.mayaVersionRequired = self.checkMayaVersion()
         # call main function
         if ui:
@@ -739,7 +740,7 @@ class Rivet(object):
     def checkMayaVersion(self, *args):
         mayaVersion = cmds.about(installedVersion=True)
         installedVersion = float(mayaVersion.split(" ")[-1])
-        minimalVersion = float(2022.3)
+        minimalVersion = float(self.mayaMinimalVersion)
         if installedVersion < minimalVersion:
             return False
         else:
