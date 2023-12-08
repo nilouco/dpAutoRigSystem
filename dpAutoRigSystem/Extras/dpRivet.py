@@ -733,8 +733,13 @@ class Rivet(object):
                 
 
     def checkMayaVersion(self, *args):
+        """ Get Maya's version installed to compare with the minimalVersionRequired (2022.3)
+            If the installed version is above the minimal it returns True, otherwise False
+        """ 
         mayaVersion = cmds.about(installedVersion=True)
         installedVersion = float(mayaVersion.split(" ")[-1])
         minimalVersion = float(self.mayaMinimalVersion)
         if installedVersion > minimalVersion:
             return True
+        else:
+            return False
