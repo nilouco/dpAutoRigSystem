@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.43"
-DPAR_UPDATELOG = "N780 OriginedFrom fix to tweakers."
+DPAR_VERSION_PY3 = "4.03.46"
+DPAR_UPDATELOG = "N764 - Mirror shape issue with headDeformer fixed."
 
 
 

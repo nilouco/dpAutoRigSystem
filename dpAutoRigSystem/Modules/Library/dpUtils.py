@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.5
+DP_UTILS_VERSION = 2.6
 
 
 # UTILS functions:
@@ -1108,3 +1108,12 @@ def setAttrValues(itemList, attrList, valueList):
         for item in itemList:
             for attr, value in zip(attrList, valueList):
                 cmds.setAttr(item+"."+attr, value)
+
+
+def reapplyDeformers(item, defList):
+    """ Reapply the given deformer list to the destination given item except the tweak node.
+    """
+    for deformerNode in defList:
+        if cmds.objExists(deformerNode):
+            if not cmds.objectType(deformerNode) == "tweak":
+                cmds.deformer(deformerNode, edit=True, geometry=item)
