@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.45"
-DPAR_UPDATELOG = "N773 - Added conditional on dpRivet FaceToRivet to check \nMaya's version when using morphDeformer to avoid geometry missplacing. \nMinimal Maya's version: 2022.3."
+DPAR_VERSION_PY3 = "4.03.46"
+DPAR_UPDATELOG = "N760 - Calling dpUtils with Chain dynamic."
 
 
 
