@@ -8,7 +8,7 @@ TITLE = "v030_colorSetCleaner"
 DESCRIPTION = "v031_colorSetCleanerDesc"
 ICON = "/Icons/dp_colorSetCleaner.png"
 
-DP_COLORSETCLEANER_VERSION = 1.1
+DP_COLORSETCLEANER_VERSION = 1.2
 
 
 class ColorSetCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -56,7 +56,8 @@ class ColorSetCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     self.resultOkList.append(False)
                 else: #fix
                     try:
-                        cmds.delete(item)
+                        if cmds.objExists(item):
+                            cmds.delete(item)
                         cmds.select(clear=True)
                         self.resultOkList.append(True)
                         self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
