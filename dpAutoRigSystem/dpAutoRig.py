@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.46"
-DPAR_UPDATELOG = "N771 - ColorSet cleaner fixed issue and report False"
+DPAR_UPDATELOG = "N764 - Mirror shape issue with headDeformer fixed.\nN760 - Calling dpUtils with Chain dynamic.\nN771 - ColorSet cleaner fixed issue and report False"
 
 
 

@@ -11,7 +11,7 @@ TITLE = "m178_chain"
 DESCRIPTION = "m179_chainDesc"
 ICON = "/Icons/dp_chain.png"
 
-DP_CHAIN_VERSION = 2.2
+DP_CHAIN_VERSION = 2.3
 
 
 class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -215,17 +215,6 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         return list(reversed(renamedList))
 
 
-    def clearUserDefinedAttr(self, jointList, *args):
-        """ TODO change to call dpUtils done function after branchativa publishing.
-        """
-        for jnt in jointList:
-            userDefAttrList = cmds.listAttr(jnt, userDefined=True)
-            if userDefAttrList:
-                for userDefAttr in userDefAttrList:
-                    cmds.setAttr(jnt+"."+userDefAttr, lock=False)
-                    cmds.deleteAttr(jnt+"."+userDefAttr)
-
-
     def createDynamicChain(self, dynName, rebuildCrvSpans=20, *args):
         """ This is like a patch to add a dynamic setup to the Chain.
         """
@@ -249,7 +238,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dynJntList.insert(0, firstDynJnt)
         self.skinJointList = self.clearRenameJointChain(skinJntList, "_Jn", "_IkFk_Jx", False)
         cmds.rename(self.skinJointList[-1], dynName+"_IkFk_JEnd")
-        self.clearUserDefinedAttr(self.skinJointList[:-1]) # to be changed to call dpUtils function instead.
+        dpUtils.removeUserDefinedAttr(self.skinJointList[:-1])
         newSkinJntList = self.clearRenameJointChain(newSkinJntList, "", "")
         cmds.rename(dynName+"_00_Jnt_First", dynName+"_00_Jnt")
         newSkinJntList = [dynName+"_00_Jnt"]
@@ -258,7 +247,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.skinJointList[0]+".visibility", 0)
         
         # setup new blend joints
-        dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef)
+        dpUtils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef, False)
         dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
         cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
         cmds.connectAttr(dynJntList[0]+".scaleY", dynStretchBC+".color1G", force=True)
