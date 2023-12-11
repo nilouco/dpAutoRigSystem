@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.6
+DP_UTILS_VERSION = 2.7
 
 
 # UTILS functions:
@@ -1069,7 +1069,7 @@ def clearJointLabel(jointList):
                 cmds.setAttr(jnt+".type", 0)
 
 
-def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef):
+def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef, storeName=True):
     """ Create an Ik Fk Blend setup for joint chain.
         Return the created reverse node.
     """
@@ -1081,8 +1081,9 @@ def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName
             revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
             cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
             cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
-            cmds.addAttr(worldRef, longName="ikFkBlendAttrName", dataType="string")
-            cmds.setAttr(worldRef+".ikFkBlendAttrName", attrCompName, type="string")
+            if storeName:
+                cmds.addAttr(worldRef, longName="ikFkBlendAttrName", dataType="string")
+                cmds.setAttr(worldRef+".ikFkBlendAttrName", attrCompName, type="string")
             cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
             cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
         # connecting ikFkBlend using the reverse node:

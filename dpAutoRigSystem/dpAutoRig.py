@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.46"
-DPAR_UPDATELOG = "N764 - Mirror shape issue with headDeformer fixed."
+DPAR_UPDATELOG = "N760 - Calling dpUtils with Chain dynamic."
 
 
 
