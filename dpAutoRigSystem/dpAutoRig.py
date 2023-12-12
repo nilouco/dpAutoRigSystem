@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.47"
-DPAR_UPDATELOG = "N568 - Inverted normal new checkin validator."
+DPAR_VERSION_PY3 = "4.03.49"
+DPAR_UPDATELOG = "N706 - Publish student version without error.\nN758 - Publisher today value."
 
 
 

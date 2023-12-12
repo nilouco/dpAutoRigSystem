@@ -257,7 +257,7 @@ class Publisher(object):
                     publishFileName += ".m"+self.pipeliner.pipeData['sceneName'][-1]
                 self.pipeliner.pipeData['publishFileName'] = publishFileName
                 publishLog["published"] = self.pipeliner.pipeData['publishPath']+"/"+publishFileName
-                publishLog["exportPath"] = self.pipeliner.pipeData['f_drive']+"/"+self.pipeliner.pipeData['f_studio']+"/"+self.pipeliner.pipeData['f_project']+"/"+self.pipeliner.pipeData['f_toClient']+"/"+self.pipeliner.today
+                publishLog["exportPath"] = self.pipeliner.pipeData['f_drive']+"/"+self.pipeliner.pipeData['f_studio']+"/"+self.pipeliner.pipeData['f_project']+"/"+self.pipeliner.pipeData['f_toClient']+"/"+self.pipeliner.getToday()
                 # comments
                 publishLog["comments"] = ""
                 commentValue = comments
@@ -326,7 +326,7 @@ class Publisher(object):
                         if self.pipeliner.pipeData['toClientPath']:
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
-                                self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.today)
+                                self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.getToday())
                     cmds.progressWindow(endProgress=True)
                     progressAmount += 1
                     cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['i225_savingFile'], isInterruptable=False)
@@ -342,7 +342,7 @@ class Publisher(object):
 
                         if self.pipeliner.pipeData['toClientPath']:
                             # toClient
-                            zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.today)
+                            zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.getToday())
                             # dropbox
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
