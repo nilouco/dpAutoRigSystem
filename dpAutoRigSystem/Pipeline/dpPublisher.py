@@ -7,7 +7,7 @@ from . import dpPackager
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.6
+DP_PUBLISHER_VERSION = 1.7
 
 
 class Publisher(object):
@@ -333,7 +333,7 @@ class Publisher(object):
                     
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
-                    cmds.file(save=True, type=cmds.file(query=True, type=True)[0], prompt=False, force=True)
+                    cmds.file(save=True, type=cmds.file(query=True, type=True)[0], force=True)
 
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
