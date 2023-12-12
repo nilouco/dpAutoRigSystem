@@ -26,7 +26,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.1
+DP_CONTROLS_VERSION = 2.3
 
 
 class ControlClass(object):
@@ -83,10 +83,8 @@ class ControlClass(object):
             cmds.setAttr(item+".outlinerColor.outlinerColorR", color[0])
             cmds.setAttr(item+".outlinerColor.outlinerColorG", color[1])
             cmds.setAttr(item+".outlinerColor.outlinerColorB", color[2])
-            try:
-                mel.eval("AEdagNodeCommonRefreshOutliners;")
-            except:
-                pass
+            mel.eval('source AEdagNodeCommon;')
+            mel.eval("AEdagNodeCommonRefreshOutliners();")
         else:
             # set override as enable:
             cmds.setAttr(item+".overrideEnabled", 1)
@@ -380,10 +378,7 @@ class ControlClass(object):
         # create Option_Ctrl Text:
         try:
             optCtrlTxt = cmds.group(name="Option_Ctrl_Txt", empty=True)
-            try:
-                cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Source Sans Pro", text="Option Ctrl", constructionHistory=False)[0]
-            except:
-                cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", font="Arial", text="Option Ctrl", constructionHistory=False)[0]
+            cvText = cmds.textCurves(name="Option_Ctrl_Txt_TEMP_Grp", text="Option Ctrl", constructionHistory=False)[0]
             txtShapeList = cmds.listRelatives(cvText, allDescendents=True, type='nurbsCurve')
             if txtShapeList:
                 for s, shape in enumerate(txtShapeList):
@@ -615,10 +610,7 @@ class ControlClass(object):
                             self.destChildrenGrp = cmds.group(destChildrenList, name="dpTemp_DestChildren_Grp")
                             cmds.parent(self.destChildrenGrp, world=True)
                         if defList:
-                            for deformerNode in defList:
-                                if cmds.objExists(deformerNode):
-                                    if not cmds.objectType(deformerNode) == "tweak":
-                                        cmds.deformer(deformerNode, edit=True, geometry=dupSourceItem)
+                            dpUtils.reapplyDeformers(dupSourceItem, defList)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
                             if needKeepVis:
@@ -627,18 +619,21 @@ class ControlClass(object):
                                 cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
                             else:
                                 # make sure we use the current shape of a froze transform, usefull to mirror control shapes
-                                forcedShape = cmds.parent(dupSourceShape, destTransform, absolute=True, shape=True)
+                                forcedShape = cmds.parent(dupSourceShape, destTransform, absolute=True, shape=True)[0]
                                 forcedTransform = cmds.listRelatives(forcedShape, parent=True, type="transform")
                                 cmds.makeIdentity(forcedTransform, apply=True, translate=True, rotate=True, scale=True)
                                 cmds.parent(forcedShape, destTransform, relative=True, shape=True)
                                 cmds.delete(forcedTransform)
                                 if defList:
-                                    histList = cmds.listHistory(forcedShape)
-                                    if histList:
-                                        for defNode in histList:
-                                            if cmds.objExists(defNode):
-                                                if cmds.objectType(defNode) == "transformGeometry":
-                                                    cmds.delete(defNode)
+                                    if cmds.objExists(forcedShape):
+                                        histList = cmds.listHistory(forcedShape)
+                                        if histList:
+                                            for defNode in histList:
+                                                if cmds.objExists(defNode):
+                                                    if cmds.objectType(defNode) == "transformGeometry":
+                                                        cmds.delete(forcedShape, constructionHistory=True)
+                                                        dpUtils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
+                                                        break
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
                         # restore children transforms to correct parent hierarchy:

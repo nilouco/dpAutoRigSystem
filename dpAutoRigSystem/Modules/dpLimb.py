@@ -4,6 +4,7 @@ from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
 from .Library import dpSoftIk
+from .Library import dpIkFkSnap
 from ..Extras import dpCorrectionManager
 from functools import partial
 from importlib import reload
@@ -19,7 +20,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.6
+DP_LIMB_VERSION = 2.7
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -49,7 +50,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.quadFrontLegList = []
         self.integrateOrigFromList = []
         self.ikStretchExtremLocList = []
-        self.ikFkNetworkList = []
         self.afkIsolateConst = []
         self.aScalableGrps = []
         self.origRotList = []
@@ -67,20 +67,29 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.createModuleLayout(self)
         dpLayoutClass.LayoutClass.basicModuleLayout(self)
 
+
     def getHasBend(self):
         return cmds.getAttr(self.moduleGrp+".hasBend")
+
 
     def getBendJoints(self):
         return cmds.getAttr(self.moduleGrp+".numBendJoints")
 
+
     def getAlignWorld(self):
         return cmds.getAttr(self.moduleGrp+".alignWorld")
-        
+
+
     def getHasAdditional(self):
         if cmds.objExists(self.moduleGrp+".additional"):
             return cmds.getAttr(self.moduleGrp+".additional")
         else:
             return 0
+
+
+    def addFollowAttrName(self, ctrl, attr, *args):
+        cmds.addAttr(ctrl, longName="followAttrName", dataType="string")
+        cmds.setAttr(ctrl+".followAttrName", attr, type="string")
 
 
     # @dpUtils.profiler
@@ -678,6 +687,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # creating a group reference to recept the attributes:
                 self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                cmds.addAttr(self.worldRef, longName="ikFkSnap", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.dpUIinst.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
                 self.worldRefShape = cmds.listRelatives(self.worldRef, children=True, type='nurbsCurve')[0]
@@ -695,10 +705,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.shoulderRefGrp, self.skinJointList[0], relative=False)
                 cmds.pointConstraint(self.shoulderRefGrp, self.zeroFkCtrlList[1], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PoC")
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderRefGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PaC")[0]
-                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['c032_follow'], attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
+                cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['m095_isolate'].lower(), attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                self.addFollowAttrName(self.fkCtrlList[1], self.dpUIinst.lang['m095_isolate'].lower())
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['c032_follow'], self.fkIsolateRevNode+".inputX", force=True)
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), self.fkIsolateRevNode+".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.masterCtrlRef+"W1", force=True)
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
@@ -1203,7 +1214,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(self.ikACJointList[0])
 
                 # Ribbon feature by James do Carmo, thanks!
-                # not using bend or ikFkSnap systems to quadruped
                 loadedRibbon = False
                 # (James) add bend to limb
                 if self.getHasBend():
@@ -1307,7 +1317,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(self.fkCtrlList[0], self.clavicleCtrlGrp, relative=True)
                     
                     # create auto clavicle attribute:
-                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0.3, keyable=True)
+                    cmds.addAttr(self.fkCtrlList[0], longName=self.dpUIinst.lang['c032_follow'], attributeType="float", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                    self.addFollowAttrName(self.fkCtrlList[0], self.dpUIinst.lang['c032_follow'])
                     
                     # ik auto clavicle locators:
                     acIkUpLoc = cmds.spaceLocator(name=side+self.userGuideName+"_AC_Up_Loc")[0]
@@ -1684,6 +1695,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(rfStretchableCnd+".outColorR", self.ikStretchExtremLoc+".translateZ", force=True)
                     cmds.orientConstraint(softIkOrientLoc, ikStretchExtremLocZero, maintainOffset=False, name=ikStretchExtremLocZero+"_OrC")
                 
+                # ikFkSnap
+                dpIkFkSnap.IkFkSnapClass(self.dpUIinst, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'])
+                
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [
@@ -1755,7 +1769,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "quadFrontLegList": self.quadFrontLegList,
                 "integrateOrigFromList": self.integrateOrigFromList,
                 "ikStretchExtremLoc": self.ikStretchExtremLocList,
-                "ikFkNetworkList": self.ikFkNetworkList,
                 "limbManualVolume": self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation'],
                 "scalableGrp": self.aScalableGrps,
                 "masterCtrlRefList": self.masterCtrlRefList,

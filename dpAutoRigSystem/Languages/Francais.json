@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2023-11-10",
+    "_updated"       : "2023-12-10",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -790,6 +790,8 @@
     "v082_unusedSkinCleaner"      : "Skin non utilisés nettoyeur",
     "v083_unusedSkinCleanerDesc"  : "Ce validateur va remover les influences de skinning non utilisés.",
     "v084_unusedNodeCleaner"      : "Node non utilisés nettoyeur",
-    "v085_unusedNodeCleanerDesc"  : "Ce validateur va nettoyer des rendering nodes non necessáires dans le fichier."
+    "v085_unusedNodeCleanerDesc"  : "Ce validateur va nettoyer des rendering nodes non necessáires dans le fichier.",
+    "v086_invertedNormals"        : "Normals inverées.",
+    "v087_invertedNormalsDesc"    : "Ce validateur va vérifier pour normales inversées dans les géometries."
 
 }

@@ -12,7 +12,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.0
+DP_PROXYCREATOR_VERSION = 1.1
 
 
 class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
@@ -38,7 +38,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         # starting
         self.verifyMode = verifyMode
         self.cleanUpToStart()
-        
+
         # ---
         # --- validator code --- beginning
         self.skinClusterList = []
@@ -106,7 +106,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
             self.notFoundNodes(proxyGrp)
         # --- validator code --- end
         # ---
-
+        
         # finishing
         self.updateButtonColors()
         self.reportLog()
@@ -131,20 +131,27 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
             self.skinClusterList.append(skinClusterNode)
             weightedInfluenceList = cmds.skinCluster(skinClusterNode, query=True, weightedInfluence=True)
             if weightedInfluenceList:
-                gotVertexList = []
+                # get data and store it into a dic
+                indexJointDic = {}
+                sourceFaceList = cmds.ls(source+".f[*]", flatten=True)
+                for i, idx in enumerate(sourceFaceList):
+                    percList = cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
+                    indexJointDic[i] = percList[0]
+                    if not len(percList) == 1:
+                        jointValueList = []
+                        for item in percList:
+                            jointValueList.append(cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=item, query=True))
+                        indexJointDic[i] = percList[jointValueList.index(max(jointValueList))]
                 for jnt in weightedInfluenceList:
-                    skinnedFaceList = []
                     nodeFaceList = []
-                    faceList = cmds.ls(source+".f[*]", flatten=True)
-                    for i, idx in enumerate(faceList):
-                        if not i in gotVertexList:
-                            percList = cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
-                            if percList:
-                                if jnt in percList:
-                                    skinnedFaceList.append(i)
-                                    gotVertexList.append(i)
+                    skinnedFaceList = []
+                    # data analisis
+                    for j in list(indexJointDic.keys()):
+                        if indexJointDic[j] == jnt:
+                            skinnedFaceList.append(j)
                     if skinnedFaceList:
-                        faceList = [w.replace(source+".f[", "") for w in faceList]
+                        # filter lists
+                        faceList = [w.replace(source+".f[", "") for w in sourceFaceList]
                         faceList = [int(w.replace("]", "")) for w in faceList]
                         if faceList:
                             for v in reversed(skinnedFaceList):
@@ -153,6 +160,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                             for n in faceList:
                                 nodeFaceList.append(source+".f["+str(n)+"]")
                         if nodeFaceList:
+                            # create proxy geometry
                             dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
                             for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
                                 if "Orig" in dupItem:

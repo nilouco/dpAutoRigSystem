@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-11-10",
+    "_updated"       : "2023-12-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -792,5 +792,7 @@
     "v082_unusedSkinCleaner"      : "Unused skin cleaner",
     "v083_unusedSkinCleanerDesc"  : "This validator will remove unused skin influences.",
     "v084_unusedNodeCleaner"      : "Unused node cleaner",
-    "v085_unusedNodeCleanerDesc"  : "This validator will remove unecessary rendering nodes."
+    "v085_unusedNodeCleanerDesc"  : "This validator will remove unecessary rendering nodes.",
+    "v086_invertedNormals"        : "Inverted Normals",
+    "v087_invertedNormalsDesc"    : "This validator will verify inverted normals in the geometries."
 }

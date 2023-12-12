@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.5
+DP_UTILS_VERSION = 2.7
 
 
 # UTILS functions:
@@ -226,11 +226,12 @@ def removeUserDefinedAttr(node):
     userDefAttrList = cmds.listAttr(node, userDefined=True)
     if userDefAttrList:
         for userDefAttr in userDefAttrList:
-            try:
-                cmds.setAttr(node+"."+userDefAttr, lock=False)
-                cmds.deleteAttr(node+"."+userDefAttr)
-            except:
-                pass
+            if not "originedFrom" in userDefAttr:
+                try:
+                    cmds.setAttr(node+"."+userDefAttr, lock=False)
+                    cmds.deleteAttr(node+"."+userDefAttr)
+                except:
+                    pass
 
 
 def zeroOut(transformList=[], offset=False):
@@ -908,10 +909,44 @@ def resolveName(name, suffix, *args):
     return baseName, name
 
 
-def magnitude(vector, *args):
+def magnitude(v, *args):
     """ Returns the square root of the sum of power 2 from a given vector.
     """
-    return( math.sqrt( pow( vector[0], 2) + pow( vector[1], 2) + pow( vector[2], 2)))
+    return math.sqrt(pow(v[0], 2)+pow(v[1], 2)+pow(v[2], 2))
+
+
+def normalizeVector(v):
+    """ Returns the normalized given vector.
+    """
+    vMag = magnitude(v)
+    return [v[i]/vMag for i in range(len(v))]
+
+
+def distanceVectors(u, v):
+    """ Returns the distance between 2 given points.
+    """
+    return math.sqrt((v[0]-u[0])**2+(v[1]-u[1])**2+(v[2]-u[2])**2)
+
+
+def addVectors(u, v):
+    """ Returns the addition of 2 given vectors.
+    """
+    return [u[i]+v[i] for i in range(len(u))]
+
+
+def subVectors(u, v):
+    """ Returns the substration of 2 given vectors.
+    """
+    return [u[i]-v[i] for i in range(len(u))]
+
+
+def multVectors(u, v):
+    return [u[i]*v[i] for i in range(len(u))]
+
+def multiScalarVector(u, scalar):
+    """
+    """
+    return [u[i]*scalar for i in range(len(u))]
 
 
 def jointChainLength(jointList):
@@ -1034,7 +1069,7 @@ def clearJointLabel(jointList):
                 cmds.setAttr(jnt+".type", 0)
 
 
-def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef):
+def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName, worldRef, storeName=True):
     """ Create an Ik Fk Blend setup for joint chain.
         Return the created reverse node.
     """
@@ -1046,6 +1081,9 @@ def createJointBlend(jointListA, jointListB, jointListC, attrName, attrStartName
             revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
             cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
             cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
+            if storeName:
+                cmds.addAttr(worldRef, longName="ikFkBlendAttrName", dataType="string")
+                cmds.setAttr(worldRef+".ikFkBlendAttrName", attrCompName, type="string")
             cmds.connectAttr(worldRef+"."+attrCompName, revNode+".inputX", force=True)
             cmds.connectAttr(revNode+".outputX", worldRef+"."+attrCompName+"RevOutputX", force=True)
         # connecting ikFkBlend using the reverse node:
@@ -1071,3 +1109,12 @@ def setAttrValues(itemList, attrList, valueList):
         for item in itemList:
             for attr, value in zip(attrList, valueList):
                 cmds.setAttr(item+"."+attr, value)
+
+
+def reapplyDeformers(item, defList):
+    """ Reapply the given deformer list to the destination given item except the tweak node.
+    """
+    for deformerNode in defList:
+        if cmds.objExists(deformerNode):
+            if not cmds.objectType(deformerNode) == "tweak":
+                cmds.deformer(deformerNode, edit=True, geometry=item)
