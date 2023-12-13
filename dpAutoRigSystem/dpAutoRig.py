@@ -617,7 +617,8 @@ class DP_AutoRig_UI(object):
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.lang['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
-        
+        self.allUIs["selectAllControls"] = cmds.button("selectAllControls", label=self.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ctrls.selectAllControls), parent=self.allUIs["editSelectedControllerFL"])
+
         # calibrationControls - frameLayout:
         self.allUIs["calibrationFL"] = cmds.frameLayout('calibrationFL', label=self.lang['i193_calibration'], collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["controlLayout"])
         self.allUIs["calibration2Layout"] = cmds.paneLayout("calibration2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["calibrationFL"])
