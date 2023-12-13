@@ -19,7 +19,7 @@ CAM_ROTY = 30
 CAM_ROTZ = 0
 CTRL_LAYER = "Ctrl_Lyr"
 
-DP_PACKAGER_VERSION = 1.7
+DP_PACKAGER_VERSION = 1.8
 
 
 class Packager(object):
@@ -229,7 +229,10 @@ class Packager(object):
             for item in sceneList:
                 self.removeExistingArchived(destinationFolder, item)
                 shutil.move(scenePath+"/"+item, destinationFolder)
-        shutil.copy2(scenePath+"/"+fileShortName, destinationFolder)
+        try: #to avoid have an issue when copying file to a non default pipeline asset name folder
+            shutil.copy2(scenePath+"/"+fileShortName, destinationFolder)
+        except:
+            pass
 
     
     def toDropbox(self, file, toPath, *args):

@@ -9,7 +9,7 @@ import time
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.7
+DP_PIPELINER_VERSION = 1.8
 
 
 class Pipeliner(object):
@@ -17,7 +17,6 @@ class Pipeliner(object):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
-        self.today = time.strftime("%Y-%m-%d", time.localtime())
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.webhookFile = "dpWebhook.json"
@@ -26,6 +25,12 @@ class Pipeliner(object):
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
         
+
+    def getToday(self, *args):
+        """ Just returns the date like 1980-11-13
+        """
+        return time.strftime("%Y-%m-%d", time.localtime())
+    
 
     def getJsonContent(self, jsonPath, *args):
         """ Open, read, close and return the json file content.
@@ -487,11 +492,15 @@ class Pipeliner(object):
             if self.pipeData['b_deliver']:
                 self.pipeData['toClientPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_toClient']
                 if self.pipeData['b_dateDir']:
-                    self.pipeData['toClientPath'] += "/"+self.today
+                    self.pipeData['toClientPath'] += "/"+self.getToday()
                 self.makeDirIfNotExists(self.pipeData['toClientPath'])
             # hist path
             if self.pipeData['b_archive']:
-                self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
+                if self.pipeData['assetNameFolderIssue']:
+                    currentPath = cmds.file(query=True, sceneName=True)
+                    self.pipeData['scenePath'] = currentPath[:currentPath.rfind("/")]
+                else:
+                    self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
                 self.pipeData['historyPath'] = self.pipeData['scenePath']+"/"+self.pipeData['s_hist']
                 self.makeDirIfNotExists(self.pipeData['historyPath'])
             # dropbox path
