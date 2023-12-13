@@ -18,8 +18,9 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.48"
-DPAR_UPDATELOG = "N067 - Added select all control tab."
+DPAR_VERSION_PY3 = "4.03.49"
+DPAR_UPDATELOG = "N043 - Wheel inverted tire controllers."
+
 
 
 
