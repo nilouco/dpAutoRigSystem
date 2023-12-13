@@ -496,7 +496,11 @@ class Pipeliner(object):
                 self.makeDirIfNotExists(self.pipeData['toClientPath'])
             # hist path
             if self.pipeData['b_archive']:
-                self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
+                if self.pipeData['assetNameFolderIssue']:
+                    currentPath = cmds.file(query=True, sceneName=True)
+                    self.pipeData['scenePath'] = currentPath[:currentPath.rfind("/")]
+                else:
+                    self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
                 self.pipeData['historyPath'] = self.pipeData['scenePath']+"/"+self.pipeData['s_hist']
                 self.makeDirIfNotExists(self.pipeData['historyPath'])
             # dropbox path

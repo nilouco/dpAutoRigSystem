@@ -171,9 +171,11 @@ class Publisher(object):
         """
         self.assetNameList = []
         if os.path.exists(filePath):
+            self.pipeliner.pipeData['assetNameFolderIssue'] = False
             assetName = self.checkPipelineAssetNameFolder()
             if not assetName:
                 assetName = self.shortAssetName
+                self.pipeliner.pipeData['assetNameFolderIssue'] = True
             publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
             fileNameList = next(os.walk(filePath))[2]
             if fileNameList:
