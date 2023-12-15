@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.7
+DP_UTILS_VERSION = 2.8
 
 
 # UTILS functions:
@@ -220,13 +220,17 @@ def useDefaultRenderLayer():
         cmds.editRenderLayerGlobals(currentRenderLayer='defaultRenderLayer')
 
 
-def removeUserDefinedAttr(node):
+def removeUserDefinedAttr(node, keepOriginedFrom=False):
     """ Just remove all user defined attributes for the given node.
     """
     userDefAttrList = cmds.listAttr(node, userDefined=True)
     if userDefAttrList:
         for userDefAttr in userDefAttrList:
-            if not "originedFrom" in userDefAttr:
+            delIt = True
+            if "originedFrom" in userDefAttr:
+                if keepOriginedFrom:
+                    delIt = False
+            if delIt:
                 try:
                     cmds.setAttr(node+"."+userDefAttr, lock=False)
                     cmds.deleteAttr(node+"."+userDefAttr)

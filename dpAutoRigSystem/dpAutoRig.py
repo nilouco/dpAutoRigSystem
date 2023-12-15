@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.50"
-DPAR_UPDATELOG = "N706 - Publish student version without error.\nN758 - Publisher today value.\nN710 - Asset folder name."
+DPAR_VERSION_PY3 = "4.03.51"
+DPAR_UPDATELOG = "N782 - Single main children parent fix."
 
 
 
