@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.51"
-DPAR_UPDATELOG = "N782 - Single main children parent fix."
+DPAR_VERSION_PY3 = "4.03.52"
+DPAR_UPDATELOG = "N783 - Proxy creator of meshes\nwith just one skinned joint."
 
 
 
