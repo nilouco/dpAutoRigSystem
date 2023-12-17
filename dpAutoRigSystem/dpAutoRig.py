@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.52"
-DPAR_UPDATELOG = "N783 - Proxy creator of meshes\nwith just one skinned joint."
+DPAR_VERSION_PY3 = "4.03.53"
+DPAR_UPDATELOG = "N776 - Remove gitHub greetings workflow."
 
 
 
