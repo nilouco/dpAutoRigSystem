@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.53"
-DPAR_UPDATELOG = "N776 - Remove gitHub greetings workflow."
+DPAR_VERSION_PY3 = "4.03.52"
+DPAR_UPDATELOG = "N770 - Fixed saved root folder file issue."
 
 
 

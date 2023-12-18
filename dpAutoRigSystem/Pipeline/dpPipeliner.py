@@ -9,7 +9,7 @@ import time
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.8
+DP_PIPELINER_VERSION = 1.9
 
 
 class Pipeliner(object):
@@ -98,7 +98,12 @@ class Pipeliner(object):
         if name:
             if dependent:
                 if self.pipeData[dependent]:
-                    name = name.split(self.pipeData[dependent]+"/")[1]
+                    try:
+                        name = name.split(self.pipeData[dependent]+"/")[1]
+                    except:
+                        self.pipeData[field] = ""
+                        self.pipeData[dependent] = ""
+                        return self.pipeData[field]
             else:
                 name = name[:name.find("/")]
             if cut:
@@ -232,8 +237,9 @@ class Pipeliner(object):
             # mouting pipeline data dictionary
             if self.pipeData['sceneName']:
                 self.getInfoByPath("f_drive", None)
-                self.getInfoByPath("f_studio", "f_drive", cut=True)
-                self.getInfoByPath("f_project", "f_studio", cut=True)
+                if not self.pipeData['sceneName'] == self.pipeData['f_drive']+"/"+self.pipeData['shortName']:
+                    self.getInfoByPath("f_studio", "f_drive", cut=True)
+                    self.getInfoByPath("f_project", "f_studio", cut=True)
                 self.pipeData['path'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipeData['path']):
                     self.pipeData['f_drive'] = ""
@@ -251,6 +257,7 @@ class Pipeliner(object):
                 self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
                 self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
             else:
+                self.pipeInfo = self.declareDefaultPipelineInfo()
                 print('Not found', self.infoFile)
         self.getHookInfo()
         return self.pipeData
