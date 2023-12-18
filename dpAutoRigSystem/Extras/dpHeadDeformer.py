@@ -10,7 +10,7 @@ TITLE = "m051_headDef"
 DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 
-DP_HEADDEFORMER_VERSION = 2.14
+DP_HEADDEFORMER_VERSION = 2.15
 
 
 class HeadDeformer(object):
@@ -24,11 +24,27 @@ class HeadDeformer(object):
         self.dpHeadDeformer(self)
     
     
+    def dpHeadDeformerUI(self, *args):
+        """ dpDeformer prompt dialog
+        """
+        result = cmds.promptDialog(title="dpHeadDeformer", message="Enter Name:", text=self.dpUIinst.lang["c024_head"], button=["OK", "Cancel"], defaultButton="OK", cancelButton="Cancel", dismissString="Cancel")
+        if result == "OK":
+            dialogName = cmds.promptDialog(query=True, text=True)
+            dialogName = dialogName[0].upper() + dialogName[1:]
+            if not "Deformer" in dialogName:
+                dialogName = dialogName+"Deformer"
+            return dialogName
+        
+        elif result is None:
+            return None
+
     def dpHeadDeformer(self, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         # defining variables
-        headDeformerName = self.dpUIinst.lang["c024_head"]+self.dpUIinst.lang["c097_deformer"]
+        deformerName = self.dpHeadDeformerUI()
+        if deformerName == None:
+            return
         centerSymmetryName = self.dpUIinst.lang["c098_center"]+self.dpUIinst.lang["c101_symmetry"]
         topSymmetryName = self.dpUIinst.lang["c099_top"]+self.dpUIinst.lang["c101_symmetry"]
         intensityName = self.dpUIinst.lang["c049_intensity"]
@@ -36,18 +52,19 @@ class HeadDeformer(object):
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
-        validName = dpUtils.validateName(headDeformerName+"_FFD", "FFD")
-        numbering = validName.replace(headDeformerName, "")[:-4]
+        validName = dpUtils.validateName(deformerName+"_FFD", "FFD")
+        numbering = validName.replace(deformerName, "")[:-4]
         if numbering:
-            headDeformerName = headDeformerName+numbering
+            deformerName = deformerName+numbering
             centerSymmetryName = centerSymmetryName+numbering
             topSymmetryName = topSymmetryName+numbering
         
         # get a list of selected items
-        selList = cmds.ls(selection=True)
+        selList = cmds.ls(selection=True)       
+
         if selList:
             # lattice deformer
-            latticeDefList = cmds.lattice(name=headDeformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
+            latticeDefList = cmds.lattice(name=deformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
             latticePointsList = latticeDefList[1]+".pt[0:5][2:5][0:5]"
             
             # store initial scaleY in order to avoid lattice rotation bug on non frozen transformations
@@ -69,25 +86,25 @@ class HeadDeformer(object):
             bBoxMidY = bBoxMinY + (bBoxSize*0.5)
             
             # twist deformer
-            twistDefList = cmds.nonLinear(latticePointsList, name=headDeformerName+"_Twist", type="twist") #[Deformer, Handle]
+            twistDefList = cmds.nonLinear(latticePointsList, name=deformerName+"_Twist", type="twist") #[Deformer, Handle]
             cmds.setAttr(twistDefList[0]+".lowBound", 0)
             cmds.setAttr(twistDefList[0]+".highBound", bBoxSize)
             cmds.setAttr(twistDefList[1]+".ty", bBoxMinY)
             
             # squash deformer
-            squashDefList = cmds.nonLinear(latticePointsList, name=headDeformerName+"_Squash", type="squash") #[Deformer, Handle]
+            squashDefList = cmds.nonLinear(latticePointsList, name=deformerName+"_Squash", type="squash") #[Deformer, Handle]
             cmds.setAttr(squashDefList[0]+".highBound", 0.5*bBoxSize)
             cmds.setAttr(squashDefList[0]+".startSmoothness", 1)
             cmds.setAttr(squashDefList[1]+".ty", bBoxMidY)
             
             # side bend deformer
-            sideBendDefList = cmds.nonLinear(latticePointsList, name=headDeformerName+"_Side_Bend", type="bend") #[Deformer, Handle]
+            sideBendDefList = cmds.nonLinear(latticePointsList, name=deformerName+"_Side_Bend", type="bend") #[Deformer, Handle]
             cmds.setAttr(sideBendDefList[0]+".lowBound", 0)
             cmds.setAttr(sideBendDefList[0]+".highBound", bBoxSize)
             cmds.setAttr(sideBendDefList[1]+".ty", bBoxMinY)
             
             # front bend deformer
-            frontBendDefList = cmds.nonLinear(latticePointsList, name=headDeformerName+"_Front_Bend", type="bend") #[Deformer, Handle]
+            frontBendDefList = cmds.nonLinear(latticePointsList, name=deformerName+"_Front_Bend", type="bend") #[Deformer, Handle]
             cmds.setAttr(frontBendDefList[0]+".lowBound", 0)
             cmds.setAttr(frontBendDefList[0]+".highBound", bBoxSize)
             cmds.setAttr(frontBendDefList[1]+".ry", -90)
@@ -100,7 +117,7 @@ class HeadDeformer(object):
                     cmds.setAttr(defHandle+".scale"+axis, 1)
             
             # arrow control curve
-            arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", headDeformerName+"_Ctrl", 0.25*bBoxSize, d=0)
+            arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", deformerName+"_Ctrl", 0.25*bBoxSize, d=0)
             
             # add control intensite and calibrate attributes
             for axis in axisList:
@@ -113,15 +130,15 @@ class HeadDeformer(object):
             cmds.addAttr(arrowCtrl, longName="calibrateReduce", attributeType='float', defaultValue=100, keyable=False)
             
             # multiply divide in order to intensify influences
-            calibrateMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_Calibrate_MD")
-            calibrateReduceMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_CalibrateReduce_MD")
-            intensityMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_"+intensityName.capitalize()+"_MD")
-            twistMD = cmds.createNode("multiplyDivide", name=headDeformerName+"_Twist_MD")
+            calibrateMD = cmds.createNode("multiplyDivide", name=deformerName+"_Calibrate_MD")
+            calibrateReduceMD = cmds.createNode("multiplyDivide", name=deformerName+"_CalibrateReduce_MD")
+            intensityMD = cmds.createNode("multiplyDivide", name=deformerName+"_"+intensityName.capitalize()+"_MD")
+            twistMD = cmds.createNode("multiplyDivide", name=deformerName+"_Twist_MD")
             cmds.setAttr(twistMD+".input2Y", -1)
             cmds.setAttr(calibrateReduceMD+".operation", 2)
 
             # create a remapValue node instead of a setDrivenKey
-            remapV = cmds.createNode("remapValue", name=headDeformerName+"_Squash_RmV")
+            remapV = cmds.createNode("remapValue", name=deformerName+"_Squash_RmV")
             cmds.setAttr(remapV+".inputMin", -0.25*bBoxSize)
             cmds.setAttr(remapV+".inputMax", 0.5*bBoxSize)
             cmds.setAttr(remapV+".outputMin", -1*bBoxSize)
@@ -166,7 +183,7 @@ class HeadDeformer(object):
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
             clustersZeroList = dpUtils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.delete(cmds.parentConstraint(centerClusterList[1], clustersZeroList[1]))
-            clusterGrp = cmds.group(clustersZeroList, name=headDeformerName+"_"+self.dpUIinst.lang["c101_symmetry"]+"_Grp")
+            clusterGrp = cmds.group(clustersZeroList, name=deformerName+"_"+self.dpUIinst.lang["c101_symmetry"]+"_Grp")
             # arrange lattice deform points percent
             cmds.percent(topClusterList[0], [latticeDefList[1]+".pt[0:5][2][0]", latticeDefList[1]+".pt[0:5][2][1]", latticeDefList[1]+".pt[0:5][2][2]", latticeDefList[1]+".pt[0:5][2][3]", latticeDefList[1]+".pt[0:5][2][4]", latticeDefList[1]+".pt[0:5][2][5]"], value=0.5)
             # symmetry controls
@@ -184,8 +201,8 @@ class HeadDeformer(object):
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
             dpUtils.zeroOut([arrowCtrl])
-            offsetGrp = cmds.group(name=headDeformerName+"_Offset_Grp", empty=True)
-            dataGrp = cmds.group(name=headDeformerName+"_Data_Grp", empty=True)
+            offsetGrp = cmds.group(name=deformerName+"_Offset_Grp", empty=True)
+            dataGrp = cmds.group(name=deformerName+"_Data_Grp", empty=True)
             cmds.delete(cmds.parentConstraint(latticeDefList[2], arrowCtrlGrp, maintainOffset=False))
             arrowCtrlHeight = bBoxMaxY + (bBoxSize*0.5)
             cmds.setAttr(arrowCtrlGrp+".ty", arrowCtrlHeight)
@@ -248,9 +265,9 @@ class HeadDeformer(object):
                     useComponentTag = cmds.optionVar(query="deformationUseComponentTags")
                     for item in toHeadDefCtrlList:
                         if useComponentTag:
-                            cmds.deformer(headDeformerName+"_FFD", edit=True, geometry=item)
+                            cmds.deformer(deformerName+"_FFD", edit=True, geometry=item)
                         else:
-                            cmds.sets(item, include=headDeformerName+"_FFDSet")
+                            cmds.sets(item, include=deformerName+"_FFDSet")
                 cmds.parent(arrowCtrlGrp, self.headCtrl)
             else:
                 mel.eval("warning" + "\"" + self.dpUIinst.lang["e020_notFoundHeadCtrl"] + "\"" + ";")
