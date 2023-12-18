@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.48"
-DPAR_UPDATELOG = "N067 - Added select all control tab."
+DPAR_VERSION_PY3 = "4.03.53"
+DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer."
 
 
 
