@@ -25,30 +25,44 @@ class HeadDeformer(object):
     
     
     def dpHeadDeformerUI(self, *args):
-        """ dpDeformer prompt dialog
+        """ dpDeformer prompt dialog to get the name of the deformer
         """
         result = cmds.promptDialog(title="dpHeadDeformer", message="Enter Name:", text=self.dpUIinst.lang["c024_head"], button=["OK", "Cancel"], defaultButton="OK", cancelButton="Cancel", dismissString="Cancel")
         if result == "OK":
             dialogName = cmds.promptDialog(query=True, text=True)
             dialogName = dialogName[0].upper() + dialogName[1:]
-            if not "Deformer" in dialogName:
-                dialogName = dialogName+"Deformer"
             return dialogName
-        
         elif result is None:
             return None
+
+
+    def addDeformerInName(self, deformerName, deformerIn, *args):
+        """ When the flag deformerIn is True, it will add the word Deformer as suffix. If it's false, it will maintain the name or take off Deformer in the name.
+        """
+        if deformerName:
+            if deformerIn == True:
+                if not "Deformer" in deformerName:
+                    deformerName = deformerName+"Deformer"
+                return deformerName
+            if deformerIn == False:
+                if "Deformer" in deformerName:
+                    deformerName = deformerName.replace("Deformer", "")
+                return deformerName+"_"
+
 
     def dpHeadDeformer(self, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         # defining variables
-        deformerName = self.dpHeadDeformerUI()
-        if deformerName == None:
+        dialogName = self.dpHeadDeformerUI()
+        if dialogName == None:
             return
-        centerSymmetryName = self.dpUIinst.lang["c098_center"]+self.dpUIinst.lang["c101_symmetry"]
-        topSymmetryName = self.dpUIinst.lang["c099_top"]+self.dpUIinst.lang["c101_symmetry"]
-        intensityName = self.dpUIinst.lang["c049_intensity"]
-        expandName = self.dpUIinst.lang["c104_expand"]
+        deformerName = self.addDeformerInName(dialogName, True)
+        symetryName = self.addDeformerInName(dialogName, False)
+        centerSymmetryName = symetryName+self.dpUIinst.lang["c098_center"]+self.dpUIinst.lang["c101_symmetry"]
+        topSymmetryName = symetryName+self.dpUIinst.lang["c099_top"]+self.dpUIinst.lang["c101_symmetry"]
+        intensityName = symetryName+self.dpUIinst.lang["c049_intensity"]
+        expandName = symetryName+self.dpUIinst.lang["c104_expand"]
         axisList = ["X", "Y", "Z"]
         
         # validating namming in order to be possible create more than one setup
