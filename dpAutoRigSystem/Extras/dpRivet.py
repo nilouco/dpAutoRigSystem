@@ -34,7 +34,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 1.8
+DP_RIVET_VERSION = 2.0
 
 
 class Rivet(object):
@@ -274,20 +274,13 @@ class Rivet(object):
 
     def dpInvertAttrTranformation(self, nodeName, invT=True, invR=False, *args):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
+            Return inverted groups.
         """
         axisList = ['X', 'Y', 'Z']
+        invTGrp = None
+        invRGrp = None
         if cmds.objExists(nodeName):
             nodePivot = cmds.xform(nodeName, query=True, worldSpace=True, rotatePivot=True)
-            if invR:
-                invRGrp = cmds.group(nodeName, name=nodeName+"_InvR_Grp")
-                cmds.xform(invRGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]), rotateOrder="zyx")
-                rMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvR_MD", skipSelect=True)
-                cmds.setAttr(rMD+'.input2X', -1)
-                cmds.setAttr(rMD+'.input2Y', -1)
-                cmds.setAttr(rMD+'.input2Z', -1)
-                for axis in axisList:
-                    cmds.connectAttr(nodeName+'.rotate'+axis, rMD+'.input1'+axis, force=True)
-                    cmds.connectAttr(rMD+'.output'+axis, invRGrp+'.rotate'+axis, force=True)
             if invT:
                 invTGrp = cmds.group(nodeName, name=nodeName+"_InvT_Grp")
                 cmds.xform(invTGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]))
@@ -298,6 +291,17 @@ class Rivet(object):
                 for axis in axisList:
                     cmds.connectAttr(nodeName+'.translate'+axis, tMD+'.input1'+axis, force=True)
                     cmds.connectAttr(tMD+'.output'+axis, invTGrp+'.translate'+axis, force=True)
+            if invR:
+                invRGrp = cmds.group(nodeName, name=nodeName+"_InvR_Grp")
+                cmds.xform(invRGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]), rotateOrder="zyx")
+                rMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvR_MD", skipSelect=True)
+                cmds.setAttr(rMD+'.input2X', -1)
+                cmds.setAttr(rMD+'.input2Y', -1)
+                cmds.setAttr(rMD+'.input2Z', -1)
+                for axis in axisList:
+                    cmds.connectAttr(nodeName+'.rotate'+axis, rMD+'.input1'+axis, force=True)
+                    cmds.connectAttr(rMD+'.output'+axis, invRGrp+'.rotate'+axis, force=True)
+        return invTGrp, invRGrp
     
     
     def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
@@ -463,7 +467,7 @@ class Rivet(object):
                 cmds.connectAttr(dupShape+".local", self.cpNode+".inputSurface", force=True)
                 
             # working with follicles and attaches
-            for rivet in self.rivetList:
+            for r, rivet in enumerate(self.rivetList):
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_Rivet_Grp")
@@ -510,17 +514,49 @@ class Rivet(object):
                 if self.masterCtrl:
                     cmds.scaleConstraint(self.masterCtrl, folTransf, maintainOffset=True, name=folTransf+"_ScC")
             
-            # check invert group (back) in order to avoide double transformations:
-            if addInvert:
-                for rivet in self.rivetList:
-                    self.dpInvertAttrTranformation(rivet, invT, invR)
-                    
+                # check invert group (back) in order to avoid double transformations:
+                if addInvert:
+                    invTGrp, invRGrp = self.dpInvertAttrTranformation(rivet, invT, invR)
+                
+                # serialize network node
+                self.net = cmds.createNode("network", name=rivet+"_Net")
+                # add
+                cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
+                cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool")
+                cmds.addAttr(self.net, longName="itemNode", attributeType="message")
+                cmds.addAttr(self.net, longName="rivet", attributeType="message")
+                cmds.addAttr(self.net, longName="follicle", attributeType="message")
+                cmds.addAttr(self.net, longName="geoToAttach", attributeType="message")
+                cmds.addAttr(self.net, longName="invTGrp", attributeType="message")
+                cmds.addAttr(self.net, longName="invRGrp", attributeType="message")
+                cmds.addAttr(self.net, longName="deformerGeo", attributeType="message")
+                cmds.addAttr(self.net, longName="deformerNode", attributeType="message")
+                # set
+                cmds.setAttr(self.net+".dpNetwork", 1)
+                cmds.setAttr(self.net+".dpRivetNet", 1)
+                # connect
+                cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)
+                cmds.connectAttr(folTransf+".message", self.net+".follicle", force=True)
+                cmds.connectAttr(geoToAttach+".message", self.net+".geoToAttach", force=True)
+                if addInvert:
+                    if invTGrp:
+                        cmds.connectAttr(invTGrp+".message", self.net+".invTGrp", force=True)
+                    if invRGrp:
+                        cmds.connectAttr(invRGrp+".message", self.net+".invRGrp", force=True)
+                if faceToRivet:
+                    cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
+                    cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformerNode", force=True)
+                if len(itemList) == len(self.rivetList):
+                    if cmds.objExists(itemList[r]):
+                        cmds.connectAttr(itemList[r]+".message", self.net+".itemNode", force=True)
+                        cmds.addAttr(itemList[r], longName="rivetNet", attributeType="message")
+                        cmds.connectAttr(self.net+".message", itemList[r]+".rivetNet", force=True)
+
             # clean-up temporary nodes:
             cmds.delete(dupGeo, self.cpNode, self.tempNode)
-            
         else:
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
-        
+
         cmds.select(clear=True)
         return folTransf
     
@@ -633,9 +669,9 @@ class Rivet(object):
         deformerSelectedRadioButton = cmds.radioCollection(self.deformerCollection, query=True, select=True)
         deformerSelected = cmds.radioButton(deformerSelectedRadioButton, query=True, annotation=True)
         if deformerSelected == self.morphDeformer:
-            self.applyMorphDeformer(geometry, origGeo)
+            self.deformerNodeList = self.applyMorphDeformer(geometry, origGeo)
         elif deformerSelected == self.wrapDeformer:
-            self.applyWrapDeformer(geometry, origGeo)
+            self.deformerNodeList = self.applyWrapDeformer(geometry, origGeo)
         return geometry
 
 
@@ -665,6 +701,7 @@ class Rivet(object):
     def applyMorphDeformer(self, morphGeo, targetGeo, *args):
         """ Apply morphDeform from morphGeo(FaceToRivet) to targetGeo(Source)
             Rename and Parent to Models_Grp
+            Return morph geometry and deformer node
         """
         targetList = cmds.ls(targetGeo, dag=True, shapes=True)
         targetShape = targetList[0]
@@ -696,11 +733,13 @@ class Rivet(object):
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
             cmds.parent(morphGeo, modelGrp)
+        return morphGeo, morphNode
 
 
     def applyWrapDeformer(self, wrapGeo, targetGeo, *args):
         """ Apply wrapDeformer from wrapGeo(FaceToRivet) to targetGeo(Source)
             Rename and Parent to Models_Grp
+            Return wrap geometry and wrap deformer
         """
         cmds.select([wrapGeo, targetGeo])
         mel.eval("CreateWrap;")
@@ -720,7 +759,7 @@ class Rivet(object):
         modelGrp = dpUtils.getNodeByMessage("modelsGrp")
         if modelGrp:
             cmds.parent(wrapGeo, baseShape, modelGrp)
-        return wrapGeo
+        return wrapGeo, wrapNode
 
 
     def findOrig(self, geoList, *args):
@@ -739,7 +778,4 @@ class Rivet(object):
         mayaVersion = cmds.about(installedVersion=True)
         installedVersion = float(mayaVersion.split(" ")[-1])
         minimalVersion = float(self.mayaMinimalVersion)
-        if installedVersion > minimalVersion:
-            return True
-        else:
-            return False
+        return installedVersion > minimalVersion
