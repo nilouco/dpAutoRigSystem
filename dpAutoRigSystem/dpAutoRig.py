@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.53"
-DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer."
+DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer.\nAlso, added a new subControl in order to correct adjustments"
 
 
 

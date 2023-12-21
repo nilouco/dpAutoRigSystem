@@ -739,7 +739,4 @@ class Rivet(object):
         mayaVersion = cmds.about(installedVersion=True)
         installedVersion = float(mayaVersion.split(" ")[-1])
         minimalVersion = float(self.mayaMinimalVersion)
-        if installedVersion > minimalVersion:
-            return True
-        else:
-            return False
+        return installedVersion > minimalVersion

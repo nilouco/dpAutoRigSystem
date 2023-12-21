@@ -2,7 +2,7 @@
     "_preset"     : "Default",
     "_author"     : "Danilo Pinheiro",
     "_date"       : "2019-12-03",
-    "_updated"    : "2023-08-13",
+    "_updated"    : "2023-12-21",
 
     "id_000_Base"            : {"type" : "Circle",           "degree" : 1},
     "id_001_Locator"         : {"type" : "Locator",          "degree" : 1},
@@ -100,5 +100,6 @@
     "id_093_HeadSub"         : {"type" : "BallonFlat",       "degree" : 3},
     "id_094_LimbExtremSub"   : {"type" : "Ball",             "degree" : 3},
     "id_095_LimbMainSub"     : {"type" : "Ball",             "degree" : 3},
-    "id_096_FkLineMain"      : {"type" : "Circle",           "degree" : 3}
+    "id_096_FkLineMain"      : {"type" : "Circle",           "degree" : 3},
+    "id_097_HeadDeformerSub" : {"type" : "Cube",             "degree" : 3}
 }
