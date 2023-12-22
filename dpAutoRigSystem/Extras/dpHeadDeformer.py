@@ -9,6 +9,9 @@ CLASS_NAME = "HeadDeformer"
 TITLE = "m051_headDef"
 DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
+DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
+DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
+DPDEFORMERCVS = "dpDeformerCVs"
 
 DP_HEADDEFORMER_VERSION = 2.15
 
@@ -24,10 +27,16 @@ class HeadDeformer(object):
         self.dpHeadDeformer(self)
     
     
-    def dpHeadDeformerUI(self, *args):
+    def dpHeadDeformerPromptDialog(self, *args):
         """ dpDeformer prompt dialog to get the name of the deformer
         """
-        result = cmds.promptDialog(title="dpHeadDeformer", message="Enter Name:", text=self.dpUIinst.lang["c024_head"], button=["OK", "Cancel"], defaultButton="OK", cancelButton="Cancel", dismissString="Cancel")
+        result = cmds.promptDialog(title="dpHeadDeformer", 
+                                   message="Enter Name:", 
+                                   text=self.dpUIinst.lang["c024_head"], 
+                                   button=["OK", "Cancel"], 
+                                   defaultButton="OK", 
+                                   cancelButton="Cancel", 
+                                   dismissString="Cancel")
         if result == "OK":
             dialogName = cmds.promptDialog(query=True, text=True)
             dialogName = dialogName[0].upper() + dialogName[1:]
@@ -54,7 +63,7 @@ class HeadDeformer(object):
         """ Create the arrow curve and deformers (squash and bends).
         """
         # defining variables
-        dialogName = self.dpHeadDeformerUI()
+        dialogName = self.dpHeadDeformerPromptDialog()
         if dialogName == None:
             return
         deformerName = self.addDeformerInName(dialogName, True)
@@ -245,58 +254,59 @@ class HeadDeformer(object):
             # fix topSymmetryCluster pivot
             topSymmetryCtrlPos = cmds.xform(symmetryCtrlZeroList[1], query=True, rotatePivot=True, worldSpace=True)
             cmds.xform(topClusterList[1], rotatePivot=(topSymmetryCtrlPos[0], topSymmetryCtrlPos[1], topSymmetryCtrlPos[2]), worldSpace=True)
-            
-            # try to integrate to Head_Head_Ctrl
+
+            # workaround to add the deformer attribute on the remaining subcontrols from head and jaw control         
+            subControlsList = []
+            headSubCtrl = self.ctrls.getControlNodeById("id_093_HeadSub")
+            jawCtrl = self.ctrls.getControlNodeById("id_024_HeadJaw")
+            jawConditionList = ["Lip_Main", "Teeth", "Tongue"]
+            if headSubCtrl:
+                headSubCtrlChildrenList = cmds.listRelatives(headSubCtrl, allDescendents=True)
+                subControlsList.append(headSubCtrlChildrenList)
+            if jawCtrl:                    
+                jawCtrlChildrenList = cmds.listRelatives(jawCtrl, allDescendents=True)                    
+                subControlsList.append(jawCtrlChildrenList)
+            if subControlsList:
+                subControlsList = subControlsList[0]+subControlsList[1]
+                for item in subControlsList:
+                    if cmds.objExists(item+".controlID"):
+                        if not cmds.objExists(item+"."+DPHEADDEFINFLUENCE):
+                            if not cmds.getAttr(item+".controlID") == "id_029_SingleIndSkin":
+                                if not cmds.getAttr(item+".controlID") == "id_052_FacialFace":
+                                    if not cmds.getAttr(item+".controlID") == "id_053_HeadDeformer":
+                                        cmds.addAttr(item, longName=DPHEADDEFINFLUENCE, attributeType="bool", defaultValue=1)
+                                        if not cmds.objExists(item+"."+DPJAWDEFINFLUENCE):
+                                            for condition in jawConditionList:
+                                                if condition in item:
+                                                    cmds.addAttr(item, longName=DPJAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
+                                                   
+            # apply influence deformer only in shape controls which have the attribute
             allTransformList = cmds.ls(selection=False, type="transform")
-            headCtrlList = self.ctrls.getControlNodeById("id_093_HeadSub")
-            if headCtrlList:
-                if len(headCtrlList) > 1:
+            if allTransformList:
+                for item in allTransformList:
+                    if cmds.objExists(item+".controlID"):
+                        if not "Jaw" in arrowCtrl:
+                            if cmds.objExists(item+"."+DPHEADDEFINFLUENCE) and cmds.getAttr(item+"."+DPHEADDEFINFLUENCE):
+                                shape = cmds.listRelatives(item, shapes=True)
+                                cmds.deformer(deformerName+"_FFD", edit=True, geometry=shape)
+                        else:
+                            if cmds.objExists(item+"."+DPJAWDEFINFLUENCE) and cmds.getAttr(item+"."+DPJAWDEFINFLUENCE):
+                                shape = cmds.listRelatives(item, shapes=True)
+                                cmds.deformer(deformerName+"_FFD", edit=True, geometry=shape)
+                                
+            # try to integrate to Head_Head_Ctrl
+            if headSubCtrl:
+                if len(headSubCtrl) > 1:
                     mel.eval("warning" + "\"" + self.dpUIinst.lang["i075_moreOne"] + " Head control.\"" + ";")
                 else:
-                    self.headCtrl = headCtrlList[0]
+                    self.headCtrl = headSubCtrl[0]
             if self.headCtrl:
-                # correcting topSymetry pivot
+                # correcting topSymetry pivot to match headCtrl pivot
                 cmds.matchTransform(topSymmetryCtrl, self.headCtrl, pivots=True)
                 cmds.matchTransform(topClusterList[1], self.headCtrl, pivots=True)
                 # setup hierarchy
                 headCtrlPosList = cmds.xform(self.headCtrl, query=True, rotatePivot=True, worldSpace=True)
                 cmds.xform(dataGrp, translation=(headCtrlPosList[0], headCtrlPosList[1], headCtrlPosList[2]), worldSpace=True)
-                # influence controls
-                self.upperJawCtrl = None
-                toHeadDefCtrlList = []
-                for item in allTransformList:
-                    if cmds.objExists(item+".controlID"):
-                        if cmds.getAttr(item+".controlID") == "id_024_HeadJaw":
-                            toHeadDefCtrlList.append(item)
-                        elif cmds.getAttr(item+".controlID") == "id_027_HeadLipCorner":
-                            toHeadDefCtrlList.append(item)
-                        elif cmds.getAttr(item+".controlID") == "id_069_HeadUpperJaw":
-                            self.upperJawCtrl = item
-                            upperJawCtrlShapeList = cmds.listRelatives(item, children=True, shapes=True)
-                            if upperJawCtrlShapeList:
-                                for upperJawShape in upperJawCtrlShapeList:
-                                    toHeadDefCtrlList.append(upperJawShape)
-                if self.upperJawCtrl:
-                    upperJawChildrenList = cmds.listRelatives(self.upperJawCtrl, children=True, allDescendents=True, type="transform")
-                    if upperJawChildrenList:
-                        for upperJawChild in upperJawChildrenList:
-                            if cmds.objExists(upperJawChild+".controlID"):
-                                if not cmds.getAttr(upperJawChild+".controlID") == "id_052_FacialFace":
-                                    if not cmds.getAttr(upperJawChild+".controlID") == "id_029_SingleIndSkin":
-                                        if not cmds.getAttr(upperJawChild+".controlID") == "id_054_SingleMain":
-                                            toHeadDefCtrlList.append(upperJawChild)
-                                        else:
-                                            singleMainShapeList = cmds.listRelatives(upperJawChild, children=True, shapes=True)
-                                            if singleMainShapeList:
-                                                for mainShape in singleMainShapeList:
-                                                    toHeadDefCtrlList.append(mainShape)
-                if toHeadDefCtrlList:
-                    useComponentTag = cmds.optionVar(query="deformationUseComponentTags")
-                    for item in toHeadDefCtrlList:
-                        if useComponentTag:
-                            cmds.deformer(deformerName+"_FFD", edit=True, geometry=item)
-                        else:
-                            cmds.sets(item, include=deformerName+"_FFDSet")
                 cmds.parent(subCtrlGrp, self.headCtrl)
 
             else:
@@ -321,7 +331,6 @@ class HeadDeformer(object):
 
             # if there's Jaw in the deformerName it will configure rotate and delete symetries setup
             if "Jaw" in subCtrl:
-                print(toHeadDefCtrlList)
                 cmds.setAttr(subCtrlGrp+".rotateX", 145)
                 cmds.delete(clusterGrp, symmetryCtrlZeroList)
             
