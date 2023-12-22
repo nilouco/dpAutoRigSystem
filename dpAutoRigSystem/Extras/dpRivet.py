@@ -514,10 +514,6 @@ class Rivet(object):
                 if self.masterCtrl:
                     cmds.scaleConstraint(self.masterCtrl, folTransf, maintainOffset=True, name=folTransf+"_ScC")
             
-                # check invert group (back) in order to avoid double transformations:
-                if addInvert:
-                    invTGrp, invRGrp = self.dpInvertAttrTranformation(rivet, invT, invR)
-                
                 # serialize network node
                 self.net = cmds.createNode("network", name=rivet+"_Net")
                 # add
@@ -538,11 +534,7 @@ class Rivet(object):
                 cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)
                 cmds.connectAttr(folTransf+".message", self.net+".follicle", force=True)
                 cmds.connectAttr(geoToAttach+".message", self.net+".geoToAttach", force=True)
-                if addInvert:
-                    if invTGrp:
-                        cmds.connectAttr(invTGrp+".message", self.net+".invTGrp", force=True)
-                    if invRGrp:
-                        cmds.connectAttr(invRGrp+".message", self.net+".invRGrp", force=True)
+                    
                 if faceToRivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
                     cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformerNode", force=True)
@@ -551,7 +543,15 @@ class Rivet(object):
                         cmds.connectAttr(itemList[r]+".message", self.net+".itemNode", force=True)
                         cmds.addAttr(itemList[r], longName="rivetNet", attributeType="message")
                         cmds.connectAttr(self.net+".message", itemList[r]+".rivetNet", force=True)
-
+                
+            # check invert group (back) in order to avoid double transformations:
+            if addInvert:
+                for rivet in self.rivetList:
+                    invTGrp, invRGrp = self.dpInvertAttrTranformation(rivet, invT, invR)
+                    if invTGrp:
+                        cmds.connectAttr(invTGrp+".message", self.net+".invTGrp", force=True)
+                    if invRGrp:
+                        cmds.connectAttr(invRGrp+".message", self.net+".invRGrp", force=True)
             # clean-up temporary nodes:
             cmds.delete(dupGeo, self.cpNode, self.tempNode)
         else:
