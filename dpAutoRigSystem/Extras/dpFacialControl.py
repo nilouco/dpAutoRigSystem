@@ -31,7 +31,7 @@ FACIALPRESET = "FacialJoints"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_FACIALCONTROL_VERSION = 1.5
+DP_FACIALCONTROL_VERSION = 1.6
 
 
 class FacialControl(object):
@@ -450,9 +450,9 @@ class FacialControl(object):
             fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=0, rot=rotVector)
             # add head or jaw influence attribute
             if headDefInfluence:
-                cmds.addAttr(fCtrl, longName=HEADDEFINFLUENCE, attributeType="bool", defaultValue=1)
+                self.ctrls.addDefInfluenceAttrs(fCtrl, 1)                
             if jawDefInfluence:
-                cmds.addAttr(fCtrl, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
+                self.ctrls.addDefInfluenceAttrs(fCtrl, 2)
             # ctrl zeroOut grp and color:
             fCtrlGrp = dpUtils.zeroOut([fCtrl])[0]
             self.ctrls.colorShape([fCtrl], color)
