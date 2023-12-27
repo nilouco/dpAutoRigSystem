@@ -11,7 +11,6 @@ DESCRIPTION = "m052_headDefDesc"
 ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
-DPDEFORMERCVS = "dpDeformerCVs"
 
 DP_HEADDEFORMER_VERSION = 2.15
 

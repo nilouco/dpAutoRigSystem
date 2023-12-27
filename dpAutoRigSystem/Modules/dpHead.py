@@ -10,7 +10,7 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
-DP_HEAD_VERSION = 2.0
+DP_HEAD_VERSION = 2.1
 
 
 class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):

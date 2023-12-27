@@ -12,7 +12,6 @@ DPCONTROL = "dpControl"
 SNAPSHOT_SUFFIX = "_Snapshot_Crv"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
-DEFINFLUENCECVS = "dpDeformerCVs"
 
 dic_colors = {
     "yellow": 17,
@@ -29,7 +28,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.3
+DP_CONTROLS_VERSION = 2.4
 
 
 class ControlClass(object):
