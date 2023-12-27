@@ -76,7 +76,7 @@ class HeadDeformer(object):
         middleCtrlName = clusterName+self.dpUIinst.lang["m033_middle"]
         topCtrlName = clusterName+self.dpUIinst.lang["c099_top"]
         axisList = ["X", "Y", "Z"]
-        posList = ["Bottom", "Middle", "Top"]
+        posList = [self.dpUIinst.lang["c100_bottom"], self.dpUIinst.lang["m033_middle"], self.dpUIinst.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
         validName = dpUtils.validateName(deformerName+"_FFD", "FFD")
@@ -244,7 +244,7 @@ class HeadDeformer(object):
             subCtrlGrpList = []
             for pos, latticeSubPoints in zip(posList, latticeSubPointsList):
                 # create and connect cluster
-                namePos = bottomCtrlName.replace("Bottom", pos)
+                namePos = bottomCtrlName.replace(self.dpUIinst.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
                 cmds.parent(dpUtils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
@@ -291,7 +291,7 @@ class HeadDeformer(object):
             childrenControlsList = []
             headSubCtrl = self.ctrls.getControlNodeById("id_093_HeadSub")
             jawCtrl = self.ctrls.getControlNodeById("id_024_HeadJaw")
-            jawConditionList = ["Lip_Main", "Teeth", "Tongue"]
+            jawConditionList = [self.dpUIinst.lang["m075_upperTeeth"], self.dpUIinst.lang["m076_lowerTeeth"], self.dpUIinst.lang["m077_tongue"], self.dpUIinst.lang["c062_lips"]+"_Main"]
             ctrlIDNotIncludeList = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if headSubCtrl:
                 headSubCtrlChildrenList = cmds.listRelatives(headSubCtrl, allDescendents=True)
