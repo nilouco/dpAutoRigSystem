@@ -10,7 +10,7 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
-DP_FOOT_VERSION = 2.2
+DP_FOOT_VERSION = 2.3
 
 
 class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -441,10 +441,14 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # show or hide reverseFoot controls:
                 cmds.addAttr(self.footCtrl, longName=showCtrlsAttr, attributeType='short', minValue=0, defaultValue=1, maxValue=1)
                 cmds.setAttr(self.footCtrl+"."+showCtrlsAttr, keyable=False, channelBox=True)
+                cmds.addAttr(self.footCtrl, longName="visIkFk", attributeType='float', minValue=0, defaultValue=1, maxValue=1, keyable=False)
+                mdNode = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Vis_MD")
+                cmds.connectAttr(self.footCtrl+".visIkFk", mdNode+".input2X", force=True)
+                cmds.connectAttr(self.footCtrl+"."+showCtrlsAttr, mdNode+".input1X", force=True)
                 showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl]
                 for rfCtrl in showHideCtrlList:
                     rfCtrlShape = cmds.listRelatives(rfCtrl, children=True, type='nurbsCurve')[0]
-                    cmds.connectAttr(self.footCtrl+"."+showCtrlsAttr, rfCtrlShape+".visibility", force=True)
+                    cmds.connectAttr(mdNode+".outputX", rfCtrlShape+".visibility", force=True)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp = cmds.group(self.footCtrlZeroList[0], name=side+self.userGuideName+"_Control_Grp")
