@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.55"
-DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer\nN058 - Deform direction\nN192 - FFD influence tweak controls\nN231 - HeadDeform affect FacialCtrls\nN332 - Symmetry controls prefix\nN621 - Double check if headDeformer influence"
+DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer.\nN058 - Deform direction.\nN192 - FFD influence tweak controls.\nN231 - HeadDeform affect FacialCtrls.\nN332 - Symmetry controls prefix.\nN621 - Double check if headDeformer influence."
 
 
 
