@@ -291,7 +291,7 @@ class HeadDeformer(object):
             childrenControlsList = []
             headSubCtrl = self.ctrls.getControlNodeById("id_093_HeadSub")
             jawCtrl = self.ctrls.getControlNodeById("id_024_HeadJaw")
-            jawConditionList = [self.dpUIinst.lang["m075_upperTeeth"], self.dpUIinst.lang["m076_lowerTeeth"], self.dpUIinst.lang["m077_tongue"], "Lip_Main"]
+            jawConditionList = [self.dpUIinst.lang["m075_upperTeeth"], self.dpUIinst.lang["m076_lowerTeeth"], self.dpUIinst.lang["m077_tongue"], self.dpUIinst.lang["c039_lip"]+"_"+self.dpUIinst.lang["c058_main"]]
             ctrlIDNotIncludeList = ["id_029_SingleIndSkin", "id_052_FacialFace", "id_068_Symmetry", "id_053_HeadDeformer", "id_098_HeadDeformerSub", "id_097_HeadDeformerMain"]
             if headSubCtrl:
                 headSubCtrlChildrenList = cmds.listRelatives(headSubCtrl, allDescendents=True)
