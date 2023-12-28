@@ -445,7 +445,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 mdNode = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Vis_MD")
                 cmds.connectAttr(self.footCtrl+".visIkFk", mdNode+".input2X", force=True)
                 cmds.connectAttr(self.footCtrl+"."+showCtrlsAttr, mdNode+".input1X", force=True)
-                showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl]
+                showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl, self.RFECtrl]
                 for rfCtrl in showHideCtrlList:
                     rfCtrlShape = cmds.listRelatives(rfCtrl, children=True, type='nurbsCurve')[0]
                     cmds.connectAttr(mdNode+".outputX", rfCtrlShape+".visibility", force=True)

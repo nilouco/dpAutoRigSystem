@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.03.53"
-DPAR_UPDATELOG = "N463 - Hide reverseFoot ctrls if in Fk mode."
+DPAR_UPDATELOG = "N463 - Hide reverseFoot ctrls if in Fk mode.\nN721 - Hide Foot_Ball_Ctrl when Limb in FK."
 
 
 
