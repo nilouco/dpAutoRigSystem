@@ -20,7 +20,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.7
+DP_LIMB_VERSION = 2.8
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -1036,7 +1036,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 
                 # quadExtraCtrl autoOrient setup:
                 if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
-                    cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', min=0, max=1, defaultValue=1, keyable=True)
+                    cmds.addAttr(self.quadExtraCtrl, longName='autoOrient', attributeType='float', minValue=0, max=1, defaultValue=1, keyable=True)
                     cmds.setAttr(self.quadExtraCtrl+".autoOrient", 0)
                     quadExtraRotNull = cmds.group(name=self.quadExtraCtrl+"_AutoOrient_Null", empty=True)
                     cmds.delete(cmds.parentConstraint(self.quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
@@ -1120,13 +1120,13 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+'Fk_ikFkBlend', parentConstToRFOffset+"."+self.fkCtrlList[len(self.fkCtrlList) - 1]+"W1", force=True)
 
                 # work with scalable extrem hand or foot:
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.lang['c040_uniformScale'], at="double", min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.dpUIinst.lang['c040_uniformScale'], at="double", min=0.001, dv=1)
+                cmds.addAttr(self.fkCtrlList[-1], longName=self.dpUIinst.lang['c040_uniformScale'], attributeType="double", minValue=0.001, defaultValue=1)
+                cmds.addAttr(self.ikExtremCtrl, longName=self.dpUIinst.lang['c040_uniformScale'], attributeType="double", minValue=0.001, defaultValue=1)
                 cmds.setAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.lang['c040_uniformScale'], edit=True, keyable=True)
                 cmds.setAttr(self.ikExtremCtrl+"."+self.dpUIinst.lang['c040_uniformScale'], edit=True, keyable=True)
                 # add scale multiplier attribute
-                cmds.addAttr(self.fkCtrlList[-1], ln=self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
-                cmds.addAttr(self.ikExtremCtrl, ln=self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), at='double', min=0.001, dv=1)
+                cmds.addAttr(self.fkCtrlList[-1], longName=self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), attributeType='double', minValue=0.001, defaultValue=1)
+                cmds.addAttr(self.ikExtremCtrl, longName=self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), attributeType='double', minValue=0.001, defaultValue=1)
                 ikScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side+self.userGuideName+"_"+self.dpUIinst.lang['c105_multiplier'].capitalize()+'_Ik_MD')
                 fkScaleMD = cmds.rename(cmds.createNode('multiplyDivide'), side+self.userGuideName+"_"+self.dpUIinst.lang['c105_multiplier'].capitalize()+'_Fk_MD')
                 cmds.connectAttr(self.ikExtremCtrl+"."+self.dpUIinst.lang['c040_uniformScale'], ikScaleMD+".input1X", force=True)
@@ -1188,6 +1188,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(ikStretchClp+".maxR", 1)
                 cmds.connectAttr(ikStretchCnd+".outColorR", ikStretchClp+".inputR", force=True)
                 cmds.connectAttr(ikStretchClp+".outputR", parentConstToRFOffset+"."+self.ikNSJointList[-2]+"W2", force=True)
+
+                # prepare to disable stretch in fk mode
+                cmds.addAttr(self.ikExtremCtrl, longName="disableIkFkRevOutputX", attributeType="double", keyable=False)
+                cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikExtremCtrl+".disableIkFkRevOutputX", force=True)
 
                 # create a masterModuleGrp to be checked if this rig exists:
                 if self.limbTypeName == ARM:

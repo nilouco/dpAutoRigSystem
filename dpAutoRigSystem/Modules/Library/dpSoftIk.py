@@ -29,7 +29,7 @@
 from maya import cmds
 from . import dpControls
 
-DP_SOFTIK_VERSION = 2.0
+DP_SOFTIK_VERSION = 2.1
 
 
 class SoftIkClass(object):
@@ -118,10 +118,13 @@ class SoftIkClass(object):
         # if stretch exists, we need to do this...
         if stretch:
             softRatioMD = cmds.createNode("multiplyDivide", name=userName+"_Soft_Ratio_MD")
+            disableFkStretchMD = cmds.createNode("multiplyDivide", name=userName+"_DisableFkStretch_MD")
             stretchBC = cmds.createNode("blendColors", name=userName+"_Stretch_BC")
             cmds.setAttr(softRatioMD+".operation", 2) #divide
             cmds.setAttr(stretchBC+".color2R", 1)
-            cmds.connectAttr(ctrlName+".stretchable", stretchBC+".blender", force=True)
+            cmds.connectAttr(ctrlName+".stretchable", disableFkStretchMD+".input1X", force=True)
+            cmds.connectAttr(ctrlName+".disableIkFkRevOutputX", disableFkStretchMD+".input2X", force=True)
+            cmds.connectAttr(disableFkStretchMD+".outputX", stretchBC+".blender", force=True)
             cmds.connectAttr(distBetween+".distance", softRatioMD+".input1X", force=True)
             cmds.connectAttr(daCnd+".outColorR", softRatioMD+".input2X", force=True)
             cmds.connectAttr(distDiffPMA+".output1D", stretchBC+".color2G", force=True)

@@ -18,7 +18,7 @@ from maya import cmds
 from . import dpUtils
 from . import dpControls
 
-DP_RIBBONCLASS_VERSION = 2.2
+DP_RIBBONCLASS_VERSION = 2.3
 
 
 class RibbonClass(object):
@@ -519,7 +519,7 @@ class RibbonClass(object):
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
         mid_Ctrl = self.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
-        dpUtils.removeUserDefinedAttr(mid_Ctrl)
+        dpUtils.removeUserDefinedAttr(mid_Ctrl, True)
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
         cmds.delete(cmds.parentConstraint(midCtrl, mid_Ctrl, mo=0))

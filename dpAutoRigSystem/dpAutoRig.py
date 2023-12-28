@@ -17,7 +17,6 @@
 #
 ###################################################################
 
-
 DPAR_VERSION_PY3 = "4.03.55"
 DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer.\nN058 - Deform direction.\nN192 - FFD influence tweak controls.\nN231 - HeadDeform affect FacialCtrls.\nN332 - Symmetry controls prefix.\nN621 - Double check if headDeformer influence."
 
@@ -2533,7 +2532,7 @@ class DP_AutoRig_UI(object):
                                     extremJnt             = self.integratedTaskDic[fatherGuide]['extremJntList'][s]
                                     ikStretchExtremLoc    = self.integratedTaskDic[fatherGuide]['ikStretchExtremLoc'][s]
                                     limbTypeName          = self.integratedTaskDic[fatherGuide]['limbTypeName']
-                                    worldRefList          = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
+                                    worldRef              = self.integratedTaskDic[fatherGuide]['worldRefList'][s]
                                     addArticJoint         = self.integratedTaskDic[fatherGuide]['addArticJoint']
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
                                     ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
@@ -2606,6 +2605,14 @@ class DP_AutoRig_UI(object):
                                             if not keyableStatus:
                                                 cmds.setAttr(ikCtrl+'.'+attr, channelBox=channelBoxStatus)
                                             cmds.connectAttr(ikCtrl+'.'+attr, revFootCtrl+'.'+attr, force=True)
+                                            if attr == "visIkFk":
+                                                if not cmds.objExists(worldRef):
+                                                    worldRef = worldRef.replace("_Ctrl", "_Grp")
+                                                if cmds.objExists(worldRef):
+                                                    wrAttrList = cmds.listAttr(worldRef, userDefined=True)
+                                                    for wrAttr in wrAttrList:
+                                                        if "Fk_ikFkBlendRevOutputX" in wrAttr:
+                                                            cmds.connectAttr(worldRef+"."+wrAttr, ikCtrl+'.'+attr, force=True)
                                     revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
                                     self.customAttr.removeAttr("dpControl", [revFootCtrlOld])
                         
@@ -2644,7 +2651,7 @@ class DP_AutoRig_UI(object):
                                 # connect Option_Ctrl RigScale_MD output to the radiusScale:
                                 if cmds.objExists(self.rigScaleMD+".dpRigScale") and cmds.getAttr(self.rigScaleMD+".dpRigScale") == True:
                                     cmds.connectAttr(self.rigScaleMD+".outputX", softIkCalibList[w]+".input2X", force=True)
-                                
+
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
                                 cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
@@ -2654,8 +2661,8 @@ class DP_AutoRig_UI(object):
                             
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
-                                rootPacConst = cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC")
-
+                                cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC")
+                            
                             # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
                             fatherGuideLoc = self.hookDic[moduleDic]['fatherGuideLoc']

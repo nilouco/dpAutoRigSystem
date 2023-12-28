@@ -12,7 +12,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.1
+DP_PROXYCREATOR_VERSION = 1.2
 
 
 class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
@@ -159,32 +159,32 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                         if faceList:
                             for n in faceList:
                                 nodeFaceList.append(source+".f["+str(n)+"]")
+                        # create proxy geometry
+                        dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
+                        for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
+                            if "Orig" in dupItem:
+                                cmds.delete(dupItem)
                         if nodeFaceList:
-                            # create proxy geometry
-                            dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
-                            for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
-                                if "Orig" in dupItem:
-                                    cmds.delete(dupItem)
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
                             cmds.delete(faceDupList)
-                            self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
-                            cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
-                            cmds.parent(dup, jnt)
-                            cmds.scriptEditorInfo(suppressWarnings=True)
-                            cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
-                            cmds.scriptEditorInfo(suppressWarnings=False)
-                            self.checkReverseNormal(dup, jnt)
-                            cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
-                            cmds.parent(dup, grp)
-                            dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
-                            self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
-                            drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
-                            if drawOverrideList:
-                                # remove from display layer
-                                cmds.disconnectAttr(drawOverrideList[0], dup+".drawOverride")
-                            cmds.setAttr(dup+".overrideEnabled", 1)
-                            cmds.setAttr(dup+".overrideDisplayType", 2) #reference
-                            self.reconnectVisibility(source, dup)
+                        self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], l=False)
+                        cmds.xform(dup, pivots=cmds.xform(jnt, worldSpace=True, rotatePivot=True, query=True))
+                        cmds.parent(dup, jnt)
+                        cmds.scriptEditorInfo(suppressWarnings=True)
+                        cmds.makeIdentity(dup, apply=True, translate=True, rotate=True, scale=True)
+                        cmds.scriptEditorInfo(suppressWarnings=False)
+                        self.checkReverseNormal(dup, jnt)
+                        cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
+                        cmds.parent(dup, grp)
+                        dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
+                        self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
+                        drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
+                        if drawOverrideList:
+                            # remove from display layer
+                            cmds.disconnectAttr(drawOverrideList[0], dup+".drawOverride")
+                        cmds.setAttr(dup+".overrideEnabled", 1)
+                        cmds.setAttr(dup+".overrideDisplayType", 2) #reference
+                        self.reconnectVisibility(source, dup)
             cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
         sourceParent = cmds.listRelatives(source, parent=True, type="transform")
         if sourceParent:
