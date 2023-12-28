@@ -12,7 +12,7 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 2.15
+DP_HEADDEFORMER_VERSION = 3.00
 
 
 class HeadDeformer(object):
@@ -155,7 +155,7 @@ class HeadDeformer(object):
             arrowCtrl = self.ctrls.cvControl("id_053_HeadDeformer", deformerName+"_Ctrl", 0.25*bBoxSize, d=0)
 
             # main control curve and shape
-            mainCtrl = self.ctrls.cvControl("id_097_HeadDeformerMain", mainCtrlName+"_Ctrl", 0.55*bBoxSize, d=0)
+            mainCtrl = self.ctrls.cvControl("id_097_HeadDeformerMain", mainCtrlName+"_Ctrl", 0.57*bBoxSize, d=0)
             mainCtrlShape = cmds.listRelatives(mainCtrl, shapes=True)[0]
             
             # add control intensity and calibrate attributes
@@ -167,8 +167,8 @@ class HeadDeformer(object):
             cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=300/bBoxSize, keyable=False)
             cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
             cmds.addAttr(arrowCtrl, longName="calibrateReduce", attributeType='float', defaultValue=100, keyable=False)
-            cmds.addAttr(arrowCtrl, longName="mainControlsDisplay", attributeType='long', min=0, max=1, defaultValue=0)
-            cmds.setAttr(arrowCtrl+".mainControlsDisplay", edit=True, keyable=False, channelBox=True)
+            cmds.addAttr(arrowCtrl, longName=self.dpUIinst.lang["c021_showControls"], attributeType='long', min=0, max=1, defaultValue=0)
+            cmds.setAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], edit=True, keyable=False, channelBox=True)
             
             # multiply divide in order to intensify influences
             calibrateMD = cmds.createNode("multiplyDivide", name=deformerName+"_Calibrate_MD")
@@ -216,7 +216,7 @@ class HeadDeformer(object):
                 if unitConvNode:
                     if cmds.objectType(unitConvNode) == "unitConversion":
                         cmds.setAttr(unitConvNode+".conversionFactor", 1)
-            cmds.connectAttr(arrowCtrl+".mainControlsDisplay", mainCtrlShape+".visibility")
+            cmds.connectAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], mainCtrlShape+".visibility")
             self.ctrls.setLockHide([arrowCtrl], ['rx', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
             
             # create symmetry setup
@@ -248,13 +248,13 @@ class HeadDeformer(object):
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
                 cmds.parent(dpUtils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
-                subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.57*bBoxSize, d=0, rot=(90, 0, 0))
+                subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0))
                 subCtrlList.append(subCtrl)
                 ctrlSubZeroList = dpUtils.zeroOut([subCtrl])[0]
                 subCtrlGrpList.append(ctrlSubZeroList)
                 cmds.matchTransform(ctrlSubZeroList, subClusterList[1], pos=True)
                 # connect atributes
-                cmds.connectAttr(arrowCtrl+".mainControlsDisplay", ctrlSubZeroList+".visibility")
+                cmds.connectAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], ctrlSubZeroList+".visibility")
                 for axis in axisList:
                     cmds.connectAttr(subCtrl+".translate"+axis, subClusterList[1]+".translate"+axis, force=True)
                     cmds.connectAttr(subCtrl+".rotate"+axis, subClusterList[1]+".rotate"+axis, force=True)
