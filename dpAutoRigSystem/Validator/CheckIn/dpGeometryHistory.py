@@ -8,7 +8,7 @@ TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 ICON = "/Icons/dp_geometryHistory.png"
 
-DP_GEOMETRYHISTORY_VERSION = 1.1
+DP_GEOMETRYHISTORY_VERSION = 1.2
 
 
 class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
@@ -37,6 +37,7 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
 
         # ---
         # --- validator code --- beginning
+        ignoreTypeList = ["tweak", "file", "place2dTexture"]
         if objList:
             geoToCleanList = objList
         else:
@@ -52,7 +53,7 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
                         if historyList:
                             for history in historyList:
                                 # Pass through tweak and initialShading nodes
-                                if cmds.nodeType(history) != "tweak": 
+                                if not cmds.nodeType(history) in ignoreTypeList: 
                                     if history != "initialShadingGroup":
                                         geoList.append(transform)
             # Merge duplicated names

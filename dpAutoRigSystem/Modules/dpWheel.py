@@ -15,7 +15,7 @@ TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 
-DP_WHEEL_VERSION = 2.1
+DP_WHEEL_VERSION = 2.2
 
 
 class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -170,7 +170,6 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for item in allGuideList:
                     cmds.rename(item, self.userGuideName+"_"+item)
                 self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
                 # re-rename grp:
                 cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
                 # joint labelling:
@@ -411,6 +410,10 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(upperClusterList[1], defCtrlGrpList[0], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(middleClusterList[1], defCtrlGrpList[1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(lowerClusterList[1], defCtrlGrpList[2], maintainOffset=False))
+                if s == 1: #fix right side controllers upper/lower flipping - workaround
+                    if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        dpUtils.unlockAttr([self.cvCenterLoc])
+                        cmds.parent(self.cvCenterLoc, world=True)
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[1], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, latticeList[2], maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.cvCenterLoc, clustersGrp, maintainOffset=False))
@@ -418,6 +421,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 outsideDist = cmds.getAttr(self.cvOutsideLoc+".tz")
                 if s == 1:
                     if cmds.getAttr(self.moduleGrp+".flip") == 1:
+                        cmds.parent(self.cvCenterLoc, self.moduleGrp)
                         outsideDist = -outsideDist
                 cmds.move(outsideDist, defCtrlGrp, moveZ=True, relative=True, objectSpace=True, worldSpaceDistance=True)
                 self.ctrls.directConnect(upperDefCtrl, upperClusterList[1])
