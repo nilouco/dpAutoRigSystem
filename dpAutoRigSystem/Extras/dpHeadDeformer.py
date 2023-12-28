@@ -361,10 +361,10 @@ class HeadDeformer(object):
             # colorize
             self.ctrls.colorShape([arrowCtrl, mainCtrl, centerSymmetryCtrl, topSymmetryCtrl, subCtrlList[0], subCtrlList[1], subCtrlList[2]], "cyan")
 
-            # if there's Jaw in the deformerName it will configure rotate and delete symetries setup
+            # if there's Jaw in the deformerName it will configure rotate and delete symetries and subControls setup
             if self.dpUIinst.lang["c025_jaw"] in mainCtrl:
                 cmds.setAttr(mainCtrlGrp+".rotateX", 145)
-                cmds.delete(clusterGrp, symmetryCtrlZeroList)
+                cmds.delete(clusterGrp, subCtrlGrpList, symmetryCtrlZeroList)
             
             # finish selection the arrow control
             cmds.select(arrowCtrl)
