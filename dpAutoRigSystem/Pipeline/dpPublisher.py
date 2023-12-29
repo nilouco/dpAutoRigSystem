@@ -7,7 +7,7 @@ from . import dpPackager
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.7
+DP_PUBLISHER_VERSION = 1.8
 
 
 class Publisher(object):
@@ -223,7 +223,7 @@ class Publisher(object):
             cmds.progressWindow(endProgress=True)
         else:
             validatorsResult = self.dpUIinst.lang['v007_allOk']
-        self.dpUIinst.info('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
+        self.dpUIinst.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
 
 
     def runPublishing(self, fromUI, verifyValidator=True, comments=False, *args):
@@ -393,7 +393,7 @@ class Publisher(object):
         cmds.progressWindow(endProgress=True)
         # report the error in a log window
         if raison:
-            self.dpUIinst.info('i019_log', 'i216_publish', raison, "left", 250, 150)
+            self.dpUIinst.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
             mel.eval('warning \"'+raison+'\";')
 
 

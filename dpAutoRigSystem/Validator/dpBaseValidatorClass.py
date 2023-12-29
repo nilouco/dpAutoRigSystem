@@ -10,7 +10,7 @@ CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
 
-DP_VALIDATORSTARTCLASS_VERSION = 2.1
+DP_VALIDATORSTARTCLASS_VERSION = 2.2
 
 
 class ValidatorStartClass(object):
@@ -141,7 +141,7 @@ class ValidatorStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.info('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
+            self.dpUIinst.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.dpUIinst.lang['v000_validator']+"\n"+thisTime+"\n"+logText)
             if not dpUtils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])

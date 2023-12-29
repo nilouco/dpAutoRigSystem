@@ -4,7 +4,7 @@ import datetime
 import re
 
 
-DPT_VERSION = 1.4
+DPT_VERSION = 1.5
 
 
 LANGUAGES = "Languages"
@@ -142,7 +142,7 @@ class Translator(object):
         # closes translator UI:
         self.dpClearTranslatorUI(2)
         # show preset creation result window:
-        self.dpUIinst.info('i149_createLanguage', 'i150_languageCreated', '\n'+self.dpUIinst.langName+'\n\n'+self.dpUIinst.lang['i134_rememberPublish']+'\n\n'+self.authorName+' '+self.dpUIinst.lang['t008_finishMessage'].lower(), 'center', 205, 270)
+        self.dpUIinst.infoWin('i149_createLanguage', 'i150_languageCreated', '\n'+self.dpUIinst.langName+'\n\n'+self.dpUIinst.lang['i134_rememberPublish']+'\n\n'+self.authorName+' '+self.dpUIinst.lang['t008_finishMessage'].lower(), 'center', 205, 270)
         # close and reload dpAR UI in order to avoide Maya crash:
         self.dpUIinst.jobReloadUI()
     
