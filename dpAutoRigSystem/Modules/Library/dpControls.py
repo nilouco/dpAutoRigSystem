@@ -10,6 +10,8 @@ import datetime
 
 DPCONTROL = "dpControl"
 SNAPSHOT_SUFFIX = "_Snapshot_Crv"
+HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
+JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
 dic_colors = {
     "yellow": 17,
@@ -26,7 +28,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.3
+DP_CONTROLS_VERSION = 2.4
 
 
 class ControlClass(object):
@@ -293,7 +295,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -315,7 +317,22 @@ class ControlClass(object):
             curve = controlInstance.cvMain(False, ctrlType, ctrlName, r, d, dir, rot, 1)
             if corrective:
                 self.addCorrectiveAttrs(curve)
+            if not headDef == 0:
+                self.addDefInfluenceAttrs(curve, headDef)
             return curve
+        
+
+    def addDefInfluenceAttrs(self, curve, defInfluenceType):
+        """ Add specific attribute to be deformed by FFD
+            If defInfluenceType is equal 1, it will be deformed by the headDeformer
+            If defInfluenceType is equal 2, it will be deformed by the jawDeformer
+            If defInfluenceType is equal 3, it will be deformed by headDeformer and jawDeformer
+        """
+        if curve:
+            if defInfluenceType == 1 or defInfluenceType == 3:
+                cmds.addAttr(curve, longName=HEADDEFINFLUENCE, attributeType="bool", defaultValue=1)
+            if defInfluenceType == 2 or defInfluenceType == 3:
+                cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
 
 
     def cvLocator(self, ctrlName, r=1, d=1, guide=False, *args):

@@ -11,11 +11,11 @@ ICON = "/Icons/dp_customAttr.png"
 
 ATTR_START = "dp"
 ATTR_DPID = "dpID"
-ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt"]
+ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt", "dpHeadDeformerInfluence", "dpJawDeformerInfluence"]
 IGNORE_LIST = ['persp', 'top', 'front', 'side']
 DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 
-DP_CUSTOMATTR_VERSION = 1.3
+DP_CUSTOMATTR_VERSION = 1.4
 
 
 class CustomAttr(object):
