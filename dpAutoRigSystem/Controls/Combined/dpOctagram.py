@@ -9,7 +9,7 @@ TITLE = "m104_octagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_octagram.png"
 
-DP_OCTAGRAM_VERSION = 1.3
+DP_OCTAGRAM_VERSION = 1.4
 
 
 class Octagram(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class Octagram(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):

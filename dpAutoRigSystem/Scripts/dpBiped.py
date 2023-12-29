@@ -8,7 +8,7 @@ TITLE = "m026_biped"
 DESCRIPTION = "m027_bipedDesc"
 ICON = "/Icons/dp_biped.png"
 
-DP_BIPED_VERSION = 2.0
+DP_BIPED_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -554,4 +554,4 @@ def Biped(dpUIinst):
             print(dpUIinst.lang['m089_createdBiped'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-12-10",
+    "_updated"       : "2023-12-29",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -138,8 +138,8 @@
     "c124_corrective"        : "corrective",
     "c125_last"              : "Last",
     
-    "e000_GuideNotFound"           : "Guide not found in this scene.",
-    "e001_GuideNotChecked"         : "Guide(s) not found in the respective folder...",
+    "e000_guideNotFound"           : "Guide not found in this scene.",
+    "e001_guideNotChecked"         : "Guide(s) not found in the respective folder...",
     "e002_matrixPluginNotFound"    : "The matrixNodes plugin not found, could not continue to create the mirror.",
     "e003_moreThanOneGeo"          : "It is not possible create the Skinning!\nSorry.\n\nThere are more than one object\nwith the same name\nin the list of Geometries.\n\nTry to use the option:\nDisplay Long Name,\nplease.\n\nHere's the problem:\n",
     "e004_objNotExist"             : "The item specified doesn't exists.\n\nHere's the problem:\n",
@@ -549,7 +549,7 @@
     "m095_isolate"              : "Isolate",
     "m096_isolateDesc"          : "This script will create an Isolate setup.\nNeed 3 nodes selected\nor it'll use the Root_Ctrl.",
     "m097_dynamic"              : "Dynamic",
-    "m098_000000000000"         : "NOT USED HERE",
+    "m098_000000000000"         : "",
     "m099_cvControlDesc"        : "This class will create a curve shape\nin order to be used as a control.",
     "m100_square"               : "Square",
     "m101_smile"                : "Smile",
@@ -620,10 +620,7 @@
     "m166_bikeDesc"             : "Bike Script Description:\n\nThis scripted module creates a basic bike guide,\nwith all modules already parented using the correct mirror settings\nand a good name convention...\n\nYou just need to place the guides in the correct location\nand press the RIG all button (the green button).\n\nYou also can change it a bit\nin order to get a motorcycle Rig.",
     "m167_createdCar"           : "Created Car Guides.",
     "m168_createdBike"          : "Created Bike Guides.",
-    "m166_selAllControls"       : "Select All Controls",
-    "m167_selAllControlsDesc"   : "This script will find the list of controls\nfrom an attribute in All_Grp\nand select them.",
-    "m168_wichAllGrp"           : "There are more than one All_Grp in this scene.\nFrom which one do you want to select all controls?",
-    "m169_selectedCtrls"        : "Selected All Controls:",
+    "m169_0000000"              : "",
     "m170_blendShapes"          : "Blend Shapes",
     "m171_joints"               : "Joints",
     "m172_loadBSDesc"           : "Load the BlendShape Node here in order to connect controls attributes.",
@@ -688,7 +685,6 @@
     "m231_proxyCreatorDesc"     : "This module will generate a proxy mesh for the current rig.",
     "m232_morphDeformer"        : "Morph Deformer",
     "m233_wrapDeformer"         : "Wrap Deformer",
-
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

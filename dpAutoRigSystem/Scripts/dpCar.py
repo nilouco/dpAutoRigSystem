@@ -8,7 +8,7 @@ TITLE = "m163_car"
 DESCRIPTION = "m164_carDesc"
 ICON = "/Icons/dp_car.png"
 
-DP_CAR_VERSION = 2.0
+DP_CAR_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -821,4 +821,4 @@ def Car(dpUIinst):
             print(dpUIinst.lang['m167_createdCar'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

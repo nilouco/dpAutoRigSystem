@@ -8,7 +8,7 @@ TITLE = "m165_bike"
 DESCRIPTION = "m166_bikeDesc"
 ICON = "/Icons/dp_bike.png"
 
-DP_BIKE_VERSION = 2.1
+DP_BIKE_VERSION = 2.2
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -379,4 +379,4 @@ def Bike(dpUIinst):
             print(dpUIinst.lang['m168_createdBike'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
