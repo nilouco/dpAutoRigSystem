@@ -15,7 +15,7 @@ TITLE = "m156_wheel"
 DESCRIPTION = "m157_wheelDesc"
 ICON = "/Icons/dp_wheel.png"
 
-DP_WHEEL_VERSION = 2.2
+DP_WHEEL_VERSION = 2.3
 
 
 class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -318,9 +318,9 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ctrls.setDefaultValue(self.wheelCtrl, self.dpUIinst.lang['c093_tryKeepUndo'], 1)
                 
                 # automatic rotation wheel setup:
-                receptSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang['c070_steering']+"_MD")
-                inverseSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang['c070_steering']+"_Inv_MD")
-                steeringInvCnd = cmds.createNode('condition', name=side+self.userGuideName+"_"+self.dpUIinst.lang['c070_steering']+"_Inv_Cnd")
+                receptSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang['c070_steering'].capitalize()+"_MD")
+                inverseSteeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang['c070_steering'].capitalize()+"_Inv_MD")
+                steeringInvCnd = cmds.createNode('condition', name=side+self.userGuideName+"_"+self.dpUIinst.lang['c070_steering'].capitalize()+"_Inv_Cnd")
                 cmds.setAttr(steeringInvCnd+".colorIfTrueR", 1)
                 cmds.setAttr(steeringInvCnd+".colorIfFalseR", -1)
                 cmds.connectAttr(self.wheelCtrl+"."+self.dpUIinst.lang['i037_to']+self.dpUIinst.lang['c070_steering'].capitalize(), receptSteeringMD+".input1X", force=True)
