@@ -162,6 +162,26 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvCornerLoc, self.jGuideCorner, maintainOffset=False, name=self.jGuideCorner+"_PaC")
         cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem+"_PaC")
 
+        # testing aimConstraint
+        #######################
+        drvLoc = cmds.spaceLocator(name="Limb_GuideCorner_DrvLoc")[0]
+        drvLocGrp = dpUtils.zeroOut([drvLoc])[0]
+        cmds.parent(drvLocGrp, self.mirrorGrp)
+        PaC = cmds.parentConstraint(self.cvCornerLoc, drvLocGrp, mo=False)
+        #cmds.delete(PaC)
+        #cmds.delete(cmds.parentConstraint(self.cvCornerLoc, drvLocGrp))
+        #cmds.matchTransform(drvLocGrp, self.cvCornerLoc, piv=True, pos=True, rot=True)
+        cmds.connectAttr(self.cvCornerLoc+".translateX", drvLoc+".translateX")
+        cmds.connectAttr(self.cvCornerLoc+".translateY", drvLoc+".translateY")
+        cmds.connectAttr(self.cvCornerLoc+".translateZ", drvLoc+".translateZ")
+        cmds.connectAttr(self.cvCornerLoc+".rotateX", drvLoc+".rotateX")
+        cmds.connectAttr(self.cvCornerLoc+".rotateY", drvLoc+".rotateY")
+        cmds.connectAttr(self.cvCornerLoc+".rotateZ", drvLoc+".rotateZ")
+        cmds.delete(PaC)
+        # mainLocGrp = dpUtils.zeroOut([self.cvMainLoc])
+
+        #cmds.aimConstraint(self.cvCornerLoc, self.mainLocGrp, name="TestingParentinging")
+
         # align cornerLocs:
         self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
 
