@@ -8,7 +8,7 @@ TITLE = "m028_arm"
 DESCRIPTION = "m029_armDesc"
 ICON = "/Icons/dp_arm.png"
 
-DP_ARM_VERSION = 2.0
+DP_ARM_VERSION = 2.1
 
 
 def Arm(dpUIinst):
@@ -98,4 +98,4 @@ def Arm(dpUIinst):
         print(dpUIinst.lang['m091_createdArm'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

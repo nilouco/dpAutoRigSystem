@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from ..Modules.Library import dpUtils
 
-DP_SKINNING_VERSION = 1.0
+DP_SKINNING_VERSION = 1.2
 
 
 class Skinning(object):
@@ -20,10 +20,10 @@ class Skinning(object):
         if geoList:
             for i, item in enumerate(geoList):
                 if item in geoList[:i]:
-                    self.dpUIinst.info('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
+                    self.dpUIinst.infoWin('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
                     return False
                 elif not cmds.objExists(item):
-                    self.dpUIinst.info('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
+                    self.dpUIinst.infoWin('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
                     return False
                 elif not mode:
                     try:
@@ -31,7 +31,7 @@ class Skinning(object):
                         if inputDeformerList:
                             for deformerNode in inputDeformerList:
                                 if cmds.objectType(deformerNode) == "skinCluster":
-                                    self.dpUIinst.info('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
+                                    self.dpUIinst.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
                                     return False
                     except:
                         pass
@@ -83,15 +83,16 @@ class Skinning(object):
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
-                        cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)
+                        newSkinClusterNode = cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)[0]
+                        cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
                 print(self.dpUIinst.lang['i077_skinned'] + ', '.join(geomSkinList))
                 if logWin:
-                    self.dpUIinst.info('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                    self.dpUIinst.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
                 cmds.select(geomSkinList)
         else:
             print(self.dpUIinst.lang['i029_skinNothing'])
             if logWin:
-                self.dpUIinst.info('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
+                self.dpUIinst.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
 
     
     def checkExistingSkinClusterNode(self, item, deleteIt=False, *args):
@@ -180,6 +181,7 @@ class Skinning(object):
                     newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
                 elif cmds.about(version=True) >= "2024": #accepting multiple skinClusters
                     newSkinClusterNode = cmds.skinCluster(skinInfList, destinationItem, multi=True, name=skinClusterName+"_"+str(i)+"_SC", toSelectedBones=True, maximumInfluences=3, skinMethod=skinMethodToUse)[0]
+                cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
                 # copy skin weights from source to destination
                 if byUVs:
                     sourceUVMap = cmds.polyUVSet(sourceItem, query=True, allUVSets=True)[0]

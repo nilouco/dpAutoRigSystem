@@ -9,7 +9,7 @@ TITLE = "m123_ovalDisc"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_ovalDisc.png"
 
-DP_OVALDISC_VERSION = 1.3
+DP_OVALDISC_VERSION = 1.4
 
 
 class OvalDisc(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class OvalDisc(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):

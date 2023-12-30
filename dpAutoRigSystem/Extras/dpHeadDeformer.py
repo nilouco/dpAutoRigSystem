@@ -12,7 +12,7 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 3.00
+DP_HEADDEFORMER_VERSION = 3.1
 
 
 class HeadDeformer(object):
@@ -29,14 +29,16 @@ class HeadDeformer(object):
     def dpHeadDeformerPromptDialog(self, *args):
         """ dpDeformer prompt dialog to get the name of the deformer
         """
+        btContinue = self.dpUIinst.lang['i174_continue']
+        btCancel = self.dpUIinst.lang['i132_cancel']
         result = cmds.promptDialog(title="dpHeadDeformer", 
-                                   message="Enter Name:", 
+                                   message=self.dpUIinst.lang["m006_name"], 
                                    text=self.dpUIinst.lang["c024_head"], 
-                                   button=["OK", "Cancel"], 
-                                   defaultButton="OK", 
-                                   cancelButton="Cancel", 
-                                   dismissString="Cancel")
-        if result == "OK":
+                                   button=[btContinue, btCancel], 
+                                   defaultButton=btContinue, 
+                                   cancelButton=btCancel, 
+                                   dismissString=btCancel)
+        if result == btContinue:
             dialogName = cmds.promptDialog(query=True, text=True)
             dialogName = dialogName[0].upper() + dialogName[1:]
             return dialogName
@@ -75,6 +77,7 @@ class HeadDeformer(object):
         bottomCtrlName = clusterName+self.dpUIinst.lang["c100_bottom"]
         middleCtrlName = clusterName+self.dpUIinst.lang["m033_middle"]
         topCtrlName = clusterName+self.dpUIinst.lang["c099_top"]
+        calibrateName = self.dpUIinst.lang["c111_calibrate"].lower()
         axisList = ["X", "Y", "Z"]
         posList = [self.dpUIinst.lang["c100_bottom"], self.dpUIinst.lang["m033_middle"], self.dpUIinst.lang["c099_top"]]
         
@@ -163,10 +166,10 @@ class HeadDeformer(object):
                 cmds.addAttr(arrowCtrl, longName=intensityName+axis, attributeType='float', defaultValue=1)
                 cmds.setAttr(arrowCtrl+"."+intensityName+axis, edit=True, keyable=False, channelBox=True)
             cmds.addAttr(arrowCtrl, longName=expandName, attributeType='float', min=0, defaultValue=1, max=10, keyable=True)
-            cmds.addAttr(arrowCtrl, longName="calibrateX", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateY", attributeType='float', defaultValue=300/bBoxSize, keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateZ", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
-            cmds.addAttr(arrowCtrl, longName="calibrateReduce", attributeType='float', defaultValue=100, keyable=False)
+            cmds.addAttr(arrowCtrl, longName=calibrateName+"X", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName=calibrateName+"Y", attributeType='float', defaultValue=300/bBoxSize, keyable=False)
+            cmds.addAttr(arrowCtrl, longName=calibrateName+"Z", attributeType='float', defaultValue=100/(3*bBoxSize), keyable=False)
+            cmds.addAttr(arrowCtrl, longName=calibrateName+"Reduce", attributeType='float', defaultValue=100, keyable=False)
             cmds.addAttr(arrowCtrl, longName=self.dpUIinst.lang["c021_showControls"], attributeType='long', min=0, max=1, defaultValue=0)
             cmds.setAttr(arrowCtrl+"."+self.dpUIinst.lang["c021_showControls"], edit=True, keyable=False, channelBox=True)
             
@@ -196,8 +199,8 @@ class HeadDeformer(object):
             # connections
             for axis in axisList:
                 cmds.connectAttr(arrowCtrl+"."+intensityName+axis, calibrateMD+".input1"+axis, force=True)
-                cmds.connectAttr(arrowCtrl+".calibrate"+axis, calibrateReduceMD+".input1"+axis, force=True)
-                cmds.connectAttr(arrowCtrl+".calibrateReduce", calibrateReduceMD+".input2"+axis, force=True)
+                cmds.connectAttr(arrowCtrl+"."+calibrateName+axis, calibrateReduceMD+".input1"+axis, force=True)
+                cmds.connectAttr(arrowCtrl+"."+calibrateName+"Reduce", calibrateReduceMD+".input2"+axis, force=True)
                 cmds.connectAttr(calibrateReduceMD+".output"+axis, calibrateMD+".input2"+axis, force=True)
                 cmds.connectAttr(arrowCtrl+".translate"+axis, intensityMD+".input1"+axis, force=True)
                 cmds.connectAttr(calibrateMD+".output"+axis, intensityMD+".input2"+axis, force=True)

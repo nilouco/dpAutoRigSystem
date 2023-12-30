@@ -7,7 +7,8 @@ TITLE = "m209_pinSide"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_pinSide.png"
 
-DP_PINSIDE_VERSION = 1.1
+DP_PINSIDE_VERSION = 1.2
+
 
 class PinSide(dpBaseControlClass.ControlStartClass):
     def __init__(self, *args, **kwargs):

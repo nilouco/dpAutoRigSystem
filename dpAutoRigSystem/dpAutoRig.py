@@ -17,8 +17,8 @@
 #
 ###################################################################
 
-DPAR_VERSION_PY3 = "4.03.55"
-DPAR_UPDATELOG = "N057 - Added a dialogBox to get preferred name to use on headDeformer.\nN058 - Deform direction.\nN192 - FFD influence tweak controls.\nN231 - HeadDeform affect FacialCtrls.\nN332 - Symmetry controls prefix.\nN621 - Double check if headDeformer influence."
+DPAR_VERSION_PY3 = "4.03.56"
+DPAR_UPDATELOG = "N217 - Calibrate naming.\nN338 - Review capitalization.\nN493 - Steering name convention.\nN514 - InfoWin.\nN304 - Rename BindPose."
 
 
 
@@ -260,11 +260,11 @@ class DP_AutoRig_UI(object):
             cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
             # help menu:
             self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-            cmds.menuItem('about_MI"', label='About', command=partial(self.info, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
-            cmds.menuItem('author_MI', label='Author', command=partial(self.info, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
-            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.info, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+            cmds.menuItem('about_MI"', label='About', command=partial(self.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+            cmds.menuItem('author_MI', label='Author', command=partial(self.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
+            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
             cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
-            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.info, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
             cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
             cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
             cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
@@ -840,7 +840,7 @@ class DP_AutoRig_UI(object):
                 cmds.optionVar(remove="dpAutoRigLastPreset")
                 cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
-            self.info('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.lang['i134_rememberPublish']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+            self.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.lang['i134_rememberPublish']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
             self.jobReloadUI()
     
@@ -1298,7 +1298,7 @@ class DP_AutoRig_UI(object):
                     if validatorInstance.customName:
                         cmds.checkBox(validatorCB, edit=True, label=validatorInstance.customName)
 
-            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.info, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     
@@ -1591,7 +1591,7 @@ class DP_AutoRig_UI(object):
         thisTime = str(time.asctime(time.localtime(time.time())))
         logText = thisTime+"\n"+logText
         if verbose:
-            self.info('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
+            self.infoWin('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
             print("\n-------------\n"+self.lang['v000_validator']+"\n"+logText)
             if publishLog:
                 validationResultData["Publisher"] = publishLog
@@ -1601,7 +1601,7 @@ class DP_AutoRig_UI(object):
         return validationResultData, False, 0
 
 
-    def info(self, title, description, text, align, width, height, *args):
+    def infoWin(self, title, description, text, align, width, height, *args):
         """ Create a window showing the text info with the description about any module.
         """
         # declaring variables:
@@ -1658,7 +1658,7 @@ class DP_AutoRig_UI(object):
         logText += '\n' + self.lang['i018_thanks']
         
         # creating a info window to show the log:
-        self.info( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
+        self.infoWin( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
     
     
     def donateWin(self, *args):
@@ -1734,12 +1734,12 @@ class DP_AutoRig_UI(object):
             cmds.progressWindow(title='Download Update', progress=50, status='Downloading...', isInterruptable=False)
             try:
                 urllib.request.urlretrieve(url, downloadFolder[0])
-                self.info('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+                self.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
                     cmds.deleteUI('dpUpdateWindow', window=True)
             except:
-                self.info('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
+                self.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
     
     
@@ -1857,7 +1857,7 @@ class DP_AutoRig_UI(object):
                 shutil.rmtree(folderToDelete)
 
                 # report finished update installation:
-                self.info('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.lang['i173_reloadScript']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+                self.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.lang['i173_reloadScript']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
                     cmds.deleteUI('dpUpdateWindow', window=True)
@@ -1865,7 +1865,7 @@ class DP_AutoRig_UI(object):
                 self.deleteExistWindow()
             except:
                 # report fail update installation:
-                self.info('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
+                self.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
         else:
             print(self.lang['i038_canceled'])

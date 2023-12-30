@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.0
+DP_QUADRUPED_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -712,4 +712,4 @@ def Quadruped(dpUIinst):
             print(dpUIinst.lang['m090_createdQuadruped'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

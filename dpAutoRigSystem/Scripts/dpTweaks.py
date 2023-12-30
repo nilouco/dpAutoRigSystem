@@ -8,7 +8,7 @@ TITLE = "m081_tweaks"
 DESCRIPTION = "m082_tweaksDesc"
 ICON = "/Icons/dp_tweaks.png"
 
-DP_TWEAKS_VERSION = 2.0
+DP_TWEAKS_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, default, userMessage):
@@ -411,4 +411,4 @@ def Tweaks(dpUIinst):
                 print(dpUIinst.lang['m093_createdTweaks'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

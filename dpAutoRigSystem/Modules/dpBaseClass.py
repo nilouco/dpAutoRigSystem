@@ -10,8 +10,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-
-DP_STARTCLASS_VERSION = 2.1
+DP_STARTCLASS_VERSION = 2.2
 
 
 class StartClass(object):
@@ -127,7 +126,7 @@ class StartClass(object):
                 else:
                     try:
                         self.deleteModule()
-                        mel.eval('warning \"'+ self.dpUIinst.lang['e000_GuideNotFound'] +' - '+ self.moduleGrp +'\";')
+                        mel.eval('warning \"'+ self.dpUIinst.lang['e000_guideNotFound'] +' - '+ self.moduleGrp +'\";')
                     except:
                         pass
                     return False
