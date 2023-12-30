@@ -18,7 +18,7 @@ from maya import cmds
 from . import dpUtils
 from . import dpControls
 
-DP_RIBBONCLASS_VERSION = 2.3
+DP_RIBBONCLASS_VERSION = 2.4
 
 
 class RibbonClass(object):
@@ -696,7 +696,7 @@ class RibbonClass(object):
         ribbonShape = cmds.listRelatives(ribbon, shapes=True)
         skinClusterNode = cmds.skinCluster(drv_Jnt[0:3], ribbonShape, tsb=True, mi=2, dr=1, n=name+"_SC")[0]
         bindPose = cmds.listConnections(skinClusterNode+".bindPose", destination=False, source=True)
-        cmds.rename(bindPose, name+"_BindPose")
+        cmds.rename(bindPose, name+"_BP")
         
         #skin presets for the ribbon (that's amazing!)
         if not horizontal:

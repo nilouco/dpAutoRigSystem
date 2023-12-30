@@ -18,7 +18,7 @@
 ###################################################################
 
 DPAR_VERSION_PY3 = "4.03.56"
-DPAR_UPDATELOG = "N217 - Calibrate naming.\nN338 - Review capitalization.\nN493 - Steering name convention.\nN514 - InfoWin."
+DPAR_UPDATELOG = "N217 - Calibrate naming.\nN338 - Review capitalization.\nN493 - Steering name convention.\nN514 - InfoWin.\nN304 - Rename BindPose."
 
 
 
