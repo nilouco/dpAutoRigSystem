@@ -113,6 +113,7 @@ VALIDATOR = "Validator"
 CHECKIN = "Validator/CheckIn"
 CHECKOUT = "Validator/CheckOut"
 VALIDATOR_PRESETS = "Validator/Presets"
+REBUILDER =  "Rebuilder"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -165,10 +166,12 @@ class DP_AutoRig_UI(object):
         self.loadedCheckIn = False
         self.loadedCheckOut = False
         self.loadedAddOns = False
+        self.loadedRebuilder = False
         self.controlInstanceList = []
         self.checkInInstanceList = []
         self.checkOutInstanceList = []
         self.checkAddOnsInstanceList = []
+        self.rebuilderInstanceList = []
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.guideMirrorGrp = GUIDEMIRROR_GRP
@@ -720,8 +723,35 @@ class DP_AutoRig_UI(object):
 
         # --
 
+        # interface of Rebuilder tab - formLayout:
+        self.allUIs["rebuilderTabLayout"] = cmds.formLayout('rebuilderTabLayout', numberOfDivisions=100, parent=self.allUIs["mainTabLayout"])
+        # rebuilderMainLayout - scrollLayout:
+        self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
+        self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
+        self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_process'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
+        # process
+        self.rebuilderModuleList = self.startGuideModules(REBUILDER, "start", "rebuilderProcessLayout")
+        cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
+        cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_process'].lower(), value=True, changeCommand=partial(self.changeActiveAllValidators, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
+        self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
+        cmds.button(label=self.lang['i164_export'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, True, True), parent=self.allUIs["selectedRebuilders2Layout"])
+        cmds.button(label=self.lang['i196_import'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, False, True), parent=self.allUIs["selectedRebuilders2Layout"])
+        cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
+        # rebuilder
+        self.allUIs["footerRebuilder"] = cmds.columnLayout('footerRebuilder', adjustableColumn=True, parent=self.allUIs["rebuilderTabLayout"])
+        cmds.separator(style='none', height=3, parent=self.allUIs["footerRebuilder"])
+        self.allUIs["rebuilderButton"] = cmds.button("rebuilderButton", label=self.lang['r000_rebuilder'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.publisher.mainUI, parent=self.allUIs["footerRebuilder"])
+        cmds.separator(style='none', height=5, parent=self.allUIs["footerRebuilder"])
+        
+        # edit formLayout in order to get a good scalable window:
+        cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
+                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 55), (self.allUIs["footerRebuilder"], 'left', 5), (self.allUIs["footerRebuilder"], 'right', 5), (self.allUIs["footerRebuilder"], 'bottom', 5)],
+                        attachNone=[(self.allUIs["footerRebuilder"], 'top')]
+                        )
+        
+        # --
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], 'Validator')) )
+        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], VALIDATOR), (self.allUIs["rebuilderTabLayout"], REBUILDER)) )
         cmds.select(clear=True)
 
 
@@ -1221,6 +1251,9 @@ class DP_AutoRig_UI(object):
             if guideDir == CHECKOUT and not self.loadedCheckOut:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedCheckOut = True
+            if guideDir == REBUILDER and not self.loadedRebuilder:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedRebuilder = True
             if guideDir == "" and not self.loadedAddOns:
                 print(path+" : "+str(guideModuleList))
                 self.loadedAddOns = True
@@ -1297,6 +1330,15 @@ class DP_AutoRig_UI(object):
                     self.checkAddOnsInstanceList.append(validatorInstance)
                     if validatorInstance.customName:
                         cmds.checkBox(validatorCB, edit=True, label=validatorInstance.customName)
+            elif guideDir == REBUILDER:
+                rebuilderInstance = self.initExtraModule(guideModule, guideDir)
+                rebuilderCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
+                exportBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                importBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                rebuilderInstance.rebuilderCB = rebuilderCB
+                rebuilderInstance.exportBT = exportBT
+                rebuilderInstance.importBT = importBT
+                self.rebuilderInstanceList.append(rebuilderInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
