@@ -116,13 +116,13 @@ class Rivet(object):
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
-        cleanLayout = cmds.columnLayout("cleanLayout", parent=rivetTabsLayout)
-        cmds.separator(style='none', height=15, parent=cleanLayout)
-        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=330, height=420, allowMultiSelection=True, parent=cleanLayout)
-        cmds.separator(style='none', height=10, parent=cleanLayout)
-        buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 20), parent=cleanLayout)
-        cmds.button(label="Clean Rivet", width=290, command=self.cleanRivet, backgroundColor=(0.6, 1.0, 0.7), parent=buttonColumnLayout)
-        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, "Create"), (cleanLayout, "Clean")))
+        removeLayout = cmds.columnLayout("removeLayout", parent=rivetTabsLayout)
+        cmds.separator(style='none', height=15, parent=removeLayout)
+        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=330, height=420, allowMultiSelection=True, parent=removeLayout)
+        cmds.separator(style='none', height=10, parent=removeLayout)
+        buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 20), parent=removeLayout)
+        cmds.button(label="Remove Rivet", width=290, command=self.removeRivetFromUI, backgroundColor=(0.6, 1.0, 0.7), parent=buttonColumnLayout)
+        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, "Create"), (removeLayout, "Remove")))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
 
@@ -133,21 +133,41 @@ class Rivet(object):
             rivetNetworkNodesList = list(filter(lambda netNode: cmds.objExists(f"{netNode}.dpRivetNet"), netNodeList))
         return rivetNetworkNodesList
     
-    def cleanRivet(self, *arg):
+    def findNetFromItem(self, item):
+        rivetNetNodes = self.riseRivetNetNodes()
+        if rivetNetNodes:
+            for rivetNode in rivetNetNodes:
+                nodeItemList = cmds.listConnections(f"{rivetNode}.itemNode", destination=False)
+                if nodeItemList:
+                    if item == nodeItemList[0]:
+                        return rivetNode
+    
+    def removeRivetFromList(self, itemList):
+        for item in itemList:
+            netNode = cmds.listConnections(f"{item}.rivetNet", destination=False)
+            if netNode:
+                netNode = netNode[0]
+            else:
+                netNode = self.findNetFromItem(item)
+            if netNode:
+                self.removeRivetFromNetNode(netNode)
+                cmds.textScrollList(self.rivetControllersList, edit=True, removeItem=item)
+            else:
+                print("Unable to remove rivet, try it manually")
+        cmds.select(clear=True)
+    
+    def removeRivetFromUI(self, *args):
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         if selectionList:
-            for control in selectionList:
-                netNode = cmds.listConnections(f"{control}.rivetNet", destination=False)[0]
-                if netNode:
-                    self.cleanSelectedRivet(netNode)
-                    cmds.textScrollList(self.rivetControllersList, edit=True, removeItem=control)
-            cmds.select(clear=True)
+            self.removeRivetFromList(selectionList)
         else:
-            print("No items selected, please select an item to clean")
+            print("No items selected, please select an item to remove")
         cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
 
-    def cleanSelectedRivet(self, rivetNetNode):
-        rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)[0]
+    def removeRivetFromNetNode(self, rivetNetNode):
+        rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
+        if rivetTransform:
+            rivetTransform = rivetTransform[0]
         rivetControl = cmds.listConnections(f"{rivetNetNode}.itemNode", destination=False)[0]
         rivetFollicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
         attachedGeometry = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
@@ -167,7 +187,7 @@ class Rivet(object):
                 cmds.delete(attachedGeometry)
         cmds.delete(rivetNetNode)
     
-    def controllersWithRivet(self):
+    def itemsWithRivetList(self):
         rivetNetNodes = self.riseRivetNetNodes()
         if rivetNetNodes:
             controllerList = []
@@ -181,9 +201,9 @@ class Rivet(object):
     
     def rivetTabChange(self, rivetTabsLayout):
         if cmds.tabLayout(rivetTabsLayout, query=True, selectTabIndex=True) == 2:
-            rivetControlsList = self.controllersWithRivet()
-            if rivetControlsList:
-                cmds.textScrollList(self.rivetControllersList, edit=True, append=rivetControlsList)
+            rivetItemsList = self.itemsWithRivetList()
+            if rivetItemsList:
+                cmds.textScrollList(self.rivetControllersList, edit=True, append=rivetItemsList)
         else:
             cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
             self.dpFillUI()
@@ -214,6 +234,22 @@ class Rivet(object):
         invT = cmds.checkBox(self.invertTCB, query=True, value=True)
         invR = cmds.checkBox(self.invertRCB, query=True, value=True)
         faceToRivet = cmds.checkBox(self.faceToRivetCB, query=True, value=True)
+
+        hasRivetList = self.itemsWithRivetList()
+
+        toCreateSet = set(itemList)
+        hasRivetSet = set(hasRivetList)
+        needToRemove = toCreateSet & hasRivetSet
+
+        if len(needToRemove) > 0:
+            removeExistingRivet = cmds.confirmDialog(title="Attention", icon="warning", message="At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended)", button=["Yes", "No", "Cancel"], defaultButton="Yes", cancelButton="Cancel", dismissString="Cancel")
+
+            if removeExistingRivet == "Yes":
+                self.removeRivetFromList(needToRemove)
+            elif removeExistingRivet == "No":
+                pass
+            else:
+                return
 
         # call run function to create Rivet setup using UI values
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
@@ -609,7 +645,8 @@ class Rivet(object):
                 if len(itemList) == len(self.rivetList):
                     if cmds.objExists(itemList[r]):
                         cmds.connectAttr(itemList[r]+".message", self.net+".itemNode", force=True)
-                        cmds.addAttr(itemList[r], longName="rivetNet", attributeType="message")
+                        if not cmds.objExists(f"{itemList[r]}.rivetNet"):
+                            cmds.addAttr(itemList[r], longName="rivetNet", attributeType="message")
                         cmds.connectAttr(self.net+".message", itemList[r]+".rivetNet", force=True)
                 
             # check invert group (back) in order to avoid double transformations:
