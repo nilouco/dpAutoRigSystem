@@ -685,6 +685,8 @@
     "m231_proxyCreatorDesc"     : "This module will generate a proxy mesh for the current rig.",
     "m232_morphDeformer"        : "Morph Deformer",
     "m233_wrapDeformer"         : "Wrap Deformer",
+    "m234_jointDisplay"         : "Joint Display",
+    "m235_jointDisplayDesc"     : "Change the joint display in the viewport",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",

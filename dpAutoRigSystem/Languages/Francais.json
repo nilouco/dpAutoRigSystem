@@ -685,6 +685,8 @@
     "m231_proxyCreatorDesc"     : "Ce module va creer a mesh proxy pour le rig courant.",
     "m232_morphDeformer"        : "Déformateur Morph",
     "m233_wrapDeformer"         : "Déformateur Wrap",
+    "m234_jointDisplay"         : "Joint d'affichage",
+    "m235_jointDisplayDesc"     : "Modifier l'affichage des articulations dans la fenêtre",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
