@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.03.52"
-DPAR_UPDATELOG = "N770 - Fixed saved root folder file issue."
+DPAR_VERSION_PY3 = "4.04.01"
+DPAR_UPDATELOG = "N685 - Rivet cleaner upgrade."
 
 
 

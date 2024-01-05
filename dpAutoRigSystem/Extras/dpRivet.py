@@ -34,7 +34,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.0
+DP_RIVET_VERSION = 2.1
 
 
 class Rivet(object):
@@ -72,7 +72,9 @@ class Rivet(object):
         dpRivetWin = cmds.window('dpRivetWindow', title=self.dpUIinst.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
-        rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10))
+        rivetTabsLayout = cmds.tabLayout('rivetTabsLayout', innerMarginWidth=5, innerMarginHeight=5, parent="dpRivetWindow")
+
+        rivetLayout = cmds.columnLayout('rivetLayout', columnOffset=("left", 10), parent=rivetTabsLayout)
         cmds.text(label=self.dpUIinst.lang["m145_loadGeo"], height=30, font='boldLabelFont', parent=rivetLayout)
         doubleLayout = cmds.rowColumnLayout('doubleLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 210)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["m146_geo"]+" >", annotation="Load the Geometry here in order to be used to attach.", backgroundColor=(1.0, 0.7, 1.0), width=100, command=self.dpLoadGeoToAttach, parent=doubleLayout)
@@ -114,10 +116,77 @@ class Rivet(object):
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
-        
+        cleanLayout = cmds.columnLayout("cleanLayout", parent=rivetTabsLayout)
+        cmds.separator(style='none', height=15, parent=cleanLayout)
+        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=330, height=420, allowMultiSelection=True, parent=cleanLayout)
+        cmds.separator(style='none', height=10, parent=cleanLayout)
+        buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 20), parent=cleanLayout)
+        cmds.button(label="Clean Rivet", width=290, command=self.cleanRivet, backgroundColor=(0.6, 1.0, 0.7), parent=buttonColumnLayout)
+        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, "Create"), (cleanLayout, "Clean")))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
+
+    def riseRivetNetNodes(self):
+        netNodeList = cmds.ls(type="network")
+        rivetNetworkNodesList = None
+        if len(netNodeList) != 0:
+            rivetNetworkNodesList = list(filter(lambda netNode: cmds.objExists(f"{netNode}.dpRivetNet"), netNodeList))
+        return rivetNetworkNodesList
     
+    def cleanRivet(self, *arg):
+        selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
+        if selectionList:
+            for control in selectionList:
+                netNode = cmds.listConnections(f"{control}.rivetNet", destination=False)[0]
+                if netNode:
+                    self.cleanSelectedRivet(netNode)
+                    cmds.textScrollList(self.rivetControllersList, edit=True, removeItem=control)
+            cmds.select(clear=True)
+        else:
+            print("No items selected, please select an item to clean")
+        cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
+
+    def cleanSelectedRivet(self, rivetNetNode):
+        rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)[0]
+        rivetControl = cmds.listConnections(f"{rivetNetNode}.itemNode", destination=False)[0]
+        rivetFollicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
+        attachedGeometry = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
+        try:
+            originalParent = cmds.listRelatives(rivetTransform, parent=True)[0]
+            cmds.parent(rivetControl, originalParent)
+            cmds.delete([rivetTransform, rivetFollicle])
+        except:
+            cmds.delete(rivetFollicle)
+            
+        # check if attached geometry should be discarded
+        networkList = cmds.listConnections(attachedGeometry, type="network").remove(rivetNetNode)
+        if networkList == None:
+            skinClusterList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='skinCluster')
+            blendShapeList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='blendShape')
+            if len(skinClusterList) == 0 and len(blendShapeList) == 0:
+                cmds.delete(attachedGeometry)
+        cmds.delete(rivetNetNode)
+    
+    def controllersWithRivet(self):
+        rivetNetNodes = self.riseRivetNetNodes()
+        if rivetNetNodes:
+            controllerList = []
+            for rivetNode in rivetNetNodes:
+                rivetControlList = cmds.listConnections(f"{rivetNode}.itemNode", destination=False)
+                if rivetControlList:
+                    controllerList.append(rivetControlList[0])
+            return controllerList
+        else:
+            return None
+    
+    def rivetTabChange(self, rivetTabsLayout):
+        if cmds.tabLayout(rivetTabsLayout, query=True, selectTabIndex=True) == 2:
+            rivetControlsList = self.controllersWithRivet()
+            if rivetControlsList:
+                cmds.textScrollList(self.rivetControllersList, edit=True, append=rivetControlsList)
+        else:
+            cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
+            self.dpFillUI()
     
     def dpFillUI(self, *args):
         """ Try to auto fill UI elements from selection.
@@ -312,7 +381,6 @@ class Rivet(object):
         self.shapeToAttachList = None
         self.shapeToAttach = None
         self.cpNode = None
-        self.tempNoce = None
         attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         self.rivetList, togetherList = [], []
         isComponent = None
