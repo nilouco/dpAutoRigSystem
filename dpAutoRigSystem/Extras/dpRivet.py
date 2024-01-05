@@ -179,8 +179,10 @@ class Rivet(object):
             cmds.delete(rivetFollicle)
             
         # check if attached geometry should be discarded
-        networkList = cmds.listConnections(attachedGeometry, type="network").remove(rivetNetNode)
-        if networkList == None:
+        networkList = cmds.listConnections(attachedGeometry, type="network")
+        networkList = list(set(networkList))
+        networkList.remove(rivetNetNode)
+        if len(networkList) == 0:
             skinClusterList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='skinCluster')
             blendShapeList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='blendShape')
             if len(skinClusterList) == 0 and len(blendShapeList) == 0:
@@ -235,21 +237,22 @@ class Rivet(object):
         invR = cmds.checkBox(self.invertRCB, query=True, value=True)
         faceToRivet = cmds.checkBox(self.faceToRivetCB, query=True, value=True)
 
+        needToRemove = None
         hasRivetList = self.itemsWithRivetList()
+        if hasRivetList:
+            hasRivetSet = set(hasRivetList)
+            toCreateSet = set(itemList)
+            needToRemove = toCreateSet & hasRivetSet
+        if needToRemove:
+            if len(needToRemove) > 0:
+                removeExistingRivet = cmds.confirmDialog(title="Attention", icon="warning", message="At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended)", button=["Yes", "No", "Cancel"], defaultButton="Yes", cancelButton="Cancel", dismissString="Cancel")
 
-        toCreateSet = set(itemList)
-        hasRivetSet = set(hasRivetList)
-        needToRemove = toCreateSet & hasRivetSet
-
-        if len(needToRemove) > 0:
-            removeExistingRivet = cmds.confirmDialog(title="Attention", icon="warning", message="At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended)", button=["Yes", "No", "Cancel"], defaultButton="Yes", cancelButton="Cancel", dismissString="Cancel")
-
-            if removeExistingRivet == "Yes":
-                self.removeRivetFromList(needToRemove)
-            elif removeExistingRivet == "No":
-                pass
-            else:
-                return
+                if removeExistingRivet == "Yes":
+                    self.removeRivetFromList(needToRemove)
+                elif removeExistingRivet == "No":
+                    pass
+                else:
+                    return
 
         # call run function to create Rivet setup using UI values
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
