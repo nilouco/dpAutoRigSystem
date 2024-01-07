@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "HideDataGrp"
@@ -9,7 +8,7 @@ TITLE = "v028_hideDataGrp"
 DESCRIPTION = "v029_hideDataGrpDesc"
 ICON = "/Icons/dp_hideDataGrp.png"
 
-DP_HIDEDATAGRP_VERSION = 1.1
+DP_HIDEDATAGRP_VERSION = 1.2
 
 
 class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
@@ -42,7 +41,7 @@ class HideDataGrp(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             dataGrp = objList[0]
         else:
-            dataGrp = dpUtils.getNodeByMessage("dataGrp")
+            dataGrp = self.utils.getNodeByMessage("dataGrp")
             if not dataGrp:
                 if cmds.objExists("Data_Grp"):
                     dataGrp = "Data_Grp"

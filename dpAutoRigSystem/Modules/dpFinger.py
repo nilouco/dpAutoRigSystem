@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m007_finger"
 DESCRIPTION = "m008_fingerDesc"
 ICON = "/Icons/dp_finger.png"
 
-DP_FINGER_VERSION = 2.0
+DP_FINGER_VERSION = 2.1
 
 
 class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -83,7 +82,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        dpUtils.useDefaultRenderLayer()
+        self.utils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -124,7 +123,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.cvEndJoint = self.guideName+"_JointEnd"
                     self.jGuide = self.guideName+"_JGuide"+str(self.enteredNJoints)
                     # re-parent the children guides:
-                    childrenGuideBellowList = dpUtils.getGuideChildrenList(self.cvJointLoc)
+                    childrenGuideBellowList = self.utils.getGuideChildrenList(self.cvJointLoc)
                     if childrenGuideBellowList:
                         for childGuide in childrenGuideBellowList:
                             cmds.parent(childGuide, self.cvJointLoc)
@@ -203,7 +202,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.skinJointList = []
@@ -226,12 +225,12 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    dpUtils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     # create a control:
                     if n == 1:
                         self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90))
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
-                        dpUtils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
+                        self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.base+";"+self.guide)   
                         # edit the mirror shape to a good direction of controls:
                         if s == 1:
                             if self.mirrorAxis == 'X':
@@ -267,9 +266,9 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.fingerCtrl = self.ctrls.cvControl("id_016_FingerFk", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree)
                         cmds.setAttr(self.fingerCtrl+".rotateOrder", 1)
                         if n == self.nJoints:
-                            dpUtils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                            self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                         else:
-                            dpUtils.originedFrom(objName=self.fingerCtrl, attrString=self.guide)
+                            self.utils.originedFrom(objName=self.fingerCtrl, attrString=self.guide)
                         if n == 0:
                             if self.nJoints == 2:
                                 # problably we are creating the first control to a thumb
@@ -300,7 +299,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     tempDel = cmds.parentConstraint(self.guide, self.sdkGrp, maintainOffset=False)
                     cmds.delete(tempDel)
                     # zeroOut controls:
-                    self.zeroGrp = dpUtils.zeroOut([self.sdkGrp])
+                    self.zeroGrp = self.utils.zeroOut([self.sdkGrp])
                     
                     # grouping:
                     if n > 0:
@@ -329,15 +328,15 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             if self.addCorrective:
                                 correctiveNetList = [None]
                                 correctiveNetList.append(self.setupCorrectiveNet(side+self.userGuideName+"_01_Ctrl", self.skinJointList[n-1], self.skinJointList[n], side+self.userGuideName+"_"+str(n)+"_PitchDown", 1, 1, -90))
-                                articJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.ctrlRadius, 0, 0)])
+                                articJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.ctrlRadius, 0, 0)])
                                 self.setupJcrControls(articJntList, s, jointLabelAdd, self.userGuideName+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
                                 if s == 1:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
                                     cmds.setAttr(articJntList[0]+".scaleY", -1)
                                     cmds.setAttr(articJntList[0]+".scaleZ", -1)
                             else:
-                                articJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt)
-                                dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                                articJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt)
+                                self.utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                                 cmds.connectAttr(self.scaleCompensateCond+".outColorR", articJntList[0]+".segmentScaleCompensate", force=True)
                     cmds.select(self.jnt)
                     
@@ -412,7 +411,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # fk control drives fk joints
                 for i, fkJoint in enumerate(fkJointList):
                     if not "_JEnd" in fkJoint:
-                        dpUtils.clearDpArAttr([fkJoint])
+                        self.utils.clearDpArAttr([fkJoint])
                         fkCtrl = fkJoint.replace("_Fk_Jxt", "_Ctrl")
                         self.scaleCompensateCond = fkCtrl.replace("_Ctrl", "_ScaleCompensate_Cnd")
                         cmds.parentConstraint(fkCtrl, fkJoint, maintainOffset=True, name=fkJoint+"_PaC")
@@ -433,7 +432,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(self.ikCtrl, longName='twist', attributeType='float', keyable=True)
                     cmds.connectAttr(self.ikCtrl+".twist", ikHandleList[0]+".twist", force=True)
                     cmds.setAttr(self.ikCtrl+".rotateOrder", 1)
-                    self.ikCtrlZero = dpUtils.zeroOut([self.ikCtrl])[0]
+                    self.ikCtrlZero = self.utils.zeroOut([self.ikCtrl])[0]
                     self.ikCtrlZeroList.append(self.ikCtrlZero)
                     cmds.delete(cmds.parentConstraint(self.skinJointList[-1], self.ikCtrlZero, maintainOffset=False))
                     cmds.delete(cmds.pointConstraint(self.cvEndJoint, self.ikCtrlZero, maintainOffset=False))
@@ -454,7 +453,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.ikCtrl, longName='stretchable', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 stretchNormMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_StretchNormalize_MD")
                 cmds.setAttr(stretchNormMD+".operation", 2)
-                distBetweenList = dpUtils.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
+                distBetweenList = self.utils.distanceBet(side+self.userGuideName+"_01_Ctrl", self.ikCtrl, name=side+self.userGuideName+"_DistBet", keep=True)
                 cmds.connectAttr(self.ikFkRevNode+".outputX", distBetweenList[5]+"."+self.ikCtrl+"W0", force=True)
                 cmds.connectAttr(self.fingerCtrl+".ikFkBlend", distBetweenList[5]+"."+distBetweenList[4]+"W1", force=True)
                 cmds.connectAttr(distBetweenList[1]+".distance", stretchNormMD+".input1X", force=True)
@@ -475,7 +474,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
                     if not "_JEnd" in ikJoint:
-                        dpUtils.clearDpArAttr([ikJoint])
+                        self.utils.clearDpArAttr([ikJoint])
                         fkJoint = ikJoint.replace("_Ik_Jxt", "_Fk_Jxt")
                         skinJoint = ikJoint.replace("_Ik_Jxt", "_Jnt")
                         self.fingerCtrl = side+self.userGuideName+"_01_Ctrl"
@@ -524,9 +523,9 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.scalableGrpList.append(self.toScalableHookGrp)
                 self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")

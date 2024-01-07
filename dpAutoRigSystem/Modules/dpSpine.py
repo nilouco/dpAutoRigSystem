@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
-DP_SPINE_VERSION = 2.1
+DP_SPINE_VERSION = 2.2
 
 
 class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -95,7 +94,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        dpUtils.useDefaultRenderLayer()
+        self.utils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -135,7 +134,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # delete difference of nJoints:
                     for n in range(self.enteredNJoints, self.currentNJoints):
                         # re-parent the children guides:
-                        childrenGuideBellowList = dpUtils.getGuideChildrenList(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
+                        childrenGuideBellowList = self.utils.getGuideChildrenList(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
                         if childrenGuideBellowList:
                             for childGuide in childrenGuideBellowList:
                                 cmds.parent(childGuide, self.cvLocator)
@@ -206,7 +205,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # naming main controls:
             hipsName  = self.dpUIinst.lang['c100_bottom']
             chestName = self.dpUIinst.lang['c099_top']
@@ -217,7 +216,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 chestName = self.dpUIinst.lang['c028_chest']
             # run for all sides
             for s, side in enumerate(sideList):
-                attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
+                attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 # get the number of joints to be created:
@@ -307,20 +306,20 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.chestACtrl, self.hipsACtrl)
                 
                 # zeroOut transformations:
-                self.hipsACtrlZero, self.chestAZero, self.chestBGrp, self.hipsFkCtrlZero, self.chestFkCtrlZero = dpUtils.zeroOut([self.hipsACtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl])
+                self.hipsACtrlZero, self.chestAZero, self.chestBGrp, self.hipsFkCtrlZero, self.chestFkCtrlZero = self.utils.zeroOut([self.hipsACtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl])
                 self.chestBGrp = cmds.rename(self.chestBGrp, self.chestBGrp.replace("Zero", "Grp"))
-                self.chestBZero = dpUtils.zeroOut([self.chestBGrp])[0]
-                self.baseCtrlZero = dpUtils.zeroOut([self.baseCtrl])[0]
-                self.tipCtrlZero = dpUtils.zeroOut([self.tipCtrl])[0]
+                self.chestBZero = self.utils.zeroOut([self.chestBGrp])[0]
+                self.baseCtrlZero = self.utils.zeroOut([self.baseCtrl])[0]
+                self.tipCtrlZero = self.utils.zeroOut([self.tipCtrl])[0]
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['v'], l=False)
                 # modify the pivots of chest controls:
                 upPivotPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(self.nJoints-1), query=True, worldSpace=True, translation=True)
                 cmds.move(upPivotPos[0], upPivotPos[1], upPivotPos[2], self.chestACtrl+".scalePivot", self.chestACtrl+".rotatePivot")
                 
                 # add originedFrom attributes to hipsA, hipsB and chestB:
-                dpUtils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
-                dpUtils.originedFrom(objName=self.baseCtrl, attrString=bottomLocGuide)
-                dpUtils.originedFrom(objName=self.tipCtrl, attrString=topLocGuide)
+                self.utils.originedFrom(objName=self.hipsACtrl, attrString=self.base+";"+self.radiusGuide)
+                self.utils.originedFrom(objName=self.baseCtrl, attrString=bottomLocGuide)
+                self.utils.originedFrom(objName=self.tipCtrl, attrString=topLocGuide)
 
                 # create base and end joints:
                 cmds.select(clear=True)
@@ -330,8 +329,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 tipJnt = cmds.joint(name=side+self.userGuideName+"_"+str(self.nJoints+1).zfill(2)+"_"+self.dpUIinst.lang['c120_tip']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(tipJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                dpUtils.setJointLabel(baseJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c106_base'])
-                dpUtils.setJointLabel(tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c120_tip'])
+                self.utils.setJointLabel(baseJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c106_base'])
+                self.utils.setJointLabel(tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c120_tip'])
                 # Base and end controllers:
                 cmds.parentConstraint(self.baseCtrl, baseJnt, maintainOffset=False, name=baseJnt+"_PaC")
                 cmds.scaleConstraint(self.baseCtrl, baseJnt, maintainOffset=True, name=baseJnt+"_ScC")
@@ -372,7 +371,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.xform(upCluster, worldSpace=True, rotation=(upClusterRot[0]+90, upClusterRot[1], upClusterRot[2]))
                 cmds.xform(downCluster, worldSpace=True, rotation=(downClusterRot[0]+90, downClusterRot[1], downClusterRot[2]))
                 # scaleY of the clusters in order to avoid great extremity deforms:
-                rbnHeight = dpUtils.distanceBet(side+self.userGuideName+"_Guide_JointLoc"+str(self.nJoints), side+self.userGuideName+"_Guide_JointLoc1", keep=False)[0]
+                rbnHeight = self.utils.distanceBet(side+self.userGuideName+"_Guide_JointLoc"+str(self.nJoints), side+self.userGuideName+"_Guide_JointLoc1", keep=False)[0]
                 cmds.setAttr(upCluster+".sy", rbnHeight / 10)
                 cmds.setAttr(downCluster+".sy", rbnHeight / 10)
                 # parent clusters in controls (up and down):
@@ -456,10 +455,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if self.rigType == dpBaseClass.RigType.quadruped:
                         cmds.rotate(90, 0, 0, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
-                    self.middleCtrlGrp = dpUtils.zeroOut([self.middleCtrl])[0]
+                    self.middleCtrlGrp = self.utils.zeroOut([self.middleCtrl])[0]
                     self.middleCtrlGrp = cmds.rename(self.middleCtrlGrp, self.middleCtrlGrp.replace("Zero", "Grp"))
-                    self.middleCtrlZero = dpUtils.zeroOut([self.middleCtrlGrp])[0]
-                    self.middleFkCtrlZero = dpUtils.zeroOut([self.middleFkCtrl])[0]
+                    self.middleCtrlZero = self.utils.zeroOut([self.middleCtrlGrp])[0]
+                    self.middleFkCtrlZero = self.utils.zeroOut([self.middleFkCtrl])[0]
                     middleCluster = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(n+1)+"]", name=side+self.userGuideName+'_Middle_Cls')[1]
                     middleLocPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(n), query=True, worldSpace=True, translation=True)
                     tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
@@ -475,7 +474,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.parent(middleCluster, self.toScalableHookGrp, relative=True)
                     # add originedFrom attribute to this middle ctrl:
                     middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_OrigFrom_Grp")
-                    dpUtils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
+                    self.utils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
                     cmds.parentConstraint(self.aRbnJointList[n], middleOrigGrp, maintainOffset=False, name=middleOrigGrp+"_PaC")
                     cmds.parent(middleOrigGrp, self.hipsACtrl)
                     # apply volumeVariation to joints in the middle ribbon setup:
@@ -534,9 +533,9 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if hideJoints:
                     cmds.setAttr(side+self.userGuideName+"_Rbn_RibbonJoint_Grp.visibility", 0)
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")

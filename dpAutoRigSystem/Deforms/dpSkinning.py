@@ -1,9 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpUtils
 
-DP_SKINNING_VERSION = 1.2
+DP_SKINNING_VERSION = 1.3
 
 
 class Skinning(object):
@@ -12,6 +11,7 @@ class Skinning(object):
         """
         # defining variables:
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
         
 
     def validateGeoList(self, geoList, mode=None, *args):
@@ -79,7 +79,7 @@ class Skinning(object):
                     elif (mode == "Remove"):
                         cmds.skinCluster(geomSkin, edit=True, removeInfluence=jointSkinList, toSelectedBones=True)
                     else: # None = create a new skinCluster node
-                        baseName = dpUtils.extractSuffix(geomSkin)
+                        baseName = self.utils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
                         if "|" in skinClusterName:
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
@@ -166,7 +166,7 @@ class Skinning(object):
         sourceDefList = self.checkExistingSkinClusterNode(sourceItem)[2]
         if sourceDefList:
             # get correct naming
-            skinClusterName = dpUtils.extractSuffix(destinationItem)
+            skinClusterName = self.utils.extractSuffix(destinationItem)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
             # clean-up current destination skinCluster

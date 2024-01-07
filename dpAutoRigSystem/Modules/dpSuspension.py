@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m153_suspension"
 DESCRIPTION = "m154_suspensionDesc"
 ICON = "/Icons/dp_suspension.png"
 
-DP_SUSPENSION_VERSION = 2.0
+DP_SUSPENSION_VERSION = 2.1
 
 
 class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -132,7 +131,7 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 # declare guide:
@@ -142,7 +141,7 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
                 self.locatorsGrp = cmds.group(name=side+self.userGuideName+"_Loc_Grp", empty=True)
                 # calculate distance between guide and end:
-                self.dist = dpUtils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
+                self.dist = self.utils.distanceBet(self.cvALoc, self.cvBLoc)[0] * 0.2
                 self.jointList, self.mainCtrlList, self.ctrlZeroList, self.ctrlList, self.aimLocList, self.upLocList = [], [], [], [], [], []
                 for p, letter in enumerate(["A", "B"]):
                     # create joints:
@@ -152,7 +151,7 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     cmds.setAttr(endJoint+".translateZ", self.dist)
                     # joint labelling:
-                    dpUtils.setJointLabel(jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+letter)
+                    self.utils.setJointLabel(jnt, s+jointLabelAdd, 18, self.userGuideName+"_"+letter)
                     self.jointList.append(jnt)
                     
                     # create a control:
@@ -167,16 +166,16 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.scaleConstraint(ctrl, jnt, maintainOffset=False, name=jnt+"_ScC")
                     self.ctrlList.append(ctrl)
                     # zeroOut controls:
-                    zeroOutCtrlGrp = dpUtils.zeroOut([mainCtrl, ctrl, upLocCtrl])
+                    zeroOutCtrlGrp = self.utils.zeroOut([mainCtrl, ctrl, upLocCtrl])
                     self.mainCtrlList.append(zeroOutCtrlGrp[0])
                     self.ctrlZeroList.append(zeroOutCtrlGrp[1])
                     cmds.setAttr(zeroOutCtrlGrp[2]+".translateX", self.dist)
                     # origined from data:
                     if p == 0:
-                        dpUtils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
+                        self.utils.originedFrom(objName=mainCtrl, attrString=self.base+";"+self.cvALoc+";"+self.radiusGuide)
                         cmds.delete(cmds.parentConstraint(self.cvALoc, zeroOutCtrlGrp[0], maintainOffset=False))
                     else:
-                        dpUtils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
+                        self.utils.originedFrom(objName=mainCtrl, attrString=self.cvBLoc)
                         cmds.delete(cmds.parentConstraint(self.cvBLoc, zeroOutCtrlGrp[0], maintainOffset=False))
                         # integrating data:
                         self.suspensionBCtrlGrpList.append(zeroOutCtrlGrp[0])
@@ -225,9 +224,9 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.toScalableHookGrp = cmds.group(self.jointList, name=side+self.userGuideName+"_Scalable_Grp")
                 self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.locatorsGrp, name=side+self.userGuideName+"_Static_Grp")
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")

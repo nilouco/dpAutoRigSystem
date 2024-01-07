@@ -2,7 +2,6 @@
 from maya import cmds
 from maya import mel
 from ..Modules.Library import dpControls
-from ..Modules.Library import dpUtils
 
 # global variables to this module:    
 CLASS_NAME = "HeadDeformer"
@@ -12,13 +11,14 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 3.1
+DP_HEADDEFORMER_VERSION = 3.2
 
 
 class HeadDeformer(object):
     def __init__(self, dpUIinst, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.headCtrl = None
         self.wellDone = True
@@ -82,7 +82,7 @@ class HeadDeformer(object):
         posList = [self.dpUIinst.lang["c100_bottom"], self.dpUIinst.lang["m033_middle"], self.dpUIinst.lang["c099_top"]]
         
         # validating namming in order to be possible create more than one setup
-        validName = dpUtils.validateName(deformerName+"_FFD", "FFD")
+        validName = self.utils.validateName(deformerName+"_FFD", "FFD")
         numbering = validName.replace(deformerName, "")[:-4]
         if numbering:
             deformerName = deformerName+numbering
@@ -225,7 +225,7 @@ class HeadDeformer(object):
             # create symmetry setup
             centerClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:3][0:5]", relative=True, name=centerSymmetryName+"_Cls") #[Cluster, Handle]
             topClusterList = cmds.cluster(latticeDefList[1]+".pt[0:5][2:5][0:5]", relative=True, name=topSymmetryName+"_Cls")
-            clustersZeroList = dpUtils.zeroOut([centerClusterList[1], topClusterList[1]])
+            clustersZeroList = self.utils.zeroOut([centerClusterList[1], topClusterList[1]])
             cmds.matchTransform(clustersZeroList[1], centerClusterList[1])
             clusterGrp = cmds.group(clustersZeroList, name=deformerName+"_Cluster_Grp")
             # arrange lattice deform points percent
@@ -233,7 +233,7 @@ class HeadDeformer(object):
             # symmetry controls
             centerSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", centerSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(-90, 0, 90))
             topSymmetryCtrl = self.ctrls.cvControl("id_068_Symmetry", topSymmetryName+"_Ctrl", bBoxSize, d=0, rot=(0, 90, 0))
-            symmetryCtrlZeroList = dpUtils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
+            symmetryCtrlZeroList = self.utils.zeroOut([centerSymmetryCtrl, topSymmetryCtrl])
             for axis in axisList:
                 cmds.connectAttr(centerSymmetryCtrl+".translate"+axis, centerClusterList[1]+".translate"+axis, force=True)
                 cmds.connectAttr(centerSymmetryCtrl+".rotate"+axis, centerClusterList[1]+".rotate"+axis, force=True)
@@ -249,11 +249,11 @@ class HeadDeformer(object):
                 # create and connect cluster
                 namePos = bottomCtrlName.replace(self.dpUIinst.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
-                cmds.parent(dpUtils.zeroOut([subClusterList[1]])[0], clusterGrp)
+                cmds.parent(self.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
                 subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0))
                 subCtrlList.append(subCtrl)
-                ctrlSubZeroList = dpUtils.zeroOut([subCtrl])[0]
+                ctrlSubZeroList = self.utils.zeroOut([subCtrl])[0]
                 subCtrlGrpList.append(ctrlSubZeroList)
                 cmds.matchTransform(ctrlSubZeroList, subClusterList[1], pos=True)
                 # connect atributes
@@ -265,7 +265,7 @@ class HeadDeformer(object):
 
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
-            dpUtils.zeroOut([arrowCtrl])
+            self.utils.zeroOut([arrowCtrl])
             offsetGrp = cmds.group(name=deformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=deformerName+"_Data_Grp", empty=True)
             cmds.matchTransform(arrowCtrlGrp, latticeDefList[2], position=True, rotation=True)

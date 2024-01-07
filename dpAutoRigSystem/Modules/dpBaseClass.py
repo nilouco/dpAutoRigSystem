@@ -2,7 +2,6 @@
 from maya import cmds
 from maya import mel
 from .Library import dpControls
-from .Library import dpUtils
 from ..Extras import dpCorrectionManager
 
 class RigType(object):
@@ -10,7 +9,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_STARTCLASS_VERSION = 2.2
+DP_STARTCLASS_VERSION = 2.3
 
 
 class StartClass(object):
@@ -34,6 +33,8 @@ class StartClass(object):
         self.moduleGrp = self.guideName+"_Base"
         self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
         self.annotation = self.moduleGrp+"_Ant"
+        # utils
+        self.utils = dpUIinst.utils
         # calling dpControls:
         self.ctrls = dpControls.ControlClass(self.dpUIinst, self.moduleGrp)
         # starting correctionManater:
@@ -63,7 +64,7 @@ class StartClass(object):
         """ Create the elements to Guide module in the scene, like controls, etc...
         """
         # GUIDE:
-        dpUtils.useDefaultRenderLayer()
+        self.utils.useDefaultRenderLayer()
         # create guide base (moduleGrp):
         guideBaseList = self.ctrls.cvBaseGuide(self.moduleGrp, r=2)
         self.moduleGrp = guideBaseList[0]
@@ -141,9 +142,9 @@ class StartClass(object):
         except:
             pass
         # delete the guide module:
-        dpUtils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
+        self.utils.clearNodeGrp(nodeGrpName=self.moduleGrp, attrFind='guideBase', unparent=True)
         # clear default 'dpAR_GuideMirror_Grp':
-        dpUtils.clearNodeGrp()
+        self.utils.clearNodeGrp()
         # remove the namespaces:
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         if self.guideNamespace in allNamespaceList:
@@ -184,7 +185,7 @@ class StartClass(object):
                     self.enteredText = ""
             self.enteredText = self.enteredText.replace(" ", "_")
             # call utils to return the normalized text:
-            self.customName = dpUtils.normalizeText(self.enteredText, prefixMax=30)
+            self.customName = self.utils.normalizeText(self.enteredText, prefixMax=30)
             # check if there is another rigged module using the same customName:
             if self.customName == "":
                 try:
@@ -298,7 +299,7 @@ class StartClass(object):
                     else:
                         s = sDefault
                     # add joint label, create controller, zeroOut
-                    dpUtils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(m))
+                    self.utils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(m))
                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
@@ -318,7 +319,7 @@ class StartClass(object):
     def changeMainCtrlsNumber(self, enteredNCtrls, *args):
         """ Edit the number of main controllers in the guide.
         """
-        dpUtils.useDefaultRenderLayer()
+        self.utils.useDefaultRenderLayer()
         # get the number of main controllers entered by user:
         if enteredNCtrls == 0:
             try:
@@ -411,11 +412,11 @@ class StartClass(object):
             self.ctrls.unPinGuide(self.moduleGrp)
             
             # RIG:
-            dpUtils.useDefaultRenderLayer()
+            self.utils.useDefaultRenderLayer()
             
             # get the radius value to controls:
             if cmds.objExists(self.radiusCtrl):
-                self.ctrlRadius = dpUtils.getCtrlRadius(self.radiusCtrl)
+                self.ctrlRadius = self.utils.getCtrlRadius(self.radiusCtrl)
             else:
                 self.ctrlRadius = 1
                 

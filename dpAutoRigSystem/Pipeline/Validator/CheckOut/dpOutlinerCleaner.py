@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "OutlinerCleaner"
@@ -9,7 +8,7 @@ TITLE = "v076_outlinerCleaner"
 DESCRIPTION = "v077_outlinerCleanerDesc"
 ICON = "/Icons/dp_outlinerCleaner.png"
 
-DP_OUTLINERCLEANER_VERSION = 1.0
+DP_OUTLINERCLEANER_VERSION = 1.1
 
 
 class OutlinerCleaner(dpBaseValidatorClass.ValidatorStartClass):

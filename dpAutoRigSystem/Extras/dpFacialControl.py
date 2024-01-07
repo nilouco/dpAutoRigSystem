@@ -4,7 +4,6 @@ from maya import mel
 import os
 import json
 from ..Modules.Library import dpControls
-from ..Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "FacialControl"
@@ -30,13 +29,14 @@ FACIALPRESET = "FacialJoints"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_FACIALCONTROL_VERSION = 1.7
+DP_FACIALCONTROL_VERSION = 1.8
 
 
 class FacialControl(object):
     def __init__(self, dpUIinst, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.headFacialCtrlsGrp = self.dpUIinst.lang["c024_head"]+"_"+self.dpUIinst.lang["c059_facial"]+"_Ctrls_Grp"
         self.headCtrl = self.dpGetHeadCtrl('id_093_HeadSub')
@@ -455,7 +455,7 @@ class FacialControl(object):
             if jawDefInfluence:
                 self.ctrls.addDefInfluenceAttrs(fCtrl, 2)
             # ctrl zeroOut grp and color:
-            fCtrlGrp = dpUtils.zeroOut([fCtrl])[0]
+            fCtrlGrp = self.utils.zeroOut([fCtrl])[0]
             self.ctrls.colorShape([fCtrl], color)
             # lock or limit XYZ axis:
             self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
@@ -710,7 +710,7 @@ class FacialControl(object):
     def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
         """ Creates the nodes to remap values and connect it to final output (toNode) item.
         """
-        fromNodeName = dpUtils.extractSuffix(fromNode)
+        fromNodeName = self.utils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
         outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
         if "t" in toAttr:

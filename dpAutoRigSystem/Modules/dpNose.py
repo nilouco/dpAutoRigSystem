@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m078_nose"
 DESCRIPTION = "m176_noseDesc"
 ICON = "/Icons/dp_nose.png"
 
-DP_NOSE_VERSION = 2.1
+DP_NOSE_VERSION = 2.2
 
 
 class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -143,7 +142,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        dpUtils.useDefaultRenderLayer()
+        self.utils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -166,7 +165,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # parent it to the lastGuide:
                     cmds.parent(self.cvTopLoc, self.guideName+"_cvTopLoc"+str(n-1), relative=True)
                     # translate new topLoc in the middle of distance of last top and middle guides:
-                    dist = dpUtils.distanceBet(self.guideName+"_cvTopLoc"+str(n-1), self.guideName+"_cvMiddleLoc")[0]
+                    dist = self.utils.distanceBet(self.guideName+"_cvTopLoc"+str(n-1), self.guideName+"_cvMiddleLoc")[0]
                     cmds.setAttr(self.cvTopLoc+".translateZ", (0.5*dist))
                     # create a joint to use like an arrowLine:
                     self.jGuide = cmds.joint(name=self.guideName+"_JGuideTop"+str(n), radius=0.001)
@@ -180,7 +179,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # re-define cvTopLoc:
                 self.cvTopLoc = self.guideName+"_cvTopLoc"+str(self.enteredNJoints)
                 # re-parent the children guides:
-                childrenGuideBellowList = dpUtils.getGuideChildrenList(self.cvTopLoc)
+                childrenGuideBellowList = self.utils.getGuideChildrenList(self.cvTopLoc)
                 if childrenGuideBellowList:
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvTopLoc)
@@ -261,7 +260,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
@@ -280,7 +279,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    dpUtils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
                     self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=1)
@@ -289,7 +288,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.jnt, maintainOffset=False))
                     cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.noseCtrl, maintainOffset=False))
                     # zeroOut controls:
-                    self.zeroOutCtrlGrp = dpUtils.zeroOut([self.noseCtrl])[0]
+                    self.zeroOutCtrlGrp = self.utils.zeroOut([self.noseCtrl])[0]
                     # hide visibility attribute:
                     cmds.setAttr(self.noseCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
@@ -300,10 +299,10 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.zeroOutCtrlGrp+".scaleZ", -1)
                     if n == 0:
                         self.mainCtrlList.append(self.noseCtrl)
-                        dpUtils.originedFrom(objName=self.noseCtrl, attrString=self.base+";"+self.cvTopLoc+";"+self.radiusGuide)
+                        self.utils.originedFrom(objName=self.noseCtrl, attrString=self.base+";"+self.cvTopLoc+";"+self.radiusGuide)
                         self.ctrlZeroGrp = self.zeroOutCtrlGrp
                     else:
-                        dpUtils.originedFrom(objName=self.noseCtrl, attrString=self.cvTopLoc)
+                        self.utils.originedFrom(objName=self.noseCtrl, attrString=self.cvTopLoc)
                     # grouping:
                     if n > 0:
                         # parent joints as a simple chain (line)
@@ -318,8 +317,8 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # add articulationJoint:
                     if n == 1:
                         if self.addArticJoint:
-                            artJntList = dpUtils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            dpUtils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            artJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
+                            self.utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                             cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
                             cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
@@ -375,14 +374,14 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if cmds.objExists(dpARJoint):
                         cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                dpUtils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle'])
-                dpUtils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip'])
-                dpUtils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom'])
-                dpUtils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
-                dpUtils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
+                self.utils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle'])
+                self.utils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip'])
+                self.utils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom'])
+                self.utils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
+                self.utils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
                 if self.addNostril:
-                    dpUtils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
-                    dpUtils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
+                    self.utils.setJointLabel(self.lNostrilJnt, 1, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
+                    self.utils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
                 
                 # creating controls:
                 self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree, headDef=1)
@@ -404,14 +403,14 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.aLCtrls.append(self.leftList)
                 self.aRCtrls.append(self.rightList)
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                dpUtils.originedFrom(objName=self.middleCtrl, attrString=self.cvMiddleLoc)
-                dpUtils.originedFrom(objName=self.tipCtrl, attrString=self.cvTipLoc)
-                dpUtils.originedFrom(objName=self.bottomCtrl, attrString=self.cvBottomLoc)
-                dpUtils.originedFrom(objName=self.lSideCtrl, attrString=self.cvLSideLoc)
-                dpUtils.originedFrom(objName=self.rSideCtrl, attrString=self.cvRSideLoc)
+                self.utils.originedFrom(objName=self.middleCtrl, attrString=self.cvMiddleLoc)
+                self.utils.originedFrom(objName=self.tipCtrl, attrString=self.cvTipLoc)
+                self.utils.originedFrom(objName=self.bottomCtrl, attrString=self.cvBottomLoc)
+                self.utils.originedFrom(objName=self.lSideCtrl, attrString=self.cvLSideLoc)
+                self.utils.originedFrom(objName=self.rSideCtrl, attrString=self.cvRSideLoc)
                 if self.addNostril:
-                    dpUtils.originedFrom(objName=self.lNostrilCtrl, attrString=self.cvLNostrilLoc)
-                    dpUtils.originedFrom(objName=self.rNostrilCtrl, attrString=self.cvRNostrilLoc)
+                    self.utils.originedFrom(objName=self.lNostrilCtrl, attrString=self.cvLNostrilLoc)
+                    self.utils.originedFrom(objName=self.rNostrilCtrl, attrString=self.cvRNostrilLoc)
 
                 # temporary parentConstraints:
                 cmds.delete(cmds.parentConstraint(self.cvMiddleLoc, self.middleCtrl, maintainOffset=False))
@@ -440,18 +439,18 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.rNostrilCtrl+".scaleX", -1)
 
                 # zeroOut controls:
-                self.zeroSideCtrlList = dpUtils.zeroOut([self.lSideCtrl, self.rSideCtrl])
+                self.zeroSideCtrlList = self.utils.zeroOut([self.lSideCtrl, self.rSideCtrl])
                 if s == 0:
                     cmds.setAttr(self.zeroSideCtrlList[1]+".scaleX", -1)
                 elif self.addFlip:
                     cmds.setAttr(self.zeroSideCtrlList[1]+".scaleX", 1)
                 if self.addNostril:
-                    self.zeroNostrilCtrlList = dpUtils.zeroOut([self.lNostrilCtrl, self.rNostrilCtrl])
+                    self.zeroNostrilCtrlList = self.utils.zeroOut([self.lNostrilCtrl, self.rNostrilCtrl])
                     if s == 0:
                         cmds.setAttr(self.zeroNostrilCtrlList[1]+".scaleX", -1)
                     elif self.addFlip:
                         cmds.setAttr(self.zeroNostrilCtrlList[1]+".scaleX", 1)
-                self.zeroCtrlList = dpUtils.zeroOut([self.middleCtrl,  self.tipCtrl, self.bottomCtrl])
+                self.zeroCtrlList = self.utils.zeroOut([self.middleCtrl,  self.tipCtrl, self.bottomCtrl])
 
                 # make controls drive joints:
                 cmds.parentConstraint(self.middleCtrl, self.middleJnt, maintainOffset=False, name=self.middleJnt+"_PaC")
@@ -498,9 +497,9 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")

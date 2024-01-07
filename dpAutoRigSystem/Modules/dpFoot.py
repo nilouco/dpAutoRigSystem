@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m024_foot"
 DESCRIPTION = "m025_footDesc"
 ICON = "/Icons/dp_foot.png"
 
-DP_FOOT_VERSION = 2.3
+DP_FOOT_VERSION = 2.4
 
 
 class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -155,7 +154,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
                 # redeclaring variables:
@@ -189,12 +188,12 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating joints:
                 cmds.select(clear=True)
                 self.footJnt = cmds.joint(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_Jnt")
-                dpUtils.setJointLabel(self.footJnt, s+jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
+                self.utils.setJointLabel(self.footJnt, s+jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
                 self.middleFootJxt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jxt")
                 self.endJnt = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.select(clear=True)
                 self.middleFootJnt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jnt")
-                dpUtils.setJointLabel(self.middleFootJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
+                self.utils.setJointLabel(self.middleFootJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
                 self.endBJnt = cmds.joint(name=side+self.userGuideName+"B_JEnd", radius=0.5)
                 cmds.parent(self.middleFootJnt, self.middleFootJxt)
                 cmds.addAttr(self.footJnt, longName='dpAR_joint', attributeType='float', keyable=False)
@@ -253,14 +252,14 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parent(self.RFEGrp, self.RFDCtrl)
                 
                 # reverse foot zero out groups:
-                self.RFEZero = dpUtils.zeroOut([self.RFEGrp])[0]
-                self.RFEZeroExtra = dpUtils.zeroOut([self.RFEZero])[0]
-                self.RFEZeroFollow = dpUtils.zeroOut([self.RFEZero])[0]
-                self.RFDZero = dpUtils.zeroOut([self.RFDGrp])[0]
-                self.RFCZero = dpUtils.zeroOut([self.RFCGrp])[0]
-                self.RFBZero = dpUtils.zeroOut([self.RFBGrp])[0]
-                self.RFAZero = dpUtils.zeroOut([self.RFAGrp])[0]
-                self.RFAZeroExtra = dpUtils.zeroOut([self.RFAZero])[0]
+                self.RFEZero = self.utils.zeroOut([self.RFEGrp])[0]
+                self.RFEZeroExtra = self.utils.zeroOut([self.RFEZero])[0]
+                self.RFEZeroFollow = self.utils.zeroOut([self.RFEZero])[0]
+                self.RFDZero = self.utils.zeroOut([self.RFDGrp])[0]
+                self.RFCZero = self.utils.zeroOut([self.RFCGrp])[0]
+                self.RFBZero = self.utils.zeroOut([self.RFBGrp])[0]
+                self.RFAZero = self.utils.zeroOut([self.RFAGrp])[0]
+                self.RFAZeroExtra = self.utils.zeroOut([self.RFAZero])[0]
                 rfJointZeroList = [self.RFAZero, self.RFBZero, self.RFCZero, self.RFDZero, self.RFEZero]
                 
                 # fixing side rool rotation order:
@@ -291,7 +290,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.middleFootCtrl+".scaleX", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleZ", -1)
-                self.footCtrlZeroList = dpUtils.zeroOut([self.footCtrl, self.middleFootCtrl])
+                self.footCtrlZeroList = self.utils.zeroOut([self.footCtrl, self.middleFootCtrl])
                 self.middleFootCtrlList.append(self.middleFootCtrl)
 
                 # mount hierarchy:
@@ -331,12 +330,12 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.connectAttr(self.footCtrl+"."+rfAttr+rfType, rfGrpList[j]+".rotateY", force=True)
 
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
-                dpUtils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
-                dpUtils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
-                dpUtils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
-                dpUtils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
-                dpUtils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
-                dpUtils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
+                self.utils.originedFrom(objName=self.footCtrl, attrString=self.base+";"+self.cvFootLoc+";"+self.radiusGuide)
+                self.utils.originedFrom(objName=self.RFACtrl, attrString=self.cvRFALoc)
+                self.utils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
+                self.utils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
+                self.utils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
+                self.utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
                 cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll, attributeType='float', keyable=True)
@@ -478,9 +477,9 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)

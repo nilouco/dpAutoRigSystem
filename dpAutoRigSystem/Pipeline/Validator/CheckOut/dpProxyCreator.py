@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "ProxyCreator"
@@ -12,7 +11,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.2
+DP_PROXYCREATOR_VERSION = 1.3
 
 
 class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
@@ -46,7 +45,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             proxyGrp = objList[0]
         else:
-            proxyGrp = dpUtils.getNodeByMessage("proxyGrp")
+            proxyGrp = self.utils.getNodeByMessage("proxyGrp")
             if not proxyGrp:
                 if cmds.objExists("Proxy_Grp"):
                     proxyGrp = "Proxy_Grp"
@@ -54,7 +53,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
             if not cmds.objExists(proxyGrp+"."+PROXIED):
                 meshList = cmds.listRelatives(proxyGrp, children=True, allDescendents=True, type="mesh")
                 if not meshList:
-                    renderGrp = dpUtils.getNodeByMessage("renderGrp")
+                    renderGrp = self.utils.getNodeByMessage("renderGrp")
                     if not renderGrp:
                         if cmds.objExists("Render_Grp"):
                             renderGrp = "Render_Grp"
@@ -176,7 +175,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                         self.checkReverseNormal(dup, jnt)
                         cmds.connectAttr(jnt+".worldMatrix", dup+".offsetParentMatrix", force=True)
                         cmds.parent(dup, grp)
-                        dpUtils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
+                        self.utils.setAttrValues([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'], [0, 0, 0, 0, 0, 0, 1, 1, 1])
                         self.dpUIinst.ctrls.setLockHide([dup], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz'])
                         drawOverrideList = cmds.listConnections(dup+".drawOverride", source=True, destination=False, plugs=True)
                         if drawOverrideList:
@@ -197,7 +196,7 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
         """
         if not cmds.objExists(grp+"."+PROXIED):
             cmds.addAttr(grp, longName=PROXIED, attributeType="bool", defaultValue=1)
-        optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
+        optionCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optionCtrl:
             # prepare optionCtrl to deformers connections
             cmds.setAttr(optionCtrl+".proxy", channelBox=True)

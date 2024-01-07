@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m073_single"
 DESCRIPTION = "m074_singleDesc"
 ICON = "/Icons/dp_single.png"
 
-DP_SINGLE_VERSION = 2.2
+DP_SINGLE_VERSION = 2.3
 
 
 class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -155,7 +154,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
@@ -167,7 +166,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # create a joint:
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                dpUtils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
+                self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName)
                 # create a control:
                 if not self.getHasIndirectSkin():
                     if self.curveDegree == 0:
@@ -191,12 +190,12 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         else:
                             indirectSkinRot=(0, 0, -90)
                 self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
-                dpUtils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
+                self.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
                 cmds.delete(cmds.parentConstraint(self.guide, self.singleCtrl, maintainOffset=False))
                 # zeroOut controls:
-                zeroOutCtrlGrp = dpUtils.zeroOut([self.singleCtrl], offset=True)[0]
+                zeroOutCtrlGrp = self.utils.zeroOut([self.singleCtrl], offset=True)[0]
                 # hide visibility attribute:
                 cmds.setAttr(self.singleCtrl+'.visibility', keyable=False)
                 # fixing flip mirror:
@@ -214,7 +213,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.select(clear=True)
                     jxtName = self.jnt.replace("_Jnt", "_Jxt")
                     jxt = cmds.duplicate(self.jnt, name=jxtName)[0]
-                    dpUtils.clearDpArAttr([jxt])
+                    self.utils.clearDpArAttr([jxt])
                     cmds.makeIdentity(self.jnt, apply=True, jointOrient=False)
                     cmds.parent(self.jnt, jxt)
                     attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
@@ -223,7 +222,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if self.getHasHolder():
                         cmds.delete(self.singleCtrl+"0Shape", shape=True)
                         self.singleCtrl = cmds.rename(self.singleCtrl, self.singleCtrl+"_"+self.dpUIinst.lang['c046_holder']+"_Grp")
-                        dpUtils.removeUserDefinedAttr(self.singleCtrl, True)
+                        self.utils.removeUserDefinedAttr(self.singleCtrl, True)
                         self.ctrls.setLockHide([self.singleCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'])
                         self.jnt = cmds.rename(self.jnt, self.jnt.replace("_Jnt", "_"+self.dpUIinst.lang['c046_holder']+"_Jis"))
                         self.ctrls.setLockHide([self.jnt], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'ro'], True, True)
@@ -295,9 +294,9 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(loc+".visibility", 0)
                 self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
                 cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
                 cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")

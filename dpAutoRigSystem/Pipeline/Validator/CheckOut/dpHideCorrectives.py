@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
-
 
 # global variables to this module:
 CLASS_NAME = "HideCorrectives"
@@ -10,7 +8,7 @@ TITLE = "v036_hideCorrectives"
 DESCRIPTION = "v037_hideCorrectivesDesc"
 ICON = "/Icons/dp_hideCorrectives.png"
 
-DP_HIDECORRECTIVES_VERSION = 1.2
+DP_HIDECORRECTIVES_VERSION = 1.3
 
 
 class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
@@ -39,7 +37,7 @@ class HideCorrectives(dpBaseValidatorClass.ValidatorStartClass):
         
         # ---
         # --- validator code --- beginning
-        optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
+        optionCtrl = self.utils.getNodeByMessage("optionCtrl")
         if optionCtrl:
             if objList:
                 toCheckList = cmds.attributeQuery('correctiveCtrls', node=objList[0], exists=True)

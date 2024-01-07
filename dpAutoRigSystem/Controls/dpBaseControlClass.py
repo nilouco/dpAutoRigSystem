@@ -2,10 +2,9 @@
 from maya import cmds
 from maya import mel
 from ..Modules.Library import dpControls
-from ..Modules.Library import dpUtils
 from ..Extras import dpCustomAttr
 
-DP_CONTROLSTARTCLASS_VERSION = 2.2
+DP_CONTROLSTARTCLASS_VERSION = 2.3
 
 
 class ControlStartClass(object):
@@ -29,6 +28,7 @@ class ControlStartClass(object):
         self.cvPeriodic = None
         self.controlsGuideDir = 'Controls'
         self.suffix = "Ctrl"
+        self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.customAttr = dpCustomAttr.CustomAttr(self.dpUIinst, ui=False, verbose=False)
     
@@ -165,7 +165,7 @@ class ControlStartClass(object):
         # getting current selection:
         destinationList = cmds.ls(selection=True, type="transform")
         # check if the given name is good or add a sequencial number on it:
-        self.cvName = dpUtils.validateName(cvName, self.suffix)
+        self.cvName = self.utils.validateName(cvName, self.suffix)
         self.cvID = cvID
         self.cvSize = cvSize
         self.cvDegree = cvDegree

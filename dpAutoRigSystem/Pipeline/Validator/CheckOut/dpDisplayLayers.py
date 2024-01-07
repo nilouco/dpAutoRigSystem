@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "DisplayLayers"
@@ -9,7 +8,7 @@ TITLE = "v054_displayLayers"
 DESCRIPTION = "v055_displayLayersDesc"
 ICON = "/Icons/dp_displayLyr.png"
 
-DP_DISPLAYLAYERS_VERSION = 1.3
+DP_DISPLAYLAYERS_VERSION = 1.4
 
 
 class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
@@ -158,7 +157,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
             If it finds nothing, it will return an empty list.
         """
         meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
-        renderGrp = dpUtils.getNodeByMessage("renderGrp")
+        renderGrp = self.utils.getNodeByMessage("renderGrp")
         if renderGrp:
             allShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
             for meshGrp in meshGrpList:

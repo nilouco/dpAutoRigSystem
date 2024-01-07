@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from ..Modules.Library import dpUtils
 from functools import partial
 
 # global variables to this module:
@@ -15,7 +14,7 @@ ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnor
 IGNORE_LIST = ['persp', 'top', 'front', 'side']
 DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 
-DP_CUSTOMATTR_VERSION = 1.4
+DP_CUSTOMATTR_VERSION = 1.5
 
 
 class CustomAttr(object):
@@ -23,14 +22,15 @@ class CustomAttr(object):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.ui = ui
+        self.utils = self.dpUIinst.utils
         self.mainWindowName = "dpCustomAttributesWindow"
         self.addWindowName = "dpAddCustomAttributesWindow"
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
         # call main UI function
         if self.ui:
-            dpUtils.closeUI(self.mainWindowName)
-            dpUtils.closeUI(self.addWindowName)
-            dpUtils.closeUI(self.removeWindowName)
+            self.utils.closeUI(self.mainWindowName)
+            self.utils.closeUI(self.addWindowName)
+            self.utils.closeUI(self.removeWindowName)
             self.getItemFilter()
             self.mainUI()
 
@@ -96,7 +96,7 @@ class CustomAttr(object):
         if filterName:
             currentItemList = cmds.selectionConnection(self.itemSC, query=True, object=True)
             if currentItemList:
-                filteredItemList = dpUtils.filterName(filterName, currentItemList, " ")
+                filteredItemList = self.utils.filterName(filterName, currentItemList, " ")
                 filteredItemList = list(set(filteredItemList) - set(IGNORE_LIST))
                 filteredItemList.sort()
                 cmds.selectionConnection(self.itemSC, edit=True, clear=True)
@@ -108,7 +108,7 @@ class CustomAttr(object):
     def addAttrUI(self, *args):
         """ Create a window with buttons to add new attributes.
         """
-        dpUtils.closeUI(self.addWindowName)
+        self.utils.closeUI(self.addWindowName)
         add_winWidth  = 220
         add_winHeight = 260
         cmds.window(self.addWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(add_winWidth, add_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
@@ -149,7 +149,7 @@ class CustomAttr(object):
                             cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
                 elif attrIndex == 0: #dpID
                     if not cmds.objExists(item+"."+ATTR_DPID):
-                        id = dpUtils.generateID(item)
+                        id = self.utils.generateID(item)
                         cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
                         cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
                 else:
@@ -163,7 +163,7 @@ class CustomAttr(object):
     def removeAttrUI(self, *args):
         """ Create a window showing the current dp custom attributes to delete them.
         """
-        dpUtils.closeUI(self.removeWindowName)
+        self.utils.closeUI(self.removeWindowName)
         remove_winWidth  = 200
         remove_winHeight = 250
         cmds.window(self.removeWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(remove_winWidth, remove_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)

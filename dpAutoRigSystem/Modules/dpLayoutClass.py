@@ -1,9 +1,8 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from functools import partial
 
-DP_LAYOUTCLASS_VERSION = 2.3
+DP_LAYOUTCLASS_VERSION = 2.4
 
 
 class LayoutClass(object):
@@ -17,6 +16,7 @@ class LayoutClass(object):
         self.description = DESCRIPTION
         self.icon = ICON
         self.userGuideName = userGuideName
+        self.utils = dpUIinst.utils
     
     
     def basicModuleLayout(self, *args):
@@ -427,7 +427,7 @@ class LayoutClass(object):
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            mirroredGuideFather = dpUtils.mirroredGuideFather(self.moduleGrp)
+            mirroredGuideFather = self.utils.mirroredGuideFather(self.moduleGrp)
             if mirroredGuideFather:
                 cmds.setAttr(self.moduleGrp+".mirrorEnable", 0)
                 # get initial values from father guide base:
@@ -474,7 +474,7 @@ class LayoutClass(object):
             stopMirrorOperation = self.checkFatherMirror()
             if not stopMirrorOperation:
                 # loading Maya matrix node (for mirror porpuses)
-                loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+                loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
                 if loadedMatrixPlugin:
                     self.mirrorAxis = item
                     cmds.setAttr(self.moduleGrp+".mirrorAxis", self.mirrorAxis, type='string')
@@ -531,10 +531,10 @@ class LayoutClass(object):
         
         # verify if there is not any guide module in the guideMirrorGrp and then delete it:
         self.guideMirrorGrp = self.dpUIinst.guideMirrorGrp
-        dpUtils.clearNodeGrp(nodeGrpName=self.guideMirrorGrp, attrFind='guideBaseMirror', unparent=False)
+        self.utils.clearNodeGrp(nodeGrpName=self.guideMirrorGrp, attrFind='guideBaseMirror', unparent=False)
         
         # get children, verifying if there are children guides:
-        guideChildrenList = dpUtils.getGuideChildrenList(self.moduleGrp)
+        guideChildrenList = self.utils.getGuideChildrenList(self.moduleGrp)
         
         self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
         if self.mirrorAxis != 'off':

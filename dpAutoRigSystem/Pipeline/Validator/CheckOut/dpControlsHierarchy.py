@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 import json
 import os
 
@@ -13,7 +12,7 @@ ICON = "/Icons/dp_controlsHierarchy.png"
 
 HIERARCHY_PATH = "dpData/dpHierarchy"
 
-DP_CONTROLSHIERARCHY_VERSION = 1.3
+DP_CONTROLSHIERARCHY_VERSION = 1.4
 
 
 class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
@@ -202,7 +201,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         if self.dpTeamFile:
             self.currentFileName = self.currentFileName.replace("_v", "_h")
         
-        globalCtrl = dpUtils.getNodeByMessage("globalCtrl")
+        globalCtrl = self.utils.getNodeByMessage("globalCtrl")
         # Verify if another Ctrl was sent via code to check hierarchy from.
         if objList and cmds.objExists(objList[0]) and self.checkNurbs(objList[0]):
             rootNode = objList[0]

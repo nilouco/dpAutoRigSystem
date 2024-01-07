@@ -1,8 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from . import dpUtils
-from ...Validator.CheckOut import dpResetPose
+from ...Pipeline.Validator.CheckOut import dpResetPose
 from functools import partial
 import os
 import getpass
@@ -28,7 +27,7 @@ dic_colors = {
     "none": 0,
 }
 
-DP_CONTROLS_VERSION = 2.5
+DP_CONTROLS_VERSION = 2.7
 
 
 class ControlClass(object):
@@ -40,6 +39,7 @@ class ControlClass(object):
         self.dpUIinst = dpUIinst
         self.attrValueDic = {}
         self.moduleGrp = moduleGrp
+        self.utils = dpUIinst.utils
         self.resetPose = dpResetPose.ResetPose(self.dpUIinst, ui=False, verbose=False)
         self.ignoreDefaultValuesAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility", "rotateOrder", "scaleCompensate"]
         self.defaultValueWindowName = "dpDefaultValueOptionWindow"
@@ -253,7 +253,7 @@ class ControlClass(object):
             # parent this ribbonPos to the ribbonGrp:
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
-            dpUtils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
+            self.utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
     
     
@@ -345,7 +345,7 @@ class ControlClass(object):
         return curve
 
 
-    #@dpUtils.profiler
+    #@self.utils.profiler
     def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
@@ -627,7 +627,7 @@ class ControlClass(object):
                             self.destChildrenGrp = cmds.group(destChildrenList, name="dpTemp_DestChildren_Grp")
                             cmds.parent(self.destChildrenGrp, world=True)
                         if defList:
-                            dpUtils.reapplyDeformers(dupSourceItem, defList)
+                            self.utils.reapplyDeformers(dupSourceItem, defList)
                         dupSourceShapeList = cmds.listRelatives(dupSourceItem, shapes=True, type="nurbsCurve", fullPath=True)
                         for dupSourceShape in dupSourceShapeList:
                             if needKeepVis:
@@ -649,7 +649,7 @@ class ControlClass(object):
                                                 if cmds.objExists(defNode):
                                                     if cmds.objectType(defNode) == "transformGeometry":
                                                         cmds.delete(forcedShape, constructionHistory=True)
-                                                        dpUtils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
+                                                        self.utils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
                                                         break
                         cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
@@ -807,7 +807,7 @@ class ControlClass(object):
         return newRadius
     
     
-    #@dpUtils.profiler
+    #@self.utils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
         """
@@ -1244,8 +1244,8 @@ class ControlClass(object):
         calibrateAxisList = ["X", "Y", "Z"]
         toCalibrationList = []
         jcrCtrl = self.cvControl(type, jcrName.replace("_Jcr", "_Ctrl"), r=radius, d=degree, corrective=True)
-        jcrGrp0 = dpUtils.zeroOut([jcrCtrl])[0]
-        jcrGrp1 = dpUtils.zeroOut([jcrGrp0])[0]
+        jcrGrp0 = self.utils.zeroOut([jcrCtrl])[0]
+        jcrGrp1 = self.utils.zeroOut([jcrGrp0])[0]
         cmds.delete(cmds.parentConstraint(jcrName, jcrGrp1, maintainOffset=False))
         cmds.parentConstraint(cmds.listRelatives(jcrName, parent=True)[0], jcrGrp1, maintainOffset=True, name=jcrGrp1+"_PaC")
         cmds.parentConstraint(jcrCtrl, jcrName, maintainOffset=True, name=jcrCtrl+"_PaC")
@@ -1469,7 +1469,7 @@ class ControlClass(object):
     def defaultValueEditor(self, *args):
         """ Create an UI to edit the attributes default values.
         """
-        dpUtils.closeUI(self.defaultValueWindowName)
+        self.utils.closeUI(self.defaultValueWindowName)
         # window
         defaultValueOption_winWidth  = 430
         defaultValueOption_winHeight = 300

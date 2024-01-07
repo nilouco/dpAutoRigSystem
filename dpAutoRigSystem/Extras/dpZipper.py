@@ -3,7 +3,6 @@ from maya import cmds
 from maya import mel
 from functools import partial
 from ..Modules.Library import dpControls
-from ..Modules.Library import dpUtils
 
 # global variables to this module:    
 CLASS_NAME = "Zipper"
@@ -14,13 +13,14 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DP_ZIPPER_VERSION = 2.17
+DP_ZIPPER_VERSION = 2.18
 
 
 class Zipper(object):
     def __init__(self, dpUIinst, *args, **kwargs):
         # redeclaring variables
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.zipperName = self.dpUIinst.lang['m061_zipper']
         self.firstName = self.dpUIinst.lang['c114_first']
@@ -202,7 +202,7 @@ class Zipper(object):
         maxPos = cmds.xform(curveName+".cv["+str(curveLength-1)+"]", query=True, worldSpace=True, translation=True)[self.curveAxis]
         if minPos > maxPos:
             cmds.reverseCurve(curveName, constructionHistory=True, replaceOriginal=True)
-            cmds.rename(cmds.listConnections(curveName+".create")[0], dpUtils.extractSuffix(curveName)+"_"+self.curveDirection+"_RevC")
+            cmds.rename(cmds.listConnections(curveName+".create")[0], self.utils.extractSuffix(curveName)+"_"+self.curveDirection+"_RevC")
     
     
     def dpGenerateMiddleCurve(self, origCurve, *args):
@@ -250,24 +250,24 @@ class Zipper(object):
         
         # check if there's a dpAR Option_Ctrl:
         if self.goodToDPAR:
-            optionCtrl = dpUtils.getNodeByMessage("optionCtrl")
+            optionCtrl = self.utils.getNodeByMessage("optionCtrl")
             if optionCtrl:
                 optCtrlRigScaleNode = cmds.listConnections(optionCtrl+"."+rigScaleAttr, source=False, destination=True)[0]
                 cmds.connectAttr(optCtrlRigScaleNode+".outputX", self.zipperCtrl+"."+rigScaleAttr, force=True)
                 cmds.setAttr(self.zipperCtrl+"."+rigScaleAttr, lock=True)
-            ctrlsVisibilityGrp = dpUtils.getNodeByMessage("ctrlsVisibilityGrp")
+            ctrlsVisibilityGrp = self.utils.getNodeByMessage("ctrlsVisibilityGrp")
             if ctrlsVisibilityGrp:
                 cmds.parent(ctrlGrp, ctrlsVisibilityGrp)
         
         # create blend curves and connect create input from first and second curves:
-        self.firstBlendCurve = cmds.duplicate(self.firstCurve, name=dpUtils.extractSuffix(self.firstCurve)+"_Blend_Crv")[0]
-        self.secondBlendCurve = cmds.duplicate(self.secondCurve, name=dpUtils.extractSuffix(self.secondCurve)+"_Blend_Crv")[0]
+        self.firstBlendCurve = cmds.duplicate(self.firstCurve, name=self.utils.extractSuffix(self.firstCurve)+"_Blend_Crv")[0]
+        self.secondBlendCurve = cmds.duplicate(self.secondCurve, name=self.utils.extractSuffix(self.secondCurve)+"_Blend_Crv")[0]
         cmds.connectAttr(self.firstCurve+".worldSpace", self.firstBlendCurve+".create", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace", self.secondBlendCurve+".create", force=True)
         
         # create curve blendShapes
-        self.firstBS = cmds.blendShape(self.middleCurve, self.firstBlendCurve, topologyCheck=False, name=dpUtils.extractSuffix(self.firstCurve)+"_BS")[0]
-        self.secondBS = cmds.blendShape(self.middleCurve, self.secondBlendCurve, topologyCheck=False, name=dpUtils.extractSuffix(self.secondCurve)+"_BS")[0]
+        self.firstBS = cmds.blendShape(self.middleCurve, self.firstBlendCurve, topologyCheck=False, name=self.utils.extractSuffix(self.firstCurve)+"_BS")[0]
+        self.secondBS = cmds.blendShape(self.middleCurve, self.secondBlendCurve, topologyCheck=False, name=self.utils.extractSuffix(self.secondCurve)+"_BS")[0]
         cmds.connectAttr(self.zipperCtrl+"."+activeAttr, self.firstBS+"."+self.middleCurve, force=True)
         cmds.connectAttr(self.zipperCtrl+"."+activeAttr, self.secondBS+"."+self.middleCurve, force=True)
         
@@ -283,8 +283,8 @@ class Zipper(object):
         self.secondLoc = cmds.listConnections(distDimShape+".endPoint", source=True, destination=False)[0]
         self.secondLoc = cmds.rename(self.secondLoc, self.zipperName+"_"+autoAttr.capitalize()+"_"+self.secondName+"_Loc")
         # attach locators to original curves:
-        firstMoP = dpUtils.attachToMotionPath(self.firstLoc, self.firstCurve, self.zipperName+"_"+autoAttr.capitalize()+"_"+self.firstName+"_MoP", 0.5)
-        secondMoP = dpUtils.attachToMotionPath(self.secondLoc, self.secondCurve, self.zipperName+"_"+autoAttr.capitalize()+"_"+self.secondName+"_MoP", 0.5)
+        firstMoP = self.utils.attachToMotionPath(self.firstLoc, self.firstCurve, self.zipperName+"_"+autoAttr.capitalize()+"_"+self.firstName+"_MoP", 0.5)
+        secondMoP = self.utils.attachToMotionPath(self.secondLoc, self.secondCurve, self.zipperName+"_"+autoAttr.capitalize()+"_"+self.secondName+"_MoP", 0.5)
         
         # automatic intensity and calibration:
         autoOnOffMD = cmds.createNode("multiplyDivide", name=self.zipperName+"_"+autoAttr.capitalize()+"_OnOff_MD")
@@ -323,7 +323,7 @@ class Zipper(object):
         # calculate distance position based 1.0 from our control attribute:
         distPos = 1.0 / self.curveLength
         for c, curve in enumerate([self.firstCurve, self.secondCurve]):
-            baseName = dpUtils.extractSuffix(curve)
+            baseName = self.utils.extractSuffix(curve)
             for i in range(0, self.curveLength+1):
                 lPosA = (i * distPos)
                 lPosB = (lPosA + distPos)
@@ -386,15 +386,15 @@ class Zipper(object):
         # generate deformMesh from origModel:
         self.deformMesh = cmds.polyDuplicateAndConnect(self.origModel)
         # rename geometries:
-        self.origModel = cmds.rename(self.origModel, dpUtils.extractSuffix(self.origModel)+"_Orig_Geo")
-        self.deformMesh = cmds.rename(self.deformMesh, dpUtils.extractSuffix(oldMeshName)+"_Def_Mesh")
+        self.origModel = cmds.rename(self.origModel, self.utils.extractSuffix(self.origModel)+"_Orig_Geo")
+        self.deformMesh = cmds.rename(self.deformMesh, self.utils.extractSuffix(oldMeshName)+"_Def_Mesh")
         cmds.setAttr(self.origModel+".visibility", 0)
         # parent if need:
-        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        modelGrp = self.utils.getNodeByMessage("modelsGrp")
         if modelGrp:
             cmds.parent(self.origModel, modelGrp)
             self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
-        renderGrp = dpUtils.getNodeByMessage("renderGrp")
+        renderGrp = self.utils.getNodeByMessage("renderGrp")
         if renderGrp:
             # avoid reparent deformMesh if already inside RenderGrp:
             parentList, allParentList = [], []
@@ -410,8 +410,8 @@ class Zipper(object):
     def dpCreateWireDeform(self, *args):
         """ Create two wire deformer for first and second curves.
         """
-        firstWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=dpUtils.extractSuffix(self.deformMesh)+"_First_Wire")[0]
-        secondWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=dpUtils.extractSuffix(self.deformMesh)+"_Second_Wire")[0]
+        firstWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=self.utils.extractSuffix(self.deformMesh)+"_First_Wire")[0]
+        secondWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=self.utils.extractSuffix(self.deformMesh)+"_Second_Wire")[0]
         cmds.connectAttr(self.firstCurve+".worldSpace[0]", firstWireDef+".baseWire[0]", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace[0]", secondWireDef+".baseWire[1]", force=True)
         cmds.connectAttr(self.firstBlendCurve+".worldSpace[0]", firstWireDef+".deformedWire[0]", force=True)
@@ -425,7 +425,7 @@ class Zipper(object):
         zipperDistanceGrp = cmds.group(self.firstLoc, self.secondLoc, self.distDimTransform, name=self.zipperName+"_Distance_Grp")
         zipperDataGrp = cmds.group(zipperCurvesGrp, zipperDistanceGrp, name=self.zipperName+"_Data_Grp")
         if self.goodToDPAR:
-            staticGrp = dpUtils.getNodeByMessage("staticGrp")
+            staticGrp = self.utils.getNodeByMessage("staticGrp")
             if staticGrp:
                 cmds.parent(zipperDataGrp, staticGrp)
     

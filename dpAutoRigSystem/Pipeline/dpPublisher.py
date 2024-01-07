@@ -1,13 +1,12 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpUtils
 from . import dpPipeliner
 from . import dpPackager
 from functools import partial
 import os
 
-DP_PUBLISHER_VERSION = 1.8
+DP_PUBLISHER_VERSION = 1.9
 
 
 class Publisher(object):
@@ -21,6 +20,7 @@ class Publisher(object):
         self.publisherName = self.dpUIinst.lang['m046_publisher']
         self.currentAssetName = None
         self.shortAssetName = None
+        self.utils = dpUIinst.utils
         self.pipeliner = dpPipeliner.Pipeliner()
         self.packager = dpPackager.Packager()
 
@@ -64,9 +64,9 @@ class Publisher(object):
         """ This is the main method to load the Publisher UI.
         """
         self.ui = True
-        dpUtils.closeUI('dpSuccessPublishedWindow')
-        dpUtils.closeUI('dpPublisherWindow')
-        savedScene = dpUtils.checkSavedScene()
+        self.utils.closeUI('dpSuccessPublishedWindow')
+        self.utils.closeUI('dpPublisherWindow')
+        savedScene = self.utils.checkSavedScene()
         if not savedScene:
             savedScene = self.userSaveThisScene()
         if savedScene:
@@ -92,7 +92,7 @@ class Publisher(object):
             # workaround to load pipeliner data correctly
             # TODO find a way to load without UI
             self.pipeliner.mainUI(self.dpUIinst)
-            dpUtils.closeUI('dpPipelinerWindow')
+            self.utils.closeUI('dpPipelinerWindow')
             self.setPublishFilePath()
 
 
@@ -373,7 +373,7 @@ class Publisher(object):
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
-                dpUtils.closeUI('dpPublisherWindow')
+                self.utils.closeUI('dpPublisherWindow')
 
             else:
                 mel.eval('warning \"'+self.dpUIinst.lang['v021_noFileName']+'\";')
@@ -400,7 +400,7 @@ class Publisher(object):
     def successPublishedWindow(self, publishedFile, *args):
         """ If everything works well we can call a success publishing window here.
         """
-        dpUtils.closeUI('dpSuccessPublishedWindow')
+        self.utils.closeUI('dpSuccessPublishedWindow')
         cmds.progressWindow(endProgress=True)
         # window
         winWidth  = 250

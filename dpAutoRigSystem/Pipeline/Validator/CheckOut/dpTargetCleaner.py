@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "TargetCleaner"
@@ -11,7 +10,7 @@ ICON = "/Icons/dp_targetCleaner.png"
 
 DPKEEPITATTR = "dpKeepIt"
 
-DP_TARGETCLEANER_VERSION = 1.7
+DP_TARGETCLEANER_VERSION = 1.8
 
 
 class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -123,7 +122,7 @@ class TargetCleaner(dpBaseValidatorClass.ValidatorStartClass):
         resultList = []
         if grpList:
             for item in grpList:
-                nodeGrp = dpUtils.getNodeByMessage(item)
+                nodeGrp = self.utils.getNodeByMessage(item)
                 if nodeGrp:
                     nodeList = cmds.listRelatives(nodeGrp, allDescendents=True, children=True, type="transform", fullPath=False)
                     if nodeList:

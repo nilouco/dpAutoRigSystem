@@ -9,7 +9,7 @@ import time
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.9
+DP_PIPELINER_VERSION = 1.10
 
 
 class Pipeliner(object):
@@ -17,6 +17,7 @@ class Pipeliner(object):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
+        self.utils = dpUtils.Utils()
         self.settingsFile = "_dpPipelineSettings.json"
         self.infoFile = "dpPipelineInfo.json"
         self.webhookFile = "dpWebhook.json"
@@ -44,7 +45,7 @@ class Pipeliner(object):
     def getJsonSettingsPath(self, *args):
         """ Returns the json path for the pipeline settings file.
         """
-        basePath = dpUtils.findPath("dpAutoRig.py")
+        basePath = self.utils.findPath("dpAutoRig.py")
         basePath = basePath[:basePath.rfind("dpAutoRigSystem")+15]
         return os.path.join(basePath, self.settingsFile).replace("\\", "/")
 
@@ -254,8 +255,13 @@ class Pipeliner(object):
             self.pipeInfo = self.getPipelineInfo()
             if self.pipeInfo:
                 # mounting structured pipeline data
+                print("HHHEERRREEE 0000000")
+                print("self.pipeData['path'] = ", self.pipeData['path'])
                 self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
                 self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
+                print("HHHEERRREEE 001111")
+                print("self.pipeData['addOnsPath'] = ", self.pipeData['addOnsPath'])
+                print("self.pipeData['presetsPath'] = ", self.pipeData['presetsPath'])
             else:
                 self.pipeInfo = self.declareDefaultPipelineInfo()
                 print('Not found', self.infoFile)
@@ -294,7 +300,7 @@ class Pipeliner(object):
     def mainUI(self, dpUIinst=None, loadedFileInfo=False, *args):
         """ Open an UI to load, set and save the pipeline info.
         """
-        dpUtils.closeUI('dpPipelinerWindow')
+        self.utils.closeUI('dpPipelinerWindow')
         self.getPipelineData(loadedFileInfo)
         # window
         if dpUIinst:
@@ -482,7 +488,7 @@ class Pipeliner(object):
 #           dpUIinst.jobReloadUI()
         else:
             print("Unexpected Error: There's no pipeline data to save, sorry.")
-        dpUtils.closeUI('dpPipelinerWindow')
+        self.utils.closeUI('dpPipelinerWindow')
 
 
     def mountPackagePath(self, *args):
@@ -543,7 +549,7 @@ class Pipeliner(object):
                     else:
                         wh = self.pipeData['h001_publishing']
                     if wh:
-                        self.pipeData['publishedWebhook'] = dpUtils.mountWH(DISCORD_URL, wh)
+                        self.pipeData['publishedWebhook'] = self.utils.mountWH(DISCORD_URL, wh)
             # callback
             if not self.pipeData['s_callback']:
                 callback = os.path.join(self.pipeData['path'], self.callbackFile)

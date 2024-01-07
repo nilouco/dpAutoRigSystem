@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from ..Modules.Library import dpUtils
 import time
 import getpass
 
@@ -10,7 +9,7 @@ CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
 
-DP_VALIDATORSTARTCLASS_VERSION = 2.2
+DP_VALIDATORSTARTCLASS_VERSION = 2.3
 
 
 class ValidatorStartClass(object):
@@ -19,6 +18,7 @@ class ValidatorStartClass(object):
         """
         # defining variables:
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -143,7 +143,7 @@ class ValidatorStartClass(object):
         if self.verbose:
             self.dpUIinst.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.dpUIinst.lang['v000_validator']+"\n"+thisTime+"\n"+logText)
-            if not dpUtils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
+            if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])
 
 

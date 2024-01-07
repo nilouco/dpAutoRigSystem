@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseValidatorClass
-from ...Modules.Library import dpUtils
 
 # global variables to this module:
 CLASS_NAME = "WIPCleaner"
@@ -9,7 +8,7 @@ TITLE = "v009_wipCleaner"
 DESCRIPTION = "v010_wipCleanerDesc"
 ICON = "/Icons/dp_wipCleaner.png"
 
-DP_WIPCLEANER_VERSION = 1.2
+DP_WIPCLEANER_VERSION = 1.3
 
 
 class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -42,7 +41,7 @@ class WIPCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             wipGrp = objList
         else:
-            wipGrp = dpUtils.getNodeByMessage("wipGrp")
+            wipGrp = self.utils.getNodeByMessage("wipGrp")
             if not wipGrp:
                 if cmds.objExists("WIP_Grp"):
                     wipGrp = "WIP_Grp"

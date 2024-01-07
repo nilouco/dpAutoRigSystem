@@ -109,11 +109,11 @@ COMBINED = "Controls/Combined"
 CONTROLS_PRESETS = "Controls/Presets"
 EXTRAS = "Extras"
 LANGUAGES = "Languages"
-VALIDATOR = "Validator"
-CHECKIN = "Validator/CheckIn"
-CHECKOUT = "Validator/CheckOut"
-VALIDATOR_PRESETS = "Validator/Presets"
-REBUILDER =  "Rebuilder"
+VALIDATOR = "Pipeline/Validator"
+CHECKIN = "Pipeline/Validator/CheckIn"
+CHECKOUT = "Pipeline/Validator/CheckOut"
+VALIDATOR_PRESETS = "Pipeline/Validator/Presets"
+REBUILDER =  "Pipeline/Rebuilder"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -181,6 +181,7 @@ class DP_AutoRig_UI(object):
         self.dpShape = DPSHAPE
         self.dpLog = DPLOG
         self.optionCtrl = None
+        self.utils = dpUtils.Utils()
         self.pipeliner = dpPipeliner.Pipeliner()
         self.packager = dpPackager.Packager()
         
@@ -270,7 +271,7 @@ class DP_AutoRig_UI(object):
             cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
             cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
             cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-            cmds.menuItem('help_MI', label='Help...', command=partial(dpUtils.visitWebSite, DPAR_SITE))
+            cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, DPAR_SITE))
             
             # create the main layout:
             self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
@@ -289,7 +290,7 @@ class DP_AutoRig_UI(object):
             print("Exception:", e)
             try:
                 # error logging
-                self.packager.toDiscord(dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), DPAR_VERSION_PY3+": "+str(e))
+                self.packager.toDiscord(self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), DPAR_VERSION_PY3+": "+str(e))
             except:
                 pass
             print(self.langDic[self.langName]['i008_errorUI'])
@@ -618,7 +619,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["editSelection2Layout"] = cmds.paneLayout("editSelection2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["editSelectedControllerFL"])
         self.allUIs["resetCurveButton"] = cmds.button("resetCurveButton", label=self.lang['i121_resetCurve'], backgroundColor=(1.0, 0.7, 0.3), height=30, command=partial(self.ctrls.resetCurve), parent=self.allUIs["editSelection2Layout"])
         self.allUIs["changeDegreeButton"] = cmds.button("changeDegreeButton", label=self.lang['i120_changeDegree'], backgroundColor=(1.0, 0.8, 0.4), height=30, command=partial(self.ctrls.resetCurve, True), parent=self.allUIs["editSelection2Layout"])
-        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=dpUtils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
+        self.allUIs["zeroOutGrpButton"] = cmds.button("zeroOutGrpButton", label=self.lang['i116_zeroOut'], backgroundColor=(0.8, 0.8, 0.8), height=30, command=self.utils.zeroOut, parent=self.allUIs["editSelectedControllerFL"])
         self.allUIs["selectAllControls"] = cmds.button("selectAllControls", label=self.lang['i291_selectAllControls'], backgroundColor=(0.9, 1.0, 0.6), height=30, command=partial(self.ctrls.selectAllControls), parent=self.allUIs["editSelectedControllerFL"])
 
         # calibrationControls - frameLayout:
@@ -743,7 +744,7 @@ class DP_AutoRig_UI(object):
         
         # --
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], VALIDATOR), (self.allUIs["rebuilderTabLayout"], REBUILDER)) )
+        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], self.lang['v000_validator']), (self.allUIs["rebuilderTabLayout"], self.lang['r000_rebuilder'])) )
         cmds.select(clear=True)
 
 
@@ -852,7 +853,7 @@ class DP_AutoRig_UI(object):
         if type == "controls":
             newPresetString = self.ctrls.dpCreateControlsPreset()
         elif type == "validator":
-            newPresetString = dpUtils.dpCreateValidatorPreset(self)
+            newPresetString = self.utils.dpCreateValidatorPreset(self)
         if newPresetString:
             # create json file:
             resultDic = self.createJsonFile(newPresetString, presetDir, '_preset')
@@ -1029,7 +1030,7 @@ class DP_AutoRig_UI(object):
         jointName = cmds.textField(self.allUIs["jointNameTF"], query=True, text=True)
         if jointList:
             if jointName:
-                sortedJointList = dpUtils.filterName(jointName, jointList, " ")
+                sortedJointList = self.utils.filterName(jointName, jointList, " ")
             else:
                 sortedJointList = jointList
         
@@ -1096,7 +1097,7 @@ class DP_AutoRig_UI(object):
         geoName = cmds.textField(self.allUIs["geoNameTF"], query=True, text=True)
         if geomList:
             if geoName:
-                sortedGeoList = dpUtils.filterName(geoName, geomList, " ")
+                sortedGeoList = self.utils.filterName(geoName, geomList, " ")
             else:
                 sortedGeoList = geomList
         
@@ -1159,7 +1160,7 @@ class DP_AutoRig_UI(object):
         print("\n", self.lang['i084_checkUpdate'])
         
         # compare current version with GitHub master
-        rawResult = dpUtils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
+        rawResult = self.utils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
         
         # call Update Window about rawRsult:
         if rawResult[0] == 0:
@@ -1198,12 +1199,12 @@ class DP_AutoRig_UI(object):
         """
         if not path:
             # find path where 'dpAutoRig.py' is been executed:
-            path = dpUtils.findPath("dpAutoRig.py")
+            path = self.utils.findPath("dpAutoRig.py")
         if not self.loadedPath:
             print("dpAutoRigPath: "+path)
             self.loadedPath = True
         # list all guide modules:
-        guideModuleList = dpUtils.findAllModules(path, guideDir)
+        guideModuleList = self.utils.findAllModules(path, guideDir)
         if guideModuleList:
             # change guide module list for alphabetic order:
             guideModuleList.sort()
@@ -1257,7 +1258,7 @@ class DP_AutoRig_UI(object):
         """
         # especific import command for guides storing theses guides modules in a variable:
         #guide = __import__("dpAutoRigSystem."+guideDir+"."+guideModule, {}, {}, [guideModule])
-        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
 
         # Sandbox the module import process so a single guide cannot crash the whole Autorig.
         # https://github.com/SqueezeStudioAnimation/dpAutoRigSystem/issues/28
@@ -1281,9 +1282,9 @@ class DP_AutoRig_UI(object):
         icon = guide.ICON
         if guideDir:
             # find path where 'dpAutoRig.py' is been executed to get the icon:
-            path = dpUtils.findPath("dpAutoRig.py")
+            path = self.utils.findPath("dpAutoRig.py")
         iconDir = path+icon
-        iconInfo = dpUtils.findPath("dpAutoRig.py")+"/Icons/"+INFO_ICON
+        iconInfo = self.utils.findPath("dpAutoRig.py")+"/Icons/"+INFO_ICON
         guideName = guide.CLASS_NAME
         
         # creating a basic layout for guide buttons:
@@ -1351,11 +1352,11 @@ class DP_AutoRig_UI(object):
                 # if yes, get the name after the "__":
                 namespaceList[i] = namespaceList[i].partition("__")[2]
         # send this result to findLastNumber in order to get the next moduleName +1:
-        newSuffix = dpUtils.findLastNumber(namespaceList, BASE_NAME) + 1
+        newSuffix = self.utils.findLastNumber(namespaceList, BASE_NAME) + 1
         # generate the current moduleName added the next new suffix:
         userSpecName = BASE_NAME + str(newSuffix)
         # especific import command for guides storing theses guides modules in a variable:
-        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         reload(self.guide)
         # get the CLASS_NAME from guideModule:
@@ -1365,7 +1366,7 @@ class DP_AutoRig_UI(object):
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])
-        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.lang['i005_footerA'])
         return guideInstance
     
@@ -1376,7 +1377,7 @@ class DP_AutoRig_UI(object):
         """
         if guideDir:
             # especific import command for guides storing theses guides modules in a variable:
-            basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+            basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
             self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         else:
             self.guide = __import__(guideModule, {}, {}, [guideModule])
@@ -1398,7 +1399,7 @@ class DP_AutoRig_UI(object):
         """ Create a instance of a scripted guide that will create several guideModules in order to integrate them.
         """
         # import this scripted module:
-        basePath = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")
+        basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
         reload(guide)
         # get the CLASS_NAME from guideModule:
@@ -1417,10 +1418,10 @@ class DP_AutoRig_UI(object):
         cmds.namespace(setNamespace=":")
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         # find path where 'dpAutoRig.py' is been executed:
-        path = dpUtils.findPath("dpAutoRig.py")
+        path = self.utils.findPath("dpAutoRig.py")
         guideDir = MODULES
         # find all module names:
-        moduleNameInfo = dpUtils.findAllModuleNames(path, guideDir)
+        moduleNameInfo = self.utils.findAllModuleNames(path, guideDir)
         validModules = moduleNameInfo[0]
         validModuleNames = moduleNameInfo[1]
         
@@ -1443,7 +1444,7 @@ class DP_AutoRig_UI(object):
             cmds.deleteUI(self.allUIs["modulesLayoutA"])
             self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
             # load again the modules:
-            guideFolder = dpUtils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
+            guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
             # this list will be used to rig all modules pressing the RIG button:
             for module in self.allGuidesList:
                 mod = __import__(guideFolder+"."+module[0], {}, {}, [module[0]])
@@ -1467,7 +1468,7 @@ class DP_AutoRig_UI(object):
                 # reload pinGuide scriptJob:
                 self.ctrls.startPinGuide(module[2])
         # edit the footer A text:
-        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         cmds.text(self.allUIs["footerAText"], edit=True, label=str(len(self.modulesToBeRiggedList)) +" "+ self.lang['i005_footerA'])
     
 
@@ -1476,7 +1477,7 @@ class DP_AutoRig_UI(object):
             Use a recursive method to remove imported of imported guides.
         """
         importedNamespaceList = []
-        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         currentCustomNameList = list(map(lambda guideModule : cmds.getAttr(guideModule.moduleGrp+".customName"), self.modulesToBeRiggedList))
         cmds.namespace(setNamespace=':')
         namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True, recurse=True)
@@ -1526,7 +1527,7 @@ class DP_AutoRig_UI(object):
         # get the entered text:
         enteredText = cmds.textField(self.allUIs["prefixTextField"], query=True, text=True)
         # call utils to return the normalized text:
-        prefixName = dpUtils.normalizeText(enteredText, prefixMax=10)
+        prefixName = self.utils.normalizeText(enteredText, prefixMax=10)
 
         # edit the prefixTextField with the prefixName:
         if len(prefixName) != 0:
@@ -1616,7 +1617,7 @@ class DP_AutoRig_UI(object):
             print("\n-------------\n"+self.lang['v000_validator']+"\n"+logText)
             if publishLog:
                 validationResultData["Publisher"] = publishLog
-            if not dpUtils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
+            if not self.utils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
                 print(self.lang['i201_saveScene'])
         cmds.progressWindow(endProgress=True)
         return validationResultData, False, 0
@@ -1700,8 +1701,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
         infoDesc = cmds.text(self.donate_description, align=self.donate_align, parent=donateColumnLayout)
         cmds.separator(style='none', height=10, parent=donateColumnLayout)
-        brPaypalButton = cmds.button('brlPaypalButton', label=self.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(dpUtils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
-        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(dpUtils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
+        brPaypalButton = cmds.button('brlPaypalButton', label=self.lang['i167_donate']+" - R$ - Real", align=self.donate_align, command=partial(self.utils.visitWebSite, DONATE+"BRL"), parent=donateColumnLayout)
+        #usdPaypalButton = cmds.button('usdPaypalButton', label=self.lang['i167_donate']+" - USD - Dollar", align=self.donate_align, command=partial(self.utils.visitWebSite, DONATE+"USD"), parent=donateColumnLayout)
         # call Donate Window:
         cmds.showWindow(dpDonateWin)
     
@@ -1733,8 +1734,8 @@ class DP_AutoRig_UI(object):
                 cmds.text(self.lang['i171_updateLog']+":\n", align="center", parent=updateLayout)
                 cmds.text(remoteLog, align="left", parent=updateLayout)
                 cmds.separator(height=30)
-            whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(dpUtils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
-            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(dpUtils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
+            whatsChangedButton = cmds.button('whatsChangedButton', label=self.lang['i117_whatsChanged'], align="center", command=partial(self.utils.visitWebSite, DPAR_WHATSCHANGED), parent=updateLayout)
+            visiteGitHubButton = cmds.button('visiteGitHubButton', label=self.lang['i093_gotoWebSite'], align="center", command=partial(self.utils.visitWebSite, DPAR_GITHUB), parent=updateLayout)
             downloadButton = cmds.button('downloadButton', label=self.lang['i094_downloadUpdate'], align="center", command=partial(self.downloadUpdate, DPAR_MASTERURL, "zip"), parent=updateLayout)
             installButton = cmds.button('installButton', label=self.lang['i095_installUpdate'], align="center", command=partial(self.installUpdate, DPAR_MASTERURL, self.update_remoteVersion), parent=updateLayout)
         # automatically check for updates:
@@ -1795,7 +1796,7 @@ class DP_AutoRig_UI(object):
             print(self.lang['i098_installing'])
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
-            dpAR_DestFolder = dpUtils.findPath("dpAutoRig.py")
+            dpAR_DestFolder = self.utils.findPath("dpAutoRig.py")
             
             # progress window:
             installAmount = 0
@@ -1968,7 +1969,7 @@ class DP_AutoRig_UI(object):
             infoData['dpAR'] = DPAR_VERSION_PY3
             #print(infoData)
             if infoData:
-                wh = dpUtils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
+                wh = self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
                 self.packager.toDiscord(wh, str(infoData))
 
     
@@ -2166,7 +2167,7 @@ class DP_AutoRig_UI(object):
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
-            self.optionCtrlGrp = dpUtils.zeroOut([self.optionCtrl])[0]
+            self.optionCtrlGrp = self.utils.zeroOut([self.optionCtrl])[0]
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
@@ -2278,7 +2279,7 @@ class DP_AutoRig_UI(object):
         self.jobReloadUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
-        self.modulesToBeRiggedList = dpUtils.getModulesToBeRigged(self.moduleInstancesList)
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
         self.riggedModuleDic = {}
         
         # declare a list to store all integrating information:
@@ -2320,7 +2321,7 @@ class DP_AutoRig_UI(object):
                 guideModule.checkFatherMirror()
             
             # store hierarchy from guides:
-            self.hookDic = dpUtils.hook()
+            self.hookDic = self.utils.hook()
             
             # get prefix:
             self.prefix = cmds.textField("prefixTextField", query=True, text=True)
@@ -2383,7 +2384,7 @@ class DP_AutoRig_UI(object):
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+self.lang['i010_integrateCB']))
                 
                 # get all parent info from rigged modules:
-                self.originedFromDic = dpUtils.getOriginedFromDic()
+                self.originedFromDic = self.utils.getOriginedFromDic()
                 
                 # verify if is necessary organize the hierarchies for each module:
                 for guideModule in self.modulesToBeRiggedList:

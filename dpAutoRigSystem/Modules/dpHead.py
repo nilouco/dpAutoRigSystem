@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from .Library import dpUtils
 from . import dpBaseClass
 from . import dpLayoutClass
 
@@ -10,7 +9,7 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
-DP_HEAD_VERSION = 2.1
+DP_HEAD_VERSION = 2.2
 
 
 class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -156,7 +155,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
-        dpUtils.useDefaultRenderLayer()
+        self.utils.useDefaultRenderLayer()
         # get the number of joints entered by user:
         if enteredNJoints == 0:
             try:
@@ -190,7 +189,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # re-define cvNeckLoc:
                 self.cvNeckLoc = self.guideName+"_Neck"+str(self.enteredNJoints)
                 # re-parent the children guides:
-                childrenGuideBellowList = dpUtils.getGuideChildrenList(self.cvNeckLoc)
+                childrenGuideBellowList = self.utils.getGuideChildrenList(self.cvNeckLoc)
                 if childrenGuideBellowList:
                     for childGuide in childrenGuideBellowList:
                         cmds.parent(childGuide, self.cvNeckLoc)
@@ -198,7 +197,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(self.guideName+"_Neck"+str(self.enteredNJoints))
                 cmds.delete(self.guideName+"_JGuideNeck"+str(self.enteredNJoints))
             # get the length of the neck to position segments.
-            dist = dpUtils.distanceBet(self.guideName+"_Neck0", self.guideName+"_Head")[0]
+            dist = self.utils.distanceBet(self.guideName+"_Neck0", self.guideName+"_Head")[0]
             # translateY to input on each cvLocator
             distBt = dist/(self.enteredNJoints)
             for n in range(1, self.enteredNJoints):
@@ -216,7 +215,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             Depends on axis and rotation done.
         """
         # declaring naming:
-        attrBaseName = dpUtils.extractSuffix(attrCtrl)
+        attrBaseName = self.utils.extractSuffix(attrCtrl)
         drivenGrp = attrBaseName+"_"+self.dpUIinst.lang[openCloseID]+self.dpUIinst.lang['c034_move']+"_Grp"
         # attribute names:
         intAttrName = self.dpUIinst.lang[openCloseID].lower()+self.dpUIinst.lang[intAttrID].capitalize()+axis
@@ -390,7 +389,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = dpUtils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
@@ -473,17 +472,17 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
                 for n in range(0, self.nJoints):
-                    dpUtils.setJointLabel(self.neckJointList[n], s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c023_neck']+"_"+str(n).zfill(2))
-                dpUtils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c024_head'])
-                dpUtils.setJointLabel(self.upperJawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c025_jaw'])
-                dpUtils.setJointLabel(self.upperHeadJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head'])
-                dpUtils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c025_jaw'])
-                dpUtils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c026_chin'])
-                dpUtils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c048_chew'])
-                dpUtils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.dpUIinst.lang['c039_lip'])
-                dpUtils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.dpUIinst.lang['c039_lip'])
-                dpUtils.setJointLabel(self.upperLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip'])
-                dpUtils.setJointLabel(self.lowerLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['c039_lip'])
+                    self.utils.setJointLabel(self.neckJointList[n], s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c023_neck']+"_"+str(n).zfill(2))
+                self.utils.setJointLabel(self.headJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c024_head'])
+                self.utils.setJointLabel(self.upperJawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c025_jaw'])
+                self.utils.setJointLabel(self.upperHeadJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c024_head'])
+                self.utils.setJointLabel(self.jawJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c025_jaw'])
+                self.utils.setJointLabel(self.chinJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c026_chin'])
+                self.utils.setJointLabel(self.chewJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c048_chew'])
+                self.utils.setJointLabel(self.lCornerLipJnt, 1, 18, self.userGuideName+"_"+self.dpUIinst.lang['c039_lip'])
+                self.utils.setJointLabel(self.rCornerLipJnt, 2, 18, self.userGuideName+"_"+self.dpUIinst.lang['c039_lip'])
+                self.utils.setJointLabel(self.upperLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip'])
+                self.utils.setJointLabel(self.lowerLipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['c039_lip'])
                 # creating controls:
                 for n in range(0, self.nJoints):
                     neckCtrl = self.ctrls.cvControl("id_022_HeadNeck", ctrlName=neckCtrlBaseName+"_"+str(n).zfill(2)+"_Ctrl", r=(self.ctrlRadius/((n*0.2)+1)), d=self.curveDegree, dir="-Z")
@@ -546,19 +545,19 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating the originedFrom attributes (in order to permit integrated parents in the future):
                 for n in range(0, self.nJoints):
                     if n == 0:
-                        dpUtils.originedFrom(objName=self.neckCtrlList[0], attrString=self.base+";"+self.neckLocList[0]+";"+self.radiusGuide)
+                        self.utils.originedFrom(objName=self.neckCtrlList[0], attrString=self.base+";"+self.neckLocList[0]+";"+self.radiusGuide)
                     else:
-                        dpUtils.originedFrom(objName=self.neckCtrlList[n], attrString=self.neckLocList[n])
-                dpUtils.originedFrom(objName=self.headSubCtrl, attrString=self.cvHeadLoc)
-                dpUtils.originedFrom(objName=self.upperJawCtrl, attrString=self.cvUpperJawLoc)
-                dpUtils.originedFrom(objName=self.upperHeadCtrl, attrString=self.cvUpperHeadLoc)
-                dpUtils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
-                dpUtils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
-                dpUtils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
-                dpUtils.originedFrom(objName=self.lCornerLipCtrl, attrString=self.cvLCornerLipLoc)
-                dpUtils.originedFrom(objName=self.rCornerLipCtrl, attrString=self.cvRCornerLipLoc)
-                dpUtils.originedFrom(objName=self.upperLipCtrl, attrString=self.cvUpperLipLoc)
-                dpUtils.originedFrom(objName=self.lowerLipCtrl, attrString=self.cvLowerLipLoc)
+                        self.utils.originedFrom(objName=self.neckCtrlList[n], attrString=self.neckLocList[n])
+                self.utils.originedFrom(objName=self.headSubCtrl, attrString=self.cvHeadLoc)
+                self.utils.originedFrom(objName=self.upperJawCtrl, attrString=self.cvUpperJawLoc)
+                self.utils.originedFrom(objName=self.upperHeadCtrl, attrString=self.cvUpperHeadLoc)
+                self.utils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
+                self.utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
+                self.utils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
+                self.utils.originedFrom(objName=self.lCornerLipCtrl, attrString=self.cvLCornerLipLoc)
+                self.utils.originedFrom(objName=self.rCornerLipCtrl, attrString=self.cvRCornerLipLoc)
+                self.utils.originedFrom(objName=self.upperLipCtrl, attrString=self.cvUpperLipLoc)
+                self.utils.originedFrom(objName=self.lowerLipCtrl, attrString=self.cvLowerLipLoc)
                 
                 # temporary parentConstraints:
                 for n in range(0, self.nJoints):
@@ -586,15 +585,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(toFlipNode+".scaleZ", -1)
 
                 # zeroOut controls:
-                self.zeroCornerLipCtrlList = dpUtils.zeroOut([self.lCornerLipCtrl, self.rCornerLipCtrl])
+                self.zeroCornerLipCtrlList = self.utils.zeroOut([self.lCornerLipCtrl, self.rCornerLipCtrl])
                 self.lLipGrp = cmds.group(self.lCornerLipCtrl, name=self.lCornerLipCtrl+"_Grp")
                 self.rLipGrp = cmds.group(self.rCornerLipCtrl, name=self.rCornerLipCtrl+"_Grp")
                 if not self.addFlip:
                     cmds.setAttr(self.zeroCornerLipCtrlList[1]+".scaleX", -1)
-                self.zeroNeckCtrlList = dpUtils.zeroOut(self.neckCtrlList)
-                self.zeroCtrlList = dpUtils.zeroOut([self.headCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl, self.upperHeadCtrl])
+                self.zeroNeckCtrlList = self.utils.zeroOut(self.neckCtrlList)
+                self.zeroCtrlList = self.utils.zeroOut([self.headCtrl, self.upperJawCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.upperLipCtrl, self.lowerLipCtrl, self.upperHeadCtrl])
                 self.zeroCtrlList.extend(self.zeroCornerLipCtrlList)
-                self.zeroCtrlList.extend(dpUtils.zeroOut([self.headSubCtrl]))
+                self.zeroCtrlList.extend(self.utils.zeroOut([self.headSubCtrl]))
                 
                 # make joints be ride by controls:
                 for n in range(0, self.nJoints):
@@ -623,11 +622,11 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False))
 
                 # hide unnecessary zero out bone display:
-                dpUtils.zeroOutJoints([self.lCornerLipJnt, self.rCornerLipJnt])
+                self.utils.zeroOutJoints([self.lCornerLipJnt, self.rCornerLipJnt])
 
                 # head follow/isolate create interations between neck and head:
                 self.headOrientGrp = cmds.group(empty=True, name=self.headCtrl+"_Orient_Grp")
-                self.zeroHeadGrp = dpUtils.zeroOut([self.headOrientGrp])[0]
+                self.zeroHeadGrp = self.utils.zeroOut([self.headOrientGrp])[0]
                 cmds.parent(self.zeroHeadGrp, self.neckCtrlList[-1])
                 self.worldRef = cmds.group(empty=True, name=side+self.userGuideName+"_WorldRef_Grp")
                 self.worldRefList.append(self.worldRef)
@@ -738,7 +737,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # articulation joint:
                 if self.addArticJoint:
                     # neckBase
-                    neckBaseJzt = dpUtils.zeroOutJoints([self.neckJointList[0]])[0]
+                    neckBaseJzt = self.utils.zeroOutJoints([self.neckJointList[0]])[0]
                     if self.addCorrective:
                         # corrective controls group
                         self.correctiveCtrlsGrp = cmds.group(name=side+self.userGuideName+"_Corrective_Grp", empty=True)
@@ -757,14 +756,14 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchUp", 0, 0, 80))
                             correctiveNetList.append(self.setupCorrectiveNet(self.neckCtrlList[n], fatherJoint, self.neckJointList[n], neckCtrlBaseName+"_"+str(n)+"_PitchDown", 0, 0, -80))
                             
-                            articJntList = dpUtils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
+                            articJntList = self.utils.articulationJoint(fatherJoint, self.neckJointList[n], 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
                             self.setupJcrControls(articJntList, s, jointLabelAdd, neckCtrlBaseName+"_"+str(n), correctiveNetList, neckHeadCalibratePresetList, invertList, [False, True, True, False, False])
                             if s == 1:
                                 if self.addFlip:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
                                     cmds.setAttr(articJntList[0]+".scaleY", -1)
                                     cmds.setAttr(articJntList[0]+".scaleZ", -1)
-                            dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c023_neck']+"_"+str(n)+"_Jar")
+                            self.utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c023_neck']+"_"+str(n)+"_Jar")
 
                         # head corrective
                         headCorrectiveNetList = [None]
@@ -773,7 +772,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head']+"_PitchUp", 0, 0, 80))
                         headCorrectiveNetList.append(self.setupCorrectiveNet(self.headSubCtrl, self.neckJointList[-1], self.headJnt, side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head']+"_PitchDown", 0, 0, -80))
                         headCalibratePresetList, invertList = self.getCalibratePresetList(s)
-                        articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
+                        articJntList = self.utils.articulationJoint(self.neckJointList[-1], self.headJnt, 4, [(0.5*self.ctrlRadius, 0, 0), (-0.5*self.ctrlRadius, 0, 0), (0, 0, 0.5*self.ctrlRadius), (0, 0, -0.5*self.ctrlRadius)])
                         self.setupJcrControls(articJntList, s, jointLabelAdd, side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], headCorrectiveNetList, headCalibratePresetList, invertList, [False, True, True, False, False])
                         if s == 1:
                             if self.addFlip:
@@ -781,15 +780,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 cmds.setAttr(articJntList[0]+".scaleY", -1)
                                 cmds.setAttr(articJntList[0]+".scaleZ", -1)
                     else:
-                        articJntList = dpUtils.articulationJoint(neckBaseJzt, self.neckJointList[0])
-                        dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.dpUIinst.lang['c023_neck']+self.dpUIinst.lang['c106_base']+"_Jar")
+                        articJntList = self.utils.articulationJoint(neckBaseJzt, self.neckJointList[0])
+                        self.utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_00_"+self.dpUIinst.lang['c023_neck']+self.dpUIinst.lang['c106_base']+"_Jar")
                         cmds.rename(articJntList[0], side+self.userGuideName+"_00_"+self.dpUIinst.lang['c023_neck']+self.dpUIinst.lang['c106_base']+"_Jar")
-                        articJntList = dpUtils.articulationJoint(self.neckJointList[-1], self.headJnt)
+                        articJntList = self.utils.articulationJoint(self.neckJointList[-1], self.headJnt)
                     
                     self.neckJointList.insert(0, neckBaseJzt)
                     cmds.parentConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_PaC")
                     cmds.scaleConstraint(self.zeroNeckCtrlList[0], neckBaseJzt, maintainOffset=True, name=neckBaseJzt+"_ScC")
-                    dpUtils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.dpUIinst.lang['c024_head']+self.dpUIinst.lang['c106_base']+"_Jar")
+                    self.utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_01_"+self.dpUIinst.lang['c024_head']+self.dpUIinst.lang['c106_base']+"_Jar")
                     cmds.rename(articJntList[0], side+self.userGuideName+"_01_"+self.dpUIinst.lang['c024_head']+self.dpUIinst.lang['c106_base']+"_Jar")
                 
                 # create a locator in order to avoid delete static group
@@ -839,9 +838,9 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
                 cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
                 # add hook attributes to be read when rigging integrated modules:
-                dpUtils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                dpUtils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                dpUtils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
                 self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)

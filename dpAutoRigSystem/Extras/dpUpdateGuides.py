@@ -1,6 +1,5 @@
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpUtils
 
 # global variables to this module:    
 CLASS_NAME = "UpdateGuides"
@@ -8,7 +7,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DP_UPDATEGUIDES_VERSION = 1.6
+DP_UPDATEGUIDES_VERSION = 1.7
 
 
 class UpdateGuides(object):
@@ -17,11 +16,12 @@ class UpdateGuides(object):
         # defining variables
         self.dpUIinst = dpUIinst
         self.ui = ui
+        self.utils = dpUIinst.utils
         # Dictionary that will hold data for update, whatever don't need update will not be saved
         self.updateData = {}
         self.currentDpArVersion = dpUIinst.dpARVersion
         # Receive the guides list from hook function
-        self.guidesDictionary = dpUtils.hook()
+        self.guidesDictionary = self.utils.hook()
         # List that will hold all new guides instances
         self.newGuidesInstanceList = []
         # Dictionary where the keys are the guides that will be used and don't need update

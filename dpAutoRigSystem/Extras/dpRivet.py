@@ -20,7 +20,6 @@
 from maya import cmds
 from maya import mel
 from functools import partial
-from ..Modules.Library import dpUtils
 from ..Modules.Library import dpControls
 
 # global variables to this module:
@@ -34,13 +33,14 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 1.8
+DP_RIVET_VERSION = 1.9
 
 
 class Rivet(object):
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # declaring variables
         self.dpUIinst = dpUIinst
+        self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.geoToAttach = None
         self.itemType = None
@@ -346,7 +346,7 @@ class Rivet(object):
         # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
         if faceToRivet:
             geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
-            modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+            modelGrp = self.utils.getNodeByMessage("modelsGrp")
             if modelGrp:
                 self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
 
@@ -544,7 +544,7 @@ class Rivet(object):
                 cmds.setAttr(blendShapeNode+".envelope", 0)
             # Duplicate geometry after turn off skinCluster and blendShape. 
             toRivetGeo = cmds.duplicate(geo)[0]
-            dpUtils.removeUserDefinedAttr(toRivetGeo)
+            self.utils.removeUserDefinedAttr(toRivetGeo)
             # Unparenting
             if cmds.listRelatives(toRivetGeo, allParents=True):
                 cmds.parent(toRivetGeo, world=True)
@@ -567,7 +567,7 @@ class Rivet(object):
         """ Get the unused FaceToRivet geo to avoid multiples connections to the same original geometry.
             Returns the suggested name.
         """
-        toRivetName = dpUtils.extractSuffix(geo)
+        toRivetName = self.utils.extractSuffix(geo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         i = 0
@@ -686,14 +686,14 @@ class Rivet(object):
         #Renaming
         hist = cmds.listHistory(morphGeo)
         morphList = cmds.ls(hist, type="morph")[0]
-        toRivetName = dpUtils.extractSuffix(morphGeo)
+        toRivetName = self.utils.extractSuffix(morphGeo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
         componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
         cmds.rename(componentMatchNode, toRivetName+"_CpM")
         # Parent in modelsGrp
-        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        modelGrp = self.utils.getNodeByMessage("modelsGrp")
         if modelGrp:
             cmds.parent(morphGeo, modelGrp)
 
@@ -707,7 +707,7 @@ class Rivet(object):
         hist = cmds.listHistory(wrapGeo)
         wrapList = cmds.ls(hist, type="wrap")[0]
         # Renaming
-        toRivetName = dpUtils.extractSuffix(wrapGeo)
+        toRivetName = self.utils.extractSuffix(wrapGeo)
         if "|" in toRivetName:
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         wrapNode = cmds.rename(wrapList, toRivetName+"_Wrp")
@@ -717,7 +717,7 @@ class Rivet(object):
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         # Parent in modelsGrp
-        modelGrp = dpUtils.getNodeByMessage("modelsGrp")
+        modelGrp = self.utils.getNodeByMessage("modelsGrp")
         if modelGrp:
             cmds.parent(wrapGeo, baseShape, modelGrp)
         return wrapGeo
