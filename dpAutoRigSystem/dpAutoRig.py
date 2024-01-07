@@ -684,19 +684,19 @@ class DP_AutoRig_UI(object):
         # check-in
         self.validatorCheckInModuleList = self.startGuideModules(CHECKIN, "start", "validatorCheckInLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
-        cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
+        self.allUIs["selectAllCheckinCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
-        cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckIn2Layout"])
-        cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckIn2Layout"])
         cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
         # check-out
         self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.lang['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
         self.validatorCheckOutModuleList = self.startGuideModules(CHECKOUT, "start", "validatorCheckOutLayout")
         cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
-        cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
+        self.allUIs["selectAllCheckoutCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
-        cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOut2Layout"])
-        cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOut2Layout"])
         # pipeline check-addons
         if self.pipeliner.pipeData['addOnsPath']:
             if self.getValidatorsAddOns():
@@ -704,16 +704,15 @@ class DP_AutoRig_UI(object):
                 self.allUIs["validatorAddOnsLayout"] = cmds.frameLayout('validatorAddOnsLayout', label=self.lang['i212_addOns'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
                 self.validatorAddOnsModuleList = self.startGuideModules("", "start", "validatorAddOnsLayout", path=self.pipeliner.pipeData['addOnsPath'])
                 cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
-                cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllValidators, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
+                self.allUIs["selectAllAddonCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-                cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
-                cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
         self.allUIs["publisherButton"] = cmds.button("publisherButton", label=self.lang['m046_publisher'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.publisher.mainUI, parent=self.allUIs["footerPublish"])
         cmds.separator(style='none', height=5, parent=self.allUIs["footerPublish"])
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["validatorTabLayout"], edit=True,
                         attachForm=[(self.allUIs["validatorMainLayout"], 'top', 20), (self.allUIs["validatorMainLayout"], 'left', 5), (self.allUIs["validatorMainLayout"], 'right', 5), (self.allUIs["validatorMainLayout"], 'bottom', 55), (self.allUIs["footerPublish"], 'left', 5), (self.allUIs["footerPublish"], 'right', 5), (self.allUIs["footerPublish"], 'bottom', 5)],
@@ -729,24 +728,17 @@ class DP_AutoRig_UI(object):
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_process'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
-        # process
+        # processes
         self.rebuilderModuleList = self.startGuideModules(REBUILDER, "start", "rebuilderProcessLayout")
         cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
-        cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_process'].lower(), value=True, changeCommand=partial(self.changeActiveAllValidators, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
+        self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_process'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
-        cmds.button(label=self.lang['i164_export'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, True, True), parent=self.allUIs["selectedRebuilders2Layout"])
-        cmds.button(label=self.lang['i196_import'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, False, True), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, True, True), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, False, True), parent=self.allUIs["selectedRebuilders2Layout"])
         cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
-        # rebuilder
-        self.allUIs["footerRebuilder"] = cmds.columnLayout('footerRebuilder', adjustableColumn=True, parent=self.allUIs["rebuilderTabLayout"])
-        cmds.separator(style='none', height=3, parent=self.allUIs["footerRebuilder"])
-        self.allUIs["rebuilderButton"] = cmds.button("rebuilderButton", label=self.lang['r000_rebuilder'], backgroundColor=(0.75, 0.75, 0.75), height=40, command=self.publisher.mainUI, parent=self.allUIs["footerRebuilder"])
-        cmds.separator(style='none', height=5, parent=self.allUIs["footerRebuilder"])
-        
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
-                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 55), (self.allUIs["footerRebuilder"], 'left', 5), (self.allUIs["footerRebuilder"], 'right', 5), (self.allUIs["footerRebuilder"], 'bottom', 5)],
-                        attachNone=[(self.allUIs["footerRebuilder"], 'top')]
+                        attachForm=[(self.allUIs["rebuilderMainLayout"], 'top', 20), (self.allUIs["rebuilderMainLayout"], 'left', 5), (self.allUIs["rebuilderMainLayout"], 'right', 5), (self.allUIs["rebuilderMainLayout"], 'bottom', 55)]
                         )
         
         # --
@@ -1395,20 +1387,6 @@ class DP_AutoRig_UI(object):
         guideInstance = guideClass(self)
         return guideInstance
     
-
-    def initValidatorModule(self, guideModule, *args):
-        """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
-            Returns the guide instance initialised.
-        """
-        # especific import command for guides storing theses guides modules in a variable:
-        self.guide = __import__(guideModule, {}, {}, [guideModule])
-        reload(self.guide)
-        # get the CLASS_NAME from extraModule:
-        guideClass = getattr(self.guide, self.guide.CLASS_NAME)
-        # initialize this extraModule as an Instance:
-        guideInstance = guideClass(self)
-        return guideInstance
-    
     
     def installControlModule(self, controlInstance, useUI, *args):
         """  Start the creation of this Control module using the UI info.
@@ -1583,12 +1561,13 @@ class DP_AutoRig_UI(object):
                         validatorModule.changeActive(self.validatorPresetDic[self.validatorPresetName][validatorModule.guideModuleName])
 
 
-    def changeActiveAllValidators(self, validatorInstList, value, *args):
-        """ Set all validator instances active attribute as True or False.
+    def changeActiveAllModules(self, instList, value, *args):
+        """ Set all module instances active attribute as True or False.
+            Used by validators and rebuilders.
         """
-        if validatorInstList:
-            for validatorInst in validatorInstList:
-                validatorInst.changeActive(value)
+        if instList:
+            for inst in instList:
+                inst.changeActive(value)
         
 
     def runSelectedValidators(self, validatorInstList, verifyMode, verbose=True, stopIfFoundBlock=False, publishLog=None, *args):
