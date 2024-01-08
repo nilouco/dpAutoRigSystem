@@ -2,12 +2,11 @@
 from maya import cmds
 from .. import dpBaseActionClass
 
-
 # global variables to this module:
 CLASS_NAME = "RebuilderTemplate"
 TITLE = "v001_template"
 DESCRIPTION = "v002_templateDesc"
-ICON = "/Icons/dp_validatorTemplate.png"
+ICON = "/Icons/dp_template.png"
 
 DP_REBUILDERRTEMPLATE_VERSION = 1.0
 
@@ -23,10 +22,10 @@ class RebuilderTemplate(dpBaseActionClass.ActionStartClass):
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
     
 
-    def runValidator(self, verifyMode=True, objList=None, *args):
+    def runAction(self, firstMode=True, objList=None, *args):
         """ Main method to process this validator instructions.
-            It's in verify mode by default.
-            If verifyMode parameter is False, it'll run in fix mode.
+            It's in export mode by default.
+            If firstMode parameter is False, it'll run in import mode.
             Returns dataLog with the validation result as:
                 - checkedObjList = node list of checked items
                 - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
@@ -34,11 +33,11 @@ class RebuilderTemplate(dpBaseActionClass.ActionStartClass):
                 - messageList = reported text
         """
         # starting
-        self.verifyMode = verifyMode
+        self.firstMode = firstMode
         self.cleanUpToStart()
         
         # ---
-        # --- validator code --- beginning
+        # --- rebuilder code --- beginning
         if objList:
             toCheckList = objList
         else:
@@ -56,7 +55,7 @@ class RebuilderTemplate(dpBaseActionClass.ActionStartClass):
                 if not '_Mesh' in item:
                     self.checkedObjList.append(parentNode)
                     self.foundIssueList.append(True)
-                    if self.verifyMode:
+                    if self.firstMode:
                         self.resultOkList.append(False)
                     else: #fix
                         try:
@@ -74,7 +73,7 @@ class RebuilderTemplate(dpBaseActionClass.ActionStartClass):
 #                    self.resultOkList.append(True)
         else:
             self.notFoundNodes()
-        # --- validator code --- end
+        # --- rebuilder code --- end
         # ---
 
         # finishing

@@ -76,5 +76,3 @@ class Logger(object):
         
         # creating a info window to show the log:
         self.infoWin( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
-    
-

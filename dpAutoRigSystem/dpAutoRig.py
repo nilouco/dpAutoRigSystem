@@ -691,8 +691,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectAllCheckinCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i208_checkin'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkInInstanceList), parent=self.allUIs["validatorCheckInLayout"])
         self.allUIs["selectedCheckIn2Layout"] = cmds.paneLayout("selectedCheckIn2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckInLayout"])
-        self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckIn2Layout"])
-        self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        self.allUIs["verifyAllSelectCheckinBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, True, True), parent=self.allUIs["selectedCheckIn2Layout"])
+        self.allUIs["fixAllSelectCheckinBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkInInstanceList, False, True), parent=self.allUIs["selectedCheckIn2Layout"])
         cmds.separator(height=30, parent=self.allUIs["validatorLayout"])
         # check-out
         self.allUIs["validatorCheckOutLayout"] = cmds.frameLayout('validatorCheckOutLayout', label=self.lang['i209_checkout'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["validatorLayout"])
@@ -700,8 +700,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectAllCheckoutCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i209_checkout'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkOutInstanceList), parent=self.allUIs["validatorCheckOutLayout"])
         self.allUIs["selectedCheckOut2Layout"] = cmds.paneLayout("selectedCheckOut2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorCheckOutLayout"])
-        self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOut2Layout"])
-        self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        self.allUIs["verifyAllSelectCheckoutBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, True, True), parent=self.allUIs["selectedCheckOut2Layout"])
+        self.allUIs["fixAllSelectCheckoutBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkOutInstanceList, False, True), parent=self.allUIs["selectedCheckOut2Layout"])
         # pipeline check-addons
         if self.pipeliner.pipeData['addOnsPath']:
             if self.getValidatorsAddOns():
@@ -711,8 +711,8 @@ class DP_AutoRig_UI(object):
                 cmds.separator(style="none", parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectAllAddonCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i212_addOns'], value=True, changeCommand=partial(self.changeActiveAllModules, self.checkAddOnsInstanceList), parent=self.allUIs["validatorAddOnsLayout"])
                 self.allUIs["selectedCheckAddOns2Layout"] = cmds.paneLayout("selectedCheckAddOns2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["validatorAddOnsLayout"])
-                self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
-                self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedValidators, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                self.allUIs["verifyAllSelectAddonBT"] = cmds.button(label=self.lang['i210_verify'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, True, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
+                self.allUIs["fixAllSelectAddonBT"] = cmds.button(label=self.lang['c052_fix'].upper(), command=partial(self.runSelectedActions, self.checkAddOnsInstanceList, False, True), parent=self.allUIs["selectedCheckAddOns2Layout"])
         # publisher
         self.allUIs["footerPublish"] = cmds.columnLayout('footerPublish', adjustableColumn=True, parent=self.allUIs["validatorTabLayout"])
         cmds.separator(style='none', height=3, parent=self.allUIs["footerPublish"])
@@ -738,8 +738,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_process'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, True, True), parent=self.allUIs["selectedRebuilders2Layout"])
-        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedValidators, self.rebuilderInstanceList, False, True), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
         cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
@@ -1313,9 +1313,10 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
-                validatorInstance.validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
-                validatorInstance.verifyBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                validatorInstance.fixBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                validatorInstance.actionType = "v000_validator"
+                validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
+                validatorInstance.firstBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                validatorInstance.secondBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 if guideDir == CHECKIN.replace("/", "."):
                     self.checkInInstanceList.append(validatorInstance)
                 elif guideDir == CHECKOUT.replace("/", "."):
@@ -1323,13 +1324,14 @@ class DP_AutoRig_UI(object):
                 else: #addOns
                     self.checkAddOnsInstanceList.append(validatorInstance)
                     if validatorInstance.customName:
-                        cmds.checkBox(validatorInstance.validatorCB, edit=True, label=validatorInstance.customName)
+                        cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
                         validatorInstance.title = validatorInstance.customName
             elif guideDir == REBUILDER.replace("/", "."):
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
-                rebuilderInstance.validatorCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
-                rebuilderInstance.verifyBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                rebuilderInstance.fixBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                rebuilderInstance.actionType = "r000_rebuilder"
+                rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
+                rebuilderInstance.firstBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                rebuilderInstance.secondBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 self.rebuilderInstanceList.append(rebuilderInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
@@ -1527,7 +1529,6 @@ class DP_AutoRig_UI(object):
         enteredText = cmds.textField(self.allUIs["prefixTextField"], query=True, text=True)
         # call utils to return the normalized text:
         prefixName = self.utils.normalizeText(enteredText, prefixMax=10)
-
         # edit the prefixTextField with the prefixName:
         if len(prefixName) != 0:
             cmds.textField(self.allUIs["prefixTextField"], edit=True, text=prefixName+"_")
@@ -1570,12 +1571,12 @@ class DP_AutoRig_UI(object):
                 inst.changeActive(value)
         
 
-    def runSelectedValidators(self, validatorInstList, verifyMode, verbose=True, stopIfFoundBlock=False, publishLog=None, *args):
+    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", *args):
         """ Run the code for each active validator instance.
-            verifyMode = True for verify
-                       = False for fix
+            firstMode = True for verify/export
+                      = False for fix/import
         """
-        validationResultData = {}
+        actionResultData = {}
         logText = ""
         if publishLog:
             logText = "\nPublisher"
@@ -1583,26 +1584,26 @@ class DP_AutoRig_UI(object):
             logText += "\nPublished: "+publishLog["published"]
             logText += "\nExported: "+publishLog["exportPath"]
             logText += "\nComments: "+publishLog["comments"]+"\n"
-        if validatorInstList:
+        if actionInstList:
             progressAmount = 0
-            maxProcess = len(validatorInstList)
-            cmds.progressWindow(title="dpValidator", progress=progressAmount, status='dpValidator: 0%', isInterruptable=False)
-            for v, validatorInst in enumerate(validatorInstList):
+            maxProcess = len(actionInstList)
+            cmds.progressWindow(title=self.lang[actionType], progress=progressAmount, status=self.lang[actionType]+': 0%', isInterruptable=False)
+            for v, validatorInst in enumerate(actionInstList):
                 if validatorInst.active:
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(validatorInst.guideModuleName+': '+repr(progressAmount)))
                     validatorInst.verbose = False
-                    validationResultData[validatorInst.guideModuleName] = validatorInst.runValidator(verifyMode)
+                    actionResultData[validatorInst.guideModuleName] = validatorInst.runAction(firstMode)
                     validatorInst.verbose = True
                     if stopIfFoundBlock:
                         if True in validatorInst.foundIssueList:
                             if False in validatorInst.resultOkList:
-                                return validationResultData, True, v
-        if validationResultData:
-            dataList = list(validationResultData.keys())
+                                return actionResultData, True, v
+        if actionResultData:
+            dataList = list(actionResultData.keys())
             dataList.sort()
             for i, dataItem in enumerate(dataList):
-                logText += validationResultData[dataItem]["logText"]
+                logText += actionResultData[dataItem]["logText"]
                 if i != len(dataList)-1:
                     logText += "\n"
             heightSize = len(dataList)
@@ -1612,14 +1613,14 @@ class DP_AutoRig_UI(object):
         thisTime = str(time.asctime(time.localtime(time.time())))
         logText = thisTime+"\n"+logText
         if verbose:
-            self.logger.infoWin('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
-            print("\n-------------\n"+self.lang['v000_validator']+"\n"+logText)
+            self.logger.infoWin('i019_log', actionType, logText, "left", 250, (150+(heightSize)*13))
+            print("\n-------------\n"+self.lang[actionType]+"\n"+logText)
             if publishLog:
-                validationResultData["Publisher"] = publishLog
-            if not self.utils.exportLogDicToJson(validationResultData, subFolder=self.dpData+"/"+self.dpLog):
+                actionResultData["Publisher"] = publishLog
+            if not self.utils.exportLogDicToJson(actionResultData, subFolder=self.dpData+"/"+self.dpLog):
                 print(self.lang['i201_saveScene'])
         cmds.progressWindow(endProgress=True)
-        return validationResultData, False, 0
+        return actionResultData, False, 0
 
     
     def donateWin(self, *args):

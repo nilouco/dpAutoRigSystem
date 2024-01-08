@@ -26,9 +26,10 @@ class ActionStartClass(object):
         self.ui = ui
         self.verbose = verbose
         self.active = True
-        self.validatorCB = None
-        self.verifyBT = None
-        self.fixBT = None
+        self.actionCB = None
+        self.firstBT = None
+        self.secondBT = None
+        self.actionType = "v000_validator" #or r000_rebuilder
         # returned lists
         self.checkedObjList = []
         self.foundIssueList = []
@@ -43,9 +44,9 @@ class ActionStartClass(object):
         """
         self.active = value
         if self.ui:
-            cmds.checkBox(self.validatorCB, edit=True, value=value)
-            cmds.button(self.verifyBT, edit=True, enable=value)
-            cmds.button(self.fixBT, edit=True, enable=value)
+            cmds.checkBox(self.actionCB, edit=True, value=value)
+            cmds.button(self.firstBT, edit=True, enable=value)
+            cmds.button(self.secondBT, edit=True, enable=value)
 
 
     def cleanUpToStart(self, *args):
@@ -62,57 +63,61 @@ class ActionStartClass(object):
             cmds.deleteUI('dpInfoWindow', window=True)
         if self.verbose:
             # Starting progress window
-            cmds.progressWindow(title="dpValidator", progress=0, status=self.dpUIinst.lang[self.title]+': 0%', isInterruptable=False)
+            cmds.progressWindow(title=self.dpUIinst.lang[self.actionType], progress=0, status=self.dpUIinst.lang[self.title]+': 0%', isInterruptable=False)
 
 
     def updateButtonColors(self, *args):
         """ Update button background colors if using UI.
         """
         if self.ui:
-            if cmds.button(self.verifyBT, exists=True):
+            if cmds.button(self.firstBT, exists=True):
                 if self.checkedObjList:
-                    if self.verifyMode:
+                    if self.firstMode:
                         if True in self.foundIssueList:
-                            cmds.button(self.verifyBT, edit=True, backgroundColor=ISSUE_COLOR)
-                            cmds.button(self.fixBT, edit=True, backgroundColor=WARNING_COLOR)
+                            cmds.button(self.firstBT, edit=True, backgroundColor=ISSUE_COLOR)
+                            cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
                         else:
-                            cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
-                            cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                            cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
+                            cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix
                         if False in self.resultOkList:
-                            cmds.button(self.verifyBT, edit=True, backgroundColor=WARNING_COLOR)
-                            cmds.button(self.fixBT, edit=True, backgroundColor=ISSUE_COLOR)
+                            cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
+                            cmds.button(self.secondBT, edit=True, backgroundColor=ISSUE_COLOR)
                         else:
-                            cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                            cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
+                            cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                            cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
                 else:
-                    if self.verifyMode:
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=CHECKED_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                    if self.firstMode:
+                        cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
+                        cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
                     else: #fix
-                        cmds.button(self.verifyBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                        cmds.button(self.fixBT, edit=True, backgroundColor=CHECKED_COLOR)
+                        cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
     
 
     def reportLog(self, *args):
-        """ Prepare the log output text and data dictionary for this checked validator.
+        """ Prepare the log output text and data dictionary for this checked validator/rebuilder.
         """
         thisTime = str(time.asctime(time.localtime(time.time())))
         # texts
         nameText = self.dpUIinst.lang['m006_name']
         titleText = self.dpUIinst.lang[self.title]
         modeText = self.dpUIinst.lang['v003_mode']
-        fixText = self.dpUIinst.lang['c052_fix'].upper()
-        verifyText = self.dpUIinst.lang['i210_verify'].upper()
+        if self.actionType == "v000_validator":
+            firstText = self.dpUIinst.lang['i210_verify'].upper()
+            secondText = self.dpUIinst.lang['c052_fix'].upper()
+        else: #r000_rebuilder
+            firstText = self.dpUIinst.lang['i164_export'].upper()
+            secondText = self.dpUIinst.lang['i196_import'].upper()
         foundIssueText = self.dpUIinst.lang['v006_foundIssue']
         everythingOkText = self.dpUIinst.lang['v007_allOk']
         # header
         logText = "\n"+nameText+": "+titleText+"\n"
         # mode
         logText += modeText+": "
-        actionText = fixText
-        if self.verifyMode:
-            actionText = verifyText
+        actionText = secondText
+        if self.firstMode:
+            actionText = firstText
         logText += actionText+"\n"
         # issues
         if True in self.foundIssueList:
@@ -129,7 +134,7 @@ class ActionStartClass(object):
             for msg in self.messageList:
                 logText += "\n"+msg
         # dataLog
-        self.dataLogDic["log"] = self.dpUIinst.lang["v000_validator"]
+        self.dataLogDic["log"] = self.dpUIinst.lang[self.actionType]
         self.dataLogDic["user"] = getpass.getuser()
         self.dataLogDic["time"] = thisTime
         self.dataLogDic["dpARVersion"] = self.dpUIinst.dpARVersion
@@ -144,8 +149,8 @@ class ActionStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.logger.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.lang['v000_validator']+"\n"+thisTime+"\n"+logText)
+            self.dpUIinst.logger.infoWin('i019_log', self.actionType, thisTime+"\n"+logText, "left", 250, 250)
+            print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+thisTime+"\n"+logText)
             if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])
 

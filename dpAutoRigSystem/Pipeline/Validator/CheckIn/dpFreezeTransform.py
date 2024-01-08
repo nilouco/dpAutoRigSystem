@@ -22,10 +22,10 @@ class FreezeTransform(dpBaseActionClass.ActionStartClass):
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
 
 
-    def runValidator(self, verifyMode=True, objList=None, *args):
+    def runAction(self, firstMode=True, objList=None, *args):
         ''' Main method to process this validator instructions.
             It's in verify mode by default.
-            If verifyMode parameter is False, it'll run in fix mode.
+            If firstMode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
                 - checkedObjList = node list of checked items
                 - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
@@ -33,7 +33,7 @@ class FreezeTransform(dpBaseActionClass.ActionStartClass):
                 - messageList = reported text
         '''
         # starting
-        self.verifyMode = verifyMode
+        self.firstMode = firstMode
         self.cleanUpToStart()
 
         # ---
@@ -93,7 +93,7 @@ class FreezeTransform(dpBaseActionClass.ActionStartClass):
                         self.resultOkList.append(False)
                         self.messageList.append(self.dpUIinst.lang['v018_foundTransform']+obj)
                         toFixList.append((obj, idx))
-            if not self.verifyMode and len(toFixList) > 0: #one item to fix
+            if not self.firstMode and len(toFixList) > 0: #one item to fix
                 for obj in toFixList:
                     if unlockAttributes(obj[0], zeroAttrList) and unlockAttributes(obj[0], oneAttrList):
                         try:

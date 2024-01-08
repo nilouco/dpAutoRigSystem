@@ -200,14 +200,14 @@ class Publisher(object):
             return False
     
 
-    def runCheckedValidators(self, verifyMode=True, stopIfFoundBlock=True, publishLog=None, *args):
+    def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
         toCheckValidatorList = self.dpUIinst.checkInInstanceList
         toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
         toCheckValidatorList.extend(self.dpUIinst.checkAddOnsInstanceList)
         if toCheckValidatorList:
-            validationResultDataList = self.dpUIinst.runSelectedValidators(toCheckValidatorList, verifyMode, True, stopIfFoundBlock, publishLog)
+            validationResultDataList = self.dpUIinst.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
                 stoppedMessage = self.dpUIinst.lang['v020_publishStopped']+" "+toCheckValidatorList[validationResultDataList[2]].guideModuleName                    
                 return stoppedMessage

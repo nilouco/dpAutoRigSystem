@@ -1448,7 +1448,7 @@ class ControlClass(object):
             nodeToRunList = self.getControlList()
         if nodeToRunList:
             if resetMode:
-                self.resetPose.runValidator(False, nodeToRunList)
+                self.resetPose.runAction(False, nodeToRunList)
             else: #set default values
                 for item in nodeToRunList:
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
