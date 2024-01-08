@@ -263,7 +263,9 @@ class Rivet(object):
                 removeExistingRivet = cmds.confirmDialog(title="Attention", icon="warning", message="At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended)", button=["Yes", "No", "Cancel"], defaultButton="Yes", cancelButton="Cancel", dismissString="Cancel")
 
                 if removeExistingRivet == "Yes":
+                    cmds.progressWindow(title='removing Rivet', progress=0, maxValue=len(needToRemove), status="Creating")
                     self.removeRivetFromList(needToRemove)
+                    cmds.progressWindow(endProgress=True)
                 elif removeExistingRivet == "No":
                     pass
                 else:
@@ -592,7 +594,7 @@ class Rivet(object):
                 
             # working with follicles and attaches
             for r, rivet in enumerate(self.rivetList):
-                self.setProgressBar(r+1, "Working")
+                self.setProgressBar(r+1, "Creating")
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_Rivet_Grp")
