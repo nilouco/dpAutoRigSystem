@@ -24,7 +24,7 @@ ATTR_TYPE = {
                 "doubleLinear" : 2
             }
 
-DP_RESETPOSE_VERSION = 1.3
+DP_RESETPOSE_VERSION = 1.4
 
 
 class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
@@ -34,6 +34,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_RESETPOSE_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
         self.nonDynZeroAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
         self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]

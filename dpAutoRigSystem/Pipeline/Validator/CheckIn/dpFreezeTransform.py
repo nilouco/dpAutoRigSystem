@@ -8,7 +8,7 @@ TITLE = 'v015_freezeTransform'
 DESCRIPTION = 'v016_freezeTranformDesc'
 ICON = '/Icons/dp_freezeTransform.png'
 
-DP_FREEZETRANSFORM_VERSION = 1.5
+DP_FREEZETRANSFORM_VERSION = 1.6
 
 
 class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         kwargs['TITLE'] = TITLE
         kwargs['DESCRIPTION'] = DESCRIPTION
         kwargs['ICON'] = ICON
+        self.version = DP_FREEZETRANSFORM_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
 
 

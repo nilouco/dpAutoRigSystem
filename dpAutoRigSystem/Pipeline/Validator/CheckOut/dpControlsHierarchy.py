@@ -22,6 +22,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_CONTROLSHIERARCHY_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
 
     def checkNurbs(self, transform):

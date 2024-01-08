@@ -8,7 +8,7 @@ TITLE = "v071_geometryHistory"
 DESCRIPTION = "v072_geometryHistoryDesc"
 ICON = "/Icons/dp_geometryHistory.png"
 
-DP_GEOMETRYHISTORY_VERSION = 1.2
+DP_GEOMETRYHISTORY_VERSION = 1.3
 
 
 class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class GeometryHistory(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_GEOMETRYHISTORY_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

@@ -223,7 +223,7 @@ class Publisher(object):
             cmds.progressWindow(endProgress=True)
         else:
             validatorsResult = self.dpUIinst.lang['v007_allOk']
-        self.dpUIinst.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
+        self.dpUIinst.logger.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
 
 
     def runPublishing(self, fromUI, verifyValidator=True, comments=False, *args):
@@ -393,7 +393,7 @@ class Publisher(object):
         cmds.progressWindow(endProgress=True)
         # report the error in a log window
         if raison:
-            self.dpUIinst.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
+            self.dpUIinst.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
             mel.eval('warning \"'+raison+'\";')
 
 

@@ -8,7 +8,7 @@ TITLE = "v082_unusedSkinCleaner"
 DESCRIPTION = "v083_unusedSkinCleanerDesc"
 ICON = "/Icons/dp_unusedSkinCleaner.png"
 
-DP_UNUSEDSKINCLEANER_VERSION = 1.1
+DP_UNUSEDSKINCLEANER_VERSION = 1.2
 
 
 class UnusedSkinCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class UnusedSkinCleaner(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_UNUSEDSKINCLEANER_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

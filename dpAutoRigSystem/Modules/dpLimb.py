@@ -91,7 +91,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(ctrl+".followAttrName", attr, type="string")
 
 
-    # @self.utils.profiler
+    # @dpUtils.profiler
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:

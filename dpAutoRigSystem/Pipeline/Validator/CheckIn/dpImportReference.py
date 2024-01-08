@@ -8,7 +8,7 @@ TITLE = "v042_importReference"
 DESCRIPTION = "v043_importReferenceDesc"
 ICON = "/Icons/dp_importReference.png"
 
-DP_IMPORTREFERENCE_VERSION = 1.2
+DP_IMPORTREFERENCE_VERSION = 1.3
 
 
 class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class ImportReference(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_IMPORTREFERENCE_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

@@ -345,7 +345,7 @@ class ControlClass(object):
         return curve
 
 
-    #@self.utils.profiler
+    #@dpUtils.profiler
     def cvJointLoc(self, ctrlName, r=0.3, d=1, rot=(0, 0, 0), guide=True, *args):
         """ Create and return a cvJointLocator curve to be usually used in the guideSystem.
         """
@@ -807,7 +807,7 @@ class ControlClass(object):
         return newRadius
     
     
-    #@self.utils.profiler
+    #@dpUtils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
         """

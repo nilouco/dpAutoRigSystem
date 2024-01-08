@@ -8,7 +8,7 @@ TITLE = "v058_unknownNodesCleaner"
 DESCRIPTION = "v059_unknownNodesCleanerDesc"
 ICON = "/Icons/dp_unknownNodesCleaner.png"
 
-DP_UNKNOWNNODESCLEANER_VERSION = 1.2
+DP_UNKNOWNNODESCLEANER_VERSION = 1.3
 
 
 class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class UnknownNodesCleaner(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_UNKNOWNNODESCLEANER_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

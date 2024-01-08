@@ -141,7 +141,7 @@ class RebuilderStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
+            self.dpUIinst.logger.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.dpUIinst.lang['v000_validator']+"\n"+thisTime+"\n"+logText)
             if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])

@@ -8,7 +8,7 @@ TITLE = "v040_keyframeCleaner"
 DESCRIPTION = "v041_keyframeCleanerDesc"
 ICON = "/Icons/dp_keyframeCleaner.png"
 
-DP_KEYFRAMECLEANER_VERSION = 1.1
+DP_KEYFRAMECLEANER_VERSION = 1.2
 
 
 class KeyframeCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class KeyframeCleaner(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_KEYFRAMECLEANER_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

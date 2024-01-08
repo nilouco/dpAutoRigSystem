@@ -255,13 +255,8 @@ class Pipeliner(object):
             self.pipeInfo = self.getPipelineInfo()
             if self.pipeInfo:
                 # mounting structured pipeline data
-                print("HHHEERRREEE 0000000")
-                print("self.pipeData['path'] = ", self.pipeData['path'])
                 self.pipeData['addOnsPath'] = self.pipeData['path']+"/"+self.pipeData['s_addOns']
                 self.pipeData['presetsPath'] = self.pipeData['path']+"/"+self.pipeData['s_presets']
-                print("HHHEERRREEE 001111")
-                print("self.pipeData['addOnsPath'] = ", self.pipeData['addOnsPath'])
-                print("self.pipeData['presetsPath'] = ", self.pipeData['presetsPath'])
             else:
                 self.pipeInfo = self.declareDefaultPipelineInfo()
                 print('Not found', self.infoFile)

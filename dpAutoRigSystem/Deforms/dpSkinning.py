@@ -20,10 +20,10 @@ class Skinning(object):
         if geoList:
             for i, item in enumerate(geoList):
                 if item in geoList[:i]:
-                    self.dpUIinst.infoWin('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
+                    self.dpUIinst.logger.infoWin('i038_canceled', 'e003_moreThanOneGeo', item, 'center', 205, 270)
                     return False
                 elif not cmds.objExists(item):
-                    self.dpUIinst.infoWin('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
+                    self.dpUIinst.logger.infoWin('i038_canceled', 'i061_notExists', item, 'center', 205, 270)
                     return False
                 elif not mode:
                     try:
@@ -31,7 +31,7 @@ class Skinning(object):
                         if inputDeformerList:
                             for deformerNode in inputDeformerList:
                                 if cmds.objectType(deformerNode) == "skinCluster":
-                                    self.dpUIinst.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
+                                    self.dpUIinst.logger.infoWin('i038_canceled', 'i285_alreadySkinned', item, 'center', 205, 270)
                                     return False
                     except:
                         pass
@@ -87,12 +87,12 @@ class Skinning(object):
                         cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
                 print(self.dpUIinst.lang['i077_skinned'] + ', '.join(geomSkinList))
                 if logWin:
-                    self.dpUIinst.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                    self.dpUIinst.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
                 cmds.select(geomSkinList)
         else:
             print(self.dpUIinst.lang['i029_skinNothing'])
             if logWin:
-                self.dpUIinst.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
+                self.dpUIinst.logger.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
 
     
     def checkExistingSkinClusterNode(self, item, deleteIt=False, *args):

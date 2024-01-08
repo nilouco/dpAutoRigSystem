@@ -8,7 +8,7 @@ TITLE = "v048_unlockIniShadGrp"
 DESCRIPTION = "v049_unlockIniShadGrpDesc"
 ICON = "/Icons/dp_unlockInitialShadingGroup.png"
 
-DP_UNLOCKINITIALSHADINGGROUP_VERSION = 1.1
+DP_UNLOCKINITIALSHADINGGROUP_VERSION = 1.2
 
 
 class UnlockInitialShadingGroup(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class UnlockInitialShadingGroup(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_UNLOCKINITIALSHADINGGROUP_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

@@ -79,6 +79,7 @@ try:
     from .Pipeline import dpPipeliner
     from .Pipeline import dpPublisher
     from .Pipeline import dpPackager
+    from .Pipeline import dpLogger
     from .Deforms import dpSkinning
     from importlib import reload
     reload(dpUtils)
@@ -89,6 +90,7 @@ try:
     reload(dpPublisher)
     reload(dpPipeliner)
     reload(dpPackager)
+    reload(dpLogger)
     reload(dpCustomAttr)
     reload(dpSkinning)
 except Exception as e:
@@ -184,6 +186,7 @@ class DP_AutoRig_UI(object):
         self.utils = dpUtils.Utils()
         self.pipeliner = dpPipeliner.Pipeliner()
         self.packager = dpPackager.Packager()
+        self.logger = dpLogger.Logger(None) #placeholder
         
         try:
             # store all UI elements in a dictionary:
@@ -264,11 +267,11 @@ class DP_AutoRig_UI(object):
             cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
             # help menu:
             self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-            cmds.menuItem('about_MI"', label='About', command=partial(self.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
-            cmds.menuItem('author_MI', label='Author', command=partial(self.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
-            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+            cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+            cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
+            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
             cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
-            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
             cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
             cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
             cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, DPAR_SITE))
@@ -402,6 +405,7 @@ class DP_AutoRig_UI(object):
         self.publisher = dpPublisher.Publisher(self)
         self.customAttr = dpCustomAttr.CustomAttr(self, False)
         self.skin = dpSkinning.Skinning(self)
+        self.logger = dpLogger.Logger(self)
         # --
 
         # creating tabs - mainTabLayout:
@@ -863,7 +867,7 @@ class DP_AutoRig_UI(object):
                 cmds.optionVar(remove="dpAutoRigLastPreset")
                 cmds.optionVar(stringValue=("dpAutoRigLastPreset", self.presetName))
             # show preset creation result window:
-            self.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.lang['i134_rememberPublish']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+            self.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.lang['i134_rememberPublish']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
             self.jobReloadUI()
     
@@ -1333,7 +1337,7 @@ class DP_AutoRig_UI(object):
                 rebuilderInstance.importBT = importBT
                 self.rebuilderInstanceList.append(rebuilderInstance)
 
-            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
+            cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
         cmds.setParent('..')
     
     
@@ -1613,7 +1617,7 @@ class DP_AutoRig_UI(object):
         thisTime = str(time.asctime(time.localtime(time.time())))
         logText = thisTime+"\n"+logText
         if verbose:
-            self.infoWin('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
+            self.logger.infoWin('i019_log', 'v000_validator', logText, "left", 250, (150+(heightSize)*13))
             print("\n-------------\n"+self.lang['v000_validator']+"\n"+logText)
             if publishLog:
                 validationResultData["Publisher"] = publishLog
@@ -1622,72 +1626,12 @@ class DP_AutoRig_UI(object):
         cmds.progressWindow(endProgress=True)
         return validationResultData, False, 0
 
-
-    def infoWin(self, title, description, text, align, width, height, *args):
-        """ Create a window showing the text info with the description about any module.
-        """
-        # declaring variables:
-        self.info_title       = title
-        self.info_description = description
-        self.info_text        = text
-        self.info_winWidth    = width
-        self.info_winHeight   = height
-        self.info_align       = align
-        # creating Info Window:
-        if cmds.window('dpInfoWindow', query=True, exists=True):
-            cmds.deleteUI('dpInfoWindow', window=True)
-        dpInfoWin = cmds.window('dpInfoWindow', title='dpAutoRig - v'+DPAR_VERSION_PY3+' - '+self.lang['i013_info']+' - '+self.lang[self.info_title], iconName='dpInfo', widthHeight=(self.info_winWidth, self.info_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
-        # creating text layout:
-        infoColumnLayout = cmds.columnLayout('infoColumnLayout', adjustableColumn=True, columnOffset=['both', 20], parent=dpInfoWin)
-        cmds.separator(style='none', height=10, parent=infoColumnLayout)
-        infoLayout = cmds.scrollLayout('infoLayout', parent=infoColumnLayout)
-        if self.info_description:
-            infoDesc = cmds.text(self.lang[self.info_description], align=self.info_align, parent=infoLayout)
-        if self.info_text:
-            infoText = cmds.text(self.info_text, align=self.info_align, parent=infoLayout)
-        # call Info Window:
-        cmds.showWindow(dpInfoWin)
-    
-    
-    def logWin(self, *args):
-        """ Just create a window with all information log and print the principal result.
-        """
-        # create the logText:
-        logText = self.lang['i014_logStart'] + '\n'
-        logText += str( time.asctime( time.localtime(time.time()) ) ) + '\n\n'
-        # get the number of riggedModules:
-        nRiggedModule = len(self.riggedModuleDic)
-        # pass for rigged module to add informations in logText:
-        if nRiggedModule != 0:
-            if nRiggedModule == 1:
-                logText += str(nRiggedModule).zfill(3) + ' ' + self.lang['i015_success'] + ':\n\n'
-                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang['i015_success'] + ', thanks!\n')
-            else:
-                logText += str(nRiggedModule).zfill(3) + ' ' + self.lang['i016_success'] + ':\n\n'
-                print('\ndpAutoRigSystem Log: ' + str(nRiggedModule).zfill(3) + ' ' + self.lang['i016_success'] + ', thanks!\n')
-            riggedGuideModuleList = []
-            for riggedGuideModule in self.riggedModuleDic:
-                riggedGuideModuleList.append(riggedGuideModule)
-            riggedGuideModuleList.sort()
-            for riggedGuideModule in riggedGuideModuleList:
-                moduleCustomName= self.riggedModuleDic[riggedGuideModule]
-                if moduleCustomName == None:
-                    logText += riggedGuideModule + '\n'
-                else:
-                    logText += riggedGuideModule + " as " + moduleCustomName + '\n'
-        else:
-            logText += self.lang['i017_nothing'] + '\n'
-        logText += '\n' + self.lang['i018_thanks']
-        
-        # creating a info window to show the log:
-        self.infoWin( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
-    
     
     def donateWin(self, *args):
         """ Simple window with links to donate in order to support this free and openSource code via PayPal.
         """
         # declaring variables:
-        self.donate_title       = 'dpAutoRig - v'+DPAR_VERSION_PY3+' - '+self.lang['i167_donate']
+        self.donate_title       = 'dpAutoRig - v'+self.dpARVersion+' - '+self.lang['i167_donate']
         self.donate_description = self.lang['i168_donateDesc']
         self.donate_winWidth    = 305
         self.donate_winHeight   = 300
@@ -1756,12 +1700,12 @@ class DP_AutoRig_UI(object):
             cmds.progressWindow(title='Download Update', progress=50, status='Downloading...', isInterruptable=False)
             try:
                 urllib.request.urlretrieve(url, downloadFolder[0])
-                self.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+                self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
                     cmds.deleteUI('dpUpdateWindow', window=True)
             except:
-                self.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
+                self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
     
     
@@ -1879,7 +1823,7 @@ class DP_AutoRig_UI(object):
                 shutil.rmtree(folderToDelete)
 
                 # report finished update installation:
-                self.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.lang['i173_reloadScript']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
+                self.logger.infoWin('i095_installUpdate', 'i099_installed', '\n\n'+newVersion+'\n\n'+self.lang['i173_reloadScript']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
                 # closes dpUpdateWindow:
                 if cmds.window('dpUpdateWindow', query=True, exists=True):
                     cmds.deleteUI('dpUpdateWindow', window=True)
@@ -1887,7 +1831,7 @@ class DP_AutoRig_UI(object):
                 self.deleteExistWindow()
             except:
                 # report fail update installation:
-                self.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
+                self.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
             cmds.progressWindow(endProgress=True)
         else:
             print(self.lang['i038_canceled'])
@@ -3164,7 +3108,7 @@ class DP_AutoRig_UI(object):
             pass
         
         # call log window:
-        self.logWin()
+        self.logger.logWin()
         
     
     ###################### End: Rigging Modules Instances.

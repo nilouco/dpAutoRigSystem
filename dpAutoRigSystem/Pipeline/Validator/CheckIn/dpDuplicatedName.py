@@ -8,7 +8,7 @@ TITLE = "v024_duplicatedName"
 DESCRIPTION = "v025_duplicatedNameDesc"
 ICON = "/Icons/dp_duplicatedName.png"
 
-DP_DUPLICATEDNAME_VERSION = 1.2
+DP_DUPLICATEDNAME_VERSION = 1.3
 
 
 class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class DuplicatedName(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_DUPLICATEDNAME_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

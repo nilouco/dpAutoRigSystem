@@ -8,7 +8,7 @@ TITLE = "v038_namespaceCleaner"
 DESCRIPTION = "v039_namespaceCleanerDesc"
 ICON = "/Icons/dp_namespaceCleaner.png"
 
-DP_NAMESPACECLEANER_VERSION = 1.1
+DP_NAMESPACECLEANER_VERSION = 1.2
 
 
 class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class NamespaceCleaner(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_NAMESPACECLEANER_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
 
 

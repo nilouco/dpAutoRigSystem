@@ -9,7 +9,7 @@ TITLE = "v086_invertedNormals"
 DESCRIPTION = "v087_invertedNormalsDesc"
 ICON = "/Icons/dp_invertedNormals.png"
 
-DP_INVERTEDNORMALS_VERSION = 1.0
+DP_INVERTEDNORMALS_VERSION = 1.1
 
 
 class InvertedNormals(dpBaseValidatorClass.ValidatorStartClass):
@@ -19,6 +19,7 @@ class InvertedNormals(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_INVERTEDNORMALS_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

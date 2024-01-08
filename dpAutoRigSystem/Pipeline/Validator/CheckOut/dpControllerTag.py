@@ -8,7 +8,7 @@ TITLE = "v073_controllerTag"
 DESCRIPTION = "v074_controllerTagDesc"
 ICON = "/Icons/dp_controllerTag.png"
 
-DP_CONTROLLERTAG_VERSION = 1.0
+DP_CONTROLLERTAG_VERSION = 1.1
 
 
 class ControllerTag(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class ControllerTag(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_CONTROLLERTAG_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

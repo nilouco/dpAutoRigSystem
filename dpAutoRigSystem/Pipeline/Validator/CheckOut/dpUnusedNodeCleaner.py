@@ -9,7 +9,7 @@ TITLE = "v084_unusedNodeCleaner"
 DESCRIPTION = "v085_unusedNodeCleanerDesc"
 ICON = "/Icons/dp_unusedNodeCleaner.png"
 
-DP_UNUSEDNODECLEANER_VERSION = 1.0
+DP_UNUSEDNODECLEANER_VERSION = 1.1
 
 
 class UnusedNodeCleaner(dpBaseValidatorClass.ValidatorStartClass):
@@ -19,6 +19,7 @@ class UnusedNodeCleaner(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_UNUSEDNODECLEANER_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

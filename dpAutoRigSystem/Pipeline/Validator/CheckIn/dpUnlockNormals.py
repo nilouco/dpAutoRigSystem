@@ -8,7 +8,7 @@ TITLE = "v078_unlockNormals"
 DESCRIPTION = "v079_unlockNormalsDesc"
 ICON = "/Icons/dp_unlockNormals.png"
 
-DP_UNLOCKNORMALS_VERSION = 1.1
+DP_UNLOCKNORMALS_VERSION = 1.2
 
 
 class UnlockNormals(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class UnlockNormals(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_UNLOCKNORMALS_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

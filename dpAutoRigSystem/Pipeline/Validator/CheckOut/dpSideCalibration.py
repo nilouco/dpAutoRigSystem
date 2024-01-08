@@ -8,7 +8,7 @@ TITLE = "v044_sideCalibration"
 DESCRIPTION = "v045_sideCalibrationDesc"
 ICON = "/Icons/dp_sideCalibration.png"
 
-DP_SIDECALIBRATION_VERSION = 1.2
+DP_SIDECALIBRATION_VERSION = 1.3
 
 
 class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
@@ -18,6 +18,7 @@ class SideCalibration(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.version = DP_SIDECALIBRATION_VERSION
         dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
     
 

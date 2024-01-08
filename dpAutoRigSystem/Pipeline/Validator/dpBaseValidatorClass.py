@@ -110,10 +110,10 @@ class ValidatorStartClass(object):
         logText = "\n"+nameText+": "+titleText+"\n"
         # mode
         logText += modeText+": "
-        checkText = fixText
+        actionText = fixText
         if self.verifyMode:
-            checkText = verifyText
-        logText += checkText+"\n"
+            actionText = verifyText
+        logText += actionText+"\n"
         # issues
         if True in self.foundIssueList:
             logText += foundIssueText+":\n"
@@ -129,11 +129,14 @@ class ValidatorStartClass(object):
             for msg in self.messageList:
                 logText += "\n"+msg
         # dataLog
+        self.dataLogDic["log"] = self.dpUIinst.lang["v000_validator"]
         self.dataLogDic["user"] = getpass.getuser()
         self.dataLogDic["time"] = thisTime
-        self.dataLogDic["validator"] = self.guideModuleName
+        self.dataLogDic["dpARVersion"] = self.dpUIinst.dpARVersion
+        self.dataLogDic["module"] = self.guideModuleName
+        self.dataLogDic["version"] = self.version
         self.dataLogDic["name"] = self.title
-        self.dataLogDic["mode"] = checkText
+        self.dataLogDic["mode"] = actionText
         self.dataLogDic["checkedObjList"] = self.checkedObjList
         self.dataLogDic["foundIssueList"] = self.foundIssueList
         self.dataLogDic["resultOkList"] = self.resultOkList
@@ -141,7 +144,7 @@ class ValidatorStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
+            self.dpUIinst.logger.infoWin('i019_log', 'v000_validator', thisTime+"\n"+logText, "left", 250, 250)
             print("\n-------------\n"+self.dpUIinst.lang['v000_validator']+"\n"+thisTime+"\n"+logText)
             if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])
