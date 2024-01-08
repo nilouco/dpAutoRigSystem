@@ -117,16 +117,26 @@ class Rivet(object):
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
-        removeLayout = cmds.columnLayout("removeLayout", parent=rivetTabsLayout)
-        cmds.separator(style='none', height=15, parent=removeLayout)
-        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=330, height=440, allowMultiSelection=True, parent=removeLayout)
-        cmds.separator(style='none', height=20, parent=removeLayout)
-        buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 20), parent=removeLayout)
-        cmds.button(label="Remove Rivet", width=290, command=self.removeRivetFromUI, backgroundColor=(1, .388, 0.278), parent=buttonColumnLayout)
+        removeLayout = cmds.columnLayout("removeLayout", columnOffset=("left", 10), parent=rivetTabsLayout)
+        cmds.separator(style='none', height=10, parent=removeLayout)
+        removeButtonsRL = cmds.rowLayout(numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent=removeLayout)
+        cmds.button(label="Select All", width=153, command=self.selectAll, parent=removeButtonsRL)
+        cmds.button(label="Refresh", width=153, command=self.refreshRivetList, parent=removeButtonsRL)
+        cmds.separator(style='none', height=10, parent=removeLayout)
+        self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
+        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=400, allowMultiSelection=True, parent=removeLayout)
+        cmds.separator(style='none', height=10, parent=removeLayout)
+        buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 15), parent=removeLayout)
+        cmds.button(label="Remove Rivet", width=270, command=self.removeRivetFromUI, backgroundColor=(1, .388, 0.278), parent=buttonColumnLayout)
         cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, "Create"), (removeLayout, "Remove")))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
 
+    def selectAll(self, *args):
+        itemsWithRivetList = self.itemsWithRivetList()
+        if itemsWithRivetList:
+            for item in itemsWithRivetList:
+                cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=item)
 
     def riseRivetNetNodes(self):
         netNodeList = cmds.ls(type="network")
@@ -210,15 +220,24 @@ class Rivet(object):
             return controllerList
         else:
             return None
+        
+    def refreshRivetList(self, *args):
+        cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
+        rivetItemsList = self.itemsWithRivetList()
+        filter = cmds.textField(self.filterRivetList, query=True, text=True)
+        print(filter)
+        if rivetItemsList:
+            if filter:
+                sortedRivetList = dpUtils.filterName(filter, rivetItemsList, " ")
+                cmds.textScrollList(self.rivetControllersList, edit=True, append=sortedRivetList)
+            else:
+                cmds.textScrollList(self.rivetControllersList, edit=True, append=rivetItemsList)
     
 
     def rivetTabChange(self, rivetTabsLayout):
         if cmds.tabLayout(rivetTabsLayout, query=True, selectTabIndex=True) == 2:
-            rivetItemsList = self.itemsWithRivetList()
-            if rivetItemsList:
-                cmds.textScrollList(self.rivetControllersList, edit=True, append=rivetItemsList)
+            self.refreshRivetList()
         else:
-            cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
             self.dpFillUI()
     
 
