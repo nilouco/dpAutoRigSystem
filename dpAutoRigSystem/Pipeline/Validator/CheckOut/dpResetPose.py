@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseValidatorClass
+from ... import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = "ResetPose"
@@ -27,7 +27,7 @@ ATTR_TYPE = {
 DP_RESETPOSE_VERSION = 1.4
 
 
-class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
+class ResetPose(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -35,7 +35,7 @@ class ResetPose(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_RESETPOSE_VERSION
-        dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.nonDynZeroAttrList = ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ"]
         self.nonDynOneAttrList = ["scaleX", "scaleY", "scaleZ", "visibility"]
     

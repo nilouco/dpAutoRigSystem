@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
 from maya import OpenMaya
-from .. import dpBaseValidatorClass
+from ... import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = "InvertedNormals"
@@ -12,7 +12,7 @@ ICON = "/Icons/dp_invertedNormals.png"
 DP_INVERTEDNORMALS_VERSION = 1.1
 
 
-class InvertedNormals(dpBaseValidatorClass.ValidatorStartClass):
+class InvertedNormals(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -20,7 +20,7 @@ class InvertedNormals(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_INVERTEDNORMALS_VERSION
-        dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
     
 
     def runValidator(self, verifyMode=True, objList=None, *args):

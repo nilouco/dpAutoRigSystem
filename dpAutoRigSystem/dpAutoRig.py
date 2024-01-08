@@ -1313,12 +1313,9 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
-                validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
-                verifyBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                fixBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                validatorInstance.validatorCB = validatorCB
-                validatorInstance.verifyBT = verifyBT
-                validatorInstance.fixBT = fixBT
+                validatorInstance.validatorCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
+                validatorInstance.verifyBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                validatorInstance.fixBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 if guideDir == CHECKIN.replace("/", "."):
                     self.checkInInstanceList.append(validatorInstance)
                 elif guideDir == CHECKOUT.replace("/", "."):
@@ -1326,15 +1323,13 @@ class DP_AutoRig_UI(object):
                 else: #addOns
                     self.checkAddOnsInstanceList.append(validatorInstance)
                     if validatorInstance.customName:
-                        cmds.checkBox(validatorCB, edit=True, label=validatorInstance.customName)
-            elif guideDir == REBUILDER:
+                        cmds.checkBox(validatorInstance.validatorCB, edit=True, label=validatorInstance.customName)
+                        validatorInstance.title = validatorInstance.customName
+            elif guideDir == REBUILDER.replace("/", "."):
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
-                rebuilderCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
-                exportBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                importBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                rebuilderInstance.rebuilderCB = rebuilderCB
-                rebuilderInstance.exportBT = exportBT
-                rebuilderInstance.importBT = importBT
+                rebuilderInstance.validatorCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
+                rebuilderInstance.verifyBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runValidator, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                rebuilderInstance.fixBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runValidator, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
                 self.rebuilderInstanceList.append(rebuilderInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)

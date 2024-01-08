@@ -100,7 +100,7 @@ class Utils(object):
         """ Find all modules in the directory.
             Return a list of all module names (without '.py' extension).
         """
-        baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseValidatorClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager", "dpBaseRebuilderClass"]
+        baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseActionClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
         allPyFilesList = self.findAllFiles(path, dir, ".py")
         moduleList = []
         # removing "__init__":

@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseValidatorClass
+from ... import dpBaseActionClass
 import json
 import os
 
@@ -15,7 +15,7 @@ HIERARCHY_PATH = "dpData/dpHierarchy"
 DP_CONTROLSHIERARCHY_VERSION = 1.4
 
 
-class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
+class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -23,7 +23,7 @@ class ControlsHierarchy(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_CONTROLSHIERARCHY_VERSION
-        dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
 
     def checkNurbs(self, transform):
         try:

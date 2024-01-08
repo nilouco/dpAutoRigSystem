@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseValidatorClass
+from ... import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = "DisplayLayers"
@@ -11,7 +11,7 @@ ICON = "/Icons/dp_displayLyr.png"
 DP_DISPLAYLAYERS_VERSION = 1.4
 
 
-class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
+class DisplayLayers(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
@@ -19,7 +19,7 @@ class DisplayLayers(dpBaseValidatorClass.ValidatorStartClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         self.version = DP_DISPLAYLAYERS_VERSION
-        dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
     
 
     def runValidator(self, verifyMode=True, objList=None, *args):

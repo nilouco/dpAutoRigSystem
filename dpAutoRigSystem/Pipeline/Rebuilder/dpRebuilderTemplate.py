@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from ..Rebuilder import dpBaseRebuilderClass
+from .. import dpBaseActionClass
 
 
 # global variables to this module:
@@ -12,14 +12,15 @@ ICON = "/Icons/dp_validatorTemplate.png"
 DP_REBUILDERRTEMPLATE_VERSION = 1.0
 
 
-class RebuilderTemplate(dpBaseRebuilderClass.RebuilderStartClass):
+class RebuilderTemplate(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        dpBaseRebuilderClass.RebuilderStartClass.__init__(self, *args, **kwargs)
+        self.version = DP_REBUILDERRTEMPLATE_VERSION
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
     
 
     def runValidator(self, verifyMode=True, objList=None, *args):

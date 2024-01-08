@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseValidatorClass
+from ... import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = 'FreezeTransform'
@@ -11,7 +11,7 @@ ICON = '/Icons/dp_freezeTransform.png'
 DP_FREEZETRANSFORM_VERSION = 1.6
 
 
-class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
+class FreezeTransform(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs['CLASS_NAME'] = CLASS_NAME
@@ -19,7 +19,7 @@ class FreezeTransform(dpBaseValidatorClass.ValidatorStartClass):
         kwargs['DESCRIPTION'] = DESCRIPTION
         kwargs['ICON'] = ICON
         self.version = DP_FREEZETRANSFORM_VERSION
-        dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
 
 
     def runValidator(self, verifyMode=True, objList=None, *args):
