@@ -45,7 +45,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
             ctrlsGeometryList = None
             self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
             if self.allCtrlsList:
-                allGeoList = self.getGeometryTranform()
+                allGeoList = self.getRenderMeshList()
                 ctrlsGeometryList = self.allCtrlsList
                 if allGeoList:
                     ctrlsGeometryList = self.allCtrlsList + allGeoList
@@ -114,7 +114,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
         """ Call functions to create Geo_Lyr and Ctrl_Lyr
             If there's no geometry on the groups Render_Grp and Proxy_Grp, it will delete the Geo_Lyr
         """ 
-        geoList = self.getGeometryTranform()
+        geoList = self.getRenderMeshList()
         if geoList:
             self.createNewLayer(geoList, self.geoLayerName)
         else:
@@ -151,30 +151,6 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
                 else: #ctrl
                     cmds.setAttr(layerName+".hideOnPlayback", 1)
                 cmds.select(clear=True)
-
-
-    def getGeometryTranform(self, *args):
-        """ Get all transform nodes from Render_Grp or convention geometry group name.
-            If it finds nothing, it will return an empty list.
-        """
-        meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
-        if renderGrp:
-            allShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
-            for meshGrp in meshGrpList:
-                if cmds.objExists(meshGrp):
-                    meshGrpShapesList = cmds.listRelatives(meshGrp, allDescendents=True, fullPath=True, type="mesh") or []
-                    if meshGrpShapesList:
-                        allShapesList = list(set(allShapesList + meshGrpShapesList))
-            allGeoList = []
-            if allShapesList:
-                for shape in allShapesList:
-                    if not "Orig" in shape:
-                        transformList = cmds.listRelatives(shape, fullPath=True, parent=True)
-                        if transformList:
-                            # Get the transform only
-                            allGeoList.append(transformList[0])
-            return allGeoList
 
 
     def verifyFixMode(self, itemList, *args):

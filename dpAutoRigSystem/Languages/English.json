@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-01-07",
+    "_updated"       : "2024-01-09",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -452,6 +452,7 @@
     "i290_oneSource"         : "One Source",
     "i291_selectAllControls" : "Select All Controls",
     "i292_process"           : "Process",
+    "i293_sModelIOAnn"       : "The folder to export and import models.",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -695,9 +696,13 @@
     "p006_front"      : "F",
     "p007_back"       : "B",
 
-    "r000_rebuilder" : "Rebuilder",
-    "r001_rebuild"   : "Rebuild",
-    "r002_splitData" : "Split Data",
+    "r000_rebuilder"     : "Rebuilder",
+    "r001_rebuild"       : "Rebuild",
+    "r002_splitData"     : "Split Data",
+    "r003_modelIO"       : "Model IO",
+    "r004_modelIODesc"   : "This action will work with modeling geometries used in the rig.\nI'll export or import alembic files.",
+    "r005_notWorkedWell" : "Not worked well, sorry",
+    "r006_wellDone"      : "Well done",
 
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

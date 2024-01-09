@@ -19,6 +19,7 @@ class ActionStartClass(object):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
+        self.pipeliner = dpUIinst.pipeliner
         self.guideModuleName = CLASS_NAME
         self.title = TITLE
         self.description = DESCRIPTION
@@ -167,3 +168,47 @@ class ActionStartClass(object):
         self.foundIssueList.append(False)
         self.resultOkList.append(True)
         self.messageList.append(self.dpUIinst.lang['v014_notFoundNodes'])
+
+
+    def notWorkedWellIO(self, item=None, *args):
+        """ Set dataLog when IO not working well for rebuilders.
+        """
+        self.checkedObjList.append(item)
+        self.foundIssueList.append(True)
+        self.resultOkList.append(False)
+        self.messageList.append(self.dpUIinst.lang['r005_notWorkedWell']+": "+item)
+
+
+    def wellDoneIO(self, item=None, *args):
+        """ Set dataLog when rebuilder IO worked well.
+        """
+        self.checkedObjList.append(item)
+        self.foundIssueList.append(False)
+        self.resultOkList.append(True)
+        self.messageList.append(self.dpUIinst.lang['r006_wellDone']+": "+item)
+
+
+    def getRenderMeshList(self, justShape=False, *args):
+        """ Get all transform nodes from Render_Grp or convention geometry group name.
+            If it finds nothing, it will return an empty list.
+        """
+        meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
+        renderGrp = self.utils.getNodeByMessage("renderGrp")
+        if renderGrp:
+            allShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
+            for meshGrp in meshGrpList:
+                if cmds.objExists(meshGrp):
+                    meshGrpShapesList = cmds.listRelatives(meshGrp, allDescendents=True, fullPath=True, type="mesh") or []
+                    if meshGrpShapesList:
+                        allShapesList = list(set(allShapesList + meshGrpShapesList))
+            allGeoList = []
+            if allShapesList:
+                if justShape:
+                    return allShapesList
+                for shape in allShapesList:
+                    if not "Orig" in shape:
+                        transformList = cmds.listRelatives(shape, fullPath=True, parent=True)
+                        if transformList:
+                            # Get the transform only
+                            allGeoList.append(transformList[0])
+            return allGeoList
