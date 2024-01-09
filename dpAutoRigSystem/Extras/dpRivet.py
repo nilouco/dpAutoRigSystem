@@ -138,8 +138,7 @@ class Rivet(object):
     def disablePac(self, badRivetItemsList, *args):
         for item in badRivetItemsList:
             netNode = cmds.listConnections(f"{item}.rivetNet", destination=False)[0]
-            rivetGrp = cmds.listConnections(f"{netNode}.rivet", destination=False)[0]
-            parentConstraint = cmds.listRelatives(rivetGrp, type="parentConstraint")[0]
+            parentConstraint = cmds.listConnections(f"{netNode}.pacNode", destination=False)[0]
             rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
             pacAttrList = cmds.listAttr(parentConstraint, settable=True, visible=True, string=f"{rivetFollicle}*")
             if pacAttrList:
@@ -698,11 +697,11 @@ class Rivet(object):
                 
                 # attach follicle and rivet using constraint:
                 if attachTranslate and attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC")
+                    rivetPac = cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC")[0]
                 elif attachTranslate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))
+                    rivetPac = cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipRotate=("x", "y", "z"))[0]
                 elif attachRotate:
-                    cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))
+                    rivetPac = cmds.parentConstraint(folTransf, rivet, maintainOffset=useOffset, name=rivet+"_PaC" , skipTranslate=("x", "y", "z"))[0]
                 
                 # try to integrate to dpAutoRigSystem in order to keep the Rig as scalable:
                 if self.masterCtrl:
@@ -721,6 +720,7 @@ class Rivet(object):
                 cmds.addAttr(self.net, longName="invRGrp", attributeType="message")
                 cmds.addAttr(self.net, longName="deformerGeo", attributeType="message")
                 cmds.addAttr(self.net, longName="deformerNode", attributeType="message")
+                cmds.addAttr(self.net, longName="pacNode", attributeType="message")
                 # set
                 cmds.setAttr(self.net+".dpNetwork", 1)
                 cmds.setAttr(self.net+".dpRivetNet", 1)
@@ -728,6 +728,7 @@ class Rivet(object):
                 cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)
                 cmds.connectAttr(folTransf+".message", self.net+".follicle", force=True)
                 cmds.connectAttr(geoToAttach+".message", self.net+".geoToAttach", force=True)
+                cmds.connectAttr(f"{rivetPac}.message", f"{self.net}.pacNode", force=True)
                     
                 if faceToRivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
