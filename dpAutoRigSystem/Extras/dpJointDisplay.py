@@ -5,9 +5,15 @@ from functools import partial
 
 # global variables to this module:
 CLASS_NAME = "JointDisplay"
-TITLE = "m234_jointDisplay"
-DESCRIPTION = "m235_jointDisplayDesc"
+TITLE = "m098_jointDisplay"
+DESCRIPTION = "m169_jointDisplayDesc"
 ICON = "/Icons/dp_reorderAttr.png"
+
+
+
+IGNORE_LIST = ['persp', 'top', 'front', 'side'] # WIP To Delete
+
+
 
 DP_JOINTDISPLAY_VERSION = 1.0
 
@@ -23,6 +29,14 @@ class JointDisplay(object):
     def dpCloseJointDisplayUI(self, *args):
         if cmds.window('dpJointDisplayWindow', query=True, exists=True):
             cmds.deleteUI('dpJointDisplayWindow', window=True)
+
+    def getItemFilter(self, *args):
+        """ Create a selection filter by transform type excluding the ignoreIt list.
+        """
+        self.itemF = cmds.itemFilter(byType="joint")
+        for ignoreIt in IGNORE_LIST:
+            self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
+        return self.itemF
     
     
     def dpJointDisplayUI(self, *args):
@@ -32,11 +46,11 @@ class JointDisplay(object):
         self.dpCloseJointDisplayUI()
         jointDisplay_winWidth  = 675
         jointDisplay_winHeight = 175
-        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.dpUIinst.lang["m234_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.dpUIinst.lang["m098_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
-        jointDisplayLayout = cmds.columnLayout('jointDisplayLayout', columnOffset=("both", 10), adjustableColumn=True)
-        mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=jointDisplayLayout)
+        jointDisplayLayout = cmds.columnLayout('jointDisplayLayout', columnOffset=("both", 5), adjustableColumn=True)
+        mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 5), parent=jointDisplayLayout)
         # cmds.separator(style='none', height=7, parent=jointDisplayLayout)
         # cmds.button(label=self.dpUIinst.lang["i154_up"], annotation=self.dpUIinst.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True), parent=jointDisplayLayout)
         # cmds.separator(style='in', height=10, width=110, parent=jointDisplayLayout)
@@ -50,10 +64,10 @@ class JointDisplay(object):
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
         self.itemSC = cmds.selectionConnection(activeList=True)
-        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, fixedAttrList=['drawStyle'], niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=mainLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=mainLayout)
         cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
         cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.dpMoveAttr, parent=buttonLayout)
         cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpMoveAttr, parent=buttonLayout)
