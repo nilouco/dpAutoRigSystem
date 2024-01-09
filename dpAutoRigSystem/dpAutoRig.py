@@ -1210,8 +1210,6 @@ class DP_AutoRig_UI(object):
         # list all guide modules:
         guideModuleList = self.utils.findAllModules(path, guideDir)
         if guideModuleList:
-            # change guide module list for alphabetic order:
-            guideModuleList.sort()
             if action == "start":
                 # create guide buttons:
                 for guideModule in guideModuleList:
@@ -1569,10 +1567,10 @@ class DP_AutoRig_UI(object):
         if instList:
             for inst in instList:
                 inst.changeActive(value)
-        
+
 
     def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", *args):
-        """ Run the code for each active validator instance.
+        """ Run the code for each active validator/rebuilder instance.
             firstMode = True for verify/export
                       = False for fix/import
         """
@@ -1588,17 +1586,17 @@ class DP_AutoRig_UI(object):
             progressAmount = 0
             maxProcess = len(actionInstList)
             cmds.progressWindow(title=self.lang[actionType], progress=progressAmount, status=self.lang[actionType]+': 0%', isInterruptable=False)
-            for v, validatorInst in enumerate(actionInstList):
-                if validatorInst.active:
+            for a, actionInst in enumerate(actionInstList):
+                if actionInst.active:
                     progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(validatorInst.guideModuleName+': '+repr(progressAmount)))
-                    validatorInst.verbose = False
-                    actionResultData[validatorInst.guideModuleName] = validatorInst.runAction(firstMode)
-                    validatorInst.verbose = True
+                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(actionInst.guideModuleName+': '+repr(progressAmount)))
+                    actionInst.verbose = False
+                    actionResultData[actionInst.guideModuleName] = actionInst.runAction(firstMode)
+                    actionInst.verbose = True
                     if stopIfFoundBlock:
-                        if True in validatorInst.foundIssueList:
-                            if False in validatorInst.resultOkList:
-                                return actionResultData, True, v
+                        if True in actionInst.foundIssueList:
+                            if False in actionInst.resultOkList:
+                                return actionResultData, True, a
         if actionResultData:
             dataList = list(actionResultData.keys())
             dataList.sort()

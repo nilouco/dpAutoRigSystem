@@ -20,10 +20,11 @@ DP_UTILS_VERSION = 3.0
 
 class Utils(object):
 
-#    def __init__(self, *args):
-#        """ Initialize the module class loading variables and store them in a dictionary.
-#        """
-#        # define variables
+    def __init__(self, *args):
+        """ Initialize the module class loading variables and store them in a dictionary.
+        """
+        # define variables
+        self.dpOrderList = "dpOrderList"
         
 
 
@@ -82,7 +83,7 @@ class Utils(object):
         return absolutePath
 
 
-    def findAllFiles(self, path, dir, ext):
+    def findAllFiles(self, path, dir, ext=".py"):
         """ Find all files in the directory with the extension.
             Return a list of all module names (without '.py' extension).
         """
@@ -91,23 +92,42 @@ class Utils(object):
         # select only files with extension:
         pyFilesList = []
         for file in allFilesList:
-            if file.endswith(".py") and str(file) != "__init__.py":
-                pyFilesList.append(str(file)[:-3])
+            if file.endswith(ext) and str(file) != "__init__.py":
+                pyFilesList.append(str(file)[:file.rfind(".")])
         return pyFilesList
 
 
     def findAllModules(self, path, dir):
         """ Find all modules in the directory.
+            If find a dpOrderList.txt file it will order the list for priority proporses.
             Return a list of all module names (without '.py' extension).
         """
         baseClassList = ["dpBaseClass", "dpLayoutClass", "dpBaseControlClass", "dpBaseActionClass", "dpValidatorTemplate", "dpPublisher", "dpPipeliner", "dpPackager"]
         allPyFilesList = self.findAllFiles(path, dir, ".py")
         moduleList = []
-        # removing "__init__":
         for file in allPyFilesList:
-            #Ensure base class are skipped
+            # ensure base class are skipped
             if not file in baseClassList:
                 moduleList.append(file)
+        # check order list
+        if moduleList:
+            textList = self.findAllFiles(path, dir, ".txt")
+            if textList:
+                for text in textList:
+                    if self.dpOrderList in text:
+                        desiredOrderList = []
+                        dupList = moduleList
+                        moduleList = []
+                        with open(path+"/"+dir+"/"+text+".txt", encoding='utf8') as filename:
+                            for line in filename.readlines():
+                                desiredOrderList.append(line.strip())
+                        if desiredOrderList:
+                            for item in desiredOrderList:
+                                if item in dupList:
+                                    moduleList.append(item)
+                                    dupList.remove(item)
+                        if dupList:
+                            moduleList.extend(dupList)
         return moduleList
 
 

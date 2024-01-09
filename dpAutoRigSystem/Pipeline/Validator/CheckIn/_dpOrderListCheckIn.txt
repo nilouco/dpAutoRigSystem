@@ -1,0 +1,10 @@
+dpVaccineCleaner
+dpImportReference
+dpNamespaceCleaner
+dpUnlockInitialShadingGroup
+dpShowBPCleaner
+dpDuplicatedName
+dpUnlockNormals
+dpInvertedNormals
+dpFreezeTransform
+dpGeometryHistory
