@@ -124,7 +124,7 @@ class Rivet(object):
         cmds.button(label="Refresh", width=153, command=self.refreshRivetList, parent=removeButtonsRL)
         cmds.separator(style='none', height=10, parent=removeLayout)
         self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
-        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=400, allowMultiSelection=True, parent=removeLayout)
+        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=400, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
         cmds.separator(style='none', height=10, parent=removeLayout)
         buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 15), parent=removeLayout)
         cmds.button(label="Remove Rivet", width=270, command=self.removeRivetFromUI, backgroundColor=(1, .388, 0.278), parent=buttonColumnLayout)
@@ -137,6 +137,10 @@ class Rivet(object):
         if itemsWithRivetList:
             for item in itemsWithRivetList:
                 cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=item)
+
+    def rivetItemSelect(self, *args):
+        selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
+        cmds.select(selectionList)
 
     def riseRivetNetNodes(self):
         netNodeList = cmds.ls(type="network")
