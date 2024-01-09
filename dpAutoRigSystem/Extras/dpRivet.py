@@ -122,25 +122,67 @@ class Rivet(object):
         removeButtonsRL = cmds.rowLayout(numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent=removeLayout)
         cmds.button(label="Select All", width=153, command=self.selectAll, parent=removeButtonsRL)
         cmds.button(label="Refresh", width=153, command=self.refreshRivetList, parent=removeButtonsRL)
-        cmds.separator(style='none', height=10, parent=removeLayout)
+        cmds.separator(style='none', height=5, parent=removeLayout)
         self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
-        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=400, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
-        cmds.separator(style='none', height=10, parent=removeLayout)
-        buttonColumnLayout = cmds.columnLayout('buttonColumnLayout', columnOffset=("left", 15), parent=removeLayout)
-        cmds.button(label="Remove Rivet", width=270, command=self.removeRivetFromUI, backgroundColor=(1, .388, 0.278), parent=buttonColumnLayout)
+        cmds.separator(style='none', height=5, parent=removeLayout)
+        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=370, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
+        cmds.separator(style='none', height=5, parent=removeLayout)
+        cmds.button(label="Remove Rivet", width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
+        cmds.separator(style='none', height=5, parent=removeLayout)
+        cmds.button(label="Check Rivet", width=310, command=self.checkRivet, backgroundColor=(1, 1, 0), parent=removeLayout)
         cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, "Create"), (removeLayout, "Remove")))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
 
+
+    def disablePac(self, badRivetItemsList, *args):
+        for item in badRivetItemsList:
+            netNode = cmds.listConnections(f"{item}.rivetNet", destination=False)[0]
+            rivetGrp = cmds.listConnections(f"{netNode}.rivet", destination=False)[0]
+            parentConstraint = cmds.listRelatives(rivetGrp, type="parentConstraint")[0]
+            rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
+            pacAttrList = cmds.listAttr(parentConstraint, settable=True, visible=True, string=f"{rivetFollicle}*")
+            if pacAttrList:
+                pacAttr = pacAttrList[0]
+                cmds.setAttr(f"{parentConstraint}.{pacAttr}", 0)
+
+
+    def checkRivet(self, *args):
+        selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
+        if selectionList:
+            badRivetsList = list(filter(self.rivetChecker, selectionList))
+            if badRivetsList:
+                removeBadRivet = cmds.confirmDialog(title="Broken Rivet Found", icon="critical", message="Some of the verified rivets are broken, would you like to remove then?", button=["Yes", "No"], defaultButton="Yes", cancelButton="No", dismissString="No")
+
+                if removeBadRivet == "Yes":
+                    cmds.progressWindow(title='removing Rivet', progress=0, maxValue=len(badRivetsList), status="Removing")
+                    self.disablePac(badRivetsList)
+                    self.removeRivetFromList(badRivetsList)
+                    cmds.progressWindow(endProgress=True)
+            else:
+                cmds.confirmDialog(title='No problem found', icon="information", message='The checked rivets seems to be fine, you may need to restart maya to be sure.', button=['OK'], defaultButton='OK', cancelButton='OK', dismissString='OK')
+        else:
+            print("No items selected, please select an item to check.")
+    
+
+    def rivetChecker(self, selectionItem, *args):
+        netNode = cmds.listConnections(f"{selectionItem}.rivetNet", destination=False)[0]
+        rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
+        tx = cmds.getAttr(f"{rivetFollicle}.translateX")
+        ty = cmds.getAttr(f"{rivetFollicle}.translateY")
+        tz = cmds.getAttr(f"{rivetFollicle}.translateZ")
+        return tx == 0 and ty == 0 and tz == 0
+
+
     def selectAll(self, *args):
-        itemsWithRivetList = self.itemsWithRivetList()
-        if itemsWithRivetList:
-            for item in itemsWithRivetList:
-                cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=item)
+        itemsList = cmds.textScrollList(self.rivetControllersList, query=True, allItems=True)
+        cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=itemsList)
+
 
     def rivetItemSelect(self, *args):
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         cmds.select(selectionList)
+
 
     def riseRivetNetNodes(self):
         netNodeList = cmds.ls(type="network")
@@ -224,12 +266,12 @@ class Rivet(object):
             return controllerList
         else:
             return None
-        
+
+
     def refreshRivetList(self, *args):
         cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
         rivetItemsList = self.itemsWithRivetList()
         filter = cmds.textField(self.filterRivetList, query=True, text=True)
-        print(filter)
         if rivetItemsList:
             if filter:
                 sortedRivetList = dpUtils.filterName(filter, rivetItemsList, " ")
@@ -256,9 +298,11 @@ class Rivet(object):
                 self.dpLoadGeoToAttach(geo)
                 self.dpAddSelect(itemList)
 
+
     def setProgressBar(self, progressAmount, status):
         if self.ui:
             cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
+
 
     def dpCreateRivetFromUI(self, *args):
         """ Just collect all information from UI and call the main function to create Rivet setup.
@@ -286,7 +330,7 @@ class Rivet(object):
                 removeExistingRivet = cmds.confirmDialog(title="Attention", icon="warning", message="At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended)", button=["Yes", "No", "Cancel"], defaultButton="Yes", cancelButton="Cancel", dismissString="Cancel")
 
                 if removeExistingRivet == "Yes":
-                    cmds.progressWindow(title='removing Rivet', progress=0, maxValue=len(needToRemove), status="Creating")
+                    cmds.progressWindow(title='removing Rivet', progress=0, maxValue=len(needToRemove), status="Removing")
                     self.removeRivetFromList(needToRemove)
                     cmds.progressWindow(endProgress=True)
                 elif removeExistingRivet == "No":
