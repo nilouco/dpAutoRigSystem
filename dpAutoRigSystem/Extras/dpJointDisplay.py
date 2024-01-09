@@ -9,7 +9,7 @@ TITLE = "m234_jointDisplay"
 DESCRIPTION = "m235_jointDisplayDesc"
 ICON = "/Icons/dp_reorderAttr.png"
 
-DP_REORDERATTR_VERSION = 1.0
+DP_JOINTDISPLAY_VERSION = 1.0
 
 
 class JointDisplay(object):
@@ -17,32 +17,50 @@ class JointDisplay(object):
         self.dpUIinst = dpUIinst
         # call main function
         if ui:
-            self.dpReorderAttrUI(self)
+            self.dpJointDisplayUI(self)
     
     
-    def dpCloseReorderAttrUI(self, *args):
-        if cmds.window('dpReorderAttrWindow', query=True, exists=True):
-            cmds.deleteUI('dpReorderAttrWindow', window=True)
+    def dpCloseJointDisplayUI(self, *args):
+        if cmds.window('dpJointDisplayWindow', query=True, exists=True):
+            cmds.deleteUI('dpJointDisplayWindow', window=True)
     
     
-    def dpReorderAttrUI(self, *args):
+    def dpJointDisplayUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
-        # creating dpReorderAttrUI Window:
-        self.dpCloseReorderAttrUI()
-        reorderAttr_winWidth  = 175
-        reorderAttr_winHeight = 75
-        dpReorderAttrWin = cmds.window('dpReorderAttrWindow', title=self.dpUIinst.lang["m087_reorderAttr"]+" "+str(DP_REORDERATTR_VERSION), widthHeight=(reorderAttr_winWidth, reorderAttr_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+        # creating dpJointDisplayUI Window:
+        self.dpCloseJointDisplayUI()
+        jointDisplay_winWidth  = 675
+        jointDisplay_winHeight = 175
+        dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.dpUIinst.lang["m234_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
         # creating layout:
-        reorderAttrLayout = cmds.columnLayout('reorderAttrLayout', columnOffset=("left", 30))
-        cmds.separator(style='none', height=7, parent=reorderAttrLayout)
-        cmds.button(label=self.dpUIinst.lang["i154_up"], annotation=self.dpUIinst.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True), parent=reorderAttrLayout)
-        cmds.separator(style='in', height=10, width=110, parent=reorderAttrLayout)
-        cmds.button(label=self.dpUIinst.lang["i156_down"], annotation=self.dpUIinst.lang["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True), parent=reorderAttrLayout)
+        jointDisplayLayout = cmds.columnLayout('jointDisplayLayout', columnOffset=("both", 10), adjustableColumn=True)
+        mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=jointDisplayLayout)
+        # cmds.separator(style='none', height=7, parent=jointDisplayLayout)
+        # cmds.button(label=self.dpUIinst.lang["i154_up"], annotation=self.dpUIinst.lang["i155_upDesc"], width=110, backgroundColor=(0.45, 1.0, 0.6), command=partial(self.dpMoveAttr, 1, None, None, True), parent=jointDisplayLayout)
+        # cmds.separator(style='in', height=10, width=110, parent=jointDisplayLayout)
+        # cmds.button(label=self.dpUIinst.lang["i156_down"], annotation=self.dpUIinst.lang["i157_downDesc"], width=110, backgroundColor=(1.0, 0.45, 0.45), command=partial(self.dpMoveAttr, 0, None, None, True), parent=jointDisplayLayout)
+
+        # filter
+        filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=mainLayout)
+        self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="TESTEEE####", changeCommand=self.dpMoveAttr, adjustableColumn=2, parent=filterLayout)
+        cmds.separator(style='none', height=5, parent=filterLayout)
+
+        # items and attributes layout
+        tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
+        self.itemSC = cmds.selectionConnection(activeList=True)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
+        # bottom layout for buttons
+        cmds.separator(style='none', height=10, parent=mainLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=mainLayout)
+        cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpMoveAttr, parent=buttonLayout)
+
         
-        # call dpReorderAttrUI Window:
-        cmds.showWindow(dpReorderAttrWin)
+        # call dpJointDisplayUI Window:
+        cmds.showWindow(dpJointDisplayWin)
     
     
     def dpMoveAttr(self, mode, objList=None, attrList=None, verbose=False, *args):
