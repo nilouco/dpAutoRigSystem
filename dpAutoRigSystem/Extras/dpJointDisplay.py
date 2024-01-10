@@ -44,7 +44,7 @@ class JointDisplay(object):
         """
         # creating dpJointDisplayUI Window:
         self.dpCloseJointDisplayUI()
-        jointDisplay_winWidth  = 675
+        jointDisplay_winWidth  = 500
         jointDisplay_winHeight = 175
         dpJointDisplayWin = cmds.window('dpJointDisplayWindow', title=self.dpUIinst.lang["m098_jointDisplay"]+" "+str(DP_JOINTDISPLAY_VERSION), widthHeight=(jointDisplay_winWidth, jointDisplay_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
 
@@ -59,18 +59,24 @@ class JointDisplay(object):
         # filter
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=mainLayout)
         self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="TESTEEE####", changeCommand=self.dpMoveAttr, adjustableColumn=2, parent=filterLayout)
-        cmds.separator(style='none', height=5, parent=filterLayout)
+        cmds.separator(style='none', height=10, parent=filterLayout)
 
         # items and attributes layout
-        tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
+        self.tablePaneLayout = cmds.paneLayout("tablePaneLayout", configuration='vertical4', parent=mainLayout)
+        # self.jointLayout = cmds.columnLayout('skinLayout', adjustableColumn=True, rowSpacing=10, parent=self.tablePaneLayout)
+        cmds.textScrollList( 'modelsTextScrollLayout1', width=30, height=500, allowMultiSelection=True, parent=self.tablePaneLayout)
+        cmds.textScrollList( 'modelsTextScrollLayout2', width=30, height=500, allowMultiSelection=True, parent=self.tablePaneLayout)
+        cmds.textScrollList( 'modelsTextScrollLayout3', width=30, height=500, allowMultiSelection=True, parent=self.tablePaneLayout)
         self.itemSC = cmds.selectionConnection(activeList=True)
-        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, fixedAttrList=['drawStyle'], niceNames=False, keyableOnly=False, parent=tablePaneLayout)
+        self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, fixedAttrList=['drawStyle'], niceNames=False, keyableOnly=False, parent=self.tablePaneLayout)
+        
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=mainLayout)
-        cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
-        cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.dpMoveAttr, parent=buttonLayout)
-        cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.button("Cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.separator(style='none', height=10, parent=buttonLayout)
 
         
         # call dpJointDisplayUI Window:
