@@ -130,7 +130,7 @@ class Rivet(object):
         cmds.button(label=self.dpUIinst.lang["i293_removeRivet"], width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
         cmds.separator(style='none', height=5, parent=removeLayout)
         cmds.button(label="Check Rivet", width=310, command=self.checkRivet, backgroundColor=(1, 1, .72), parent=removeLayout)
-        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.dpUIinst.lang["i158_create"]), (removeLayout, "Remove")))
+        cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.dpUIinst.lang["i158_create"]), (removeLayout, self.dpUIinst.lang["i046_remove"])))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
 
@@ -153,7 +153,7 @@ class Rivet(object):
             if badRivetsList:
                 removeBadRivet = cmds.confirmDialog(title=self.dpUIinst.lang["i294_brokenRivet"], icon="critical", message=self.dpUIinst.lang["i295_brokenRivetMsg"], button=[self.dpUIinst.lang["i071_yes"], self.dpUIinst.lang["i072_no"]], defaultButton=self.dpUIinst.lang["i071_yes"], cancelButton=self.dpUIinst.lang["i072_no"], dismissString=self.dpUIinst.lang["i072_no"])
 
-                if removeBadRivet == "Yes":
+                if removeBadRivet == self.dpUIinst.lang["i071_yes"]:
                     cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(badRivetsList), status=self.dpUIinst.lang["i297_removing"])
                     self.disablePac(badRivetsList)
                     self.removeRivetFromList(badRivetsList)
@@ -329,19 +329,19 @@ class Rivet(object):
             needToRemove = toCreateSet & hasRivetSet
         if needToRemove:
             if len(needToRemove) > 0:
-                removeExistingRivet = cmds.confirmDialog(title="Attention", icon="warning", message="At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended)", button=["Yes", "No", "Cancel"], defaultButton="Yes", cancelButton="Cancel", dismissString="Cancel")
+                removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i300_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
 
-                if removeExistingRivet == "Yes":
-                    cmds.progressWindow(title='removing Rivet', progress=0, maxValue=len(needToRemove), status="Removing")
+                if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
+                    cmds.progressWindow(title=self.dpUIinst.lang['i296_removingRivet'], progress=0, maxValue=len(needToRemove), status=self.dpUIinst.lang['i297_removing'])
                     self.removeRivetFromList(needToRemove)
                     cmds.progressWindow(endProgress=True)
-                elif removeExistingRivet == "No":
+                elif removeExistingRivet == self.dpUIinst.lang['i072_no']:
                     pass
                 else:
                     return
 
         # call run function to create Rivet setup using UI values
-        cmds.progressWindow(title='Creating Rivet', progress=0, maxValue=len(itemList), status="Working")
+        cmds.progressWindow(title=self.dpUIinst.lang['i301_creatingRivet'], progress=0, maxValue=len(itemList), status=self.dpUIinst.lang['i302_working'])
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         cmds.progressWindow(endProgress=True)
         self.dpCloseRivetUi()

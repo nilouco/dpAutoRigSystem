@@ -459,6 +459,9 @@
     "i297_removing"          : "Removing",
     "i298_noProblem"         : "No problem found",
     "i299_rivetSeemFine"     : "The checked rivets seems to be fine, you may need to restart maya to be sure.",
+    "i300_rivetNotFine"      : "At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended).",
+    "i301_creatingRivet"     : "Creating Rivet",
+    "i302_working"           : "Working",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

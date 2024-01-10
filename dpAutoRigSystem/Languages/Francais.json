@@ -459,6 +459,9 @@
     "i297_removing"          : "Suppression",
     "i298_noProblem"         : "Aucun problème trouvé.",
     "i299_rivetSeemFine"     : "Les rivets vérifiés semblent ok, vous devrez peut-être redémarrer Maya pour en être sûr.",
+    "i300_rivetNotFine"      : "Au moins un des éléments sélectionnés possède déjà un rivet, vous souhaitez le retirer avant d'en créer un nouveau (fortement recommandé).",
+    "i301_creatingRivet"     : "Création de rivets",
+    "i302_working"           : "Travaillant",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
