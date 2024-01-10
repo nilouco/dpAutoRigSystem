@@ -451,6 +451,14 @@
     "i289_sameNameSkinDesc"  : "It'll copy the skinning of meshes with the same name.\nIt's very useful to update the models in the rig.",
     "i290_oneSource"         : "One Source",
     "i291_selectAllControls" : "Select All Controls",
+    "i292_selectAll"         : "Select All",
+    "i293_removeRivet"       : "Remove Rivet",
+    "i294_brokenRivet"       : "Broken Rivet Found",
+    "i295_brokenRivetMsg"    : "Some of the verified rivets are broken, would you like to remove them?",
+    "i296_removingRivet"     : "Removing Rivet",
+    "i297_removing"          : "Removing",
+    "i298_noProblem"         : "No problem found",
+    "i299_rivetSeemFine"     : "The checked rivets seems to be fine, you may need to restart maya to be sure.",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -688,6 +696,9 @@
     "m231_proxyCreatorDesc"     : "This module will generate a proxy mesh for the current rig.",
     "m232_morphDeformer"        : "Morph Deformer",
     "m233_wrapDeformer"         : "Wrap Deformer",
+    "m234_noRivetSelect"        : "No items selected, please select an item to check.",
+    "m235_unableRemRivet"       : "Unable to remove rivet: ",
+    "m236_noItemSelect"         : "No items selected, please select an item to remove.",
 
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
