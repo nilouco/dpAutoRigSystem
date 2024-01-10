@@ -162,26 +162,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvCornerLoc, self.jGuideCorner, maintainOffset=False, name=self.jGuideCorner+"_PaC")
         cmds.parentConstraint(self.cvExtremLoc, self.jGuideExtrem, maintainOffset=False, name=self.jGuideExtrem+"_PaC")
 
-        # testing aimConstraint
-        #######################
-        drvLoc = cmds.spaceLocator(name="Limb_GuideCorner_DrvLoc")[0]
-        drvLocGrp = dpUtils.zeroOut([drvLoc])[0]
-        cmds.parent(drvLocGrp, self.mirrorGrp)
-        PaC = cmds.parentConstraint(self.cvCornerLoc, drvLocGrp, mo=False)
-        #cmds.delete(PaC)
-        #cmds.delete(cmds.parentConstraint(self.cvCornerLoc, drvLocGrp))
-        #cmds.matchTransform(drvLocGrp, self.cvCornerLoc, piv=True, pos=True, rot=True)
-        cmds.connectAttr(self.cvCornerLoc+".translateX", drvLoc+".translateX")
-        cmds.connectAttr(self.cvCornerLoc+".translateY", drvLoc+".translateY")
-        cmds.connectAttr(self.cvCornerLoc+".translateZ", drvLoc+".translateZ")
-        cmds.connectAttr(self.cvCornerLoc+".rotateX", drvLoc+".rotateX")
-        cmds.connectAttr(self.cvCornerLoc+".rotateY", drvLoc+".rotateY")
-        cmds.connectAttr(self.cvCornerLoc+".rotateZ", drvLoc+".rotateZ")
-        cmds.delete(PaC)
-        # mainLocGrp = dpUtils.zeroOut([self.cvMainLoc])
-
-        #cmds.aimConstraint(self.cvCornerLoc, self.mainLocGrp, name="TestingParentinging")
-
         # align cornerLocs:
         self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
 
@@ -191,9 +171,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
         # creating relationship of corner:
         self.cornerPointGrp = cmds.group(self.cornerGrp, name=self.cornerGrp+"_Zero_0_Grp")
-        cornerPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cornerPointGrp, maintainOffset=False, name=self.cornerPointGrp+"_PoC")[0]
-        cmds.setAttr(cornerPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
-        cmds.setAttr(cornerPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
+        self.cornerPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cornerPointGrp, maintainOffset=False, name=self.cornerPointGrp+"_PoC")[0]
+        cmds.setAttr(self.cornerPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
+        cmds.setAttr(self.cornerPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
 
         # transform cvLocs in order to put as a good limb guide:
         cmds.setAttr(self.cvBeforeLoc+".translateX", -0.5)
@@ -207,9 +187,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvUpVectorGrp = cmds.group(self.cvUpVectorLoc, name=self.cvUpVectorLoc+"_Grp")
         cornerPositionList = cmds.xform(self.cvCornerLoc, query=True, worldSpace=True, rotatePivot=True)
         cmds.move(cornerPositionList[0], cornerPositionList[1], cornerPositionList[2], self.cvUpVectorGrp)
-        cornerUpVectorPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp+"_PoC")[0]
-        cmds.setAttr(cornerUpVectorPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
-        cmds.setAttr(cornerUpVectorPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
+        self.cornerUpVectorPointConst = cmds.pointConstraint(self.cvMainLoc, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp+"_PoC")[0]
+        cmds.setAttr(self.cornerUpVectorPointConst+'.'+self.cvMainLoc[self.cvMainLoc.rfind(":")+1:]+'W0', 0.52)
+        cmds.setAttr(self.cornerUpVectorPointConst+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.48)
         cmds.setAttr(self.cvUpVectorLoc+".translateY", -10)
 
         # display cornerUpVector:
@@ -224,6 +204,85 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.reOrientGuide()
         cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
 
+        # create autoAim setup null grps
+        self.cvMainLocGrp = dpUtils.zeroOut([self.cvMainLoc])[0]
+        self.guideMainDrvNull = cmds.group(empty=True, name=self.cvMainLoc+"_Drv_Null")
+        #self.guideMainDrvNullGrp = cmds.group(self.guideMainDrvNull, name=self.guideMainDrvNull+"_Grp")
+        self.cornerDrvNull = cmds.group(empty=True, name=self.cvCornerLoc+"_Drv_Null")
+        self.cornerDrvNullGrp = cmds.group(self.cornerDrvNull, name=self.cornerDrvNull+"_Grp")
+        cmds.parent(self.guideMainDrvNull, self.cornerDrvNullGrp, self.moduleGrp)
+        cmds.matchTransform(self.guideMainDrvNull, self.cvMainLoc)
+        #cmds.parent(self.guideMainDrvNullGrp, self.cornerDrvNullGrp, self.moduleGrp)
+        #cmds.matchTransform(self.guideMainDrvNullGrp, self.cvMainLoc)
+        cmds.matchTransform(self.cornerDrvNullGrp, self.cvCornerLoc)
+        cmds.setAttr(self.guideMainDrvNull+".visibility", 0)
+        #cmds.setAttr(self.guideMainDrvNullGrp+".visibility", 0)
+        cmds.setAttr(self.cornerDrvNull+".visibility", 0)
+        cmds.setAttr(self.cornerDrvNullGrp+".visibility", 0)
+        self.createAutoAim()
+
+    def createAutoAim(self, limb=ARM, *args):
+        # aimConstraint setup in order to auto orient mainGuide with CornerGuide
+        if limb==ARM:
+            upVectorValues = (0.0, -1.0, 0.0)
+            #mainAimConstrantOffsetValue = [".offsetX"]
+        if limb==LEG:
+            upVectorValues = (1.0, 0.0, 0.0)
+            #mainAimConstrantOffsetValue = [".offsetY"]
+        cornerPointGrpConnections = cmds.listConnections(self.cornerPointGrp, type="constraint", source=True, destination=False)
+        cvUpVectorGrpConnections = cmds.listConnections(self.cvUpVectorGrp, type="constraint", source=True, destination=False)
+        if cornerPointGrpConnections and cvUpVectorGrpConnections:
+            cmds.delete(cornerPointGrpConnections, cvUpVectorGrpConnections)
+        cmds.connectAttr(self.cvMainLoc+".translateX", self.guideMainDrvNull+".translateX")
+        cmds.connectAttr(self.cvMainLoc+".translateY", self.guideMainDrvNull+".translateY")
+        cmds.connectAttr(self.cvMainLoc+".translateZ", self.guideMainDrvNull+".translateZ")
+        cmds.connectAttr(self.cvMainLoc+".rotateX", self.guideMainDrvNull+".rotateX")
+        cmds.connectAttr(self.cvMainLoc+".rotateY", self.guideMainDrvNull+".rotateY")
+        cmds.connectAttr(self.cvMainLoc+".rotateZ", self.guideMainDrvNull+".rotateZ")
+        cmds.connectAttr(self.cvCornerLoc+".translateX", self.cornerDrvNull+".translateX")
+        cmds.connectAttr(self.cvCornerLoc+".translateY", self.cornerDrvNull+".translateY")
+        cmds.connectAttr(self.cvCornerLoc+".translateZ", self.cornerDrvNull+".translateZ")
+        cmds.connectAttr(self.cvCornerLoc+".rotateX", self.cornerDrvNull+".rotateX")
+        cmds.connectAttr(self.cvCornerLoc+".rotateY", self.cornerDrvNull+".rotateY")
+        cmds.connectAttr(self.cvCornerLoc+".rotateZ", self.cornerDrvNull+".rotateZ")
+        self.cornerPoc = cmds.pointConstraint(self.guideMainDrvNull, self.cvExtremLoc, self.cornerPointGrp, maintainOffset=True, name=self.cornerPointGrp+"_PoC")[0]
+        self.cornerUpVectorPoc = cmds.pointConstraint(self.guideMainDrvNull, self.cvExtremLoc, self.cvUpVectorGrp, maintainOffset=True, name=self.cvUpVectorGrp+"_PoC")[0]
+        self.cornerNullPoc = cmds.pointConstraint(self.guideMainDrvNull, self.cvExtremLoc, self.cornerDrvNullGrp, maintainOffset=True, name=self.cornerDrvNullGrp+"_PoC")[0]
+        self.cornerDrvNullAic = cmds.aimConstraint(self.cvExtremLoc, self.cornerDrvNullGrp, aimVector=(0.0, 0.0, 1.0), upVector=upVectorValues, worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerDrvNullGrp+"_AiC")
+        cmds.setAttr(self.cornerPoc+'.'+self.guideMainDrvNull[self.guideMainDrvNull.rfind(":")+1:]+'W0', 0.5)
+        cmds.setAttr(self.cornerPoc+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.5)
+        cmds.setAttr(self.cornerUpVectorPoc+'.'+self.guideMainDrvNull[self.guideMainDrvNull.rfind(":")+1:]+'W0', 0.5)
+        cmds.setAttr(self.cornerUpVectorPoc+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.5)
+        cmds.setAttr(self.cornerNullPoc+'.'+self.guideMainDrvNull[self.guideMainDrvNull.rfind(":")+1:]+'W0', 0.5)
+        cmds.setAttr(self.cornerNullPoc+'.'+self.cvExtremLoc[self.cvExtremLoc.rfind(":")+1:]+'W1', 0.5)
+        self.mainAic = cmds.aimConstraint(self.cornerDrvNull, self.cvMainLocGrp, maintainOffset=True, aimVector=(0.0, 0.0, 1.0), upVector=upVectorValues, worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cvMainLocGrp+"_AiC")[0]
+        cmds.select(self.moduleGrp)
+        #mainAimConstraintOffset = cmds.getAttr(self.mainAic+mainAimConstrantOffsetValue[0])
+        #cmds.setAttr(self.mainAic+mainAimConstrantOffsetValue[0], mainAimConstraintOffset+1)
+
+
+    def recreateAutoAim(self, limbType, *args):
+        axisList = ["X", "Y", "Z"]
+        #cmds.delete(self.cornerPoc, self.cornerDrvNullAic, self.cornerPoc, self.cornerUpVectorPoc, self.cornerNullPoc, self.cornerDrvNullGrp)
+        cmds.delete(self.cornerPoc, self.cornerDrvNullAic, self.cornerPoc, self.cornerUpVectorPoc, self.cornerNullPoc)
+        for axis in axisList:
+            cmds.disconnectAttr(self.cvMainLoc+".translate"+axis, self.guideMainDrvNull+".translate"+axis)
+            cmds.disconnectAttr(self.cvMainLoc+".rotate"+axis, self.guideMainDrvNull+".rotate"+axis)
+            cmds.disconnectAttr(self.cvCornerLoc+".translate"+axis, self.cornerDrvNull+".translate"+axis)
+            cmds.disconnectAttr(self.cvCornerLoc+".rotate"+axis, self.cornerDrvNull+".rotate"+axis)
+        cmds.parent(self.cvMainLoc, self.moduleGrp)
+        cmds.delete(self.cvMainLocGrp)
+        self.cvMainLocGrp2 = dpUtils.zeroOut([self.cvMainLoc])[0]
+        cmds.matchTransform(self.guideMainDrvNull, self.cvMainLoc)
+        #self.cornerDrvNull = cmds.group(empty=True, name=self.cvCornerLoc+"_Drv_Null")
+        #self.cornerDrvNullGrp = cmds.group(self.cornerDrvNull, name=self.cornerDrvNull+"_Grp")
+        #cmds.parent(self.cornerDrvNullGrp ,self.moduleGrp)
+        cmds.matchTransform(self.cornerDrvNullGrp, self.cvCornerLoc)
+        self.reOrientGuide(limbType)
+        self.createAutoAim(limbType)
+            
+        return print("testing recreation")
+        
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
@@ -367,7 +426,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.delete(self.cornerAIC)
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(0.0, -1.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
             self.setLockCornerAttr(ARM)
-
+            #self.reOrientGuide()
+            self.recreateAutoAim(ARM)
+            
         # for Leg type:
         elif type == self.dpUIinst.lang['m030_leg'] or type == 1:
             cmds.setAttr(self.moduleGrp+".type", 1)
@@ -385,14 +446,20 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.delete(self.cornerAIC)
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
             self.setLockCornerAttr(LEG)
+            #self.reOrientGuide()
+            self.recreateAutoAim(LEG)
 
         # reset rotations:
-        self.reOrientGuide()
+        #self.reOrientGuide()
+        
 
-
-    def reOrientGuide(self, *args):
+    def reOrientGuide(self, limbType=ARM, *args):
         """ This function reOrient guides orientations, creating temporary aimConstraints for them.
         """
+        if limbType==ARM:
+            offsetAxis=".offsetX"
+        if limbType==LEG:
+            offsetAxis=".offsetY"
         # re-declaring guide names:
         self.cvBeforeLoc = self.guideName+"_Before"
         self.cvMainLoc = self.guideName+"_Main"
@@ -402,6 +469,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # re-orient rotations:
         tempToDelBefore = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0))
         tempToDelMain = cmds.aimConstraint(self.cvCornerLoc, self.cvMainLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0))
+        offsetValue = cmds.getAttr(tempToDelMain[0]+offsetAxis)
+        cmds.setAttr(tempToDelMain[0]+offsetAxis, offsetValue+1)
         cmds.delete(tempToDelBefore, tempToDelMain)
         cmds.setAttr(self.cvExtremLoc+'.rotateX', 0)
         cmds.setAttr(self.cvExtremLoc+'.rotateY', 0)
