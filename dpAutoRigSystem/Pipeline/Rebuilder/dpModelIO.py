@@ -98,6 +98,8 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                             abcToImport = self.ioPath+"/"+exportedList[-1]
                             #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
                             mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                            # clean up geometries
+                            self.runCheckInValidators()
                             self.wellDoneIO(exportedList[-1])
                         except:
                             self.notWorkedWellIO(exportedList[-1])
@@ -113,3 +115,21 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         self.reportLog()
         self.endProgressBar()
         return self.dataLogDic
+
+
+    def runCheckInValidators(self, *args):
+        """ Run checkin validators after importing the model.
+        """
+        validatorToRunList = [
+            "dpUnlockNormals",
+            "dpSoftenEdges",
+            "dpFreezeTransform",
+            "dpGeometryHistory"
+        ]
+        if self.dpUIinst.checkInInstanceList:
+            for validatorToRun in validatorToRunList:
+                for vInst in self.dpUIinst.checkInInstanceList:
+                    if validatorToRun in str(vInst):
+                        vInst.verbose = False
+                        vInst.runAction(False) #fix
+                        vInst.verbose = True
