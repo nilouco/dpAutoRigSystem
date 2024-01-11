@@ -61,6 +61,10 @@ class Rivet(object):
     def dpCloseRivetUi(self, *args):
         if cmds.window('dpRivetWindow', query=True, exists=True):
             cmds.deleteUI('dpRivetWindow', window=True)
+
+    def dpCloseStuckUi(self, *args):
+        if cmds.window('dpStuckWindow', query=True, exists=True):
+            cmds.deleteUI('dpStuckWindow', window=True)
     
     
     def dpRivetUI(self, *args):
@@ -129,7 +133,7 @@ class Rivet(object):
         cmds.separator(style='none', height=5, parent=removeLayout)
         cmds.button(label=self.dpUIinst.lang["i293_removeRivet"], width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
         cmds.separator(style='none', height=5, parent=removeLayout)
-        cmds.button(label="Check Rivet", width=310, command=self.checkRivet, backgroundColor=(1, 1, .72), parent=removeLayout)
+        cmds.button(label=self.dpUIinst.lang["i303_rivetStick"], width=310, command=self.checkStuck, backgroundColor=(1, 1, .72), parent=removeLayout)
         cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.dpUIinst.lang["i158_create"]), (removeLayout, self.dpUIinst.lang["i046_remove"])))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
@@ -145,26 +149,37 @@ class Rivet(object):
                 pacAttr = pacAttrList[0]
                 cmds.setAttr(f"{parentConstraint}.{pacAttr}", 0)
 
+    def removeNonStuckRivetList(self, badRivetsList, *args):
+        cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(badRivetsList), status=self.dpUIinst.lang["i297_removing"])
+        self.disablePac(badRivetsList)
+        self.removeRivetFromList(badRivetsList)
+        cmds.progressWindow(endProgress=True)
+        self.dpCloseStuckUi()
 
-    def checkRivet(self, *args):
+    def checkStuck(self, *args):
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         if selectionList:
-            badRivetsList = list(filter(self.rivetChecker, selectionList))
+            badRivetsList = list(filter(self.rivetOnOrigin, selectionList))
             if badRivetsList:
-                removeBadRivet = cmds.confirmDialog(title=self.dpUIinst.lang["i294_brokenRivet"], icon="critical", message=self.dpUIinst.lang["i295_brokenRivetMsg"], button=[self.dpUIinst.lang["i071_yes"], self.dpUIinst.lang["i072_no"]], defaultButton=self.dpUIinst.lang["i071_yes"], cancelButton=self.dpUIinst.lang["i072_no"], dismissString=self.dpUIinst.lang["i072_no"])
-
-                if removeBadRivet == self.dpUIinst.lang["i071_yes"]:
-                    cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(badRivetsList), status=self.dpUIinst.lang["i297_removing"])
-                    self.disablePac(badRivetsList)
-                    self.removeRivetFromList(badRivetsList)
-                    cmds.progressWindow(endProgress=True)
+                self.dpCloseStuckUi()
+                dpStuckWindow = cmds.window("dpStuckWindow", title=self.dpUIinst.lang["i294_brokenRivet"], widthHeight=(310, 200), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
+                stuckCL = cmds.columnLayout("stuckCL", columnAlign="center", columnOffset=("both", 10), parent="dpStuckWindow")
+                cmds.separator(style='none', height=10, parent=stuckCL)
+                cmds.text(label=self.dpUIinst.lang["i295_brokenRivetMsg"], wordWrap=True, width=290, parent=stuckCL)
+                cmds.separator(style='none', height=10, parent=stuckCL)
+                self.badRivetsTextList = cmds.textScrollList("badRivetsTextList", width=290, height=100, append=badRivetsList, parent=stuckCL)
+                cmds.separator(style='none', height=10, parent=stuckCL)
+                rowStuckL = cmds.rowLayout("rowStuckL", numberOfColumns=2, width=290, columnAlign=[(1, "left"), (2, "right")], parent=stuckCL)
+                cmds.button(label="Yes", width=143, command=partial(self.removeNonStuckRivetList, badRivetsList), parent=rowStuckL)
+                cmds.button(label="No", width=143, command=self.dpCloseStuckUi, parent=rowStuckL)
+                cmds.showWindow(dpStuckWindow)
             else:
                 cmds.confirmDialog(title=self.dpUIinst.lang["i298_noProblem"], icon="information", message=self.dpUIinst.lang["i299_rivetSeemFine"], button=[self.dpUIinst.lang["i131_ok"]], defaultButton=self.dpUIinst.lang["i131_ok"], cancelButton=self.dpUIinst.lang["i131_ok"], dismissString=self.dpUIinst.lang["i131_ok"])
         else:
             mel.eval('print \"dpAR: '+self.dpUIinst.lang['m234_noRivetSelect']+'\\n\";')
     
 
-    def rivetChecker(self, selectionItem, *args):
+    def rivetOnOrigin(self, selectionItem, *args):
         netNode = cmds.listConnections(f"{selectionItem}.rivetNet", destination=False)[0]
         rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
         tx = cmds.getAttr(f"{rivetFollicle}.translateX")
