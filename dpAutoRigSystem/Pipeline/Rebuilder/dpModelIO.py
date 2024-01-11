@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseActionClass
+import os
 
 # global variables to this module:
 CLASS_NAME = "ModelIO"
@@ -20,6 +22,8 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_MODELIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        self.ioDir = "s_modelIO"
+        self.startName = "dpModel"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -38,42 +42,69 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        meshList = None
-        print(self.pipeliner.pipeData["s_modelIO"])
-        if objList:
-            meshList = cmds.listRelatives(objList, children=True, allDescendents=True, type="mesh")
+        # ensure file is saved
+        if not cmds.file(query=True, sceneName=True):
+            self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
         else:
-            meshList = self.getRenderMeshList(True)
-        if meshList:
-            progressAmount = 0
-            maxProcess = len(meshList)
-            for item in meshList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                # get transform node
-                parentNode = cmds.listRelatives(item, parent=True)[0]
+            # load alembic plugin
+            if self.utils.checkLoadedPlugin("AbcExport"):
+                self.ioPath = self.getIOPath(self.ioDir)
                 if self.firstMode: #export
-                    try:
-                        # WIP
-                        print("EXPORTING HERE")
-                        
-                        self.wellDoneIO(parentNode)
-                    except:
-                        self.notWorkedWellIO(parentNode)
+                    meshList = None
+                    ioList = []
+                    if objList:
+                        meshList = cmds.listRelatives(objList, children=True, allDescendents=True, type="mesh")
+                    else:
+                        meshList = self.getRenderMeshList(True)
+                    if meshList:
+                        for meshName in meshList:
+                            if not "Orig" in meshName:
+                                # get transform node
+                                parentNode = cmds.listRelatives(meshName, parent=True)[0]
+                                if not parentNode in ioList:
+                                    ioList.append(parentNode)
+                        if ioList:
+                            progressAmount = 0
+                            maxProcess = len(ioList)
+                            if self.verbose:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            try:
+                                # export alembic
+                                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                                ioItems = ' -root '.join(ioList)
+                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
+                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -dataFormat ogawa -root "+ioItems+" -file "+abcName)
+                                self.wellDoneIO(', '.join(ioList))
+                            except:
+                                self.notWorkedWellIO(', '.join(ioList))
+                        else:
+                            self.notWorkedWellIO("Render_Grp")
+                    else:
+                        self.notWorkedWellIO("Render_Grp")
                 else: #import
-                    try:
-                        # WIP
-                        print("IMPORTING HERE")
-                        if not "_Mesh" in parentNode:
-                            cmds.rename(parentNode, parentNode+"_Mesh")
-                        
-                        self.wellDoneIO(parentNode)
-                    except:
-                        self.notWorkedWellIO(parentNode)
-        else:
-            self.notWorkedWellIO("Render_Grp")
+                    exportedList = None
+                    if objList:
+                        exportedList = objList
+                        if not type(objList) == list:
+                            exportedList = [objList]
+                    else:
+                        exportedList = next(os.walk(self.ioPath))[2]
+                    if exportedList:
+                        try:
+                            # import alembic
+                            exportedList.sort()
+                            abcToImport = self.ioPath+"/"+exportedList[-1]
+                            #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
+                            mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                            self.wellDoneIO(exportedList[-1])
+                        except:
+                            self.notWorkedWellIO(exportedList[-1])
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+            else:
+                self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
         # --- rebuilder code --- end
         # ---
 

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-01-09",
+    "_updated"       : "2024-01-10",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -160,6 +160,7 @@
     "e019_notFoundAllGrp"          : "Pas trouvé le groupe All_Grp pour selectionner les controleurs, désolé.",
     "e020_notFoundHeadCtrl"        : "Head Deformer a été créé, mais on n'a pas trouvé le Head_Ctrl pour parenter, désole.",
     "e021_cantLoadSoftIk"          : "Ce n'est pas possible charger l'extention dpSoftIk pour creer le setup de softIk dans le Limb module, désolé.",
+    "e022_notLoadedPlugin"         : "Ce n'est pas possible charger le plugin",
 
     "i000_guides"            : "Créer des GUIDES",
     "i001_modules"           : "Modifier des MODULES",
@@ -696,13 +697,14 @@
     "p006_front"      : "D",
     "p007_back"       : "A",
 
-    "r000_rebuilder"     : "Reconstructeur",
-    "r001_rebuild"       : "Reconstruire",
-    "r002_splitData"     : "Diviser les Données",
-    "r003_modelIO"       : "Modèle IO",
-    "r004_modelIODesc"   : "Cet action va travailler les geometries de la modelage utilisée dans le rig.\nÇa va exporter et importer des fichiers alembic.",
-    "r005_notWorkedWell" : "N'est pas fonctionné correctement, désolé",
-    "r006_wellDone"      : "Bien fait",
+    "r000_rebuilder"       : "Reconstructeur",
+    "r001_rebuild"         : "Reconstruire",
+    "r002_splitData"       : "Diviser les Données",
+    "r003_modelIO"         : "Modèle IO",
+    "r004_modelIODesc"     : "Cet action va travailler les geometries de la modelage utilisée dans le rig.\nÇa va exporter et importer des fichiers alembic.",
+    "r005_notWorkedWell"   : "N'est pas fonctionné correctement, désolé",
+    "r006_wellDone"        : "Bien fait",
+    "r007_notExportedData" : "Données pas exportées.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

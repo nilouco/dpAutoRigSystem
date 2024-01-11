@@ -170,7 +170,7 @@ class ActionStartClass(object):
         self.messageList.append(self.dpUIinst.lang['v014_notFoundNodes'])
 
 
-    def notWorkedWellIO(self, item=None, *args):
+    def notWorkedWellIO(self, item="", *args):
         """ Set dataLog when IO not working well for rebuilders.
         """
         self.checkedObjList.append(item)
@@ -179,7 +179,7 @@ class ActionStartClass(object):
         self.messageList.append(self.dpUIinst.lang['r005_notWorkedWell']+": "+item)
 
 
-    def wellDoneIO(self, item=None, *args):
+    def wellDoneIO(self, item="", *args):
         """ Set dataLog when rebuilder IO worked well.
         """
         self.checkedObjList.append(item)
@@ -212,3 +212,9 @@ class ActionStartClass(object):
                             # Get the transform only
                             allGeoList.append(transformList[0])
             return allGeoList
+
+
+    def getIOPath(self, ioDir, *args):
+        """ Returns the IO path for the current scene.
+        """
+        return self.pipeliner.getCurrentPath()+"/"+self.pipeliner.pipeData[ioDir]

@@ -197,7 +197,7 @@ class DP_AutoRig_UI(object):
             self.deleteExistWindow()
             dpAR_winWidth  = 305
             dpAR_winHeight = 605
-            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(DPAR_VERSION_PY3)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
+            self.allUIs["dpAutoRigWin"] = cmds.window('dpAutoRigWindow', title='dpAutoRigSystem - v'+str(self.dpARVersion)+' - UI', iconName='dpAutoRig', widthHeight=(dpAR_winWidth, dpAR_winHeight), menuBar=True, sizeable=True, minimizeButton=True, maximizeButton=False)
             
             # creating menus:
             self.allUIs["settingsMenu"] = cmds.menu('settingsMenu', label='Settings')
@@ -293,7 +293,7 @@ class DP_AutoRig_UI(object):
             print("Exception:", e)
             try:
                 # error logging
-                self.packager.toDiscord(self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), DPAR_VERSION_PY3+": "+str(e))
+                self.packager.toDiscord(self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h002_error']), self.dpARVersion+": "+str(e))
             except:
                 pass
             print(self.langDic[self.langName]['i008_errorUI'])
@@ -1164,7 +1164,7 @@ class DP_AutoRig_UI(object):
         print("\n", self.lang['i084_checkUpdate'])
         
         # compare current version with GitHub master
-        rawResult = self.utils.checkRawURLForUpdate(DPAR_VERSION_PY3, DPAR_RAWURL)
+        rawResult = self.utils.checkRawURLForUpdate(self.dpARVersion, DPAR_RAWURL)
         
         # call Update Window about rawRsult:
         if rawResult[0] == 0:
@@ -1663,7 +1663,7 @@ class DP_AutoRig_UI(object):
         updateLayout = cmds.columnLayout('updateLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpUpdateWin)
         if self.update_text:
             updateDesc = cmds.text("\n"+self.lang[self.update_text], align="center", parent=updateLayout)
-            cmds.text("\n"+DPAR_VERSION_PY3+self.lang['i090_currentVersion'], align="left", parent=updateLayout)
+            cmds.text("\n"+self.dpARVersion+self.lang['i090_currentVersion'], align="left", parent=updateLayout)
         if self.update_remoteVersion:
             cmds.text(self.update_remoteVersion+self.lang['i091_onlineVersion'], align="left", parent=updateLayout)
             cmds.separator(height=30)
@@ -1904,7 +1904,7 @@ class DP_AutoRig_UI(object):
             infoData['os'] = platform.system()
             infoData['lang'] = self.langName
             infoData['Maya'] = cmds.about(version=True)
-            infoData['dpAR'] = DPAR_VERSION_PY3
+            infoData['dpAR'] = self.dpARVersion
             #print(infoData)
             if infoData:
                 wh = self.utils.mountWH(dpPipeliner.DISCORD_URL, self.pipeliner.pipeData['h000_location'])
@@ -2024,7 +2024,7 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.masterGrp+".dpAutoRigSystem", DPAR_GITHUB, type="string")
             cmds.setAttr(self.masterGrp+".date", localTime, type="string")
             cmds.setAttr(self.masterGrp+".maya", cmds.about(version=True), type="string")
-            cmds.setAttr(self.masterGrp+".system", DPAR_VERSION_PY3, type="string")
+            cmds.setAttr(self.masterGrp+".system", self.dpARVersion, type="string")
             cmds.setAttr(self.masterGrp+".language", self.langName, type="string")
             cmds.setAttr(self.masterGrp+".preset", self.presetName, type="string")
             cmds.setAttr(self.masterGrp+".author", getpass.getuser(), type="string")
@@ -2229,11 +2229,11 @@ class DP_AutoRig_UI(object):
             # check guide versions to be sure we are building with the same dpAutoRigSystem version:
             for guideModule in self.modulesToBeRiggedList:
                 guideVersion = cmds.getAttr(guideModule.moduleGrp+'.dpARVersion')
-                if not guideVersion == DPAR_VERSION_PY3:
+                if not guideVersion == self.dpARVersion:
                     btYes = self.lang['i071_yes']
                     btUpdateGuides = self.lang['m186_updateGuides']
                     btNo = self.lang['i072_no']
-                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+DPAR_VERSION_PY3, message=self.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
+                    userChoose = cmds.confirmDialog(title='dpAutoRigSystem - v'+self.dpARVersion, message=self.lang['i127_guideVersionDif'], button=[btYes, btUpdateGuides, btNo], defaultButton=btYes, cancelButton=btNo, dismissString=btNo)
                     if userChoose == btNo:
                         return
                     elif userChoose == btUpdateGuides:

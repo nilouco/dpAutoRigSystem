@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-01-09",
+    "_updated"       : "2024-01-10",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -160,6 +160,7 @@
     "e019_notFoundAllGrp"          : "Não encontrado o All_Grp para selecionar os controles, desculpe.",
     "e020_notFoundHeadCtrl"        : "Head Deformer criado, mas não encontrado o Head_Ctrl para parentear, desculpe.",
     "e021_cantLoadSoftIk"          : "Não foi possível carregar a extensão dpSoftIk para criar o softIk no módulo Limb, desculpe.",
+    "e022_notLoadedPlugin"         : "Não carregado o plugin",
     
     "i000_guides"            : "Criar GUIAS",
     "i001_modules"           : "Editar MODULOS",
@@ -696,13 +697,14 @@
     "p006_front"      : "F",
     "p007_back"       : "B",
     
-    "r000_rebuilder"     : "Reconstrutor",
-    "r001_rebuild"       : "Reconstruir",
-    "r002_splitData"     : "Dividir Dados",
-    "r003_modelIO"       : "Modelo IO",
-    "r004_modelIODesc"   : "Essa ação vai trabalhar as geometrias de modelagem usadas no rig.\nVai exportar e importar arquivos de alembic.",
-    "r005_notWorkedWell" : "Não funcionou corretamente, desculpe",
-    "r006_wellDone"      : "Bem feito",
+    "r000_rebuilder"       : "Reconstrutor",
+    "r001_rebuild"         : "Reconstruir",
+    "r002_splitData"       : "Dividir Dados",
+    "r003_modelIO"         : "Modelo IO",
+    "r004_modelIODesc"     : "Essa ação vai trabalhar as geometrias de modelagem usadas no rig.\nVai exportar e importar arquivos de alembic.",
+    "r005_notWorkedWell"   : "Não funcionou corretamente, desculpe",
+    "r006_wellDone"        : "Bem feito",
+    "r007_notExportedData" : "Dados não exportados.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

@@ -506,8 +506,7 @@ class Pipeliner(object):
             # hist path
             if self.pipeData['b_archive']:
                 if self.pipeData['assetNameFolderIssue']:
-                    currentPath = cmds.file(query=True, sceneName=True)
-                    self.pipeData['scenePath'] = currentPath[:currentPath.rfind("/")]
+                    self.pipeData['scenePath'] = self.getCurrentPath()
                 else:
                     self.pipeData['scenePath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']+"/"+self.pipeData['f_wip']+"/"+self.pipeData['assetName']
                 self.pipeData['historyPath'] = self.pipeData['scenePath']+"/"+self.pipeData['s_hist']
@@ -555,3 +554,17 @@ class Pipeliner(object):
                 callback = self.pipeData['s_callback'].replace("\\", "/")
                 self.pipeData['callbackPath'] = callback[:callback.rfind("/")]
                 self.pipeData['callbackFile'] = callback[callback.rfind("/")+1:-3]
+
+
+    def getCurrentPath(self, *args):
+        """ Returns the current scene path.
+        """
+        currentPath = cmds.file(query=True, sceneName=True)
+        return currentPath[:currentPath.rfind("/")]
+    
+    def getCurrentFileName(self, *args):
+        """ Returns the current file name without the extension.
+        """
+        shortSceneName = cmds.file(query=True, sceneName=True, shortName=True)
+        if shortSceneName:
+            return shortSceneName[:shortSceneName.rfind(".")]

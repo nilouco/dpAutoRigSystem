@@ -1,8 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from . import dpPipeliner
-from . import dpPackager
 from functools import partial
 import os
 
@@ -21,8 +19,8 @@ class Publisher(object):
         self.currentAssetName = None
         self.shortAssetName = None
         self.utils = dpUIinst.utils
-        self.pipeliner = dpPipeliner.Pipeliner()
-        self.packager = dpPackager.Packager()
+        self.pipeliner = dpUIinst.pipeliner
+        self.packager = dpUIinst.packager
 
 
     def getFileTypeByExtension(self, fileName, *args):
@@ -203,9 +201,9 @@ class Publisher(object):
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
         """ Run the verify of fix of checked validators.
         """
-        toCheckValidatorList = self.dpUIinst.checkInInstanceList
+        toCheckValidatorList = self.dpUIinst.checkAddOnsInstanceList
+        toCheckValidatorList.extend(self.dpUIinst.checkInInstanceList)
         toCheckValidatorList.extend(self.dpUIinst.checkOutInstanceList)
-        toCheckValidatorList.extend(self.dpUIinst.checkAddOnsInstanceList)
         if toCheckValidatorList:
             validationResultDataList = self.dpUIinst.runSelectedActions(toCheckValidatorList, firstMode, True, stopIfFoundBlock, publishLog)
             if validationResultDataList[1]: #found issue
