@@ -142,12 +142,15 @@ class Rivet(object):
     def disablePac(self, badIndexList, *args):
         for index in badIndexList:
             netNode = self.rivetNetNodeList[index]
-            parentConstraint = cmds.listConnections(f"{netNode}.pacNode", destination=False)[0]
-            rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
-            pacAttrList = cmds.listAttr(parentConstraint, settable=True, visible=True, string=f"{rivetFollicle}*")
-            if pacAttrList:
-                pacAttr = pacAttrList[0]
-                cmds.setAttr(f"{parentConstraint}.{pacAttr}", 0)
+            try:
+                parentConstraint = cmds.listConnections(f"{netNode}.pacNode", destination=False)[0]
+                rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
+                pacAttrList = cmds.listAttr(parentConstraint, settable=True, visible=True, string=f"{rivetFollicle}*")
+                if pacAttrList:
+                    pacAttr = pacAttrList[0]
+                    cmds.setAttr(f"{parentConstraint}.{pacAttr}", 0)
+            except:
+                pass
 
     def removeNonStuckRivetList(self, badRivetsList, badIndexList, *args):
         cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(badRivetsList), status=self.dpUIinst.lang["i297_removing"])
