@@ -233,14 +233,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         axisList = ["X", "Y", "Z"]
 
         # checking limbType to create correctly with offset
-        if limbType==None:
-            enumType = cmds.getAttr(self.moduleGrp+'.type')
-            if enumType == 0:
-                self.limbType = self.dpUIinst.lang['m028_arm']
-                self.limbTypeName = ARM
-            elif enumType == 1:
-                self.limbType = self.dpUIinst.lang['m030_leg']
-                self.limbTypeName = LEG
+        self.getLimbType()
         if self.limbTypeName==ARM:
             upVectorValues = (0.0, -1.0, 0.0)
         if self.limbTypeName==LEG:
@@ -308,40 +301,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.reOrientGuide()
         self.createAutoAim(limbType)
 
-
-    def reOrientGuideButton(self, *args):
-        """ New functions when the button reOrient is pressed. For Arm, the extrem will point to the corner. For legs, the extrem will point to the ground.
-        """
-        self.cvExtremLoc = self.guideName+"_Extrem"
-        self.reOrientGuide()
-        # re-orient extremLoc to align with cornerLoc. 
-        if self.limbTypeName==ARM:
-            toUnparentList = []
-            extremChildrenList = cmds.listRelatives(self.cvExtremLoc, children=True, type="transform")
-            if extremChildrenList:
-                extremChildrenGrpTemp = cmds.group(empty=True, name="extremChildren_Temp_Grp", parent=self.moduleGrp)
-                for extremChildren in extremChildrenList:
-                    if cmds.objExists(extremChildren+".pinGuide"):
-                        toUnparentList.append(extremChildren)
-                        cmds.parent(extremChildren, extremChildrenGrpTemp)
-                tempUpVectorWrist = cmds.group(empty=True, name="tempUpVectorWrist_Null")
-                cmds.parent(tempUpVectorWrist, self.moduleGrp)
-                cmds.matchTransform(tempUpVectorWrist, self.cvExtremLoc)
-                cmds.setAttr(tempUpVectorWrist+".translateX", 2)
-                tempToDelWristAim = cmds.aimConstraint(self.cvCornerLoc, self.cvExtremLoc, aimVector=(0.0, 0.0, -1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempUpVectorWrist, name=self.cvExtremLoc+"_Tmp_AiC")
-                cmds.delete(tempToDelWristAim, tempUpVectorWrist)
-            if toUnparentList:
-                cmds.parent(toUnparentList, self.cvExtremLoc)
-                cmds.delete(extremChildrenGrpTemp)
-        # setup to reorient the ankle guide to point to the ground when rotate mainGuide
-        if self.limbTypeName==LEG:
-            ankleToAimNull = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
-            cmds.matchTransform(ankleToAimNull, self.cvExtremLoc, position=True)
-            cmds.setAttr(ankleToAimNull+".translateY", -10)
-            tempToDelAnkleAim = cmds.aimConstraint(ankleToAimNull, self.cvExtremLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), name=self.cvExtremLoc+"_Tmp_AiC")
-            cmds.delete(tempToDelAnkleAim, ankleToAimNull)
-        cmds.select(self.moduleGrp)
-     
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
         dpLayoutClass.LayoutClass.reCreateEditSelectedModuleLayout(self, bSelect)
@@ -505,7 +464,60 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.cornerAIC = cmds.aimConstraint(self.cvExtremLoc, self.cornerGrp, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=self.cvUpVectorLoc, name=self.cornerGrp+"_AiC")[0]
             self.setLockCornerAttr(LEG)
             self.recreateAutoAim(LEG)
+    
+    
+    def getLimbType(self, *args):
+        """ This function will get the limbType
+        """
+        enumType = cmds.getAttr(self.moduleGrp+'.type')
+        if enumType == 0:
+            self.limbType = self.dpUIinst.lang['m028_arm']
+            self.limbTypeName = ARM
+        elif enumType == 1:
+            self.limbType = self.dpUIinst.lang['m030_leg']
+            self.limbTypeName = LEG
+        return self.limbTypeName
+
+
+    def getLimbStyle(self, *args):
+        """ This function will get the limbStyle
+        """
+        enumStyle = cmds.getAttr(self.moduleGrp+'.style')
+        if enumStyle == 0:
+            self.limbStyle = self.dpUIinst.lang['m042_default']
+        elif enumStyle == 1:
+            self.limbStyle = self.dpUIinst.lang['m026_biped']
+        elif enumStyle == 2:
+            self.limbStyle = self.dpUIinst.lang['m037_quadruped']
+        elif enumStyle == 3:
+            self.limbStyle = self.dpUIinst.lang['m043_quadSpring']
+        elif enumStyle == 4:
+            self.limbStyle = self.dpUIinst.lang['m155_quadrupedExtra']
+        return self.limbStyle
+
+
+    def setAimConstraintOffset(self, aimConstraint, *args):
+        """ Adjust aimOffset depends on corner position
+        """
+        self.cvCornerLoc = self.guideName+"_Corner"
         
+        if self.getLimbType()==ARM:
+            cvCornerTranslateY = cmds.getAttr(self.cvCornerLoc+".translateY")
+            if cvCornerTranslateY <= 0:
+                offsetValue = 1
+            else:
+                offsetValue = -1
+            offsetAxis = ".offsetX"
+        
+        if self.getLimbType()==LEG:
+            cvCornerTranslateX = cmds.getAttr(self.cvCornerLoc+".translateX")
+            if cvCornerTranslateX >= 0:
+                offsetValue = 1
+            else:
+                offsetValue = -1
+            offsetAxis = ".offsetY"
+        cmds.setAttr(aimConstraint+offsetAxis, offsetValue)
+
 
     def reOrientGuide(self, *args):
         """ This function reOrient guides orientations, creating temporary aimConstraints for them.
@@ -515,36 +527,85 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvMainLoc = self.guideName+"_Main"
         self.cvCornerLoc = self.guideName+"_Corner"
         self.cvExtremLoc = self.guideName+"_Extrem"
+        self.cvUpVectorLoc = self.guideName+"_CornerUpVector"
 
-        # get limb type
-        enumType = cmds.getAttr(self.moduleGrp+'.type')
-        if enumType == 0:
-            self.limbType = self.dpUIinst.lang['m028_arm']
-            self.limbTypeName = ARM
-        elif enumType == 1:
-            self.limbType = self.dpUIinst.lang['m030_leg']
-            self.limbTypeName = LEG
+        # Adjust offset when it's arm or leg. Using diferent axis for arm or leg.
+        if self.getLimbType()==ARM:
+            beforeTranslateAxis = ".translateY"
+        if self.getLimbType()==LEG:
+            beforeTranslateAxis = ".translateX"
+
+        # re-orient clavicle rotations:
+        tempToDelBeforeUpVector = cmds.group(empty=True, name=self.cvBeforeLoc+"_UpVector_Tmp")
+        cmds.matchTransform(tempToDelBeforeUpVector, self.cvBeforeLoc, position=True)
+        beforeUpVectorTranslate = cmds.getAttr(tempToDelBeforeUpVector+beforeTranslateAxis)
+        cmds.setAttr(tempToDelBeforeUpVector+beforeTranslateAxis, beforeUpVectorTranslate+10)
+        tempToDelBeforeAic = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelBeforeUpVector, name=self.cvBeforeLoc+"_Tmp_AiC")[0]
+        cmds.delete(tempToDelBeforeAic, tempToDelBeforeUpVector)
+        
+        # re-orient main shoulder guide
+        tempToDelMainUpVector = cmds.group(empty=True, parent=self.moduleGrp, relative=True, name=self.cvMainLoc+"_UpVector_Tmp")
+        cmds.setAttr(tempToDelMainUpVector+".translateX", 10)
+        tempToDelMainAic = cmds.aimConstraint(self.cvCornerLoc, self.cvMainLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelMainUpVector, name=self.cvMainLoc+"_Tmp_AiC")[0]
+        
+        self.setAimConstraintOffset(tempToDelMainAic)
+        cmds.delete(tempToDelMainAic, tempToDelMainUpVector)
+        
+
+    def reOrientGuideButton(self, *args):
+        """ New functions when the button reOrient is pressed. For Arm, the extrem will point to the corner. For legs, the extrem will point to the ground.
+        """
+        self.cvExtremLoc = self.guideName+"_Extrem"
+        self.cvCornerLoc = self.guideName+"_Corner"
+        self.mainAic = self.guideName+"_Main_Zero_0_Grp_AiC"
+        
+        self.reOrientGuide()
+        self.getLimbType()
+        # re-orient extremLoc to align with cornerLoc. 
         if self.limbTypeName==ARM:
-            offsetAxis = ".offsetX"
+            toUnparentList = []
+            extremChildrenList = cmds.listRelatives(self.cvExtremLoc, children=True, type="transform")
+            if extremChildrenList:
+                extremChildrenGrpTemp = cmds.group(empty=True, name="extremChildren_Temp_Grp", parent=self.moduleGrp)
+                for extremChildren in extremChildrenList:
+                    if cmds.objExists(extremChildren+".pinGuide"):
+                        toUnparentList.append(extremChildren)
+                        cmds.parent(extremChildren, extremChildrenGrpTemp)
+                tempUpVectorWrist = cmds.group(empty=True, name="tempUpVectorWrist_Null")
+                cmds.parent(tempUpVectorWrist, self.moduleGrp)
+                cmds.matchTransform(tempUpVectorWrist, self.cvExtremLoc)
+                cmds.setAttr(tempUpVectorWrist+".translateX", 2)
+                tempToDelWristAim = cmds.aimConstraint(self.cvCornerLoc, self.cvExtremLoc, aimVector=(0.0, 0.0, -1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempUpVectorWrist, name=self.cvExtremLoc+"_Tmp_AiC")
+                cmds.delete(tempToDelWristAim, tempUpVectorWrist)
+            if toUnparentList:
+                cmds.parent(toUnparentList, self.cvExtremLoc)
+            cmds.delete(extremChildrenGrpTemp)
+
+            # adjust offset depends on corner position
+            self.setAimConstraintOffset(self.mainAic)
+            # cornerTranslateY = cmds.getAttr(self.cvCornerLoc+".translateY")
+            # if cornerTranslateY <= 0:
+            #     cmds.setAttr(self.mainAic+".offsetX", 1)
+            # else:
+            #     cmds.setAttr(self.mainAic+".offsetX", -1)
+                
+        # setup to reorient the ankle guide to point to the ground when rotate mainGuide
         if self.limbTypeName==LEG:
-            offsetAxis = ".offsetY"
-
-        # re-orient rotations:
-        tempToDelUpVector = cmds.group(empty=True, name=self.cvMainLoc+"_UpVector_Tmp")
-        cmds.parent(tempToDelUpVector, self.cvBeforeLoc)
-        cmds.matchTransform(tempToDelUpVector, self.cvBeforeLoc)
-        cmds.setAttr(tempToDelUpVector+".translateX", 2)
-        cmds.parent(tempToDelUpVector, self.moduleGrp)
-        tempToDelBefore = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelUpVector, name=self.cvBeforeLoc+"_Tmp_AiC")
-        cmds.parent(tempToDelUpVector, self.cvMainLoc)
-        cmds.matchTransform(tempToDelUpVector, self.cvMainLoc)
-        cmds.setAttr(tempToDelUpVector+".translateX", 2)
-        cmds.parent(tempToDelUpVector, self.moduleGrp)
-        tempToDelMain = cmds.aimConstraint(self.cvCornerLoc, self.cvMainLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelUpVector, name=self.cvMainLoc+"_Tmp_AiC")
-        offsetValue = cmds.getAttr(tempToDelMain[0]+offsetAxis)
-        cmds.setAttr(tempToDelMain[0]+offsetAxis, offsetValue+1)
-        cmds.delete(tempToDelBefore, tempToDelMain, tempToDelUpVector)
-
+            ankleToAimNull = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
+            cmds.matchTransform(ankleToAimNull, self.cvExtremLoc, position=True)
+            cmds.setAttr(ankleToAimNull+".translateY", -10)
+            tempToDelAnkleAim = cmds.aimConstraint(ankleToAimNull, self.cvExtremLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), name=self.cvExtremLoc+"_Tmp_AiC")
+            cmds.delete(tempToDelAnkleAim, ankleToAimNull)
+            # leg offset adjust
+            self.setAimConstraintOffset(self.mainAic)
+            # cornerTranslateX = cmds.getAttr(self.cvCornerLoc+".translateX")
+            # if cornerTranslateX >= 0:
+            #     cmds.setAttr(self.mainAic+".offsetY", 1)
+            # else:
+            #     cmds.setAttr(self.mainAic+".offsetY", -1)
+            cmds.setAttr(self.cvMainLoc+".rotateY", 0)
+        cmds.select(self.moduleGrp)
+     
 
     def setLockCornerAttr(self, limbType, *args):
         """ Set corner guide lock attributes to specific limb type (arm or leg).
@@ -665,26 +726,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             for s, side in enumerate(sideList):
                 attrNameLower = dpUtils.getAttrNameLower(side, self.userGuideName)
                 toCornerBendList = []
+                
                 # getting type of limb:
-                enumType = cmds.getAttr(self.moduleGrp+'.type')
-                if enumType == 0:
-                    self.limbType = self.dpUIinst.lang['m028_arm']
-                    self.limbTypeName = ARM
-                elif enumType == 1:
-                    self.limbType = self.dpUIinst.lang['m030_leg']
-                    self.limbTypeName = LEG
+                self.getLimbType()
+
                 # getting style of the limb:
-                enumStyle = cmds.getAttr(self.moduleGrp+'.style')
-                if enumStyle == 0:
-                    self.limbStyle = self.dpUIinst.lang['m042_default']
-                elif enumStyle == 1:
-                    self.limbStyle = self.dpUIinst.lang['m026_biped']
-                elif enumStyle == 2:
-                    self.limbStyle = self.dpUIinst.lang['m037_quadruped']
-                elif enumStyle == 3:
-                    self.limbStyle = self.dpUIinst.lang['m043_quadSpring']
-                elif enumStyle == 4:
-                    self.limbStyle = self.dpUIinst.lang['m155_quadrupedExtra']
+                self.getLimbStyle()
 
                 # re-declaring guide names:
                 self.cvBeforeLoc = side+self.userGuideName+"_Guide_Before"

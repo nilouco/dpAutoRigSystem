@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.0
+DP_QUADRUPED_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -183,7 +183,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateX", 20)
             cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateY", 10)
             cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateZ", -105)
-            cmds.setAttr(backLegLimbInstance.cvMainLoc+".rotateY", 25)
+            #cmds.setAttr(backLegLimbInstance.cvMainLoc+".rotateY", 0)
             cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateX", 0.7)
             cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateZ", -0.7)
             
@@ -249,7 +249,8 @@ def Quadruped(dpUIinst):
             cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateX", -15)
             cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateY", 15)
             cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateZ", -90)
-            cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", -27)
+            cmds.setAttr(frontLegLimbInstance.mainAic+".offsetY", -1)
+            #cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", 0)
             cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateX", -2.0)
             cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateZ", -0.6)
             
