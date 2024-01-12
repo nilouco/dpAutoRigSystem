@@ -333,7 +333,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             if toUnparentList:
                 cmds.parent(toUnparentList, self.cvExtremLoc)
                 cmds.delete(extremChildrenGrpTemp)
-            cmds.select(self.moduleGrp)
         # setup to reorient the ankle guide to point to the ground when rotate mainGuide
         if self.limbTypeName==LEG:
             ankleToAimNull = cmds.group(empty=True, world=True, name="Temp_Ankle_ToAim_Null")
@@ -341,7 +340,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(ankleToAimNull+".translateY", -10)
             tempToDelAnkleAim = cmds.aimConstraint(ankleToAimNull, self.cvExtremLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), name=self.cvExtremLoc+"_Tmp_AiC")
             cmds.delete(tempToDelAnkleAim, ankleToAimNull)
-            cmds.select(self.moduleGrp)
+        cmds.select(self.moduleGrp)
      
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
@@ -532,16 +531,19 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
         # re-orient rotations:
         tempToDelUpVector = cmds.group(empty=True, name=self.cvMainLoc+"_UpVector_Tmp")
+        cmds.parent(tempToDelUpVector, self.cvBeforeLoc)
+        cmds.matchTransform(tempToDelUpVector, self.cvBeforeLoc)
+        cmds.setAttr(tempToDelUpVector+".translateX", 2)
         cmds.parent(tempToDelUpVector, self.moduleGrp)
+        tempToDelBefore = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelUpVector, name=self.cvBeforeLoc+"_Tmp_AiC")
+        cmds.parent(tempToDelUpVector, self.cvMainLoc)
         cmds.matchTransform(tempToDelUpVector, self.cvMainLoc)
         cmds.setAttr(tempToDelUpVector+".translateX", 2)
-        tempToDelBefore = cmds.aimConstraint(self.cvMainLoc, self.cvBeforeLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelUpVector, name=self.cvBeforeLoc+"_Tmp_AiC")
+        cmds.parent(tempToDelUpVector, self.moduleGrp)
         tempToDelMain = cmds.aimConstraint(self.cvCornerLoc, self.cvMainLoc, aimVector=(0.0, 0.0, 1.0), upVector=(1.0, 0.0, 0.0), worldUpType="object", worldUpObject=tempToDelUpVector, name=self.cvMainLoc+"_Tmp_AiC")
         offsetValue = cmds.getAttr(tempToDelMain[0]+offsetAxis)
         cmds.setAttr(tempToDelMain[0]+offsetAxis, offsetValue+1)
         cmds.delete(tempToDelBefore, tempToDelMain, tempToDelUpVector)
-
-
 
 
     def setLockCornerAttr(self, limbType, *args):
