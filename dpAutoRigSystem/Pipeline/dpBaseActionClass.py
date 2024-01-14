@@ -188,33 +188,19 @@ class ActionStartClass(object):
         self.messageList.append(self.dpUIinst.lang['r006_wellDone']+": "+item)
 
 
-    def getRenderMeshList(self, justShape=False, *args):
-        """ Get all transform nodes from Render_Grp or convention geometry group name.
-            If it finds nothing, it will return an empty list.
-        """
-        meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
-        if renderGrp:
-            allShapesList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, type="mesh") or []
-            for meshGrp in meshGrpList:
-                if cmds.objExists(meshGrp):
-                    meshGrpShapesList = cmds.listRelatives(meshGrp, allDescendents=True, fullPath=True, type="mesh") or []
-                    if meshGrpShapesList:
-                        allShapesList = list(set(allShapesList + meshGrpShapesList))
-            allGeoList = []
-            if allShapesList:
-                if justShape:
-                    return allShapesList
-                for shape in allShapesList:
-                    if not "Orig" in shape:
-                        transformList = cmds.listRelatives(shape, fullPath=True, parent=True)
-                        if transformList:
-                            # Get the transform only
-                            allGeoList.append(transformList[0])
-            return allGeoList
-
-
     def getIOPath(self, ioDir, *args):
         """ Returns the IO path for the current scene.
         """
         return self.pipeliner.getCurrentPath()+"/"+self.pipeliner.pipeData[ioDir]
+
+
+    def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, *args):
+        """ Run action from a list without verbose.
+        """
+        if actionInstanceList:
+            for actionToRun in actionToRunList:
+                for aInst in actionInstanceList:
+                    if actionToRun in str(aInst):
+                        aInst.verbose = False
+                        aInst.runAction(firstMode)
+                        aInst.verbose = True

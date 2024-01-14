@@ -51,36 +51,26 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.firstMode: #export
                     meshList = None
-                    ioList = []
                     if objList:
-                        meshList = cmds.listRelatives(objList, children=True, allDescendents=True, type="mesh")
+                        meshList = objList
                     else:
-                        meshList = self.getRenderMeshList(True)
+                        meshList = self.getToExportList()
                     if meshList:
-                        for meshName in meshList:
-                            if not "Orig" in meshName:
-                                # get transform node
-                                parentNode = cmds.listRelatives(meshName, parent=True)[0]
-                                if not parentNode in ioList:
-                                    ioList.append(parentNode)
-                        if ioList:
-                            progressAmount = 0
-                            maxProcess = len(ioList)
-                            if self.verbose:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                            try:
-                                # export alembic
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                ioItems = ' -root '.join(ioList)
-                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
-                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                                self.wellDoneIO(', '.join(ioList))
-                            except:
-                                self.notWorkedWellIO(', '.join(ioList))
-                        else:
-                            self.notWorkedWellIO("Render_Grp")
+                        progressAmount = 0
+                        maxProcess = len(meshList)
+                        if self.verbose:
+                            # Update progress window
+                            progressAmount += 1
+                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                        try:
+                            # export alembic
+                            self.pipeliner.makeDirIfNotExists(self.ioPath)
+                            ioItems = ' -root '.join(meshList)
+                            abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
+                            cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
+                            self.wellDoneIO(', '.join(meshList))
+                        except:
+                            self.notWorkedWellIO(', '.join(meshList))
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import
@@ -99,7 +89,8 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                             #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
                             mel.eval("AbcImport -mode import \""+abcToImport+"\";")
                             # clean up geometries
-                            self.runCheckInValidators()
+                            validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
+                            self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
                             self.wellDoneIO(exportedList[-1])
                         except:
                             self.notWorkedWellIO(exportedList[-1])
@@ -117,19 +108,21 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def runCheckInValidators(self, *args):
-        """ Run checkin validators after importing the model.
+    def getToExportList(self, *args):
+        """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
         """
-        validatorToRunList = [
-            "dpUnlockNormals",
-            "dpSoftenEdges",
-            "dpFreezeTransform",
-            "dpGeometryHistory"
-        ]
-        if self.dpUIinst.checkInInstanceList:
-            for validatorToRun in validatorToRunList:
-                for vInst in self.dpUIinst.checkInInstanceList:
-                    if validatorToRun in str(vInst):
-                        vInst.verbose = False
-                        vInst.runAction(False) #fix
-                        vInst.verbose = True
+        meshList = []
+        renderGrp = self.utils.getNodeByMessage("renderGrp")
+        if renderGrp:
+            meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+            if meshList:
+                return cmds.listRelatives(renderGrp, children=True, type="transform")
+        if not meshList:
+            unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            if unparentedMeshList:
+                for item in unparentedMeshList:
+                    fatherNode = item[:item[1:].find("|")+1]
+                    if fatherNode:
+                        if not fatherNode in meshList:
+                            meshList.append(fatherNode)
+                return meshList

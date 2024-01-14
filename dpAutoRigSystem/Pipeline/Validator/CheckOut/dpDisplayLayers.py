@@ -153,6 +153,33 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
                 cmds.select(clear=True)
 
 
+    def getGeometryTranform(self, *args):
+        """ Get all transform nodes from Render_Grp or convention geometry group name.
+            If it finds nothing, it will return an empty list.
+        """
+        existsGrpList = []
+        meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
+        renderGrp = self.utils.getNodeByMessage("renderGrp")
+        if renderGrp:
+            existsGrpList.append(renderGrp)
+        for grp in meshGrpList:
+            if cmds.objExists(grp):
+                existsGrpList.append(grp)
+        if existsGrpList:
+            for meshGrp in existsGrpList:
+                meshGrpShapesList = cmds.listRelatives(meshGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+                if meshGrpShapesList:
+                    allShapesList = list(set(allShapesList + meshGrpShapesList))
+            allGeoList = []
+            if allShapesList:
+                for shape in allShapesList:
+                    transformList = cmds.listRelatives(shape, fullPath=True, parent=True)
+                    if transformList:
+                        # Get the transform only
+                        allGeoList.append(transformList[0])
+            return allGeoList
+    
+
     def verifyFixMode(self, itemList, *args):
         """ This function will check if the item is a list or not.
             If it's a list it will append the items in the dic and run the main function once.
