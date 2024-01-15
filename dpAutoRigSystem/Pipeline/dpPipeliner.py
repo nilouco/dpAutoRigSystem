@@ -121,7 +121,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2024-01-09",
+        "updated" : "2024-01-14",
         
         "f_drive"      : "",
         "f_studio"     : "",
@@ -133,6 +133,7 @@ class Pipeliner(object):
         "s_addOns"     : "dpAddOns",
         "s_hist"       : "dpData/dpHist",
         "s_modelIO"    : "dpData/dpModel",
+        "s_shaderIO"   : "dpData/dpShader",
         "s_old"        : "dpOld",
         "s_dropbox"    : "Job",
         "s_webhook"    : "",
@@ -175,7 +176,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2024-01-09",
+        "updated" : "2024-01-14",
         
         "f_drive"      : "i228_fDriveAnn",
         "f_studio"     : "i229_fStudioAnn",
@@ -187,6 +188,7 @@ class Pipeliner(object):
         "s_addOns"     : "i235_sAddOnsAnn",
         "s_hist"       : "i236_sHistAnn",
         "s_modelIO"    : "i293_sModelIOAnn",
+        "s_shaderIO"   : "i293_sShaderIOAnn",
         "s_old"        : "i237_sOldAnn",
         "s_dropbox"    : "i238_sDropboxAnn",
         "s_prefix"     : "i239_sPrefixAnn",
@@ -561,10 +563,19 @@ class Pipeliner(object):
         """
         currentPath = cmds.file(query=True, sceneName=True)
         return currentPath[:currentPath.rfind("/")]
-    
+
+
     def getCurrentFileName(self, *args):
         """ Returns the current file name without the extension.
         """
         shortSceneName = cmds.file(query=True, sceneName=True, shortName=True)
         if shortSceneName:
             return shortSceneName[:shortSceneName.rfind(".")]
+
+
+    def saveJsonFile(self, dataDic, fileNamePath, indentation=4, sortKeys=True, *args):
+        """ Save the json file with the given data dic in the given file name path.
+        """
+        # write json file in the HD:
+        with open(fileNamePath, 'w') as jsonFile:
+            json.dump(dataDic, jsonFile, indent=indentation, sort_keys=sortKeys)

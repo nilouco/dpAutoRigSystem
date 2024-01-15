@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+import os
 import time
 import getpass
 
@@ -192,6 +193,19 @@ class ActionStartClass(object):
         """ Returns the IO path for the current scene.
         """
         return self.pipeliner.getCurrentPath()+"/"+self.pipeliner.pipeData[ioDir]
+
+
+    def getExportedList(self, objList=None, *args):
+        """ Returns the exported file list in the current asset folder io or the given objList.
+        """
+        exportedList = None
+        if objList:
+            exportedList = objList
+            if not type(objList) == list:
+                exportedList = [objList]
+        else:
+            exportedList = next(os.walk(self.ioPath))[2]
+        return exportedList
 
 
     def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, *args):

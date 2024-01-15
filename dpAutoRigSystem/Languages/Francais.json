@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-01-10",
+    "_updated"       : "2024-01-14",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -705,6 +705,10 @@
     "r005_notWorkedWell"   : "N'est pas fonctionné correctement, désolé",
     "r006_wellDone"        : "Bien fait",
     "r007_notExportedData" : "Données pas exportées.",
+    "r008_shaderIO"        : "Shader IO",
+    "r009_shaderIODesc"    : "Cet action va travailler le shading de geometries.\nÇa va exporter ou importer des fichiers json pour\nrecreer des shaders de couleur simples et\nles connecter au meshes.",
+    "r010_notFoundPath"    : "N'est pas trouvé les dossier pour exporter ou importer des donnés dans la pipeline courante, désolé.",
+    "r011_notFoundMesh"    : "N'est pas trouvé des meshes pour appliquer les shaders importés, désolé.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

@@ -2,7 +2,6 @@
 from maya import cmds
 from maya import mel
 from .. import dpBaseActionClass
-import os
 
 # global variables to this module:
 CLASS_NAME = "ModelIO"
@@ -49,53 +48,50 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
             # load alembic plugin
             if self.utils.checkLoadedPlugin("AbcExport"):
                 self.ioPath = self.getIOPath(self.ioDir)
-                if self.firstMode: #export
-                    meshList = None
-                    if objList:
-                        meshList = objList
-                    else:
-                        meshList = self.getToExportList()
-                    if meshList:
-                        progressAmount = 0
-                        maxProcess = len(meshList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                        try:
-                            # export alembic
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            ioItems = ' -root '.join(meshList)
-                            abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
-                            cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                            self.wellDoneIO(', '.join(meshList))
-                        except:
-                            self.notWorkedWellIO(', '.join(meshList))
-                    else:
-                        self.notWorkedWellIO("Render_Grp")
-                else: #import
-                    exportedList = None
-                    if objList:
-                        exportedList = objList
-                        if not type(objList) == list:
-                            exportedList = [objList]
-                    else:
-                        exportedList = next(os.walk(self.ioPath))[2]
-                    if exportedList:
-                        try:
-                            # import alembic
-                            exportedList.sort()
-                            abcToImport = self.ioPath+"/"+exportedList[-1]
-                            #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
-                            mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                            # clean up geometries
-                            validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                            self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
-                            self.wellDoneIO(exportedList[-1])
-                        except:
-                            self.notWorkedWellIO(exportedList[-1])
-                    else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                if self.ioPath:
+                    if self.firstMode: #export
+                        meshList = None
+                        if objList:
+                            meshList = objList
+                        else:
+                            meshList = self.getModelToExportList()
+                        if meshList:
+                            progressAmount = 0
+                            maxProcess = len(meshList)
+                            if self.verbose:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            try:
+                                # export alembic
+                                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                                ioItems = ' -root '.join(meshList)
+                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
+                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
+                                self.wellDoneIO(', '.join(meshList))
+                            except:
+                                self.notWorkedWellIO(', '.join(meshList))
+                        else:
+                            self.notWorkedWellIO("Render_Grp")
+                    else: #import
+                        exportedList = self.getExportedList()
+                        if exportedList:
+                            try:
+                                # import alembic
+                                exportedList.sort()
+                                abcToImport = self.ioPath+"/"+exportedList[-1]
+                                #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
+                                mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                                # clean up geometries
+                                validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
+                                self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
+                                self.wellDoneIO(exportedList[-1])
+                            except:
+                                self.notWorkedWellIO(exportedList[-1])
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
         # --- rebuilder code --- end
@@ -108,7 +104,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def getToExportList(self, *args):
+    def getModelToExportList(self, *args):
         """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
         """
         meshList = []
