@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
 from .. import dpBaseActionClass
 
 # global variables to this module:
@@ -69,8 +68,10 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                             assignedList = cmds.ls(selection=True)
                             if assignedList:
                                 colorAttr = "color"
-                                if not cmds.objExists(shader+"."+colorAttr):
+                                transparencyAttr = "transparency"
+                                if not cmds.objExists(shader+"."+colorAttr): #support standardShader
                                     colorAttr = "baseColor"
+                                    transparencyAttr = "opacity"
                                 if cmds.objExists(shader+"."+colorAttr):
                                     shaderConnectionList = cmds.listConnections(shader+"."+colorAttr, destination=False, source=True)
                                     if shaderConnectionList:
@@ -78,13 +79,16 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                         texture = cmds.getAttr(fileNode+".fileTextureName")
                                     else:
                                         color = cmds.getAttr(shader+"."+colorAttr)[0]
+                                transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
                                 # data dictionary to export
-                                shaderDic[shader] = {"assigned"  : assignedList,
-                                                     "color"     : color,
-                                                     "colorAttr" : colorAttr,
-                                                     "fileNode"  : fileNode,
-                                                     "material"  : cmds.objectType(shader),
-                                                     "texture"   : texture
+                                shaderDic[shader] = {"assigned"         : assignedList,
+                                                     "color"            : color,
+                                                     "colorAttr"        : colorAttr,
+                                                     "fileNode"         : fileNode,
+                                                     "material"         : cmds.objectType(shader),
+                                                     "texture"          : texture,
+                                                     "transparency"     : transparency,
+                                                     "transparencyAttr" : transparencyAttr
                                                      }
                             cmds.select(clear=True)
                         try:
@@ -118,6 +122,8 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                         else:
                                             colorList = shaderDic[item]['color']
                                             cmds.setAttr(shader+"."+shaderDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
+                                        transparencyList = shaderDic[item]['transparency']
+                                        cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
                                     # apply shader to meshes
                                     for mesh in shaderDic[item]['assigned']:
                                         if cmds.objExists(mesh):
