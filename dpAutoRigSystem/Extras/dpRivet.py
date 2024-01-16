@@ -139,8 +139,8 @@ class Rivet(object):
         cmds.showWindow(dpRivetWin)
 
 
-    def disablePac(self, badIndexList, *args):
-        for index in badIndexList:
+    def disablePac(self, rivetIndexList, *args):
+        for index in rivetIndexList:
             netNode = self.rivetNetNodeList[index]
             try:
                 parentConstraint = cmds.listConnections(f"{netNode}.pacNode", destination=False)[0]
@@ -152,11 +152,13 @@ class Rivet(object):
             except:
                 pass
 
-    def removeNonStuckRivetList(self, badRivetsList, badIndexList, *args):
-        cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(badRivetsList), status=self.dpUIinst.lang["i297_removing"])
-        self.removeRivetFromList(badIndexList, badRivetsList)
+
+    def removeNonStuckRivetList(self, rivetsList, rivetIndexList, *args):
+        cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(rivetsList), status=self.dpUIinst.lang["i297_removing"])
+        self.removeRivetFromList(rivetIndexList, rivetsList)
         cmds.progressWindow(endProgress=True)
         self.dpCloseStuckUi()
+
 
     def findBadFromSelection(self, selectionList, trueIndexList, *args):
         badRivetsList = []
@@ -207,7 +209,8 @@ class Rivet(object):
 
     def selectAll(self, *args):
         itemsList = cmds.textScrollList(self.rivetControllersList, query=True, allItems=True)
-        cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=itemsList)
+        if itemsList:
+            cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=itemsList)
 
 
     def rivetItemSelect(self, *args):
@@ -239,8 +242,8 @@ class Rivet(object):
     def removeRivetFromUI(self, *args):
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
-        trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-        if trueIndexList:
+        if selectionList and selectionIndexList:
+            trueIndexList = list(map(lambda n : n-1, selectionIndexList))
             cmds.progressWindow(title=self.dpUIinst.lang['i296_removingRivet'], progress=0, maxValue=len(trueIndexList), status=self.dpUIinst.lang['i297_removing'])
             self.removeRivetFromList(trueIndexList, selectionList)
             cmds.progressWindow(endProgress=True)
@@ -298,6 +301,7 @@ class Rivet(object):
         else:
             return None
 
+
     def filterRivetName(self, name, itemList, separator):
         """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
             Returns the filtered list.
@@ -319,6 +323,7 @@ class Rivet(object):
                 newNodesList.append(self.rivetNetNodeList[index])
             self.rivetNetNodeList = newNodesList
         return filteredList
+
 
     def refreshRivetList(self, *args):
         cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
