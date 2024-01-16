@@ -65,6 +65,8 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
+        # include into net
+        self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
 
 
     def changeJointNumber(self, enteredNJoints, *args):

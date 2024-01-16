@@ -107,6 +107,8 @@ class StartClass(object):
         cmds.parent(self.annotation, self.moduleGrp)
         cmds.setAttr(self.annotation+'.text', self.moduleGrp[self.moduleGrp.find("__")+2:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
+        # prepare guide to serialization
+        self.createGuideNetwork()
     
     
     def updateModuleInstanceInfo(self, *args):
@@ -462,8 +464,31 @@ class StartClass(object):
         """ This method just create this dictionary in order to build information of module integration.
         """
         self.integratedActionsDic = {}
-        
-        
+    
+
+    def createGuideNetwork(self, *args):
+        """ Create a network for the current guide and store on it the nodes used in this module by message.
+            Returns the network node useful to guide rebuilding.
+        """
+        self.guideNet = cmds.createNode("network", name=self.userGuideName+"_Net")
+        cmds.addAttr(self.guideNet, longName="dpNetwork", attributeType="bool")
+        cmds.addAttr(self.guideNet, longName="dpGuideNet", attributeType="bool")
+        cmds.setAttr(self.guideNet+".dpNetwork", 1)
+        cmds.setAttr(self.guideNet+".dpGuideNet", 1)
+        cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
+        cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net")
+        self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
+        return self.guideNet
+
+    
+    def addNodeToGuideNet(self, nodeList, messageAttrList, *args):
+        """ Include the given node list to the respective given attribute list as message connection in the network.
+        """
+        for node, messageAttr in zip(nodeList, messageAttrList):
+            cmds.addAttr(self.guideNet, longName=messageAttr, attributeType="message")
+            cmds.connectAttr(node+".message", self.guideNet+"."+messageAttr)
+
+
     # Getters:
     #
     def getArticulation(self, *args):
