@@ -12,6 +12,7 @@
 #        robthebloke.org, for sharing the knowlege.
 #
 #   Also thanks to Caio Hidaka for the FaceToRivet implementation.
+#   and André Rüegger for the rivet removal.
 #
 ###
 
@@ -130,7 +131,7 @@ class Rivet(object):
 
 
     def disablePac(self, rivetIndexList, *args):
-        """Receive a index list to disable parent constraint before remove rivet.
+        """ Receive a index list to disable parent constraint before remove rivet.
         """
         for index in rivetIndexList:
             netNode = self.rivetNetNodeList[index]
@@ -146,7 +147,7 @@ class Rivet(object):
 
 
     def selectAll(self, *args):
-        """Select all items from rivet controllers list.
+        """ Select all items from rivet controllers list.
         """
         itemsList = cmds.textScrollList(self.rivetControllersList, query=True, allItems=True)
         if itemsList:
@@ -154,14 +155,14 @@ class Rivet(object):
 
 
     def rivetItemSelect(self, *args):
-        """Select items on viewport that has been selected on controllers list.
+        """ Select items on viewport that has been selected on controllers list.
         """
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         cmds.select(selectionList)
 
 
     def riseRivetNetNodes(self):
-        """Find all network nodes that have dpRivetNet attribute, and return them as a list.
+        """ Find all network nodes that have dpRivetNet attribute, and return them as a list.
         """
         netNodeList = cmds.ls(type="network")
         rivetNetworkNodesList = None
@@ -171,7 +172,7 @@ class Rivet(object):
     
 
     def removeRivetFromList(self, indexList, itemList):
-        """Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
+        """ Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
         """
         self.disablePac(indexList)
         for i, index in enumerate(indexList):
@@ -186,15 +187,15 @@ class Rivet(object):
     
 
     def checkRivetGrp(self, *args):
-        """Verify if rivet group is empty to remove it.
+        """ Verify if rivet group is empty to remove it.
         """
-        if cmds.objExists("Rivet_Grp"):
-            if not cmds.listRelatives("Rivet_Grp", children=True):
-                cmds.delete("Rivet_Grp")
+        if cmds.objExists(RIVET_GRP):
+            if not cmds.listRelatives(RIVET_GRP, children=True):
+                cmds.delete(RIVET_GRP)
     
 
     def removeRivetFromUI(self, *args):
-        """Remove rivets selected on the controllers list in the ui.
+        """ Remove rivets selected on the controllers list in the ui.
         """
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
@@ -210,7 +211,7 @@ class Rivet(object):
 
     
     def removeRivetFromNetNode(self, rivetNetNode):
-        """Remove the rivet from your network node.
+        """ Remove the rivet from its network node.
         """
         rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
         if rivetTransform:
@@ -254,10 +255,11 @@ class Rivet(object):
             if len(skinClusterList) == 0 and len(blendShapeList) == 0:
                 cmds.delete(attachedGeometry)
         cmds.delete(rivetNetNode)
+        mel.eval('print \"dpAR: '+self.dpUIinst.lang['m236_removedRivet']+" "+rivetControl+'\\n\";')
     
 
     def itemsWithRivetList(self):
-        """From all rivet network nodes, rise a controllers list to fill ui.
+        """ From all rivet network nodes, rise a controllers list to fill ui.
         """
         rivetNetNodes = self.riseRivetNetNodes()
         if rivetNetNodes:
@@ -298,7 +300,7 @@ class Rivet(object):
 
 
     def refreshRivetList(self, *args):
-        """Refresh the rivets list in the ui.
+        """ Refresh the rivets list in the ui.
         """
         cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
         rivetItemsList = self.itemsWithRivetList()
@@ -312,7 +314,7 @@ class Rivet(object):
     
 
     def rivetTabChange(self, rivetTabsLayout):
-        """Intermediate method to control rivet ui tab change.
+        """ Intermediate method to control rivet ui tab change.
         """
         if cmds.tabLayout(rivetTabsLayout, query=True, selectTabIndex=True) == 2:
             self.refreshRivetList()
@@ -334,14 +336,14 @@ class Rivet(object):
 
 
     def setProgressBar(self, progressAmount, status):
-        """Updates progress window amount and status.
+        """ Updates progress window amount and status.
         """
         if self.ui:
             cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
 
 
     def riseRemoveAndIndexList(self, needToRemoveSet, hasRivetList):
-        """From a set of items to be removed rise all rivets and matching indexes needed to removal.
+        """ From a set of items to be removed rise all rivets and matching indexes needed to removal.
         """
         needToRemoveList = []
         trueIndexList = []
@@ -548,7 +550,7 @@ class Rivet(object):
         return invTGrp, invRGrp
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName='Rivet_Grp', askComponent=False, useOffset=True, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, *args):
         """ Create the Rivet setup.
             Returns follicle node.
         """
@@ -714,7 +716,7 @@ class Rivet(object):
                 self.setProgressBar(r+1, "Creating")
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
-                    rivet = cmds.group(rivet, name=rivet+"_Rivet_Grp")
+                    rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)
                     cmds.xform(rivet, worldSpace=True, rotatePivot=(rivetPos[0], rivetPos[1], rivetPos[2]))
                 
                 # move temp tranform to rivet location:

@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2023-12-29",
+    "_updated"       : "2024-01-17",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -453,7 +453,7 @@
     "i291_selectAllControls" : "Select All Controls",
     "i292_selectAll"         : "Select All",
     "i293_removing"          : "Removing",
-    "i294_rivetNotFine"      : "At least one of the selected items already has a rivet, would you like to remove then before create the new one(high recommended).",
+    "i294_rivetNotFine"      : "At least one of the selected items already has a rivet, would you like to remove then before create the new one (high recommended).",
     "i295_creatingRivet"     : "Creating Rivet",
     "i296_working"           : "Working",
 
@@ -692,6 +692,7 @@
     "m233_wrapDeformer"         : "Wrap Deformer",
     "m234_unableRemRivet"       : "Unable to remove rivet: ",
     "m235_noItemSelect"         : "No items selected, please select an item to remove.",
+    "m236_removedRivet"         : "Removed rivet with success!",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
