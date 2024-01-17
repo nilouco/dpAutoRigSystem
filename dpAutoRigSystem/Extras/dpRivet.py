@@ -179,9 +179,9 @@ class Rivet(object):
             netNode = self.rivetNetNodeList[index]
             if netNode:
                 self.removeRivetFromNetNode(netNode)
-                cmds.textScrollList(self.rivetControllersList, edit=True, removeItem=itemList[i])
             else:
                 mel.eval('print \"dpAR: '+self.dpUIinst.lang['m234_unableRemRivet']+itemList[i]+'\\n\";')
+        self.refreshRivetList()
         cmds.select(clear=True)
     
 
