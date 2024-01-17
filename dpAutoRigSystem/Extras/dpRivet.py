@@ -221,8 +221,9 @@ class Rivet(object):
         try:
             originalParent = cmds.listRelatives(rivetTransform, parent=True)
             currentParent = cmds.listRelatives(rivetControl, parent=True)
-            if originalParent == None and currentParent != originalParent:
-                cmds.parent(rivetControl, world=True)
+            if originalParent == None:
+                if currentParent != originalParent:
+                    cmds.parent(rivetControl, world=True)
             else:
                 originalParent = originalParent[0]
                 if not originalParent in currentParent:
