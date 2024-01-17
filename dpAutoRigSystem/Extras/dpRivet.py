@@ -56,22 +56,13 @@ class Rivet(object):
             self.dpRivetUI()
             # try to fill UI items from selection
             self.dpFillUI()
-            
-            
-    def dpCloseRivetUi(self, *args):
-        if cmds.window('dpRivetWindow', query=True, exists=True):
-            cmds.deleteUI('dpRivetWindow', window=True)
 
-    def dpCloseStuckUi(self, *args):
-        if cmds.window('dpStuckWindow', query=True, exists=True):
-            cmds.deleteUI('dpStuckWindow', window=True)
-    
-    
+
     def dpRivetUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
         # creating dpRivetUI Window:
-        self.dpCloseRivetUi()
+        dpUtils.closeUI('dpRivetWindow')
         rivet_winWidth  = 305
         rivet_winHeight = 470
         dpRivetWin = cmds.window('dpRivetWindow', title=self.dpUIinst.lang["m083_rivet"]+" "+str(DP_RIVET_VERSION), widthHeight=(rivet_winWidth, rivet_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
@@ -121,6 +112,7 @@ class Rivet(object):
         cmds.separator(style='none', height=15, parent=rivetLayout)
         createLayout = cmds.columnLayout('createLayout', columnOffset=("left", 10), parent=rivetLayout)
         cmds.button(label=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], annotation=self.dpUIinst.lang["i158_create"]+" "+self.dpUIinst.lang["m083_rivet"], width=290, backgroundColor=(0.20, 0.7, 1.0), command=self.dpCreateRivetFromUI, parent=createLayout)
+        # remove tab layout
         removeLayout = cmds.columnLayout("removeLayout", columnOffset=("left", 10), parent=rivetTabsLayout)
         cmds.separator(style='none', height=10, parent=removeLayout)
         removeButtonsRL = cmds.rowLayout(numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent=removeLayout)
@@ -129,17 +121,17 @@ class Rivet(object):
         cmds.separator(style='none', height=5, parent=removeLayout)
         self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
         cmds.separator(style='none', height=5, parent=removeLayout)
-        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=370, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
+        self.rivetControllersList = cmds.textScrollList("controllerRivetsTextList", width=310, height=410, allowMultiSelection=True, selectCommand=self.rivetItemSelect, parent=removeLayout)
         cmds.separator(style='none', height=5, parent=removeLayout)
-        cmds.button(label=self.dpUIinst.lang["i293_removeRivet"], width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
-        cmds.separator(style='none', height=5, parent=removeLayout)
-        cmds.button(label=self.dpUIinst.lang["i303_rivetStick"], width=310, command=self.checkStuck, backgroundColor=(1, 1, .72), parent=removeLayout)
+        cmds.button(label=f"{self.dpUIinst.lang['i046_remove']} {self.dpUIinst.lang['m083_rivet']}", width=310, command=self.removeRivetFromUI, backgroundColor=(1, .56, 0.48), parent=removeLayout)
         cmds.tabLayout(rivetTabsLayout, edit=True, changeCommand=partial(self.rivetTabChange, rivetTabsLayout), tabLabel=((rivetLayout, self.dpUIinst.lang["i158_create"]), (removeLayout, self.dpUIinst.lang["i046_remove"])))
         # call dpRivetUI Window:
         cmds.showWindow(dpRivetWin)
 
 
     def disablePac(self, rivetIndexList, *args):
+        """Receive a index list to disable parent constraint before remove rivet.
+        """
         for index in rivetIndexList:
             netNode = self.rivetNetNodeList[index]
             try:
@@ -153,72 +145,24 @@ class Rivet(object):
                 pass
 
 
-    def removeNonStuckRivetList(self, rivetsList, rivetIndexList, *args):
-        cmds.progressWindow(title=self.dpUIinst.lang["i296_removingRivet"], progress=0, maxValue=len(rivetsList), status=self.dpUIinst.lang["i297_removing"])
-        self.removeRivetFromList(rivetIndexList, rivetsList)
-        cmds.progressWindow(endProgress=True)
-        self.dpCloseStuckUi()
-
-
-    def findBadFromSelection(self, selectionList, trueIndexList, *args):
-        badRivetsList = []
-        badIndexList = []
-        for i, item in enumerate(selectionList):
-            if self.rivetOnOrigin(trueIndexList[i]):
-                badRivetsList.append(item)
-                badIndexList.append(trueIndexList[i])
-        if len(badRivetsList) > 0:
-            return badRivetsList, badIndexList
-        else:
-            return (None, None)
-
-
-    def checkStuck(self, *args):
-        selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
-        if selectionList:
-            selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
-            trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            badRivetsList, badIndexList = self.findBadFromSelection(selectionList, trueIndexList)
-            if badRivetsList:
-                self.dpCloseStuckUi()
-                dpStuckWindow = cmds.window("dpStuckWindow", title=self.dpUIinst.lang["i294_brokenRivet"], widthHeight=(310, 200), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False, menuBarVisible=False, titleBar=True)
-                stuckCL = cmds.columnLayout("stuckCL", columnAlign="center", columnOffset=("both", 10), parent="dpStuckWindow")
-                cmds.separator(style='none', height=10, parent=stuckCL)
-                cmds.text(label=self.dpUIinst.lang["i295_brokenRivetMsg"], wordWrap=True, width=290, parent=stuckCL)
-                cmds.separator(style='none', height=10, parent=stuckCL)
-                self.badRivetsTextList = cmds.textScrollList("badRivetsTextList", width=290, height=100, append=badRivetsList, parent=stuckCL)
-                cmds.separator(style='none', height=10, parent=stuckCL)
-                rowStuckL = cmds.rowLayout("rowStuckL", numberOfColumns=2, width=290, columnAlign=[(1, "left"), (2, "right")], parent=stuckCL)
-                cmds.button(label="Yes", width=143, command=partial(self.removeNonStuckRivetList, badRivetsList, badIndexList), parent=rowStuckL)
-                cmds.button(label="No", width=143, command=self.dpCloseStuckUi, parent=rowStuckL)
-                cmds.showWindow(dpStuckWindow)
-            else:
-                cmds.confirmDialog(title=self.dpUIinst.lang["i298_noProblem"], icon="information", message=self.dpUIinst.lang["i299_rivetSeemFine"], button=[self.dpUIinst.lang["i131_ok"]], defaultButton=self.dpUIinst.lang["i131_ok"], cancelButton=self.dpUIinst.lang["i131_ok"], dismissString=self.dpUIinst.lang["i131_ok"])
-        else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m234_noRivetSelect']+'\\n\";')
-    
-
-    def rivetOnOrigin(self, itemIndex, *args):
-        netNode = self.rivetNetNodeList[itemIndex]
-        rivetFollicle = cmds.listConnections(f"{netNode}.follicle", destination=False)[0]
-        tx = cmds.getAttr(f"{rivetFollicle}.translateX")
-        ty = cmds.getAttr(f"{rivetFollicle}.translateY")
-        tz = cmds.getAttr(f"{rivetFollicle}.translateZ")
-        return tx == 0 and ty == 0 and tz == 0
-
-
     def selectAll(self, *args):
+        """Select all items from rivet controllers list.
+        """
         itemsList = cmds.textScrollList(self.rivetControllersList, query=True, allItems=True)
         if itemsList:
             cmds.textScrollList(self.rivetControllersList, edit=True, selectItem=itemsList)
 
 
     def rivetItemSelect(self, *args):
+        """Select items on viewport that has been selected on controllers list.
+        """
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         cmds.select(selectionList)
 
 
     def riseRivetNetNodes(self):
+        """Find all network nodes that have dpRivetNet attribute, and return them as a list.
+        """
         netNodeList = cmds.ls(type="network")
         rivetNetworkNodesList = None
         if len(netNodeList) != 0:
@@ -227,32 +171,47 @@ class Rivet(object):
     
 
     def removeRivetFromList(self, indexList, itemList):
+        """Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
+        """
         self.disablePac(indexList)
         for i, index in enumerate(indexList):
-            self.setProgressBar(i+1, self.dpUIinst.lang['i297_removing'])
+            self.setProgressBar(i+1, self.dpUIinst.lang['i293_removing'])
             netNode = self.rivetNetNodeList[index]
             if netNode:
                 self.removeRivetFromNetNode(netNode)
                 cmds.textScrollList(self.rivetControllersList, edit=True, removeItem=itemList[i])
             else:
-                mel.eval('print \"dpAR: '+self.dpUIinst.lang['m235_unableRemRivet']+itemList[i]+'\\n\";')
+                mel.eval('print \"dpAR: '+self.dpUIinst.lang['m234_unableRemRivet']+itemList[i]+'\\n\";')
         cmds.select(clear=True)
     
 
+    def checkRivetGrp(self, *args):
+        """Verify if rivet group is empty to remove it.
+        """
+        if cmds.objExists("Rivet_Grp"):
+            if not cmds.listRelatives("Rivet_Grp", children=True):
+                cmds.delete("Rivet_Grp")
+    
+
     def removeRivetFromUI(self, *args):
+        """Remove rivets selected on the controllers list in the ui.
+        """
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            cmds.progressWindow(title=self.dpUIinst.lang['i296_removingRivet'], progress=0, maxValue=len(trueIndexList), status=self.dpUIinst.lang['i297_removing'])
+            cmds.progressWindow(title=f"{self.dpUIinst.lang['i293_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(trueIndexList), status=self.dpUIinst.lang['i293_removing'])
             self.removeRivetFromList(trueIndexList, selectionList)
+            self.checkRivetGrp()
             cmds.progressWindow(endProgress=True)
         else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m236_noItemSelect']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['m235_noItemSelect']+'\\n\";')
         cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
 
     
     def removeRivetFromNetNode(self, rivetNetNode):
+        """Remove the rivet from your network node.
+        """
         rivetTransform = cmds.listConnections(f"{rivetNetNode}.rivet", destination=False)
         if rivetTransform:
             rivetTransform = rivetTransform[0]
@@ -260,8 +219,12 @@ class Rivet(object):
         rivetFollicle = cmds.listConnections(f"{rivetNetNode}.follicle", destination=False)[0]
         attachedGeometry = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
         try:
-            originalParent = cmds.listRelatives(rivetTransform, parent=True)[0]
-            cmds.parent(rivetControl, originalParent)
+            originalParent = cmds.listRelatives(rivetTransform, parent=True)
+            if originalParent == None:
+                cmds.parent(rivetControl, world=True)
+            else:
+                originalParent = originalParent[0]
+                cmds.parent(rivetControl, originalParent)
             cmds.delete([rivetTransform, rivetFollicle])
         except:
             cmds.delete(rivetFollicle)
@@ -288,6 +251,8 @@ class Rivet(object):
     
 
     def itemsWithRivetList(self):
+        """From all rivet network nodes, rise a controllers list to fill ui.
+        """
         rivetNetNodes = self.riseRivetNetNodes()
         if rivetNetNodes:
             controllerList = []
@@ -305,6 +270,7 @@ class Rivet(object):
     def filterRivetName(self, name, itemList, separator):
         """ Filter list with the name or a list of name as a string separated by the separator (usually a space).
             Returns the filtered list.
+            Update the index list to match the returned list.
         """
         filteredList = []
         multiFilterList = [name]
@@ -326,6 +292,8 @@ class Rivet(object):
 
 
     def refreshRivetList(self, *args):
+        """Refresh the rivets list in the ui.
+        """
         cmds.textScrollList(self.rivetControllersList, edit=True, removeAll=True)
         rivetItemsList = self.itemsWithRivetList()
         filter = cmds.textField(self.filterRivetList, query=True, text=True)
@@ -338,6 +306,8 @@ class Rivet(object):
     
 
     def rivetTabChange(self, rivetTabsLayout):
+        """Intermediate method to control rivet ui tab change.
+        """
         if cmds.tabLayout(rivetTabsLayout, query=True, selectTabIndex=True) == 2:
             self.refreshRivetList()
         else:
@@ -358,11 +328,15 @@ class Rivet(object):
 
 
     def setProgressBar(self, progressAmount, status):
+        """Updates progress window amount and status.
+        """
         if self.ui:
             cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
 
 
     def riseRemoveAndIndexList(self, needToRemoveSet, hasRivetList):
+        """From a set of items to be removed rise all rivets and matching indexes needed to removal.
+        """
         needToRemoveList = []
         trueIndexList = []
         for item in needToRemoveSet:
@@ -396,11 +370,11 @@ class Rivet(object):
             needToRemove = toCreateSet & hasRivetSet
         if needToRemove:
             if len(needToRemove) > 0:
-                removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i300_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
+                removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i294_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
 
                 if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    cmds.progressWindow(title=self.dpUIinst.lang['i296_removingRivet'], progress=0, maxValue=len(needToRemoveList), status=self.dpUIinst.lang['i297_removing'])
+                    cmds.progressWindow(title=f"{self.dpUIinst.lang['i293_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(needToRemoveList), status=self.dpUIinst.lang['i293_removing'])
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
                     cmds.progressWindow(endProgress=True)
                 elif removeExistingRivet == self.dpUIinst.lang['i072_no']:
@@ -409,10 +383,10 @@ class Rivet(object):
                     return
 
         # call run function to create Rivet setup using UI values
-        cmds.progressWindow(title=self.dpUIinst.lang['i301_creatingRivet'], progress=0, maxValue=len(itemList), status=self.dpUIinst.lang['i302_working'])
+        cmds.progressWindow(title=self.dpUIinst.lang['i295_creatingRivet'], progress=0, maxValue=len(itemList), status=self.dpUIinst.lang['i296_working'])
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         cmds.progressWindow(endProgress=True)
-        self.dpCloseRivetUi()
+        dpUtils.closeUI('dpRivetWindow')
     
     
     def dpSelectUVSetWin(self, uvSetList, *args):
