@@ -220,12 +220,17 @@ class Rivet(object):
         attachedGeometry = cmds.listConnections(f"{rivetNetNode}.geoToAttach", destination=False)[0]
         try:
             originalParent = cmds.listRelatives(rivetTransform, parent=True)
-            if originalParent == None:
+            currentParent = cmds.listRelatives(rivetControl, parent=True)
+            if originalParent == None and currentParent != originalParent:
                 cmds.parent(rivetControl, world=True)
             else:
                 originalParent = originalParent[0]
-                cmds.parent(rivetControl, originalParent)
-            cmds.delete([rivetTransform, rivetFollicle])
+                if not originalParent in currentParent:
+                    cmds.parent(rivetControl, originalParent)
+            if rivetControl != rivetTransform:
+                cmds.delete([rivetTransform, rivetFollicle])
+            else:
+                cmds.delete(rivetFollicle)
         except:
             cmds.delete(rivetFollicle)
 
