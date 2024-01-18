@@ -60,7 +60,7 @@ class StartClass(object):
         # here we have just the column layouts to be populated by modules.
     
     
-    def createGuide(self, *args):
+    def createGuide(self, raw=True, *args):
         """ Create the elements to Guide module in the scene, like controls, etc...
         """
         # GUIDE:
@@ -108,7 +108,7 @@ class StartClass(object):
         cmds.setAttr(self.annotation+'.text', self.moduleGrp[self.moduleGrp.find("__")+2:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.annotation+'.template', 1)
         # prepare guide to serialization
-        self.createGuideNetwork()
+        self.createGuideNetwork(raw)
     
     
     def updateModuleInstanceInfo(self, *args):
@@ -410,6 +410,9 @@ class StartClass(object):
             except:
                 pass
             
+            # start serialization
+            self.serializeGuide()
+
             # unPinGuides before Rig them:
             self.ctrls.unPinGuide(self.moduleGrp)
             
@@ -466,27 +469,110 @@ class StartClass(object):
         self.integratedActionsDic = {}
     
 
-    def createGuideNetwork(self, *args):
+    def createGuideNetwork(self, raw=True, *args):
         """ Create a network for the current guide and store on it the nodes used in this module by message.
+            Set it as locked node in order to keep it existing after generating the rig.
             Returns the network node useful to guide rebuilding.
         """
-        self.guideNet = cmds.createNode("network", name=self.userGuideName+"_Net")
-        cmds.addAttr(self.guideNet, longName="dpNetwork", attributeType="bool")
-        cmds.addAttr(self.guideNet, longName="dpGuideNet", attributeType="bool")
-        cmds.setAttr(self.guideNet+".dpNetwork", 1)
-        cmds.setAttr(self.guideNet+".dpGuideNet", 1)
+        if raw:
+            self.guideNet = cmds.createNode("network", name=self.userGuideName+"_Guide_Net")
+            for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
+                cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
+                cmds.setAttr(self.guideNet+"."+baseAttr, 1)
+            cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
+            cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
+        else:
+            cmds.lockNode(self.guideNet, lock=False)
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
-        cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net")
-        self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
+        cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
+        self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"], raw)
         return self.guideNet
 
     
-    def addNodeToGuideNet(self, nodeList, messageAttrList, *args):
+    def addNodeToGuideNet(self, nodeList, messageAttrList, raw=True, *args):
         """ Include the given node list to the respective given attribute list as message connection in the network.
         """
         for node, messageAttr in zip(nodeList, messageAttrList):
-            cmds.addAttr(self.guideNet, longName=messageAttr, attributeType="message")
-            cmds.connectAttr(node+".message", self.guideNet+"."+messageAttr)
+            if not cmds.objExists(self.guideNet+"."+messageAttr):
+                cmds.addAttr(self.guideNet, longName=messageAttr, attributeType="message")
+            cmds.connectAttr(node+".message", self.guideNet+"."+messageAttr, force=True)
+            self.updateBeforeData(messageAttr)
+
+
+    def removeAttrFromGuideNet(self, attrList, *args):
+        """ Remove the given attribute list from the network node.
+        """
+        for attr in attrList:
+            cmds.deleteAttr(self.guideNet+"."+attr)
+    
+
+    def updateBeforeData(self, attr, *args):
+        """ Just read the current before attribute string, add the new give attribute to it and set the guide network attibute with this new info.
+            Returns the updated before data string.
+        """
+        beforeString = cmds.getAttr(self.guideNet+".beforeData") or ""
+        beforeString = beforeString + attr + ";"
+        cmds.setAttr(self.guideNet+".beforeData", beforeString, type="string")
+        return beforeString
+
+
+    def getBeforeList(self, *args):
+        """ Just return a list with the splited items from the guide network beforeData string attribute.
+        """
+        beforeString = cmds.getAttr(self.guideNet+".beforeData")
+        if beforeString:
+            return list(filter(None, beforeString.split(";")))
+
+
+    def getNodeData(self, node, *args):
+        """ Get and return all transformation data for the transform, also the userDefined attributes and them values.
+            Returns a dictionary with this info.
+        """
+        # WIP
+#        print("HERE WE GO!", node)
+        attrList = cmds.listAttr(node, keyable=True)
+#        print("attrList = ", attrList)
+        userDefinedAttrList = cmds.listAttr(node, unlocked=True, userDefined=True)
+#        print("userDefinedAttrList = ", userDefinedAttrList)
+        if attrList:
+            if userDefinedAttrList:
+                attrList.extend(userDefinedAttrList)
+            attrList = list(set(attrList))
+            attrList.sort()
+
+            print("attrList =", attrList)
+            attrDic = {}
+            for attr in attrList:
+                try:
+                    attrDic[attr] = cmds.getAttr(node+"."+attr)
+                except:
+                    print("NOT WORKING = ", attr)
+# have ignoreAttrList?
+                    # get father?
+            return attrDic
+
+
+    def serializeGuide(self, *args):
+        """ Work in the guide info to store it in order to be able to rebuild it in the future.
+        """
+        print("YES... serialization of the guide here...")
+
+        # WIP
+        afterDataDic = {}
+        beforeList = self.getBeforeList()
+        if beforeList:
+            for beforeAttr in beforeList:
+                nodeName = cmds.listConnections(self.guideNet+"."+beforeAttr, source=True, destination=False) or None
+                if nodeName:
+                    if cmds.objExists(nodeName[0]):
+                        afterDataDic[nodeName[0]] = self.getNodeData(nodeName[0])
+
+        print("afterDataDic =", afterDataDic)
+        cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
+        cmds.setAttr(self.guideNet+".rawGuide", 0)
+        cmds.lockNode(self.guideNet, lock=True) #to avoid deleting network node
+
+
 
 
     # Getters:

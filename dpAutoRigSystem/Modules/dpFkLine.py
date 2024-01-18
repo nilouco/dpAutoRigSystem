@@ -65,7 +65,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.jGuideEnd, self.jGuide1)
         cmds.parentConstraint(self.cvJointLoc, self.jGuide1, maintainOffset=False, name=self.jGuide1+"_PaC")
         cmds.parentConstraint(self.cvEndJoint, self.jGuideEnd, maintainOffset=False, name=self.jGuideEnd+"_PaC")
-        # include into net
+        # include nodes into net
         self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
 
 
@@ -108,6 +108,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     #Do not maintain offset and ensure cv will be at the same place than the joint
                     cmds.parentConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
                     cmds.scaleConstraint(self.cvJointLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScC")
+                    self.addNodeToGuideNet([self.cvJointLoc], ["JointLoc"+str(n)])
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvEndJoint:
                 self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
@@ -121,6 +122,8 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete difference of nJoints:
                 cmds.delete(self.guideName+"_JointLoc"+str(self.enteredNJoints+1))
                 cmds.delete(self.guideName+"_JGuide"+str(self.enteredNJoints+1))
+                for j in range(self.enteredNJoints+1, self.currentNJoints+1):
+                    self.removeAttrFromGuideNet(["JointLoc"+str(j)])
             # re-parent cvEndJoint:
             pTempParent = cmds.listRelatives(self.cvEndJoint, p=True)
             cmds.parent(self.cvEndJoint, self.cvJointLoc)
