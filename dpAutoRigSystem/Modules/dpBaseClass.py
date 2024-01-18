@@ -3,6 +3,7 @@ from maya import cmds
 from maya import mel
 from .Library import dpControls
 from ..Extras import dpCorrectionManager
+import json
 
 class RigType(object):
     biped = "biped"
@@ -528,36 +529,34 @@ class StartClass(object):
         """ Get and return all transformation data for the transform, also the userDefined attributes and them values.
             Returns a dictionary with this info.
         """
-        # WIP
-#        print("HERE WE GO!", node)
         attrList = cmds.listAttr(node, keyable=True)
-#        print("attrList = ", attrList)
         userDefinedAttrList = cmds.listAttr(node, unlocked=True, userDefined=True)
-#        print("userDefinedAttrList = ", userDefinedAttrList)
         if attrList:
             if userDefinedAttrList:
                 attrList.extend(userDefinedAttrList)
             attrList = list(set(attrList))
             attrList.sort()
-
-            print("attrList =", attrList)
             attrDic = {}
             for attr in attrList:
-                try:
+                if cmds.getAttr(node+"."+attr, type=True) == "message":
+                    attrConnectList = cmds.listConnections(node+"."+attr, source=True, destination=False)
+                    if attrConnectList:
+                        attrDic[attr] = attrConnectList[0]
+                else:
                     attrDic[attr] = cmds.getAttr(node+"."+attr)
-                except:
-                    print("NOT WORKING = ", attr)
-# have ignoreAttrList?
-                    # get father?
+
+            # get father?
+            fatherList = cmds.listRelatives(node, parent=True)
+            if fatherList:
+                attrDic["fatherNode"] = fatherList[0]
+            else:
+                attrDic["fatherNode"] = None
             return attrDic
 
 
     def serializeGuide(self, *args):
-        """ Work in the guide info to store it in order to be able to rebuild it in the future.
+        """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
-        print("YES... serialization of the guide here...")
-
-        # WIP
         afterDataDic = {}
         beforeList = self.getBeforeList()
         if beforeList:
@@ -566,9 +565,7 @@ class StartClass(object):
                 if nodeName:
                     if cmds.objExists(nodeName[0]):
                         afterDataDic[nodeName[0]] = self.getNodeData(nodeName[0])
-
-        print("afterDataDic =", afterDataDic)
-        cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
+        cmds.setAttr(self.guideNet+".afterData", json.dumps(afterDataDic), type="string")
         cmds.setAttr(self.guideNet+".rawGuide", 0)
         cmds.lockNode(self.guideNet, lock=True) #to avoid deleting network node
 
