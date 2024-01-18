@@ -9,7 +9,7 @@ TITLE = "m105_diamond"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_diamond.png"
 
-DP_DIAMOND_VERSION = 1.5
+DP_DIAMOND_VERSION = 1.6
 
 
 class Diamond(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class Diamond(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):

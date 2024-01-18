@@ -9,7 +9,7 @@ TITLE = "m101_smile"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_smile.png"
 
-DP_SMILE_VERSION = 1.3
+DP_SMILE_VERSION = 1.4
 
 
 class Smile(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class Smile(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):

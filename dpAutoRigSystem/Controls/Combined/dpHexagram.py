@@ -9,7 +9,7 @@ TITLE = "m103_hexagram"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_hexagram.png"
 
-DP_HEXAGRAM_VERSION = 1.3
+DP_HEXAGRAM_VERSION = 1.4
 
 
 class Hexagram(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class Hexagram(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):

@@ -9,7 +9,7 @@ TITLE = "m113_arrow"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_arrow.png"
 
-DP_ARROW_VERSION = 1.3
+DP_ARROW_VERSION = 1.4
 
 
 class Arrow(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class Arrow(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
