@@ -795,7 +795,11 @@ class Rivet(object):
                         else:
                             rivetNetList = cmds.listAttr(itemList[r], string="rivetNet*")
                             rivetNetList.sort(reverse=True)
-                            lastIndex = int(rivetNetList[0].removeprefix("rivetNet"))
+                            lastIndex = rivetNetList[0].removeprefix("rivetNet")
+                            if lastIndex == "":
+                                lastIndex = 0
+                            else:
+                                lastIndex = int(lastIndex)
                             newIndex = lastIndex + 1
                             currentLongName = f"rivetNet{newIndex}"
                             cmds.addAttr(itemList[r], longName=currentLongName, attributeType="message")
