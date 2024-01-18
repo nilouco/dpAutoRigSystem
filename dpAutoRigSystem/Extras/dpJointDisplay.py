@@ -11,11 +11,14 @@ ICON = "/Icons/dp_reorderAttr.png"
 
 
 
+DP_JOINTDISPLAY_VERSION = 1.0
+
 IGNORE_LIST = ['persp', 'top', 'front', 'side'] # WIP To Delete
 
-
-
-DP_JOINTDISPLAY_VERSION = 1.0
+noneLabelList = []
+boneLabelList = []
+jointLabelList = []
+multiChildLabelList = []
 
 
 class JointDisplay(object):
@@ -38,7 +41,6 @@ class JointDisplay(object):
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
         return self.itemF
     
-    
     def dpJointDisplayUI(self, *args):
         """ Create a window in order to load the original model and targets to be mirrored.
         """
@@ -55,18 +57,19 @@ class JointDisplay(object):
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=jointDisplayMainLayout)
         self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="TESTEEE####", changeCommand=self.dpMoveAttr, adjustableColumn=2, parent=filterLayout)
 
-        # column Layout
+        # creating column Layout
         colunmLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout)
 
+        # creating titles
         title1 = cmds.text('boneTitle', label='Bone',parent=colunmLayout)
         title2 = cmds.text('jointTitle',label='Joint',parent=colunmLayout)
         title3 = cmds.text('multiChildAsBoxTitle',label='Multi-Child as box',parent=colunmLayout)
         title4 = cmds.text('noneTitle', label='None',parent=colunmLayout)
 
-        cmds.scrollField(parent=colunmLayout)
-        cmds.scrollField(parent=colunmLayout)
-        cmds.scrollField(parent=colunmLayout)
-        cmds.scrollField(parent=colunmLayout)
+        jointListFeild1 = cmds.scrollField(parent=colunmLayout)
+        jointListFeild2 = cmds.scrollField(parent=colunmLayout)
+        jointListFeild3 = cmds.scrollField(parent=colunmLayout)
+        jointListFeild4 = cmds.scrollField(parent=colunmLayout)
 
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
@@ -79,7 +82,46 @@ class JointDisplay(object):
         # call dpJointDisplayUI Window:
         cmds.showWindow(dpJointDisplayWin)
     
-    
+        def getJointList(self, *args):
+            """ Get all joints in the scene
+            """
+            jointList = cmds.ls(type='joint')
+            if cmds.objExists(jointList[0]):
+                return jointList
+        
+        def populateLabelList(self, *args):
+            """ Populate each list with label joint type
+            """
+            if getJointList():
+                for jnt in getJointList():
+                    if jnt +'.drawStyle' == 0:
+                        boneLabelList.append(jnt)
+                    if jnt +'.drawStyle' == 1:
+                        multiChildLabelList.append(jnt)
+                    if jnt +'.drawStyle' == 2:
+                        noneLabelList.append(jnt)
+                    if jnt +'.drawStyle' == 3:
+                        jointLabelList.append(jnt)
+
+
+        
+        def refresh(self):
+            """ Refresh the code
+            """
+            getJointList(self)
+            populateLabelList(self)
+            
+            #TODO
+            # read all joints
+            # populate fields
+
+
+
+
+
+
+
+
     def dpMoveAttr(self, mode, objList=None, attrList=None, verbose=False, *args):
         """ Change order of attributes in order to move it to up or down in the list position.
         """
