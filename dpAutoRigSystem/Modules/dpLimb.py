@@ -8,6 +8,7 @@ from .Library import dpIkFkSnap
 from ..Extras import dpCorrectionManager
 from functools import partial
 from importlib import reload
+from maya.api import OpenMaya as om
 import math
 
 # global variables to this module:
@@ -20,7 +21,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 2.9
+DP_LIMB_VERSION = 3.0
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -302,8 +303,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.disconnectAttr(self.cvMainLoc+".rotate"+axis, self.guideMainDrvNull+".rotate"+axis)
             cmds.disconnectAttr(self.cvCornerLoc+".translate"+axis, self.cornerDrvNull+".translate"+axis)
             cmds.disconnectAttr(self.cvCornerLoc+".rotate"+axis, self.cornerDrvNull+".rotate"+axis)
-
-        # deleting mainLoc group, this group previous received the main auto aimConstraint:
+        
+       # deleting mainLoc group, this group previous received the main auto aimConstraint:
         cmds.parent(self.cvMainLoc, self.moduleGrp)
         cmds.delete(self.cvMainLocGrp)
 
@@ -311,9 +312,49 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.matchTransform(self.guideMainDrvNull, self.cvMainLoc)
         cmds.matchTransform(self.cornerDrvNullGrp, self.cvCornerLoc)
 
-        # reOrient and create autoAim:
+        # re-orient guides:
         self.reOrientGuide()
+
+        # autoAim main function:
         self.createAutoAim()
+
+
+    def crossProduct(self, limbType, *args):
+        """ Calculate cross product between guides Main, Corner and Extrem
+            It will check which side the corner is to adjust the aim constraint offset
+        """
+        # re-declaring variables:
+        self.cvMainLoc = self.guideName+"_Main"
+        self.cvCornerLoc = self.guideName+"_Corner"
+        self.cvExtremLoc = self.guideName+"_Extrem"
+
+        # get guides position in worldSpace:
+        posMain = om.MVector(cmds.xform(self.cvMainLoc, query=True, worldSpace=True, translation=True))
+        posCorner = om.MVector(cmds.xform(self.cvCornerLoc, query=True, worldSpace=True, translation=True))
+        posExtrem = om.MVector(cmds.xform(self.cvExtremLoc, query=True, worldSpace=True, translation=True))
+
+        # create vector between guides position directions:
+        vectorMainToCorner = posCorner - posMain
+        vectorMainToExtrem = posExtrem - posMain
+
+        # calculate crossProduct between vectors:
+        crossProduct = vectorMainToCorner ^ vectorMainToExtrem
+
+        # check position of crossProduct depending on the limbType:
+        if limbType == ARM:
+            # if the limbType is arm the crossProduct will look for the axis y:
+            if crossProduct.y <= 0:
+                offsetValue = 1
+            else:
+                offsetValue = -1
+
+        if limbType == LEG:
+            # if the limbtype is leg the crossProduct will look for the axis X
+            if crossProduct.x <= 0:
+                offsetValue = -1
+            else:
+                offsetValue = 1
+        return offsetValue
 
 
     def setAimConstraintOffset(self, aimConstraint, *args):
@@ -322,23 +363,17 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # re-declaring corner guide name:
         self.cvCornerLoc = self.guideName+"_Corner"
         
-        # When the limbType is Arm, the translateY will help tp get the right offset for X
+        # when the limbType is arm, it will call the crossProduct function to get the right offset for X
         if self.getLimbType()==ARM:
-            cvCornerTranslateY = cmds.getAttr(self.cvCornerLoc+".translateY")
-            if cvCornerTranslateY <= 0:
-                offsetValue = 1
-            else:
-                offsetValue = -1
             offsetAxis = ".offsetX"
+            offsetValue = self.crossProduct(ARM)
         
-        # When the limbType is Leg, the translateX will help to get the right offset for Y
+        # when the limbType is arm, it will call the crossProduct function to get the right offset for Y:
         if self.getLimbType()==LEG:
-            cvCornerTranslateX = cmds.getAttr(self.cvCornerLoc+".translateX")
-            if cvCornerTranslateX >= 0:
-                offsetValue = 1
-            else:
-                offsetValue = -1
             offsetAxis = ".offsetY"
+            offsetValue = self.crossProduct(LEG)
+
+        # set the aimConstraint's offset according to limbType:
         cmds.setAttr(aimConstraint+offsetAxis, offsetValue)
 
 
@@ -408,6 +443,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.delete(extremChildrenGrpTemp)
 
             # adjust offset depends on corner position
+            cmds.setAttr(self.cvMainLoc+".rotateX", 0)
             self.setAimConstraintOffset(self.mainAic)
                 
         # setup to reorient the ankle guide to point to the ground when rotate mainGuide
@@ -419,8 +455,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.delete(tempToDelAnkleAim, ankleToAimNull)
 
             # leg offset adjust
-            self.setAimConstraintOffset(self.mainAic)
             cmds.setAttr(self.cvMainLoc+".rotateY", 0)
+            self.setAimConstraintOffset(self.mainAic)
         cmds.select(self.moduleGrp)
 
 
@@ -558,6 +594,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.cvExtremLoc+".translateZ", 10)
             cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
             cmds.setAttr(self.cornerGrp+".translateY", -0.75)
+            cmds.setAttr(self.cvCornerLoc+".translateZ", 0)
             cmds.setAttr(self.cvEndJoint+".translateZ", 1.3)
             cmds.setAttr(self.moduleGrp+".rotateX", 90)
             cmds.setAttr(self.moduleGrp+".rotateY", 0)
@@ -576,6 +613,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.cvExtremLoc+".translateZ", 10)
             cmds.setAttr(self.cvExtremLoc+".translateY", lock=True)
             cmds.setAttr(self.cornerGrp+".translateX", 0.75)
+            cmds.setAttr(self.cvCornerLoc+".translateZ", 0)
             cmds.setAttr(self.cvEndJoint+".translateZ", 1.3)
             cmds.setAttr(self.moduleGrp+".rotateX", 0)
             cmds.setAttr(self.moduleGrp+".rotateY", -90)
