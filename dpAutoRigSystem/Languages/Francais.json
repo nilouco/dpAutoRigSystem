@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-01-17",
+    "_updated"       : "2023-12-29",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -451,11 +451,6 @@
     "i289_sameNameSkinDesc"  : "Ça va copier le skinning entre les meshes de même noms.\nC'est très utile pour mettre à jour des modèles dans le rig.",
     "i290_oneSource"         : "Une Origine",
     "i291_selectAllControls" : "Sélectionner tous les contrôles",
-    "i292_selectAll"         : "Tout sélectionner",
-    "i293_removing"          : "Suppression",
-    "i294_rivetNotFine"      : "Au moins un des éléments sélectionnés possède déjà un rivet, vous souhaitez le retirer avant d'en créer un nouveau (fortement recommandé).",
-    "i295_creatingRivet"     : "Création de rivets",
-    "i296_working"           : "Travaillant",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -690,9 +685,6 @@
     "m231_proxyCreatorDesc"     : "Ce module va creer a mesh proxy pour le rig courant.",
     "m232_morphDeformer"        : "Déformateur Morph",
     "m233_wrapDeformer"         : "Déformateur Wrap",
-    "m234_unableRemRivet"       : "Impossible de retirer le rivet: ",
-    "m235_noItemSelect"         : "Aucun élément sélectionné, veuillez sélectionner un élément à supprimer.",
-    "m236_removedRivet"         : "Le rivet a été bien supprimé!",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
