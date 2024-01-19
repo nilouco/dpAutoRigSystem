@@ -308,21 +308,12 @@ class CorrectionManager(object):
         """
         cmds.textScrollList(self.existingNetTSL, edit=True, deselectAll=True)
         cmds.textScrollList(self.existingNetTSL, edit=True, removeAll=True)
-        currentNetList = cmds.ls(selection=False, type="network")
-        if currentNetList:
-            self.netList = []
-            for item in currentNetList:
-                if cmds.objExists(item+".dpNetwork"):
-                    if cmds.getAttr(item+".dpNetwork") == 1:
-                        if cmds.objExists(item+".dpCorrectionManager"):
-                            if cmds.getAttr(item+".dpCorrectionManager") == 1:
-                                #TODO validate correctionManager node integrity here
-                                self.netList.append(item)
-            if self.netList:
-                cmds.textScrollList(self.existingNetTSL, edit=True, append=self.netList)
-                if self.net:
-                    if cmds.objExists(self.net):
-                        cmds.textScrollList(self.existingNetTSL, edit=True, selectItem=self.net)
+        netList = self.utils.getNetworkNodeByAttr("dpCorrectionManager")
+        if netList:
+            cmds.textScrollList(self.existingNetTSL, edit=True, append=netList)
+            if self.net:
+                if cmds.objExists(self.net):
+                    cmds.textScrollList(self.existingNetTSL, edit=True, selectItem=self.net)
 
 
     def clearEditLayout(self, *args):

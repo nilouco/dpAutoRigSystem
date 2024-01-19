@@ -1,2 +1,3 @@
 dpModelIO
 dpShaderIO
+dpGuideIO

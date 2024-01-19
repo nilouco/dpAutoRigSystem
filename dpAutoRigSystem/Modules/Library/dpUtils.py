@@ -1151,3 +1151,18 @@ class Utils(object):
             if cmds.objExists(deformerNode):
                 if not cmds.objectType(deformerNode) == "tweak":
                     cmds.deformer(deformerNode, edit=True, geometry=item)
+
+
+    def getNetworkNodeByAttr(self, netAttr, *args):
+        """ Returns a list of network nodes with the boolean given net attribute active.
+        """
+        netList = []
+        allNetList = cmds.ls(selection=False, type="network")
+        if allNetList:
+            for item in allNetList:
+                if cmds.objExists(item+".dpNetwork"):
+                    if cmds.getAttr(item+".dpNetwork") == 1:
+                        if cmds.objExists(item+"."+netAttr):
+                            if cmds.getAttr(item+"."+netAttr) == 1:
+                                netList.append(item)
+        return netList
