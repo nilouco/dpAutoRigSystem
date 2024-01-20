@@ -96,7 +96,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="type", attributeType='enum', enumName=self.dpUIinst.lang['m028_arm']+':'+self.dpUIinst.lang['m030_leg'])
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="hasBend", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".hasBend", 1)
         cmds.addAttr(self.moduleGrp, longName="numBendJoints", attributeType='long')

@@ -74,7 +74,6 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', defaultValue=1)
         cmds.addAttr(self.moduleGrp, longName="style", attributeType='enum', enumName=self.dpUIinst.lang['m042_default']+':'+self.dpUIinst.lang['m026_biped'])
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.5, d=1, guide=True)

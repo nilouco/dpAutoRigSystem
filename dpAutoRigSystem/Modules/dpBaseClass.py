@@ -50,6 +50,8 @@ class StartClass(object):
         self.createModuleLayout()
         # update module instance info:
         self.updateModuleInstanceInfo()
+        self.guideNet = self.utils.getNodeByMessage("net", self.moduleGrp)
+        self.raw = cmds.getAttr(self.guideNet+".rawGuide")
     
     
     def createModuleLayout(self, *args):
@@ -62,7 +64,7 @@ class StartClass(object):
         # here we have just the column layouts to be populated by modules.
     
     
-    def createGuide(self, raw=True, *args):
+    def createGuide(self, *args):
         """ Create the elements to Guide module in the scene, like controls, etc...
         """
         # GUIDE:
@@ -81,9 +83,11 @@ class StartClass(object):
         for baseIntegerAttr in baseIntegerAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseIntegerAttr, attributeType='long')
         
-        baseStringAttrList  = ['moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
+        baseStringAttrList  = ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
+        cmds.setAttr(self.moduleGrp+".moduleType", self.moduleGrp[:self.moduleGrp.find("__")], type='string')
+        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
         cmds.setAttr(self.moduleGrp+".mirrorName", self.dpUIinst.lang['p002_left']+' --> '+self.dpUIinst.lang['p003_right'], type='string')
         cmds.setAttr(self.moduleGrp+".hookNode", "_Grp", type='string')
@@ -473,11 +477,10 @@ class StartClass(object):
 
     def createGuideNetwork(self, *args):
         """ Create a network for the current guide and store on it the nodes used in this module by message.
-            Set it as locked node in order to keep it existing after generating the rig.
-            Returns the network node useful to guide rebuilding.
         """
         if self.raw:
-            self.guideNet = cmds.createNode("network", name=self.userGuideName+"_Guide_Net")
+            netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
+            self.guideNet = cmds.createNode("network", name="dpGuide_"+str(len(netList)+1).zfill(3)+"_Net")
             for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
                 cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
                 cmds.setAttr(self.guideNet+"."+baseAttr, 1)
@@ -488,7 +491,6 @@ class StartClass(object):
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
-        return self.guideNet
 
     
     def addNodeToGuideNet(self, nodeList, messageAttrList, *args):

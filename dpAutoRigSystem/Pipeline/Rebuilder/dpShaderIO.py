@@ -112,7 +112,6 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                 notFoundMeshList = []
                                 # rebuild shaders
                                 for item in shaderDic.keys():
-                                    shader = item
                                     if not cmds.objExists(item):
                                         shader = cmds.shadingNode(shaderDic[item]['material'], asShader=True, name=item)
                                         if shaderDic[item]['fileNode']:

@@ -37,8 +37,6 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
         
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
-        
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 0)
 

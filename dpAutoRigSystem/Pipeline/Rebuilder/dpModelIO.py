@@ -46,7 +46,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
             self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
         else:
             # load alembic plugin
-            if self.utils.checkLoadedPlugin("AbcExport"):
+            if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
                 self.ioPath = self.getIOPath(self.ioDir)
                 if self.ioPath:
                     if self.firstMode: #export

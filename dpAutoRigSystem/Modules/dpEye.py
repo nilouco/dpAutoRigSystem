@@ -55,7 +55,6 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+"."+SPEC, 0)
         cmds.addAttr(self.moduleGrp, longName=PIVOT, attributeType='bool')
         cmds.setAttr(self.moduleGrp+"."+PIVOT, 0)
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # main joint (center of eye globe)
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)

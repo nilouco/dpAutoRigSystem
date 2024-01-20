@@ -38,8 +38,6 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="fatherB", dataType='string')
         
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
-        
         self.cvALoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocA", r=0.3, d=1, guide=True)
         self.jAGuide = cmds.joint(name=self.guideName+"_jAGuide", radius=0.001)
         cmds.setAttr(self.jAGuide+".template", 1)

@@ -32,7 +32,6 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long', minValue=2, defaultValue=2)
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')

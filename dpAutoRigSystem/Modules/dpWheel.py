@@ -44,8 +44,6 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".showControls", 1)
         cmds.setAttr(self.moduleGrp+".steering", 0)
         
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
-        
         self.cvCenterLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_CenterLoc", r=0.6, d=1, rot=(90, 0, 90), guide=True)
         self.jGuideCenter = cmds.joint(name=self.guideName+"_JGuideCenter", radius=0.001)
         cmds.setAttr(self.jGuideCenter+".template", 1)

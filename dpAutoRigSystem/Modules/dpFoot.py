@@ -40,7 +40,6 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         # create cvJointLoc and cvLocators:
         self.cvFootLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Foot", r=0.3, d=1, guide=True)
         self.cvRFALoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_RfA", r=0.3, d=1, guide=True)

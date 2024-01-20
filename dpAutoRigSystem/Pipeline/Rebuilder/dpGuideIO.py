@@ -61,23 +61,20 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                 # Update progress window
                                 progressAmount += 1
                                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                            
-                            #WIP
-                            print("EXPORTING.....")
-                                #work with getting data from all guideNet
-                            
+                            # mount a dic with all data 
                             if cmds.objExists(net+".afterData"):
                                 dataDic[net] = cmds.getAttr(net+".afterData")
-                                #mount a dic with all data 
-#                        print(dataDic)
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
-                            self.pipeliner.saveJsonFile(dataDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except:
-                            self.notWorkedWellIO(jsonName)
+                        if dataDic:
+                            try:
+                                # export json file
+                                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
+                                self.pipeliner.saveJsonFile(dataDic, jsonName)
+                                self.wellDoneIO(jsonName)
+                            except:
+                                self.notWorkedWellIO(jsonName)
+                        else:
+                            self.notWorkedWellIO("v014_notFoundNodes")
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
                 else: #import
@@ -98,37 +95,24 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
 
 
 
-                                mayaVersion = cmds.about(version=True)
-                                notFoundMeshList = []
-                                # rebuild shaders
-                                for item in dataDic.keys():
-                                    shader = item
-                                    if not cmds.objExists(item):
-                                        shader = cmds.shadingNode(dataDic[item]['material'], asShader=True, name=item)
-                                        if dataDic[item]['fileNode']:
-                                            fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=dataDic[item]['fileNode'])
-                                            cmds.connectAttr(fileNode+".outColor", shader+"."+dataDic[item]['colorAttr'], force=True)
-                                            cmds.setAttr(fileNode+".fileTextureName", dataDic[item]['texture'], type="string")
-                                        else:
-                                            colorList = dataDic[item]['color']
-                                            cmds.setAttr(shader+"."+dataDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
-                                        transparencyList = dataDic[item]['transparency']
-                                        cmds.setAttr(shader+"."+dataDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
-                                    # apply shader to meshes
-                                    for mesh in dataDic[item]['assigned']:
-                                        if cmds.objExists(mesh):
-                                            if mayaVersion >= "2024":
-                                                cmds.hyperShade(assign=item, geometries=mesh)
-                                            else:
-                                                cmds.select(mesh)
-                                                cmds.hyperShade(assign=item)
-                                        else:
-                                            notFoundMeshList.append(mesh)
-                                cmds.select(clear=True)
-                                if notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh'])
-                                else:
-                                    self.wellDoneIO(exportedList[-1])
+                                
+                                
+                                for net in dataDic.keys():
+                                    if not cmds.objExists(net):
+                                        print(net)
+                                        print(dataDic[net])
+
+                                        guideDir = 'Modules'
+
+
+                                        # create fkLine module instance:
+                                        chassisInstance = self.dpUIinst.initGuide(dataDic[net]['moduleType'], guideDir)
+                                        # editing chassis base guide informations:
+                                        chassisInstance.editUserName("guideName_TEST")
+                                        cmds.setAttr(chassisInstance.moduleGrp+".translateY", 9)
+                                        cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 8)
+
+                                
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                         else:

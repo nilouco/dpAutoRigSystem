@@ -56,8 +56,6 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName='sdkLocator', attributeType='bool')
         cmds.setAttr(self.moduleGrp+".sdkLocator", 0)
         
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
-        
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
         cmds.setAttr(self.jGuide1+".template", 1)

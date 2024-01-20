@@ -35,7 +35,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
