@@ -15,10 +15,10 @@ DP_JOINTDISPLAY_VERSION = 1.0
 
 IGNORE_LIST = ['persp', 'top', 'front', 'side'] # WIP To Delete
 
-noneLabelList = []
 boneLabelList = []
 jointLabelList = []
 multiChildLabelList = []
+noneLabelList = []
 
 
 class JointDisplay(object):
@@ -26,8 +26,19 @@ class JointDisplay(object):
         self.dpUIinst = dpUIinst
         # call main function
         if ui:
+            print(f'boneLabelList {boneLabelList}, jointLabelList {jointLabelList}, multiChildLabelList {multiChildLabelList}, noneLabelList {noneLabelList}')
+            self.refreshLists(self)
+            print('\nCalled Refresh Function\n')
             self.dpJointDisplayUI(self)
+            
+            print(f'boneLabelList {boneLabelList}, jointLabelList {jointLabelList}, multiChildLabelList {multiChildLabelList}, noneLabelList {noneLabelList}')
+            
     
+    def refreshLists(self,*args, **kwargs):
+        """ Refresh the code
+        """
+        self.getJointList(self)
+        self.populateLabelList(self)
     
     def dpCloseJointDisplayUI(self, *args):
         if cmds.window('dpJointDisplayWindow', query=True, exists=True):
@@ -55,141 +66,96 @@ class JointDisplay(object):
         
         # filter
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=jointDisplayMainLayout)
-        self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="TESTEEE####", changeCommand=self.dpMoveAttr, adjustableColumn=2, parent=filterLayout)
+        self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="TESTEEE####", changeCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
 
         # creating column Layout
         colunmLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout)
 
         # creating titles
-        title1 = cmds.text('boneTitle', label='Bone',parent=colunmLayout)
-        title2 = cmds.text('jointTitle',label='Joint',parent=colunmLayout)
-        title3 = cmds.text('multiChildAsBoxTitle',label='Multi-Child as box',parent=colunmLayout)
-        title4 = cmds.text('noneTitle', label='None',parent=colunmLayout)
+        boneTitle = cmds.text('boneTitle', label='Bone',parent=colunmLayout)
+        jointTitle = cmds.text('jointTitle',label='Joint',parent=colunmLayout)
+        multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=colunmLayout)
+        noneTitle = cmds.text('noneTitle', label='None',parent=colunmLayout)
 
-        jointListFeild1 = cmds.scrollField(parent=colunmLayout)
-        jointListFeild2 = cmds.scrollField(parent=colunmLayout)
-        jointListFeild3 = cmds.scrollField(parent=colunmLayout)
-        jointListFeild4 = cmds.scrollField(parent=colunmLayout)
+        boneFieldColunm = cmds.textScrollList('boneFieldColunm', parent=colunmLayout, allowMultiSelection=True, append=boneLabelList)
+        jointFieldColunm = cmds.textScrollList('jointFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=jointLabelList)
+        multiChildFieldColunm = cmds.textScrollList('multiChildFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=multiChildLabelList)
+        noneFieldColunm = cmds.textScrollList('noneFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=noneLabelList)
 
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=jointDisplayMainLayout)
-        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
-        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.dpMoveAttr, parent=buttonLayout)
-        cmds.button("Cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.dpMoveAttr, parent=buttonLayout)
+        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedToRight', parent=buttonLayout)
+        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedLeft', parent=buttonLayout)
+        cmds.button("Cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command='Cancel', parent=buttonLayout)
         cmds.separator(style='none', height=10, parent=buttonLayout)
 
         # call dpJointDisplayUI Window:
         cmds.showWindow(dpJointDisplayWin)
     
-        def getJointList(self, *args):
-            """ Get all joints in the scene
-            """
-            jointList = cmds.ls(type='joint')
-            if cmds.objExists(jointList[0]):
-                return jointList
-        
-        def populateLabelList(self, *args):
-            """ Populate each list with label joint type
-            """
-            if getJointList():
-                for jnt in getJointList():
-                    if jnt +'.drawStyle' == 0:
-                        boneLabelList.append(jnt)
-                    if jnt +'.drawStyle' == 1:
-                        multiChildLabelList.append(jnt)
-                    if jnt +'.drawStyle' == 2:
-                        noneLabelList.append(jnt)
-                    if jnt +'.drawStyle' == 3:
-                        jointLabelList.append(jnt)
-
-
-        
-        def refresh(self):
-            """ Refresh the code
-            """
-            getJointList(self)
-            populateLabelList(self)
-            
-            #TODO
-            # read all joints
-            # populate fields
-
-
-
-
-
-
-
-
-    def dpMoveAttr(self, mode, objList=None, attrList=None, verbose=False, *args):
-        """ Change order of attributes in order to move it to up or down in the list position.
+    def getJointList(self, *args, **kwargs):
+        """ Get all joints in the scene
         """
-        # do ScriptEditor do not print Undo messages:
-        cmds.scriptEditorInfo(suppressInfo=False)
-        if not objList:
-            # get current selected objects:
-            objList = cmds.channelBox('mainChannelBox', query=True, mainObjectList=True)
-        if objList:
-            if not attrList:
-                # get selected attributes from channelBox
-                attrList = cmds.channelBox('mainChannelBox', query=True, selectedMainAttributes=True)
-            if attrList:
-                for obj in objList:
-                    userDefAttrList = cmds.listAttr(obj, userDefined=True)
-                    if userDefAttrList:
-                        if not attrList[0] in userDefAttrList:
-                            if verbose:
-                                mel.eval("warning \"Selected attribute "+str(attrList)+" is static and can not be moved, sorry.\";")
-                        else:
-                            cmds.scriptEditorInfo(suppressInfo=True)
-                            # unlock all user defined attibutes before start the changing position:
-                            lockAttrList = cmds.listAttr(obj, userDefined=True, locked=True)
-                            if lockAttrList:
-                                for lockAttr in lockAttrList:
-                                    cmds.setAttr(obj+"."+lockAttr, lock=False)
-                            # start moving attributes
-                            if mode == 0: #down
-                                if len(attrList) > 1:
-                                    attrList.reverse()
-                                    sortedList = attrList
-                                if len(attrList) == 1:
-                                    sortedList = attrList
-                                for i in sortedList:
-                                    attrLs = cmds.listAttr(obj, userDefined=True)
-                                    attrSize = len(attrLs)
-                                    attrPos = attrLs.index(i)
-                                    cmds.deleteAttr(obj,at=attrLs[attrPos])
-                                    cmds.undo()
-                                    for x in range(attrPos+2,attrSize,1):
-                                        cmds.deleteAttr(obj,at=attrLs[x])
-                                        cmds.undo()
-                                        
-                            elif mode == 1: #up
-                                for i in attrList:
-                                    attrLs = cmds.listAttr(obj, userDefined=True)
-                                    attrSize = len(attrLs)
-                                    attrPos = attrLs.index(i)
-                                    if attrLs[attrPos-1]:
-                                        cmds.deleteAttr(obj, at=attrLs[attrPos-1])
-                                        cmds.undo()
-                                    for x in range(attrPos+1,attrSize,1):
-                                        cmds.deleteAttr(obj, at=attrLs[x])
-                                        cmds.undo()
-                            
-                            # lock all user defined attibutes after the changing position:
-                            if lockAttrList:
-                                for lockAttr in lockAttrList:
-                                    cmds.setAttr(obj+"."+lockAttr, lock=True)
-                    else:
-                        if verbose:
-                            mel.eval("warning \"We can only reorder added attributes by user.\";")
-            else:
-                if verbose:
-                    mel.eval("warning \"Select one or more attributes in the Channel Box, please.\";")
-        else:
-            if verbose:
-                mel.eval("warning \"Select one or more transform nodes to reorder attributes, please.\";")
-        # back ScritpEditor to show info:
-        cmds.scriptEditorInfo(suppressInfo=True)
- 
+        jointList = cmds.ls(type='joint')
+        if cmds.objExists(jointList[0]):
+            return jointList
+    
+    def populateLabelList(self, *args, **kwargs):
+        """ Populate each list with label joint type
+        """
+        
+        if cmds.objExists(self.getJointList(self)[0]):
+            for jnt in self.getJointList(self):
+                if cmds.getAttr(jnt +'.drawStyle') == 0:
+                    try:
+                        boneLabelList.append(jnt)
+                        print(f'{jnt} was appended to boneLabelList')
+                    except:
+                        pass
+                if cmds.getAttr(jnt +'.drawStyle') == 1:
+                    try:
+                        multiChildLabelList.append(jnt)
+                        print(f'{jnt} was appended to multiChildLabelList')
+                    except:
+                        pass
+                if cmds.getAttr(jnt +'.drawStyle') == 2:
+                    try:
+                        noneLabelList.append(jnt)
+                        print(f'{jnt} was appended to noneLabelList')
+                    except:
+                        pass
+                if cmds.getAttr(jnt +'.drawStyle') == 3:
+                    try:
+                        jointLabelList.append(jnt)
+                        print(f'{jnt} was appended to jointLabelList')
+                    except:
+                        pass
+
+
+    # def mainfilter():
+    #     """ Filter list to populate the 
+    #     """
+
+    #     #TODO
+    #     # create a filter to populate list that will be searched 
+
+    
+    # def refreshLists(self,*args, **kwargs):
+    #     """ Refresh the code
+    #     """
+    #     self.getJointList()
+    #     self.populateLabelList()
+
+
+        
+        #TODO
+        # read all joints
+        # populate fields
+
+    # def activeSelectionBoard():
+    #     """ Find the active selection and indicate the board
+    #     """
+
+
+
+
