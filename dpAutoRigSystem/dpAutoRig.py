@@ -1337,23 +1337,17 @@ class DP_AutoRig_UI(object):
     
     
     #@dpUtils.profiler
-    def initGuide(self, guideModule, guideDir, rigType=dpBaseClass.RigType.biped, *args):
+    def initGuide(self, guideModule, guideDir, rigType=dpBaseClass.RigType.biped, number=None, *args):
         """ Create a guideModuleReference (instance) of a further guideModule that will be rigged (installed).
             Returns the guide instance initialised.
         """
         # creating unique namespace:
         cmds.namespace(setNamespace=":")
-        # list all namespaces:
-        namespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
-        # check if there is "__" (double undersore) in the namespaces:
-        for i in range(len(namespaceList)):
-            if namespaceList[i].find("__") != -1:
-                # if yes, get the name after the "__":
-                namespaceList[i] = namespaceList[i].partition("__")[2]
-        # send this result to findLastNumber in order to get the next moduleName +1:
-        newSuffix = self.utils.findLastNumber(namespaceList, BASE_NAME) + 1
-        # generate the current moduleName added the next new suffix:
-        userSpecName = BASE_NAME + str(newSuffix)
+        # generate the current moduleName added the next new number suffix:
+        if number:
+            userSpecName = BASE_NAME + str(number)
+        else:
+            userSpecName = BASE_NAME + self.utils.findLastNumber()
         # especific import command for guides storing theses guides modules in a variable:
         basePath = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")
         self.guide = __import__(basePath+"."+guideDir+"."+guideModule, {}, {}, [guideModule])
@@ -1361,7 +1355,7 @@ class DP_AutoRig_UI(object):
         # get the CLASS_NAME from guideModule:
         guideClass = getattr(self.guide, self.guide.CLASS_NAME)
         # initialize this guideModule as an guide Instance:
-        guideInstance = guideClass(self, userSpecName, rigType)
+        guideInstance = guideClass(self, userSpecName, rigType, number=number)
         self.moduleInstancesList.append(guideInstance)
         # edit the footer A text:
         self.allGuidesList.append([guideModule, userSpecName])

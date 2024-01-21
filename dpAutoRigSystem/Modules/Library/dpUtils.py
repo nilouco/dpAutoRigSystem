@@ -19,14 +19,12 @@ DP_UTILS_VERSION = 3.0
 
 
 class Utils(object):
-
     def __init__(self, *args):
         """ Initialize the module class loading variables and store them in a dictionary.
         """
         # define variables
         self.dpOrderList = "dpOrderList"
         
-
 
     # UTILS functions:
     def findEnv(self, key, path):
@@ -146,54 +144,10 @@ class Utils(object):
         return(validModules, validModuleNames)
 
 
-    def findLastNumber(self, nameList, basename):
-        """ Find the highest number in the name list.
-            Return its highest number.
+    def findLastNumber(self, name="dpGuideNet", *args):
+        """ Returns a padding 3 string of the number of network node list lenght in the scene.
         """
-        # work with rigged modules in the scene:
-        existValue = 0
-        numberList = []
-        # list all transforms and find the existing value in them names:
-        transformList = cmds.ls(selection=False, transforms=True)
-        for transform in transformList:
-            if basename in transform:
-                endNumber = transform.partition(basename)[2]
-                if "_" in endNumber and not ":" in endNumber:
-                    number = endNumber[:endNumber.find("_")]
-                    try:
-                        if int(number) not in numberList:
-                            numberList.append(int(number))
-                    except ValueError:
-                        pass
-
-        # sorted(numberList) doesn't work properly as expected after 5 elements.
-        numberList.sort()
-        numberList.reverse()
-        if numberList:
-            # get the greather value (first item):
-            existValue = numberList[0]
-
-        # work with created guides in the scene:
-        lastValue = 0
-        for n in nameList:
-            # verify if there the basename in the name:
-            if n.find(basename) == 0:
-                # get the number in the end of the basename:
-                suffix = n.partition(basename)[2]
-                # verify if the got suffix has numbers:
-                if re.match("^[0-9]*$", suffix):
-                    # store this numbers as integers:
-                    numberElement = int(suffix)
-                    # verify if this got number is greather than the last number (value) in order to return them:
-                    if numberElement > lastValue:
-                        lastValue = numberElement
-
-        # analysis which value must be returned:
-        if lastValue > existValue:
-            finalValue = lastValue
-        else:
-            finalValue = existValue
-        return finalValue
+        return str(len(self.getNetworkNodeByAttr(name))).zfill(3) or "000"
 
 
     def findModuleLastNumber(self, className, typeName):
@@ -551,6 +505,7 @@ class Utils(object):
 
     def getModulesToBeRigged(self, instanceList):
         """ Get all valid loaded modules to be rigged (They are valid instances with namespaces in the scene, then they are not deleted).
+            Currently named as rawGuide instances.
             Return a list of modules to be rigged.
         """
         modulesToBeRiggedList = []

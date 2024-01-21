@@ -14,7 +14,7 @@ DP_STARTCLASS_VERSION = 2.3
 
 
 class StartClass(object):
-    def __init__(self, dpUIinst, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, *args):
+    def __init__(self, dpUIinst, userGuideName, rigType, CLASS_NAME, TITLE, DESCRIPTION, ICON, number=None, *args):
         """ Initialize the module class creating a button in createGuidesLayout in order to be used to start the guide module.
         """
         # defining variables:
@@ -34,6 +34,7 @@ class StartClass(object):
         self.moduleGrp = self.guideName+"_Base"
         self.radiusCtrl = self.moduleGrp+"_RadiusCtrl"
         self.annotation = self.moduleGrp+"_Ant"
+        self.number = number
         self.raw = True
         # utils
         self.utils = dpUIinst.utils
@@ -86,7 +87,7 @@ class StartClass(object):
         baseStringAttrList  = ['moduleType', 'moduleNamespace', 'customName', 'mirrorAxis', 'mirrorName', 'mirrorNameList', 'hookNode', 'moduleInstanceInfo', 'guideObjectInfo', 'rigType', 'dpARVersion']
         for baseStringAttr in baseStringAttrList:
             cmds.addAttr(self.moduleGrp, longName=baseStringAttr, dataType='string')
-        cmds.setAttr(self.moduleGrp+".moduleType", self.moduleGrp[:self.moduleGrp.find("__")], type='string')
+        cmds.setAttr(self.moduleGrp+".moduleType", self.guideModuleName, type='string')
         cmds.setAttr(self.moduleGrp+".moduleNamespace", self.moduleGrp[:self.moduleGrp.rfind(":")], type='string')
         cmds.setAttr(self.moduleGrp+".mirrorAxis", "off", type='string')
         cmds.setAttr(self.moduleGrp+".mirrorName", self.dpUIinst.lang['p002_left']+' --> '+self.dpUIinst.lang['p003_right'], type='string')
@@ -478,17 +479,24 @@ class StartClass(object):
     def createGuideNetwork(self, *args):
         """ Create a network for the current guide and store on it the nodes used in this module by message.
         """
-        if self.raw:
-            netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
-            self.guideNet = cmds.createNode("network", name="dpGuide_"+str(len(netList)+1).zfill(3)+"_Net")
-            for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
-                cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
-                cmds.setAttr(self.guideNet+"."+baseAttr, 1)
-            cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
-            cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
+        print("self.number =", self.number)
+        if self.number:
+            print("siiimm, have selfnumber")
+            guideNumber = self.number
         else:
-            cmds.lockNode(self.guideNet, lock=False)
+            guideNumber = self.utils.findLastNumber()
+        self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
+        for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
+            cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
+            cmds.setAttr(self.guideNet+"."+baseAttr, 1)
+        cmds.addAttr(self.guideNet, longName="moduleType", dataType="string")
+        cmds.addAttr(self.guideNet, longName="guideNumber", dataType="string")
+        cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
+        cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
+        cmds.setAttr(self.guideNet+".moduleType", self.guideModuleName, type="string")
+        cmds.setAttr(self.guideNet+".guideNumber", guideNumber, type="string")
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
+        cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
 
@@ -545,11 +553,18 @@ class StartClass(object):
         attrList = cmds.listAttr(node, keyable=True)
         userDefinedAttrList = cmds.listAttr(node, unlocked=True, userDefined=True)
         if attrList:
+            attrDic = {}
+            fatherList = cmds.listRelatives(node, parent=True)
+            if fatherList:
+                attrDic["fatherNode"] = fatherList[0]
+                if node.endswith("Guide_Base"):
+                    cmds.parent(node, world=True) #to export guide base transformation in worldSpace
+            else:
+                attrDic["fatherNode"] = None
             if userDefinedAttrList:
                 attrList.extend(userDefinedAttrList)
             attrList = list(set(attrList))
             attrList.sort()
-            attrDic = {}
             for attr in attrList:
                 if cmds.getAttr(node+"."+attr, type=True) == "message":
                     attrConnectList = cmds.listConnections(node+"."+attr, source=True, destination=False)
@@ -557,11 +572,9 @@ class StartClass(object):
                         attrDic[attr] = attrConnectList[0]
                 else:
                     attrDic[attr] = cmds.getAttr(node+"."+attr)
-            fatherList = cmds.listRelatives(node, parent=True)
-            if fatherList:
-                attrDic["fatherNode"] = fatherList[0]
-            else:
-                attrDic["fatherNode"] = None
+            if node.endswith("Guide_Base"):
+                if fatherList:
+                    cmds.parent(node, fatherList[0])
             return attrDic
 
 
@@ -571,6 +584,13 @@ class StartClass(object):
         afterDataDic = {}
         beforeList = self.getBeforeList()
         if beforeList:
+            if buildIt:
+                self.raw = False
+                cmds.setAttr(self.guideNet+".rawGuide", 0)
+            afterDataDic["GuideNumber"] = cmds.getAttr(self.guideNet+".guideNumber")
+            afterDataDic["ModuleType"] = self.guideModuleName
+            afterDataDic["RawGuide"] = self.raw
+            afterDataDic["BeforeData"] = beforeList
             for beforeAttr in beforeList:
                 nodeName = cmds.listConnections(self.guideNet+"."+beforeAttr, source=True, destination=False) or None
                 if nodeName:
@@ -578,11 +598,8 @@ class StartClass(object):
                         afterDataDic[nodeName[0]] = self.getNodeData(nodeName[0])
                         if buildIt:
                             cmds.deleteAttr(self.guideNet+"."+beforeAttr)
-            afterDataDic["BeforeData"] = beforeList
             cmds.setAttr(self.guideNet+".afterData", json.dumps(afterDataDic), type="string")
             if buildIt:
-                self.raw = False
-                cmds.setAttr(self.guideNet+".rawGuide", 0)
                 cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node
 
 

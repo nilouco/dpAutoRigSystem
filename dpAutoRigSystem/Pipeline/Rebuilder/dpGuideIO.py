@@ -1,12 +1,15 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseActionClass
+import json
 
 # global variables to this module:
 CLASS_NAME = "GuideIO"
 TITLE = "r012_guideIO"
 DESCRIPTION = "r013_guideIODesc"
 ICON = "/Icons/dp_guideIO.png"
+
+MODULES = "Modules"
 
 DP_GUIDEIO_VERSION = 1.0
 
@@ -63,6 +66,12 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                             # mount a dic with all data 
                             if cmds.objExists(net+".afterData"):
+                                if cmds.getAttr(net+".rawGuide"): 
+                                    # get data from not rendered guide (rawGuide status on)
+                                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
+                                    for moduleInstance in self.dpUIinst.moduleInstancesList:
+                                        if str(moduleInstance) == moduleInstanceInfoString:
+                                            moduleInstance.serializeGuide(False) #serialize it without build it
                                 dataDic[net] = cmds.getAttr(net+".afterData")
                         if dataDic:
                             try:
@@ -88,31 +97,50 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                 #WIP
                                 #
                                 #
-                                #mount guides from netDataDic
-                                #parentGuides
-                                #change net status to raw True
                                 print("IMPORTING Guides....")
 
 
 
                                 
-                                
+                                progressAmount = 0
+                                maxProcess = len(dataDic.keys())
                                 for net in dataDic.keys():
-                                    if not cmds.objExists(net):
-                                        print(net)
-                                        print(dataDic[net])
+                                    if self.verbose:
+                                        # Update progress window
+                                        progressAmount += 1
+                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                    toInitializeGuide = True
+                                    if cmds.objExists(net):
+                                        if cmds.getAttr(net+".rawGuide"):
+                                            toInitializeGuide = False
+                                        else:
+                                            cmds.lockNode(net, lock=False)
+                                            cmds.delete(net)
+                                    if toInitializeGuide:
+#                                        try:
+                                        print("toInitializate", net)
+                                        #WIP
 
-                                        guideDir = 'Modules'
+                                        netDic = json.loads(dataDic[net])
+                                        
+                                        # create a module instance:
+                                        instance = self.dpUIinst.initGuide("dp"+netDic['ModuleType'], MODULES, number=netDic["GuideNumber"])
+                                        print("imported =", instance)
+                                        # setup instance changes
+                                        instance.editUserName("guideName_TEST")
+                                        
+                                        # setup transformations
+                                        cmds.setAttr(instance.moduleGrp+".translateY", 9)
+                                        cmds.setAttr(instance.radiusCtrl+".translateX", 8)
 
+                                        
 
-                                        # create fkLine module instance:
-                                        chassisInstance = self.dpUIinst.initGuide(dataDic[net]['moduleType'], guideDir)
-                                        # editing chassis base guide informations:
-                                        chassisInstance.editUserName("guideName_TEST")
-                                        cmds.setAttr(chassisInstance.moduleGrp+".translateY", 9)
-                                        cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 8)
-
+                                        print("HEREEEE 00030")
+#                                    except:
+#                                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                                 
+                                #parentGuides
+                                #change net status to raw True ?
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                         else:
