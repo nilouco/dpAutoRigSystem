@@ -17,8 +17,8 @@
 #
 ###################################################################
 
-DPAR_VERSION_PY3 = "4.04.00"
-DPAR_UPDATELOG = "Release version."
+DPAR_VERSION_PY3 = "4.04.01"
+DPAR_UPDATELOG = "N685 - Rivet remove added."
 
 
 
