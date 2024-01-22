@@ -136,6 +136,8 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.nostrilTMD+".input2X", -1)
         cmds.setAttr(self.nostrilRMD+".input2Y", -1)
         cmds.setAttr(self.nostrilRMD+".input2Z", -1)
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvTopLoc, self.cvMiddleLoc, self.cvTipLoc, self.cvLSideLoc, self.cvRSideLoc, self.cvLNostrilLoc, self.cvBottomLoc, self.cvEndJoint], ["cvTopLoc1", "cvMiddleLoc", "cvTipLoc", "cvLSideLoc", "cvRSideLoc", "cvLNostrilLoc", "cvBottomLoc", "JointEnd"])
         
         
     def changeJointNumber(self, enteredNJoints, *args):
@@ -174,6 +176,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     #Do not maintain offset and ensure cv will be at the same place than the joint
                     cmds.parentConstraint(self.cvTopLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
                     cmds.scaleConstraint(self.cvTopLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScC")
+                    self.addNodeToGuideNet([self.cvTopLoc], ["cvTopLoc"+str(n)])
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvTopLoc:
                 self.cvTopLoc = self.guideName+"_cvTopLoc"+str(self.enteredNJoints)
@@ -185,6 +188,8 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete difference of nJoints:
                 cmds.delete(self.guideName+"_cvTopLoc"+str(self.enteredNJoints+1))
                 cmds.delete(self.guideName+"_JGuideTop"+str(self.enteredNJoints+1))
+                for j in range(self.enteredNJoints+1, self.currentNJoints+1):
+                    self.removeAttrFromGuideNet(["cvTopLoc"+str(j)])
             cmds.setAttr(self.moduleGrp+".nJoints", self.enteredNJoints)
             self.currentNJoints = self.enteredNJoints
             # re-build the preview mirror:

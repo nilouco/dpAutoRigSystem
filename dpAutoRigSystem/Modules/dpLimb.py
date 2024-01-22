@@ -201,6 +201,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # re orient guides:
         self.reOrientGuide()
         cmds.setAttr(self.cvExtremLoc+".translateX", lock=True)
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvBeforeLoc, self.cvMainLoc, self.cvCornerLoc, self.cvCornerBLoc, self.cvExtremLoc, self.cvUpVectorLoc, self.cvEndJoint], ["Before", "Main", "Corner", "CornerB", "Extrem", "CornerUpVector", "JointEnd"])
 
 
     def reCreateEditSelectedModuleLayout(self, bSelect=False, *args):
@@ -232,7 +234,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.bendMainLayout = cmds.rowColumnLayout("bendMainLayout", numberOfColumns=2, columnWidth=[(1, 260), (2, 80)], columnSpacing=[(1, 2), (2, 10)], parent="selectedModuleColumn")
         self.bendLayout = cmds.rowLayout(numberOfColumns=4, columnWidth4=(100, 20, 50, 20), columnAlign=[(1, 'right'), (2, 'left'), (3, 'left'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'left', 2), (3, 'left', 2), (4, 'both', 10)], parent=self.bendMainLayout)
         cmds.text(label=self.dpUIinst.lang['m044_addBend'], visible=True, parent=self.bendLayout)
-        self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', ofc=self.setBendFalse, onc=self.setBendTrue, parent=self.bendLayout)
+        self.bendCB = cmds.checkBox(value=self.getHasBend(), label=' ', changeCommand=self.changeBend, parent=self.bendLayout)
         self.bendNumJointsMenu = cmds.optionMenu("bendNumJointsMenu", label='Ribbon Joints', changeCommand=self.changeNumBend, enable=self.getHasBend(), parent=self.bendLayout)
         bendNumMenuItemList = [3, 5, 7]
         for item in bendNumMenuItemList:
@@ -256,26 +258,26 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
     def setAlignWorld(self, value, *args):
         cmds.setAttr(self.moduleGrp+".alignWorld", value)
 
-    def setBendTrue(self, *args):
-        self.hasBend = True
-        cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=True)
-        cmds.checkBox(self.additionalCB, edit=True, enable=True)
-        cmds.setAttr(self.moduleGrp+".hasBend", 1)
 
-    def setBendFalse(self, *args):
-        self.hasBend = False
-        cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=False)
-        cmds.checkBox(self.additionalCB, edit=True, enable=False)
-        cmds.setAttr(self.moduleGrp+".hasBend", 0)
+    def changeBend(self, value, *args):
+        """ Just set bend values and enable or disable UI elements.
+        """
+        self.hasBend = value
+        cmds.optionMenu(self.bendNumJointsMenu, edit=True, enable=value)
+        cmds.checkBox(self.additionalCB, edit=True, enable=value)
+        cmds.setAttr(self.moduleGrp+".hasBend", value)
+
 
     def changeNumBend(self, numberBendJoints, *args):
         """ Change the number of joints used in the bend ribbon.
         """
         cmds.setAttr(self.moduleGrp+".numBendJoints", int(numberBendJoints))
 
+
     def changeAdditional(self, *args):
         self.hasAdditional = cmds.checkBox(self.additionalCB, query=True, value=True)
         cmds.setAttr(self.moduleGrp+".additional", self.hasAdditional)
+
 
     def changeStyle(self, style, *args):
         """ Change the style to be applyed custom actions to be more animator friendly.

@@ -63,6 +63,8 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.jGuideEnd, self.jGuide1)
         self.ctrls.directConnect(self.cvJointLoc1, self.jGuide1, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvJointLoc1, self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointLoc2", "JointEnd"])
 
         # change the number of phalanges to 3:
         self.changeJointNumber(3)
@@ -72,6 +74,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvBaseJoint+".translateZ", -1)
         cmds.setAttr(self.cvBaseJoint+".rotateZ", lock=True)
         cmds.parent(self.cvBaseJoint, self.moduleGrp)
+        self.addNodeToGuideNet([self.cvBaseJoint], ["JointLoc0"])
 
         # transform cvLocs in order to put as a good finger guide:
         cmds.setAttr(self.moduleGrp+".rotateX", 90)
@@ -116,6 +119,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.setAttr(self.jGuide+".template", 1)
                         cmds.parent(self.jGuide, self.guideName+"_JGuide"+str(n-1))
                         self.ctrls.directConnect(self.cvJointLoc, self.jGuide, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
+                        self.addNodeToGuideNet([self.cvJointLoc], ["JointLoc"+str(n)])
                 elif self.enteredNJoints < self.currentNJoints:
                     # re-define cvEndJoint:
                     self.cvJointLoc = self.guideName+"_JointLoc"+str(self.enteredNJoints)
@@ -129,6 +133,8 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # delete difference of nJoints:
                     cmds.delete(self.guideName+"_JointLoc"+str(self.enteredNJoints+1))
                     cmds.delete(self.guideName+"_JGuide"+str(self.enteredNJoints+1))
+                    for j in range(self.enteredNJoints+1, self.currentNJoints+1):
+                        self.removeAttrFromGuideNet(["JointLoc"+str(j)])
                 # re-parent cvEndJoint:
                 cmds.parent(self.cvEndJoint, self.cvJointLoc)
                 cmds.setAttr(self.cvEndJoint+".tz", 1.3)

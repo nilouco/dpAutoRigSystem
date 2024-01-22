@@ -91,6 +91,8 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvFrontLoc, self.jGuideFront, maintainOffset=False, name=self.jGuideFront+"_PaC")
         cmds.parentConstraint(self.cvInsideLoc, self.jGuideInside, maintainOffset=False, name=self.cvInsideLoc+"_PaC")
         cmds.parentConstraint(self.cvOutsideLoc, self.jGuideOutside, maintainOffset=False, name=self.cvOutsideLoc+"_PaC")
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvCenterLoc, self.cvFrontLoc, self.cvInsideLoc, self.cvOutsideLoc], ["CenterLoc", "FrontLoc", "InsideLoc", "OutsideLoc"])
     
     
     def changeStartFrame(self, *args):

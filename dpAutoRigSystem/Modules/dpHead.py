@@ -149,6 +149,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.cvLCornerLipLoc, self.cvJawLoc)
         cmds.parent(self.cvRCornerLipLoc, self.cvJawLoc)
         cmds.parent(self.cvUpperLipLoc, self.cvUpperHeadLoc, self.cvUpperJawLoc)
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvEndJoint], ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "JointEnd"])
     
 
     def changeJointNumber(self, enteredNJoints, *args):
@@ -184,6 +186,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     #Do not maintain offset and ensure cv will be at the same place than the joint
                     cmds.parentConstraint(self.cvNeckLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_PaC")
                     cmds.scaleConstraint(self.cvNeckLoc, self.jGuide, maintainOffset=False, name=self.jGuide+"_ScC")
+                    self.addNodeToGuideNet([self.cvNeckLoc], ["Neck"+str(n-1)])
             elif self.enteredNJoints < self.currentNJoints:
                 # re-define cvNeckLoc:
                 self.cvNeckLoc = self.guideName+"_Neck"+str(self.enteredNJoints)
@@ -195,6 +198,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete difference of nJoints:
                 cmds.delete(self.guideName+"_Neck"+str(self.enteredNJoints))
                 cmds.delete(self.guideName+"_JGuideNeck"+str(self.enteredNJoints))
+                for j in range(self.enteredNJoints, self.currentNJoints):
+                    self.removeAttrFromGuideNet(["Neck"+str(j)])
             # get the length of the neck to position segments.
             dist = self.utils.distanceBet(self.guideName+"_Neck0", self.guideName+"_Head")[0]
             # translateY to input on each cvLocator

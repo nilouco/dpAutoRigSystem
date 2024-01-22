@@ -58,6 +58,8 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_PaC")
         cmds.scaleConstraint(self.cvALoc, self.jAGuide, maintainOffset=False, name=self.jAGuide+"_ScC")
         cmds.scaleConstraint(self.cvBLoc, self.jBGuide, maintainOffset=False, name=self.jBGuide+"_ScC")
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvALoc, self.cvBLoc], ["JointLocA", "JointLocB"])
     
     
     def loadFatherB(self, *args):

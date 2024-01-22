@@ -33,9 +33,11 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.reverseFootAttrList = []
         self.aScalableGrp = []
 
+
     def createModuleLayout(self, *args):
         dpBaseClass.StartClass.createModuleLayout(self)
         dpLayoutClass.LayoutClass.basicModuleLayout(self)
+
 
     def createGuide(self, *args):
         dpBaseClass.StartClass.createGuide(self)
@@ -108,6 +110,9 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvRFDLoc+".rotateZ", -90)
         cmds.setAttr(self.moduleGrp+".rotateX", -90)
         cmds.setAttr(self.moduleGrp+".rotateY", 90)
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvEndJoint], ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "JointEnd"])
+
 
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
@@ -489,6 +494,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
+
 
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)

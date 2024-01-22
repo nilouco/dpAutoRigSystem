@@ -479,9 +479,7 @@ class StartClass(object):
     def createGuideNetwork(self, *args):
         """ Create a network for the current guide and store on it the nodes used in this module by message.
         """
-        print("self.number =", self.number)
         if self.number:
-            print("siiimm, have selfnumber")
             guideNumber = self.number
         else:
             guideNumber = self.utils.findLastNumber()
@@ -581,7 +579,7 @@ class StartClass(object):
     def serializeGuide(self, buildIt=True, *args):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
-        afterDataDic = {}
+        afterDataDic, guideDic = {}, {}
         beforeList = self.getBeforeList()
         if beforeList:
             if buildIt:
@@ -595,9 +593,10 @@ class StartClass(object):
                 nodeName = cmds.listConnections(self.guideNet+"."+beforeAttr, source=True, destination=False) or None
                 if nodeName:
                     if cmds.objExists(nodeName[0]):
-                        afterDataDic[nodeName[0]] = self.getNodeData(nodeName[0])
+                        guideDic[nodeName[0]] = self.getNodeData(nodeName[0])
                         if buildIt:
                             cmds.deleteAttr(self.guideNet+"."+beforeAttr)
+            afterDataDic["GuideData"] = guideDic
             cmds.setAttr(self.guideNet+".afterData", json.dumps(afterDataDic), type="string")
             if buildIt:
                 cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node

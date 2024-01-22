@@ -56,7 +56,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     else:
                         netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                     if netList:
-                        dataDic = {}
+                        toExportDataDic = {}
                         progressAmount = 0
                         maxProcess = len(netList)
                         for net in netList:
@@ -72,18 +72,19 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                     for moduleInstance in self.dpUIinst.moduleInstancesList:
                                         if str(moduleInstance) == moduleInstanceInfoString:
                                             moduleInstance.serializeGuide(False) #serialize it without build it
-                                dataDic[net] = cmds.getAttr(net+".afterData")
-                        if dataDic:
+                                toExportDataDic[net] = cmds.getAttr(net+".afterData")
+                        if toExportDataDic:
                             try:
                                 # export json file
                                 self.pipeliner.makeDirIfNotExists(self.ioPath)
                                 jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
-                                self.pipeliner.saveJsonFile(dataDic, jsonName)
+                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
                                 self.wellDoneIO(jsonName)
                             except:
                                 self.notWorkedWellIO(jsonName)
                         else:
                             self.notWorkedWellIO("v014_notFoundNodes")
+                        cmds.select(clear=True)
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
                 else: #import
@@ -91,24 +92,12 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                         exportedList = self.getExportedList()
                         if exportedList:
                             exportedList.sort()
-                            dataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if dataDic:
-
-                                #WIP
-                                #
-                                #
-                                print("IMPORTING Guides....")
-
-
-
-                                
+                            self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                            if self.importedDataDic:
                                 progressAmount = 0
-                                maxProcess = len(dataDic.keys())
-                                for net in dataDic.keys():
-                                    if self.verbose:
-                                        # Update progress window
-                                        progressAmount += 1
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                maxProcess = len(self.importedDataDic.keys())
+                                for net in self.importedDataDic.keys():
+                                    progressAmount += 1
                                     toInitializeGuide = True
                                     if cmds.objExists(net):
                                         if cmds.getAttr(net+".rawGuide"):
@@ -118,31 +107,29 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                             cmds.delete(net)
                                     if toInitializeGuide:
 #                                        try:
-                                        print("toInitializate", net)
-                                        #WIP
-
-                                        netDic = json.loads(dataDic[net])
-                                        
+                                        self.netDic = json.loads(self.importedDataDic[net])
+                                        if self.verbose:
+                                            # Update progress window
+                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+self.netDic['ModuleType']+" - "+repr(progressAmount)))
                                         # create a module instance:
-                                        instance = self.dpUIinst.initGuide("dp"+netDic['ModuleType'], MODULES, number=netDic["GuideNumber"])
-                                        print("imported =", instance)
-                                        # setup instance changes
-                                        instance.editUserName("guideName_TEST")
-                                        
-                                        # setup transformations
-                                        cmds.setAttr(instance.moduleGrp+".translateY", 9)
-                                        cmds.setAttr(instance.radiusCtrl+".translateX", 8)
-
+                                        self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                                        self.setupInstanceChanges()
+                                        self.setupGuideTransformations()
                                         
 
-                                        print("HEREEEE 00030")
+
 #                                    except:
 #                                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                                 
-                                #parentGuides
-                                #change net status to raw True ?
+                                # Parenting guides
+                                self.setupGuideBaseParenting()
+
+
+
+#                                    except:
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            cmds.select(clear=True)
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                     except:
@@ -157,3 +144,67 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         self.reportLog()
         self.endProgressBar()
         return self.dataLogDic
+
+
+    def setupInstanceChanges(self, *args):
+        """ Run instance code to Guide_Base node configuration or just set the simple attributes.
+        """
+        directionList = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
+        customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style"]
+        for item in list(self.netDic["GuideData"]):
+            if item.endswith("Guide_Base"): #moduleGrp
+                for baseAttr in list(self.netDic["GuideData"][item]):
+                    if baseAttr == "customName":
+                        customNameData = self.netDic["GuideData"][item]["customName"]
+                        if customNameData:
+                            self.instance.editUserName(customNameData)
+                    elif baseAttr == "mirrorAxis":
+                        cmds.setAttr(item+".mirrorAxis", self.netDic["GuideData"][item]["mirrorAxis"], type="string")
+                        cmds.setAttr(item+".mirrorName", self.netDic["GuideData"][item]["mirrorName"], type="string")                                                        
+                    elif baseAttr == "articulation":
+                        self.instance.setArticulation(self.netDic["GuideData"][item]["articulation"])
+                    elif baseAttr == "nJoints":
+                        self.instance.changeJointNumber(self.netDic["GuideData"][item]["nJoints"])
+                    elif baseAttr == "type": #limb
+                        self.instance.changeType(self.netDic["GuideData"][item]["type"])
+                    elif baseAttr == "hasBend": #limb
+                        self.instance.changeBend(self.netDic["GuideData"][item]["hasBend"])
+                    elif baseAttr == "aimDirection": #eye
+                        self.instance.changeAimDirection(directionList[(int(self.netDic["GuideData"][item]["aimDirection"]))])
+                    elif baseAttr == "fatherB": #suspention
+                        fatherBData = self.netDic["GuideData"][item]["fatherB"]
+                        if fatherBData:
+                            cmds.setAttr(item+".fatherB", fatherBData, type="string")
+                    elif baseAttr == "geo": #wheel
+                        geoData = self.netDic["GuideData"][item]["geo"]
+                        if geoData:
+                            cmds.setAttr(item+".geo", geoData, type="string")
+                    else: #just set simple attributes
+                        if baseAttr in customAttrList:
+                            cmds.setAttr(item+"."+baseAttr, self.netDic["GuideData"][item][baseAttr])
+#                    cmds.refresh()
+
+
+    def setupGuideTransformations(self, *args):
+        """ Work with guide transformations to put the transform as imported data.
+        """
+        transformAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ', 'visibility']
+        for item in list(self.netDic["GuideData"]):
+            for attr in list(self.netDic["GuideData"][item]):
+                if attr in transformAttrList:
+                    if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
+                        if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
+                            cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])
+#                cmds.refresh()
+
+
+    def setupGuideBaseParenting(self, *args):
+        """ Rebuild the Guide_Base parenting.
+        """
+        for net in self.importedDataDic.keys():
+            netDic = json.loads(self.importedDataDic[net])
+            for item in list(netDic["GuideData"]):
+                if item.endswith("Guide_Base"): #moduleGrp
+                    fatherNodeData = netDic["GuideData"][item]['fatherNode']
+                    if fatherNodeData:
+                        cmds.parent(item, fatherNodeData)

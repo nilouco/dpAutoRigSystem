@@ -53,6 +53,8 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         
         cmds.setAttr(self.moduleGrp+".translateY", 3)
         cmds.setAttr(self.moduleGrp+".rotateX", 45)
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
     
     
     def rigModule(self, *args):

@@ -64,10 +64,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             We will optimise: control world orientation
         """
         # for Default style:
-        if style == self.dpUIinst.lang['m042_default']:
+        if style == self.dpUIinst.lang['m042_default'] or style == 0:
             cmds.setAttr(self.moduleGrp+".style", 0)
         # for Biped style:
-        if style == self.dpUIinst.lang['m026_biped']:
+        if style == self.dpUIinst.lang['m026_biped'] or style == 1:
             cmds.setAttr(self.moduleGrp+".style", 1)
 
 
@@ -88,6 +88,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".ry", -90)
         cmds.setAttr(self.moduleGrp+"_RadiusCtrl.tx", 4)
         self.changeJointNumber(3)
+        # include nodes into net
+        self.addNodeToGuideNet([self.cvJointLoc, self.cvEndJoint], ["JointLoc1", "JointEnd"])
 
 
     def changeJointNumber(self, enteredNJoints, *args):
@@ -126,6 +128,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.setAttr(self.cvLocGrp+".translateZ", 2)
                         if n > 2:
                             cmds.parent(self.cvLocGrp, self.guideName+"_JointLoc1", absolute=True)
+                        self.addNodeToGuideNet([self.cvLocator], ["JointLoc"+str(n)])
                 elif self.enteredNJoints < self.currentNJoints:
                     # re-parent cvEndJoint:
                     self.cvLocator = self.guideName+"_JointLoc" + str(self.enteredNJoints)
@@ -138,6 +141,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             for childGuide in childrenGuideBellowList:
                                 cmds.parent(childGuide, self.cvLocator)
                         cmds.delete(self.guideName+"_JointLoc"+str(n+1)+"_Grp")
+                        self.removeAttrFromGuideNet(["JointLoc"+str(n+1)])
                 # re-parent cvEndJoint:
                 cmds.parent(self.cvEndJoint, self.cvLocator)
                 cmds.setAttr(self.cvEndJoint+".tz", 1.3)
