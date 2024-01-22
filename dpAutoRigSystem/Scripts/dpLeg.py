@@ -8,7 +8,7 @@ TITLE = "m030_leg"
 DESCRIPTION = "m031_legDesc"
 ICON = "/Icons/dp_leg.png"
 
-DP_LEG_VERSION = 2.0
+DP_LEG_VERSION = 2.1
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -227,4 +227,4 @@ def Leg(dpUIinst):
             print(dpUIinst.lang['m092_createdLeg'])
     else:
         # error checking modules in the folder:
-        mel.eval('error \"'+ dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+        mel.eval('error \"'+ dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')

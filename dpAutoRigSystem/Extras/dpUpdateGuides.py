@@ -8,7 +8,7 @@ TITLE = "m186_updateGuides"
 DESCRIPTION = "m187_updateGuidesDesc"
 ICON = "/Icons/dp_updateGuides.png"
 
-DP_UPDATEGUIDES_VERSION = 1.4
+DP_UPDATEGUIDES_VERSION = 1.6
 
 
 class UpdateGuides(object):
@@ -33,7 +33,7 @@ class UpdateGuides(object):
             # Get all info nedeed and store in updateData dictionary
             self.getGuidesToUpdateData()
         else:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_GuideNotFound']+'\\n\";')
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_guideNotFound']+'\\n\";')
         if self.ui:
             # Open the UI
             self.updateGuidesUI()
@@ -318,6 +318,7 @@ class UpdateGuides(object):
         childrenList = self.filterAnotation(childrenList)
         return childrenList
     
+
     def splitTransformAttrValues(self, guide, attrList):
         nonTransformDic = {}
         transformDic = {}
@@ -329,6 +330,7 @@ class UpdateGuides(object):
             else:
                 nonTransformDic[attribute] = attributeValue
         return nonTransformDic, transformDic
+
 
     def getGuidesToUpdateData(self):
         """ Scan a dictionary for old guides and gather data needed to update them.
@@ -491,29 +493,22 @@ class UpdateGuides(object):
             return newDataDic
     
 
-
-
-
     def doDelete(self, *args):
         self.closeExistWin('updateSummary')
-        
         for guide in self.updateData:
             try:
                 cmds.parent(guide, world=True)
             except Exception as e:
                 print(e)
-                
         try:
             cmds.delete(*self.updateData.keys())
         except:
-            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_GuideNotFound']+'\\n\";')
-        
+            mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_guideNotFound']+'\\n\";')
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
              if self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace in allNamespaceList:
                     cmds.namespace(moveNamespace=(self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, ':'), force=True)
                     cmds.namespace(removeNamespace=self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, force=True)
-
         self.dpUIinst.jobReloadUI()
 
 

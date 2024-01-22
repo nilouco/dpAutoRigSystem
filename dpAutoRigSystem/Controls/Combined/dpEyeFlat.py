@@ -9,7 +9,7 @@ TITLE = "m211_eyeFlat"
 DESCRIPTION = "m099_cvControlDesc"
 ICON = "/Icons/dp_eyeFlat.png"
 
-DP_EYEFLAT_VERSION = 1.1
+DP_EYEFLAT_VERSION = 1.2
 
 
 class EyeFlat(dpBaseControlClass.ControlStartClass):
@@ -36,7 +36,7 @@ class EyeFlat(dpBaseControlClass.ControlStartClass):
             return result
         else:
             # error checking modules in the folder:
-            mel.eval('error \"'+ self.dpUIinst.lang['e001_GuideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
+            mel.eval('error \"'+ self.dpUIinst.lang['e001_guideNotChecked'] +' - '+ (", ").join(checkResultList) +'\";')
     
     
     def generateCombineCurves(self, useUI, cvID, cvName, cvSize, cvDegree, cvDirection, *args):
