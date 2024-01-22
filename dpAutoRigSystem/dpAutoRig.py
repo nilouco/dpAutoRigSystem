@@ -17,8 +17,9 @@
 #
 ###################################################################
 
-DPAR_VERSION_PY3 = "4.04.01"
-DPAR_UPDATELOG = "N685 - Rivet remove added."
+
+DPAR_VERSION_PY3 = "4.04.02"
+DPAR_UPDATELOG = "N768 - AimConstraint from elbow to shoulder guide.\nN322 - Review limb autoOrient guides."
 
 
 
