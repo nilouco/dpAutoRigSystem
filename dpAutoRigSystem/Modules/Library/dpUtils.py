@@ -144,10 +144,21 @@ class Utils(object):
         return(validModules, validModuleNames)
 
 
-    def findLastNumber(self, name="dpGuideNet", *args):
-        """ Returns a padding 3 string of the number of network node list lenght in the scene.
+    def findLastNumber(self, name="dpGuideNet", attr="guideNumber", *args):
+        """ Returns a padding 3 string of the number of network node in the scene or zero.
         """
-        return str(len(self.getNetworkNodeByAttr(name))).zfill(3) or "000"
+        nodeList = self.getNetworkNodeByAttr(name)
+        if not nodeList:
+            return "000"
+        else:
+            numberList = []
+            for node in nodeList:
+                if cmds.objExists(node+"."+attr):
+                    numberList.append(int(cmds.getAttr(node+"."+attr)))
+            if not numberList:
+                return "000"
+            else:
+                return str(max(numberList)+1).zfill(3)
 
 
     def findModuleLastNumber(self, className, typeName):
