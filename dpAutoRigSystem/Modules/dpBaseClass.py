@@ -416,9 +416,6 @@ class StartClass(object):
                 self.clearSelectedModuleLayout()
             except:
                 pass
-            
-            # start serialization
-            self.serializeGuide()
 
             # unPinGuides before Rig them:
             self.ctrls.unPinGuide(self.moduleGrp)
@@ -554,11 +551,11 @@ class StartClass(object):
             attrDic = {}
             fatherList = cmds.listRelatives(node, parent=True)
             if fatherList:
-                attrDic["fatherNode"] = fatherList[0]
-                if node.endswith("Guide_Base"):
+                attrDic["FatherNode"] = fatherList[0]
+                if cmds.objExists(node+".guideBase") and cmds.getAttr(node+".guideBase") == 1:
                     cmds.parent(node, world=True) #to export guide base transformation in worldSpace
             else:
-                attrDic["fatherNode"] = None
+                attrDic["FatherNode"] = None
             if userDefinedAttrList:
                 attrList.extend(userDefinedAttrList)
             attrList = list(set(attrList))
@@ -570,7 +567,7 @@ class StartClass(object):
                         attrDic[attr] = attrConnectList[0]
                 else:
                     attrDic[attr] = cmds.getAttr(node+"."+attr)
-            if node.endswith("Guide_Base"):
+            if cmds.objExists(node+".guideBase") and cmds.getAttr(node+".guideBase") == 1:
                 if fatherList:
                     cmds.parent(node, fatherList[0])
             return attrDic

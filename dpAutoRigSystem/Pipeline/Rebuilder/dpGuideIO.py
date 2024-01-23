@@ -152,7 +152,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         directionList = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
         customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style"]
         for item in list(self.netDic["GuideData"]):
-            if item.endswith("Guide_Base"): #moduleGrp
+            if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                 for baseAttr in list(self.netDic["GuideData"][item]):
                     if baseAttr == "customName":
                         customNameData = self.netDic["GuideData"][item]["customName"]
@@ -204,7 +204,8 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         for net in self.importedDataDic.keys():
             netDic = json.loads(self.importedDataDic[net])
             for item in list(netDic["GuideData"]):
-                if item.endswith("Guide_Base"): #moduleGrp
-                    fatherNodeData = netDic["GuideData"][item]['fatherNode']
+                if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
+                    fatherNodeData = netDic["GuideData"][item]['FatherNode']
                     if fatherNodeData:
-                        cmds.parent(item, fatherNodeData)
+                        if cmds.objExists(fatherNodeData):
+                            cmds.parent(item, fatherNodeData)

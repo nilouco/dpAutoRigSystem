@@ -2254,6 +2254,9 @@ class DP_AutoRig_UI(object):
             
             # store hierarchy from guides:
             self.hookDic = self.utils.hook()
+            # serialize guides before change hierarchy
+            for guideModule in self.modulesToBeRiggedList:
+                guideModule.serializeGuide()
             
             # get prefix:
             self.prefix = cmds.textField("prefixTextField", query=True, text=True)
