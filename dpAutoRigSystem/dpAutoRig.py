@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.02"
-DPAR_UPDATELOG = "N768 - AimConstraint from elbow to shoulder guide.\nN322 - Review limb autoOrient guides."
+DPAR_VERSION_PY3 = "4.04.03"
+DPAR_UPDATELOG = "N798 - Fix sneer and grimace translate Y."
 
 
 

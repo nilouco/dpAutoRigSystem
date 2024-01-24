@@ -30,7 +30,7 @@ FACIALPRESET = "FacialJoints"
 HEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 JAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_FACIALCONTROL_VERSION = 1.7
+DP_FACIALCONTROL_VERSION = 1.8
 
 
 class FacialControl(object):
@@ -282,17 +282,17 @@ class FacialControl(object):
         """
         connectBS, connectJnt = self.dpGetUserType()
         # creating controls:
-        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red", True, False)
-        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue", True, False)
+        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red", True, False, False, False)
+        rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue", True, False, False, False)
         if self.userType == TYPE_BS:
-            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red", True, False)
-            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue", True, False)
-        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red", True, True)
-        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue", True, True)
-        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow", True, True)
-        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True)
-        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, True, connectBS, connectJnt, "cyan", False, False)
+            lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red", True, False, False, False)
+            rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue", True, False, False, False)
+        lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red", True, True, False, False)
+        rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue", True, True, False, False)
+        lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow", True, True, False, False)
+        sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True, True, True)
+        grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", GRIMACE_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "cyan", True, True, True, True)
+        faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", FACE_TGTLIST, (0, 0, 0), True, True, True, True, True, True, True, connectBS, connectJnt, "cyan", False, False, False, False)
         
         # integrating to dpAutoRigSystem:
         if self.headCtrl:
@@ -390,21 +390,21 @@ class FacialControl(object):
         connectBS, connectJnt = self.dpGetUserType()
         
         if cmds.checkBox(self.browCB, query=True, value=True):
-            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red", True, False)
-            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue", True, False)
+            lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red", True, False, False, False)
+            rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", BROW_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "blue", True, False, False, False)
             if rBrowCtrlGrp:
                 cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.eyelidCB, query=True, enable=True):
             if cmds.checkBox(self.eyelidCB, query=True, value=True):
-                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red", True, False)
-                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue", True, False)
+                lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "red", True, False, False, False)
+                rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", EYELID_TGTLIST, (0, 0, 90), True, False, True, False, True, True, False, connectBS, connectJnt, "blue", True, False, False, False)
         if cmds.checkBox(self.mouthCB, query=True, value=True):
-            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red", True, True)
-            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue", True, True)
+            lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "red", True, True, False, False)
+            rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", MOUTH_TGTLIST, (0, 0, -90), False, False, True, False, False, True, False, connectBS, connectJnt, "blue", True, True, False, False)
             if rMouthCtrlGrp:
                 cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
         if cmds.checkBox(self.lipsCB, query=True, value=True):
-            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow", True, True)
+            lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", LIPS_TGTLIST, (0, 0, 0), False, False, False, True, True, True, False, connectBS, connectJnt, "yellow", True, True, False, False)
         if cmds.checkBox(self.sneerCB, query=True, value=True):
             sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", SNEER_TGTLIST, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "cyan", True, True, True, True)
         if cmds.checkBox(self.grimaceCB, query=True, value=True):
