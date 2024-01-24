@@ -211,11 +211,11 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
                 # reverse foot controls:
-                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
-                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
-                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
-                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
-                self.RFECtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, rot=(0, 90, 0))
+                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, guideSource=self.guideName+"_RfA")
+                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, guideSource=self.guideName+"_RfB")
+                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), guideSource=self.guideName+"_RfC")
+                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), guideSource=self.guideName+"_RfD")
+                self.RFECtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_RfE")
                 self.ballRFList.append(self.RFECtrl)
                 
                 # reverse foot groups:
@@ -278,13 +278,13 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(ikHandleMiddleList[0]+'.visibility', 0)
 
                 # creating Fk controls:
-                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z")
+                self.footCtrl = self.ctrls.cvControl("id_020_FootFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Foot")
                 self.footCtrlList.append(self.footCtrl)
                 cmds.setAttr(self.footCtrl+".rotateOrder", 1)
 
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
 
-                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree)
+                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfE")
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
                 tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)

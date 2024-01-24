@@ -41,7 +41,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        # ensure file is saved
+        # ensure file has a name to define dpData path
         if not cmds.file(query=True, sceneName=True):
             self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
         else:

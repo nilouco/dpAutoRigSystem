@@ -330,9 +330,8 @@ class Utils(object):
                 if childrenList:
                     for child in childrenList:
                         if cmds.objExists(child+".guideBase"):
-                            if cmds.getAttr(child+".guideBase"):
-                                if cmds.getAttr(child+".guideBase") == 1:
-                                    guideChildrenList.append(child)
+                            if cmds.getAttr(child+".guideBase") == 1:
+                                guideChildrenList.append(child)
                         if cmds.objExists(child+".hookNode"):
                             hookNode = cmds.getAttr(child+".hookNode")
                 

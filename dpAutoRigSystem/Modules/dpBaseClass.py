@@ -553,6 +553,9 @@ class StartClass(object):
             if fatherList:
                 attrDic["FatherNode"] = fatherList[0]
                 if cmds.objExists(node+".guideBase") and cmds.getAttr(node+".guideBase") == 1:
+                    if not "__" in fatherList[0]: #not a rawGuide
+                        if cmds.objExists(fatherList[0]+".guideSource"):
+                            attrDic["FatherNode"] = cmds.getAttr(fatherList[0]+".guideSource")
                     cmds.parent(node, world=True) #to export guide base transformation in worldSpace
             else:
                 attrDic["FatherNode"] = None
@@ -605,15 +608,15 @@ class StartClass(object):
         return cmds.getAttr(self.moduleGrp+".articulation")
 
     def getModuleAttr(self, moduleAttr, *args):
-        return cmds.getAttr(self.moduleGrp + "." + moduleAttr)
+        return cmds.getAttr(self.moduleGrp+"."+moduleAttr)
 
     
     # Setters:
     #
     def setArticulation(self, value, *args):
         self.addArticJoint = value
-        cmds.setAttr(self.moduleGrp + ".articulation", value)
+        cmds.setAttr(self.moduleGrp+".articulation", value)
     
     def setCorrective(self, value, *args):
         self.addCorrective = value
-        cmds.setAttr(self.moduleGrp + ".corrective", value)
+        cmds.setAttr(self.moduleGrp+".corrective", value)

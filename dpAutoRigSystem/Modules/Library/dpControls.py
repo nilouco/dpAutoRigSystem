@@ -141,8 +141,8 @@ class ControlClass(object):
                     cmds.connectAttr(fromObj+"."+attr, toObj+"."+attr, force=f)
                 except:
                     print("Error: Cannot connect", toObj, ".", attr, "directely.")
-        
-        
+
+
     def setLockHide(self, objList, attrList, l=True, k=False, cb=False, *args):
         """Set lock or hide to attributes for object in lists.
         """
@@ -154,8 +154,8 @@ class ControlClass(object):
                         cmds.setAttr(obj+"."+attr, lock=l, keyable=k, channelBox=cb)
                     except:
                         print("Error: Cannot set", obj, ".", attr, "as lock=", l, "and keyable=", k, "and channelBox=", cb)
-                        
-                        
+
+
     def setNonKeyable(self, objList, attrList, *args):
         """Set nonKeyable to attributes for objects in lists.
         """
@@ -203,7 +203,7 @@ class ControlClass(object):
                                     #print("Error: Cannot set not renderable ", attr, "as zero for", shape)
                                     pass
 
-    
+
     def createSimpleRibbon(self, name='ribbon', totalJoints=6, jointLabelNumber=0, jointLabelName="SimpleRibbon", *args):
         """ Creates a Ribbon system.
             Receives the total number of joints to create.
@@ -255,8 +255,8 @@ class ControlClass(object):
             # joint labelling:
             self.utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
-    
-    
+
+
     def getControlNodeById(self, ctrlType, *args):
         """ Find and return node list with ctrlType in its attribute.
         """
@@ -267,16 +267,16 @@ class ControlClass(object):
                 if cmds.getAttr(item+".controlID") == ctrlType:
                     ctrlList.append(item)
         return ctrlList
-    
-    
+
+
     def getControlModuleById(self, ctrlType, *args):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
         """
         ctrlModule = self.dpUIinst.ctrlPreset[ctrlType]['type']
         return ctrlModule
-        
-        
+
+
     def getControlDegreeById(self, ctrlType, *args):
         """ Check the control type reading the loaded dictionary from preset json file.
             Return the respective control module name by id.
@@ -295,7 +295,7 @@ class ControlClass(object):
                     return instance
 
 
-    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, *args):
+    def cvControl(self, ctrlType, ctrlName, r=1, d=1, dir='+Y', rot=(0, 0, 0), corrective=False, headDef=0, guideSource=None, *args):
         """ Create and return a curve to be used as a control.
             Check if the ctrlType starts with 'id_###_Abc' and get the control type from json file.
             Otherwise, check if ctrlType is a valid control curve object in order to create it.
@@ -319,8 +319,11 @@ class ControlClass(object):
                 self.addCorrectiveAttrs(curve)
             if not headDef == 0:
                 self.addDefInfluenceAttrs(curve, headDef)
+            if guideSource:
+                cmds.addAttr(curve, longName="guideSource", dataType="string")
+                cmds.setAttr(curve+".guideSource", guideSource, type="string")
             return curve
-        
+
 
     def addDefInfluenceAttrs(self, curve, defInfluenceType):
         """ Add specific attribute to be deformed by FFD
@@ -380,8 +383,8 @@ class ControlClass(object):
             self.addGuideAttrs(locCtrl)
         cmds.select(clear=True)
         return locCtrl
-    
-    
+
+
     def cvCharacter(self, ctrlType, ctrlName, r=1, d=1, dir="+Y", rot=(0, 0, 0), *args):
         """ Create and return a curve to be used as a control.
         """
@@ -435,8 +438,8 @@ class ControlClass(object):
                     if histType == historyName:
                         foundHistoryList.append(hist)
             return foundHistoryList
-    
-    
+
+
     def cvBaseGuide(self, ctrlName, r=1, *args):
         """Create a control to be used as a Base Guide control.
             Returns the main control (circle) and the radius control in a list.
@@ -474,8 +477,8 @@ class ControlClass(object):
         # pinGuide:
         self.createPinGuide(circle)
         return [circle, radiusCtrl]
-    
-    
+
+
     def setAndFreeze(nodeName="", tx=None, ty=None, tz=None, rx=None, ry=None, rz=None, sx=None, sy=None, sz=None, freeze=True):
         """This function set attribute values and do a freezeTransfomation.
         """
@@ -504,8 +507,8 @@ class ControlClass(object):
                     cmds.makeIdentity(nodeName, apply=freeze, translate=freezeT, rotate=freezeR, scale=freezeS)
                 except:
                     pass
-    
-    
+
+
     def copyAttr(self, sourceItem=False, attrList=False, verbose=False, *args):
         """ Get and store in a dictionary the attributes from sourceItem.
             Returns the dictionary with attribute values.
@@ -535,8 +538,8 @@ class ControlClass(object):
                 if verbose:
                     print(self.dpUIinst.lang["i125_copiedAttr"])
         return self.attrValueDic
-    
-    
+
+
     def pasteAttr(self, destinationList=False, verbose=False, *args):
         """ Get to destination list and set the dictionary values on them.
         """
@@ -558,8 +561,8 @@ class ControlClass(object):
                                 print(self.dpUIinst.lang["e016_notPastedAttr"], attr)
             if verbose:
                 print(self.dpUIinst.lang["i126_pastedAttr"])
-    
-    
+
+
     def copyAndPasteAttr(self, verbose=False, *args):
         """ Call copy and past functions.
         """
@@ -572,16 +575,16 @@ class ControlClass(object):
                 destinationList = currentSelectedList[1:]
                 # calling function to paste attributes to destinationList:
                 self.pasteAttr(destinationList, verbose)
-    
-    
+
+
     def transferAttr(self, sourceItem, destinationList, attrList, *args):
         """ Transfer attributes from sourceItem to destinationList.
         """
         if sourceItem and destinationList and attrList:
             self.copyAttr(sourceItem, attrList)
             self.pasteAttr(destinationList)
-    
-    
+
+
     def transferShape(self, deleteSource=False, clearDestinationShapes=True, sourceItem=None, destinationList=None, keepColor=True, force=False, *args):
         """ Transfer control shape from sourceItem to destination list
         """
@@ -661,8 +664,8 @@ class ControlClass(object):
                         # update cvControls attributes:
                         self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
-    
-    
+
+
     def setSourceColorOverride(self, sourceItem, destinationList, *args):
         """ Check if there's a colorOverride for destination shapes
             and try to set it to source shapes.
@@ -682,8 +685,8 @@ class ControlClass(object):
                             colorList.append(cmds.getAttr(childShape+".overrideColor"))
                             self.colorShape([sourceItem], colorList[0])
                         break
-                        
-    
+
+
     def resetCurve(self, changeDegree=False, transformList=False, *args):
         """ Read the current curve degree of selected curve controls and change it to another one.
             1 to 3
@@ -713,10 +716,10 @@ class ControlClass(object):
                     curve = self.cvControl(curType, "Temp_Ctrl", curSize, curDegree, curDir, (curRotX, curRotY, curRotZ), 1)
                     self.transferShape(deleteSource=True, clearDestinationShapes=True, sourceItem=curve, destinationList=[item], keepColor=True)
             cmds.select(transformList)
-    
+
 
     def confirmAskUser(self, titleText, messageText, *args):
-        """
+        """ Just a confirmDialog that return user choise as True or False.
         """
         # ask user to continue
         resultQuestion = cmds.confirmDialog(
@@ -729,7 +732,8 @@ class ControlClass(object):
         if resultQuestion == self.dpUIinst.lang['i071_yes']:
             return True
         return False
-    
+
+
     def dpCreateControlsPreset(self, *args):
         """ Creates a json file as a Control Preset and returns it.
         """
@@ -779,8 +783,8 @@ class ControlClass(object):
                             resultString += ',"'+pID+'":{"type":"'+self.dpUIinst.ctrlPreset[pID]["type"]+'","degree":'+str(self.dpUIinst.ctrlPreset[pID]["degree"])+'}'
                     resultString += "}"
         return resultString
-    
-    
+
+
     def dpCheckLinearUnit(self, origRadius, defaultUnit="centimeter", *args):
         """ Verify if the Maya linear unit is in Centimeter.
             Return the radius to the new unit size.
@@ -805,8 +809,8 @@ class ControlClass(object):
     #    elif linearUnit == "yard":
     #        newRadius = origRadius*0.010936
         return newRadius
-    
-    
+
+
     #@dpUtils.profiler
     def shapeSizeSetup(self, transformNode, *args):
         """ Find shapes, create a cluster deformer to all and set the pivot to transform pivot.
@@ -826,8 +830,8 @@ class ControlClass(object):
             print("There are not children shape to create shapeSize setup of:", transformNode)
         if clusterHandle:
             self.connectShapeSize(clusterHandle)
-    
-    
+
+
     def connectShapeSize(self, clusterHandle, *args):
         """ Connect shapeSize attribute from guide main control to shapeSizeClusterHandle scale XYZ.
         """
@@ -843,8 +847,8 @@ class ControlClass(object):
             cmds.setAttr(self.dpARTempGrp+".hiddenInOutliner", 1)
             self.setLockHide([self.dpARTempGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
         cmds.parent(clusterHandle, self.dpARTempGrp)
-    
-    
+
+
     def addGuideAttrs(self, ctrlName, *args):
         """ Add and set attributes to this control curve be used as a guide.
         """
@@ -857,8 +861,8 @@ class ControlClass(object):
         self.shapeSizeSetup(ctrlName)
         # pinGuide:
         self.createPinGuide(ctrlName)
-    
-    
+
+
     def createPinGuide(self, ctrlName, *args):
         """ Add pinGuide attribute if it doesn't exist yet.
             Create a scriptJob to read this attribute change.
@@ -872,8 +876,8 @@ class ControlClass(object):
                     cmds.addAttr(ctrlName, longName="lockedList", dataType="string")
                 cmds.scriptJob(attributeChange=[str(ctrlName+".pinGuide"), lambda nodeName=ctrlName: self.jobPinGuide(nodeName)], killWithScene=True, compressUndo=True)
                 self.jobPinGuide(ctrlName) # just forcing pinGuide setup run before wait for the job be trigger by the attribute
-    
-    
+
+
     def setPinnedGuideColor(self, ctrlName, status, color="red", *args):
         """ Set the color override for pinned guide shapes.
         """
@@ -886,8 +890,8 @@ class ControlClass(object):
                     cmds.setAttr(shapeNode+".overrideEnabled", 0)
                 else:
                     cmds.setAttr(shapeNode+".overrideEnabled", 1)
-    
-    
+
+
     def jobPinGuide(self, ctrlName, *args):
         """ Pin temporally the guide by scriptJob.
         """
@@ -925,8 +929,8 @@ class ControlClass(object):
                     self.restoreLockedList(ctrlName)
             self.setPinnedGuideColor(ctrlName, pinValue)
             cmds.namespace(set=":")
-    
-    
+
+
     def startPinGuide(self, guideBase, *args):
         """ Reload pinGuide job for already created guide.
         """
@@ -938,8 +942,8 @@ class ControlClass(object):
                         self.createPinGuide(childNode)
             if cmds.objExists(guideBase+".pinGuide"):
                 self.createPinGuide(guideBase)
-    
-    
+
+
     def unPinGuide(self, guideBase, *args):
         """ Remove pinGuide setup.
             We expect to have the scriptJob running here to clean-up the pin setup.
@@ -1005,7 +1009,7 @@ class ControlClass(object):
         cmds.file(importCalibrationPath, removeReference=True)
         cmds.progressWindow(endProgress=True)
         print("dpImportCalibrationPath: "+importCalibrationPath)
-        
+
 
     def mirrorCalibration(self, nodeName=False, fromPrefix=False, toPrefix=False, *args):
         """ Mirror calibration by naming using prefixes to find nodes.
@@ -1077,7 +1081,7 @@ class ControlClass(object):
         if cmds.objExists(nodeName+".calibrationList"):
             return list(cmds.getAttr(nodeName+".calibrationList").split(";"))
 
-    
+
     def getControlList(self, *args):
         """ List all dpControl transforms that has active .dpControl attribute.
             Returns a list of them.
@@ -1287,8 +1291,8 @@ class ControlClass(object):
                 toCalibrationList.append("calibrate"+attr+axis)
         self.setCalibrationAttr(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
-    
-    
+
+
     def addCorrectiveAttrs(self, ctrlName, *args):
         """ Add and set attributes to this control curve be used as a corrective controller.
         """
@@ -1307,7 +1311,7 @@ class ControlClass(object):
                 if ctrlName in job:
                     jobNumber = int(job[:job.find(":")])
                     cmds.scriptJob(kill=jobNumber, force=True)
-                    
+
 
     def createCorrectiveMode(self, ctrlName, *args):
         """ Create a scriptJob to read this attribute change.
@@ -1316,8 +1320,8 @@ class ControlClass(object):
         cmds.scriptJob(attributeChange=[str(ctrlName+".editMode"), lambda nodeName=ctrlName: self.jobCorrectiveEditMode(nodeName)], killWithScene=True, compressUndo=True)
         if cmds.getAttr(ctrlName+".editMode"):
             self.colorShape([ctrlName], 'bonina', rgb=True)
-    
-    
+
+
     def jobCorrectiveEditMode(self, ctrlName, *args):
         """ Edit mode to corrective control by scriptJob.
         """
@@ -1331,8 +1335,8 @@ class ControlClass(object):
                     for shapeNode in shapeList:
                         cmds.setAttr(shapeNode+".overrideRGBColors", 0)
                 self.setCorrectiveCalibration(ctrlName)
-    
-    
+
+
     def startCorrectiveEditMode(self, *args):
         """ Reload editMode job for existing corrective controllers.
         """
@@ -1341,8 +1345,8 @@ class ControlClass(object):
             for transformNode in transformList:
                 if cmds.objExists(transformNode+".editMode"):
                     self.createCorrectiveMode(transformNode)
-    
-    
+
+
     def setCorrectiveCalibration(self, ctrlName, *args):
         """ Remove corrective controller editMode setup.
             Calculate the results of transformations to set the calibration attributes.
@@ -1458,13 +1462,13 @@ class ControlClass(object):
                             # hack to avoid Maya limitation to edit boolean attributes
                             if not cmds.attributeQuery(attr, node=item, attributeType=True) == "bool":
                                 cmds.addAttr(item+"."+attr, edit=True, defaultValue=cmds.getAttr(item+"."+attr))
-    
+
 
     def getSelectedControls(self, *args):
         """ Return the intersection of all dpControls in the scene and the selected items.
         """
         return list(set(self.getControlList()) & set(cmds.ls(selection=True, type="transform")))
-    
+
 
     def defaultValueEditor(self, *args):
         """ Create an UI to edit the attributes default values.
@@ -1493,7 +1497,7 @@ class ControlClass(object):
         self.populateSelectedControls()
         # call window
         cmds.showWindow(self.defaultValueWindowName)
-        
+
 
     def populateSelectedControls(self, *args):
         """ Refresh the default value editor UI to fill it with the selected dpAR controllers.

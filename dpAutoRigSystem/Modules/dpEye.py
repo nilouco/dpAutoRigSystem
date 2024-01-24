@@ -243,7 +243,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # declating a concatenated name used for base to compose:
         baseName = side+self.userGuideName+"_"+self.dpUIinst.lang[lid]+"_"+self.dpUIinst.lang['c042_eyelid']
         # creating eyelid control:
-        eyelidCtrl = self.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.ctrlRadius*0.4, d=self.curveDegree, rot=rotCtrl, headDef=1)
+        eyelidCtrl = self.ctrls.cvControl("id_008_Eyelid", baseName+"_Ctrl", self.ctrlRadius*0.4, d=self.curveDegree, rot=rotCtrl, headDef=1, guideSource=self.guideModuleName+"__"+cvEyelidLoc.replace("_Guide", ":Guide"))
         self.utils.originedFrom(objName=eyelidCtrl, attrString=cvEyelidLoc)
         eyelidCtrlZero = self.utils.zeroOut([eyelidCtrl])[0]
         self.ctrls.setLockHide([eyelidCtrl], ['tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
@@ -435,7 +435,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         else:
             ctrlId = "id_013_EyePupil"
             ctrlRadius = 0.2*self.ctrlRadius
-        ctrl = self.ctrls.cvControl(ctrlId, side+self.userGuideName+"_"+self.dpUIinst.lang[codeName]+"_1_Ctrl", r=ctrlRadius, d=self.curveDegree, headDef=1)
+        ctrl = self.ctrls.cvControl(ctrlId, side+self.userGuideName+"_"+self.dpUIinst.lang[codeName]+"_1_Ctrl", r=ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideModuleName+"__"+cvLoc.replace("_Guide", ":Guide"))
         self.utils.originedFrom(objName=ctrl, attrString=cvLoc)
         cmds.makeIdentity(ctrl, rotate=True, apply=True)
         # create constraints and arrange hierarchy:
@@ -522,7 +522,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.hasIris = False
             self.hasPupil = False
             # create the main control:
-            self.eyeCtrl = self.ctrls.cvControl("id_010_EyeLookAtMain", self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=(2.25*self.ctrlRadius), d=self.curveDegree)
+            self.eyeCtrl = self.ctrls.cvControl("id_010_EyeLookAtMain", self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=(2.25*self.ctrlRadius), d=self.curveDegree, guideSource=self.guideName+"_JointEnd")
             cmds.addAttr(self.eyeCtrl, longName=self.dpUIinst.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
             cmds.delete(cmds.parentConstraint(sideList[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
             if self.mirrorAxis != 'off':
@@ -545,11 +545,11 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
-                self.fkEyeCtrl = self.ctrls.cvControl("id_014_EyeFk", side+self.userGuideName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=1)
+                self.fkEyeCtrl = self.ctrls.cvControl("id_014_EyeFk", side+self.userGuideName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_JointLoc1")
                 self.utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
-                self.fkEyeSubCtrl = self.ctrls.cvControl("id_070_EyeFkSub", side+self.userGuideName+"_Fk_Sub_Ctrl", r=(0.75*self.ctrlRadius), d=self.curveDegree, headDef=1)
+                self.fkEyeSubCtrl = self.ctrls.cvControl("id_070_EyeFkSub", side+self.userGuideName+"_Fk_Sub_Ctrl", r=(0.75*self.ctrlRadius), d=self.curveDegree, headDef=1, guideSource=self.guideName+"_JointLoc1")
                 cmds.parent(self.fkEyeSubCtrl, self.fkEyeCtrl)
-                self.baseEyeCtrl = self.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.userGuideName+"_Base_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=1)
+                self.baseEyeCtrl = self.ctrls.cvControl("id_009_EyeBase", ctrlName=side+self.userGuideName+"_Base_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_JointLoc1")
                 self.utils.originedFrom(objName=self.baseEyeCtrl, attrString=self.base+";"+self.guide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.pointConstraint(self.guide, self.jxt, maintainOffset=False))
@@ -583,7 +583,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.scaleConstraint(self.fkEyeSubCtrl, self.subJnt, maintainOffset=True, name=self.subJnt+"_ScC")
                 
                 # lookAt control:
-                self.lookAtCtrl = self.ctrls.cvControl("id_011_EyeLookAt", side+self.userGuideName+"_LookAt_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.lookAtCtrl = self.ctrls.cvControl("id_011_EyeLookAt", side+self.userGuideName+"_LookAt_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointEnd")
                 cmds.delete(cmds.parentConstraint(self.cvEndJoint, self.lookAtCtrl, maintainOffset=False))
                 lookAtCtrlZeroGrp = self.utils.zeroOut([self.lookAtCtrl])
                 cmds.parent(lookAtCtrlZeroGrp, self.eyeCtrl, relative=False)
@@ -646,7 +646,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.endSpecJoint+".translateZ", 0.2*self.ctrlRadius)
                     cmds.parent(self.eyeSpecJnt, self.eyeScaleJnt)
                     # specular control:
-                    self.eyeSpecCtrl = self.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.userGuideName+"_Spec_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=1)
+                    self.eyeSpecCtrl = self.ctrls.cvControl("id_071_EyeSpec", ctrlName=side+self.userGuideName+"_Spec_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_SpecularLoc")
                     cmds.delete(cmds.parentConstraint(self.guide, self.eyeSpecCtrl, maintainOffset=False))
                     eyeSpecZeroGrp = self.utils.zeroOut([self.eyeSpecCtrl])[0]
                     cmds.parent(eyeSpecZeroGrp, self.baseEyeCtrl)
@@ -660,7 +660,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.dpUIinst.lang['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
                     cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
                     # specular scale control:
-                    self.eyeSpecScaleCtrl = self.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.userGuideName+"_SpecScale_Ctrl", r=0.2*self.ctrlRadius, d=self.curveDegree, headDef=1)
+                    self.eyeSpecScaleCtrl = self.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.userGuideName+"_SpecScale_Ctrl", r=0.2*self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_SpecularLoc")
                     cmds.delete(cmds.parentConstraint(self.cvSpecularLoc, self.eyeSpecScaleCtrl, maintainOffset=False))
                     eyeSpecScaleZeroGrp = self.utils.zeroOut([self.eyeSpecScaleCtrl])
                     cmds.parent(eyeSpecScaleZeroGrp, self.eyeSpecCtrl)
