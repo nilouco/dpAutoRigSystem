@@ -67,6 +67,7 @@ def Arm(dpUIinst):
         # Update progress window
         progressAmount += 1
         cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dpUIinst.lang['m007_finger']))
+        cmds.refresh()
         
         # edit finger guides:
         fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
@@ -89,6 +90,7 @@ def Arm(dpUIinst):
             
             # parent finger guide to the arm wrist guide:
             cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
+            cmds.refresh()
         
         # Close progress window
         cmds.progressWindow(endProgress=True)

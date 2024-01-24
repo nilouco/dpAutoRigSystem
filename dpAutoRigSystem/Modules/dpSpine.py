@@ -225,11 +225,11 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
                 # create controls:
-                self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.userGuideName+"_"+hipsName+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.userGuideName+"_"+chestName+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.hipsACtrl = self.ctrls.cvControl("id_041_SpineHipsA", ctrlName=side+self.userGuideName+"_"+hipsName+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc1")
+                self.chestACtrl = self.ctrls.cvControl("id_044_SpineChestA", ctrlName=side+self.userGuideName+"_"+chestName+"A_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
                 # create start and end Fk controls:
-                self.hipsFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+hipsName+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
-                self.chestFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+chestName+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                self.hipsFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+hipsName+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_JointLoc1")
+                self.chestFkCtrl = self.ctrls.cvControl("id_067_SpineFk", ctrlName=side+self.userGuideName+"_"+chestName+"A_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
                 # optimize controls CV shapes:
                 tempHipsACluster = cmds.cluster(self.hipsACtrl)[1]
                 cmds.setAttr(tempHipsACluster+".scaleY", 0.25)
@@ -242,8 +242,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     hipsFkCtrlCVPos = 0.4*self.ctrlRadius
                 cmds.move(0, hipsFkCtrlCVPos, 0, self.hipsFkCtrl+"0Shape.cv[0:5]", relative=True, worldSpace=True, worldSpaceDistance=True)
                 
-                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
-                self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+chestName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.hipsBCtrl = self.ctrls.cvControl("id_042_SpineHipsB", side+self.userGuideName+"_"+hipsName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc1")
+                self.chestBCtrl = self.ctrls.cvControl("id_045_SpineChestB", side+self.userGuideName+"_"+chestName+"B_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
                 cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'Active_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
                 cmds.addAttr(self.hipsACtrl, longName=attrNameLower+'_masterScale_'+self.dpUIinst.lang['c031_volumeVariation'], attributeType="float", defaultValue=1, keyable=True)
@@ -255,8 +255,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.aIkFkBlendAttrList.append(attrNameLower+'Fk_ikFkBlend')
                 
                 # base and end controls:
-                self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
-                self.tipCtrl = self.ctrls.cvControl("id_090_SpineTip", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
+                self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc1")
+                self.tipCtrl = self.ctrls.cvControl("id_090_SpineTip", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
                 self.tipList.append(self.tipCtrl)
                 
                 # Setup axis order
@@ -433,15 +433,15 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # middle ribbon setup:
                 for n in range(1, self.nJoints - 1):
                     if self.currentStyle == 0: #default
-                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
+                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 4)
                         cmds.setAttr(self.middleFkCtrl+".rotateOrder", 4)
                         cmds.rotate(0, 0, 90, self.middleCtrl, self.middleFkCtrl)
                         cmds.makeIdentity(self.middleCtrl, self.middleFkCtrl, apply=True, rotate=True)
                     else: #biped
-                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
-                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X")
+                        self.middleCtrl = self.ctrls.cvControl("id_043_SpineMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
+                        self.middleFkCtrl = self.ctrls.cvControl("id_067_SpineFk", side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(n+1))
                         cmds.setAttr(self.middleCtrl+".rotateOrder", 3)
                         cmds.setAttr(self.middleFkCtrl+".rotateOrder", 3)
                     self.aInnerCtrls[s].append(self.middleCtrl)

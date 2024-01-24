@@ -594,9 +594,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.fkCtrlList, self.origFromList = [], []
                 for n, jName in enumerate(self.jNameList):
                     if n == 0:
-                        fkCtrl = self.ctrls.cvControl("id_030_LimbClavicle", side+self.userGuideName+"_"+jName+"_Ctrl", r=(self.ctrlRadius * 2), d=self.curveDegree, rot=(45, 0 ,-90))
+                        fkCtrl = self.ctrls.cvControl("id_030_LimbClavicle", side+self.userGuideName+"_"+jName+"_Ctrl", r=(self.ctrlRadius * 2), d=self.curveDegree, rot=(45, 0 ,-90), guideSource=self.guideModuleName+"__"+self.cvLocList[n].replace("_Guide", ":Guide"))
                     else:
-                        fkCtrl = self.ctrls.cvControl("id_031_LimbFk", side+self.userGuideName+"_"+jName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                        fkCtrl = self.ctrls.cvControl("id_031_LimbFk", side+self.userGuideName+"_"+jName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideModuleName+"__"+self.cvLocList[n].replace("_Guide", ":Guide"))
                     
                     # Setup axis order
                     if jName == beforeName:  # Clavicle and hip
@@ -639,7 +639,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.parent(origGrp, self.origFromList[n - 1])
                     # add wrist_toParent_Ctrl
                     if n == len(self.jNameList)-1:
-                        self.toParentExtremCtrl = self.ctrls.cvControl("id_032_LimbToParent", ctrlName=side+self.userGuideName+"_"+extremName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree)
+                        self.toParentExtremCtrl = self.ctrls.cvControl("id_032_LimbToParent", ctrlName=side+self.userGuideName+"_"+extremName+"_ToParent_Ctrl", r=(self.ctrlRadius * 0.1), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
                         cmds.parent(self.toParentExtremCtrl, origGrp)
                         if s == 0:
                             cmds.setAttr(self.toParentExtremCtrl+".translateX", self.ctrlRadius)
@@ -686,7 +686,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(tempToDelE, tempToDelF, tempToDelF1, tempToDelF2, tempToDelG)
 
                 # creating a group reference to recept the attributes:
-                self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z")
+                self.worldRef = self.ctrls.cvControl("id_036_LimbWorldRef", side+self.userGuideName+"_WorldRef_Ctrl", r=self.ctrlRadius, d=self.curveDegree, dir="+Z", guideSource=self.guideName+"_Base")
                 cmds.addAttr(self.worldRef, longName="ikFkSnap", attributeType='short', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(self.worldRef, longName=self.dpUIinst.lang['c113_length'], attributeType='float', defaultValue=1)
                 self.worldRefList.append(self.worldRef)
@@ -723,18 +723,18 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parentConstraint(self.fkCtrlList[0], self.skinJointList[0], maintainOffset=True, name=self.skinJointList[0]+"_PaC")
 
                 # creating ik controls:
-                self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
-                self.ikExtremSubCtrl = self.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
+                self.ikExtremCtrl = self.ctrls.cvControl("id_033_LimbWrist", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
+                self.ikExtremSubCtrl = self.ctrls.cvControl("id_094_LimbExtremSub", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Sub_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Extrem")
                 self.ctrls.setLockHide([self.ikExtremSubCtrl], ["sx", "sy", "sz", "v"])
                 self.ctrls.setSubControlDisplay(self.ikExtremCtrl, self.ikExtremSubCtrl, 0)
                 cmds.parent(self.ikExtremSubCtrl, self.ikExtremCtrl)
                 
                 if self.limbTypeName == ARM:
-                    self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
+                    self.ikCornerCtrl = self.ctrls.cvControl("id_034_LimbElbow", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Corner")
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 2) #zxy
                     cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 2) #zxy
                 else:
-                    self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree)
+                    self.ikCornerCtrl = self.ctrls.cvControl("id_035_LimbKnee", ctrlName=side+self.userGuideName+"_"+cornerName+"_Ik_Ctrl", r=(self.ctrlRadius * 0.5), d=self.curveDegree, guideSource=self.guideName+"_Corner")
                     cmds.setAttr(self.ikExtremCtrl+".rotateOrder", 3) #xzy
                     cmds.setAttr(self.ikExtremSubCtrl+".rotateOrder", 3) #xzy
                 self.ikExtremCtrlList.append(self.ikExtremCtrl)
@@ -857,7 +857,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # setup quadruped extra control:
                 if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
                     cmds.rename(ikHandleExtraList[1], side+self.userGuideName+"_"+self.limbType.capitalize()+"_Extra_Eff")
-                    self.quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z")
+                    self.quadExtraCtrl = self.ctrls.cvControl("id_058_LimbQuadExtra", ctrlName=side+self.userGuideName+"_"+extremName+"_Ik_Extra_Ctrl", r=(self.ctrlRadius * 0.7), d=self.curveDegree, dir="-Z", guideSource=self.guideName+"_Extrem")
                     if s == 1:
                         cmds.setAttr(self.quadExtraCtrl+".rotateY", 180)
                         cmds.makeIdentity(self.quadExtraCtrl, rotate=True, apply=True)
@@ -1094,7 +1094,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         forearmDistZ = -(tempDist / 3)
                     cmds.move(0, 0, forearmDistZ, forearmJnt, localSpace=True, worldSpaceDistance=True)
                     # create forearmCtrl:
-                    forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree)
+                    forearmCtrl = self.ctrls.cvControl("id_037_LimbForearm", side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Ctrl", r=(self.ctrlRadius * 0.75), d=self.curveDegree, guideSource=self.guideName+"_Corner")
                     forearmGrp = cmds.group(forearmCtrl, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Grp")
                     forearmZero = cmds.group(forearmGrp, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c030_forearm']+"_Zero_0_Grp")
                     tempToDelete = cmds.parentConstraint(forearmJnt, forearmZero, maintainOffset=False)
@@ -1224,7 +1224,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     try:
                         from .Library import jcRibbon
                         reload(jcRibbon)
-                        RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self.ctrlRadius, self.curveDegree)
+                        RibbonClass = jcRibbon.RibbonClass(self.dpUIinst, self)
                         loadedRibbon = True
                     except Exception as e:
                         print(e)
@@ -1660,7 +1660,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         if self.bendGrps:
                             mainJar = mainJntList[0]
                             mainJax = cmds.listRelatives(mainJntList[0], parent=True, type="joint")[0]
-                            mainSubCtrl = self.ctrls.cvControl("id_095_LimbMainSub", ctrlName=side+self.userGuideName+"_"+mainName+"_Sub_Ctrl", r=(self.ctrlRadius * 0.9), d=self.curveDegree)
+                            mainSubCtrl = self.ctrls.cvControl("id_095_LimbMainSub", ctrlName=side+self.userGuideName+"_"+mainName+"_Sub_Ctrl", r=(self.ctrlRadius * 0.9), d=self.curveDegree, guideSource=self.guideName+"_Main")
                             self.ctrls.setLockHide([mainSubCtrl], ["sx", "sy", "sz", "v"])
                             self.ctrls.setSubControlDisplay(self.fkCtrlList[0], mainSubCtrl, 0)
                             mainSubCtrlZero = self.utils.zeroOut([mainSubCtrl])[0]

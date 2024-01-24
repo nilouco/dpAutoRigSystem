@@ -105,6 +105,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sterringHandleName))
+            cmds.refresh()
             
             # woking with STEERING HANDLE system:
             # create fkLine module instance:
@@ -123,6 +124,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sterringName))
+            cmds.refresh()
             
             # woking with STEERING system:
             # create steering module instance:
@@ -141,6 +143,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontWheelName))
+            cmds.refresh()
             
             # working with FRONT WHEEL system:
             # create wheel module instance:
@@ -167,6 +170,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backWheelName))
+            cmds.refresh()
             
             # working with BACK WHEEL system:
             # create wheel module instance:
@@ -193,6 +197,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontSuspensionName))
+            cmds.refresh()
             
             # create FRONT SUSPENSION module instance:
             frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
@@ -216,6 +221,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backSuspensionName))
+            cmds.refresh()
             
             # create BACK SUSPENSION module instance:
             backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
@@ -239,6 +245,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontDoorName))
+            cmds.refresh()
             
             # woking with FRONT DOOR system:
             # create fkLine module instance:
@@ -259,6 +266,7 @@ def Car(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backDoorName))
+            cmds.refresh()
             
             # woking with BACK DOOR system:
             # create fkLine module instance:
@@ -283,6 +291,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+hornName))
+                cmds.refresh()
                 
                 # woking with HORN system:
                 # create fkLine module instance:
@@ -301,6 +310,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontDoorHandleName))
+                cmds.refresh()
                 
                 # woking with FRONT DOOR HANDLE system:
                 # create fkLine module instance:
@@ -321,6 +331,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backDoorHandleName))
+                cmds.refresh()
                 
                 # woking with BACK DOOR HANDLE system:
                 # create fkLine module instance:
@@ -341,6 +352,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontWiperAName))
+                cmds.refresh()
                 
                 # woking with FRONT WIPER A system:
                 # create fkLine module instance:
@@ -365,6 +377,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontWiperBName))
+                cmds.refresh()
                 
                 # woking with FRONT WIPER B system:
                 # create fkLine module instance:
@@ -390,6 +403,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+trunkName))
+                cmds.refresh()
                 
                 # woking with TRUNK system:
                 # create fkLine module instance:
@@ -407,6 +421,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backWiperName))
+                cmds.refresh()
                 
                 # woking with BACK WIPER system:
                 # create fkLine module instance:
@@ -429,6 +444,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+gasName))
+                cmds.refresh()
                 
                 # woking with GAS system:
                 # create fkLine module instance:
@@ -446,6 +462,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+hoodName))
+                cmds.refresh()
                 
                 # woking with HOOD system:
                 # create fkLine module instance:
@@ -463,6 +480,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+sunRoofName))
+                cmds.refresh()
                 
                 # woking with SUN ROOF system:
                 # create fkLine module instance:
@@ -478,6 +496,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+antennaName))
+                cmds.refresh()
                 
                 # woking with ANTENNA system:
                 # create fkLine module instance:
@@ -496,6 +515,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+leftTurnHandleName))
+                cmds.refresh()
                 
                 # woking with LEFT TURN HANDLE system:
                 # create fkLine module instance:
@@ -514,6 +534,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+rightTurnHandleName))
+                cmds.refresh()
                 
                 # woking with RIGHT TURN HANDLE system:
                 # create fkLine module instance:
@@ -532,6 +553,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+gearLeverName))
+                cmds.refresh()
                 
                 # woking with GEAR LEVER system:
                 # create fkLine module instance:
@@ -548,6 +570,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+handBreakName))
+                cmds.refresh()
                 
                 # woking with HAND BREAK system:
                 # create fkLine module instance:
@@ -564,6 +587,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+breakName))
+                cmds.refresh()
                 
                 # woking with BREAK system:
                 # create fkLine module instance:
@@ -581,6 +605,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+acceleratorName))
+                cmds.refresh()
                 
                 # woking with ACCELERATOR system:
                 # create fkLine module instance:
@@ -598,6 +623,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+clutchName))
+                cmds.refresh()
                 
                 # woking with CLUTCH system:
                 # create fkLine module instance:
@@ -615,6 +641,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dashboardAName))
+                cmds.refresh()
                 
                 # woking with DASHBOARD A system:
                 # create fkLine module instance:
@@ -633,6 +660,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+dashboardBName))
+                cmds.refresh()
                 
                 # woking with DASHBOARD B system:
                 # create fkLine module instance:
@@ -651,6 +679,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontSeatName))
+                cmds.refresh()
                 
                 # woking with FRONT SEAT system:
                 # create fkLine module instance:
@@ -677,6 +706,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backSeatName))
+                cmds.refresh()
                 
                 # woking with BACK SEAT system:
                 # create fkLine module instance:
@@ -696,6 +726,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontDoorInsideHandleName))
+                cmds.refresh()
                 
                 # woking with FRONT DOOR INSIDE HANDLE system:
                 # create fkLine module instance:
@@ -716,6 +747,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backDoorInsideHandleName))
+                cmds.refresh()
                 
                 # woking with BACK DOOR INSIDE HANDLE system:
                 # create fkLine module instance:
@@ -736,6 +768,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontDoorWindowName))
+                cmds.refresh()
                 
                 # woking with FRONT DOOR WINDOW system:
                 # create fkLine module instance:
@@ -756,6 +789,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backDoorWindowName))
+                cmds.refresh()
                 
                 # woking with BACK DOOR WINDOW system:
                 # create fkLine module instance:
@@ -776,6 +810,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+mirrorName))
+                cmds.refresh()
                 
                 # woking with MIRROR system:
                 # create fkLine module instance:
@@ -799,6 +834,7 @@ def Car(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+insideMirrorName))
+                cmds.refresh()
                 
                 # woking with INSIDE MIRROR system:
                 # create fkLine module instance:

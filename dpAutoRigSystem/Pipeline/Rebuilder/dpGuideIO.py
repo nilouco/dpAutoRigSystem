@@ -106,27 +106,22 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                             cmds.lockNode(net, lock=False)
                                             cmds.delete(net)
                                     if toInitializeGuide:
-#                                        try:
-                                        self.netDic = json.loads(self.importedDataDic[net])
-                                        if self.verbose:
-                                            # Update progress window
-                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+self.netDic['ModuleType']+" - "+repr(progressAmount)))
-                                        # create a module instance:
-                                        self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
-                                        self.setupInstanceChanges()
-                                        self.setupGuideTransformations()
-                                        
-
-
-#                                    except:
-#                                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                                
-                                # Parenting guides
-                                self.setupGuideBaseParenting()
-
-
-
-#                                    except:
+                                        try:
+                                            self.netDic = json.loads(self.importedDataDic[net])
+                                            if self.verbose:
+                                                # Update progress window
+                                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
+                                            # create a module instance:
+                                            self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                                            self.setupInstanceChanges()
+                                            self.setupGuideTransformations()
+                                        except:
+                                            self.notWorkedWellIO(net)
+                                try:
+                                    # Parenting guides
+                                    self.setupGuideBaseParenting(self.dpUIinst.lang['m197_notPossibleParent'])
+                                except:
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])    
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             cmds.select(clear=True)
@@ -150,7 +145,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         """ Run instance code to Guide_Base node configuration or just set the simple attributes.
         """
         directionList = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
-        customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style"]
+        customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style", "rigType"]
         for item in list(self.netDic["GuideData"]):
             if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                 for baseAttr in list(self.netDic["GuideData"][item]):
@@ -179,10 +174,15 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                         geoData = self.netDic["GuideData"][item]["geo"]
                         if geoData:
                             cmds.setAttr(item+".geo", geoData, type="string")
+                    elif baseAttr == "rigType": #all
+                        rigTypeData = self.netDic["GuideData"][item]["rigType"]
+                        if rigTypeData:
+                            cmds.setAttr(item+".rigType", rigTypeData, type="string")
+                            self.instance.rigType = rigTypeData
                     else: #just set simple attributes
                         if baseAttr in customAttrList:
                             cmds.setAttr(item+"."+baseAttr, self.netDic["GuideData"][item][baseAttr])
-#                    cmds.refresh()
+                    cmds.refresh()
 
 
     def setupGuideTransformations(self, *args):
@@ -195,7 +195,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
                         if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
                             cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])
-#                cmds.refresh()
+                cmds.refresh()
 
 
     def setupGuideBaseParenting(self, *args):

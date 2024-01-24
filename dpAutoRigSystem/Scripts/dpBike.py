@@ -79,15 +79,11 @@ def Bike(dpUIinst):
             chassisInstance.editUserName(chassisName)
             cmds.setAttr(chassisInstance.moduleGrp+".translateY", 9)
             cmds.setAttr(chassisInstance.radiusCtrl+".translateX", 8)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+forkName))
-    
-            
+
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+handlebarName))
+            cmds.refresh()
             
             # create fork instance:
             handlebarInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -98,7 +94,11 @@ def Bike(dpUIinst):
             cmds.setAttr(handlebarInstance.moduleGrp+".rotateX", 71)
             cmds.setAttr(handlebarInstance.annotation+".translateY", 2)
 
-            
+            # Update progress window
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+forkName))
+            cmds.refresh()
+
             # parent fork guide to Handlebar guide:
             cmds.parent(handlebarInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
 
@@ -118,6 +118,7 @@ def Bike(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+pedalName))
+            cmds.refresh()
             
             # working with PEDAL WHEEL system:
             # create pedal wheel module instance:
@@ -136,6 +137,7 @@ def Bike(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+leftPedalName))
+            cmds.refresh()
             
             # working with LEFT PEDAL system:
             # create pedal fkLine module instance:
@@ -153,6 +155,7 @@ def Bike(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+rightPedalName))
+            cmds.refresh()
             
             # working with RIGHT PEDAL system:
             # create pedal fkLine module instance:
@@ -170,6 +173,7 @@ def Bike(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontWheelName))
+            cmds.refresh()
             
             # working with FRONT WHEEL system:
             # create wheel module instance:
@@ -191,6 +195,7 @@ def Bike(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backWheelName))
+            cmds.refresh()
             
             # working with BACK WHEEL system:
             # create wheel module instance:
@@ -212,6 +217,7 @@ def Bike(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+seatName))
+            cmds.refresh()
             
             # woking with SEAT system:
             # create fkLine module instance:
@@ -236,6 +242,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+hornName))
+                cmds.refresh()
                 
                 # woking with HORN system:
                 # create fkLine module instance:
@@ -254,6 +261,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontSuspensionName))
+                cmds.refresh()
                 
                 # create FRONT SUSPENSION module instance:
                 frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
@@ -272,6 +280,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backSuspensionName))
+                cmds.refresh()
                 
                 # create BACK SUSPENSION module instance:
                 backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
@@ -290,6 +299,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+mirrorName))
+                cmds.refresh()
                 
                 # woking with MIRROR system:
                 # create fkLine module instance:
@@ -316,6 +326,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+leverName))
+                cmds.refresh()
                 
                 # woking with LEVER system:
                 # create fkLine module instance:
@@ -337,6 +348,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+frontBasketName))
+                cmds.refresh()
                 
                 # woking with FRONT BASKET system:
                 # create fkLine module instance:
@@ -355,6 +367,7 @@ def Bike(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+backBasketName))
+                cmds.refresh()
                 
                 # woking with BACK BASKET system:
                 # create fkLine module instance:

@@ -204,7 +204,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_JEnd", radius=0.5)
                 
                 # create controls:
-                self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.wheelCtrl = self.ctrls.cvControl("id_060_WheelCenter", side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
                 # add clip shape on wheel shape and optimize control CV shapes:
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 0) ), destinationList=[self.wheelCtrl], keepColor=False)
                 self.ctrls.transferShape(deleteSource = True, clearDestinationShapes=False, sourceItem=self.ctrls.cvControl("Clip", side+self.userGuideName+"_"+self.dpUIinst.lang['m106_clip']+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot = (0, 0, 90) ), destinationList=[self.wheelCtrl], keepColor=False)
@@ -222,9 +222,9 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(self.wheelCtrl, constructionHistory=True)
                 
                 # create defaults controls shape
-                self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree)
-                self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
-                self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0))
+                self.mainCtrl = self.ctrls.cvControl("id_061_WheelMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius*0.4, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
+                self.insideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c011_revFoot_B'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_InsideLoc")
+                self.outsideCtrl = self.ctrls.cvControl("id_062_WheelPivot", side+self.userGuideName+"_"+self.dpUIinst.lang['c010_revFoot_A'].capitalize()+"_Ctrl", r=self.ctrlRadius*0.2, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_OutsideLoc")
                 self.mainCtrlList.append(self.mainCtrl)
                 self.wheelCtrlList.append(self.wheelCtrl)
 
@@ -399,9 +399,9 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
                 # deform controls:
-                upperDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
-                middleDefCtrl = self.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
-                lowerDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180))
+                upperDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
+                middleDefCtrl = self.ctrls.cvControl("id_064_WheelMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['m033_middle']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_CenterLoc")
+                lowerDefCtrl = self.ctrls.cvControl("id_063_WheelDeform", side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, rot=(0, 0, 180), guideSource=self.guideName+"_CenterLoc")
                 defCtrlGrpList = self.utils.zeroOut([upperDefCtrl, middleDefCtrl, lowerDefCtrl])
                 defCtrlGrp = cmds.group(defCtrlGrpList, name=side+self.userGuideName+"_Ctrl_Grp")
                 

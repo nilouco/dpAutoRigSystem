@@ -126,8 +126,8 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
                 # create a control:
-                self.steeringCtrl = self.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.dpUIinst.lang['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                self.mainCtrl = self.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+                self.steeringCtrl = self.ctrls.cvControl("id_065_SteeringWheel", side+self.userGuideName+"_"+self.dpUIinst.lang['m158_steering']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc1")
+                self.mainCtrl = self.ctrls.cvControl("id_066_SteeringMain", side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointEnd")
                 self.utils.originedFrom(objName=self.steeringCtrl, attrString=self.guide)
                 self.utils.originedFrom(objName=self.mainCtrl, attrString=self.base+";"+self.cvEndJoint+";"+self.radiusGuide)
                 self.steeringCtrlList.append(self.steeringCtrl)

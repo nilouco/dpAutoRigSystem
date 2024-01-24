@@ -141,6 +141,7 @@ def Tweaks(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+lipMainName))
+                cmds.refresh()
 
                 lipMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 lipMainInstance.editUserName(lipMainName)
@@ -176,6 +177,7 @@ def Tweaks(dpUIinst):
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+eyelidMainName))
+                    cmds.refresh()
                     
                     eyebrowMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
                     eyebrowMiddleInstance.editUserName(eyebrowMiddleName)
@@ -220,6 +222,7 @@ def Tweaks(dpUIinst):
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+squintMainName))
+                    cmds.refresh()
                     
                     squintMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                     squintMainInstance.editUserName(squintMainName)
@@ -281,6 +284,7 @@ def Tweaks(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' hierarchy'))
+                cmds.refresh()
                 
                 # working on hierarchy
                 cmds.parent([eyebrowMainInstance.moduleGrp, lipMainInstance.moduleGrp], holderMainInstance.moduleGrp, absolute=True)

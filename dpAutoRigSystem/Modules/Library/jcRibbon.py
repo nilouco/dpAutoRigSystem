@@ -21,11 +21,12 @@ DP_RIBBONCLASS_VERSION = 2.5
 
 
 class RibbonClass(object):
-    def __init__(self, dpUIinst, ctrlRadius, curveDegree, *args):
+    def __init__(self, dpUIinst, limbInstance, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.ctrlRadius = ctrlRadius
-        self.curveDegree = curveDegree
+        self.limbInstance = limbInstance
+        self.ctrlRadius = limbInstance.ctrlRadius
+        self.curveDegree = limbInstance.curveDegree
         self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
         self.limbManualVVAttr = self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation']
@@ -290,7 +291,7 @@ class RibbonClass(object):
             Returns the group zeroOut and the control curve.
         """
         grp = None
-        curve = self.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
+        curve = self.ctrls.cvControl("id_038_RibbonBend", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.moduleGrp)
         self.dpUIinst.ctrls.setLockHide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=myName+'_Grp')
@@ -302,9 +303,9 @@ class RibbonClass(object):
             Returns the group, the control curve and it's zeroOut group.
         """
         if armStyle:
-            curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
+            curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.guideName+"_Corner")
         else:
-            curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0))
+            curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0), guideSource=self.limbInstance.guideName+"_Corner")
         grp = None
         if zero:
             zero = cmds.group(curve, n=myName+'_Zero_0_Grp')
@@ -518,7 +519,7 @@ class RibbonClass(object):
         
         cmds.parent(aux_Jnt[0], mid_Loc[0])
         #create a nurbs control in order to be used in the ribbon offset
-        mid_Ctrl = self.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
+        mid_Ctrl = self.ctrls.cvControl("Circle", name+'_MidCtrl', r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.guideName+"_Corner")
         self.utils.removeUserDefinedAttr(mid_Ctrl, True)
         midCtrl = mid_Ctrl
         mid_Ctrl = cmds.group(n=mid_Ctrl+'_Grp', em=True)
@@ -594,7 +595,7 @@ class RibbonClass(object):
             
             # create extra control
             extraName = jnt[:-4] #removed _Jnt suffix
-            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
+            extraCtrl = self.ctrls.cvControl("id_040_RibbonExtra", ctrlName=extraName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.limbInstance.moduleGrp)
             extraCtrlList.append(extraCtrl)
             cmds.rotate(0, 90, 0, extraCtrl)
             cmds.makeIdentity(extraCtrl, a=True)
@@ -649,7 +650,7 @@ class RibbonClass(object):
                         self.utils.setJointLabel(jad, s+jointLabelAdd, 18, jointLabelName+'_%02d_%02d'%(i,d))
                         cmds.addAttr(jad, longName="dpAR_joint", attributeType='float', keyable=False)
                         # control:
-                        addCtrl = self.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree)
+                        addCtrl = self.ctrls.cvControl("id_088_LimbAdditional", ctrlName=extraName+"_Add_%02d_Ctrl"%d, r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.limbInstance.moduleGrp)
                         extraCtrlList.append(addCtrl)
                         addCtrlGrp = self.utils.zeroOut([addCtrl])[0]
                         cmds.delete(cmds.parentConstraint(jad, addCtrlGrp, maintainOffset=False))

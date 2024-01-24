@@ -2293,6 +2293,7 @@ class DP_AutoRig_UI(object):
                 # get integrated information:
                 if guideModule.integratedActionsDic:
                     self.integratedTaskDic[guideModule.moduleGrp] = guideModule.integratedActionsDic["module"]
+                cmds.refresh()
             
             #Colorize all controller in yellow as a base
             if bColorize:

@@ -189,7 +189,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             indirectSkinRot=(0, 0, 90)
                         else:
                             indirectSkinRot=(0, 0, -90)
-                self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot)
+                self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot, guideSource=self.guideName+"_JointLoc1")
                 self.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))

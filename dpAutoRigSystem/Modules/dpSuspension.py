@@ -155,9 +155,9 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.jointList.append(jnt)
                     
                     # create a control:
-                    mainCtrl = self.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.dpUIinst.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree)
-                    ctrl = self.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree)
-                    upLocCtrl = self.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree)
+                    mainCtrl = self.ctrls.cvControl("id_055_SuspensionMain", side+self.userGuideName+"_"+self.dpUIinst.lang["c058_main"]+"_"+letter+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter)
+                    ctrl = self.ctrls.cvControl("id_056_SuspensionAB", side+self.userGuideName+"_"+letter+"_Ctrl", r=self.ctrlRadius*0.5, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter)
+                    upLocCtrl = self.ctrls.cvControl("id_057_SuspensionUpLoc", side+self.userGuideName+"_"+letter+"_UpLoc_Ctrl", r=self.ctrlRadius*0.1, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+letter)
                     self.ctrls.setLockHide([ctrl], ['tx', 'ty', 'tz', 'v'])
                     self.ctrls.setLockHide([upLocCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # position and orientation of joint and control:

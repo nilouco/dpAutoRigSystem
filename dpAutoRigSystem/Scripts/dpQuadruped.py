@@ -97,6 +97,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+headName))
+            cmds.refresh()
             
             # woking with HEAD system:
             # create head module instance:
@@ -132,6 +133,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+eyeName))
+            cmds.refresh()
             
             # woking with Eye system:
             # create eyeLookAt module instance:
@@ -154,6 +156,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+legName))
+            cmds.refresh()
             
             # working with BACK LEG (B) system:
             # create back leg module instance:
@@ -201,6 +204,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+footName))
+            cmds.refresh()
             
             # create BACK FOOT (B) module instance:
             backFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
@@ -220,6 +224,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+legName))
+            cmds.refresh()
             
             # working with FRONT LEG (A) system:
             # create front leg module instance:
@@ -269,6 +274,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+footName))
+            cmds.refresh()
             
             # create FRONT FOOT (A) module instance:
             frontFootInstance = dpUIinst.initGuide('dpFoot', guideDir, RigType.quadruped)
@@ -288,6 +294,7 @@ def Quadruped(dpUIinst):
             # Update progress window
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+tailName))
+            cmds.refresh()
             
             # woking with TAIL system:
             # create FkLine module instance:
@@ -315,6 +322,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+earName))
+                cmds.refresh()
                 
                 # woking with EAR system:
                 # create FkLine module instance:
@@ -346,6 +354,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+upperTeethName))
+                cmds.refresh()
                 
                 # woking with Teeth system:
                 # create FkLine module instance:
@@ -426,6 +435,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+tongueName))
+                cmds.refresh()
                 
                 # woking with Tongue system:
                 # create FkLine module instance:
@@ -449,6 +459,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+noseName))
+                cmds.refresh()
                 
                 # woking with Nose system:
                 # create Nose module instance:
@@ -474,6 +485,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+frontName+'_1'))
+                cmds.refresh()
                 
                 # create toe1 module instance:
                 toe1FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -499,6 +511,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+frontName+'_2'))
+                cmds.refresh()
                 
                 # create toe2 module instance:
                 toe2FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -524,6 +537,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+frontName+'_3'))
+                cmds.refresh()
                 
                 # create toe3 module instance:
                 toe3FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -549,6 +563,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+frontName+'_4'))
+                cmds.refresh()
                 
                 # create toe4 module instance:
                 toe4FrontInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -574,6 +589,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+backName+'_1'))
+                cmds.refresh()
                 
                 # create toe1 module instance:
                 toe1BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -599,6 +615,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+backName+'_2'))
+                cmds.refresh()
                 
                 # create toe2 module instance:
                 toe2BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -624,6 +641,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+backName+'_3'))
+                cmds.refresh()
                 
                 # create toe3 module instance:
                 toe3BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -649,6 +667,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+backName+'_4'))
+                cmds.refresh()
                 
                 # create toe4 module instance:
                 toe4BackInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -674,6 +693,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+breathName))
+                cmds.refresh()
                 
                 # create breath module instance:
                 breathInstance = dpUIinst.initGuide('dpFkLine', guideDir)
@@ -690,6 +710,7 @@ def Quadruped(dpUIinst):
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+bellyName))
+                cmds.refresh()
                 
                 # create belly module instance:
                 bellyInstance = dpUIinst.initGuide('dpFkLine', guideDir)
