@@ -1099,7 +1099,7 @@ class ControlClass(object):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
-            If IO is True, it will use the current location and create the dpControlShapeIO directory by default.
+            If IO is True, it will use the current location and create the dpControlShapeIO directory inside dpData folder by default.
             If keepSnapshot is True, it will parent a backup dpSnapshotGrp group to Wip_Grp and hide it.
             If overrideExisting is True, it will delete the old node before create the new snapshot.
         """
@@ -1160,11 +1160,12 @@ class ControlClass(object):
                     cmds.file(exportSelected=True, type='mayaAscii', prompt=False, force=True)
                     cmds.file(rename=currentPath)
                     # DEV helper keepSnapshot
-                    if not cmds.objExists("WIP_Grp"): #TODO need to be refactory to get this node by masterGrp attribute
+                    wipGrp = self.utils.getNodeByMessage("wipGrp")
+                    if not cmds.objExists(wipGrp):
                         keepSnapshot = False
                     if keepSnapshot:
                         try:
-                            cmds.parent(dpSnapshotGrp, "WIP_Grp")
+                            cmds.parent(dpSnapshotGrp, wipGrp)
                             cmds.setAttr(dpSnapshotGrp+".visibility", 0)
                             if cmds.objExists("Backup_"+dpSnapshotGrp):
                                 cmds.delete("Backup_"+dpSnapshotGrp)

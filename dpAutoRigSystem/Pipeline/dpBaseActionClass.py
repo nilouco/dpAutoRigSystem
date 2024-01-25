@@ -196,7 +196,7 @@ class ActionStartClass(object):
 
 
     def getExportedList(self, objList=None, *args):
-        """ Returns the exported file list in the current asset folder io or the given objList.
+        """ Returns the exported file list in the current asset folder IO or the given objList.
         """
         exportedList = None
         if objList:

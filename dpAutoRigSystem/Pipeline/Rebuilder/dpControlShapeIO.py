@@ -4,8 +4,8 @@ from .. import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = "ControlShapeIO"
-TITLE = "r014_ctrlShapeIO"
-DESCRIPTION = "r015_ctrlShapeIODesc"
+TITLE = "r014_controlShapeIO"
+DESCRIPTION = "r015_controlShapeIODesc"
 ICON = "/Icons/dp_controlShapeIO.png"
 
 MODULES = "Modules"
@@ -40,16 +40,6 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
         self.firstMode = firstMode
         self.cleanUpToStart()
         
-        
-                    #
-                    # WIP
-                    #
-                    # ref
-                    #self.allUIs["rechargeShapeButton"] = cmds.button("rechargeShapeButton", label=self.lang['i204_recharge'], backgroundColor=(1.0, 0.7, 0.7), height=30, command=partial(self.ctrls.importShape, recharge=True), parent=self.allUIs["shapeIO4Layout"])
-                    #self.allUIs["publishShapeButton"] = cmds.button("publishShapeButton", label=self.lang['i200_publish'], backgroundColor=(1.0, 0.6, 0.6), height=30, command=partial(self.ctrls.exportShape, publish=True), parent=self.allUIs["shapeIO4Layout"])
-                    #
-        
-        
         # ---
         # --- rebuilder code --- beginning
         # ensure file has a name to define dpData path
@@ -58,47 +48,36 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
         else:
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
-                if self.firstMode: #export
-                    meshList = None
-                    if objList:
-                        meshList = objList
-                    else:
-                        meshList = self.getModelToExportList()
-                    if meshList:
-                        progressAmount = 0
-                        maxProcess = len(meshList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                ctrlList = None
+                if objList:
+                    ctrlList = objList
+                else:
+                    ctrlList = self.dpUIinst.ctrls.getControlList()
+                if ctrlList:
+                    if self.firstMode: #export
                         try:
                             # export alembic
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            ioItems = ' -root '.join(meshList)
-                            abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
-                            cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                            self.wellDoneIO(', '.join(meshList))
+                            ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".ma"
+                            self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName)
+                            self.wellDoneIO(', '.join(ctrlList))
                         except:
-                            self.notWorkedWellIO(', '.join(meshList))
-                    else:
-                        self.notWorkedWellIO("Render_Grp")
-                else: #import
-                    exportedList = self.getExportedList()
-                    if exportedList:
-                        try:
-                            # import alembic
-                            exportedList.sort()
-                            abcToImport = self.ioPath+"/"+exportedList[-1]
-                            #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
-                            mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                            # clean up geometries
-                            validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                            self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
-                            self.wellDoneIO(exportedList[-1])
-                        except:
-                            self.notWorkedWellIO(exportedList[-1])
-                    else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            self.notWorkedWellIO(', '.join(ctrlList))
+                    else: #import
+                        exportedList = self.getExportedList()
+                        if exportedList:
+                            try:
+                                # import alembic
+                                exportedList.sort()
+                                ctrlsToImport = self.ioPath+"/"+exportedList[-1]
+                                self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport)
+                                self.wellDoneIO(exportedList[-1])
+                            except:
+                                self.notWorkedWellIO(exportedList[-1])
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                else:
+                    self.notWorkedWellIO("Ctrls_Grp")
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end
