@@ -1095,11 +1095,11 @@ class ControlClass(object):
         return nodeList
 
 
-    def exportShape(self, nodeList=None, path=None, publish=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, *args):
+    def exportShape(self, nodeList=None, path=None, IO=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, dir="dpControlShape", *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
-            If publish is True, it will use the current location and create the dpShapeIO directory by default.
+            If IO is True, it will use the current location and create the dpControlShapeIO directory by default.
             If keepSnapshot is True, it will parent a backup dpSnapshotGrp group to Wip_Grp and hide it.
             If overrideExisting is True, it will delete the old node before create the new snapshot.
         """
@@ -1112,11 +1112,11 @@ class ControlClass(object):
             nodeList = self.getControlList()
         if nodeList:
             if not path:
-                if publish:
-                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
+                if IO:
+                    dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
                     if not os.path.exists(dpFolder):
                         os.makedirs(dpFolder)
-                    path = dpFolder+"/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
+                    path = dpFolder+"/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
                 else:
                     pathList = cmds.fileDialog2(fileMode=0, caption="Export Shapes")
                     if pathList:
@@ -1182,23 +1182,23 @@ class ControlClass(object):
             cmds.progressWindow(endProgress=True)
 
 
-    def importShape(self, nodeList=None, path=None, recharge=False, ui=True, *args):
+    def importShape(self, nodeList=None, path=None, IO=False, ui=True, dir="dpControlShape", *args):
         """ Import control shapes from an external loaded Maya file.
             If not get an user defined parameter for a node list, it will import all shapes.
-            If the recharge parameter is True, it will use the default path as current location inside dpShapeIO directory.
+            If the IO parameter is True, it will use the default path as current location inside dpControlShapeIO directory.
         """
         importShapeNamespace = "dpImportShape"
         if not nodeList:
             nodeList = self.getControlList()
         if nodeList:
-            if recharge:
+            if IO:
                 currentPath = cmds.file(query=True, sceneName=True)
                 if not currentPath:
                     print(self.dpUIinst.lang['i201_saveScene'])
                     return
-                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+self.dpUIinst.dpShape
-                dpShapeFile = "/"+self.dpUIinst.dpShape+"_"+currentPath[currentPath.rfind("/")+1:]
-                path = dpFolder+dpShapeFile
+                dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
+                dpControlShapeFile = "/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
+                path = dpFolder+dpControlShapeFile
                 if not os.path.exists(path):
                     print (self.dpUIinst.lang['i202_noControls'])
                     return

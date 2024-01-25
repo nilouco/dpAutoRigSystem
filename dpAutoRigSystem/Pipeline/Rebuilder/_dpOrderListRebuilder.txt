@@ -1,3 +1,4 @@
 dpModelIO
 dpShaderIO
 dpGuideIO
+dpControlShapeIO
