@@ -2,3 +2,4 @@ dpModelIO
 dpShaderIO
 dpGuideIO
 dpControlShapeIO
+dpSkinningIO
