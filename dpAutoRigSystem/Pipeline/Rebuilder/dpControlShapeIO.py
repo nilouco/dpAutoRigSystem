@@ -56,7 +56,6 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                 if ctrlList:
                     if self.firstMode: #export
                         try:
-                            # export alembic
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
                             ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".ma"
                             self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName)
@@ -67,7 +66,7 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                         exportedList = self.getExportedList()
                         if exportedList:
                             try:
-                                # import alembic
+                                self.dpUIinst.rigAll(rebuilding=True)
                                 exportedList.sort()
                                 ctrlsToImport = self.ioPath+"/"+exportedList[-1]
                                 self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport)

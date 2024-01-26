@@ -728,11 +728,11 @@ class DP_AutoRig_UI(object):
         # rebuilderMainLayout - scrollLayout:
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
-        self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_process'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
+        self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
         self.rebuilderModuleList = self.startGuideModules(REBUILDER, "start", "rebuilderProcessLayout")
         cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_process'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
+        self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
         self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
@@ -2197,14 +2197,15 @@ class DP_AutoRig_UI(object):
                     cmds.delete(pConst)
     
     
-    def rigAll(self, integrate=None, *args):
+    def rigAll(self, integrate=None, rebuilding=False, *args):
         """ Create the RIG based in the Guide Modules in the scene.
             Most important function to automate the process.
         """
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
         # force refresh in order to avoid calculus error is creating Rig at the same time of guides:
         cmds.refresh()
-        self.jobReloadUI()
+        if not rebuilding:
+            self.jobReloadUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
@@ -3096,8 +3097,9 @@ class DP_AutoRig_UI(object):
         except:
             pass
         
-        # call log window:
-        self.logger.logWin()
+        if not rebuilding:
+            # call log window:
+            self.logger.logWin()
         
     
     ###################### End: Rigging Modules Instances.
