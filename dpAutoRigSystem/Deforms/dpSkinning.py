@@ -1,6 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from xml.dom import minidom
+import os
 
 DP_SKINNING_VERSION = 1.3
 
@@ -243,3 +245,124 @@ class Skinning(object):
         annot = cmds.radioButton(skinSurfAssociationCollection, query=True, annotation=True)
         if annot == "uvSpace":
             return True
+
+
+    def getJointsFromXMLFile(self, mesh, path, *args):
+        """ Returns the influence joint list to the given mesh from xml file in the given path.
+        """
+        allDefList = []
+        jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']
+        if os.path.exists(path+'/'+mesh+'.xml'):
+            dom = minidom.parse(path+'/'+mesh+'.xml')
+            elementList = dom.getElementsByTagName('weights')
+            for element in elementList:
+                allDefList.append(element.attributes['source'].value)
+            jointsList = list(filter(lambda name : name[-3:] in jointSuffixList, allDefList))
+            return jointsList
+    
+
+    def getSkinMethodFromXMLFile(self, mesh, path, *args):
+        """ Returns the influence joint list to the given mesh from xml file in the given path.
+            If not found skinningMethod attribute in the XML file, it'll return 0 for classical linear.
+        """
+        if os.path.exists(path+'/'+mesh+'.xml'):
+            dom = minidom.parse(path+'/'+mesh+'.xml')
+            elementList = dom.getElementsByTagName('attribute')
+            if elementList:
+                return int(elementList[0].attributes['value'].value)
+            else:
+                return 0 #classicalLinear
+            
+    
+    def createMissingJoints(self, incomingJointList, *args):
+        """ Create missing joints if we don't have them in the scene.
+        """
+        missingJntList = []
+        for jnt in incomingJointList:
+            if not cmds.objExists(jnt):
+                cmds.select(clear=True)
+                cmds.joint(name=jnt)
+                cmds.select(clear=True)
+                missingJntList.append(jnt)
+        return missingJntList
+
+
+    def fillSkinClusterWithOneJnt(self, mesh, jntList, skinningMethod, *args):
+        """ Remove the existing skinCluster.
+            Create a new skinCluster fresh one.
+            Ensure we have a skinCluster node with all weights in just one joint to avoide import issue.
+        """
+        skinClusterInfoList = self.checkExistingSkinClusterNode(mesh)
+        if skinClusterInfoList[0]:
+            cmds.delete(skinClusterInfoList[2])
+        # create skinCluster node
+        skinClusterNode = cmds.skinCluster(jntList, mesh, name=mesh+'_SC', toSelectedBones=True, maximumInfluences=3, skinMethod=skinningMethod)[0]
+        # Transfer all the weights to just one joint
+        cmds.skinPercent(skinClusterNode, mesh+'.vtx[:]', transformValue=[(jntList[-1], 1)])
+
+
+    def unlockJoints(self, skinCluster, *args):
+        """ Just unlock joints from a given skinCluster node.
+        """
+        jointsList = cmds.skinCluster(skinCluster, inf=True, q=True)
+        for joint in jointsList:
+            cmds.setAttr(joint+'.liw', 0)
+
+
+    def normalizeMeshWeights(self, mesh, *args):
+        """ Just normalize the skinCluster weigths for the given mesh.
+        """
+        for skinClusterNode in self.checkExistingSkinClusterNode(mesh)[2]:
+            self.unlockJoints(skinClusterNode)
+            cmds.skinPercent(skinClusterNode, mesh, normalize=True)
+
+
+    def getIOFileName(self, mesh, *args):
+        """ Returns the cut fileName if found "|" in the given mesh name to avoid windows special character backup issue.
+        """
+        fileName = mesh
+        if "|" in mesh:
+            fileName = mesh[mesh.rfind("|")+1:]
+        return fileName
+
+
+    def exportSkinWeightsToFile(self, mesh, path, extension="xml", *args):
+        """ Export the skinCluster weights of the given mesh in the given path using the choose file extension (xml by default).
+        """
+        fileName = self.getIOFileName(mesh)
+        cmds.deformerWeights(fileName+"."+extension, method="index", export=True, path=path, shape=mesh, attribute="skinningMethod")
+
+
+    def importSkinWeightsFromFile(self, mesh, path, extension="xml", *args):
+        """ Import the skinCluster weights of the given mesh in the given path using the choose file extension (xml by default).
+        """
+        fileName = self.getIOFileName(mesh)
+        incomingJointList = self.getJointsFromXMLFile(mesh, path)
+        self.createMissingJoints(incomingJointList)
+        skinningMethod = self.getSkinMethodFromXMLFile(mesh, path)
+        self.fillSkinClusterWithOneJnt(mesh, incomingJointList, skinningMethod)
+        cmds.deformerWeights(fileName+"."+extension, method='index', im=True, path=path, shape=mesh)
+        # after import weights it is necessary to normalize them
+        self.normalizeMeshWeights(mesh)
+
+
+    def ioSkinWeightsByUI(self, io=True, *args):
+        """ Call export or import the skinCluster weights by UI.
+            Export: If IO parameter is True
+            Import: If IO parameter is False
+        """
+        meshList = cmds.ls(selection=True, type="transform")
+        if not meshList:
+            cmds.confirmDialog(title="SkinCluster Weights IO", message=self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['m225_selectAnything'], button=[self.dpUIinst.lang['i038_canceled']])
+            return
+        action = self.dpUIinst.lang['i196_import']
+        if io:
+            action = self.dpUIinst.lang['i164_export']
+        path = cmds.fileDialog2(fileMode=3, caption=action+" "+self.dpUIinst.lang['i298_folder'], okCaption=action)
+        if meshList and path:
+            for mesh in meshList:
+                if cmds.listRelatives(mesh, children=True, allDescendents=True, type="mesh"):
+                    if io:
+                        self.exportSkinWeightsToFile(mesh, path[0])
+                    else:
+                        self.importSkinWeightsFromFile(mesh, path[0])

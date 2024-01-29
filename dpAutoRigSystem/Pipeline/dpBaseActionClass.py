@@ -195,7 +195,7 @@ class ActionStartClass(object):
         return self.pipeliner.getCurrentPath()+"/"+self.pipeliner.pipeData[ioDir]
 
 
-    def getExportedList(self, objList=None, *args):
+    def getExportedList(self, objList=None, subFolder="", *args):
         """ Returns the exported file list in the current asset folder IO or the given objList.
         """
         exportedList = None
@@ -204,7 +204,7 @@ class ActionStartClass(object):
             if not type(objList) == list:
                 exportedList = [objList]
         else:
-            exportedList = next(os.walk(self.ioPath))[2]
+            exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
         return exportedList
 
 
@@ -218,3 +218,23 @@ class ActionStartClass(object):
                         aInst.verbose = False
                         aInst.runAction(firstMode)
                         aInst.verbose = True
+
+
+    def getModelToExportList(self, *args):
+        """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
+        """
+        meshList = []
+        renderGrp = self.utils.getNodeByMessage("renderGrp")
+        if renderGrp:
+            meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+            if meshList:
+                return cmds.listRelatives(renderGrp, children=True, type="transform")
+        if not meshList:
+            unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+            if unparentedMeshList:
+                for item in unparentedMeshList:
+                    fatherNode = item[:item[1:].find("|")+1]
+                    if fatherNode:
+                        if not fatherNode in meshList:
+                            meshList.append(fatherNode)
+                return meshList

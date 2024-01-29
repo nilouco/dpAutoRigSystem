@@ -153,6 +153,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
         self.updateButtonColors()
         self.reportLog()
         self.endProgressBar()
+        cmds.refresh()
         return self.dataLogDic
 
 

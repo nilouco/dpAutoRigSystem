@@ -94,6 +94,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                             exportedList.sort()
                             self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if self.importedDataDic:
+                                wellImported = True
                                 progressAmount = 0
                                 maxProcess = len(self.importedDataDic.keys())
                                 for net in self.importedDataDic.keys():
@@ -116,12 +117,17 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                             self.setupInstanceChanges()
                                             self.setupGuideTransformations()
                                         except:
+                                            wellImported = False
                                             self.notWorkedWellIO(net)
+                                            break
                                 try:
                                     # Parenting guides
                                     self.setupGuideBaseParenting(self.dpUIinst.lang['m197_notPossibleParent'])
                                 except:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])    
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                                    wellImported = False
+                                if wellImported:
+                                    self.wellDoneIO(exportedList[-1])
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             cmds.select(clear=True)
@@ -138,6 +144,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         self.updateButtonColors()
         self.reportLog()
         self.endProgressBar()
+        cmds.refresh()
         return self.dataLogDic
 
 

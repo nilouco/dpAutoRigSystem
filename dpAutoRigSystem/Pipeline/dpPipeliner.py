@@ -585,3 +585,12 @@ class Pipeliner(object):
         # write json file in the HD:
         with open(fileNamePath, 'w') as jsonFile:
             json.dump(dataDic, jsonFile, indent=indentation, sort_keys=sortKeys)
+
+
+    def removeFolder(self, path, *args):
+        """ Just delete all files and folder for the given path.
+        """
+        if os.path.exists(path):
+            for eachFile in next(os.walk(path))[2]:
+                os.remove(path+"/"+eachFile)
+            os.rmdir(path)

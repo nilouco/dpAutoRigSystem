@@ -1,6 +1,7 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseActionClass
+import os
 
 # global variables to this module:
 CLASS_NAME = "SkinningIO"
@@ -44,55 +45,68 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         if not cmds.file(query=True, sceneName=True):
             self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
         else:
-            # load alembic plugin
-            if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    if self.firstMode: #export
-                        meshList = None
-                        if objList:
-                            meshList = objList
-                        else:
-                            meshList = self.getModelToExportList()
-                        if meshList:
-                            progressAmount = 0
-                            maxProcess = len(meshList)
+            self.ioPath = self.getIOPath(self.ioDir)
+            if self.ioPath:
+                ioSubFolder = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()
+                skinningSubFolder = self.getSubFolder()
+                if self.firstMode: #export
+                    fatherList = None
+                    if objList:
+                        fatherList = objList
+                    else:
+                        fatherList = self.getModelToExportList()
+                    if fatherList:
+                        meshList = self.getMeshTansformToExportList(fatherList)
+                        self.pipeliner.removeFolder(ioSubFolder)
+                        self.pipeliner.makeDirIfNotExists(ioSubFolder)
+                        wellExported = True
+                        progressAmount = 0
+                        maxProcess = len(meshList)
+                        for mesh in meshList:
                             if self.verbose:
                                 # Update progress window
                                 progressAmount += 1
                                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                             try:
-                                # export alembic
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                ioItems = ' -root '.join(meshList)
-                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
-                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                                self.wellDoneIO(', '.join(meshList))
+                                # export xml files
+                                self.dpUIinst.skin.exportSkinWeightsToFile(mesh, ioSubFolder)
                             except:
                                 self.notWorkedWellIO(', '.join(meshList))
-                        else:
-                            self.notWorkedWellIO("Render_Grp")
-                    else: #import
-                        exportedList = self.getExportedList()
+                                wellExported = False
+                                break
+                        if wellExported:
+                            self.wellDoneIO(', '.join(meshList))
+                    else:
+                        self.notWorkedWellIO("Render_Grp")
+                else: #import
+                    if skinningSubFolder:
+                        exportedList = self.getExportedList(subFolder=skinningSubFolder)
                         if exportedList:
-                            try:
-                                # import alembic
-                                exportedList.sort()
-                                abcToImport = self.ioPath+"/"+exportedList[-1]
-                                #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
-                                
-                                # clean up geometries
-                                validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                                self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
-                                self.wellDoneIO(exportedList[-1])
-                            except:
-                                self.notWorkedWellIO(exportedList[-1])
+                            wellImported = True
+                            progressAmount = 0
+                            maxProcess = len(exportedList)
+                            for item in exportedList:
+                                if self.verbose:
+                                    # Update progress window
+                                    progressAmount += 1
+                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                try:
+                                    meshName = item[:-4] #filename without extention
+                                    if cmds.objExists(meshName):
+                                        self.dpUIinst.skin.importSkinWeightsFromFile(item[:-4], self.ioPath+"/"+skinningSubFolder)
+                                except Exception as e:
+                                    self.notWorkedWellIO(item+e)
+                                    wellImported = False
+                                    break
+                            cmds.select(clear=True)
+                            if wellImported:
+                                self.wellDoneIO(', '.join(exportedList))
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
+                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end
         # ---
 
@@ -100,24 +114,32 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         self.updateButtonColors()
         self.reportLog()
         self.endProgressBar()
+        cmds.refresh()
         return self.dataLogDic
 
 
-    def getModelToExportList(self, *args):
-        """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
+    def getMeshTansformToExportList(self, fatherList, *args):
+        """ Returns a list of the transform mesh nodes.
         """
         meshList = []
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
-        if renderGrp:
-            meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-            if meshList:
-                return cmds.listRelatives(renderGrp, children=True, type="transform")
-        if not meshList:
-            unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-            if unparentedMeshList:
-                for item in unparentedMeshList:
-                    fatherNode = item[:item[1:].find("|")+1]
-                    if fatherNode:
-                        if not fatherNode in meshList:
-                            meshList.append(fatherNode)
-                return meshList
+        for item in fatherList:
+            meshShapeList = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, noIntermediate=True, type="mesh")
+            if meshShapeList:
+                for meshShape in meshShapeList:
+                    meshTransformList = cmds.listRelatives(meshShape, fullPath=True, parent=True)
+                    if meshTransformList:
+                        if not (meshTransformList[0]) in meshList:
+                            meshList.append(meshTransformList[0])
+        return meshList
+
+
+    def getSubFolder(self, *args):
+        """ List and return the latest subfolder by sorted naming or None.
+        """
+        subFolder = None
+        if os.path.exists(self.ioPath):
+            subFolderList = next(os.walk(self.ioPath))[1]
+            if subFolderList:
+                subFolderList.sort()
+                subFolder = subFolderList[-1]
+        return subFolder

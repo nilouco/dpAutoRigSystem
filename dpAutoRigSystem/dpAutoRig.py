@@ -549,13 +549,21 @@ class DP_AutoRig_UI(object):
         
         #skinCopy - layout
         self.allUIs["skinCopyFL"] = cmds.frameLayout('skinCopyFL', label=self.lang['i287_copy']+" Skinning", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
-        self.allUIs["skinSurfAssociationCollection"] = cmds.radioCollection('skinSurfAssociationCollection', parent=self.allUIs["skinCopyFL"])
+        self.allUIs['skinCopyRowLayout'] = cmds.rowLayout('skinCopyRowLayout', numberOfColumns=3, columnWidth3=(90, 90, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)], parent=self.allUIs["skinCopyFL"])
+        self.allUIs["skinSurfAssociationCollection"] = cmds.radioCollection('skinSurfAssociationCollection', parent=self.allUIs["skinCopyRowLayout"])
         closestPoint = cmds.radioButton(label="closestPoint", annotation="closestPoint")
         uvSpace      = cmds.radioButton(label="uvSpace", annotation="uvSpace")
-        self.allUIs["skinCopy2Layout"] = cmds.paneLayout("skinCopy2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCopyFL"])
+        self.allUIs["skinCopy2Layout"] = cmds.paneLayout("skinCopy2Layout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinCopyRowLayout"])
         self.allUIs["skinCopyOneSourceBT"] = cmds.button("skinCopyOneSourceBT", label=self.lang['i290_oneSource'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.skin.copySkinFromOneSource, None, True), annotation=self.lang['i288_copySkinDesc'], parent=self.allUIs["skinCopy2Layout"])
         self.allUIs["skinCopyMultiSourceBT"] = cmds.button("skinCopyMultiSourceBT", label=self.lang['i146_same']+" "+self.lang['m222_name'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.copySkinSameName, None, True), annotation=self.lang['i289_sameNameSkinDesc'], parent=self.allUIs["skinCopy2Layout"])
         cmds.radioCollection(self.allUIs["skinSurfAssociationCollection"], edit=True, select=closestPoint)
+        cmds.setParent( self.allUIs["mainTabLayout"] )
+
+        #skinWeightsIO - layout
+        self.allUIs["skinWeightsIOFL"] = cmds.frameLayout('skinWeightsIOFL', label="SkinCluster weights IO", collapsable=True, collapse=False, marginHeight=10, marginWidth=10, parent=self.allUIs["skinLayout"])
+        self.allUIs["skinWeightsIOLayout"] = cmds.paneLayout("skinWeightsIOLayout", configuration="vertical2", separatorThickness=2.0, parent=self.allUIs["skinWeightsIOFL"])
+        self.allUIs["skinWeightsExportBT"] = cmds.button("skinWeightsExportBT", label=self.lang['i164_export'], backgroundColor=(0.4, 0.8, 0.9), command=partial(self.skin.ioSkinWeightsByUI, True), annotation=self.lang['i266_selected'], parent=self.allUIs["skinWeightsIOLayout"])
+        self.allUIs["skinWeightsImportBT"] = cmds.button("skinWeightsImportBT", label=self.lang['i196_import'], backgroundColor=(0.5, 0.8, 0.9), command=partial(self.skin.ioSkinWeightsByUI, False), annotation=self.lang['i266_selected'], parent=self.allUIs["skinWeightsIOLayout"])
         cmds.setParent( self.allUIs["mainTabLayout"] )
         
         # edit formLayout in order to get a good scalable window:
