@@ -12,7 +12,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.2
+DP_PROXYCREATOR_VERSION = 1.3
 
 
 class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
@@ -161,8 +161,9 @@ class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
                                 nodeFaceList.append(source+".f["+str(n)+"]")
                         # create proxy geometry
                         dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
-                        for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
+                        for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True, fullPath=True):
                             if "Orig" in dupItem:
+                                cmds.lockNode(dupItem, lock=False)
                                 cmds.delete(dupItem)
                         if nodeFaceList:
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
