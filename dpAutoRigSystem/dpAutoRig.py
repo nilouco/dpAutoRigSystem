@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.03"
-DPAR_UPDATELOG = "N798 - Fix sneer and grimace translate Y."
+DPAR_VERSION_PY3 = "4.04.04"
+DPAR_UPDATELOG = "N799 - Add fullPath on validator proxyCreator."
 
 
 
