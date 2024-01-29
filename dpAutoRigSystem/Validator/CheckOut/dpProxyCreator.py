@@ -12,7 +12,7 @@ ICON = "/Icons/dp_proxyCreator.png"
 PROXIED = "dpProxied"
 NO_PROXY = "dpDoNotProxyIt"
 
-DP_PROXYCREATOR_VERSION = 1.2
+DP_PROXYCREATOR_VERSION = 1.3
 
 
 class ProxyCreator(dpBaseValidatorClass.ValidatorStartClass):
