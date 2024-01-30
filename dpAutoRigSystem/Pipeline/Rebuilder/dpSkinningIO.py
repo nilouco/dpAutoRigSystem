@@ -95,7 +95,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                                     if cmds.objExists(meshName):
                                         self.dpUIinst.skin.importSkinWeightsFromFile(item[:-4], self.ioPath+"/"+skinningSubFolder)
                                 except Exception as e:
-                                    self.notWorkedWellIO(item+e)
+                                    self.notWorkedWellIO(item+": "+str(e))
                                     wellImported = False
                                     break
                             cmds.select(clear=True)
