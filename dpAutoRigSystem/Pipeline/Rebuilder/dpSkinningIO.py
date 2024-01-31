@@ -23,6 +23,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.ioDir = "s_skinningIO"
         self.startName = "dpSkinning"
+        self.importRefName = "dpSkinningIO_Import"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -82,6 +83,8 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                     if skinningSubFolder:
                         exportedList = self.getExportedList(subFolder=skinningSubFolder)
                         if exportedList:
+                            # reference old wip rig version to compare meshes changes
+                            refNodeList = self.referOldWipFile()
                             wellImported = True
                             progressAmount = 0
                             maxProcess = len(exportedList)
@@ -93,12 +96,20 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                                 try:
                                     meshName = item[:-4] #filename without extention
                                     if cmds.objExists(meshName):
-                                        self.dpUIinst.skin.importSkinWeightsFromFile(item[:-4], self.ioPath+"/"+skinningSubFolder)
+                                        method = "index"
+                                        if refNodeList:
+                                            for refNodeName in refNodeList:
+                                                if refNodeName[refNodeName.rfind(":")+1:] == meshName:
+                                                    if cmds.polyCompare(meshName, refNodeName, vertices=True) > 0 or cmds.polyCompare(meshName, refNodeName, edges=True) > 0: #check if topology changes
+                                                        method = "nearest"
+                                        self.dpUIinst.skin.importSkinWeightsFromFile(item[:-4], self.ioPath+"/"+skinningSubFolder, methodToUse=method)
                                 except Exception as e:
                                     self.notWorkedWellIO(item+": "+str(e))
                                     wellImported = False
                                     break
                             cmds.select(clear=True)
+                            if refNodeList:
+                                cmds.file(self.refPathName, removeReference=True)
                             if wellImported:
                                 self.wellDoneIO(', '.join(exportedList))
                         else:
@@ -143,3 +154,20 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                 subFolderList.sort()
                 subFolder = subFolderList[-1]
         return subFolder
+
+
+    def referOldWipFile(self, *args):
+        """ Reference the latest wip rig file before the current, and and return it's tranform elements, if there.
+        """
+        refNodeList = []
+        wipFilesList = next(os.walk(self.pipeliner.getCurrentPath()))[2]
+        if len(wipFilesList) > 1:
+            wipFilesList.sort()
+            if not self.pipeliner.getCurrentFileName == wipFilesList[-2]:
+                self.refPathName = self.pipeliner.getCurrentPath()+"/"+wipFilesList[-2]
+                cmds.file(self.refPathName, reference=True, namespace=self.importRefName)
+                refNode = cmds.file(self.refPathName, referenceNode=True, query=True)
+                refNodeList = cmds.referenceQuery(refNode, nodes=True)
+                if refNodeList:
+                    refNodeList = cmds.ls(refNodeList, type="transform")
+        return refNodeList
