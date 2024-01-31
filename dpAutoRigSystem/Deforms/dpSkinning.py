@@ -14,6 +14,7 @@ class Skinning(object):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
+        self.skinInfoAttrList = ['skinningMethod', 'maintainMaxInfluences', 'maxInfluences']
         
 
     def validateGeoList(self, geoList, mode=None, *args):
@@ -272,8 +273,11 @@ class Skinning(object):
             deformerList = dom.getElementsByTagName('deformer')
             if deformerList:
                 for deform in deformerList:
-                    attr = deform.getElementsByTagName('attribute')[0]
-                    skinClusterInfoDic[deform.attributes['name'].value] = {attr.attributes['name'].value : attr.attributes['value'].value}
+                    defAttrList = deform.getElementsByTagName('attribute')
+                    if defAttrList:
+                        skinClusterInfoDic[deform.attributes['name'].value] = {}
+                        for defAttr in defAttrList:
+                            skinClusterInfoDic[deform.attributes['name'].value].update({defAttr.attributes['name'].value : int(defAttr.attributes['value'].value)})
                 return skinClusterInfoDic
             
     
@@ -290,7 +294,7 @@ class Skinning(object):
         return missingJntList
 
 
-    def fillSkinClusterWithOneJnt(self, mesh, incomingJointList, skinClusterName, skinningMethod, *args):
+    def fillSkinClusterWithOneJnt(self, mesh, incomingJointList, skinClusterName, skinInfoDic, *args):
         """ Add influence to the existing skinCluster.
             Create a new skinCluster if it needs.
             Ensure we have a skinCluster node with all weights in just one joint to avoid import issue.
@@ -307,10 +311,11 @@ class Skinning(object):
                             cmds.skinCluster(mesh, edit=True, addInfluence=jnt, lockWeights=True, weight=0.0)
                             needToCreateSkinCluster = False
         if needToCreateSkinCluster:
+            infoDic = skinInfoDic[skinClusterName]
             if cmds.about(version=True) >= "2024": #accepting multiple skinClusters
-                cmds.skinCluster(incomingJointList, mesh, multi=True, name=skinClusterName, toSelectedBones=True, maximumInfluences=3, skinMethod=int(skinningMethod))[0]
+                cmds.skinCluster(incomingJointList, mesh, multi=True, name=skinClusterName, toSelectedBones=True, skinMethod=infoDic[self.skinInfoAttrList[0]], obeyMaxInfluences=infoDic[self.skinInfoAttrList[1]], maximumInfluences=infoDic[self.skinInfoAttrList[2]])[0]
             else:
-                cmds.skinCluster(incomingJointList, mesh, name=skinClusterName, toSelectedBones=True, maximumInfluences=3, skinMethod=int(skinningMethod))[0]
+                cmds.skinCluster(incomingJointList, mesh, name=skinClusterName, toSelectedBones=True, skinMethod=infoDic[self.skinInfoAttrList[0]], obeyMaxInfluences=infoDic[self.skinInfoAttrList[1]], maximumInfluences=infoDic[self.skinInfoAttrList[2]])[0]
         # Transfer all the weights to just one joint
         cmds.skinPercent(skinClusterName, mesh+'.vtx[:]', transformValue=[(incomingJointList[-1], 1)])
 
@@ -340,11 +345,13 @@ class Skinning(object):
         return fileName
 
 
-    def exportSkinWeightsToFile(self, mesh, path, extension="xml", methodToUse="index", *args):
+    def exportSkinWeightsToFile(self, mesh, path, extension="xml", methodToUse="index", attrList=None, *args):
         """ Export the skinCluster weights of the given mesh in the given path using the choose file extension (xml by default).
         """
+        if not attrList:
+            attrList = self.skinInfoAttrList
         fileName = self.getIOFileName(mesh)
-        cmds.deformerWeights(fileName+"."+extension, method=methodToUse, export=True, path=path, shape=mesh, attribute="skinningMethod")
+        cmds.deformerWeights(fileName+"."+extension, method=methodToUse, export=True, path=path, shape=mesh, attribute=attrList)
 
 
     def importSkinWeightsFromFile(self, mesh, path, extension="xml", methodToUse="index", *args):
@@ -355,7 +362,7 @@ class Skinning(object):
         if skinInfoDic:
             for skinClusterName in reversed(list(skinInfoDic)): #reversed to try create skinClusters in a good deformer order
                 incomingJointList = self.getJointsFromXMLFile(mesh, path, skinClusterName)
-                self.fillSkinClusterWithOneJnt(mesh, incomingJointList, skinClusterName, skinInfoDic[skinClusterName]['skinningMethod'])
+                self.fillSkinClusterWithOneJnt(mesh, incomingJointList, skinClusterName, skinInfoDic)
                 cmds.deformerWeights(fileName+"."+extension, method=methodToUse, im=True, path=path, shape=mesh)
                 # after import weights it is necessary to normalize them
                 self.normalizeMeshWeights(mesh)
