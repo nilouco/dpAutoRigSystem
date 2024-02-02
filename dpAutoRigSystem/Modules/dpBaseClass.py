@@ -52,7 +52,9 @@ class StartClass(object):
         # update module instance info:
         self.updateModuleInstanceInfo()
         self.guideNet = self.utils.getNodeByMessage("net", self.moduleGrp)
-        self.raw = cmds.getAttr(self.guideNet+".rawGuide")
+        if self.guideNet:
+            self.raw = cmds.getAttr(self.guideNet+".rawGuide")
+
     
     
     def createModuleLayout(self, *args):

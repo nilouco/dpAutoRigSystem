@@ -305,6 +305,7 @@ class DP_AutoRig_UI(object):
         #print self.pDockCtrl
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
+        self.checkGuideNets()
         
 
     def deleteExistWindow(self, *args):
@@ -763,6 +764,7 @@ class DP_AutoRig_UI(object):
         cmds.select(clear=True)
         cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
         self.checkImportedGuides()
+        self.checkGuideNets()
   
     
     def jobWinClose(self, *args):
@@ -1517,6 +1519,16 @@ class DP_AutoRig_UI(object):
                             self.checkImportedGuides(False)
                             break
     
+
+    def checkGuideNets(self, *args):
+        """ Verify if there are guideNet nodes to existing guides, otherwise it'll call the updatedGuides tool to fix it.
+        """
+        self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
+        for item in self.modulesToBeRiggedList:
+            if not item.guideNet:
+                self.initExtraModule("dpUpdateGuides", EXTRAS)
+                break
+
 
     def setPrefix(self, *args):
         """ Get the text entered in the textField and change it to normal.
