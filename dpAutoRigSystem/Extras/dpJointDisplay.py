@@ -44,10 +44,10 @@ class JointDisplay(object):
         if cmds.window('dpJointDisplayWindow', query=True, exists=True):
             cmds.deleteUI('dpJointDisplayWindow', window=True)
 
-    def getItemFilter(self, *args):
+    def getItemFilter(self, *args, **kwargs):
         """ Create a selection filter by transform type excluding the ignoreIt list.
         """
-        self.itemF = cmds.itemFilter(byType="joint")
+        self.itemF = cmds.itemFilter(byName= "")
         for ignoreIt in IGNORE_LIST:
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
         return self.itemF
@@ -66,7 +66,7 @@ class JointDisplay(object):
         
         # filter
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=jointDisplayMainLayout)
-        self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="TESTEEE####", changeCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
+        self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="Test", changeCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
 
         # creating column Layout
         colunmLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout)
@@ -77,17 +77,23 @@ class JointDisplay(object):
         multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=colunmLayout)
         noneTitle = cmds.text('noneTitle', label='None',parent=colunmLayout)
 
-        boneFieldColunm = cmds.textScrollList('boneFieldColunm', parent=colunmLayout, allowMultiSelection=True, append=boneLabelList)
-        jointFieldColunm = cmds.textScrollList('jointFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=jointLabelList)
-        multiChildFieldColunm = cmds.textScrollList('multiChildFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=multiChildLabelList)
-        noneFieldColunm = cmds.textScrollList('noneFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=noneLabelList)
+        # boneFieldColunm = cmds.textScrollList('boneFieldColunm', parent=colunmLayout, allowMultiSelection=True, append=boneLabelList, enable=True)
+        boneFieldColunm = cmds.textScrollList('boneFieldColunm', enable=True, append=boneLabelList, parent=colunmLayout)
+        jointFieldColunm = cmds.textScrollList('jointFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=jointLabelList, enable=True)
+        multiChildFieldColunm = cmds.textScrollList('multiChildFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=multiChildLabelList, enable=True)
+        noneFieldColunm = cmds.textScrollList('noneFieldColunm',parent=colunmLayout, allowMultiSelection=True, append=noneLabelList, enable=True)
 
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=jointDisplayMainLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
         cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedToRight', parent=buttonLayout)
         cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedLeft', parent=buttonLayout)
-        cmds.button("Cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command='Cancel', parent=buttonLayout)
+        changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
+        cmds.menuItem( label='Bone', parent=changeAllMenu)
+        cmds.menuItem( label='Joint', parent=changeAllMenu )
+        cmds.menuItem( label='Multi-Child as box', parent=changeAllMenu )
+        cmds.menuItem( label='None', parent=changeAllMenu )
+        cmds.button("cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command='Cancel', parent=buttonLayout)
         cmds.separator(style='none', height=10, parent=buttonLayout)
 
         # call dpJointDisplayUI Window:
@@ -97,14 +103,16 @@ class JointDisplay(object):
         """ Get all joints in the scene
         """
         jointList = cmds.ls(type='joint')
-        if cmds.objExists(jointList[0]):
+        if jointList:
             return jointList
+        else:
+            return print(f'No exists joints in the scene')
     
     def populateLabelList(self, *args, **kwargs):
         """ Populate each list with label joint type
         """
         
-        if cmds.objExists(self.getJointList(self)[0]):
+        if self.getJointList():
             for jnt in self.getJointList(self):
                 if cmds.getAttr(jnt +'.drawStyle') == 0:
                     try:
@@ -131,11 +139,18 @@ class JointDisplay(object):
                     except:
                         pass
 
+    def activeSelection():
+        """ Get the active selection
+        """
+    
+        #TODO
+        # - Search the active selection
+
 
     # def mainfilter():
     #     """ Filter list to populate the 
     #     """
-
+        
     #     #TODO
     #     # create a filter to populate list that will be searched 
 
