@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.04"
-DPAR_UPDATELOG = "N799 - Add fullPath on validator proxyCreator."
+DPAR_VERSION_PY3 = "4.04.05"
+DPAR_UPDATELOG = "N793 - Soften edges check-in validator."
 
 
 
