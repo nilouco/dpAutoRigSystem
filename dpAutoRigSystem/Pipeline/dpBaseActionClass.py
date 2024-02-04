@@ -204,7 +204,8 @@ class ActionStartClass(object):
             if not type(objList) == list:
                 exportedList = [objList]
         else:
-            exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
+            if os.path.exists(self.ioPath+"/"+subFolder):
+                exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
         return exportedList
 
 

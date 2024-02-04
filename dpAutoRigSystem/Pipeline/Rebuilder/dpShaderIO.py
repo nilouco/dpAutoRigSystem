@@ -156,7 +156,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                     except:
-                        self.notWorkedWellIO(exportedList[-1])
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end

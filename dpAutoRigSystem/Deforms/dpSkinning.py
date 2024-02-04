@@ -1,20 +1,20 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+from . import dpWeights
 from xml.dom import minidom
 import os
 
-DP_SKINNING_VERSION = 1.3
+DP_SKINNING_VERSION = 1.4
 
 
-class Skinning(object):
-    def __init__(self, dpUIinst, *args, **kwargs):
+class Skinning(dpWeights.Weights):
+    def __init__(self, *args, **kwargs):
         """ Initialize the class.
         """
         # defining variables:
-        self.dpUIinst = dpUIinst
-        self.utils = dpUIinst.utils
         self.skinInfoAttrList = ['skinningMethod', 'maintainMaxInfluences', 'maxInfluences']
+        self.jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']
         
 
     def validateGeoList(self, geoList, mode=None, *args):
@@ -148,18 +148,6 @@ class Skinning(object):
         cmds.progressWindow(endProgress=True)
 
 
-    def getDeformerOrder(self, defList, *args):
-        """ Find and return the latest old skinCluster deformer order index for the given list.
-            It's useful to reorder the deformers and place the new skinCluster to the correct position of deformation.
-        """
-        for d, destItem in enumerate(defList[1]):
-            if not cmds.objExists(destItem):
-                if destItem in defList[2]: #it's an old skinCluster node
-                    if d > 0:
-                        return d
-        return 0
-
-
     def runCopySkin(self, sourceItem, destinationItem, byUVs=False, *args):
         """ Copy the skin from sourceItem to destinationItem.
             It will get skinInfList and skinMethod by source.
@@ -252,14 +240,13 @@ class Skinning(object):
         """ Returns the influence joint list to the given mesh from xml file in the given path.
         """
         allDefList = []
-        jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']
         if os.path.exists(path+'/'+mesh+'.xml'):
             dom = minidom.parse(path+'/'+mesh+'.xml')
             elementList = dom.getElementsByTagName('weights')
             for element in elementList:
                 if element.attributes['deformer'].value == skinClusterName:
                     allDefList.append(element.attributes['source'].value)
-            jointsList = list(filter(lambda name : name[-3:] in jointSuffixList, allDefList))
+            jointsList = list(filter(lambda name : name[-3:] in self.jointSuffixList, allDefList))
             return jointsList
     
 
@@ -334,15 +321,6 @@ class Skinning(object):
         for skinClusterNode in self.checkExistingSkinClusterNode(mesh)[2]:
             self.unlockJoints(skinClusterNode)
             cmds.skinPercent(skinClusterNode, mesh, normalize=True)
-
-
-    def getIOFileName(self, mesh, *args):
-        """ Returns the cut fileName if found "|" in the given mesh name to avoid windows special character backup issue.
-        """
-        fileName = mesh
-        if "|" in mesh:
-            fileName = mesh[mesh.rfind("|")+1:]
-        return fileName
 
 
     def exportSkinWeightsToFile(self, mesh, path, extension="xml", methodToUse="index", attrList=None, *args):
