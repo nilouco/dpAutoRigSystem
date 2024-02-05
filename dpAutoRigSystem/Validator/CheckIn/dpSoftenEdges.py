@@ -55,7 +55,6 @@ class SoftenEdges(dpBaseValidatorClass.ValidatorStartClass):
                     cmds.polySelectConstraint(type=0x8000, mode=3, smoothness=1)
                     hardenEdges = cmds.ls(selection=True)
                     cmds.polySelectConstraint(mode=0)
-                    cmds.select(clear=True)
                     if hardenEdges:
                         # converts the selected edges to faces
                         toFace = cmds.polyListComponentConversion(hardenEdges, toFace=True, internal=True)
@@ -68,12 +67,12 @@ class SoftenEdges(dpBaseValidatorClass.ValidatorStartClass):
                             else: #fix
                                 try:
                                     cmds.polySoftEdge(mesh, angle=180, constructionHistory=False)
-                                    cmds.select(clear = True)
                                     self.resultOkList.append(True)
                                     self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+mesh)
                                 except:
                                     self.resultOkList.append(False)
                                     self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+mesh)
+                    cmds.select(clear=True)
     
         else:
             self.notFoundNodes()
