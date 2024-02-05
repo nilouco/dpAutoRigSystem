@@ -11,6 +11,7 @@
     "InvertedNormals"           : false,
     "NamespaceCleaner"          : false,
     "ShowBPCleaner"             : false,
+    "SoftenEdges"               : false,
     "UnlockInitialShadingGroup" : false,
     "UnlockNormals"             : false,
     "VaccineCleaner"            : false,
