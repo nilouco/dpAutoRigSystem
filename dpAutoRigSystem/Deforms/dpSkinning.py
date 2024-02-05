@@ -12,9 +12,12 @@ class Skinning(dpWeights.Weights):
     def __init__(self, *args, **kwargs):
         """ Initialize the class.
         """
+        dpWeights.Weights.__init__(self, *args, **kwargs)
         # defining variables:
         self.skinInfoAttrList = ['skinningMethod', 'maintainMaxInfluences', 'maxInfluences']
         self.jointSuffixList = ['Jnt', 'Jar', 'Jad', 'Jcr', 'Jis']
+        self.ignoreSkinningAttr = "dpDoNotSkinIt"
+        self.ioStartName = "dpSkinning"
         
 
     def validateGeoList(self, geoList, mode=None, *args):
@@ -323,13 +326,40 @@ class Skinning(dpWeights.Weights):
             cmds.skinPercent(skinClusterNode, mesh, normalize=True)
 
 
-    def exportSkinWeightsToFile(self, mesh, path, extension="xml", methodToUse="index", attrList=None, *args):
-        """ Export the skinCluster weights of the given mesh in the given path using the choose file extension (xml by default).
+    def getSkinWeights(self, mesh, skinClusterNode, *args):
+        """ Returns a list with all skin weights for each mesh vertex as a influence dictionary.
         """
-        if not attrList:
-            attrList = self.skinInfoAttrList
-        fileName = self.getIOFileName(mesh)
-        cmds.deformerWeights(fileName+"."+extension, method=methodToUse, export=True, path=path, shape=mesh, attribute=attrList)
+        skinWeightsList = []
+        vertexList = cmds.ls(mesh+".vtx[*]", flatten=True)
+        for vertex in range(0, len(vertexList)):
+            skinWeightsList.append(self.getDeformerWeights(skinClusterNode, vertex))
+        return skinWeightsList
+
+
+    def getSkinWeightData(self, meshList, *args):
+        """ Return the the skinCluster weights data of the given mesh list.
+        """
+        skinWeightsDic = {}
+        for mesh in meshList:
+            skinWeightsDic[mesh] = {}
+            # get skinCluster nodes for the given mesh
+            skinClusterInfoList = self.checkExistingSkinClusterNode(mesh)
+            if skinClusterInfoList[0]:
+                for skinClusterNode in skinClusterInfoList[2]:
+                    # get skinCluster data
+                    skinWeightsDic[mesh][skinClusterNode] = {
+                        "skinInfList"        : cmds.skinCluster(skinClusterNode, query=True, influence=True),
+                        "skinMethodToUse"    : cmds.skinCluster(skinClusterNode, query=True, skinMethod=True),
+                        "skinMaintainMaxInf" : cmds.skinCluster(skinClusterNode, query=True, obeyMaxInfluences=True),
+                        "skinMaxInf"         : cmds.skinCluster(skinClusterNode, query=True, maximumInfluences=True),
+                        "skinWeights"        : self.getSkinWeights(mesh, skinClusterNode)
+                    }
+        return skinWeightsDic
+                    
+
+
+
+
 
 
     def importSkinWeightsFromFile(self, mesh, path, extension="xml", methodToUse="index", *args):
@@ -361,8 +391,27 @@ class Skinning(dpWeights.Weights):
         path = cmds.fileDialog2(fileMode=3, caption=action+" "+self.dpUIinst.lang['i298_folder'], okCaption=action)
         if meshList and path:
             for mesh in meshList:
+                filename = path[0]+"/"+self.ioStartName+"_"+self.getIOFileName(mesh)+".json"
                 if cmds.listRelatives(mesh, children=True, allDescendents=True, type="mesh"):
                     if io:
-                        self.exportSkinWeightsToFile(mesh, path[0])
+                        skinClusterDic = self.getSkinWeightData([mesh])
+                        self.dpUIinst.pipeliner.saveJsonFile(skinClusterDic, filename)
                     else:
-                        self.importSkinWeightsFromFile(mesh, path[0])
+                        self.importSkinWeightsFromFile([mesh], path[0], filename)
+
+
+    def getSkinnedModelList(self, *args):
+        """ Get and return the skinned mesh transforms as a list.
+            It ignores transforms with the "dpDoNotSkinIt" attributes.
+        """
+        skinnedModelList = []
+        allMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+        if allMeshList:
+            for item in allMeshList:
+                fatherNode = item[:item[1:].find("|")+1]
+                if fatherNode:
+                    if not cmds.objExists(fatherNode+"."+self.dpUIinst.skin.ignoreSkinningAttr):
+                        if self.checkExistingSkinClusterNode(fatherNode)[0]:
+                            if not fatherNode in skinnedModelList:
+                                skinnedModelList.append(fatherNode)
+        return skinnedModelList

@@ -13,6 +13,15 @@ class Weights(object):
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
     
+    
+    def getIOFileName(self, mesh, *args):
+        """ Returns the cut fileName if found "|" in the given mesh name to avoid windows special character backup issue.
+        """
+        fileName = mesh
+        if "|" in mesh:
+            fileName = mesh[mesh.rfind("|")+1:]
+        return fileName
+    
 
     def getDeformerOrder(self, defList, *args):
         """ Find and return the latest old deformer order index for the given list.
@@ -26,14 +35,32 @@ class Weights(object):
         return 0
 
 
-
-    def getIOFileName(self, mesh, *args):
-        """ Returns the cut fileName if found "|" in the given mesh name to avoid windows special character backup issue.
+    def getDeformerWeights(self, deformerNode, idx, *args):
+        """ 
         """
-        fileName = mesh
-        if "|" in mesh:
-            fileName = mesh[mesh.rfind("|")+1:]
-        return fileName
+        weightPlug = deformerNode+".weightList["+str(idx)+"].weights"
+        weightIndexList = cmds.getAttr(weightPlug, multiIndices=True)
+        for weightIndex in weightIndexList:
+            valueList = cmds.getAttr(weightPlug)[0]
+            return dict(zip(weightIndexList, valueList))
+
+
+
+
+
+##
+#
+# NOT USED -----
+#
+#
+    def getShapeIndexDic(self, deformerNode, *args):
+        """ Return a dictionary of the deformer index by shape.
+        """
+        shapeLongList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
+        indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
+        defShapeIndexDic = dict(zip(shapeLongList, indexList))
+        return defShapeIndexDic
+
 
 
 
@@ -49,3 +76,5 @@ class Weights(object):
         """
         print("todo")
         
+
+

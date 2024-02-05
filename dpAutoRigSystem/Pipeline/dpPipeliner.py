@@ -587,6 +587,26 @@ class Pipeliner(object):
             json.dump(dataDic, jsonFile, indent=indentation, sort_keys=sortKeys)
 
 
+
+###
+#
+# --- UNUSED ---
+#
+#
+###
+    def getSubFolder(self, *args):
+        """ List and return the latest subfolder by sorted naming or None.
+            # UNUSED
+        """
+        subFolder = None
+        if os.path.exists(self.ioPath):
+            subFolderList = next(os.walk(self.ioPath))[1]
+            if subFolderList:
+                subFolderList.sort()
+                subFolder = subFolderList[-1]
+        return subFolder
+    
+    
     def removeFolder(self, path, *args):
         """ Just delete all files and folder for the given path.
         """
@@ -594,3 +614,18 @@ class Pipeliner(object):
             for eachFile in next(os.walk(path))[2]:
                 os.remove(path+"/"+eachFile)
             os.rmdir(path)
+
+
+    def getMeshTansformToExportList(self, fatherList, *args):
+        """ Returns a list of the transform mesh nodes.
+        """
+        meshList = []
+        for item in fatherList:
+            meshShapeList = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, noIntermediate=True, type="mesh")
+            if meshShapeList:
+                for meshShape in meshShapeList:
+                    meshTransformList = cmds.listRelatives(meshShape, fullPath=True, parent=True)
+                    if meshTransformList:
+                        if not (meshTransformList[0]) in meshList:
+                            meshList.append(meshTransformList[0])
+        return meshList
