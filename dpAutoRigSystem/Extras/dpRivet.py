@@ -251,7 +251,16 @@ class Rivet(object):
             skinClusterList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='skinCluster')
             blendShapeList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='blendShape')
             if len(skinClusterList) == 0 and len(blendShapeList) == 0:
-                cmds.delete(attachedGeometry)
+                removeAttachedGeo = cmds.confirmDialog(title="Remove attached geometry", icon="question", message=f"The geometry that held the rivet(s) {attachedGeometry} does not have any connections left, would you like to remove it?", button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
+
+                if removeAttachedGeo == self.dpUIinst.lang['i071_yes']:
+                    currentParent = cmds.listRelatives(attachedGeometry, parent=True)
+                    if currentParent:
+                        cmds.lockNode(currentParent[0])
+                        cmds.delete(attachedGeometry)
+                        cmds.lockNode(currentParent[0], lock=False)
+                    else:
+                        cmds.delete(attachedGeometry)
         cmds.delete(rivetNetNode)
         mel.eval('print \"dpAR: '+self.dpUIinst.lang['m236_removedRivet']+" "+rivetControl+'\\n\";')
     
