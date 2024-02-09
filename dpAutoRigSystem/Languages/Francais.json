@@ -456,6 +456,9 @@
     "i294_rivetNotFine"      : "Au moins un des éléments sélectionnés possède déjà un rivet, vous souhaitez le retirer avant d'en créer un nouveau (fortement recommandé).",
     "i295_creatingRivet"     : "Création de rivets",
     "i296_working"           : "Travaillant",
+    "i297_removeGeometry"    : "Supprimer la géométrie attachée",
+    "i298_rivetHeldGeo"      : "La géométrie qui retenait le(s) rivet(s)",
+    "i299_noConnectionGeo"   : "n'a plus aucune connexion, souhaitez-vous la supprimer ?",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
