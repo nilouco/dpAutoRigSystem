@@ -83,12 +83,15 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                             maxProcess = len(skinWeightDic.keys())
 
                             wellImported = True
-                            notFoundMeshList, changedTopoMeshList = [], []
+                            toImportList, notFoundMeshList, changedTopoMeshList = [], [], []
+                            
                             mayaVersion = cmds.about(version=True)
                             
+
                             self.currentPath = self.pipeliner.getCurrentPath()
                             # reference old wip rig version to compare meshes changes
                             refNodeList = self.referOldWipFile()
+                            print("refNodeList =", refNodeList)
                             for mesh in skinWeightDic.keys():
                                 if self.verbose:
                                     # Update progress window
@@ -96,21 +99,25 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
 
                                 if cmds.objExists(mesh):
-                                    print("mesh, dic =", mesh, skinWeightDic[mesh])
+                                    
 
 
                                     if refNodeList:
                                         for refNodeName in refNodeList:
-                                            if refNodeName[refNodeName.rfind(":")+1:] == mesh:
+
+                                            if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
                                                 if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if topology changes
                                                     changedTopoMeshList.append(mesh)
                                                     
                                                     print ("changed topology =", mesh)
                                                     wellImported = False
+                                                else:
+                                                    toImportList.append(mesh)
+                                    else:
+                                        toImportList.append(mesh)
 
-
-                                    for skinClusterNode in skinWeightDic[mesh].keys():
-                                        print("mesh, skinClusterNode, dic =", mesh, skinClusterNode, skinWeightDic[mesh][skinClusterNode])
+#                                    for skinClusterNode in skinWeightDic[mesh].keys():
+#                                        print("mesh, skinClusterNode, dic =", mesh, skinClusterNode, skinWeightDic[mesh][skinClusterNode])
 
                                         #WIP
                                         # redo/update skinCluster here...
@@ -123,23 +130,18 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                                 else:
                                     print("MESH doesn't exist.....", mesh)
                                     notFoundMeshList.append(mesh)
-                            return
-
-                            try:
-                                meshName = item[:-4] #filename without extention
-                                if cmds.objExists(meshName):
-                                    method = "index"
-                                    method = "nearest"
-#                                    self.dpUIinst.skin.importSkinWeightsFromFile(item[:-4], self.ioPath, methodToUse=method)
-                            except Exception as e:
-                                self.notWorkedWellIO(item+": "+str(e))
-                                wellImported = False
-                                #break
-                            cmds.select(clear=True)
+                                    
                             if refNodeList:
                                 cmds.file(self.refPathName, removeReference=True)
-                            if wellImported:
-                                self.wellDoneIO(', '.join(exportedList))
+                            print("toImportList 0000 =", toImportList)
+                            if toImportList:
+                                try:
+                                    
+                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
+                                    self.wellDoneIO(', '.join(toImportList))
+                                except Exception as e:
+                                    self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
+
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:

@@ -45,7 +45,12 @@ class Weights(object):
             return dict(zip(weightIndexList, valueList))
 
 
-
+    def normalizeMeshWeights(self, mesh, *args):
+        """ Just normalize the skinCluster weigths for the given mesh.
+        """
+        for skinClusterNode in self.checkExistingSkinClusterNode(mesh)[2]:
+            self.unlockJoints(skinClusterNode)
+            cmds.skinPercent(skinClusterNode, mesh, normalize=True)
 
 
 ##
@@ -62,7 +67,15 @@ class Weights(object):
         return defShapeIndexDic
 
 
+    
 
+
+    def unlockJoints(self, skinCluster, *args):
+        """ Just unlock joints from a given skinCluster node.
+        """
+        jointsList = cmds.skinCluster(skinCluster, inf=True, q=True)
+        for joint in jointsList:
+            cmds.setAttr(joint+'.liw', 0)
 
     def exportWeightsToFile(self, *args):
         """ Export the weights......

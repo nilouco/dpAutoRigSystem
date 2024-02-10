@@ -199,6 +199,7 @@ class ActionStartClass(object):
         """ Returns the exported file list in the current asset folder IO or the given objList.
         """
         exportedList = None
+        resultList = []
         if objList:
             exportedList = objList
             if not type(objList) == list:
@@ -206,7 +207,14 @@ class ActionStartClass(object):
         else:
             if os.path.exists(self.ioPath+"/"+subFolder):
                 exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
-        return exportedList
+        if exportedList:
+            assetName = self.pipeliner.getCurrentFileName()
+            assetName = assetName[:assetName.find("_")]
+            print("assetName =", assetName)
+            for item in exportedList:
+                if assetName in item:
+                    resultList.append(item)
+        return resultList
 
 
     def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, *args):
