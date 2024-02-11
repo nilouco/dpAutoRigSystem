@@ -35,14 +35,19 @@ class Weights(object):
         return 0
 
 
-    def getDeformerWeights(self, deformerNode, idx, *args):
-        """ 
+    def getDeformerWeights(self, deformerNode, idx, infList=False, *args):
+        """ Read the deformer information to return a dictionary with influence index or connected matrix nodes as keys and the weight as values.
         """
         weightPlug = deformerNode+".weightList["+str(idx)+"].weights"
-        weightIndexList = cmds.getAttr(weightPlug, multiIndices=True)
-        for weightIndex in weightIndexList:
+        weightKeyList = cmds.getAttr(weightPlug, multiIndices=True)
+        if infList:
+            matrixList = []
+            for item in weightKeyList:
+                matrixList.append(cmds.listConnections(deformerNode+".matrix["+str(item)+"]", source=True, destination=False)[0])
+            weightKeyList = matrixList
+        for weightIndex in weightKeyList:
             valueList = cmds.getAttr(weightPlug)[0]
-            return dict(zip(weightIndexList, valueList))
+            return dict(zip(weightKeyList, valueList))
 
 
     def normalizeMeshWeights(self, mesh, *args):
@@ -52,6 +57,17 @@ class Weights(object):
             self.unlockJoints(skinClusterNode)
             cmds.skinPercent(skinClusterNode, mesh, normalize=True)
 
+
+    def getConnectedMatrixDic(self, deformerName, *args):
+        """ Returns a dictionary with the connected matrix nodes as keys and them index as values.
+            Useful to set skinCluster weights values correctly.
+        """
+        matrixDic = {}
+        matrixList = cmds.getAttr(deformerName+".matrix", multiIndices=True)
+        for m in matrixList:
+            matrixItem = cmds.listConnections(deformerName+".matrix["+str(m)+"]", source=True, destination=False)[0]
+            matrixDic[matrixItem] = m
+        return matrixDic
 
 ##
 #

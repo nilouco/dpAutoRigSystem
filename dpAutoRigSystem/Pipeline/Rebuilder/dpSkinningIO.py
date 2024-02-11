@@ -90,7 +90,8 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
 
                             self.currentPath = self.pipeliner.getCurrentPath()
                             # reference old wip rig version to compare meshes changes
-                            refNodeList = self.referOldWipFile()
+                        #    refNodeList = self.referOldWipFile()
+                            refNodeList = None
                             print("refNodeList =", refNodeList)
                             for mesh in skinWeightDic.keys():
                                 if self.verbose:
