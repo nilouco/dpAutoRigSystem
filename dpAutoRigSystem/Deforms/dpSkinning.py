@@ -106,7 +106,7 @@ class Skinning(dpWeights.Weights):
                 True/False if there's/not a skinCluster.
                 The current deformer list by default.
                 A list with existing skinCluster nodes.
-            Delete existing skinCluster node if there's one.
+            Delete existing skinCluster node if there's one using the deleteIt parametter as True.
         """
         result = [False, None, None]
         inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
@@ -326,11 +326,15 @@ class Skinning(dpWeights.Weights):
         cmds.select(clear=True)
         tmpJoint = cmds.joint(name="Temp_Jnt")
         cmds.skinCluster(skinClusterName, edit=True, addInfluence=tmpJoint, toSelectedBones=True, lockWeights=False, weight=1.0)
-        cmds.skinPercent(skinClusterName, mesh+'.vtx[:]', transformValue=[(tmpJoint, 1)])
+        try:
+#            cmds.skinPercent(skinClusterName, mesh+'.vtx[:]', transformValue=[(tmpJoint, 1)])
+            cmds.skinPercent(skinClusterName, mesh, transformValue=[(tmpJoint, 1)])
+        except Exception as e:
+            print(e)
         # get indices
         matrixDic = self.getConnectedMatrixDic(skinClusterName)
         vertexList = cmds.ls(mesh+".vtx[*]", flatten=True)
-        for v, vertex in enumerate(vertexList):
+        for v in range(0, len(vertexList)):
             for jntName in skinWeightDic[mesh][skinClusterName]['skinJointsWeights'][v].keys():
                 # set weights
                 cmds.setAttr(skinClusterName+".weightList["+str(v)+"].weights["+str(matrixDic[jntName])+"]", skinWeightDic[mesh][skinClusterName]['skinJointsWeights'][v][jntName])
@@ -376,8 +380,8 @@ class Skinning(dpWeights.Weights):
 
 
     def getSkinnedModelList(self, *args):
-        """ Get and return the skinned mesh transforms as a list.
-            It ignores transforms with the "dpDoNotSkinIt" attributes.
+        """ Returns the skinned mesh transforms as a list.
+            It ignores transforms with the "dpDoNotSkinIt" attribute.
         """
         skinnedModelList, ranList = [], []
         allMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
@@ -387,10 +391,14 @@ class Skinning(dpWeights.Weights):
                 if fatherNode:
                     if not fatherNode in ranList:
                         ranList.append(fatherNode)
-                        childrenList = cmds.listRelatives(fatherNode, allDescendents=True, children=True, type="transform")
+                        childrenList = cmds.listRelatives(fatherNode, allDescendents=True, children=True, fullPath=True, type="transform")
                         if childrenList:
                             for childNode in childrenList:
                                 if not cmds.objExists(childNode+"."+self.ignoreSkinningAttr):
+                                    if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
+                                        childNode = childNode[childNode.rfind("|")+1:] #unique name
+                                    else:
+                                        print("Not unique name =", childNode)
                                     if self.checkExistingSkinClusterNode(childNode)[0]:
                                         if not childNode in skinnedModelList:
                                             skinnedModelList.append(childNode)

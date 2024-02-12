@@ -43,11 +43,21 @@ class Weights(object):
         if infList:
             matrixList = []
             for item in weightKeyList:
-                matrixList.append(cmds.listConnections(deformerNode+".matrix["+str(item)+"]", source=True, destination=False)[0])
+                sourceList = cmds.listConnections(deformerNode+".matrix["+str(item)+"]", source=True, destination=False)
+                if sourceList:
+                    matrixList.append(sourceList[0])
             weightKeyList = matrixList
         for weightIndex in weightKeyList:
             valueList = cmds.getAttr(weightPlug)[0]
             return dict(zip(weightKeyList, valueList))
+
+
+    def unlockJoints(self, skinCluster, *args):
+        """ Just unlock joints from a given skinCluster node.
+        """
+        jointsList = cmds.skinCluster(skinCluster, inf=True, q=True)
+        for joint in jointsList:
+            cmds.setAttr(joint+'.liw', 0)
 
 
     def normalizeMeshWeights(self, mesh, *args):
@@ -59,51 +69,13 @@ class Weights(object):
 
 
     def getConnectedMatrixDic(self, deformerName, *args):
-        """ Returns a dictionary with the connected matrix nodes as keys and them index as values.
+        """ Returns a dictionary with the connected matrix nodes as keys and their index as values.
             Useful to set skinCluster weights values correctly.
         """
         matrixDic = {}
         matrixList = cmds.getAttr(deformerName+".matrix", multiIndices=True)
         for m in matrixList:
-            matrixItem = cmds.listConnections(deformerName+".matrix["+str(m)+"]", source=True, destination=False)[0]
-            matrixDic[matrixItem] = m
+            matrixItemList = cmds.listConnections(deformerName+".matrix["+str(m)+"]", source=True, destination=False)
+            if matrixItemList:
+                matrixDic[matrixItemList[0]] = m
         return matrixDic
-
-##
-#
-# NOT USED -----
-#
-#
-    def getShapeIndexDic(self, deformerNode, *args):
-        """ Return a dictionary of the deformer index by shape.
-        """
-        shapeLongList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
-        indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
-        defShapeIndexDic = dict(zip(shapeLongList, indexList))
-        return defShapeIndexDic
-
-
-    
-
-
-    def unlockJoints(self, skinCluster, *args):
-        """ Just unlock joints from a given skinCluster node.
-        """
-        jointsList = cmds.skinCluster(skinCluster, inf=True, q=True)
-        for joint in jointsList:
-            cmds.setAttr(joint+'.liw', 0)
-
-    def exportWeightsToFile(self, *args):
-        """ Export the weights......
-        """
-        print("todo")
-        
-
-
-    def importWeightsFromFile(self, *args):
-        """ Import the weights......
-        """
-        print("todo")
-        
-
-
