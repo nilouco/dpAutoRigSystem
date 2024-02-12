@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.05"
-DPAR_UPDATELOG = "N793 - Soften edges check-in validator."
+DPAR_VERSION_PY3 = "4.04.06"
+DPAR_UPDATELOG = "N801 - Prompt for exclude faceToRivet\nand lock empty groups."
 
 
 

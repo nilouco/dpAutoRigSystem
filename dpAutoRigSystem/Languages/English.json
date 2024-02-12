@@ -456,6 +456,9 @@
     "i294_rivetNotFine"      : "At least one of the selected items already has a rivet, would you like to remove then before create the new one (high recommended).",
     "i295_creatingRivet"     : "Creating Rivet",
     "i296_working"           : "Working",
+    "i297_removeGeometry"    : "Remove attached geometry",
+    "i298_rivetHeldGeo"      : "The geometry that held the rivet(s)",
+    "i299_noConnectionGeo"   : "does not have any connections left, would you like to remove it?",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
