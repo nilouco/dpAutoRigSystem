@@ -61,22 +61,29 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                             if self.verbose:
                                 # Update progress window
                                 progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+meshList))
                             try:
+                                nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
                                 # export alembic
                                 self.pipeliner.makeDirIfNotExists(self.ioPath)
                                 ioItems = ' -root '.join(meshList)
                                 abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
                                 cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
+                                if nodeStateDic:
+                                    self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) 
                                 self.wellDoneIO(', '.join(meshList))
-                            except:
-                                self.notWorkedWellIO(', '.join(meshList))
+                            except Exception as e:
+                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
                         else:
                             self.notWorkedWellIO("Render_Grp")
                     else: #import
                         exportedList = self.getExportedList()
                         if exportedList:
                             try:
+                                
+                                # start a new asset context clean scene
+                                self.startNewScene()
+
                                 # import alembic
                                 exportedList.sort()
                                 abcToImport = self.ioPath+"/"+exportedList[-1]
@@ -86,8 +93,8 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                                 validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
                                 self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
                                 self.wellDoneIO(exportedList[-1])
-                            except:
-                                self.notWorkedWellIO(exportedList[-1])
+                            except Exception as e:
+                                self.notWorkedWellIO(exportedList[-1]+": "+str(e))
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
@@ -103,3 +110,9 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         self.endProgressBar()
         self.refreshView()
         return self.dataLogDic
+
+
+    def startNewScene(self, *args):
+        """
+        """
+        print("starting a new Asset context clean scene here.... merci... WIP")

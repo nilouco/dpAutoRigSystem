@@ -60,7 +60,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                             if self.verbose:
                                 # Update progress window
                                 progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+shader))
                             fileNode = None
                             texture = None
                             color = None
@@ -105,8 +105,8 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                             jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
                             self.pipeliner.saveJsonFile(shaderDic, jsonName)
                             self.wellDoneIO(jsonName)
-                        except:
-                            self.notWorkedWellIO(jsonName)
+                        except Exception as e:
+                            self.notWorkedWellIO(jsonName+": "+str(e))
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import
@@ -155,8 +155,8 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    except Exception as e:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end

@@ -68,8 +68,8 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                             skinWeightDic = self.dpUIinst.skin.getSkinWeightData(meshList)
                             self.pipeliner.saveJsonFile(skinWeightDic, jsonName)
                             self.wellDoneIO(jsonName)
-                        except:
-                            self.notWorkedWellIO(', '.join(meshList))
+                        except Exception as e:
+                            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import
@@ -83,8 +83,11 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                             wellImported = True
                             toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
                             self.currentPath = self.pipeliner.getCurrentPath()
+                            
                             # reference old wip rig version to compare meshes changes
-                            refNodeList = self.referOldWipFile()
+                            #refNodeList = self.referOldWipFile()
+                            refNodeList = None
+
                             for mesh in skinWeightDic.keys():
                                 if self.verbose:
                                     # Update progress window
@@ -97,7 +100,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                                                 if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
                                                     changedShapeMeshList.append(mesh)
                                                     wellImported = False
-                                                elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)):
+                                                elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
                                                     changedTopoMeshList.append(mesh)
                                                     wellImported = False
                                                 else:
@@ -119,11 +122,11 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                                 self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
                             if not wellImported:
                                 if changedShapeMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+changedShapeMeshList)
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
                                 elif changedTopoMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+changedTopoMeshList)
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
                                 elif notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+notFoundMeshList)
+                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:

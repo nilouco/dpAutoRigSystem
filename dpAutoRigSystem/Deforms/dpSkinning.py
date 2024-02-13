@@ -302,8 +302,13 @@ class Skinning(dpWeights.Weights):
     def getSkinWeightData(self, meshList, *args):
         """ Return the the skinCluster weights data of the given mesh list.
         """
+        progressAmount = 0
+        maxProcess = len(meshList)
+        cmds.progressWindow(title=self.ioStartName, progress=0, status=self.ioStartName+': 0%', isInterruptable=False)
         skinWeightsDic = {}
         for mesh in meshList:
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('SkinningIO: '+repr(progressAmount)+' - '+mesh))
             skinWeightsDic[mesh] = {}
             # get skinCluster nodes for the given mesh
             skinClusterInfoList = self.checkExistingSkinClusterNode(mesh)
@@ -345,9 +350,15 @@ class Skinning(dpWeights.Weights):
     def importSkinWeightsFromFile(self, meshList, path, filename, *args):
         """ Import the skinCluster weights of the given mesh in the given path using the choose file extension (xml by default).
         """
+        progressAmount = 0
+        maxProcess = len(meshList)
+        # Starting progress window
+        cmds.progressWindow(title=self.ioStartName, progress=0, status=self.ioStartName+': 0%', isInterruptable=False)
         skinWeightDic = self.dpUIinst.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
             for mesh in meshList:
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('SkinningIO: '+repr(progressAmount)+' - '+mesh))
                 if cmds.objExists(mesh):
                     for skinClusterName in skinWeightDic[mesh].keys():
                         self.updateOrCreateSkinCluster(mesh, skinClusterName, skinWeightDic)

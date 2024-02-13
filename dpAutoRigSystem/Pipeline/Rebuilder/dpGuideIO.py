@@ -80,8 +80,8 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                 jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
                                 self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
                                 self.wellDoneIO(jsonName)
-                            except:
-                                self.notWorkedWellIO(jsonName)
+                            except Exception as e:
+                                self.notWorkedWellIO(jsonName+": "+str(e))
                         else:
                             self.notWorkedWellIO("v014_notFoundNodes")
                         cmds.select(clear=True)
@@ -116,15 +116,15 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                             self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
                                             self.setupInstanceChanges()
                                             self.setupGuideTransformations()
-                                        except:
+                                        except Exception as e:
                                             wellImported = False
-                                            self.notWorkedWellIO(net)
+                                            self.notWorkedWellIO(net+": "+str(e))
                                             break
                                 try:
                                     # Parenting guides
                                     self.setupGuideBaseParenting(self.dpUIinst.lang['m197_notPossibleParent'])
-                                except:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                                except Exception as e:
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
                                     wellImported = False
                                 if wellImported:
                                     self.wellDoneIO(exportedList[-1])

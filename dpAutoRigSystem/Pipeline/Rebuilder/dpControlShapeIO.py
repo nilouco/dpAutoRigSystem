@@ -60,8 +60,8 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                             ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".ma"
                             self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName)
                             self.wellDoneIO(', '.join(ctrlList))
-                        except:
-                            self.notWorkedWellIO(', '.join(ctrlList))
+                        except Exception as e:
+                            self.notWorkedWellIO(', '.join(ctrlList)+": "+str(e))
                     else: #import
                         exportedList = self.getExportedList()
                         if exportedList:
@@ -71,8 +71,8 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                                 ctrlsToImport = self.ioPath+"/"+exportedList[-1]
                                 self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport)
                                 self.wellDoneIO(exportedList[-1])
-                            except:
-                                self.notWorkedWellIO(exportedList[-1])
+                            except Exception as e:
+                                self.notWorkedWellIO(exportedList[-1]+": "+str(e))
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:

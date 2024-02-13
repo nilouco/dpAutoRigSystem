@@ -254,3 +254,49 @@ class ActionStartClass(object):
         """
         cmds.refresh()
         cmds.viewFit(allObjects=True, animate=True)
+
+
+    def changeNodeState(self, itemList, findDeformers=True, state=None, dic=None, *args):
+        """ Useful for rebuilder to set deformer node state as has no effect before export a not edited mesh.
+            Returns the current node state dictionary of the given node list and all descendent hierarchy too.
+        """
+        resultDic = {}
+        toChangeNodeStateList = []
+        if findDeformers:
+            for item in itemList:
+                childrenList = cmds.listRelatives(item, children=True, allDescendents=True)
+                if childrenList:
+                    childrenList.append(item)
+                else:
+                    childrenList = [item]
+                for child in childrenList:
+                    try:
+                        inputDeformerList = cmds.findDeformers(child)
+                    except:
+                        self.messageList.append(self.dpUIinst.lang['i075_moreOne']+": "+child)
+                        inputDeformerList = False
+                    if inputDeformerList:
+                        for defNode in inputDeformerList:
+                            if not defNode in toChangeNodeStateList:
+                                toChangeNodeStateList.append(defNode)
+        elif dic:
+            toChangeNodeStateList = dic.keys()
+        else:
+            toChangeNodeStateList = itemList
+        if toChangeNodeStateList:
+            for node in toChangeNodeStateList:
+                if not cmds.listConnections(node+".nodeState", source=True, destination=False):
+                    value = state
+                    if dic:
+                        value = dic[node]
+                    resultDic[node] = cmds.getAttr(node+".nodeState")
+                    lockAttrStatus = cmds.getAttr(node+".nodeState", lock=True)
+                    lockNodeStatus = cmds.lockNode(node, query=True, lock=True)
+                    cmds.lockNode(node, lock=False)
+                    cmds.setAttr(node+".nodeState", lock=False)
+                    # set nodeState attribute value
+                    cmds.setAttr(node+".nodeState", value)
+                    cmds.setAttr(node+".nodeState", lock=lockAttrStatus)
+                    if lockNodeStatus:
+                        cmds.lockNode(node, lock=1)
+        return resultDic
