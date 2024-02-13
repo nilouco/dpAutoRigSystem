@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-01-28",
+    "_updated"       : "2024-02-12",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -459,6 +459,7 @@
     "i296_sControlShapeIOAnn" : "Le dossier ou on va importer et exporter les controller shapes.",
     "i297_sSkinningIOAnn"     : "Le dossier ou on va importer et exporter les skinnning weights.",
     "i298_folder"             : "dossier",
+    "i299_notUniqueName"      : "Il n'y a pas d'unique nom pour ce node",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -719,7 +720,8 @@
     "r014_controlShapeIO"     : "Controlleur Shape IO",
     "r015_controlShapeIODesc" : "Cet action va travailler les shapes de controlleurs\nl'export et l'import des fichiers ma avec le snapshot de curves.",
     "r016_skinningIO"         : "Skinning IO",
-    "r017_skinningIODesc"     : "Cet action va travailler le skinning\nl'export et l'import des weights en fichier xml.",
+    "r017_skinningIODesc"     : "Cet action va travailler le skinning\nl'export et l'import des weights en fichier json.",
+    "r018_changedMesh"        : "Il a changé la géometrie",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

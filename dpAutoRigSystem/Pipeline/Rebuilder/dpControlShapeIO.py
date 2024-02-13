@@ -86,5 +86,5 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
         self.updateButtonColors()
         self.reportLog()
         self.endProgressBar()
-        cmds.refresh()
+        self.refreshView()
         return self.dataLogDic

@@ -247,3 +247,10 @@ class ActionStartClass(object):
                         if not fatherNode in meshList:
                             meshList.append(fatherNode)
                 return meshList
+
+
+    def refreshView(self, *args):
+        """ Just refresh the viewport and fit the view camera to all visible nodes.
+        """
+        cmds.refresh()
+        cmds.viewFit(allObjects=True, animate=True)

@@ -327,7 +327,6 @@ class Skinning(dpWeights.Weights):
         tmpJoint = cmds.joint(name="Temp_Jnt")
         cmds.skinCluster(skinClusterName, edit=True, addInfluence=tmpJoint, toSelectedBones=True, lockWeights=False, weight=1.0)
         try:
-#            cmds.skinPercent(skinClusterName, mesh+'.vtx[:]', transformValue=[(tmpJoint, 1)])
             cmds.skinPercent(skinClusterName, mesh, transformValue=[(tmpJoint, 1)])
         except Exception as e:
             print(e)
@@ -387,19 +386,21 @@ class Skinning(dpWeights.Weights):
         allMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
         if allMeshList:
             for item in allMeshList:
-                fatherNode = item[:item[1:].find("|")+1]
-                if fatherNode:
-                    if not fatherNode in ranList:
-                        ranList.append(fatherNode)
-                        childrenList = cmds.listRelatives(fatherNode, allDescendents=True, children=True, fullPath=True, type="transform")
-                        if childrenList:
-                            for childNode in childrenList:
-                                if not cmds.objExists(childNode+"."+self.ignoreSkinningAttr):
-                                    if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
-                                        childNode = childNode[childNode.rfind("|")+1:] #unique name
-                                    else:
-                                        print("Not unique name =", childNode)
-                                    if self.checkExistingSkinClusterNode(childNode)[0]:
-                                        if not childNode in skinnedModelList:
-                                            skinnedModelList.append(childNode)
+                transformNode = item[:item[1:].find("|")+1]
+                if not transformNode in ranList:
+                    ranList.append(transformNode)
+                    transformList = cmds.listRelatives(transformNode, allDescendents=True, children=True, fullPath=True, type="transform")
+                    if transformList:
+                        transformList.append(transformNode)
+                    else:
+                        transformList = [transformNode]
+                    for childNode in transformList:
+                        if not cmds.objExists(childNode+"."+self.ignoreSkinningAttr):
+                            if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
+                                childNode = childNode[childNode.rfind("|")+1:] #unique name
+                            else:
+                                print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
+                            if self.checkExistingSkinClusterNode(childNode)[0]:
+                                if not childNode in skinnedModelList:
+                                    skinnedModelList.append(childNode)
         return skinnedModelList
