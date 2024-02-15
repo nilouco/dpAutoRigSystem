@@ -2,8 +2,6 @@
 from maya import cmds
 from maya import mel
 from . import dpWeights
-from xml.dom import minidom
-import os
 
 DP_SKINNING_VERSION = 1.4
 

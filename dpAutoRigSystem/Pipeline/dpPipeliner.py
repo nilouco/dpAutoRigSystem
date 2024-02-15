@@ -121,7 +121,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2024-01-25",
+        "updated" : "2024-02-13",
         
         "f_drive"          : "",
         "f_studio"         : "",
@@ -137,6 +137,7 @@ class Pipeliner(object):
         "s_guideIO"        : "dpData/dpGuide",
         "s_controlShapeIO" : "dpData/dpControlShape",
         "s_skinningIO"     : "dpData/dpSkinning",
+        "s_parentIO"       : "dpData/dpParent",
         "s_old"            : "dpOld",
         "s_dropbox"        : "Job",
         "s_webhook"        : "",
@@ -179,7 +180,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2024-01-25",
+        "updated" : "2024-02-13",
         
         "f_drive"          : "i228_fDriveAnn",
         "f_studio"         : "i229_fStudioAnn",
@@ -195,6 +196,7 @@ class Pipeliner(object):
         "s_guideIO"        : "i295_sGuideIOAnn",
         "s_controlShapeIO" : "i296_sControlShapeIOAnn",
         "s_skinningIO"     : "i297_sSkinningIOAnn",
+        "s_parentIO"       : "i300_sParentIOAnn",
         "s_old"            : "i237_sOldAnn",
         "s_dropbox"        : "i238_sDropboxAnn",
         "s_prefix"         : "i239_sPrefixAnn",
@@ -585,47 +587,3 @@ class Pipeliner(object):
         # write json file in the HD:
         with open(fileNamePath, 'w') as jsonFile:
             json.dump(dataDic, jsonFile, indent=indentation, sort_keys=sortKeys)
-
-
-
-###
-#
-# --- UNUSED ---
-#
-#
-###
-    def getSubFolder(self, *args):
-        """ List and return the latest subfolder by sorted naming or None.
-            # UNUSED
-        """
-        subFolder = None
-        if os.path.exists(self.ioPath):
-            subFolderList = next(os.walk(self.ioPath))[1]
-            if subFolderList:
-                subFolderList.sort()
-                subFolder = subFolderList[-1]
-        return subFolder
-    
-    
-    def removeFolder(self, path, *args):
-        """ Just delete all files and folder for the given path.
-        """
-        if os.path.exists(path):
-            for eachFile in next(os.walk(path))[2]:
-                os.remove(path+"/"+eachFile)
-            os.rmdir(path)
-
-
-    def getMeshTansformToExportList(self, fatherList, *args):
-        """ Returns a list of the transform mesh nodes.
-        """
-        meshList = []
-        for item in fatherList:
-            meshShapeList = cmds.listRelatives(item, allDescendents=True, children=True, fullPath=True, noIntermediate=True, type="mesh")
-            if meshShapeList:
-                for meshShape in meshShapeList:
-                    meshTransformList = cmds.listRelatives(meshShape, fullPath=True, parent=True)
-                    if meshTransformList:
-                        if not (meshTransformList[0]) in meshList:
-                            meshList.append(meshTransformList[0])
-        return meshList
