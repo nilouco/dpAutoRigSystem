@@ -60,8 +60,11 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                             progressAmount += 1
                             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                         # define list to export
-                        transformList = self.removeCameras(transformList)
-                        transformList = self.reorderedList(transformList)
+                        transformList = self.filterTransformList(transformList)
+                        transformList = self.reorderList(transformList)
+
+                        # TODO filter nodes like constraints
+
                         parentDic = {"Parent" : transformList}
                         try:
                             # export json file
@@ -82,8 +85,8 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                             if parentDic:
                                 
                                 currentTransformList = cmds.ls(selection=False, long=True, type="transform")
-                                currentTransformList = self.removeCameras(currentTransformList)
-                                currentTransformList = self.reorderedList(currentTransformList)
+                                currentTransformList = self.filterTransformList(currentTransformList)
+                                currentTransformList = self.reorderList(currentTransformList)
 
                                 if not currentTransformList == parentDic["Parent"]:
                                     progressAmount = 0
@@ -121,7 +124,7 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                                                                     cmds.parent(shortItem, shortFatherNode)
                                                                     wellImportedList.append(shortItem)
 
-                                            # TODO: node/father in root, don't exists father anymore, 
+                                            # TODO: node/father in root, don't exists father anymore, constraints?
 
                                     if parentIssueList:
                                         print("parentIssueList =", parentIssueList)
@@ -153,17 +156,28 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def removeCameras(self, camList, *args):
-        """ Remove default cameras from given list and return it.
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, *args):
+        """ Remove camera and/or constraints from the given list and return it.
         """
-        ignoreList = ["|persp", "|top", "|side", "|front"]
-        for ignoreNode in ignoreList:
-            if ignoreNode in camList:
-                camList.remove(ignoreNode)
-        return camList
-    
+        cameraList = ["|persp", "|top", "|side", "|front"]
+        constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint"]
+        toRemoveList = []
+        for item in itemList:
+            if filterCamera:
+                for cameraName in cameraList:
+                    if item.endswith(cameraName):
+                        toRemoveList.append(item)
+            if filterConstraint:
+                itemType = cmds.objectType(item)
+                if itemType in constraintList:
+                    toRemoveList.append(item)
+        if toRemoveList:
+            for toRemoveNode in toRemoveList:
+                itemList.remove(toRemoveNode)
+        return itemList
 
-    def reorderedList(self, itemList, *args):
+
+    def reorderList(self, itemList, *args):
         """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
         """
         return sorted(itemList, key = lambda x: x.count("|"), reverse=True)
