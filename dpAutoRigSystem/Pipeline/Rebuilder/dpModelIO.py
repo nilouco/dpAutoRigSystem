@@ -70,7 +70,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                                 abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
                                 cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
                                 if nodeStateDic:
-                                    self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) 
+                                    self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
                                 self.wellDoneIO(', '.join(meshList))
                             except Exception as e:
                                 self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
@@ -89,9 +89,6 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                                 abcToImport = self.ioPath+"/"+exportedList[-1]
                                 #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
                                 mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                                # clean up geometries
-                                validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                                self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False) #fix
                                 self.wellDoneIO(exportedList[-1])
                             except Exception as e:
                                 self.notWorkedWellIO(exportedList[-1]+": "+str(e))

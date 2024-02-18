@@ -1,5 +1,7 @@
 dpModelIO
+dpCheckinIO
 dpShaderIO
 dpGuideIO
 dpControlShapeIO
 dpSkinningIO
+dpParentIO

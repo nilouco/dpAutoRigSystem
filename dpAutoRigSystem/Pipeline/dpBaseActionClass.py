@@ -217,7 +217,7 @@ class ActionStartClass(object):
         return resultList
 
 
-    def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, *args):
+    def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, objList, *args):
         """ Run action from a list without verbose.
         """
         if actionInstanceList:
@@ -225,7 +225,7 @@ class ActionStartClass(object):
                 for aInst in actionInstanceList:
                     if actionToRun in str(aInst):
                         aInst.verbose = False
-                        aInst.runAction(firstMode)
+                        aInst.runAction(firstMode, objList)
                         aInst.verbose = True
 
 

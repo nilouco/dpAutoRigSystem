@@ -62,9 +62,6 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                         # define list to export
                         transformList = self.filterTransformList(transformList)
                         transformList = self.reorderList(transformList)
-
-                        # TODO filter nodes like constraints
-
                         parentDic = {"Parent" : transformList}
                         try:
                             # export json file
@@ -83,15 +80,13 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                             exportedList.sort()
                             parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if parentDic:
-                                
                                 currentTransformList = cmds.ls(selection=False, long=True, type="transform")
                                 currentTransformList = self.filterTransformList(currentTransformList)
                                 currentTransformList = self.reorderList(currentTransformList)
-
                                 if not currentTransformList == parentDic["Parent"]:
                                     progressAmount = 0
                                     maxProcess = len(parentDic["Parent"])
-
+                                    # define lists to check result
                                     wellImportedList = []
                                     parentIssueList = []
                                     # check parenting shaders
@@ -100,35 +95,33 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                                             # Update progress window
                                             progressAmount += 1
                                             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                                                        
-                                        
                                         if not cmds.objExists(item):
                                             parentIssueList.append(item)
-
-                                            # WIP
-
                                             shortItem = item[item.rfind("|")+1:]
-                                            print("shortItem = ", shortItem)
                                             if cmds.objExists(shortItem):
-                                                itemSelList = cmds.ls(shortItem)
-                                                if itemSelList:
-                                                    if len(itemSelList) == 1:
-                                                        shortFatherNode = item[:item.rfind("|")]
-                                                        print("shortFatherNode1 =", shortFatherNode)
-                                                        shortFatherNode = shortFatherNode[shortFatherNode.rfind("|")+1:]
-                                                        print("shortFatherNode2 =", shortFatherNode)
-                                                        if cmds.objExists(shortFatherNode):
-                                                            fatherSelList = cmds.ls(shortFatherNode)
-                                                            if fatherSelList:
-                                                                if len(fatherSelList) == 1:
-                                                                    cmds.parent(shortItem, shortFatherNode)
-                                                                    wellImportedList.append(shortItem)
-
-                                            # TODO: node/father in root, don't exists father anymore, constraints?
-
+                                                if len(cmds.ls(shortItem)) == 1:
+                                                    # get father name
+                                                    longFatherNode = item[:item.rfind("|")]
+                                                    shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
+                                                    if cmds.objExists(longFatherNode):
+                                                        # simple parent to existing old father node in the ancient hierarchy
+                                                        cmds.parent(shortItem, longFatherNode)
+                                                        wellImportedList.append(shortItem)
+                                                    elif cmds.objExists(shortFatherNode):
+                                                        if len(cmds.ls(shortFatherNode)) == 1:
+                                                            # found unique father node in another hierarchy to parent
+                                                            cmds.parent(shortItem, shortFatherNode)
+                                                            wellImportedList.append(shortItem)
+                                                        else:
+                                                            self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
+                                                    else: #root here
+                                                        cmds.parent(shortItem, world=True)
+                                                        wellImportedList.append(shortItem)
+                                                else:
+                                                    self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortItem)
+                                            else:
+                                                self.notWorkedWellIO(self.dpUIinst.lang['e004_objNotExist'], shortItem)
                                     if parentIssueList:
-                                        print("parentIssueList =", parentIssueList)
-
                                         if wellImportedList:
                                             self.wellDoneIO(exportedList[-1]+": "+', '.join(parentIssueList))
                                         else:
@@ -181,15 +174,3 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
         """ Returns a list with high to low counting of '|' in the item list given. That means a descending order.
         """
         return sorted(itemList, key = lambda x: x.count("|"), reverse=True)
-
-
-
-
-
-    # TODO
-    #
-    # get uniqueName
-    # parent unique node to unique father
-    # check again after reparenting to see if we got orphan transforms
-    #
-    #

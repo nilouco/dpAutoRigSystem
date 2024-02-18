@@ -88,10 +88,14 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
                 else: #import
-                    try:
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            exportedList.sort()
+                    modelPanelList = cmds.getPanel(type="modelPanel")
+                    for mp in modelPanelList:
+                        cmds.modelEditor(mp, edit=True, xray=True)
+
+                    exportedList = self.getExportedList()
+                    if exportedList:
+                        exportedList.sort()
+                        try:
                             self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if self.importedDataDic:
                                 wellImported = True
@@ -131,10 +135,14 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             cmds.select(clear=True)
-                        else:
+                        except:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except:
+                    else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    
+                    for mp in modelPanelList:
+                        cmds.modelEditor(mp, edit=True, xray=False)
+                        #cmds.modelEditor(currentPanel, edit=True, displayAppearance='smoothShaded')
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end

@@ -148,7 +148,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                             notFoundMeshList.append(mesh)
                                 cmds.select(clear=True)
                                 if notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh'])
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
                                 else:
                                     self.wellDoneIO(exportedList[-1])
                             else:
