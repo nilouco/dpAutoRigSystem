@@ -32,6 +32,8 @@ class ActionStartClass(object):
         self.firstBT = None
         self.secondBT = None
         self.actionType = "v000_validator" #or r000_rebuilder
+        self.firstBTEnable = True
+        self.secondBTEnable = True
         # returned lists
         self.checkedObjList = []
         self.foundIssueList = []

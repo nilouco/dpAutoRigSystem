@@ -22,6 +22,7 @@ class CheckinIO(dpBaseActionClass.ActionStartClass):
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.ioDir = "s_checkinIO"
         self.startName = "dpCheckin"
+        self.firstBTEnable = False
     
 
     def runAction(self, firstMode=True, objList=None, *args):

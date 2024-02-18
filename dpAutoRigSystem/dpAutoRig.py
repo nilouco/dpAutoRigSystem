@@ -1319,8 +1319,8 @@ class DP_AutoRig_UI(object):
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
                 validatorInstance.actionType = "v000_validator"
                 validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
-                validatorInstance.firstBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                validatorInstance.secondBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                validatorInstance.firstBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
+                validatorInstance.secondBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
                 if guideDir == CHECKIN.replace("/", "."):
                     self.checkInInstanceList.append(validatorInstance)
                 elif guideDir == CHECKOUT.replace("/", "."):
@@ -1334,8 +1334,8 @@ class DP_AutoRig_UI(object):
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
                 rebuilderInstance.actionType = "r000_rebuilder"
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
-                rebuilderInstance.firstBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
-                rebuilderInstance.secondBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), parent=moduleLayout)
+                rebuilderInstance.firstBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
+                rebuilderInstance.secondBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
                 self.rebuilderInstanceList.append(rebuilderInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
