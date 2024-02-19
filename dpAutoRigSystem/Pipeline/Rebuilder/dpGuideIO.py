@@ -88,10 +88,10 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
                 else: #import
+                    # apply viewport xray
                     modelPanelList = cmds.getPanel(type="modelPanel")
                     for mp in modelPanelList:
                         cmds.modelEditor(mp, edit=True, xray=True)
-
                     exportedList = self.getExportedList()
                     if exportedList:
                         exportedList.sort()
@@ -113,9 +113,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                     if toInitializeGuide:
                                         try:
                                             self.netDic = json.loads(self.importedDataDic[net])
-                                            if self.verbose:
-                                                # Update progress window
-                                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
+                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
                                             # create a module instance:
                                             self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
                                             self.setupInstanceChanges()
@@ -139,10 +137,9 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    
+                    # remove viewport xray
                     for mp in modelPanelList:
                         cmds.modelEditor(mp, edit=True, xray=False)
-                        #cmds.modelEditor(currentPanel, edit=True, displayAppearance='smoothShaded')
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end

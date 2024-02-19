@@ -4,25 +4,25 @@ from maya import mel
 from .. import dpBaseActionClass
 
 # global variables to this module:
-CLASS_NAME = "ModelIO"
-TITLE = "r003_modelIO"
-DESCRIPTION = "r004_modelIODesc"
-ICON = "/Icons/dp_modelIO.png"
+CLASS_NAME = "SetupGeometryIO"
+TITLE = "r023_setupGeometryIO"
+DESCRIPTION = "r024_setupGeometryIODesc"
+ICON = "/Icons/dp_setupGeometryIO.png"
 
-DP_MODELIO_VERSION = 1.0
+DP_SETUPGEOMETRYIO_VERSION = 1.0
 
 
-class ModelIO(dpBaseActionClass.ActionStartClass):
+class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_MODELIO_VERSION
+        self.version = DP_SETUPGEOMETRYIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
-        self.ioDir = "s_modelIO"
-        self.startName = "dpModel"
+        self.ioDir = "s_setupGeometryIO"
+        self.startName = "dpSetupGeometry"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -54,7 +54,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                         if objList:
                             meshList = objList
                         else:
-                            meshList = self.getModelToExportList()
+                            meshList = self.getGeometryToExportList()
                         if meshList:
                             progressAmount = 0
                             maxProcess = len(meshList)
@@ -72,15 +72,11 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                             except Exception as e:
                                 self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
                         else:
-                            self.notWorkedWellIO("Render_Grp")
+                            self.notWorkedWellIO("Geometries")
                     else: #import
                         exportedList = self.getExportedList()
                         if exportedList:
                             try:
-                                
-                                # start a new asset context clean scene
-                                self.startNewScene()
-
                                 # import alembic
                                 exportedList.sort()
                                 abcToImport = self.ioPath+"/"+exportedList[-1]
@@ -106,29 +102,15 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def getModelToExportList(self, *args):
-        """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
+    def getGeometryToExportList(self, *args):
+        """ Returns a list of the first children node in geometry groups.
         """
-        meshList = []
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
-        if renderGrp:
-            meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-            if meshList:
-                return cmds.listRelatives(renderGrp, children=True, type="transform")
-        if not meshList:
-            unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-            if unparentedMeshList:
-                for item in unparentedMeshList:
-                    if not cmds.objExists(item+".masterGrp"):
-                        fatherNode = item[:item[1:].find("|")+1]
-                        if fatherNode:
-                            if not cmds.objExists(fatherNode+".masterGrp"):
-                                if not fatherNode in meshList:
-                                    meshList.append(fatherNode)
-                return meshList
-
-
-    def startNewScene(self, *args):
-        """
-        """
-        print("starting a new Asset context clean scene here.... merci... WIP")
+        geoList = []
+        geoGrpList = ["modelsGrp", "blendShapesGrp", "wipGrp"]
+        for geoGrp in geoGrpList:
+            grp = self.utils.getNodeByMessage(geoGrp)
+            if grp:
+                meshList = cmds.listRelatives(grp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
+                if meshList:
+                    geoList.extend(cmds.listRelatives(grp, children=True, type="transform"))
+        return geoList

@@ -231,26 +231,6 @@ class ActionStartClass(object):
                         aInst.verbose = True
 
 
-    def getModelToExportList(self, *args):
-        """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
-        """
-        meshList = []
-        renderGrp = self.utils.getNodeByMessage("renderGrp")
-        if renderGrp:
-            meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
-            if meshList:
-                return cmds.listRelatives(renderGrp, children=True, type="transform")
-        if not meshList:
-            unparentedMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-            if unparentedMeshList:
-                for item in unparentedMeshList:
-                    fatherNode = item[:item[1:].find("|")+1]
-                    if fatherNode:
-                        if not fatherNode in meshList:
-                            meshList.append(fatherNode)
-                return meshList
-
-
     def refreshView(self, *args):
         """ Just refresh the viewport and fit the view camera to all visible nodes.
         """

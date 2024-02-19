@@ -91,10 +91,8 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                                     parentIssueList = []
                                     # check parenting shaders
                                     for item in parentDic["Parent"]:
-                                        if self.verbose:
-                                            # Update progress window
-                                            progressAmount += 1
-                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                        progressAmount += 1
+                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
                                         if not cmds.objExists(item):
                                             parentIssueList.append(item)
                                             shortItem = item[item.rfind("|")+1:]
@@ -103,7 +101,12 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                                                     # get father name
                                                     longFatherNode = item[:item.rfind("|")]
                                                     shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
-                                                    if cmds.objExists(longFatherNode):
+                                                    currentFatherList = cmds.listRelatives(shortItem, parent=True)
+                                                    if currentFatherList:
+                                                        if currentFatherList[0] == shortFatherNode:
+                                                            # already child of the father node
+                                                            wellImportedList.append(shortItem)
+                                                    elif cmds.objExists(longFatherNode):
                                                         # simple parent to existing old father node in the ancient hierarchy
                                                         cmds.parent(shortItem, longFatherNode)
                                                         wellImportedList.append(shortItem)
