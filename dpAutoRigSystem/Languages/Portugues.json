@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-02-18",
+    "_updated"       : "2024-02-21",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -463,6 +463,7 @@
     "i300_sParentIOAnn"        : "O diretório onde será exportado ou importado os dados de parent.",
     "i301_sCheckinIOAnn"       : "O diretório onde será exportado ou importado os dados de checkin. Não utilizado no momento.",
     "i302_sSetupGeometryIOAnn" : "O diretório onde será exportado ou importado as geometrias usadas no setup.",
+    "i303_assetNameText"       : "Nome do asset",
 
     "m001_fkLine"               : "Linha Fk",
     "m002_fkLineDesc"           : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

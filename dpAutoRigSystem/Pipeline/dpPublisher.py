@@ -100,35 +100,6 @@ class Publisher(object):
         self.pipeliner.pipeData['publishPath'] = cmds.textFieldButtonGrp(self.filePathFBG, query=True, text=True)
 
 
-    def checkPipelineAssetNameFolder(self, *args):
-        """ Compare the sceneName with the father folder name to define if we use the assetName as a default pipeline setup.
-            Return the shortName of the asset if found.
-            Otherwise return False
-        """
-        self.currentAssetName = cmds.file(query=True, sceneName=True)
-        self.shortAssetName = cmds.file(query=True, sceneName=True, shortName=True)
-        if "_" in self.shortAssetName:
-            self.shortAssetName = self.shortAssetName[:self.shortAssetName.find("_")]
-        for ext in [".ma", ".mb"]:
-            if self.shortAssetName.endswith(ext):
-                self.shortAssetName = self.shortAssetName[:-3]
-        folderAssetName = self.currentAssetName[:self.currentAssetName.rfind("/")]
-        folderAssetName = folderAssetName[folderAssetName.rfind("/")+1:]
-        if folderAssetName == self.shortAssetName:
-            return self.shortAssetName
-        return False
-
-
-    def defineFileVersion(self, assetNameList, *args):
-        """ Return the max number plus one of a versioned files list.
-        """
-        if assetNameList:
-            numberList = []
-            for item in assetNameList:
-                numberList.append(int(item[:item.rfind(".")].split(self.pipeliner.pipeData['s_middle'])[1]))
-            return max(numberList)+1
-
-
     def setPublishFilePath(self, filePath=None, *args):
         """ Set the publish file path and return it.
         """
@@ -138,7 +109,7 @@ class Publisher(object):
         if filePath:
             try:
                 cmds.textFieldButtonGrp(self.filePathFBG, edit=True, text=str(filePath))
-                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.getPipeFileName(filePath)))
+                cmds.textFieldGrp(self.fileNameTFG, edit=True, text=str(self.pipeliner.getPipeFileName(filePath)))
                 self.pipeliner.pipeData['publishPath'] = filePath
             except:
                 pass
@@ -151,51 +122,6 @@ class Publisher(object):
         dialogResult = cmds.fileDialog2(fileFilter="Maya Files (*.ma *.mb);;", fileMode=3, dialogStyle=2, okCaption=self.dpUIinst.lang['i187_load'])
         if dialogResult:
             self.setPublishFilePath(dialogResult[0])
-
-
-    def getRigWIPVersion(self, *args):
-        """ Find the rig version by scene name and return it.
-        """
-        rigWipVersion = 0
-        shortName = cmds.file(query=True, sceneName=True, shortName=True)
-        if self.pipeliner.pipeData['s_rig'] in shortName:
-            rigWipVersion = shortName[shortName.rfind(self.pipeliner.pipeData['s_rig'])+len(self.pipeliner.pipeData['s_rig']):shortName.rfind(".")]
-        return rigWipVersion
-
-
-    def getPipeFileName(self, filePath, *args):
-        """ Return the generated file name based on the pipeline publish folder.
-            It's check the asset name and define the file version to save the published file.
-        """
-        self.assetNameList = []
-        if os.path.exists(filePath):
-            self.pipeliner.pipeData['assetNameFolderIssue'] = False
-            assetName = self.checkPipelineAssetNameFolder()
-            if not assetName:
-                assetName = self.shortAssetName
-                self.pipeliner.pipeData['assetNameFolderIssue'] = True
-            publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
-            fileNameList = next(os.walk(filePath))[2]
-            if fileNameList:
-                for fileName in fileNameList:
-                    if assetName+self.pipeliner.pipeData['s_middle'] in fileName:
-                        if not fileName in self.assetNameList:
-                            self.assetNameList.append(fileName)
-                if self.assetNameList:
-                    publishVersion = self.defineFileVersion(self.assetNameList)
-            if self.pipeliner.pipeData['b_capitalize']:
-                assetName = assetName.capitalize()
-            elif self.pipeliner.pipeData['b_lower']:
-                assetName = assetName.lower()
-            elif self.pipeliner.pipeData['b_upper']:
-                assetName = assetName.upper()
-            self.pipeliner.pipeData['assetName'] = assetName
-            self.pipeliner.pipeData['rigVersion'] = self.getRigWIPVersion()
-            self.pipeliner.pipeData['publishVersion'] = publishVersion
-            fileName = self.pipeliner.pipeData['s_prefix']+assetName+self.pipeliner.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeliner.pipeData['i_padding']))+self.pipeliner.pipeData['s_suffix'])
-            return fileName
-        else:
-            return False
     
 
     def runCheckedValidators(self, firstMode=True, stopIfFoundBlock=True, publishLog=None, *args):
@@ -246,7 +172,7 @@ class Publisher(object):
             cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Starting...', isInterruptable=False)
 
             # check if there'a a file name to publish this scene
-            publishFileName = self.getPipeFileName(self.pipeliner.pipeData['publishPath'])
+            publishFileName = self.pipeliner.getPipeFileName(self.pipeliner.pipeData['publishPath'])
             if fromUI:
                 publishFileName = cmds.textFieldGrp(self.fileNameTFG, query=True, text=True)
             if publishFileName:
@@ -289,6 +215,10 @@ class Publisher(object):
                         if not cmds.objExists(self.dpUIinst.masterGrp+".publishedFromFile"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="publishedFromFile", dataType="string")
                         cmds.setAttr(self.dpUIinst.masterGrp+".publishedFromFile", self.pipeliner.pipeData['sceneName'], type="string")
+                        # asset name
+                        if not cmds.objExists(self.dpUIinst.masterGrp+".assetName"):
+                            cmds.addAttr(self.dpUIinst.masterGrp, longName="assetName", dataType="string")
+                        cmds.setAttr(self.dpUIinst.masterGrp+".assetName", self.pipeliner.pipeData['assetName'], type="string")
                         # comments
                         if not cmds.objExists(self.dpUIinst.masterGrp+".comment"):
                             cmds.addAttr(self.dpUIinst.masterGrp, longName="comment", dataType="string")
@@ -353,8 +283,8 @@ class Publisher(object):
                         if self.pipeliner.pipeData['historyPath']:
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
                         # organize old published files
-                        if self.assetNameList:
-                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
+                        if self.pipeliner.assetNameList:
+                            self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
                             messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"

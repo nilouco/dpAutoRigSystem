@@ -737,6 +737,10 @@ class DP_AutoRig_UI(object):
         # rebuilderMainLayout - scrollLayout:
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
+        self.allUIs["rebuilderHeaderLayout"] = cmds.rowLayout("rebuilderHeaderLayout", numberOfColumns=3, columnWidth3=(80, 75, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
+        self.allUIs["assetNameText"] = cmds.text("assetNameText", label=self.lang['i303_assetNameText'], parent=self.allUIs["rebuilderHeaderLayout"])
+        self.allUIs["assetNameTF"] = cmds.textField("assetNameTF", text=self.pipeliner.pipeData['assetName'], font="boldLabelFont", parent=self.allUIs["rebuilderHeaderLayout"])
+        cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
         self.rebuilderModuleList = self.startGuideModules(REBUILDER, "start", "rebuilderProcessLayout")
@@ -2046,6 +2050,7 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName="firstGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="lastGuidesFile", dataType="string")
             cmds.addAttr(self.masterGrp, longName="publishedFromFile", dataType="string")
+            cmds.addAttr(self.masterGrp, longName="assetName", dataType="string")
             cmds.addAttr(self.masterGrp, longName="comment", dataType="string")
             cmds.addAttr(self.masterGrp, longName="modelVersion", attributeType="long", defaultValue=0, minValue=0)
             # set data

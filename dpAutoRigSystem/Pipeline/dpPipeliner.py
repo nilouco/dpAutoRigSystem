@@ -25,6 +25,8 @@ class Pipeliner(object):
         self.callbackFile = "dpPublishCallback.py"
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
+        self.getPipeFileName()
+        print("self pipe assetName =", self.pipeData['assetName'])
         
 
     def getToday(self, *args):
@@ -583,11 +585,91 @@ class Pipeliner(object):
         shortSceneName = cmds.file(query=True, sceneName=True, shortName=True)
         if shortSceneName:
             return shortSceneName[:shortSceneName.rfind(".")]
-
-
+    
+    
     def saveJsonFile(self, dataDic, fileNamePath, indentation=4, sortKeys=True, *args):
         """ Save the json file with the given data dic in the given file name path.
         """
         # write json file in the HD:
         with open(fileNamePath, 'w') as jsonFile:
             json.dump(dataDic, jsonFile, indent=indentation, sort_keys=sortKeys)
+
+
+    def defineFileVersion(self, assetNameList, *args):
+        """ Return the max number plus one of a versioned files list.
+        """
+        if assetNameList:
+            numberList = []
+            for item in assetNameList:
+                numberList.append(int(item[:item.rfind(".")].split(self.pipeData['s_middle'])[1]))
+            return max(numberList)+1
+    
+
+    def getRigWIPVersion(self, *args):
+        """ Find the rig version by scene name and return it.
+        """
+        rigWipVersion = 0
+        shortName = cmds.file(query=True, sceneName=True, shortName=True)
+        if self.pipeData['s_rig'] in shortName:
+            rigWipVersion = shortName[shortName.rfind(self.pipeData['s_rig'])+len(self.pipeData['s_rig']):shortName.rfind(".")]
+        return rigWipVersion
+
+
+    def getAssetName(self, *args):
+        """ Compare the sceneName with the father folder name to define if we use the assetName as a default pipeline setup.
+            Return True or False and the shortName of the asset if found.
+            Otherwise return False
+        """
+        folderName = None
+        assetName = None
+        currentPath = self.getCurrentPath()
+        if currentPath:
+            folderName = currentPath[currentPath.rfind("/")+1:]
+        shortSceneName = self.getCurrentFileName()
+        if shortSceneName:
+            if "_" in shortSceneName:
+                assetName = shortSceneName[:shortSceneName.find("_")]
+        for ext in [".ma", ".mb"]:
+            if assetName.endswith(ext):
+                assetName = assetName[:-3]
+        if folderName == assetName:
+            return [True, assetName]
+        elif assetName:
+            return [False, assetName]
+        elif folderName:
+            return [False, folderName]
+        return [False, None]
+
+
+    def getPipeFileName(self, filePath=None, *args):
+        """ Return the generated file name based on the pipeline publish folder.
+            It's check the asset name and define the file version to save the published file.
+        """
+        self.pipeData['assetName'] = None
+        self.assetNameList = []
+        if not filePath:
+            filePath = self.getCurrentPath()
+        if os.path.exists(filePath):
+            self.pipeData['assetNameFolderIssue'], assetName = self.getAssetName()
+            publishVersion = 1 #starts the number versioning by one to have the first delivery file as _v001.
+            fileNameList = next(os.walk(filePath))[2]
+            if fileNameList:
+                for fileName in fileNameList:
+                    if assetName+self.pipeData['s_middle'] in fileName:
+                        if not fileName in self.assetNameList:
+                            self.assetNameList.append(fileName)
+                if self.assetNameList:
+                    publishVersion = self.defineFileVersion(self.assetNameList)
+            if self.pipeData['b_capitalize']:
+                assetName = assetName.capitalize()
+            elif self.pipeData['b_lower']:
+                assetName = assetName.lower()
+            elif self.pipeData['b_upper']:
+                assetName = assetName.upper()
+            self.pipeData['assetName'] = assetName
+            self.pipeData['rigVersion'] = self.getRigWIPVersion()
+            self.pipeData['publishVersion'] = publishVersion
+            fileName = self.pipeData['s_prefix']+assetName+self.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeData['i_padding']))+self.pipeData['s_suffix'])
+            return fileName
+        else:
+            return False

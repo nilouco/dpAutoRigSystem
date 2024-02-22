@@ -210,9 +210,8 @@ class ActionStartClass(object):
             if os.path.exists(self.ioPath+"/"+subFolder):
                 exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
         if exportedList:
-            assetName = self.pipeliner.getCurrentFileName()
-            assetName = assetName[:assetName.find("_")]
-            print("assetName =", assetName)
+            #assetName = self.pipeliner.getAssetName()[1]
+            assetName = self.pipeliner.pipeData["assetName"]
             for item in exportedList:
                 if assetName in item:
                     resultList.append(item)

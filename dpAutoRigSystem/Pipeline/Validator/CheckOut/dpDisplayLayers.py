@@ -45,7 +45,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
             ctrlsGeometryList = None
             self.allCtrlsList = self.dpUIinst.ctrls.getControlList()
             if self.allCtrlsList:
-                allGeoList = self.getRenderMeshList()
+                allGeoList = self.getGeometryTranform()
                 ctrlsGeometryList = self.allCtrlsList
                 if allGeoList:
                     ctrlsGeometryList = self.allCtrlsList + allGeoList
@@ -114,7 +114,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
         """ Call functions to create Geo_Lyr and Ctrl_Lyr
             If there's no geometry on the groups Render_Grp and Proxy_Grp, it will delete the Geo_Lyr
         """ 
-        geoList = self.getRenderMeshList()
+        geoList = self.getGeometryTranform()
         if geoList:
             self.createNewLayer(geoList, self.geoLayerName)
         else:
@@ -157,7 +157,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
         """ Get all transform nodes from Render_Grp or convention geometry group name.
             If it finds nothing, it will return an empty list.
         """
-        existsGrpList = []
+        existsGrpList, allShapesList = [], []
         meshGrpList = ["Mesh_Grp", "mesh_grp", "Geo_Grp", "geo_grp", "grp_cache"]
         renderGrp = self.utils.getNodeByMessage("renderGrp")
         if renderGrp:
