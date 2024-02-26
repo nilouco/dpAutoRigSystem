@@ -1,3 +1,4 @@
+dpNewSceneIO
 dpModelIO
 dpCheckinIO
 dpSetupGeometryIO

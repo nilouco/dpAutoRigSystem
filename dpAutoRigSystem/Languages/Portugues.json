@@ -464,6 +464,7 @@
     "i301_sCheckinIOAnn"       : "O diretório onde será exportado ou importado os dados de checkin. Não utilizado no momento.",
     "i302_sSetupGeometryIOAnn" : "O diretório onde será exportado ou importado as geometrias usadas no setup.",
     "i303_assetNameText"       : "Nome do asset",
+    "i304_sNewSceneIOAnn"      : "O diretório onde será exportado ou importado os dados usados pelo reconstrutor.",
 
     "m001_fkLine"               : "Linha Fk",
     "m002_fkLineDesc"           : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -721,7 +722,7 @@
     "r011_notFoundMesh"        : "Não encontrado meshes para aplicar os shaders importados, desculpe.",
     "r012_guideIO"             : "Guide IO",
     "r013_guideIODesc"         : "Essa ação vai trabalhar as guias\nexportando e importando arquivos json dos nodes de network.",
-    "r014_controlShapeIO"      : "Control Shape IO",
+    "r014_controlShapeIO"      : "Control shape IO",
     "r015_controlShapeIODesc"  : "Essa ação vai trabalhar os shapes de controles\nexportando e importando arquivos ma com o snapshot de curvas.",
     "r016_skinningIO"          : "Skinning IO",
     "r017_skinningIODesc"      : "Essa ação vai trabalhar o skinning\nexportando e importando arquivos json com os pesos.",
@@ -730,8 +731,10 @@
     "r020_parentIODesc"        : "Essa ação vai trabalhar o parenting,\nexportando e importando arquivos json para\nreconstruir hierarquia de transforms.",
     "r021_checkinIO"           : "Checkin IO",
     "r022_checkinIODesc"       : "Essa ação vai trabalhar a verificação\ndo modelo importado usando validadores como:\ndpUnlockNormals, dpSoftenEdges, dpFreezeTransform e dpGeometryHistory.",
-    "r023_setupGeometryIO"     : "Setup Geometria IO",
+    "r023_setupGeometryIO"     : "Setup geometria IO",
     "r024_setupGeometryIODesc" : "Essa ação vai trabalhar as geometrias usadas no setup\nexportando e importando dos grupos como:\nModels_Grp, BlendShape_Grp and WIP_Grp.",
+    "r025_newSceneIO"          : "Nova cena IO",
+    "r026_newSceneIODesc"      : "Essa ação vai trabalhar com um arquivo de nova cena\nbaseado no contexto do nome do asset\npara começar a reconstrução em uma cena limpa.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

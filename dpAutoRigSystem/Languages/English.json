@@ -464,6 +464,7 @@
     "i301_sCheckinIOAnn"       : "The folder to export and import checkin data. Currently, not in use.",
     "i302_sSetupGeometryIOAnn" : "The folder to export and import geometries used in the setup.",
     "i303_assetNameText"       : "Asset name",
+    "i304_sNewSceneIOAnn"      : "The folder to export and import data used in the rebuilder.",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -721,7 +722,7 @@
     "r011_notFoundMesh"        : "Not found meshes to apply the imported shaders, sorry.",
     "r012_guideIO"             : "Guide IO",
     "r013_guideIODesc"         : "This action will work with guides\nexporting and importing json files from network nodes.",
-    "r014_controlShapeIO"      : "Control Shape IO",
+    "r014_controlShapeIO"      : "Control shape IO",
     "r015_controlShapeIODesc"  : "This action will work with controller shapes\nexporting and importing ma files from snapshot curves.",
     "r016_skinningIO"          : "Skinning IO",
     "r017_skinningIODesc"      : "This action will work with skinning\nexporting and importing json files for the deformer weights.",
@@ -730,8 +731,10 @@
     "r020_parentIODesc"        : "This action will work with parenting,\nexporting and importing json files\nto rebuild the transform hierarchy.",
     "r021_checkinIO"           : "Checkin IO",
     "r022_checkinIODesc"       : "This action will work with check\nthe imported model using defined validators like:\ndpUnlockNormals, dpSoftenEdges, dpFreezeTransform and dpGeometryHistory.",
-    "r023_setupGeometryIO"     : "Setup Geometry IO",
+    "r023_setupGeometryIO"     : "Setup geometry IO",
     "r024_setupGeometryIODesc" : "This action will work with geometries used in the setup\nexporting and importing them from groups like:\nModels_Grp, BlendShape_Grp and WIP_Grp.",
+    "r025_newSceneIO"          : "New scene IO",
+    "r026_newSceneIODesc"      : "This action will work with new scene file\nbased on the asset name context\nto start a clear maya scene to run the rebuilding.",
     
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

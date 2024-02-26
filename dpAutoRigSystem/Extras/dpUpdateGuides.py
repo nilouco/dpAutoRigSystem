@@ -509,7 +509,7 @@ class UpdateGuides(object):
              if self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace in allNamespaceList:
                     cmds.namespace(moveNamespace=(self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, ':'), force=True)
                     cmds.namespace(removeNamespace=self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, force=True)
-        self.dpUIinst.jobReloadUI()
+        self.dpUIinst.reloadMainUI()
 
 
     def doUpdate(self, *args):

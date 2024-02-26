@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 import os
-import time
 import getpass
 
 # global variables to this module:
@@ -102,7 +101,6 @@ class ActionStartClass(object):
     def reportLog(self, *args):
         """ Prepare the log output text and data dictionary for this checked validator/rebuilder.
         """
-        thisTime = str(time.asctime(time.localtime(time.time())))
         # texts
         nameText = self.dpUIinst.lang['m006_name']
         titleText = self.dpUIinst.lang[self.title]
@@ -140,7 +138,7 @@ class ActionStartClass(object):
         # dataLog
         self.dataLogDic["log"] = self.dpUIinst.lang[self.actionType]
         self.dataLogDic["user"] = getpass.getuser()
-        self.dataLogDic["time"] = thisTime
+        self.dataLogDic["time"] = self.pipeliner.getToday(True)
         self.dataLogDic["dpARVersion"] = self.dpUIinst.dpARVersion
         self.dataLogDic["module"] = self.guideModuleName
         self.dataLogDic["version"] = self.version
@@ -153,8 +151,8 @@ class ActionStartClass(object):
         self.dataLogDic["logText"] = logText
         # verbose call info window
         if self.verbose:
-            self.dpUIinst.logger.infoWin('i019_log', self.actionType, thisTime+"\n"+logText, "left", 250, 250)
-            print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+thisTime+"\n"+logText)
+            self.dpUIinst.logger.infoWin('i019_log', self.actionType, self.dataLogDic["time"]+"\n"+logText, "left", 250, 250)
+            print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n"+logText)
             if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])
 

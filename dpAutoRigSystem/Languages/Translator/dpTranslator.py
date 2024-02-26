@@ -144,7 +144,7 @@ class Translator(object):
         # show preset creation result window:
         self.dpUIinst.logger.infoWin('i149_createLanguage', 'i150_languageCreated', '\n'+self.dpUIinst.langName+'\n\n'+self.dpUIinst.lang['i134_rememberPublish']+'\n\n'+self.authorName+' '+self.dpUIinst.lang['t008_finishMessage'].lower(), 'center', 205, 270)
         # close and reload dpAR UI in order to avoide Maya crash:
-        self.dpUIinst.jobReloadUI()
+        self.dpUIinst.reloadMainUI()
     
     
     def dpTranslatorMain(self, *args):

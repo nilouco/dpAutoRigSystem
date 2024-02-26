@@ -182,7 +182,7 @@ class DP_AutoRig_UI(object):
         self.dpLog = DPLOG
         self.optionCtrl = None
         self.utils = dpUtils.Utils()
-        self.pipeliner = dpPipeliner.Pipeliner()
+        self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager()
         self.logger = dpLogger.Logger(None) #placeholder
         
@@ -261,7 +261,7 @@ class DP_AutoRig_UI(object):
             cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
             # window menu:
             self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
-            cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.jobReloadUI)
+            cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.reloadMainUI)
             cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
             # help menu:
             self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
@@ -494,7 +494,7 @@ class DP_AutoRig_UI(object):
                         )
         
         # create the job of selected guide module and when new scene is created:
-        self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.jobReloadUI), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
+        self.iDeleteJobId = cmds.scriptJob(event=('deleteAll', self.refreshMainUI), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=False, force=True)
         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
         
         # --
@@ -739,7 +739,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
         self.allUIs["rebuilderHeaderLayout"] = cmds.rowLayout("rebuilderHeaderLayout", numberOfColumns=3, columnWidth3=(80, 75, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
         self.allUIs["assetNameText"] = cmds.text("assetNameText", label=self.lang['i303_assetNameText'], parent=self.allUIs["rebuilderHeaderLayout"])
-        self.allUIs["assetNameTF"] = cmds.textField("assetNameTF", text=self.pipeliner.pipeData['assetName'], font="boldLabelFont", parent=self.allUIs["rebuilderHeaderLayout"])
+        self.allUIs["assetNameTF"] = cmds.textField("assetNameTF", text=self.pipeliner.pipeData['assetName'], font="boldLabelFont", changeCommand=partial(self.pipeliner.setAssetData, ui=True), parent=self.allUIs["rebuilderHeaderLayout"])
         cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
@@ -757,18 +757,30 @@ class DP_AutoRig_UI(object):
         
         # --
         # call tabLayouts:
-        cmds.tabLayout( self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], self.lang['v000_validator']), (self.allUIs["rebuilderTabLayout"], self.lang['r000_rebuilder'])) )
+        cmds.tabLayout(self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], self.lang['v000_validator']), (self.allUIs["rebuilderTabLayout"], self.lang['r000_rebuilder'])))
         cmds.select(clear=True)
+    
 
-
-    def jobReloadUI(self, *args):
+    def reloadMainUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
         from maya import cmds
         cmds.select(clear=True)
         cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
+        self.refreshMainUI()
+    
+    
+    def refreshMainUI(self, *args):
+        """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
+            Useful to rebuilding process when creating a new scene
+        """
+        cmds.select(clear=True)
+        self.populateCreatedGuideModules()
         self.checkImportedGuides()
         self.checkGuideNets()
+        self.populateJoints()
+        self.populateGeoms()
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
   
     
     def jobWinClose(self, *args):
@@ -809,7 +821,7 @@ class DP_AutoRig_UI(object):
                     else:
                         selectedGuideNodeList.append(selectedItem)
             if needUpdateSelect:
-                self.jobReloadUI()
+                self.refreshMainUI()
                 cmds.select(updatedGuideNodeList)
 
         # re-create module layout:
@@ -879,7 +891,7 @@ class DP_AutoRig_UI(object):
             # show preset creation result window:
             self.logger.infoWin('i129_createPreset', 'i133_presetCreated', '\n'+self.presetName+'\n\n'+self.lang['i134_rememberPublish']+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
             # close and reload dpAR UI in order to avoid Maya crash
-            self.jobReloadUI()
+            self.reloadMainUI()
     
     
     def setupDuplicatedGuide(self, selectedItem, *args):
@@ -895,6 +907,7 @@ class DP_AutoRig_UI(object):
         customNameAttr = "customName"
         mirrorAxisAttr = "mirrorAxis"
         dispAnnotAttr = "displayAnnotation"
+        netAttr = "net"
 
         # unparenting
         parentList = cmds.listRelatives(selectedItem, parent=True)
@@ -949,6 +962,8 @@ class DP_AutoRig_UI(object):
             toSetAttrList.remove(dispAnnotAttr)
             currentDisplayAnnotValue = cmds.getAttr(selectedItem+'.'+dispAnnotAttr)
             newGuideInstance.displayAnnotation(currentDisplayAnnotValue)
+        if cmds.objExists(selectedItem+"."+netAttr):
+            toSetAttrList.remove(netAttr)
         
         # TODO: change to unify style and type attributes        
         if cmds.objExists(selectedItem+".type"):
@@ -1411,6 +1426,16 @@ class DP_AutoRig_UI(object):
         startScriptFunction(self)
     
     
+    def clearGuideLayout(self, *args):
+        """ Clear current guide layout before reload modules.
+        """
+        self.allUIs["editSelectedModuleLayoutA"] = cmds.frameLayout('editSelectedModuleLayoutA', edit=True, label=self.lang['i011_editSelected'], collapsable=True, collapse=False, parent=self.allUIs["riggingTabLayout"])
+        cmds.deleteUI(self.allUIs["modulesLayoutA"])
+        cmds.deleteUI(self.allUIs["selectedModuleLayout"])
+        self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
+        self.allUIs["selectedModuleLayout"] = cmds.columnLayout('selectedModuleLayout', adjustableColumn=True, parent=self.allUIs["editSelectedModuleLayoutA"])
+
+
     def populateCreatedGuideModules(self, *args):
         """ Read all guide modules loaded in the scene and re-create the elements in the moduleLayout.
         """
@@ -1440,12 +1465,10 @@ class DP_AutoRig_UI(object):
                     curGuideName = validModuleNames[index]+"__"+userSpecName+":"+GUIDE_BASE_NAME
                     if cmds.objExists(curGuideName):
                         self.allGuidesList.append([validModules[index], userSpecName, curGuideName])
-                        
+
+        self.clearGuideLayout()
         # if exists any guide module in the scene, recreate its instance as objectClass:
         if self.allGuidesList:
-            # clear current layout before reload modules:
-            cmds.deleteUI(self.allUIs["modulesLayoutA"])
-            self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
             # load again the modules:
             guideFolder = self.utils.findEnv("PYTHONPATH", "dpAutoRigSystem")+"."+MODULES
             # this list will be used to rig all modules pressing the RIG button:
@@ -2227,10 +2250,9 @@ class DP_AutoRig_UI(object):
             Most important function to automate the process.
         """
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
-        # force refresh in order to avoid calculus error is creating Rig at the same time of guides:
+        # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
-        if not rebuilding:
-            self.jobReloadUI()
+        self.refreshMainUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
