@@ -173,6 +173,7 @@ class DP_AutoRig_UI(object):
         self.checkOutInstanceList = []
         self.checkAddOnsInstanceList = []
         self.rebuilderInstanceList = []
+        self.rebuilding = False
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.guideMirrorGrp = GUIDEMIRROR_GRP
@@ -305,7 +306,7 @@ class DP_AutoRig_UI(object):
         #print self.pDockCtrl
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
-        self.checkGuideNets()
+        self.refreshMainUI()
         
 
     def deleteExistWindow(self, *args):
@@ -483,8 +484,6 @@ class DP_AutoRig_UI(object):
         self.allUIs["footerAText"] = cmds.text('footerAText', align='center', label="# "+self.lang['i005_footerA'], parent=self.allUIs["footerA"])
         cmds.setParent( self.allUIs["mainTabLayout"] )
         
-        # call the function in order to populate the colMiddleRightA (modulesLayout)
-        self.populateCreatedGuideModules()
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["riggingTabLayout"], edit=True,
                         attachForm=[(self.allUIs["colTopLeftA"], 'top', 5), (self.allUIs["colTopLeftA"], 'left', 5), (self.allUIs["colTopRightA"], 'top', 5), (self.allUIs["colTopRightA"], 'right', 5), (self.allUIs["colMiddleLeftA"], 'left', 5), (self.allUIs["colMiddleRightA"], 'right', 5), (self.allUIs["optionsA"], 'left', 5), (self.allUIs["optionsA"], 'right', 5), (self.allUIs["editSelectedModuleLayoutA"], 'left', 5), (self.allUIs["editSelectedModuleLayoutA"], 'right', 5), (self.allUIs["footerA"], 'left', 5), (self.allUIs["footerA"], 'bottom', 5), (self.allUIs["footerA"], 'right', 5)],
@@ -571,10 +570,6 @@ class DP_AutoRig_UI(object):
         cmds.formLayout( self.allUIs["skinningTabLayout"], edit=True,
                         attachForm=[(self.allUIs["skinMainLayout"], 'top', 20), (self.allUIs["skinMainLayout"], 'left', 5), (self.allUIs["skinMainLayout"], 'right', 5), (self.allUIs["skinMainLayout"], 'bottom', 5)]
                         )
-        
-        # populate the joint and geometries lists:
-        self.populateJoints()
-        self.populateGeoms()
         
         # --
         
@@ -737,9 +732,9 @@ class DP_AutoRig_UI(object):
         # rebuilderMainLayout - scrollLayout:
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
-        self.allUIs["rebuilderHeaderLayout"] = cmds.rowLayout("rebuilderHeaderLayout", numberOfColumns=3, columnWidth3=(80, 75, 150), adjustableColumn=2, columnAlign=(1, 'right'), columnAttach=[(1, 'both', 0), (2, 'both', 0), (3, 'both', 0)])
-        self.allUIs["assetNameText"] = cmds.text("assetNameText", label=self.lang['i303_assetNameText'], parent=self.allUIs["rebuilderHeaderLayout"])
-        self.allUIs["assetNameTF"] = cmds.textField("assetNameTF", text=self.pipeliner.pipeData['assetName'], font="boldLabelFont", changeCommand=partial(self.pipeliner.setAssetData, ui=True), parent=self.allUIs["rebuilderHeaderLayout"])
+        self.allUIs["rebuilderHeaderLayout"] = cmds.rowLayout("rebuilderHeaderLayout", numberOfColumns=2, columnWidth2=(80, 150), adjustableColumn=2, columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'both', 0), (2, 'left', 10)])
+        self.allUIs["assetNameLabel"] = cmds.text("assetNameLabel", label=self.lang['i303_assetName']+":", parent=self.allUIs["rebuilderHeaderLayout"])
+        self.allUIs["assetNameText"] = cmds.text("assetNameText", label="None", font="boldLabelFont", parent=self.allUIs["rebuilderHeaderLayout"])
         cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
@@ -747,8 +742,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
-        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder", rebuilding=True), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder", rebuilding=True), parent=self.allUIs["selectedRebuilders2Layout"])
         cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
@@ -780,7 +775,11 @@ class DP_AutoRig_UI(object):
         self.checkGuideNets()
         self.populateJoints()
         self.populateGeoms()
-        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
+        if not self.rebuilding:
+            self.resetAllButtonColors()
+        self.rebuilding = False
+        self.pipeliner.refreshAssetNameUI()
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
   
     
     def jobWinClose(self, *args):
@@ -848,6 +847,15 @@ class DP_AutoRig_UI(object):
         # call reload the geometries in skin UI:
         self.reloadPopulatedGeoms()
     
+
+    def resetAllButtonColors(self, *args):
+        """ Just reset the button colors to default for each validator or rebuilder module.
+        """
+        buttonInstanceList = self.checkInInstanceList + self.checkOutInstanceList + self.checkAddOnsInstanceList + self.rebuilderInstanceList
+        if buttonInstanceList:
+            for item in buttonInstanceList:
+                item.resetButtonColors()
+
     
     def createJsonFile(self, newString, fileDir, fileNameID, *args):
         """ Load given string as a json dictionary and save it as a json file with the fileNameID in the fileDir.
@@ -1336,10 +1344,10 @@ class DP_AutoRig_UI(object):
                 cmds.button(label=title, height=32, width=200, command=partial(self.initExtraModule, guideModule, guideDir), parent=moduleLayout)
             elif guideDir == CHECKIN.replace("/", ".") or guideDir == CHECKOUT.replace("/", ".") or guideDir == "": #addOns
                 validatorInstance = self.initExtraModule(guideModule, guideDir)
-                validatorInstance.actionType = "v000_validator"
+                validatorInstance.setActionType("v000_validator")
                 validatorInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=validatorInstance.changeActive)
-                validatorInstance.firstBT = cmds.button(label=self.lang["i210_verify"], width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
-                validatorInstance.secondBT = cmds.button(label=self.lang["c052_fix"].capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
+                validatorInstance.firstBT = cmds.button(label=validatorInstance.firstBTLabel, width=45, command=partial(validatorInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.firstBTEnable, parent=moduleLayout)
+                validatorInstance.secondBT = cmds.button(label=validatorInstance.secondBTLabel.capitalize(), width=45, command=partial(validatorInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=validatorInstance.secondBTEnable, parent=moduleLayout)
                 if guideDir == CHECKIN.replace("/", "."):
                     self.checkInInstanceList.append(validatorInstance)
                 elif guideDir == CHECKOUT.replace("/", "."):
@@ -1351,10 +1359,10 @@ class DP_AutoRig_UI(object):
                         validatorInstance.title = validatorInstance.customName
             elif guideDir == REBUILDER.replace("/", "."):
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
-                rebuilderInstance.actionType = "r000_rebuilder"
+                rebuilderInstance.setActionType("r000_rebuilder")
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
-                rebuilderInstance.firstBT = cmds.button(label=self.lang["i164_export"], width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
-                rebuilderInstance.secondBT = cmds.button(label=self.lang["i196_import"], width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
+                rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)
+                rebuilderInstance.secondBT = cmds.button(label=rebuilderInstance.secondBTLabel, width=45, command=partial(rebuilderInstance.runAction, False), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.secondBTEnable, parent=moduleLayout)
                 self.rebuilderInstanceList.append(rebuilderInstance)
 
             cmds.iconTextButton(image=iconInfo, height=30, width=17, style='iconOnly', command=partial(self.logger.infoWin, guide.TITLE, guide.DESCRIPTION, None, 'center', 305, 250), parent=moduleLayout)
@@ -1606,11 +1614,13 @@ class DP_AutoRig_UI(object):
                 inst.changeActive(value)
 
 
-    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", *args):
+    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", rebuilding=False, *args):
         """ Run the code for each active validator/rebuilder instance.
             firstMode = True for verify/export
                       = False for fix/import
         """
+        self.resetAllButtonColors()
+        self.rebuilding = rebuilding
         actionResultData = {}
         logText = ""
         if publishLog:
@@ -1645,8 +1655,7 @@ class DP_AutoRig_UI(object):
         else:
             logText += "\n"+self.lang['i207_notMarked']
             heightSize = 2
-        thisTime = str(time.asctime(time.localtime(time.time())))
-        logText = thisTime+"\n"+logText
+        logText = self.pipeliner.getToday(True)+"\n"+logText
         if verbose:
             self.logger.infoWin('i019_log', actionType, logText, "left", 250, (150+(heightSize)*13))
             print("\n-------------\n"+self.lang[actionType]+"\n"+logText)
@@ -2245,14 +2254,15 @@ class DP_AutoRig_UI(object):
                     cmds.delete(pConst)
     
     
-    def rigAll(self, integrate=None, rebuilding=False, *args):
+    def rigAll(self, integrate=None, *args):
         """ Create the RIG based in the Guide Modules in the scene.
-            Most important function to automate the process.
+            Most important function to automate the generating process.
         """
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
-        self.refreshMainUI()
+        if not self.rebuilding:
+            self.refreshMainUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
         self.modulesToBeRiggedList = self.utils.getModulesToBeRigged(self.moduleInstancesList)
@@ -3032,7 +3042,7 @@ class DP_AutoRig_UI(object):
         
             # Close progress window
             cmds.progressWindow(endProgress=True)
-        
+            
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
@@ -3144,7 +3154,7 @@ class DP_AutoRig_UI(object):
         except:
             pass
         
-        if not rebuilding:
+        if not self.rebuilding:
             # call log window:
             self.logger.logWin()
         

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-02-21",
+    "_updated"       : "2024-02-26",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -461,10 +461,12 @@
     "i298_folder"              : "dossier",
     "i299_notUniqueName"       : "Il n'y a pas d'unique nom pour ce node",
     "i300_sParentIOAnn"        : "Le dossier ou on va importer et exporter le data de parent.",
-    "i301_sCheckinIOAnn"       : "Le dossier ou on va importer et exporter le data de checkin. Ce n'est pas utilisé pour l'instant.",
+    "i301_00000"       : "NOT USED",
     "i302_sSetupGeometryIOAnn" : "Le dossier ou on va importer et exporter les géometries utilisées dans le setup.",
-    "i303_assetNameText"       : "Nom de l'asset",
-    "i304_sNewSceneIOAnn"      : "Le dossier ou on va importer et exporter les donnés utilisés par le reconstructeur.",
+    "i303_assetName"           : "Nom de l'asset",
+    "i304_00000"      : "NOT USED",
+    "i305_none"                : "Rien",
+    "i306_run"                 : "Faire",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

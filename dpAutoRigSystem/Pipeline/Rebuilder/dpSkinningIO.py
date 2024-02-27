@@ -42,95 +42,90 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        # ensure file has a name to define dpData path
-        if not cmds.file(query=True, sceneName=True):
-            self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
-        else:
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    meshList = None
-                    if objList:
-                        meshList = objList
-                    else:
-                        meshList = self.dpUIinst.skin.getSkinnedModelList()
-                    if meshList:
+        self.ioPath = self.getIOPath(self.ioDir)
+        if self.ioPath:
+            if self.firstMode: #export
+                meshList = None
+                if objList:
+                    meshList = objList
+                else:
+                    meshList = self.dpUIinst.skin.getSkinnedModelList()
+                if meshList:
+                    progressAmount = 0
+                    maxProcess = len(meshList)
+                    if self.verbose:
+                        # Update progress window
+                        progressAmount += 1
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                    try:
+                        # export skinning data
+                        self.pipeliner.makeDirIfNotExists(self.ioPath)
+                        jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
+                        skinWeightDic = self.dpUIinst.skin.getSkinWeightData(meshList)
+                        self.pipeliner.saveJsonFile(skinWeightDic, jsonName)
+                        self.wellDoneIO(jsonName)
+                    except Exception as e:
+                        self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                else:
+                    self.notWorkedWellIO("Render_Grp")
+            else: #import
+                self.exportedList = self.getExportedList()
+                if self.exportedList:
+                    self.exportedList.sort()
+                    skinWeightDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
+                    if skinWeightDic:
                         progressAmount = 0
-                        maxProcess = len(meshList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                        try:
-                            # export skinning data
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
-                            skinWeightDic = self.dpUIinst.skin.getSkinWeightData(meshList)
-                            self.pipeliner.saveJsonFile(skinWeightDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
-                    else:
-                        self.notWorkedWellIO("Render_Grp")
-                else: #import
-                    self.exportedList = self.getExportedList()
-                    if self.exportedList:
-                        self.exportedList.sort()
-                        skinWeightDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                        if skinWeightDic:
-                            progressAmount = 0
-                            maxProcess = len(skinWeightDic.keys())
-                            wellImported = True
-                            toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
-                            self.currentPath = self.pipeliner.getCurrentPath()
-                            
-                            # reference old wip rig version to compare meshes changes
-                            #refNodeList = self.referOldWipFile()
-                            refNodeList = None
+                        maxProcess = len(skinWeightDic.keys())
+                        wellImported = True
+                        toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
+                        
+                        # reference old wip rig version to compare meshes changes
+                        #refNodeList = self.referOldWipFile()
+                        refNodeList = None
 
-                            for mesh in skinWeightDic.keys():
-                                if self.verbose:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                                if cmds.objExists(mesh):
-                                    if refNodeList:
-                                        for refNodeName in refNodeList:
-                                            if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
-                                                if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
-                                                    changedShapeMeshList.append(mesh)
-                                                    wellImported = False
-                                                elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
-                                                    changedTopoMeshList.append(mesh)
-                                                    wellImported = False
-                                                else:
-                                                    toImportList.append(mesh)
-                                    else:
-                                        toImportList.append(mesh)
+                        for mesh in skinWeightDic.keys():
+                            if self.verbose:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            if cmds.objExists(mesh):
+                                if refNodeList:
+                                    for refNodeName in refNodeList:
+                                        if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
+                                            if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
+                                                changedShapeMeshList.append(mesh)
+                                                wellImported = False
+                                            elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
+                                                changedTopoMeshList.append(mesh)
+                                                wellImported = False
+                                            else:
+                                                toImportList.append(mesh)
                                 else:
-                                    notFoundMeshList.append(mesh)
-                            if refNodeList:
-                                cmds.file(self.refPathName, removeReference=True)
-                            if toImportList:
-                                try:
-                                    # import skin weights
-                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
-                                    self.wellDoneIO(', '.join(toImportList))
-                                except Exception as e:
-                                    self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
+                                    toImportList.append(mesh)
                             else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
-                            if not wellImported:
-                                if changedShapeMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
-                                elif changedTopoMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
-                                elif notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
-                    else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-            else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                                notFoundMeshList.append(mesh)
+                        if refNodeList:
+                            cmds.file(self.refPathName, removeReference=True)
+                        if toImportList:
+                            try:
+                                # import skin weights
+                                self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
+                                self.wellDoneIO(', '.join(toImportList))
+                            except Exception as e:
+                                self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
+                        if not wellImported:
+                            if changedShapeMeshList:
+                                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+                            elif changedTopoMeshList:
+                                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
+                            elif notFoundMeshList:
+                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end
         # ---
 
@@ -146,16 +141,16 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         """ Reference the latest wip rig file before the current, and return it's tranform elements, if there.
         """
         refNodeList = []
-        wipFilesList = next(os.walk(self.currentPath))[2]
+        wipFilesList = next(os.walk(self.pipeliner.pipeData['assetPath']))[2]
         if len(wipFilesList) > 1:
             wipFilesList.sort()
             if len(self.exportedList) > 1:
                 self.refPathName = self.exportedList[-2][len(self.startName)+1:-5]
-                if os.path.isfile(self.currentPath+"/"+self.refPathName+".ma"):
+                if os.path.isfile(self.pipeliner.pipeData['assetPath']+"/"+self.refPathName+".ma"):
                     self.refPathName = self.refPathName+".ma"
                 else:
                     self.refPathName = self.refPathName+".mb"
-                self.refPathName = self.pipeliner.getCurrentPath()+"/"+wipFilesList[-2]
+                self.refPathName = self.pipeliner.pipeData['assetPath']+"/"+wipFilesList[-2]
                 cmds.file(self.refPathName, reference=True, namespace=self.importRefName)
                 refNode = cmds.file(self.refPathName, referenceNode=True, query=True)
                 refNodeList = cmds.referenceQuery(refNode, nodes=True)

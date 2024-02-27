@@ -20,9 +20,10 @@ class CheckinIO(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_CHECKINIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
-        self.ioDir = "s_checkinIO"
         self.startName = "dpCheckin"
         self.firstBTEnable = False
+        self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']
+        self.secondBTCustomLabel = self.dpUIinst.lang['i306_run']
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -41,20 +42,16 @@ class CheckinIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        # ensure file has a name to define dpData path
-        if not cmds.file(query=True, sceneName=True):
-            self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
-        else:
-            if self.firstMode: #export
-                self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
-            else: #import
-                try:
-                    # clean up geometries
-                    validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
-                    self.wellDoneIO(", ".join(validatorToRunList))
-                except Exception as e:
-                    self.notWorkedWellIO(str(e))
+        if self.firstMode: #export
+            self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
+        else: #import
+            try:
+                # clean up geometries
+                validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
+                self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
+                self.wellDoneIO(", ".join(validatorToRunList))
+            except Exception as e:
+                self.notWorkedWellIO(str(e))
         # --- rebuilder code --- end
         # ---
 

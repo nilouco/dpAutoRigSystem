@@ -27,9 +27,6 @@ class Pipeliner(object):
         self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
         self.getPipeFileName()
-        if not self.rebuildingAssetData():
-            self.setAssetData()
-        print("self pipe assetName =", self.pipeData['assetName'])
         
 
     def getToday(self, fullTime=False, *args):
@@ -139,10 +136,8 @@ class Pipeliner(object):
         "s_presets"         : "dpPresets",
         "s_addOns"          : "dpAddOns",
         "s_hist"            : "dpData/dpHist",
-        "s_newSceneIO"      : "dpData/dpNewScene",
         "s_modelIO"         : "dpData/dpModel",
         "s_setupGeometryIO" : "dpData/dpSetupGeometry",
-        "s_checkinIO"       : "dpData/dpCheckin",
         "s_shaderIO"        : "dpData/dpShader",
         "s_guideIO"         : "dpData/dpGuide",
         "s_controlShapeIO"  : "dpData/dpControlShape",
@@ -190,7 +185,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2024-02-21",
+        "updated" : "2024-02-26",
         
         "f_drive"           : "i228_fDriveAnn",
         "f_studio"          : "i229_fStudioAnn",
@@ -201,9 +196,7 @@ class Pipeliner(object):
         "s_presets"         : "i234_sPresetsAnn",
         "s_addOns"          : "i235_sAddOnsAnn",
         "s_hist"            : "i236_sHistAnn",
-        "s_newSceneIO"      : "i304_sNewSceneIOAnn",
         "s_modelIO"         : "i293_sModelIOAnn",
-        "s_checkinIO"       : "i301_sCheckinIOAnn",
         "s_setupGeometryIO" : "i302_sSetupGeometryIOAnn",
         "s_shaderIO"        : "i294_sShaderIOAnn",
         "s_guideIO"         : "i295_sGuideIOAnn",
@@ -586,11 +579,13 @@ class Pipeliner(object):
         return currentPath[:currentPath.rfind("/")]
 
 
-    def getCurrentFileName(self, *args):
-        """ Returns the current file name without the extension.
+    def getCurrentFileName(self, complete=False, *args):
+        """ Returns the current file name with or without the extension depending of the given complete parameter.
         """
         shortSceneName = cmds.file(query=True, sceneName=True, shortName=True)
         if shortSceneName:
+            if complete:
+                return shortSceneName
             return shortSceneName[:shortSceneName.rfind(".")]
     
     
@@ -683,43 +678,19 @@ class Pipeliner(object):
                 assetName = assetName.upper()
             self.pipeData['assetName'] = assetName
             self.pipeData['assetPath'] = self.getCurrentPath()
+            self.pipeData['currentFileName'] = self.getCurrentFileName()
+            self.pipeData['extension'] = self.getFileExtension()
             self.pipeData['rigVersion'] = self.getRigWIPVersion()
             self.pipeData['publishVersion'] = publishVersion
-            fileName = self.pipeData['s_prefix']+assetName+self.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeData['i_padding']))+self.pipeData['s_suffix'])
-            return fileName
+            self.pipeData['fileName'] = self.pipeData['s_prefix']+assetName+self.pipeData['s_middle']+(str(publishVersion).zfill(int(self.pipeData['i_padding']))+self.pipeData['s_suffix'])
+            return self.pipeData['fileName']
         else:
             return False
 
 
-    def rebuildingAssetData(self, *args):
+    def refreshAssetNameUI(self, *args):
+        """ Just read again the pipeline data and set the UI with the assetName.
         """
-        """
-        savedAssetData = self.getJsonContent(self.utils.findPath("dpPipeliner")+"/"+self.assetDataFile)
-        if savedAssetData:
-            if savedAssetData["rebuilding"]:
-                self.assetData = savedAssetData
-                self.pipeData["assetName"] = self.assetData["assetName"]
-                return True
-        print("loaded =", savedAssetData)
-
-
-    def setAssetData(self, assetName=None, rebuilding=False, ui=False, *args):
-        """ Set the asset data dictionary with name, path, rebuilding info, etc.
-            Save it as dpAssetData.json file in dpAutoRigSystem/Pipeline folder.
-        """
-        if assetName:
-            self.pipeData["assetName"] = assetName
-        elif ui:
-            self.pipeData["assetName"] = cmds.textField(self.dpUIinst.allUIs["assetNameTF"], query=True, text=True)
-        # define and fill the dictionary 
-        self.assetData = {}
-        self.assetData["assetName"] = self.pipeData["assetName"]
-        self.assetData["rebuilding"] = rebuilding
-        self.assetData["fileName"] = self.getCurrentFileName()
-        self.assetData["extension"] = self.getFileExtension()
-        self.assetData["rigVersion"] = self.getRigWIPVersion()
-        self.assetData["path"] = self.getCurrentPath()
-        self.assetData["time"] = self.getToday(True)
-        # save the dictionary as a json file
-        jsonFile = self.utils.findPath("dpPipeliner")+"/"+self.assetDataFile
-        self.saveJsonFile(self.assetData, jsonFile)
+        self.getPipeFileName()
+        if self.pipeData['assetName']:
+            cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label=self.pipeData['assetName'])

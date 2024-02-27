@@ -41,56 +41,52 @@ class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        # ensure file has a name to define dpData path
-        if not cmds.file(query=True, sceneName=True):
-            self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
-        else:
-            # load alembic plugin
-            if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
-                self.ioPath = self.getIOPath(self.ioDir)
-                if self.ioPath:
-                    if self.firstMode: #export
-                        meshList = None
-                        if objList:
-                            meshList = objList
-                        else:
-                            meshList = self.getGeometryToExportList()
-                        if meshList:
-                            progressAmount = 0
-                            maxProcess = len(meshList)
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+str(meshList)))
-                            try:
-                                nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
-                                # export alembic
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                ioItems = ' -root '.join(meshList)
-                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".abc"
-                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                                if nodeStateDic:
-                                    self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
-                                self.wellDoneIO(', '.join(meshList))
-                            except Exception as e:
-                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
-                        else:
-                            self.notWorkedWellIO("Geometries")
-                    else: #import
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            try:
-                                # import alembic
-                                exportedList.sort()
-                                abcToImport = self.ioPath+"/"+exportedList[-1]
-                                #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
-                                mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                                self.wellDoneIO(exportedList[-1])
-                            except Exception as e:
-                                self.notWorkedWellIO(exportedList[-1]+": "+str(e))
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+        # load alembic plugin
+        if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
+            self.ioPath = self.getIOPath(self.ioDir)
+            if self.ioPath:
+                if self.firstMode: #export
+                    meshList = None
+                    if objList:
+                        meshList = objList
+                    else:
+                        meshList = self.getGeometryToExportList()
+                    if meshList:
+                        progressAmount = 0
+                        maxProcess = len(meshList)
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+str(meshList)))
+                        try:
+                            nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
+                            # export alembic
+                            self.pipeliner.makeDirIfNotExists(self.ioPath)
+                            ioItems = ' -root '.join(meshList)
+                            abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".abc"
+                            cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
+                            if nodeStateDic:
+                                self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
+                            self.wellDoneIO(', '.join(meshList))
+                        except Exception as e:
+                            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                    else:
+                        self.notWorkedWellIO("Geometries")
+                else: #import
+                    exportedList = self.getExportedList()
+                    if exportedList:
+                        try:
+                            # import alembic
+                            exportedList.sort()
+                            abcToImport = self.ioPath+"/"+exportedList[-1]
+                            #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
+                            mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                            self.wellDoneIO(exportedList[-1])
+                        except Exception as e:
+                            self.notWorkedWellIO(exportedList[-1]+": "+str(e))
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
-                self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
+                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
         # --- rebuilder code --- end
         # ---
 

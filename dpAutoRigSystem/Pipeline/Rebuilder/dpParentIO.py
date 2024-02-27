@@ -40,107 +40,103 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        # ensure file has a name to define dpData path
-        if not cmds.file(query=True, sceneName=True):
-            self.notWorkedWellIO(self.dpUIinst.lang['i201_saveScene'])
-        else:
-            self.ioPath = self.getIOPath(self.ioDir)
-            if self.ioPath:
-                if self.firstMode: #export
-                    transformList = None
-                    if objList:
-                        transformList = objList
-                    else:
-                        transformList = cmds.ls(selection=False, long=True, type="transform")
-                    if transformList:
-                        progressAmount = 0
-                        maxProcess = len(transformList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                        # define list to export
-                        transformList = self.filterTransformList(transformList)
-                        transformList = self.reorderList(transformList)
-                        parentDic = {"Parent" : transformList}
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.getCurrentFileName()+".json"
-                            self.pipeliner.saveJsonFile(parentDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(jsonName+": "+str(e))
-                    else:
-                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
-                else: #import
+        self.ioPath = self.getIOPath(self.ioDir)
+        if self.ioPath:
+            if self.firstMode: #export
+                transformList = None
+                if objList:
+                    transformList = objList
+                else:
+                    transformList = cmds.ls(selection=False, long=True, type="transform")
+                if transformList:
+                    progressAmount = 0
+                    maxProcess = len(transformList)
+                    if self.verbose:
+                        # Update progress window
+                        progressAmount += 1
+                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                    # define list to export
+                    transformList = self.filterTransformList(transformList)
+                    transformList = self.reorderList(transformList)
+                    parentDic = {"Parent" : transformList}
                     try:
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            exportedList.sort()
-                            parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if parentDic:
-                                currentTransformList = cmds.ls(selection=False, long=True, type="transform")
-                                currentTransformList = self.filterTransformList(currentTransformList)
-                                currentTransformList = self.reorderList(currentTransformList)
-                                if not currentTransformList == parentDic["Parent"]:
-                                    progressAmount = 0
-                                    maxProcess = len(parentDic["Parent"])
-                                    # define lists to check result
-                                    wellImportedList = []
-                                    parentIssueList = []
-                                    # check parenting shaders
-                                    for item in parentDic["Parent"]:
-                                        progressAmount += 1
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
-                                        if not cmds.objExists(item):
-                                            parentIssueList.append(item)
-                                            shortItem = item[item.rfind("|")+1:]
-                                            if cmds.objExists(shortItem):
-                                                if len(cmds.ls(shortItem)) == 1:
-                                                    # get father name
-                                                    longFatherNode = item[:item.rfind("|")]
-                                                    shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
-                                                    currentFatherList = cmds.listRelatives(shortItem, parent=True)
-                                                    if currentFatherList:
-                                                        if currentFatherList[0] == shortFatherNode:
-                                                            # already child of the father node
-                                                            wellImportedList.append(shortItem)
-                                                    elif cmds.objExists(longFatherNode):
-                                                        # simple parent to existing old father node in the ancient hierarchy
-                                                        cmds.parent(shortItem, longFatherNode)
+                        # export json file
+                        self.pipeliner.makeDirIfNotExists(self.ioPath)
+                        jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
+                        self.pipeliner.saveJsonFile(parentDic, jsonName)
+                        self.wellDoneIO(jsonName)
+                    except Exception as e:
+                        self.notWorkedWellIO(jsonName+": "+str(e))
+                else:
+                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
+            else: #import
+                try:
+                    exportedList = self.getExportedList()
+                    if exportedList:
+                        exportedList.sort()
+                        parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                        if parentDic:
+                            currentTransformList = cmds.ls(selection=False, long=True, type="transform")
+                            currentTransformList = self.filterTransformList(currentTransformList)
+                            currentTransformList = self.reorderList(currentTransformList)
+                            if not currentTransformList == parentDic["Parent"]:
+                                progressAmount = 0
+                                maxProcess = len(parentDic["Parent"])
+                                # define lists to check result
+                                wellImportedList = []
+                                parentIssueList = []
+                                # check parenting shaders
+                                for item in parentDic["Parent"]:
+                                    progressAmount += 1
+                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+                                    if not cmds.objExists(item):
+                                        parentIssueList.append(item)
+                                        shortItem = item[item.rfind("|")+1:]
+                                        if cmds.objExists(shortItem):
+                                            if len(cmds.ls(shortItem)) == 1:
+                                                # get father name
+                                                longFatherNode = item[:item.rfind("|")]
+                                                shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
+                                                currentFatherList = cmds.listRelatives(shortItem, parent=True)
+                                                if currentFatherList:
+                                                    if currentFatherList[0] == shortFatherNode:
+                                                        # already child of the father node
                                                         wellImportedList.append(shortItem)
-                                                    elif cmds.objExists(shortFatherNode):
-                                                        if len(cmds.ls(shortFatherNode)) == 1:
-                                                            # found unique father node in another hierarchy to parent
-                                                            cmds.parent(shortItem, shortFatherNode)
-                                                            wellImportedList.append(shortItem)
-                                                        else:
-                                                            self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
-                                                    else: #root here
-                                                        cmds.parent(shortItem, world=True)
+                                                elif cmds.objExists(longFatherNode):
+                                                    # simple parent to existing old father node in the ancient hierarchy
+                                                    cmds.parent(shortItem, longFatherNode)
+                                                    wellImportedList.append(shortItem)
+                                                elif cmds.objExists(shortFatherNode):
+                                                    if len(cmds.ls(shortFatherNode)) == 1:
+                                                        # found unique father node in another hierarchy to parent
+                                                        cmds.parent(shortItem, shortFatherNode)
                                                         wellImportedList.append(shortItem)
-                                                else:
-                                                    self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortItem)
+                                                    else:
+                                                        self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
+                                                else: #root here
+                                                    cmds.parent(shortItem, world=True)
+                                                    wellImportedList.append(shortItem)
                                             else:
-                                                self.notWorkedWellIO(self.dpUIinst.lang['e004_objNotExist'], shortItem)
-                                    if parentIssueList:
-                                        if wellImportedList:
-                                            self.wellDoneIO(exportedList[-1]+": "+', '.join(parentIssueList))
+                                                self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortItem)
                                         else:
-                                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(parentIssueList))
+                                            self.notWorkedWellIO(self.dpUIinst.lang['e004_objNotExist'], shortItem)
+                                if parentIssueList:
+                                    if wellImportedList:
+                                        self.wellDoneIO(exportedList[-1]+": "+', '.join(parentIssueList))
                                     else:
-                                        self.wellDoneIO(exportedList[-1])
+                                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(parentIssueList))
                                 else:
                                     self.wellDoneIO(exportedList[-1])
                             else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                                self.wellDoneIO(exportedList[-1])
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except Exception as e:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
-            else:
-                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                except Exception as e:
+                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         # --- rebuilder code --- end
         # ---
 

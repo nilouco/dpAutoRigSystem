@@ -33,12 +33,32 @@ class ActionStartClass(object):
         self.actionType = "v000_validator" #or r000_rebuilder
         self.firstBTEnable = True
         self.secondBTEnable = True
+        self.firstBTLabel = None
+        self.secondBTLabel = None
+        self.firstBTCustomLabel = None
+        self.secondBTCustomLabel = None
         # returned lists
         self.checkedObjList = []
         self.foundIssueList = []
         self.resultOkList = []
         self.messageList = []
         self.dataLogDic = {}
+
+
+    def setActionType(self, value, *args):
+        """ Define the button label texts.
+        """
+        self.actionType = value
+        if self.actionType == "v000_validator":
+            self.firstBTLabel = self.dpUIinst.lang['i210_verify']
+            self.secondBTLabel = self.dpUIinst.lang['c052_fix']
+        else: #r000_rebuilder
+            self.firstBTLabel = self.dpUIinst.lang['i164_export']
+            self.secondBTLabel = self.dpUIinst.lang['i196_import']
+        if self.firstBTCustomLabel:
+            self.firstBTLabel = self.firstBTCustomLabel
+        if self.secondBTCustomLabel:
+            self.secondBTLabel = self.secondBTCustomLabel
 
 
     def changeActive(self, value, *args):
@@ -67,6 +87,15 @@ class ActionStartClass(object):
         if self.verbose:
             # Starting progress window
             cmds.progressWindow(title=self.dpUIinst.lang[self.actionType], progress=0, status=self.dpUIinst.lang[self.title]+': 0%', isInterruptable=False)
+
+
+    def resetButtonColors(self, *args):
+        """ Just set the button colors as default.
+        """
+        if self.ui:
+            if cmds.button(self.firstBT, exists=True):
+                cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
 
 
     def updateButtonColors(self, *args):
@@ -105,21 +134,15 @@ class ActionStartClass(object):
         nameText = self.dpUIinst.lang['m006_name']
         titleText = self.dpUIinst.lang[self.title]
         modeText = self.dpUIinst.lang['v003_mode']
-        if self.actionType == "v000_validator":
-            firstText = self.dpUIinst.lang['i210_verify'].upper()
-            secondText = self.dpUIinst.lang['c052_fix'].upper()
-        else: #r000_rebuilder
-            firstText = self.dpUIinst.lang['i164_export'].upper()
-            secondText = self.dpUIinst.lang['i196_import'].upper()
         foundIssueText = self.dpUIinst.lang['v006_foundIssue']
         everythingOkText = self.dpUIinst.lang['v007_allOk']
         # header
         logText = "\n"+nameText+": "+titleText+"\n"
         # mode
         logText += modeText+": "
-        actionText = secondText
+        actionText = self.secondBTLabel.upper()
         if self.firstMode:
-            actionText = firstText
+            actionText = self.firstBTLabel.upper()
         logText += actionText+"\n"
         # issues
         if True in self.foundIssueList:
@@ -192,7 +215,7 @@ class ActionStartClass(object):
     def getIOPath(self, ioDir, *args):
         """ Returns the IO path for the current scene.
         """
-        return self.pipeliner.getCurrentPath()+"/"+self.pipeliner.pipeData[ioDir]
+        return self.pipeliner.pipeData['assetPath']+"/"+self.pipeliner.pipeData[ioDir]
 
 
     def getExportedList(self, objList=None, subFolder="", *args):

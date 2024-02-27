@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-02-21",
+    "_updated"       : "2024-02-26",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -461,10 +461,12 @@
     "i298_folder"              : "folder",
     "i299_notUniqueName"       : "Not unique name for this node",
     "i300_sParentIOAnn"        : "The folder to export and import parent data.",
-    "i301_sCheckinIOAnn"       : "The folder to export and import checkin data. Currently, not in use.",
+    "i301_0000000"       : "NOT USED.",
     "i302_sSetupGeometryIOAnn" : "The folder to export and import geometries used in the setup.",
-    "i303_assetNameText"       : "Asset name",
-    "i304_sNewSceneIOAnn"      : "The folder to export and import data used in the rebuilder.",
+    "i303_assetName"           : "Asset name",
+    "i304_0000000"      : "NOT USED",
+    "i305_none"                : "None",
+    "i306_run"                 : "Run",
 
     "m001_fkLine"               : "Fk Line",
     "m002_fkLineDesc"           : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
