@@ -23,10 +23,17 @@ class Pipeliner(object):
         self.webhookFile = "dpWebhook.json"
         self.hookFile = "dpHook.json"
         self.callbackFile = "dpPublishCallback.py"
-        self.assetDataFile = "dpAssetData.json"
-        self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
+        self.refreshAssetData()
+
+
+    def refreshAssetData(self, *args):
+        """ Load the asset data from saved file in the pipeline.
+        """
+        print("WIP = refreshedAssetData here.......")
+        self.pipeData = self.getPipelineData()
         self.getPipeFileName()
+        self.refreshAssetNameUI()
         
 
     def getToday(self, fullTime=False, *args):
@@ -688,9 +695,26 @@ class Pipeliner(object):
             return False
 
 
-    def refreshAssetNameUI(self, *args):
+    def refreshAssetNameUI(self, newSceneValue=False, *args):
         """ Just read again the pipeline data and set the UI with the assetName.
         """
         self.getPipeFileName()
-        if self.pipeData['assetName']:
-            cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label=self.pipeData['assetName'])
+        if newSceneValue:
+            cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label="None")
+        else:
+            if self.pipeData['assetName']:
+                if self.pipeData['assetName'] == "None":
+                    print("There's no pipeline asset configured to rebuild it, sorry.")
+                else:
+                    try:
+                        cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label=self.pipeData['assetName'])
+                        print("LOADED asset name here:", self.pipeData['assetName'])
+                    except Exception as e:
+                        print(e)
+            else:
+                print("NO pipeline asset here....")
+                try:
+                    cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label="None")
+                    print("LOADED asset name 2 here: NONE")
+                except Exception as e:
+                    print(e)

@@ -303,11 +303,29 @@ class DP_AutoRig_UI(object):
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
         
-        #print self.pDockCtrl
+        #self.refreshAssetNewJob = cmds.scriptJob(event=('deleteAll', self.pipeliner.refreshAssetData), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+        #self.refreshAssetOpenJob = cmds.scriptJob(event=('SceneOpened', self.pipeliner.refreshAssetData), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+        #self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', self.pipeliner.refreshAssetData), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+#        self.refreshAssetNewJob = cmds.scriptJob(event=('deleteAll', self.testNew), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+#        self.refreshAssetOpenJob = cmds.scriptJob(event=('SceneOpened', self.testOpened), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
+        
+        #self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', self.pipeliner.refreshAssetData), killWithScene=False, compressUndo=True)
+        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', self.refreshMainUI), killWithScene=False, compressUndo=True)
+        
+        #print(self.refreshAssetNewJob)
+#        print(self.refreshAssetOpenJob)
+#        print(self.refreshAssetSaveJob)
+
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
         self.refreshMainUI()
         
+    def testNew(self, *args):
+        print("newnewnew")
+    def testOpened(self, *args):
+        print("testOpened")
+    def testSaved(self, *args):
+        print("testSaved")
 
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
@@ -742,8 +760,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder", rebuilding=True), parent=self.allUIs["selectedRebuilders2Layout"])
-        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder", rebuilding=True), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
         cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
@@ -769,6 +787,7 @@ class DP_AutoRig_UI(object):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
+        print("REFRESHING mainUI here...")
         cmds.select(clear=True)
         self.populateCreatedGuideModules()
         self.checkImportedGuides()
@@ -777,11 +796,15 @@ class DP_AutoRig_UI(object):
         self.populateGeoms()
         if not self.rebuilding:
             self.resetAllButtonColors()
-        self.rebuilding = False
-        self.pipeliner.refreshAssetNameUI()
-        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
-  
-    
+            self.pipeliner.refreshAssetData()
+#        self.rebuilding = False
+#        else:
+#            self.pipeliner.refreshAssetNameUI()
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
+        print("REBUILDING = ", self.rebuilding)
+        print("DATA = ", self.pipeliner.pipeData)
+
+
     def jobWinClose(self, *args):
         #This job will ensure that the dock control is killed correctly
         if self.pDockCtrl:
@@ -1614,13 +1637,12 @@ class DP_AutoRig_UI(object):
                 inst.changeActive(value)
 
 
-    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", rebuilding=False, *args):
+    def runSelectedActions(self, actionInstList, firstMode, verbose=True, stopIfFoundBlock=False, publishLog=None, actionType="v000_validator", *args):
         """ Run the code for each active validator/rebuilder instance.
             firstMode = True for verify/export
                       = False for fix/import
         """
         self.resetAllButtonColors()
-        self.rebuilding = rebuilding
         actionResultData = {}
         logText = ""
         if publishLog:

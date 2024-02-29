@@ -41,6 +41,9 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
+
+        # TODO validate asset data
+
         # load alembic plugin
         if self.utils.checkLoadedPlugin("AbcExport") and self.utils.checkLoadedPlugin("AbcImport"):
             self.ioPath = self.getIOPath(self.ioDir)

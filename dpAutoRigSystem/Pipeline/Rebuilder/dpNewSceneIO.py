@@ -42,6 +42,10 @@ class NewSceneIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
+
+        # TODO validate asset data
+
+        
         if self.firstMode: #export
             self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
         else: #import
@@ -51,7 +55,7 @@ class NewSceneIO(dpBaseActionClass.ActionStartClass):
                 cmds.file(newFile=True, force=True)
                 self.wellDoneIO(self.pipeliner.pipeData["assetName"])
             except Exception as e:
-                self.notWorkedWellIO(self.pipeliner.pipeData["assetName"]+": "+str(e))
+                self.notWorkedWellIO(str(e))
         # --- rebuilder code --- end
         # ---
 
