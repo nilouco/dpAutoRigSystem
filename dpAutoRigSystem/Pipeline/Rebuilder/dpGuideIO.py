@@ -43,101 +43,104 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        self.ioPath = self.getIOPath(self.ioDir)
-        if self.ioPath:
-            if self.firstMode: #export
-                netList = None
-                if objList:
-                    netList = objList
-                else:
-                    netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
-                if netList:
-                    toExportDataDic = {}
-                    progressAmount = 0
-                    maxProcess = len(netList)
-                    for net in netList:
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                        # mount a dic with all data 
-                        if cmds.objExists(net+".afterData"):
-                            if cmds.getAttr(net+".rawGuide"): 
-                                # get data from not rendered guide (rawGuide status on)
-                                moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
-                                for moduleInstance in self.dpUIinst.moduleInstancesList:
-                                    if str(moduleInstance) == moduleInstanceInfoString:
-                                        moduleInstance.serializeGuide(False) #serialize it without build it
-                            toExportDataDic[net] = cmds.getAttr(net+".afterData")
-                    if toExportDataDic:
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(jsonName+": "+str(e))
+        if self.pipeliner.checkAssetContext():
+            self.ioPath = self.getIOPath(self.ioDir)
+            if self.ioPath:
+                if self.firstMode: #export
+                    netList = None
+                    if objList:
+                        netList = objList
+                    else:
+                        netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
+                    if netList:
+                        toExportDataDic = {}
+                        progressAmount = 0
+                        maxProcess = len(netList)
+                        for net in netList:
+                            if self.verbose:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            # mount a dic with all data 
+                            if cmds.objExists(net+".afterData"):
+                                if cmds.getAttr(net+".rawGuide"): 
+                                    # get data from not rendered guide (rawGuide status on)
+                                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
+                                    for moduleInstance in self.dpUIinst.moduleInstancesList:
+                                        if str(moduleInstance) == moduleInstanceInfoString:
+                                            moduleInstance.serializeGuide(False) #serialize it without build it
+                                toExportDataDic[net] = cmds.getAttr(net+".afterData")
+                        if toExportDataDic:
+                            try:
+                                # export json file
+                                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
+                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
+                                self.wellDoneIO(jsonName)
+                            except Exception as e:
+                                self.notWorkedWellIO(jsonName+": "+str(e))
+                        else:
+                            self.notWorkedWellIO("v014_notFoundNodes")
+                        cmds.select(clear=True)
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
-                    cmds.select(clear=True)
-                else:
-                    self.notWorkedWellIO("v014_notFoundNodes")
-            else: #import
-                # apply viewport xray
-                modelPanelList = cmds.getPanel(type="modelPanel")
-                for mp in modelPanelList:
-                    cmds.modelEditor(mp, edit=True, xray=True)
-                exportedList = self.getExportedList()
-                if exportedList:
-                    exportedList.sort()
-                    try:
-                        self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                        if self.importedDataDic:
-                            wellImported = True
-                            progressAmount = 0
-                            maxProcess = len(self.importedDataDic.keys())
-                            for net in self.importedDataDic.keys():
-                                progressAmount += 1
-                                toInitializeGuide = True
-                                if cmds.objExists(net):
-                                    if cmds.getAttr(net+".rawGuide"):
-                                        toInitializeGuide = False
-                                    else:
-                                        cmds.lockNode(net, lock=False)
-                                        cmds.delete(net)
-                                if toInitializeGuide:
-                                    try:
-                                        self.netDic = json.loads(self.importedDataDic[net])
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
-                                        # create a module instance:
-                                        self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
-                                        self.setupInstanceChanges()
-                                        self.setupGuideTransformations()
-                                    except Exception as e:
-                                        wellImported = False
-                                        self.notWorkedWellIO(net+": "+str(e))
-                                        break
-                            try:
-                                # Parenting guides
-                                self.setupGuideBaseParenting(self.dpUIinst.lang['m197_notPossibleParent'])
-                            except Exception as e:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
-                                wellImported = False
-                            if wellImported:
-                                self.wellDoneIO(exportedList[-1])
-                        else:
+                else: #import
+                    # apply viewport xray
+                    modelPanelList = cmds.getPanel(type="modelPanel")
+                    for mp in modelPanelList:
+                        cmds.modelEditor(mp, edit=True, xray=True)
+                    exportedList = self.getExportedList()
+                    if exportedList:
+                        exportedList.sort()
+                        try:
+                            self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                            if self.importedDataDic:
+                                wellImported = True
+                                progressAmount = 0
+                                maxProcess = len(self.importedDataDic.keys())
+                                for net in self.importedDataDic.keys():
+                                    progressAmount += 1
+                                    toInitializeGuide = True
+                                    if cmds.objExists(net):
+                                        if cmds.getAttr(net+".rawGuide"):
+                                            toInitializeGuide = False
+                                        else:
+                                            cmds.lockNode(net, lock=False)
+                                            cmds.delete(net)
+                                    if toInitializeGuide:
+                                        try:
+                                            self.netDic = json.loads(self.importedDataDic[net])
+                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
+                                            # create a module instance:
+                                            self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                                            self.setupInstanceChanges()
+                                            self.setupGuideTransformations()
+                                        except Exception as e:
+                                            wellImported = False
+                                            self.notWorkedWellIO(net+": "+str(e))
+                                            break
+                                try:
+                                    # Parenting guides
+                                    self.setupGuideBaseParenting(self.dpUIinst.lang['m197_notPossibleParent'])
+                                except Exception as e:
+                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                                    wellImported = False
+                                if wellImported:
+                                    self.wellDoneIO(exportedList[-1])
+                            else:
+                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            cmds.select(clear=True)
+                        except:
                             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        cmds.select(clear=True)
-                    except:
+                    else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                else:
-                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                # remove viewport xray
-                for mp in modelPanelList:
-                    cmds.modelEditor(mp, edit=True, xray=False)
+                    # remove viewport xray
+                    for mp in modelPanelList:
+                        cmds.modelEditor(mp, edit=True, xray=False)
+            else:
+                self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
+            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         # --- rebuilder code --- end
         # ---
 

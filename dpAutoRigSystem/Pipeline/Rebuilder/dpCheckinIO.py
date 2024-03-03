@@ -42,16 +42,19 @@ class CheckinIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-        if self.firstMode: #export
-            self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
-        else: #import
-            try:
-                # clean up geometries
-                validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
-                self.wellDoneIO(", ".join(validatorToRunList))
-            except Exception as e:
-                self.notWorkedWellIO(str(e))
+        if self.pipeliner.checkAssetContext():
+            if self.firstMode: #export
+                self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
+            else: #import
+                try:
+                    # clean up geometries
+                    validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
+                    self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
+                    self.wellDoneIO(", ".join(validatorToRunList))
+                except Exception as e:
+                    self.notWorkedWellIO(str(e))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         # --- rebuilder code --- end
         # ---
 

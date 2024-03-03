@@ -302,30 +302,13 @@ class DP_AutoRig_UI(object):
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
-        
-        #self.refreshAssetNewJob = cmds.scriptJob(event=('deleteAll', self.pipeliner.refreshAssetData), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
-        #self.refreshAssetOpenJob = cmds.scriptJob(event=('SceneOpened', self.pipeliner.refreshAssetData), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
-        #self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', self.pipeliner.refreshAssetData), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
-#        self.refreshAssetNewJob = cmds.scriptJob(event=('deleteAll', self.testNew), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
-#        self.refreshAssetOpenJob = cmds.scriptJob(event=('SceneOpened', self.testOpened), parent='dpAutoRigWindow', replacePrevious=True, killWithScene=False, compressUndo=True, force=True)
-        
-        #self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', self.pipeliner.refreshAssetData), killWithScene=False, compressUndo=True)
-        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', self.refreshMainUI), killWithScene=False, compressUndo=True)
-        
-        #print(self.refreshAssetNewJob)
-#        print(self.refreshAssetOpenJob)
-#        print(self.refreshAssetSaveJob)
+
+        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), killWithScene=False, compressUndo=True)
 
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
         self.refreshMainUI()
-        
-    def testNew(self, *args):
-        print("newnewnew")
-    def testOpened(self, *args):
-        print("testOpened")
-    def testSaved(self, *args):
-        print("testSaved")
+
 
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
@@ -750,9 +733,11 @@ class DP_AutoRig_UI(object):
         # rebuilderMainLayout - scrollLayout:
         self.allUIs["rebuilderMainLayout"] = cmds.scrollLayout("rebuilderMainLayout", parent=self.allUIs["rebuilderTabLayout"])
         self.allUIs["rebuilderLayout"] = cmds.columnLayout("rebuilderLayout", adjustableColumn=True, rowSpacing=3, parent=self.allUIs["rebuilderMainLayout"])
-        self.allUIs["rebuilderHeaderLayout"] = cmds.rowLayout("rebuilderHeaderLayout", numberOfColumns=2, columnWidth2=(80, 150), adjustableColumn=2, columnAlign=[(1, 'right'), (2, 'left')], columnAttach=[(1, 'both', 0), (2, 'left', 10)])
-        self.allUIs["assetNameLabel"] = cmds.text("assetNameLabel", label=self.lang['i303_assetName']+":", parent=self.allUIs["rebuilderHeaderLayout"])
-        self.allUIs["assetNameText"] = cmds.text("assetNameText", label="None", font="boldLabelFont", parent=self.allUIs["rebuilderHeaderLayout"])
+        # asset
+        self.allUIs["rebuilderAssetFL"] = cmds.frameLayout('rebuilderAssetFL', label=self.lang['i303_asset'], collapsable=True, collapse=True, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
+        self.allUIs["rebuilderAsset2Layout"] = cmds.paneLayout("rebuilderAsset2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderAssetFL"])
+        self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["rebuilderAsset2Layout"])
+        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" dpData", command=self.pipeliner.replaceDPData, parent=self.allUIs["rebuilderAsset2Layout"])
         cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
@@ -760,8 +745,8 @@ class DP_AutoRig_UI(object):
         cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
-        self.allUIs["splitDataSelectProcessBT"] = cmds.button(label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
-        self.allUIs["rebuildSelectProcessBT"] = cmds.button(label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["splitDataSelectProcessBT"] = cmds.button("splitDataSelectProcessBT", label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
+        self.allUIs["rebuildSelectProcessBT"] = cmds.button("rebuildSelectProcessBT", label=self.lang['r001_rebuild'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, False, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
         cmds.separator(height=30, parent=self.allUIs["rebuilderLayout"])
         # edit formLayout in order to get a good scalable window:
         cmds.formLayout( self.allUIs["rebuilderTabLayout"], edit=True,
@@ -783,11 +768,12 @@ class DP_AutoRig_UI(object):
         self.refreshMainUI()
     
     
-    def refreshMainUI(self, *args):
+    def refreshMainUI(self, savedScene=None, *args):
         """ Read guides, joints, geometries and refresh the UI without reload the script creating a new instance.
             Useful to rebuilding process when creating a new scene
         """
-        print("REFRESHING mainUI here...")
+        if savedScene:
+            self.rebuilding = False
         cmds.select(clear=True)
         self.populateCreatedGuideModules()
         self.checkImportedGuides()
@@ -797,12 +783,7 @@ class DP_AutoRig_UI(object):
         if not self.rebuilding:
             self.resetAllButtonColors()
             self.pipeliner.refreshAssetData()
-#        self.rebuilding = False
-#        else:
-#            self.pipeliner.refreshAssetNameUI()
         self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
-        print("REBUILDING = ", self.rebuilding)
-        print("DATA = ", self.pipeliner.pipeData)
 
 
     def jobWinClose(self, *args):

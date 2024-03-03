@@ -42,20 +42,19 @@ class NewSceneIO(dpBaseActionClass.ActionStartClass):
         
         # ---
         # --- rebuilder code --- beginning
-
-        # TODO validate asset data
-
-        
-        if self.firstMode: #export
-            self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
-        else: #import
-            self.dpUIinst.rebuilding = True
-            try:
-                # start a new asset context clean scene
-                cmds.file(newFile=True, force=True)
-                self.wellDoneIO(self.pipeliner.pipeData["assetName"])
-            except Exception as e:
-                self.notWorkedWellIO(str(e))
+        if self.pipeliner.checkAssetContext():
+            if self.firstMode: #export
+                self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
+            else: #import
+                self.dpUIinst.rebuilding = True
+                try:
+                    # start a new asset context clean scene
+                    cmds.file(newFile=True, force=True)
+                    self.wellDoneIO(self.pipeliner.pipeData["assetName"])
+                except Exception as e:
+                    self.notWorkedWellIO(str(e))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
         # --- rebuilder code --- end
         # ---
 

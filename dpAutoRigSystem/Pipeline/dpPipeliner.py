@@ -30,7 +30,6 @@ class Pipeliner(object):
     def refreshAssetData(self, *args):
         """ Load the asset data from saved file in the pipeline.
         """
-        print("WIP = refreshedAssetData here.......")
         self.pipeData = self.getPipelineData()
         self.getPipeFileName()
         self.refreshAssetNameUI()
@@ -266,11 +265,13 @@ class Pipeliner(object):
                 if not self.pipeData['sceneName'] == self.pipeData['f_drive']+"/"+self.pipeData['shortName']:
                     self.getInfoByPath("f_studio", "f_drive", cut=True)
                     self.getInfoByPath("f_project", "f_studio", cut=True)
+                self.pipeData['projectPath'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+self.pipeData['f_project']
                 self.pipeData['path'] = self.pipeData['f_drive']+"/"+self.pipeData['f_studio']+"/"+PIPE_FOLDER #dpTeam
                 if not os.path.exists(self.pipeData['path']):
                     self.pipeData['f_drive'] = ""
                     self.pipeData['f_studio'] = ""
                     self.pipeData['f_project'] = ""
+                    self.pipeData['projectPath'] = ""
                     self.pipeData['path'] = ""
                     loaded = False
             else:
@@ -698,23 +699,136 @@ class Pipeliner(object):
     def refreshAssetNameUI(self, newSceneValue=False, *args):
         """ Just read again the pipeline data and set the UI with the assetName.
         """
-        self.getPipeFileName()
         if newSceneValue:
-            cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label="None")
+            cmds.frameLayout(self.dpUIinst.allUIs["rebuilderAssetFL"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - None")
         else:
             if self.pipeData['assetName']:
                 if self.pipeData['assetName'] == "None":
-                    print("There's no pipeline asset configured to rebuild it, sorry.")
+                    print(self.dpUIinst.lang['r027_noAssetContext'])
                 else:
                     try:
-                        cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label=self.pipeData['assetName'])
-                        print("LOADED asset name here:", self.pipeData['assetName'])
-                    except Exception as e:
-                        print(e)
+                        cmds.frameLayout(self.dpUIinst.allUIs["rebuilderAssetFL"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - "+self.pipeData['assetName'])
+                    except:
+                        pass
             else:
-                print("NO pipeline asset here....")
                 try:
-                    cmds.text(self.dpUIinst.allUIs["assetNameText"], edit=True, label="None")
-                    print("LOADED asset name 2 here: NONE")
-                except Exception as e:
-                    print(e)
+                    cmds.frameLayout(self.dpUIinst.allUIs["rebuilderAssetFL"], edit=True, label=self.dpUIinst.lang['i303_asset']+" - None")
+                except:
+                    pass
+
+
+    def checkAssetContext(self, *args):
+        """ Returns True if there's an asset context to work the rebuilding or False if not.
+        """
+        hasAssetContext = False
+        if self.pipeData:
+            if self.pipeData['assetName']:
+                if not self.pipeData['assetName'] == "None":
+                    hasAssetContext = True
+        return hasAssetContext
+    
+
+    def loadProjectPath(self, *args):
+        """ Open a file dialog to get the project path and write it in the respective field.
+        """
+        resultInfoList = cmds.fileDialog2(fileMode=3, dialogStyle=2)
+        if resultInfoList:
+            cmds.textFieldButtonGrp(self.projectPathTFBG, edit=True, text=resultInfoList[0])
+
+
+    def getNewAssetPreviewTextByUI(self, *args):
+        """
+        """
+        print("wip get texttt")
+        self.newAssetFile = ""
+        newAssetName = cmds.textFieldGrp(self.newAssetNameTFG, query=True, text=True)
+        newModelVersion = cmds.textFieldGrp(self.newModelVersionTFG, query=True, text=True)
+        newWIPVersion = cmds.textFieldGrp(self.newWIPVersionTFG, query=True, text=True)
+        projectPath = cmds.textFieldButtonGrp(self.projectPathTFBG, query=True, text=True)
+        if projectPath:
+            if not projectPath.endswith("/"):
+                projectPath = projectPath+"/"
+            wipFolder = self.pipeData['f_wip']
+            if wipFolder:
+                if not wipFolder.endswith("/"):
+                    wipFolder = wipFolder+"/"
+            if newWIPVersion and newModelVersion and newAssetName:
+                self.newAssetFile = projectPath+wipFolder+newAssetName+self.pipeData['s_model']+newModelVersion.zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+newWIPVersion.zfill(self.pipeData['i_padding'])+".ma"
+        if self.newAssetFile:
+            cmds.text(self.newAssetPreviewTxt, edit=True, label=self.newAssetFile)
+        return self.newAssetFile
+        
+
+
+
+
+
+    def createNewAssetUI(self, *args):
+        """ A simple UI to get the asset info like name, model version, wip rig version in order to create a new asset context.
+        """
+        # declaring variables:
+        self.newAsset_title     = 'dpAutoRig - '+self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset']
+        self.newAsset_winWidth  = 420
+        self.newAsset_winHeight = 250
+        self.newAsset_align     = "left"
+        # creating New Asset Window:
+        self.utils.closeUI("dpNewAssetWindow")
+        dpNewAssetWin = cmds.window('dpNewAssetWindow', title=self.newAsset_title, iconName='dpInfo', widthHeight=(self.newAsset_winWidth, self.newAsset_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        newAssetColumnLayout = cmds.columnLayout('newAssetColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpNewAssetWin)
+        cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
+        self.newAssetNameTFG = cmds.textFieldGrp('newAssetNameTFG', label=self.dpUIinst.lang['i303_asset']+" "+self.dpUIinst.lang['m006_name'].lower(), columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newModelVersionTFG = cmds.textFieldGrp('newModelVersionTFG', label="Model "+self.dpUIinst.lang['m205_version'].lower(), text="1", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        self.newWIPVersionTFG = cmds.textFieldGrp('newWIPVersionTFG', label="WIP "+self.dpUIinst.lang['m205_version'].lower(), text="1", columnWidth2=(80, 150), textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        try:
+            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text=self.pipeData['projectPath'], columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        except:
+            self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text="", columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
+        cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
+        self.previewTxt = cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
+        self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=newAssetColumnLayout)
+        cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
+        cmds.button('runCreateNewAssetBT', label=self.dpUIinst.lang['i158_create'], align=self.newAsset_align, command=self.createNewAsset, parent=newAssetColumnLayout)
+        # call New Asset Window:
+        cmds.showWindow(dpNewAssetWin)
+        self.getNewAssetPreviewTextByUI()
+
+
+    def createNewAsset(self, newAssetName=None, modelVersion=None, wipVersion=None, *args):
+        """ Create a new asset context saving a maya file with the given arguments.
+        """
+        if not newAssetName:
+            newAssetName = cmds.textFieldGrp(self.newAssetNameTFG, query=True, text=True)
+        if not modelVersion:
+            modelVersion = cmds.textFieldGrp(self.newModelVersionTFG, query=True, text=True)
+        if not wipVersion:
+            wipVersion = cmds.textFieldGrp(self.newWIPVersionTFG, query=True, text=True)
+
+        #
+        # WIP
+        #
+            
+        print("creating a new asset here...")
+        print("UI info =",newAssetName, modelVersion, wipVersion)
+        print("HERE all todo =", self.newAssetFile)
+
+        if newAssetName:
+            print("YES nenewnew =", newAssetName)
+            print(self.pipeData)
+
+
+            self.utils.closeUI("dpNewAssetWindow")
+        else:
+            print("fill fields correctly, please.")
+
+
+
+    def replaceDPData(self, *args):
+        """
+        """
+
+        #
+        # WIP
+        #
+
+        print("replacing dpDATA start...")

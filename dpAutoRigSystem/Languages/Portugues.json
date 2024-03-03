@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-02-26",
+    "_updated"       : "2024-03-03",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -461,10 +461,10 @@
     "i298_folder"              : "diretório",
     "i299_notUniqueName"       : "Não tem único nome para esse node",
     "i300_sParentIOAnn"        : "O diretório onde será exportado ou importado os dados de parent.",
-    "i301_00000"       : "NOT USED",
+    "i301_project"             : "Projeto",
     "i302_sSetupGeometryIOAnn" : "O diretório onde será exportado ou importado as geometrias usadas no setup.",
-    "i303_assetName"           : "Nome do asset",
-    "i304_00000"      : "NOT USED",
+    "i303_asset"               : "Asset",
+    "i304_new"                 : "Novo",
     "i305_none"                : "Nada",
     "i306_run"                 : "Rodar",
 
@@ -737,6 +737,7 @@
     "r024_setupGeometryIODesc" : "Essa ação vai trabalhar as geometrias usadas no setup\nexportando e importando dos grupos como:\nModels_Grp, BlendShape_Grp and WIP_Grp.",
     "r025_newSceneIO"          : "Nova cena IO",
     "r026_newSceneIODesc"      : "Essa ação vai trabalhar com um arquivo de nova cena\nbaseado no contexto do nome do asset\npara começar a reconstrução em uma cena limpa.",
+    "r027_noAssetContext"      : "Parado! Não existe contexto de asset configurado para o recriar, desculpe.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-02-26",
+    "_updated"       : "2024-03-03",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -461,10 +461,10 @@
     "i298_folder"              : "dossier",
     "i299_notUniqueName"       : "Il n'y a pas d'unique nom pour ce node",
     "i300_sParentIOAnn"        : "Le dossier ou on va importer et exporter le data de parent.",
-    "i301_00000"       : "NOT USED",
+    "i301_project"             : "Projet",
     "i302_sSetupGeometryIOAnn" : "Le dossier ou on va importer et exporter les géometries utilisées dans le setup.",
-    "i303_assetName"           : "Nom de l'asset",
-    "i304_00000"      : "NOT USED",
+    "i303_asset"               : "Asset",
+    "i304_new"                 : "Nouveau",
     "i305_none"                : "Rien",
     "i306_run"                 : "Faire",
 
@@ -737,6 +737,7 @@
     "r024_setupGeometryIODesc" : "Cet action va travailer les géométries utilisées dans le setup\nl'export et l'import de groupes comme:\nModels_Grp, BlendShape_Grp and WIP_Grp.",
     "r025_newSceneIO"          : "Nouvelle scene IO",
     "r026_newSceneIODesc"      : "Cet action va travailler une nouvelle scene\nbasée dans le contexte du nom de l'asset\npour commencer la reconstruction avec tout en nouveaux.",
+    "r027_noAssetContext"      : "Arreté! Il n'y a pas de contexte d'asset configuré pour le reconstruire, désolé.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

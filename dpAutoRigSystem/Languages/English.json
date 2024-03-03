@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-02-26",
+    "_updated"       : "2024-03-03",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -461,10 +461,10 @@
     "i298_folder"              : "folder",
     "i299_notUniqueName"       : "Not unique name for this node",
     "i300_sParentIOAnn"        : "The folder to export and import parent data.",
-    "i301_0000000"       : "NOT USED.",
+    "i301_project"             : "Project",
     "i302_sSetupGeometryIOAnn" : "The folder to export and import geometries used in the setup.",
-    "i303_assetName"           : "Asset name",
-    "i304_0000000"      : "NOT USED",
+    "i303_asset"               : "Asset",
+    "i304_new"                 : "New",
     "i305_none"                : "None",
     "i306_run"                 : "Run",
 
@@ -737,6 +737,7 @@
     "r024_setupGeometryIODesc" : "This action will work with geometries used in the setup\nexporting and importing them from groups like:\nModels_Grp, BlendShape_Grp and WIP_Grp.",
     "r025_newSceneIO"          : "New scene IO",
     "r026_newSceneIODesc"      : "This action will work with new scene file\nbased on the asset name context\nto start a clear maya scene to run the rebuilding.",
+    "r027_noAssetContext"      : "Stoped! There's no configured asset context to rebuild it, sorry.",
     
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",
