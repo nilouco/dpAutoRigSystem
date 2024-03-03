@@ -467,6 +467,7 @@
     "i304_new"                 : "Nouveau",
     "i305_none"                : "Rien",
     "i306_run"                 : "Faire",
+    "i307_fillFieldCorrectly"  : "Remplissez les champs correctement, s'il vous plaît.",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",

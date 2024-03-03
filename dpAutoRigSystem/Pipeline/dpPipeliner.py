@@ -477,10 +477,12 @@ class Pipeliner(object):
 
     def makeDirIfNotExists(self, pathToMake=None, *args):
         """ Check if the path exists and create it if it doesn't exists.
+            Returns True if it worked well.
         """
         if pathToMake:
             if not os.path.exists(pathToMake):
                 os.makedirs(pathToMake)
+                return True
 
 
     def createPipelineInfoSubFolders(self, *args):
@@ -737,9 +739,8 @@ class Pipeliner(object):
 
 
     def getNewAssetPreviewTextByUI(self, *args):
+        """ Generate and return the new asset file name with complete path, using the UI info.
         """
-        """
-        print("wip get texttt")
         self.newAssetFile = ""
         newAssetName = cmds.textFieldGrp(self.newAssetNameTFG, query=True, text=True)
         newModelVersion = cmds.textFieldGrp(self.newModelVersionTFG, query=True, text=True)
@@ -753,14 +754,10 @@ class Pipeliner(object):
                 if not wipFolder.endswith("/"):
                     wipFolder = wipFolder+"/"
             if newWIPVersion and newModelVersion and newAssetName:
-                self.newAssetFile = projectPath+wipFolder+newAssetName+self.pipeData['s_model']+newModelVersion.zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+newWIPVersion.zfill(self.pipeData['i_padding'])+".ma"
+                self.newAssetFile = projectPath+wipFolder+newAssetName+"/"+newAssetName+self.pipeData['s_model']+newModelVersion.zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+newWIPVersion.zfill(self.pipeData['i_padding'])+".ma"
         if self.newAssetFile:
             cmds.text(self.newAssetPreviewTxt, edit=True, label=self.newAssetFile)
         return self.newAssetFile
-        
-
-
-
 
 
     def createNewAssetUI(self, *args):
@@ -785,8 +782,9 @@ class Pipeliner(object):
         except:
             self.projectPathTFBG = cmds.textFieldButtonGrp('projectPathTFG', label=self.dpUIinst.lang['i301_project']+" path", text="", columnWidth3=(80, 150, 30), buttonLabel=self.dpUIinst.lang['i187_load'], buttonCommand=self.loadProjectPath, adjustableColumn=2, textChangedCommand=self.getNewAssetPreviewTextByUI, parent=newAssetColumnLayout)
         cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
-        self.previewTxt = cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
-        self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=newAssetColumnLayout)
+        cmds.text('previewTxt', label="Preview:", font="obliqueLabelFont", align=self.newAsset_align, parent=newAssetColumnLayout)
+        previewTextLayout = cmds.scrollLayout("previewTextLayout", height=35, parent=newAssetColumnLayout)
+        self.newAssetPreviewTxt = cmds.text('newAssetPreviewTxt', label="", font="boldLabelFont", align="center", parent=previewTextLayout)
         cmds.separator(style='none', height=10, parent=newAssetColumnLayout)
         cmds.button('runCreateNewAssetBT', label=self.dpUIinst.lang['i158_create'], align=self.newAsset_align, command=self.createNewAsset, parent=newAssetColumnLayout)
         # call New Asset Window:
@@ -794,33 +792,18 @@ class Pipeliner(object):
         self.getNewAssetPreviewTextByUI()
 
 
-    def createNewAsset(self, newAssetName=None, modelVersion=None, wipVersion=None, *args):
-        """ Create a new asset context saving a maya file with the given arguments.
+    def createNewAsset(self, assetFile=None, *args):
+        """ Create a new asset context saving a maya file with the given asset file complete path.
         """
-        if not newAssetName:
-            newAssetName = cmds.textFieldGrp(self.newAssetNameTFG, query=True, text=True)
-        if not modelVersion:
-            modelVersion = cmds.textFieldGrp(self.newModelVersionTFG, query=True, text=True)
-        if not wipVersion:
-            wipVersion = cmds.textFieldGrp(self.newWIPVersionTFG, query=True, text=True)
-
-        #
-        # WIP
-        #
-            
-        print("creating a new asset here...")
-        print("UI info =",newAssetName, modelVersion, wipVersion)
-        print("HERE all todo =", self.newAssetFile)
-
-        if newAssetName:
-            print("YES nenewnew =", newAssetName)
-            print(self.pipeData)
-
-
-            self.utils.closeUI("dpNewAssetWindow")
+        if assetFile:
+            self.newAssetFile = assetFile
+        if self.newAssetFile:
+            if self.makeDirIfNotExists(self.newAssetFile[:self.newAssetFile.rfind("/")]):
+                cmds.file(rename=self.newAssetFile)
+                cmds.file(save=True, type="mayaAscii", force=True)
+                self.utils.closeUI("dpNewAssetWindow")
         else:
-            print("fill fields correctly, please.")
-
+            cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i307_fillFieldCorrectly'], button="Ok")
 
 
     def replaceDPData(self, *args):
