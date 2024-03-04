@@ -4,6 +4,7 @@ from functools import partial
 import os
 import json
 import time
+import shutil
 
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
@@ -131,7 +132,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2024-02-21",
+        "updated" : "2024-03-03",
         
         "f_drive"           : "",
         "f_studio"          : "",
@@ -141,14 +142,14 @@ class Pipeliner(object):
         "f_toClient"        : "Data/ToClient",
         "s_presets"         : "dpPresets",
         "s_addOns"          : "dpAddOns",
-        "s_hist"            : "dpData/dpHist",
-        "s_modelIO"         : "dpData/dpModel",
-        "s_setupGeometryIO" : "dpData/dpSetupGeometry",
-        "s_shaderIO"        : "dpData/dpShader",
-        "s_guideIO"         : "dpData/dpGuide",
-        "s_controlShapeIO"  : "dpData/dpControlShape",
-        "s_skinningIO"      : "dpData/dpSkinning",
-        "s_parentIO"        : "dpData/dpParent",
+        "s_hist"            : self.dpUIinst.dpData+"/dpHist",
+        "s_modelIO"         : self.dpUIinst.dpData+"/dpModel",
+        "s_setupGeometryIO" : self.dpUIinst.dpData+"/dpSetupGeometry",
+        "s_shaderIO"        : self.dpUIinst.dpData+"/dpShader",
+        "s_guideIO"         : self.dpUIinst.dpData+"/dpGuide",
+        "s_controlShapeIO"  : self.dpUIinst.dpData+"/dpControlShape",
+        "s_skinningIO"      : self.dpUIinst.dpData+"/dpSkinning",
+        "s_parentIO"        : self.dpUIinst.dpData+"/dpParent",
         "s_old"             : "dpOld",
         "s_dropbox"         : "Job",
         "s_webhook"         : "",
@@ -806,12 +807,107 @@ class Pipeliner(object):
             cmds.confirmDialog(title=self.dpUIinst.lang['i158_create']+" "+self.dpUIinst.lang['i304_new']+" "+self.dpUIinst.lang['i303_asset'], message=self.dpUIinst.lang['i307_fillFieldCorrectly'], button="Ok")
 
 
-    def replaceDPData(self, *args):
+    def replaceDPData(self, path=None, toReplaceList=None, *args):
+        """ Check given path and to replace list and call the method to replace or the UI to choose what to replace in the dpData folder.
         """
+        if self.checkAssetContext():
+            if not path:
+                pathList = cmds.fileDialog2(fileMode=3, caption=self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData, okCaption=self.dpUIinst.lang['i196_import'])
+                if pathList:
+                    path = pathList[0]
+            if path:
+                if os.path.exists(path):
+                    self.pathToReplaceFrom = path
+                    if self.dpUIinst.dpData in path:
+                        self.pathToReplaceFrom = path[:path.rfind(self.dpUIinst.dpData)-1]
+                    if not toReplaceList:
+                        self.getDPDataExistListToReplace(self.pathToReplaceFrom)
+                        if self.existList:
+                            self.dpDataToReplaceUI(self.existList)
+                    else:
+                        self.runReplaceDPData(path, toReplaceList)
+        else:
+            cmds.confirmDialog(title=self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData, message=self.dpUIinst.lang['r027_noAssetContext'], button="Ok")
+
+
+    def getDPDataExistListToReplace(self, path, *args):
+        """ Check if exists exported module data in the given path.
         """
+        defaultList = [
+            "modelIO",
+            "setupGeometryIO",
+            "shaderIO",
+            "guideIO",
+            "controlShapeIO",
+            "skinningIO",
+            "parentIO"
+            ]
+        self.existList = []
+        for item in defaultList:
+            if os.path.exists(path+"/"+self.pipeData["s_"+item]):
+                self.existList.append(item)
 
-        #
-        # WIP
-        #
 
-        print("replacing dpDATA start...")
+    def dpDataToReplaceUI(self, existList, *args):
+        """ UI to list exist items as a checkboxes to let the user choose what to replace in the dpData.
+        """
+        # declaring variables:
+        self.replaceDPData_title     = 'dpAutoRig - '+self.dpUIinst.lang['m219_replace']+" "+self.dpUIinst.dpData+" - "+self.dpUIinst.lang['i303_asset']
+        self.replaceDPData_winWidth  = 220
+        self.replaceDPData_winHeight = 350
+        self.replaceDPData_align     = "left"
+        # creating replace dpData Window:
+        self.utils.closeUI("dpReplaceDPDataWindow")
+        dpReplaceDPDataWindow = cmds.window('dpReplaceDPDataWindow', title=self.replaceDPData_title, iconName='dpInfo', widthHeight=(self.replaceDPData_winWidth, self.replaceDPData_winHeight), menuBar=False, sizeable=False, minimizeButton=False, maximizeButton=False)
+        # creating layout:
+        replaceDPDataColumnLayout = cmds.columnLayout('replaceDPDataColumnLayout', adjustableColumn=True, columnOffset=['both', 20], rowSpacing=5, parent=dpReplaceDPDataWindow)
+        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
+        cmds.text("rebuilderReplaceDataText", label=self.dpUIinst.lang['i308_toReplaceDPData']+" "+self.pipeData['assetName'], parent=replaceDPDataColumnLayout)
+        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
+        for item in existList:
+            cmds.checkBox(item+"CB", label=item, value=True)
+        cmds.separator(style='none', height=10, parent=replaceDPDataColumnLayout)
+        cmds.button('runReplaceDPDataBT', label=self.dpUIinst.lang['m219_replace'].upper(), align=self.replaceDPData_align, command=self.getDPDataToReplaceByUI, parent=replaceDPDataColumnLayout)
+        # call New Asset Window:
+        cmds.showWindow(dpReplaceDPDataWindow)
+        
+
+    def getDPDataToReplaceByUI(self, *args):
+        """ Read the dpReplaceDPDataWindow UI to get the active checkBoxes in order to return it in a list.
+        """
+        self.dpDataToReplaceList = []
+        for item in self.existList:
+            if cmds.checkBox(item+"CB", query=True, value=True):
+                self.dpDataToReplaceList.append(item)
+        if self.dpDataToReplaceList:
+            self.runReplaceDPData()
+            self.utils.closeUI("dpReplaceDPDataWindow")
+        
+
+    def runReplaceDPData(self, path=None, toReplaceList=None, *args):
+        """ Replace the dpData subFolder with the given arguments.
+        """
+        if not path:
+            path = self.pathToReplaceFrom
+        if not toReplaceList:
+            toReplaceList = self.dpDataToReplaceList
+        if path and toReplaceList:
+            for toReplace in toReplaceList:
+                sourcePath = path+"/"+self.pipeData['s_'+toReplace]
+                destPath = self.pipeData['assetPath']+"/"+self.pipeData['s_'+toReplace]
+                if os.path.exists(sourcePath):
+                    if os.path.exists(destPath):
+                        for destFile in next(os.walk(destPath))[2]:
+                            try:
+                                os.remove(destPath+"/"+destFile)
+                            except PermissionError as exc:
+                                # use a brute force to delete without permission:
+                                os.chmod(destPath+"/"+destFile, stat.S_IWUSR)
+                                os.remove(destPath+"/"+destFile)
+                    else:
+                        self.makeDirIfNotExists(destPath)
+                    sourceItem = next(os.walk(sourcePath))[2][-1]
+                    ext = sourceItem[sourceItem.rfind("."):]
+                    prefix = sourceItem[:sourceItem.find("_")+1]
+                    destItem = destPath+"/"+prefix+self.pipeData['assetName']+self.pipeData['s_model']+"0".zfill(self.pipeData['i_padding'])+self.pipeData['s_rig']+"0".zfill(self.pipeData['i_padding'])+ext
+                    shutil.copy2(sourcePath+"/"+sourceItem, destItem)

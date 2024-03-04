@@ -10,9 +10,9 @@ TITLE = "v060_controlsHierarchy"
 DESCRIPTION = "v061_controlsHierarchyDesc"
 ICON = "/Icons/dp_controlsHierarchy.png"
 
-HIERARCHY_PATH = "dpData/dpHierarchy"
+HIERARCHY_PATH = "dpHierarchy"
 
-DP_CONTROLSHIERARCHY_VERSION = 1.4
+DP_CONTROLSHIERARCHY_VERSION = 1.5
 
 
 class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
@@ -24,6 +24,7 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_CONTROLSHIERARCHY_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        self.hierarchyPath = self.dpUIinst.dpData+"/"+HIERARCHY_PATH
 
     def checkNurbs(self, transform):
         try:
@@ -118,7 +119,7 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
     def lookForLastHierarchy(self):
         lastHierarchyFilePath = None
         currentPath = cmds.file(query=True, sceneName=True)
-        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+HIERARCHY_PATH
+        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+self.hierarchyPath
         if os.path.exists(dpHierarchyPath):
             if self.dpTeamFile:
                 if os.path.exists(f"{dpHierarchyPath}/{self.currentFileName}.json"):
@@ -159,7 +160,7 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
 
     def exportCtlrsHierarchyToFile(self, dicToJson):
         currentPath = cmds.file(query=True, sceneName=True)
-        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+HIERARCHY_PATH
+        dpHierarchyPath = currentPath[:currentPath.rfind("/")+1]+self.hierarchyPath
         finalSaveFilePath = f"{dpHierarchyPath}/{self.currentFileName}_h001.json"
         if os.path.exists(dpHierarchyPath):
             lastFileVersion = self.findLastFileVersion(dpHierarchyPath)

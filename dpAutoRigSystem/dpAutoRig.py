@@ -737,7 +737,7 @@ class DP_AutoRig_UI(object):
         self.allUIs["rebuilderAssetFL"] = cmds.frameLayout('rebuilderAssetFL', label=self.lang['i303_asset'], collapsable=True, collapse=True, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderAsset2Layout"] = cmds.paneLayout("rebuilderAsset2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderAssetFL"])
         self.allUIs['newAssetBT'] = cmds.button("newAssetBT", label=self.lang['i304_new'], command=self.pipeliner.createNewAssetUI, parent=self.allUIs["rebuilderAsset2Layout"])
-        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" dpData", command=self.pipeliner.replaceDPData, parent=self.allUIs["rebuilderAsset2Layout"])
+        self.allUIs['replaceDPDataBT'] = cmds.button("replaceDPDataBT", label=self.lang['m219_replace']+" "+self.dpData, command=self.pipeliner.replaceDPData, parent=self.allUIs["rebuilderAsset2Layout"])
         cmds.separator(style="none", parent=self.allUIs["rebuilderLayout"])
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
