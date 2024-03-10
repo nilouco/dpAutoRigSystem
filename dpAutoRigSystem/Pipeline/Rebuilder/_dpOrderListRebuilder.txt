@@ -4,6 +4,7 @@ dpCheckinIO
 dpSetupGeometryIO
 dpShaderIO
 dpGuideIO
-dpControlShapeIO
+dpRigItIO
 dpSkinningIO
 dpParentIO
+dpControlShapeIO

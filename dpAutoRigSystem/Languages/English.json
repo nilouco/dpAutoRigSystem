@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-03-03",
+    "_updated"       : "2024-03-10",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -740,6 +740,8 @@
     "r025_newSceneIO"          : "New scene IO",
     "r026_newSceneIODesc"      : "This action will work with new scene file\nbased on the asset name context\nto start a clear maya scene to run the rebuilding.",
     "r027_noAssetContext"      : "Stoped! There's no configured asset context to rebuild it, sorry.",
+    "r028_rigItIO"             : "Rig it IO",
+    "r029_rigItIODesc"         : "This action will call the main method to\ncreate the rig setup for all existing guides.",
     
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

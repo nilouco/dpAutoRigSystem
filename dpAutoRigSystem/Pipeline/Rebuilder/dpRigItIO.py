@@ -2,24 +2,24 @@
 from .. import dpBaseActionClass
 
 # global variables to this module:
-CLASS_NAME = "CheckinIO"
-TITLE = "r021_checkinIO"
-DESCRIPTION = "r022_checkinIODesc"
-ICON = "/Icons/dp_checkinIO.png"
+CLASS_NAME = "RigItIO"
+TITLE = "r028_rigItIO"
+DESCRIPTION = "r029_rigItIODesc"
+ICON = "/Icons/dp_rigItIO.png"
 
-DP_CHECKINIO_VERSION = 1.0
+DP_RIGITIO_VERSION = 1.0
 
 
-class CheckinIO(dpBaseActionClass.ActionStartClass):
+class RigItIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_CHECKINIO_VERSION
+        self.version = DP_RIGITIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
-        self.startName = "dpCheckin"
+        self.startName = "dpRigIt"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']
         self.secondBTCustomLabel = self.dpUIinst.lang['i306_run']
@@ -46,10 +46,8 @@ class CheckinIO(dpBaseActionClass.ActionStartClass):
                 self.wellDoneIO(self.dpUIinst.lang['v007_allOk'])
             else: #import
                 try:
-                    # clean up geometries
-                    validatorToRunList = ["dpUnlockNormals", "dpSoftenEdges", "dpFreezeTransform", "dpGeometryHistory"]
-                    self.runActionsInSilence(validatorToRunList, self.dpUIinst.checkInInstanceList, False, objList) #fix
-                    self.wellDoneIO(", ".join(validatorToRunList))
+                    self.dpUIinst.rebuilding = True
+                    self.dpUIinst.rigAll()
                 except Exception as e:
                     self.notWorkedWellIO(str(e))
         else:

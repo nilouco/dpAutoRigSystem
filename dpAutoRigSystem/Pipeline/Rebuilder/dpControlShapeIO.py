@@ -1,5 +1,4 @@
 # importing libraries:
-from maya import cmds
 from .. import dpBaseActionClass
 
 # global variables to this module:
@@ -7,8 +6,6 @@ CLASS_NAME = "ControlShapeIO"
 TITLE = "r014_controlShapeIO"
 DESCRIPTION = "r015_controlShapeIODesc"
 ICON = "/Icons/dp_controlShapeIO.png"
-
-MODULES = "Modules"
 
 DP_CONTROLSHAPEIO_VERSION = 1.0
 
@@ -63,8 +60,6 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                         exportedList = self.getExportedList()
                         if exportedList:
                             try:
-                                self.dpUIinst.rebuilding = True
-                                self.dpUIinst.rigAll()
                                 exportedList.sort()
                                 ctrlsToImport = self.ioPath+"/"+exportedList[-1]
                                 self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport)
