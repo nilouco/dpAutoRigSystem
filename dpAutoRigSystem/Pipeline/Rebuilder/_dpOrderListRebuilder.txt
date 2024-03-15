@@ -2,6 +2,7 @@ dpNewSceneIO
 dpModelIO
 dpCheckinIO
 dpSetupGeometryIO
+dpTargetIO
 dpShaderIO
 dpGuideIO
 dpRigItIO
