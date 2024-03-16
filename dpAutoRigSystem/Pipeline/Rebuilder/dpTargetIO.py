@@ -44,97 +44,90 @@ class TargetIO(dpBaseActionClass.ActionStartClass):
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
                 if self.firstMode: #export
-                    shaderList = None
+                    bsList = None
                     if objList:
-                        shaderList = objList
+                        bsList = objList
                     else:
-                        shaderList = self.getShaderToExportList()
-                    if shaderList:
-                        shaderDic = {}
+                        bsList = cmds.ls(selection=False, type="blendShape")
+                    if bsList:
+                        targetDic = {}
                         progressAmount = 0
-                        maxProcess = len(shaderList)
-                        for shader in shaderList:
+                        maxProcess = len(bsList)
+                        for bsNode in bsList:
+                            targetDic[bsNode] = {}
                             if self.verbose:
                                 # Update progress window
                                 progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+shader))
-                            fileNode = None
-                            texture = None
-                            color = None
-                            specularColor = None
-                            cosinePower = None
-                            cmds.hyperShade(objects=shader)
-                            assignedList = cmds.ls(selection=True)
-                            if assignedList:
-                                colorAttr = "color"
-                                transparencyAttr = "transparency"
-                                if not cmds.objExists(shader+"."+colorAttr): #support standardShader
-                                    colorAttr = "baseColor"
-                                    transparencyAttr = "opacity"
-                                if cmds.objExists(shader+"."+colorAttr):
-                                    shaderConnectionList = cmds.listConnections(shader+"."+colorAttr, destination=False, source=True)
-                                    if shaderConnectionList:
-                                        fileNode = shaderConnectionList[0]
-                                        texture = cmds.getAttr(fileNode+".fileTextureName")
-                                    else:
-                                        color = cmds.getAttr(shader+"."+colorAttr)[0]
-                                transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
-                                if cmds.objExists(shader+".specularColor"):
-                                    specularColor = cmds.getAttr(shader+".specularColor")[0]
-                                if cmds.objExists(shader+".cosinePower"):
-                                    cosinePower = cmds.getAttr(shader+".cosinePower")
-                                # data dictionary to export
-                                shaderDic[shader] = {"assigned"         : assignedList,
-                                                        "color"            : color,
-                                                        "colorAttr"        : colorAttr,
-                                                        "fileNode"         : fileNode,
-                                                        "material"         : cmds.objectType(shader),
-                                                        "texture"          : texture,
-                                                        "transparency"     : transparency,
-                                                        "transparencyAttr" : transparencyAttr,
-                                                        "specularColor"    : specularColor,
-                                                        "cosinePower"      : cosinePower
-                                                        }
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+bsNode))
+                            targetList = cmds.listAttr(bsNode+".weight", multi=True)
+                            if targetList:
+                                for target in targetList:
+                                    combination = False
+                                    combinationList = []
+                                    plug = cmds.listConnections(bsNode+"."+target, destination=False, source=True, plugs=True)
+                                    if plug:
+                                        if ".outputWeight" in plug[0]:
+                                            combinationShapeNode = plug[0][:plug[0].find(".outputWeight")]
+                                            combination = True
+                                            inputWeightList = cmds.listAttr(combinationShapeNode+".inputWeight", multi=True)
+                                            if inputWeightList:
+                                                for inputWeight in inputWeightList:
+                                                    combinationList.append(cmds.listConnections(combinationShapeNode+".inputWeight", destination=False, source=True, plugs=True)[0])
+
+                                    # data dictionary to export
+                                    targetDic[bsNode][target] = {"exists" : cmds.objExists(target),
+                                                                "weight" : cmds.getAttr(bsNode+"."+target),
+                                                                "plug"   : plug,
+                                                                "combination" : combination,
+                                                                "combinationList" : combinationList
+                                                                }
+
+
+
+
                             cmds.select(clear=True)
                         try:
                             # export json file
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
                             jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            self.pipeliner.saveJsonFile(shaderDic, jsonName)
+                            self.pipeliner.saveJsonFile(targetDic, jsonName)
                             self.wellDoneIO(jsonName)
                         except Exception as e:
                             self.notWorkedWellIO(jsonName+": "+str(e))
                     else:
-                        self.notWorkedWellIO("Render_Grp")
+                        self.notWorkedWellIO("BlendShape_Grp")
+
+
+
                 else: #import
                     try:
                         exportedList = self.getExportedList()
                         if exportedList:
                             exportedList.sort()
-                            shaderDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if shaderDic:
+                            targetDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                            if targetDic:
                                 mayaVersion = cmds.about(version=True)
                                 notFoundMeshList = []
                                 # rebuild shaders
-                                for item in shaderDic.keys():
+                                for item in targetDic.keys():
                                     if not cmds.objExists(item):
-                                        shader = cmds.shadingNode(shaderDic[item]['material'], asShader=True, name=item)
-                                        if shaderDic[item]['fileNode']:
-                                            fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=shaderDic[item]['fileNode'])
-                                            cmds.connectAttr(fileNode+".outColor", shader+"."+shaderDic[item]['colorAttr'], force=True)
-                                            cmds.setAttr(fileNode+".fileTextureName", shaderDic[item]['texture'], type="string")
+                                        bsNode = cmds.shadingNode(targetDic[item]['material'], asShader=True, name=item)
+                                        if targetDic[item]['fileNode']:
+                                            fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=targetDic[item]['fileNode'])
+                                            cmds.connectAttr(fileNode+".outColor", bsNode+"."+targetDic[item]['colorAttr'], force=True)
+                                            cmds.setAttr(fileNode+".fileTextureName", targetDic[item]['texture'], type="string")
                                         else:
-                                            colorList = shaderDic[item]['color']
-                                            cmds.setAttr(shader+"."+shaderDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
-                                        transparencyList = shaderDic[item]['transparency']
-                                        cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
-                                        if shaderDic[item]['specularColor']:
-                                            specularColorList = shaderDic[item]['specularColor']
-                                            cmds.setAttr(shader+".specularColor", specularColorList[0], specularColorList[1], specularColorList[2], type="double3")
-                                        if shaderDic[item]['cosinePower']:
-                                            cmds.setAttr(shader+".cosinePower", shaderDic[item]['cosinePower'])
-                                    # apply shader to meshes
-                                    for mesh in shaderDic[item]['assigned']:
+                                            colorList = targetDic[item]['color']
+                                            cmds.setAttr(bsNode+"."+targetDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
+                                        transparencyList = targetDic[item]['transparency']
+                                        cmds.setAttr(bsNode+"."+targetDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
+                                        if targetDic[item]['specularColor']:
+                                            specularColorList = targetDic[item]['specularColor']
+                                            cmds.setAttr(bsNode+".specularColor", specularColorList[0], specularColorList[1], specularColorList[2], type="double3")
+                                        if targetDic[item]['cosinePower']:
+                                            cmds.setAttr(bsNode+".cosinePower", targetDic[item]['cosinePower'])
+                                    # apply bsNode to meshes
+                                    for mesh in targetDic[item]['assigned']:
                                         if cmds.objExists(mesh):
                                             if mayaVersion >= "2024":
                                                 cmds.hyperShade(assign=item, geometries=mesh)
@@ -167,22 +160,3 @@ class TargetIO(dpBaseActionClass.ActionStartClass):
         self.endProgressBar()
         self.refreshView()
         return self.dataLogDic
-
-
-    def getShaderToExportList(self, *args):
-        """ Returns a list of shaders to export as json dictionary.
-        """
-        materialList = ["anisotropic", "blinn", "hairTubeShader", "lambert", "phong", "phongE", "aiStandardSurface", "standardSurface"]
-        ignoreMaterialList = ["lambert1"]
-        shaderList = []
-        for material in materialList:
-            matList = cmds.ls(selection=False, type=material)
-            if matList:
-                shaderList.extend(matList)
-        if shaderList:
-            shaderList = list(set(shaderList))
-            shaderList.sort()
-            for ignoreMaterial in ignoreMaterialList:
-                if ignoreMaterial in shaderList:
-                    shaderList.remove(ignoreMaterial)
-        return shaderList
