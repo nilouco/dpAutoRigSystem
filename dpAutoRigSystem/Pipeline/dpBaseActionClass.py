@@ -231,12 +231,11 @@ class ActionStartClass(object):
             if os.path.exists(self.ioPath+"/"+subFolder):
                 exportedList = next(os.walk(self.ioPath+"/"+subFolder))[2]
         if exportedList:
-            #assetName = self.pipeliner.getAssetName()[1]
             assetName = self.pipeliner.pipeData["assetName"]
             for item in exportedList:
                 if assetName in item:
                     resultList.append(item)
-        return resultList
+        return resultList or exportedList
 
 
     def runActionsInSilence(self, actionToRunList, actionInstanceList, firstMode, objList, *args):

@@ -83,7 +83,7 @@ class Pipeliner(object):
             if content:
                 self.pipeData.update(content)
                 return content
-            
+
 
     def getPipelineInfo(self, *args):
         """ Load PipelineInfo data and returns it.
@@ -145,7 +145,7 @@ class Pipeliner(object):
         "s_hist"            : self.dpUIinst.dpData+"/dpHist",
         "s_modelIO"         : self.dpUIinst.dpData+"/dpModel",
         "s_setupGeometryIO" : self.dpUIinst.dpData+"/dpSetupGeometry",
-        "s_targetIO"        : self.dpUIinst.dpData+"/dpTarget",
+        "s_blendShapeIO"    : self.dpUIinst.dpData+"/dpBlendShape",
         "s_shaderIO"        : self.dpUIinst.dpData+"/dpShader",
         "s_guideIO"         : self.dpUIinst.dpData+"/dpGuide",
         "s_controlShapeIO"  : self.dpUIinst.dpData+"/dpControlShape",
@@ -206,7 +206,7 @@ class Pipeliner(object):
         "s_hist"            : "i236_sHistAnn",
         "s_modelIO"         : "i293_sModelIOAnn",
         "s_setupGeometryIO" : "i302_sSetupGeometryIOAnn",
-        "s_targetIO"        : "i309_targetIOAnn",
+        "s_blendShapeIO"    : "i309_blendShapeIOAnn",
         "s_shaderIO"        : "i294_sShaderIOAnn",
         "s_guideIO"         : "i295_sGuideIOAnn",
         "s_controlShapeIO"  : "i296_sControlShapeIOAnn",
