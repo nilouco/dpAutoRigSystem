@@ -745,6 +745,7 @@
     "r029_rigItIODesc"         : "Essa ação vai chamar o método principal\npara criar o setup de rig para todas as guias existentes.",
     "r030_blendShapeIO"        : "BlendShape IO",
     "r031_blendShapeIODesc"    : "Essa ação vai trabalhar as targets de blendShape\nexportando e importando seus dados.",
+    "r032_notImportedData"     : "Dados não importados.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

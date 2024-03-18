@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 from .. import dpBaseActionClass
 
 # global variables to this module:
@@ -110,7 +111,7 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                                                         "combList"       : combinationList,
                                                                         "unitConvFactor" : unitConversionFactor,
                                                                         "unitConvInput"  : unitConversionInputPlug,
-                                                                        "weightDic"     : weightDic
+                                                                        "weightDic"      : weightDic
                                                                         }
                                 try:
                                     self.pipeliner.makeDirIfNotExists(self.targetPath)
@@ -139,56 +140,75 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                 self.notWorkedWellIO(jsonName+": "+str(e))
                         else:
                             self.notWorkedWellIO("BlendShape_Grp")
-
-
-
                     else: #import
 
-                        # WIP
-                        #cmds.setAttr('blendShape.it[0].itg[0].tw[0:%d]' % (len(weights) - 1), *weights)
+                        
 
 
                         try:
                             exportedList = self.getExportedList()
+                            print("exportedList =", exportedList)
+
                             if exportedList:
                                 exportedList.sort()
                                 bsDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                                 if bsDic:
-                                    mayaVersion = cmds.about(version=True)
+
+                                    originalList = self.getExportedList(subFolder=self.originalName)
+                                    targetList = self.getExportedList(subFolder=self.targetName)
+                                    print("originalList =", originalList)
+                                    print("targetList =", targetList)
+
+
+                                    
                                     notFoundMeshList = []
-                                    # rebuild shaders
-                                    for item in bsDic.keys():
-                                        if not cmds.objExists(item):
-                                            bsNode = cmds.shadingNode(bsDic[item]['material'], asShader=True, name=item)
-                                            if bsDic[item]['fileNode']:
-                                                fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=bsDic[item]['fileNode'])
-                                                cmds.connectAttr(fileNode+".outColor", bsNode+"."+bsDic[item]['colorAttr'], force=True)
-                                                cmds.setAttr(fileNode+".fileTextureName", bsDic[item]['texture'], type="string")
-                                            else:
-                                                colorList = bsDic[item]['color']
-                                                cmds.setAttr(bsNode+"."+bsDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
-                                            transparencyList = bsDic[item]['transparency']
-                                            cmds.setAttr(bsNode+"."+bsDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
-                                            if bsDic[item]['specularColor']:
-                                                specularColorList = bsDic[item]['specularColor']
-                                                cmds.setAttr(bsNode+".specularColor", specularColorList[0], specularColorList[1], specularColorList[2], type="double3")
-                                            if bsDic[item]['cosinePower']:
-                                                cmds.setAttr(bsNode+".cosinePower", bsDic[item]['cosinePower'])
-                                        # apply bsNode to meshes
-                                        for mesh in bsDic[item]['assigned']:
-                                            if cmds.objExists(mesh):
-                                                if mayaVersion >= "2024":
-                                                    cmds.hyperShade(assign=item, geometries=mesh)
-                                                else:
-                                                    cmds.select(mesh)
-                                                    cmds.hyperShade(assign=item)
-                                            else:
-                                                notFoundMeshList.append(mesh)
-                                    cmds.select(clear=True)
-                                    if notFoundMeshList:
-                                        self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
-                                    else:
-                                        self.wellDoneIO(exportedList[-1])
+                                    # rebuild blendShapes
+                                    for bsNode in bsDic.keys():
+                                        print("bsNode =", bsNode)
+
+                                        # import alembic original mesh if it doesn't exists
+                                        originalShapeList = bsDic[bsNode]['geometry']
+                                        for originalShape in originalShapeList:
+                                            if not cmds.objExists(originalShape):
+                                                for originalName in originalList:
+                                                    if bsNode in originalName:
+                                                        try:
+                                                            abcToImport = self.originalPath+"/"+originalName
+                                                            mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                                                        except:
+                                                            self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+originalName)
+
+                                        if not cmds.objExists(bsNode):
+                                            # create an empty blendShape node
+                                            cmds.blendShape(originalShapeList, name=bsNode)
+                                            cmds.setAttr(bsNode+".envelope", bsDic[bsNode]['envelope'])
+                                            cmds.setAttr(bsNode+".supportNegativeWeights", bsDic[bsNode]['supportNegativeWeights'])
+                                            
+                                            # import targets
+                                            for targetName in targetList:
+                                                if bsNode in targetName:
+                                                    try:
+                                                        cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+targetName)
+                                                    except:
+                                                        self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+targetName)
+
+
+                                            # TODO
+                                                # set target weights
+                                                # regenerate
+                                                # reconnect existing meshes
+                                                # delete target if not exists (data = False)
+                                                # 
+
+                                    # WIP
+                                    #cmds.setAttr('blendShape.it[0].itg[0].tw[0:%d]' % (len(weights) - 1), *weights)
+
+
+#                                    cmds.select(clear=True)
+#                                    if notFoundMeshList:
+#                                        self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
+#                                    else:
+#                                        self.wellDoneIO(exportedList[-1])
                                 else:
                                     self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             else:
