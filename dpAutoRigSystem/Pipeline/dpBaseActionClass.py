@@ -43,6 +43,8 @@ class ActionStartClass(object):
         self.resultOkList = []
         self.messageList = []
         self.dataLogDic = {}
+        # start action type
+        self.setActionType(self.actionType)
 
 
     def setActionType(self, value, *args):

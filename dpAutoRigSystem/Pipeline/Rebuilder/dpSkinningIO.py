@@ -21,6 +21,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_SKINNINGIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        self.setActionType("r000_rebuilder")
         self.ioDir = "s_skinningIO"
         self.startName = "dpSkinning"
         self.importRefName = "dpSkinningIO_Import"

@@ -21,6 +21,7 @@ class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_SETUPGEOMETRYIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        self.setActionType("r000_rebuilder")
         self.ioDir = "s_setupGeometryIO"
         self.startName = "dpSetupGeometry"
     

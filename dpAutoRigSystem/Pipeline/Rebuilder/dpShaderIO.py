@@ -20,6 +20,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_SHADERIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        self.setActionType("r000_rebuilder")
         self.ioDir = "s_shaderIO"
         self.startName = "dpShader"
     
