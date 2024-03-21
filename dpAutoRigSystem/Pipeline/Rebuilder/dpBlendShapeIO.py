@@ -155,54 +155,46 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                 bsDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                                 if bsDic:
 
-                                    originalList = self.getExportedList(subFolder=self.originalName)
-                                    targetList = self.getExportedList(subFolder=self.targetName)
-                                    print("originalList =", originalList)
-                                    print("targetList =", targetList)
-
+                                    
 
                                     
                                     notFoundMeshList = []
                                     # rebuild blendShapes
                                     for bsNode in bsDic.keys():
-                                        print("bsNode =", bsNode)
-
                                         # import alembic original mesh if it doesn't exists
                                         originalShapeList = bsDic[bsNode]['geometry']
                                         for originalShape in originalShapeList:
                                             if not cmds.objExists(originalShape):
-                                                for originalName in originalList:
-                                                    if bsNode in originalName:
-                                                        try:
-                                                            abcToImport = self.originalPath+"/"+originalName
-                                                            mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                                                        except:
-                                                            self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+originalName)
-
+                                                try:
+                                                    abcToImport = self.originalPath+"/"+self.originalName+"_"+bsNode+".abc"
+                                                    mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                                                except:
+                                                    self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+self.originalName+"_"+bsNode+".abc")
                                         if not cmds.objExists(bsNode):
                                             # create an empty blendShape node
                                             cmds.blendShape(originalShapeList, name=bsNode)
                                             cmds.setAttr(bsNode+".envelope", bsDic[bsNode]['envelope'])
                                             cmds.setAttr(bsNode+".supportNegativeWeights", bsDic[bsNode]['supportNegativeWeights'])
-                                            
                                             # import targets
-                                            for targetName in targetList:
-                                                if bsNode in targetName:
-                                                    try:
-                                                        cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+targetName)
-                                                    except:
-                                                        self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+targetName)
+                                            try:
+                                                cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+self.targetName+"_"+bsNode+".bs")
+                                            except:
+                                                self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+self.targetName+"_"+bsNode+".bs")
+                                        # set target weights
+                                        for s, shapeNode in enumerate(bsDic[bsNode]['geometry']):
+                                            for t, target in enumerate(cmds.listAttr(bsNode+".weight", multi=True)):
+                                                for idx in list(bsDic[bsNode]["targets"][str(t)]["weightDic"].keys()):
+                                                    cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bsNode, s, t, idx), bsDic[bsNode]["targets"][str(t)]["weightDic"][idx])
 
 
                                             # TODO
-                                                # set target weights
                                                 # regenerate
                                                 # reconnect existing meshes
                                                 # delete target if not exists (data = False)
-                                                # 
+                                                # fix double original mesh / import double targets by group issue
+                                                # remove script editor messages from import targets
 
-                                    # WIP
-                                    #cmds.setAttr('blendShape.it[0].itg[0].tw[0:%d]' % (len(weights) - 1), *weights)
+                                        
 
 
 #                                    cmds.select(clear=True)
