@@ -104,7 +104,7 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                                         weightDic[w] = weight
                                         # data dictionary to export
                                         bsDic[bsNode]["targets"][t] = { "name"           : target,
-                                                                        "exists"         : cmds.objExists(target),
+                                                                        "regenerate"     : cmds.objExists(target),
                                                                         "value"          : cmds.getAttr(bsNode+"."+target),
                                                                         "plug"           : plug,
                                                                         "comb"           : combination,
@@ -180,19 +180,53 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                                 cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+self.targetName+"_"+bsNode+".bs")
                                             except:
                                                 self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+self.targetName+"_"+bsNode+".bs")
-                                        # set target weights
-                                        for s, shapeNode in enumerate(bsDic[bsNode]['geometry']):
-                                            for t, target in enumerate(cmds.listAttr(bsNode+".weight", multi=True)):
+                                        targetList = cmds.listAttr(bsNode+".weight", multi=True)
+                                        
+                                        # WIP
+                                        print("targetList =", targetList)
+                                        #targetList = targetList[0:-1]
+                                        
+                                        for t, target in enumerate(targetList):
+                                            print("t =", t)
+                                            print("target t =", target)
+
+                                            # set target value
+                                            cmds.setAttr(bsNode+"."+target, bsDic[bsNode]["targets"][str(t)]["value"])
+
+                                            # set target weights
+                                            for s, shapeNode in enumerate(bsDic[bsNode]['geometry']):
+                                                print("s = ", s)
+                                                print("list =", list(bsDic[bsNode]["targets"][str(t)]["weightDic"].keys()))
                                                 for idx in list(bsDic[bsNode]["targets"][str(t)]["weightDic"].keys()):
+                                                    print("idx =", idx)
                                                     cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bsNode, s, t, idx), bsDic[bsNode]["targets"][str(t)]["weightDic"][idx])
+                                                    print("set ok idx =", idx)
+                                            
+                                            
+                                            # regenerate target
+                                            print("target regenerate =", target)
+                                            if bsDic[bsNode]["targets"][str(t)]["regenerate"]:
+                                                print("yes to reg")
+                                                tgtAlreadyExists = cmds.objExists(target)
+                                                if tgtAlreadyExists:
+                                                    print("yes, already existss =", target)
+                                                    cmds.group(target, name=target+"_Grp")
+                                                tgt = cmds.sculptTarget(bsNode, edit=True, regenerate=True, target=t)[0]
+                                                print("reged tgt =", tgt)
+                                                cmds.rename(cmds.listRelatives(tgt, children=True, type="mesh")[0], bsDic[bsNode]["targets"][str(t)]["name"]+"Shape")
+                                                print("tgt end =", tgt)
+                                                
 
 
+                                            
                                             # TODO
+                                                # fix deleted weights (t) = remove lacuna indexes
                                                 # regenerate
                                                 # reconnect existing meshes
                                                 # delete target if not exists (data = False)
                                                 # fix double original mesh / import double targets by group issue
                                                 # remove script editor messages from import targets
+                                                # fix label buttons (Run)
 
                                         
 
