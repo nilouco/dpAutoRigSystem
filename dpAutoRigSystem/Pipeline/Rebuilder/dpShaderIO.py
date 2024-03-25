@@ -85,17 +85,17 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                 if cmds.objExists(shader+".cosinePower"):
                                     cosinePower = cmds.getAttr(shader+".cosinePower")
                                 # data dictionary to export
-                                shaderDic[shader] = {"assigned"         : assignedList,
-                                                        "color"            : color,
-                                                        "colorAttr"        : colorAttr,
-                                                        "fileNode"         : fileNode,
-                                                        "material"         : cmds.objectType(shader),
-                                                        "texture"          : texture,
-                                                        "transparency"     : transparency,
-                                                        "transparencyAttr" : transparencyAttr,
-                                                        "specularColor"    : specularColor,
-                                                        "cosinePower"      : cosinePower
-                                                        }
+                                shaderDic[shader] = {"assigned"        : assignedList,
+                                                    "color"            : color,
+                                                    "colorAttr"        : colorAttr,
+                                                    "fileNode"         : fileNode,
+                                                    "material"         : cmds.objectType(shader),
+                                                    "texture"          : texture,
+                                                    "transparency"     : transparency,
+                                                    "transparencyAttr" : transparencyAttr,
+                                                    "specularColor"    : specularColor,
+                                                    "cosinePower"      : cosinePower
+                                                    }
                             cmds.select(clear=True)
                         try:
                             # export json file

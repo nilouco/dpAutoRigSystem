@@ -1,5 +1,6 @@
 # importing libraries:
 from maya import cmds
+from maya import mel
 import os
 import getpass
 
@@ -259,6 +260,7 @@ class ActionStartClass(object):
         """
         cmds.refresh()
         cmds.viewFit(allObjects=True, animate=True)
+        mel.eval("flushUndo;")
 
 
     def changeNodeState(self, itemList, findDeformers=True, state=None, dic=None, *args):

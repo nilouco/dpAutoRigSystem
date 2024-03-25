@@ -87,6 +87,7 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                                     # define lists to check result
                                     wellImportedList = []
                                     parentIssueList = []
+                                    notFoundNodesList = []
                                     # check parenting shaders
                                     for item in parentDic["Parent"]:
                                         progressAmount += 1
@@ -115,18 +116,16 @@ class ParentIO(dpBaseActionClass.ActionStartClass):
                                                             wellImportedList.append(shortItem)
                                                         else:
                                                             self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortFatherNode)
-                                                    else: #root here
-                                                        cmds.parent(shortItem, world=True)
-                                                        wellImportedList.append(shortItem)
+                                                    #else: #root here
                                                 else:
                                                     self.notWorkedWellIO(self.dpUIinst.lang['i075_moreOne']+" "+self.dpUIinst.lang['i076_sameName']+" "+shortItem)
                                             else:
-                                                self.notWorkedWellIO(self.dpUIinst.lang['e004_objNotExist'], shortItem)
+                                                notFoundNodesList.append(shortItem)
                                     if parentIssueList:
                                         if wellImportedList:
                                             self.wellDoneIO(exportedList[-1]+": "+', '.join(parentIssueList))
                                         else:
-                                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(parentIssueList))
+                                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
                                     else:
                                         self.wellDoneIO(exportedList[-1])
                                 else:

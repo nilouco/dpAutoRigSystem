@@ -20,11 +20,12 @@ class NewSceneIO(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_NEWSCENEIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
-        self.setActionType("r000_rebuilder")
         self.startName = "dpNewScene"
         self.firstBTEnable = False
         self.firstBTCustomLabel = self.dpUIinst.lang['i305_none']
         self.secondBTCustomLabel = self.dpUIinst.lang['i306_run']
+        self.setActionType("r000_rebuilder")
+
     
 
     def runAction(self, firstMode=True, objList=None, *args):
