@@ -80,6 +80,7 @@ class RibbonClass(object):
         elbowctrl = elbowctrlList[0]
         self.elbowctrlCtrl = elbowctrlList[1]
         self.elbowctrlZero = elbowctrlList[2]
+        self.elbowctrlZero1 = elbowctrlList[3]
         
         cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
         cmds.addAttr(upctrlCtrl, longName="baseTwist", attributeType='float', keyable=True)
@@ -299,7 +300,7 @@ class RibbonClass(object):
     
     def createElbowCtrl(self, myName='Limb_Ctrl', zero=True, armStyle=True, *args):
         """ Create the Ribbon Corner (Elbow) control.
-            Returns the group, the control curve and it's zeroOut group.
+            Returns the group, the control curve and it's zeroOut groups.
         """
         if armStyle:
             curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0))
@@ -307,16 +308,18 @@ class RibbonClass(object):
             curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0))
         grp = None
         if zero:
-            zero = cmds.group(curve, n=myName+'_Zero_0_Grp')
-            grp = cmds.group(zero, n=myName+'_Grp')
+            zero = cmds.group(curve, name=myName+'_Zero_0_Grp')
+            zero1 = cmds.group(zero, name=myName+'_Zero_1_Grp')
+            grp = cmds.group(zero1, name=myName+'_Grp')
             if armStyle:
-                cmds.rotate(0, -90, -90, zero)
+                cmds.rotate(0, -90, -90, zero1)
             else:
-                cmds.rotate(-90, 0, -90, zero)
+                cmds.rotate(-90, 0, -90, zero1)
         cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+        cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         self.dpUIinst.ctrls.setLockHide([curve], ['v'])
-        return [grp, curve, zero]
+        return [grp, curve, zero1, zero]
     
     
     def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, *args):
