@@ -7,7 +7,7 @@ TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 ICON = "/Icons/dp_limbSpaceSwitch.png"
 
-DP_LIMBSPACESWITCH_VERSION = 2.1
+DP_LIMBSPACESWITCH_VERSION = 2.2
 
 
 class LimbSpaceSwitch(object):
@@ -29,9 +29,15 @@ class LimbSpaceSwitch(object):
         self.spineChestACtrl = self.spineName+"_"+self.chestName+"A_Ctrl"
         self.spineChestBCtrl = self.spineName+"_"+self.chestName+"B_Ctrl"
         self.headSubCtrl = self.headName+"_"+self.headName+"_Sub_Ctrl"
-
         self.followAttr = self.dpUIinst.lang['c032_follow']
         
+        # find ctrls visibility grp to use instead root ctrl
+        childrenList = cmds.listRelatives(self.rootCtrl, children=True)
+        if childrenList:
+            for child in childrenList:
+                if child.find("_Visibility_Grp") != -1:
+                    self.rootCtrl = child
+
         # call main function
         self.dpMain(self)
     
