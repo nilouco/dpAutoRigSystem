@@ -15,31 +15,29 @@ class LimbSpaceSwitch(object):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         
-        self.globalName = "Global"
-        self.rootName = "Root"
-        self.spineName = self.dpUIinst.lang['m011_spine']
-        self.hipsName = self.dpUIinst.lang['c027_hips']
-        self.headName = self.dpUIinst.lang['c024_head']
-        self.chestName = self.dpUIinst.lang['c028_chest']
-        
-        self.globalCtrl = self.globalName+"_Ctrl"
-        self.rootCtrl = self.rootName+"_Ctrl"
-        self.spineHipsACtrl = self.spineName+"_"+self.hipsName+"A_Ctrl"
-        self.spineHipsBCtrl = self.spineName+"_"+self.hipsName+"B_Ctrl"
-        self.spineChestACtrl = self.spineName+"_"+self.chestName+"A_Ctrl"
-        self.spineChestBCtrl = self.spineName+"_"+self.chestName+"B_Ctrl"
-        self.headSubCtrl = self.headName+"_"+self.headName+"_Sub_Ctrl"
-        self.followAttr = self.dpUIinst.lang['c032_follow']
-        
-        # find ctrls visibility grp to use instead root ctrl
-        childrenList = cmds.listRelatives(self.rootCtrl, children=True)
-        if childrenList:
-            for child in childrenList:
-                if child.find("_Visibility_Grp") != -1:
-                    self.rootCtrl = child
+        # find nodes
+        for item in cmds.ls(selection=False, type="transform"):
+            if cmds.objExists(item+".masterGrp"): #All_Grp
+                self.rootCtrl = cmds.listConnections(item+".ctrlsVisibilityGrp", source=True, destination=False)[0] #Ctrls_Visibility_Grp
+                self.globalCtrl = cmds.listConnections(item+".globalCtrl", source=True, destination=False)[0]
 
-        # call main function
-        self.dpMain(self)
+                self.globalName = "Global"
+                self.rootName = "Root"
+
+                self.spineName = self.dpUIinst.lang['m011_spine']
+                self.hipsName = self.dpUIinst.lang['c027_hips']
+                self.headName = self.dpUIinst.lang['c024_head']
+                self.chestName = self.dpUIinst.lang['c028_chest']
+                
+                self.spineHipsACtrl = self.spineName+"_"+self.hipsName+"A_Ctrl"
+                self.spineHipsBCtrl = self.spineName+"_"+self.hipsName+"B_Ctrl"
+                self.spineChestACtrl = self.spineName+"_"+self.chestName+"A_Ctrl"
+                self.spineChestBCtrl = self.spineName+"_"+self.chestName+"B_Ctrl"
+                self.headSubCtrl = self.headName+"_"+self.headName+"_Sub_Ctrl"
+                self.followAttr = self.dpUIinst.lang['c032_follow']
+
+                # call main function
+                self.dpMain(self)
     
     
     def dpMain(self, *args):

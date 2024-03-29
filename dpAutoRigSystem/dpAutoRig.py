@@ -2178,15 +2178,12 @@ class DP_AutoRig_UI(object):
         # set lock and hide attributes
         self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
         self.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
-        self.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        self.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
 
         # root pivot control setup
-        cmds.connectAttr(self.rootPivotCtrl+".translateX", self.rootCtrl+".rotatePivotX")
-        cmds.connectAttr(self.rootPivotCtrl+".translateY", self.rootCtrl+".rotatePivotY")
-        cmds.connectAttr(self.rootPivotCtrl+".translateZ", self.rootCtrl+".rotatePivotZ")
-        cmds.connectAttr(self.rootPivotCtrl+".translateX", self.rootCtrl+".scalePivotX")
-        cmds.connectAttr(self.rootPivotCtrl+".translateY", self.rootCtrl+".scalePivotY")
-        cmds.connectAttr(self.rootPivotCtrl+".translateZ", self.rootCtrl+".scalePivotZ")
+        for axis in ["X", "Y", "Z"]:
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis)
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis)
 
         cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
         cmds.select(None)
