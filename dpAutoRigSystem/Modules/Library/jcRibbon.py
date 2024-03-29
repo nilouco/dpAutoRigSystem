@@ -18,7 +18,7 @@ from maya import cmds
 from . import dpUtils
 from . import dpControls
 
-DP_RIBBONCLASS_VERSION = 2.4
+DP_RIBBONCLASS_VERSION = 2.5
 
 
 class RibbonClass(object):
@@ -88,27 +88,6 @@ class RibbonClass(object):
         cmds.addAttr(upctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
         cmds.addAttr(downctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
         cmds.addAttr(downctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
-        
-        # corner autoRotate setup
-        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
-        if loadedQuatNode and loadedMatrixPlugin:
-            self.cornerAutoRotateMD = cmds.createNode("multiplyDivide", name=prefix+myName+"_"+cornerName+"_AutoRotate_MD")
-            cornerAutoRotateMM = cmds.createNode("multMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_MM")
-            cornerAutoRotateDM = cmds.createNode("decomposeMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_DM")
-            cornerAutoRotateQtE = cmds.createNode("quatToEuler", name=prefix+myName+"_"+cornerName+"_AutoRotate_QtE")
-            cmds.connectAttr(self.elbowctrlCtrl+".autoRotate", self.cornerAutoRotateMD+".input1Z", force=True)
-            cmds.connectAttr(self.cornerAutoRotateMD+".outputZ", self.elbowctrlZero0+".rotateX", force=True)
-            extremDup = cmds.duplicate(lista[2], name=lista[2].replace("Jnt", "Orig_Jxt"))[0]
-            cmds.delete(cmds.listRelatives(extremDup, children=True, fullPath=True))
-            cmds.connectAttr(extremDup+".worldInverseMatrix[0]", cornerAutoRotateMM+".matrixIn[0]", force=True)
-            cmds.connectAttr(lista[2]+".worldMatrix[0]", cornerAutoRotateMM+".matrixIn[1]", force=True)
-            cmds.connectAttr(cornerAutoRotateMM+".matrixSum", cornerAutoRotateDM+".inputMatrix", force=True)
-            cmds.connectAttr(cornerAutoRotateDM+".outputQuatX", cornerAutoRotateQtE+".inputQuatX", force=True)
-            cmds.connectAttr(cornerAutoRotateDM+".outputQuatY", cornerAutoRotateQtE+".inputQuatY", force=True)
-            cmds.connectAttr(cornerAutoRotateDM+".outputQuatZ", cornerAutoRotateQtE+".inputQuatZ", force=True)
-            cmds.connectAttr(cornerAutoRotateDM+".outputQuatW", cornerAutoRotateQtE+".inputQuatW", force=True)
-            cmds.connectAttr(cornerAutoRotateQtE+".outputRotateX", self.cornerAutoRotateMD+".input2Z", force=True)
 
         if addArtic:
             # corner joint
@@ -255,6 +234,37 @@ class RibbonClass(object):
                 cmds.setAttr(pac+".interpType", 2) #shortest
                 cmds.setAttr(pac+"."+iniJxt+"W1", 0.3)
 
+        # corner autoRotate setup
+        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+        if loadedQuatNode and loadedMatrixPlugin:
+            cornerAutoRotateMD = cmds.createNode("multiplyDivide", name=prefix+myName+"_"+cornerName+"_AutoRotate_MD")
+            cornerAutoRotateMM = cmds.createNode("multMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_MM")
+            cornerAutoRotateDM = cmds.createNode("decomposeMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_DM")
+            cornerAutoRotateQtE = cmds.createNode("quatToEuler", name=prefix+myName+"_"+cornerName+"_AutoRotate_QtE")
+            cornerAutoRotateRev = cmds.createNode("reverse", name=prefix+myName+"_"+cornerName+"_AutoRotate_Rev")
+            cornerAutoRotateInvPinMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Pin_Inv_MD"))
+            cornerAutoRotateInvMidMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Mid_Inv_MD"))
+            extremDup = cmds.duplicate(lista[2], name=lista[2].replace("Jnt", "Orig_Jxt"))[0]
+            cmds.delete(cmds.listRelatives(extremDup, children=True, fullPath=True))
+            cmds.connectAttr(self.elbowctrlCtrl+".autoRotate", cornerAutoRotateMD+".input1Z", force=True)
+            cmds.connectAttr(self.elbowctrlCtrl+".autoRotate", cornerAutoRotateRev+".inputZ", force=True)
+            cmds.connectAttr(extremDup+".worldInverseMatrix[0]", cornerAutoRotateMM+".matrixIn[0]", force=True)
+            cmds.connectAttr(lista[2]+".worldMatrix[0]", cornerAutoRotateMM+".matrixIn[1]", force=True)
+            cmds.connectAttr(cornerAutoRotateMM+".matrixSum", cornerAutoRotateDM+".inputMatrix", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatX", cornerAutoRotateQtE+".inputQuatX", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatY", cornerAutoRotateQtE+".inputQuatY", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatZ", cornerAutoRotateQtE+".inputQuatZ", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatW", cornerAutoRotateQtE+".inputQuatW", force=True)
+            cmds.connectAttr(cornerAutoRotateMD+".outputZ", cornerAutoRotateInvPinMD+".input1Z", force=True)
+            cmds.connectAttr(cornerAutoRotateRev+".outputZ", cornerAutoRotateInvMidMD+".input1Z", force=True)
+            if arm:
+                cmds.connectAttr(cornerAutoRotateQtE+".outputRotateX", cornerAutoRotateMD+".input2Z", force=True)
+                cmds.connectAttr(cornerAutoRotateInvPinMD+".outputZ", self.elbowctrlZero0+".rotateX", force=True)
+            else: #leg
+                cmds.connectAttr(cornerAutoRotateQtE+".outputRotateY", cornerAutoRotateMD+".input2Z", force=True)
+                cmds.connectAttr(cornerAutoRotateInvPinMD+".outputZ", self.elbowctrlZero0+".rotateY", force=True)
+
         # implementing pin setup to ribbon corner offset control:
         if elbowctrlList[2]:
             worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero1, mo=True, name=self.elbowctrlZero1+"_PaC")[0]
@@ -262,6 +272,7 @@ class RibbonClass(object):
             cmds.connectAttr(self.elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
             cmds.connectAttr(self.elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
             cmds.connectAttr(pinRev+".outputX", worldRefPC+"."+elbowctrl+"W1", force=True)
+            cmds.connectAttr(pinRev+".outputX", cornerAutoRotateInvPinMD+".input2Z", force=True)
         
         # autoRotate by twistBone control setup:
         if upLimb['upTwistBoneMD']:
@@ -274,8 +285,8 @@ class RibbonClass(object):
             cmds.connectAttr(downctrlCtrl+".invert", downLimb['twistBoneCnd']+".firstTerm", force=True)
         if downLimb['bottomTwistBoneMD']:
             cmds.connectAttr(downctrlCtrl+".autoRotate", downLimb['bottomTwistBoneMD']+".input1Z", force=True)
-        
-        
+            cmds.connectAttr(cornerAutoRotateInvMidMD+".outputZ", downLimb['twistAutoRotMD']+".input2X", force=True)
+
         # WIP: not used this mirror by dpAR system because each module guide will create each own mirror
         if mirror:
             jnt = None
@@ -315,8 +326,7 @@ class RibbonClass(object):
                 'jntGrp'        : jntGrp,
                 'rotFirst'      : upLimb['locsList'][4],
                 'rotExtrem'     : downLimb['locsList'][3],
-                'bottomPosPaC'  : [upLimb['locsList'][2], upLimb['constraints'][0]],
-                'cornerARMD'    : self.cornerAutoRotateMD
+                'bottomPosPaC'  : [upLimb['locsList'][2], upLimb['constraints'][0]]
                 }
     
     
@@ -848,16 +858,19 @@ class RibbonClass(object):
             twistBonePMA = cmds.createNode("plusMinusAverage", name=name+"_TwistBone_PMA")
             twistBoneInvMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_Inv_MD")
             twistBoneCnd = cmds.createNode("condition", name=name+"_TwistBone_Cnd")
+            twistAutoRotMD = cmds.createNode("multiplyDivide", name=name+"_TwistBone_AutoRotate_MD")
             cmds.setAttr(twistBoneCnd+".colorIfTrueR", -1)
             cmds.setAttr(twistBoneCnd+".secondTerm", 1)
             cmds.connectAttr(twistBonePMA+".output1D", twistBoneInvMD+".input1X", force=True)
             cmds.connectAttr(twistBoneCnd+".outColor.outColorR", twistBoneInvMD+".input2X", force=True)
             cmds.connectAttr(upTwistBoneMD+".outputZ", twistBonePMA+".input1D[0]", force=True)
             cmds.connectAttr(bottomTwistBoneMD+".outputZ", twistBonePMA+".input1D[1]", force=True)
-            cmds.connectAttr(twistBoneInvMD+".outputX", mid_Loc[2]+".rotateX", force=True)
+            cmds.connectAttr(twistBoneInvMD+".outputX", twistAutoRotMD+".input1X", force=True)
+            cmds.connectAttr(twistAutoRotMD+".outputX", mid_Loc[2]+".rotateX", force=True)
             retDict['upTwistBoneMD'] = upTwistBoneMD
             retDict['bottomTwistBoneMD'] = bottomTwistBoneMD
             retDict['twistBoneCnd'] = twistBoneCnd
+            retDict['twistAutoRotMD'] = twistAutoRotMD
             
         #updating values
         cmds.setAttr(rbScaleMD+".input2X", cmds.getAttr(curveInfoNode+".arcLength"))
