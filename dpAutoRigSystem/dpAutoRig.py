@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.07"
+DPAR_VERSION_PY3 = "4.04.08"
 DPAR_UPDATELOG = "N809 - Limb corner autoRotate."
 
 

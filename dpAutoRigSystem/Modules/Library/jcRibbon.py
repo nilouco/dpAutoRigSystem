@@ -360,7 +360,10 @@ class RibbonClass(object):
             else:
                 cmds.rotate(-90, 0, -90, zero1)
         cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
-        cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
+        if armStyle:
+            cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0.2, keyable=True)
+        else:
+            cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         self.dpUIinst.ctrls.setLockHide([curve], ['v'])
         return [grp, curve, zero0, zero1]
