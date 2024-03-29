@@ -21,7 +21,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 3.0
+DP_LIMB_VERSION = 3.1
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -1557,6 +1557,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         if s == 0: #left
                             cmds.setAttr(upCtrl+".invert", 1)
                             cmds.setAttr(downCtrl+".invert", 1)
+
+                        # corner autoRotate setup
+                        cornerAutoRotateMD = self.bendGrps["cornerARMD"]
+                        
 
                 # auto clavicle:
                 # loading Maya matrix node

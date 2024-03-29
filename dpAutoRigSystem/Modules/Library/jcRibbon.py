@@ -79,7 +79,7 @@ class RibbonClass(object):
         elbowctrlList = self.createElbowCtrl(prefix+myName+'_'+cornerName+'_Offset_Ctrl', armStyle=arm)
         elbowctrl = elbowctrlList[0]
         self.elbowctrlCtrl = elbowctrlList[1]
-        self.elbowctrlZero = elbowctrlList[2]
+        self.elbowctrlZero0 = elbowctrlList[2]
         self.elbowctrlZero1 = elbowctrlList[3]
         
         cmds.addAttr(upctrlCtrl, longName="autoTwistBone", attributeType='float', min=0, defaultValue=0.75, max=1, keyable=True)
@@ -89,6 +89,27 @@ class RibbonClass(object):
         cmds.addAttr(downctrlCtrl, longName="autoRotate", attributeType='float', min=0, defaultValue=0.5, max=1, keyable=True)
         cmds.addAttr(downctrlCtrl, longName="invert", attributeType='bool', defaultValue=0, keyable=False)
         
+        # corner autoRotate setup
+        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+        if loadedQuatNode and loadedMatrixPlugin:
+            self.cornerAutoRotateMD = cmds.createNode("multiplyDivide", name=prefix+myName+"_"+cornerName+"_AutoRotate_MD")
+            cornerAutoRotateMM = cmds.createNode("multMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_MM")
+            cornerAutoRotateDM = cmds.createNode("decomposeMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_DM")
+            cornerAutoRotateQtE = cmds.createNode("quatToEuler", name=prefix+myName+"_"+cornerName+"_AutoRotate_QtE")
+            cmds.connectAttr(self.elbowctrlCtrl+".autoRotate", self.cornerAutoRotateMD+".input1Z", force=True)
+            cmds.connectAttr(self.cornerAutoRotateMD+".outputZ", self.elbowctrlZero0+".rotateX", force=True)
+            extremDup = cmds.duplicate(lista[2], name=lista[2].replace("Jnt", "Orig_Jxt"))[0]
+            cmds.delete(cmds.listRelatives(extremDup, children=True, fullPath=True))
+            cmds.connectAttr(extremDup+".worldInverseMatrix[0]", cornerAutoRotateMM+".matrixIn[0]", force=True)
+            cmds.connectAttr(lista[2]+".worldMatrix[0]", cornerAutoRotateMM+".matrixIn[1]", force=True)
+            cmds.connectAttr(cornerAutoRotateMM+".matrixSum", cornerAutoRotateDM+".inputMatrix", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatX", cornerAutoRotateQtE+".inputQuatX", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatY", cornerAutoRotateQtE+".inputQuatY", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatZ", cornerAutoRotateQtE+".inputQuatZ", force=True)
+            cmds.connectAttr(cornerAutoRotateDM+".outputQuatW", cornerAutoRotateQtE+".inputQuatW", force=True)
+            cmds.connectAttr(cornerAutoRotateQtE+".outputRotateX", self.cornerAutoRotateMD+".input2Z", force=True)
+
         if addArtic:
             # corner joint
             cmds.select(clear=True)
@@ -236,7 +257,7 @@ class RibbonClass(object):
 
         # implementing pin setup to ribbon corner offset control:
         if elbowctrlList[2]:
-            worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero, mo=True, name=self.elbowctrlZero+"_PaC")[0]
+            worldRefPC = cmds.parentConstraint(worldRef, elbowctrl, self.elbowctrlZero1, mo=True, name=self.elbowctrlZero1+"_PaC")[0]
             pinRev = cmds.createNode('reverse', name=self.elbowctrlCtrl+"_Pin_Rev")
             cmds.connectAttr(self.elbowctrlCtrl+".pin", worldRefPC+"."+worldRef+"W0", force=True)
             cmds.connectAttr(self.elbowctrlCtrl+".pin", pinRev+".inputX", force=True)
@@ -283,7 +304,20 @@ class RibbonClass(object):
         extraCtrlList = upLimb['extraCtrlList']
         extraCtrlList.extend(downLimb['extraCtrlList'])
         
-        return {'scaleGrp':scaleGrp, 'staticGrp':staticGrp, 'ctrlsGrp':ctrlsGrp, 'bendGrpList':[upctrl, downctrl], 'ctrlList':[upctrlCtrl, downctrlCtrl, self.elbowctrlCtrl], 'extraBendGrp':[upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']], 'extraCtrlList':extraCtrlList, 'twistBoneMD':upLimb['twistBoneMD'], 'jntGrp':jntGrp, 'rotFirst':upLimb['locsList'][4], 'rotExtrem':downLimb['locsList'][3], 'bottomPosPaC':[upLimb['locsList'][2], upLimb['constraints'][0]]}
+        return {'scaleGrp'      : scaleGrp,
+                'staticGrp'     : staticGrp,
+                'ctrlsGrp'      : ctrlsGrp,
+                'bendGrpList'   : [upctrl, downctrl],
+                'ctrlList'      : [upctrlCtrl, downctrlCtrl, self.elbowctrlCtrl],
+                'extraBendGrp'  : [upLimb['extraCtrlGrp'], downLimb['extraCtrlGrp']],
+                'extraCtrlList' : extraCtrlList,
+                'twistBoneMD'   : upLimb['twistBoneMD'],
+                'jntGrp'        : jntGrp,
+                'rotFirst'      : upLimb['locsList'][4],
+                'rotExtrem'     : downLimb['locsList'][3],
+                'bottomPosPaC'  : [upLimb['locsList'][2], upLimb['constraints'][0]],
+                'cornerARMD'    : self.cornerAutoRotateMD
+                }
     
     
     def createBendCtrl(self, myName='Bend_Ctrl', r=1, zero=True, *args):
@@ -308,8 +342,8 @@ class RibbonClass(object):
             curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(90, 0, 0))
         grp = None
         if zero:
-            zero = cmds.group(curve, name=myName+'_Zero_0_Grp')
-            zero1 = cmds.group(zero, name=myName+'_Zero_1_Grp')
+            zero0 = cmds.group(curve, name=myName+'_Zero_0_Grp')
+            zero1 = cmds.group(zero0, name=myName+'_Zero_1_Grp')
             grp = cmds.group(zero1, name=myName+'_Grp')
             if armStyle:
                 cmds.rotate(0, -90, -90, zero1)
@@ -319,7 +353,7 @@ class RibbonClass(object):
         cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         self.dpUIinst.ctrls.setLockHide([curve], ['v'])
-        return [grp, curve, zero1, zero]
+        return [grp, curve, zero0, zero1]
     
     
     def createRibbon(self, axis=(0, 0, 1), name='RibbonSetup', horizontal=False, numJoints=3, guides=None, iniJxt=None, v=True, s=0, upCtrl=None, worldRef="worldRef", jointLabelAdd=0, jointLabelName="RibbonName", centerUpDown=0, addArtic=True, additionalJoint=False, limbArm=True, *args):

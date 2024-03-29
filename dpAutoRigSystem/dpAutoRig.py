@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.06"
-DPAR_UPDATELOG = "N801 - Prompt for exclude faceToRivet\nand lock empty groups."
+DPAR_VERSION_PY3 = "4.04.07"
+DPAR_UPDATELOG = "N809 - Limb corner autoRotate."
 
 
 
