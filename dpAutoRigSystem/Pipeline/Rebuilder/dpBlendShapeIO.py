@@ -26,6 +26,7 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
         self.startName = "dpBlendShape"
         self.targetName = "dpTarget"
         self.originalName = "dpOriginal"
+        self.extention = "shp"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -75,13 +76,11 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                 bsDic[bsNode]['supportNegativeWeights'] = cmds.getAttr(bsNode+".supportNegativeWeights")
                                 targetList = cmds.listAttr("{}.weight".format(bsNode), multi=True)
                                 if targetList:
-                                    
+                                    # prepare index to deleted targets
                                     indexList = cmds.getAttr("{}.weight".format(bsNode), multiIndices=True)
                                     bsDic[bsNode]["indexTargetDic"] = dict(zip(indexList, targetList))
                                     deletedIndexList = []
                                     i = 0 #workaround to avoid deleted target index when importing data
-                                    
-                                    
                                     for t, target in enumerate(targetList):
                                         weightDic = {}
                                         combination = False
@@ -135,7 +134,7 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                     self.pipeliner.makeDirIfNotExists(self.targetPath)
                                     self.pipeliner.makeDirIfNotExists(self.originalPath)
                                     # export blendShape targets as compiled maya file
-                                    cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+".bs")
+                                    cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
                                     # export original mesh transform as alembic file
                                     transformList = []
                                     for geoShape in bsDic[bsNode]["geometry"]:
@@ -165,10 +164,12 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                 exportedList.sort()
                                 bsDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                                 if bsDic:
-
-                                    cmds.scriptEditorInfo(edit=True, suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
-                                    
-                                    notFoundMeshList = []
+                                    # not working scriptEditor suppress command...
+                                    suppressWarningsState = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
+                                    suppressInfoState = cmds.scriptEditorInfo(query=True, suppressInfo=True)
+                                    suppressErrorsState = cmds.scriptEditorInfo(query=True, suppressErrors=True)
+                                    suppressResultsState = cmds.scriptEditorInfo(query=True, suppressResults=True)
+                                    cmds.scriptEditorInfo(suppressWarnings=True, suppressInfo=True, suppressErrors=True, suppressResults=True)
                                     # rebuild blendShapes
                                     for bsNode in bsDic.keys():
                                         # import alembic original mesh if it doesn't exists
@@ -187,21 +188,24 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                             cmds.setAttr(bsNode+".supportNegativeWeights", bsDic[bsNode]["supportNegativeWeights"])
                                             # import targets
                                             try:
-                                                cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+self.targetName+"_"+bsNode+".bs")
-                                            except:
-                                                self.notWorkedWellIO(self.dpUIinst.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+".bs")
-                                        
+                                                # OMG!
+                                                print("--------------------------------\nStarting Autodesk not suppressed messages, sorry!\n--------------------------------\n")
+                                                cmds.blendShape(bsNode, edit=True, ip=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
+                                                #mel.eval('catchQuiet(`blendShape -edit -ip "'+self.targetPath+'/'+self.targetName+'_'+bsNode+'.'+self.extention+'" '+bsNode+'`);')
+                                                print("--------------------------------\nEnding Autodesk not suppressed messages, sorry!\n--------------------------------\n")
+                                            except Exception as e:
+                                                self.notWorkedWellIO(self.dpUIinst.lang["r032_notImportedData"]+": "+self.targetName+"_"+bsNode+"."+self.extention+" - "+str(e))
                                         for i in list(bsDic[bsNode]["indexTargetDic"].keys()):
                                             target = bsDic[bsNode]["indexTargetDic"][i]
-
                                             # set target value
-                                            cmds.setAttr(bsNode+"."+target, bsDic[bsNode]["targets"][i]["value"])
-
+                                            try:
+                                                cmds.setAttr(bsNode+"."+target, bsDic[bsNode]["targets"][i]["value"])
+                                            except:
+                                                pass #connected combination target
                                             # set target weights
                                             for s, shapeNode in enumerate(bsDic[bsNode]["geometry"]):
                                                 for idx in list(bsDic[bsNode]["targets"][i]["weightDic"].keys()):
                                                     cmds.setAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[{}]".format(bsNode, s, i, idx), bsDic[bsNode]["targets"][i]["weightDic"][idx])
-
                                             # regenerate target
                                             if bsDic[bsNode]["targets"][i]["regenerate"]:
                                                 tgtAlreadyExists = cmds.objExists(target)
@@ -214,21 +218,13 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                                                 else:
                                                     cmds.rename(cmds.listRelatives(tgt, children=True, type="mesh")[0], bsDic[bsNode]["targets"][i]["name"]+"Shape")
 
-                                            
                                             # TODO
-                                                # fix double original mesh / import double targets by group issue
+                                                # fix double original mesh / import double targets by group issue = Maya 2024 bug, supposed fixed on Maya 2025
                                                 # remove script editor messages from import targets
-                                                
 
                                         for d in bsDic[bsNode]["deletedIndexList"]:
                                             cmds.removeMultiInstance("{}.weight[{}]".format(bsNode, d), b=True) #doing nothing... I don't know why, sorry. Maya2024.2 at 2024-03-24
-
-
-#                                    cmds.select(clear=True)
-#                                    if notFoundMeshList:
-#                                        self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
-#                                    else:
-#                                        self.wellDoneIO(exportedList[-1])
+                                    cmds.scriptEditorInfo(suppressWarnings=suppressWarningsState, suppressInfo=suppressInfoState, suppressErrors=suppressErrorsState, suppressResults=suppressResultsState)
                                 else:
                                     self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             else:
@@ -241,11 +237,6 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                 self.notWorkedWellIO(self.dpUIinst.lang['e022_notLoadedPlugin']+"AbcExport")
         else:
             self.notWorkedWellIO(self.dpUIinst.lang['r027_noAssetContext'])
-
-            
-        cmds.scriptEditorInfo(edit=True, suppressWarnings=False, suppressInfo=True, suppressErrors=False, suppressResults=False)
-
-
         # --- rebuilder code --- end
         # ---
 
