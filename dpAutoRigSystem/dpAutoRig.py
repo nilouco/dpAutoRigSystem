@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.06"
-DPAR_UPDATELOG = "N801 - Prompt for exclude faceToRivet\nand lock empty groups."
+DPAR_VERSION_PY3 = "4.04.07"
+DPAR_UPDATELOG = "N811 - Implemented Root pivot controller setup."
 
 
 
@@ -2143,10 +2143,12 @@ class DP_AutoRig_UI(object):
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
+        self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
             self.optionCtrlGrp = dpUtils.zeroOut([self.optionCtrl])[0]
+            self.rootPivotCtrlGrp = dpUtils.zeroOut([self.rootPivotCtrl])[0]
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
@@ -2164,6 +2166,7 @@ class DP_AutoRig_UI(object):
             self.ctrls.setLockHide([self.optionCtrl], ['rigScaleOutput'])
             self.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
             self.ctrls.setCalibrationAttr(self.optionCtrl, ['rigScaleMultiplier'])
+            cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
             cmds.parent(self.rootCtrl, self.masterCtrl)
             cmds.parent(self.masterCtrl, self.globalCtrl)
             cmds.parent(self.globalCtrl, self.ctrlsGrp)
@@ -2175,6 +2178,12 @@ class DP_AutoRig_UI(object):
         # set lock and hide attributes
         self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
         self.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
+        self.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+
+        # root pivot control setup
+        for axis in ["X", "Y", "Z"]:
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis)
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis)
 
         cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
         cmds.select(None)
@@ -3086,7 +3095,12 @@ class DP_AutoRig_UI(object):
                     cmds.addAttr(self.optionCtrl, longName="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
                     cmds.connectAttr(self.optionCtrl+".control", self.ctrlsVisGrp+".visibility", force=True)
                     cmds.setAttr(self.optionCtrl+".control", channelBox=True)
-                
+
+                if not cmds.objExists(self.optionCtrl+".rootPivot"):
+                    cmds.addAttr(self.optionCtrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                    cmds.connectAttr(self.optionCtrl+".rootPivot", self.rootPivotCtrlGrp+".visibility", force=True)
+                    cmds.setAttr(self.optionCtrl+".rootPivot", channelBox=True)
+
                 # try to organize Option_Ctrl attributes:
                 # get current user defined attributes:
                 currentAttrList = cmds.listAttr(self.optionCtrl, userDefined=True)
@@ -3115,7 +3129,7 @@ class DP_AutoRig_UI(object):
                 'tailFk', 'tailDyn', 'tail1Fk', 'tail1Dyn', 'tailFk1', 'tailDyn1', leftAttr+'TailFk', leftAttr+'TailFk1', rightAttr+'TailFk', rightAttr+'TailFk1', leftAttr+'TailDyn', leftAttr+'TailDyn1', rightAttr+'TailDyn', rightAttr+'TailDyn1',
                 'hairFk', 'hairDyn', 'hair1Fk', 'hair1Dyn', 'hairFk1', 'hairDyn1', leftAttr+'HairFk', leftAttr+'HairFk1', rightAttr+'HairFk', rightAttr+'HairFk1', leftAttr+'HairDyn', leftAttr+'HairDyn1', rightAttr+'HairDyn', rightAttr+'HairDyn1',
                 'dpAR_1Fk', 'dpAR_1Dyn', 'dpAR_2Fk', 'dpAR_2Dyn', 'dpAR_1Fk1', 'dpAR_1Dyn1', leftAttr+'dpAR_1Fk', leftAttr+'dpAR_1Fk1', rightAttr+'dpAR_1Fk', rightAttr+'dpAR_1Fk1', leftAttr+'dpAR_1Dyn', leftAttr+'dpAR_1Dyn1', rightAttr+'dpAR_1Dyn', rightAttr+'dpAR_1Dyn1',
-                'display', 'mesh', 'proxy', 'control', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
+                'display', 'mesh', 'proxy', 'control', 'rootPivot', 'bends', 'extraBends', tweaksAttr, 'correctiveCtrls']
                 # call method to reorder Option_Ctrl attributes:
                 self.reorderAttributes([self.optionCtrl], desiredAttrList)
                 
