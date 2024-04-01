@@ -2182,8 +2182,8 @@ class DP_AutoRig_UI(object):
 
         # root pivot control setup
         for axis in ["X", "Y", "Z"]:
-            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis)
-            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis)
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
 
         cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
         cmds.select(None)
