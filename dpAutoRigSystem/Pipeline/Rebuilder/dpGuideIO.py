@@ -157,7 +157,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         """ Run instance code to Guide_Base node configuration or just set the simple attributes.
         """
         directionList = ["+X", "-X", "+Y", "-Y", "+Z", "-Z"]
-        customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style", "rigType", "numBendJoints"]
+        customAttrList = ["flip", "mainControls", "nMain", "dynamic", "corrective", "alignWorld", "additional", "softIk", "nostril", "indirectSkin", "holder", "sdkLocator", "startFrame", "showControls", "steering", "degree", "eyelid", "iris", "pupil", "specular", "lidPivot", "style", "rigType", "numBendJoints", "facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
         for item in list(self.netDic["GuideData"]):
             if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                 for baseAttr in list(self.netDic["GuideData"][item]):

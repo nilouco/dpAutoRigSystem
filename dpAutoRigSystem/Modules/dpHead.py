@@ -2,6 +2,8 @@
 from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
+import os
+import json
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -9,7 +11,7 @@ TITLE = "m017_head"
 DESCRIPTION = "m018_headDesc"
 ICON = "/Icons/dp_head.png"
 
-DP_HEAD_VERSION = 2.2
+DP_HEAD_VERSION = 3.0
 
 
 class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -19,10 +21,12 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
+        self.facialAttrList = ["facialBrow", "facialEyelid", "facialMouth", "facialLips", "facialSneer", "facialGrimace", "facialFace"]
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
         # declare variables
         self.correctiveCtrlGrpList = []
         self.aInnerCtrls = []
+        self.redeclareVariables(self.guideName)
     
     
     def createModuleLayout(self, *args):
@@ -38,9 +42,14 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 1)
+        cmds.setAttr(self.moduleGrp+".articulation", 0)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".corrective", 0)
+        cmds.addAttr(self.moduleGrp, longName="facial", attributeType='bool')
+        cmds.setAttr(self.moduleGrp+".facial", 0)
+        for attr in self.facialAttrList:
+            cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool')
+            cmds.setAttr(self.moduleGrp+"."+attr, 1)
 
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
@@ -50,10 +59,18 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvChewLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Chew", r=0.3, d=1, guide=True)
         self.cvLCornerLipLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_LCornerLip", r=0.1, d=1, guide=True)
         self.cvRCornerLipLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_RCornerLip", r=0.1, d=1, guide=True)
-        self.cvUpperJawLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_UpperJaw", r=0.2, d=1, rot=(0, 0, 90), guide=True)
+        self.cvUpperJawLoc  = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_UpperJaw", r=0.2, d=1, rot=(0, 0, 90), guide=True)
         self.cvUpperHeadLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_UpperHead", r=0.2, d=1, rot=(0, 0, 90), guide=True)
-        self.cvUpperLipLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_UpperLip", r=0.15, d=1, guide=True)
-        self.cvLowerLipLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_LowerLip", r=0.15, d=1, guide=True)
+        self.cvUpperLipLoc  = self.ctrls.cvLocator(ctrlName=self.guideName+"_UpperLip", r=0.15, d=1, guide=True)
+        self.cvLowerLipLoc  = self.ctrls.cvLocator(ctrlName=self.guideName+"_LowerLip", r=0.15, d=1, guide=True)
+        self.cvBrowLoc    = self.ctrls.cvLocator(ctrlName=self.guideName+"_Brow", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_046_FacialBrow"))
+        self.cvEyelidLoc  = self.ctrls.cvLocator(ctrlName=self.guideName+"_Eyelid", r=0.2, d=1, guide=True, rot=(0, 0, 90), color="cyan", cvType=self.ctrls.getControlModuleById("id_047_FacialEyelid"))
+        self.cvMouthLoc   = self.ctrls.cvLocator(ctrlName=self.guideName+"_Mouth", r=0.2, d=1, guide=True, rot=(0, 0, -90), color="cyan", cvType=self.ctrls.getControlModuleById("id_048_FacialMouth"))
+        self.cvLipsLoc    = self.ctrls.cvLocator(ctrlName=self.guideName+"_Lips", r=0.1, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_049_FacialLips"))
+        self.cvSneerLoc   = self.ctrls.cvLocator(ctrlName=self.guideName+"_Sneer", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_050_FacialSneer"))
+        self.cvGrimaceLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Grimace", r=0.2, d=1, guide=True, rot=(0, 0, 180), color="cyan", cvType=self.ctrls.getControlModuleById("id_051_FacialGrimace"))
+        self.cvFaceLoc    = self.ctrls.cvLocator(ctrlName=self.guideName+"_Face", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_052_FacialFace"))
+
         # create jointGuides:
         self.jGuideNeck0 = cmds.joint(name=self.guideName+"_JGuideNeck0", radius=0.001)
         self.jGuideHead = cmds.joint(name=self.guideName+"_JGuideHead", radius=0.001)
@@ -140,6 +157,25 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.lipRMD+".input2Y", -1)
         cmds.setAttr(self.lipRMD+".input2Z", -1)
         cmds.setAttr(self.cvRCornerLipLoc+".template", 1)
+        # facial cvLocs
+        cmds.setAttr(self.cvBrowLoc+".translateX", 0.9)
+        cmds.setAttr(self.cvBrowLoc+".translateY", 4.7)
+        cmds.setAttr(self.cvBrowLoc+".translateZ", 3.5)
+        cmds.setAttr(self.cvEyelidLoc+".translateX", 0.3)
+        cmds.setAttr(self.cvEyelidLoc+".translateY", 4.15)
+        cmds.setAttr(self.cvEyelidLoc+".translateZ", 3.5)
+        cmds.setAttr(self.cvMouthLoc+".translateX", 1)
+        cmds.setAttr(self.cvMouthLoc+".translateY", 2.6)
+        cmds.setAttr(self.cvMouthLoc+".translateZ", 3.4)
+        cmds.setAttr(self.cvLipsLoc+".translateY", 2.6)
+        cmds.setAttr(self.cvLipsLoc+".translateZ", 3.9)
+        cmds.setAttr(self.cvSneerLoc+".translateY", 3.15)
+        cmds.setAttr(self.cvSneerLoc+".translateZ", 3.9)
+        cmds.setAttr(self.cvGrimaceLoc+".translateY", 2)
+        cmds.setAttr(self.cvGrimaceLoc+".translateZ", 3.9)
+        cmds.setAttr(self.cvFaceLoc+".translateX", 2.4)
+        cmds.setAttr(self.cvFaceLoc+".translateY", 1.5)
+        cmds.setAttr(self.cvFaceLoc+".translateZ", 0.7)
         # make parenting between cvLocs:
         cmds.parent(self.cvNeckLoc, self.moduleGrp)
         cmds.parent(self.cvHeadLoc, self.cvNeckLoc)
@@ -148,11 +184,17 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.cvChewLoc, self.cvLowerLipLoc, self.cvChinLoc)
         cmds.parent(self.cvLCornerLipLoc, self.cvJawLoc)
         cmds.parent(self.cvRCornerLipLoc, self.cvJawLoc)
-        cmds.parent(self.cvUpperLipLoc, self.cvUpperHeadLoc, self.cvUpperJawLoc)
+        cmds.parent(self.cvUpperLipLoc, self.cvUpperHeadLoc, self.cvLipsLoc, self.cvUpperJawLoc)
+        cmds.parent(self.cvBrowLoc, self.cvEyelidLoc, self.cvUpperHeadLoc)
+        cmds.parent(self.cvMouthLoc, self.cvLCornerLipLoc)
+        cmds.parent(self.cvSneerLoc, self.cvUpperLipLoc)
+        cmds.parent(self.cvGrimaceLoc, self.cvLowerLipLoc)
+        cmds.parent(self.cvFaceLoc, self.cvHeadLoc)
         # include nodes into net
-        self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvEndJoint], ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "JointEnd"])
+        self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
+                                ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
     
-
+    
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
@@ -213,6 +255,29 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             dpLayoutClass.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
     
+
+    def changeFacial(self, value, *args):
+        """ Enable or disable the Facial Controls UI.
+            Set the moduleGrp facial value as well.
+        """
+        collapsed = False
+        if not value:
+            collapsed = True
+        cmds.frameLayout(self.facialCtrlFrameLayout, edit=True, collapse=collapsed, enable=value)
+        cmds.setAttr(self.moduleGrp+".facial", value)
+        for item in list(self.facialLocDic.keys()):
+            cmds.setAttr(self.facialLocDic[item]+".visibility", False)
+            if value:
+                cmds.setAttr(self.facialLocDic[item]+".visibility", cmds.getAttr(self.moduleGrp+"."+item))
+
+
+    def changeFacialElement(self, uiCB, attr, *args):
+        """ Activate or disactivate the facial elements by them UI checkbox value.
+        """
+        cbValue = cmds.checkBox(uiCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+"."+attr, cbValue)
+        cmds.setAttr(self.facialLocDic[attr]+".visibility", cbValue)
+
 
     def setupJawMove(self, attrCtrl, openCloseID, positiveRotation=True, axis="Y", intAttrID="c049_intensity", invertRot=False, createOutput=False, fixValue=0.01, *args):
         """ Create the setup for move jaw group when jaw control rotates for open or close adjustements.
@@ -337,6 +402,40 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 return (2**(n/self.nJoints))-(1-(1/self.nJoints))
 
     
+    def redeclareVariables(self, middle, side="", guide="", *args):
+        """ Just redeclare main locators and dictionary to use it again after reloading code.
+        """
+        self.base            = side+middle+guide+"_Base"
+        self.cvHeadLoc       = side+middle+guide+"_Head"
+        self.cvUpperJawLoc   = side+middle+guide+"_UpperJaw"
+        self.cvUpperHeadLoc  = side+middle+guide+"_UpperHead"
+        self.cvJawLoc        = side+middle+guide+"_Jaw"
+        self.cvChinLoc       = side+middle+guide+"_Chin"
+        self.cvChewLoc       = side+middle+guide+"_Chew"
+        self.cvLCornerLipLoc = side+middle+guide+"_LCornerLip"
+        self.cvRCornerLipLoc = side+middle+guide+"_RCornerLip"
+        self.cvUpperLipLoc   = side+middle+guide+"_UpperLip"
+        self.cvLowerLipLoc   = side+middle+guide+"_LowerLip"
+        self.cvEndJoint      = side+middle+guide+"_JointEnd"
+        self.radiusGuide     = side+middle+guide+"_Base_RadiusCtrl"
+        self.cvBrowLoc       = side+middle+guide+"_Brow"
+        self.cvEyelidLoc     = side+middle+guide+"_Eyelid"
+        self.cvMouthLoc      = side+middle+guide+"_Mouth"
+        self.cvLipsLoc       = side+middle+guide+"_Lips"
+        self.cvSneerLoc      = side+middle+guide+"_Sneer"
+        self.cvGrimaceLoc    = side+middle+guide+"_Grimace"
+        self.cvFaceLoc       = side+middle+guide+"_Face"
+        self.facialLocDic = {
+                                self.facialAttrList[0] : self.cvBrowLoc,
+                                self.facialAttrList[1] : self.cvEyelidLoc,
+                                self.facialAttrList[2] : self.cvMouthLoc,
+                                self.facialAttrList[3] : self.cvLipsLoc,
+                                self.facialAttrList[4] : self.cvSneerLoc,
+                                self.facialAttrList[5] : self.cvGrimaceLoc,
+                                self.facialAttrList[6] : self.cvFaceLoc
+                            }
+        
+
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
@@ -398,19 +497,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             for s, side in enumerate(sideList):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
                 # redeclaring variables:
-                self.base            = side+self.userGuideName+"_Guide_Base"
-                self.cvHeadLoc       = side+self.userGuideName+"_Guide_Head"
-                self.cvUpperJawLoc   = side+self.userGuideName+"_Guide_UpperJaw"
-                self.cvUpperHeadLoc  = side+self.userGuideName+"_Guide_UpperHead"
-                self.cvJawLoc        = side+self.userGuideName+"_Guide_Jaw"
-                self.cvChinLoc       = side+self.userGuideName+"_Guide_Chin"
-                self.cvChewLoc       = side+self.userGuideName+"_Guide_Chew"
-                self.cvLCornerLipLoc = side+self.userGuideName+"_Guide_LCornerLip"
-                self.cvRCornerLipLoc = side+self.userGuideName+"_Guide_RCornerLip"
-                self.cvUpperLipLoc   = side+self.userGuideName+"_Guide_UpperLip"
-                self.cvLowerLipLoc   = side+self.userGuideName+"_Guide_LowerLip"
-                self.cvEndJoint      = side+self.userGuideName+"_Guide_JointEnd"
-                self.radiusGuide     = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
+                self.redeclareVariables(self.userGuideName, side, "_Guide")
                 
                 # generating naming:
                 headJntName = side+self.userGuideName+"_01_"+self.dpUIinst.lang['c024_head']+"_Jnt"

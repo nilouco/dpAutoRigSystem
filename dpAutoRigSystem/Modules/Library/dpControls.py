@@ -338,13 +338,13 @@ class ControlClass(object):
                 cmds.addAttr(curve, longName=JAWDEFINFLUENCE, attributeType="bool", defaultValue=1)
 
 
-    def cvLocator(self, ctrlName, r=1, d=1, guide=False, *args):
+    def cvLocator(self, ctrlName, r=1, d=1, guide=False, rot=(0, 0, 0), color="blue", cvType="Locator", *args):
         """ Create and return a cvLocator curve to be usually used in the guideSystem.
         """
-        curveInstance = self.getControlInstance("Locator")
-        curve = curveInstance.cvMain(False, "Locator", ctrlName, r, d, '+Y', (0, 0, 0), 1, guide)
+        curveInstance = self.getControlInstance(cvType)
+        curve = curveInstance.cvMain(False, cvType, ctrlName, r, d, '+Y', rot, 1, guide)
         if guide:
-            self.addGuideAttrs(curve)
+            self.addGuideAttrs(curve, color)
         return curve
 
 
@@ -849,14 +849,14 @@ class ControlClass(object):
         cmds.parent(clusterHandle, self.dpARTempGrp)
 
 
-    def addGuideAttrs(self, ctrlName, *args):
+    def addGuideAttrs(self, ctrlName, color="blue", *args):
         """ Add and set attributes to this control curve be used as a guide.
         """
         # create an attribute to be used as guide by module:
         cmds.addAttr(ctrlName, longName="nJoint", attributeType='long')
         cmds.setAttr(ctrlName+".nJoint", 1)
         # colorize curveShapes:
-        self.colorShape([ctrlName], 'blue')
+        self.colorShape([ctrlName], color)
         # shapeSize setup:
         self.shapeSizeSetup(ctrlName)
         # pinGuide:
