@@ -2,14 +2,6 @@
 from maya import cmds
 from functools import partial
 
-BROW_TGTLIST = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
-EYELID_TGTLIST = [None, None, "EyelidsClose", "EyelidsOpen"]
-MOUTH_TGTLIST = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
-LIPS_TGTLIST = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
-SNEER_TGTLIST = ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"]
-GRIMACE_TGTLIST = ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"]
-FACE_TGTLIST = ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
-
 DP_LAYOUTCLASS_VERSION = 2.4
 
 
@@ -30,6 +22,18 @@ class LayoutClass(object):
     def basicModuleLayout(self, *args):
         """ Create a Basic Module dpLayoutClass.
         """
+        # declaring facial variables
+        self.browTgtList = ["BrowFrown", "BrowSad", "BrowDown", "BrowUp"]
+        self.eyelidTgtList = [None, None, "EyelidsClose", "EyelidsOpen"]
+        self.mouthTgtList = ["MouthNarrow", "MouthWide", "MouthSad", "MouthSmile"]
+        self.lipsTgtList = ["R_LipsSide", "L_LipsSide", "LipsDown", "LipsUp", "LipsBack", "LipsFront"]
+        self.sneerTgtList = ["R_Sneer", "L_Sneer", None, None, "UpperLipBack", "UpperLipFront"]
+        self.grimaceTgtList = ["R_Grimace", "L_Grimace", None, None, "LowerLipBack", "LowerLipFront"]
+        self.faceTgtList = ["L_Puff", "R_Puff", "Pucker", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"]
+        self.bsType = "bsType"
+        self.jointsType = "jointsType"
+        self.facialUserType = self.bsType
+
         # BASIC MODULE LAYOUT:
         self.basicColumn = cmds.rowLayout(numberOfColumns=5, width=190, columnWidth5=(30, 20, 80, 20, 35), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent=self.topColumn)
         # create basic module UI:
@@ -378,22 +382,22 @@ class LayoutClass(object):
                         collapsed = True
                     # facial frame layout
                     self.facialCtrlFrameLayout = cmds.frameLayout('facialCtrlFrameLayout', label=self.dpUIinst.lang['m139_facialCtrlsAttr'], collapsable=True, collapse=collapsed, enable=facialValue, parent="selectedModuleColumn")
-                    doubleCBLayout = cmds.rowColumnLayout('doubleCBLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.facialCtrlFrameLayout)
+                    facialCBLayout = cmds.rowColumnLayout('facialCBLayout', numberOfColumns=2, columnWidth=[(1, 70), (2, 300)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 20)], parent=self.facialCtrlFrameLayout)
                     # facial element checkboxes
-                    self.browCB = cmds.checkBox('browCB', label=self.dpUIinst.lang["c060_brow"], value=cmds.getAttr(self.moduleGrp+".facialBrow"), changeCommand=partial(self.changeFacialElement, "browCB", "facialBrow"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(BROW_TGTLIST), parent=doubleCBLayout)
-                    self.eyelidCB = cmds.checkBox('eyelidCB', label=self.dpUIinst.lang["c042_eyelid"], value=cmds.getAttr(self.moduleGrp+".facialEyelid"), changeCommand=partial(self.changeFacialElement, "eyelidCB", "facialEyelid"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(EYELID_TGTLIST[2:]), parent=doubleCBLayout)
-                    self.mouthCB = cmds.checkBox('mouthCB', label=self.dpUIinst.lang["c061_mouth"], value=cmds.getAttr(self.moduleGrp+".facialMouth"), changeCommand=partial(self.changeFacialElement, "mouthCB", "facialMouth"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(MOUTH_TGTLIST), parent=doubleCBLayout)
-                    self.lipsCB = cmds.checkBox('lipsCB', label=self.dpUIinst.lang["c062_lips"], value=cmds.getAttr(self.moduleGrp+".facialLips"), changeCommand=partial(self.changeFacialElement, "lipsCB", "facialLips"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(LIPS_TGTLIST), parent=doubleCBLayout)
-                    self.sneerCB = cmds.checkBox('sneerCB', label=self.dpUIinst.lang["c063_sneer"], value=cmds.getAttr(self.moduleGrp+".facialSneer"), changeCommand=partial(self.changeFacialElement, "sneerCB", "facialSneer"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(SNEER_TGTLIST[:2]+SNEER_TGTLIST[4:]), parent=doubleCBLayout)
-                    self.grimaceCB = cmds.checkBox('grimaceCB', label=self.dpUIinst.lang["c064_grimace"], value=cmds.getAttr(self.moduleGrp+".facialGrimace"), changeCommand=partial(self.changeFacialElement, "grimaceCB", "facialGrimace"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(GRIMACE_TGTLIST[:2]+GRIMACE_TGTLIST[4:]), parent=doubleCBLayout)
-                    self.faceCB = cmds.checkBox('faceCB', label=self.dpUIinst.lang["c065_face"], value=cmds.getAttr(self.moduleGrp+".facialFace"), changeCommand=partial(self.changeFacialElement, "faceCB", "facialFace"), parent=doubleCBLayout)
-                    cmds.text(label=', '.join(FACE_TGTLIST), parent=doubleCBLayout)
+                    self.facialBrowCB = cmds.checkBox('facialBrowCB', label=self.dpUIinst.lang["c060_brow"], value=cmds.getAttr(self.moduleGrp+".facialBrow"), changeCommand=partial(self.changeFacialElement, "facialBrowCB", "facialBrow"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.browTgtList), parent=facialCBLayout)
+                    self.facialEyelidCB = cmds.checkBox('facialEyelidCB', label=self.dpUIinst.lang["c042_eyelid"], value=cmds.getAttr(self.moduleGrp+".facialEyelid"), changeCommand=partial(self.changeFacialElement, "facialEyelidCB", "facialEyelid"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.eyelidTgtList[2:]), parent=facialCBLayout)
+                    self.facialMouthCB = cmds.checkBox('facialMouthCB', label=self.dpUIinst.lang["c061_mouth"], value=cmds.getAttr(self.moduleGrp+".facialMouth"), changeCommand=partial(self.changeFacialElement, "facialMouthCB", "facialMouth"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.mouthTgtList), parent=facialCBLayout)
+                    self.facialLipsCB = cmds.checkBox('facialLipsCB', label=self.dpUIinst.lang["c062_lips"], value=cmds.getAttr(self.moduleGrp+".facialLips"), changeCommand=partial(self.changeFacialElement, "facialLipsCB", "facialLips"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.lipsTgtList), parent=facialCBLayout)
+                    self.facialSneerCB = cmds.checkBox('facialSneerCB', label=self.dpUIinst.lang["c063_sneer"], value=cmds.getAttr(self.moduleGrp+".facialSneer"), changeCommand=partial(self.changeFacialElement, "facialSneerCB", "facialSneer"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.sneerTgtList[:2]+self.sneerTgtList[4:]), parent=facialCBLayout)
+                    self.facialGrimaceCB = cmds.checkBox('facialGrimaceCB', label=self.dpUIinst.lang["c064_grimace"], value=cmds.getAttr(self.moduleGrp+".facialGrimace"), changeCommand=partial(self.changeFacialElement, "facialGrimaceCB", "facialGrimace"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.grimaceTgtList[:2]+self.grimaceTgtList[4:]), parent=facialCBLayout)
+                    self.facialFaceCB = cmds.checkBox('facialFaceCB', label=self.dpUIinst.lang["c065_face"], value=cmds.getAttr(self.moduleGrp+".facialFace"), changeCommand=partial(self.changeFacialElement, "facialFaceCB", "facialFace"), parent=facialCBLayout)
+                    cmds.text(label=', '.join(self.faceTgtList), parent=facialCBLayout)
 
 
 

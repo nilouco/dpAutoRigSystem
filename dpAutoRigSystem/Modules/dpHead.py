@@ -27,6 +27,56 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.correctiveCtrlGrpList = []
         self.aInnerCtrls = []
         self.redeclareVariables(self.guideName)
+        
+        self.RmVNumber = 0
+        # redefining Tweaks variables:
+        self.dpInitTweaksVariables()
+        self.bsNode = None
+        # declaring gaming dictionary:
+#        self.tweaksDic = self.dpInitTweaksDic()
+    
+    
+    def dpInitTweaksVariables(self, *args):
+        # part names:
+        mainName = self.dpUIinst.lang['c058_main']
+        tweaksName = self.dpUIinst.lang['m081_tweaks']
+        middleName = self.dpUIinst.lang['c029_middle']
+        eyebrowName = self.dpUIinst.lang['c041_eyebrow']
+        cornerName = self.dpUIinst.lang['c043_corner']
+        upperName = self.dpUIinst.lang['c044_upper']
+        lowerName = self.dpUIinst.lang['c045_lower']
+        lipName = self.dpUIinst.lang['c039_lip']
+        squintName = self.dpUIinst.lang['c054_squint']
+        cheekName = self.dpUIinst.lang['c055_cheek']
+        self.calibrateName = self.dpUIinst.lang["c111_calibrate"].lower()
+        # eyebrows names:
+        self.eyebrowMiddleName = tweaksName+"_"+middleName+"_"+eyebrowName
+        self.eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
+        self.eyebrowName2 = tweaksName+"_"+eyebrowName+"_02"
+        self.eyebrowName3 = tweaksName+"_"+eyebrowName+"_03"
+        # squints names:
+        self.squintName1 = tweaksName+"_"+squintName+"_01"
+        self.squintName2 = tweaksName+"_"+squintName+"_02"
+        self.squintName3 = tweaksName+"_"+squintName+"_03"
+        # cheeks names:
+        self.cheekName1 = tweaksName+"_"+cheekName+"_01"
+        # lip names:
+        self.upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
+        self.upperLipName1 = tweaksName+"_"+upperName+"_"+lipName+"_01"
+        self.upperLipName2 = tweaksName+"_"+upperName+"_"+lipName+"_02"
+        self.lowerLipMiddleName = tweaksName+"_"+lowerName+"_"+lipName+"_00"
+        self.lowerLipName1 = tweaksName+"_"+lowerName+"_"+lipName+"_01"
+        self.lowerLipName2 = tweaksName+"_"+lowerName+"_"+lipName+"_02"
+        self.lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
+        # list:
+        self.tweaksNameList = [self.eyebrowMiddleName, self.eyebrowName1, self.eyebrowName2, self.eyebrowName3, \
+                                self.squintName1, self.squintName2, self.squintName3, \
+                                self.cheekName1, \
+                                self.upperLipMiddleName, self.upperLipName1, self.upperLipName2, self.lowerLipMiddleName, self.lowerLipName1, self.lowerLipName2, self.lipCornerName]
+        self.tweaksNameStrList = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", \
+                                "squintName1", "squintName2", "squintName3", \
+                                "cheekName1", \
+                                "upperLipMiddleName", "upperLipName1", "upperLipName2", "lowerLipMiddleName", "lowerLipName1", "lowerLipName2", "lipCornerName"]
     
     
     def createModuleLayout(self, *args):
@@ -194,7 +244,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
                                 ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
     
-    
+
     def changeJointNumber(self, enteredNJoints, *args):
         """ Edit the number of joints in the guide.
         """
@@ -526,6 +576,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 rCornerLipCtrlName = self.dpUIinst.lang['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.lang['c043_corner']+self.dpUIinst.lang['c039_lip']+"_Ctrl"
                 upperLipCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip']+"_Ctrl"
                 lowerLipCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['c039_lip']+"_Ctrl"
+                lBrowCtrlName = self.dpUIinst.lang['p002_left']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c060_brow"]+"_Ctrl"
+                rBrowCtrlName = self.dpUIinst.lang['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c060_brow"]+"_Ctrl"
+                lEyelidCtrlName = self.dpUIinst.lang['p002_left']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c042_eyelid"]+"_Ctrl"
+                rEyelidCtrlName = self.dpUIinst.lang['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c042_eyelid"]+"_Ctrl"
+                mouthCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c061_mouth"]+"_Ctrl"
+                lipsCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c062_lips"]+"_Ctrl"
+                sneerCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c063_sneer"]+"_Ctrl"
+                grimaceCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c064_grimace"]+"_Ctrl"
+                faceCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c065_face"]+"_Ctrl"
                 
                 # get the number of joints to be created for the neck:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
@@ -591,6 +650,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip")
                 self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
                 self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip")
+                # facial controls
+                if cmds.getAttr(self.moduleGrp+".facial"):
+                    if cmds.getAttr(self.moduleGrp+".facialBrow"):
+                        
+                        #lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red", True, False)
+                        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, True, False, "red", True, False)
+
+
+
                 self.upperCtrlList.append(self.upperHeadCtrl)
                 self.aCtrls.append([self.upperLipCtrl, self.lowerLipCtrl])
                 self.aLCtrls.append([self.lCornerLipCtrl])
@@ -943,6 +1011,279 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
+    
+    
+    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, connectBS=True, connectJnt=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, *args):
+        """ Important function to receive called parameters and create the specific asked control.
+            Convention:
+                transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
+                axisDirectionList = [-1, 1, -1, 1, -1, 1] # neg, pos, neg, pos, neg, pos
+            Returns the created Facial control and its zeroOut group.
+        """
+        # force limits when working on facial joints:
+        if connectJnt:
+            limitX = True
+            limitY = True
+            limitZ = True
+        
+        # declaring variables:
+        fCtrl = None
+        fCtrlGrp = None
+        
+        calibrationList = []
+        transfList = ["tx", "tx", "ty", "ty", "tz", "tz"]
+        # naming:
+        if not side == None:
+            ctrlName = side+"_"+ctrlName
+        fCtrlName = ctrlName+"_Ctrl"
+        # skip if already there is this ctrl object:
+        if cmds.objExists(fCtrlName):
+            return None, None
+        else:
+            if self.facialUserType == self.bsType:
+                if connectBS and self.bsNode:
+                    # validating blendShape node:
+                    if cmds.objectType(self.bsNode) == "blendShape":
+                        aliasList = cmds.aliasAttr(self.bsNode, query=True)
+            # create control calling dpControls function:
+            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=0, rot=rotVector)
+            # add head or jaw influence attribute
+            if headDefInfluence:
+                self.ctrls.addDefInfluenceAttrs(fCtrl, 1)                
+            if jawDefInfluence:
+                self.ctrls.addDefInfluenceAttrs(fCtrl, 2)
+            # ctrl zeroOut grp and color:
+            fCtrlGrp = self.utils.zeroOut([fCtrl])[0]
+            self.ctrls.colorShape([fCtrl], color)
+            # lock or limit XYZ axis:
+            self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
+            self.ctrls.setLockHide([fCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+            # start work with custom attributes
+            if attrList:
+                for a, attr in enumerate(attrList):
+                    if not attr == None:
+                        if directConnection:
+                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0, minValue=0, maxValue=1)
+                            cmds.setAttr(fCtrl+"."+attr, keyable=True)
+                        else:
+                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0)
+                            calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
+                            clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
+                            invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
+                            if a == 0 or a == 2 or a == 4: #negative
+                                cmds.setAttr(clp+".minR", -1000)
+                                cmds.setAttr(invMD+".input2X", -1)
+                            else: #positive
+                                cmds.setAttr(clp+".maxR", 1000)
+                            # connect nodes:
+                            cmds.connectAttr(fCtrl+"."+transfList[a], calibrateMD+".input1X", force=True)
+                            if a == 0 or a == 1: # -x or +x
+                                cmds.connectAttr(fCtrl+"."+self.calibrateName+"TX", calibrateMD+".input2X", force=True)
+                                if not self.calibrateName+"TX" in calibrationList:
+                                    calibrationList.append(self.calibrateName+"TX")
+                            elif a == 2 or a == 3: # -y or +y
+                                cmds.connectAttr(fCtrl+"."+self.calibrateName+"TY", calibrateMD+".input2X", force=True)
+                                if not self.calibrateName+"TY" in calibrationList:
+                                    calibrationList.append(self.calibrateName+"TY")
+                            else: # -z or +z
+                                cmds.connectAttr(fCtrl+"."+self.calibrateName+"TZ", calibrateMD+".input2X", force=True)
+                                if not self.calibrateName+"TZ" in calibrationList:
+                                    calibrationList.append(self.calibrateName+"TZ")
+                            if addTranslateY: #useful for Sneer and Grimace
+                                integrateTYPMA = cmds.createNode("plusMinusAverage", name=ctrlName+"_"+attr+"_TY_PMA")
+                                cmds.connectAttr(calibrateMD+".outputX", integrateTYPMA+".input1D[0]", force=True)
+                                if not "Front" in attr:
+                                    cmds.connectAttr(fCtrl+".translateY", integrateTYPMA+".input1D[1]", force=True)
+                                cmds.connectAttr(integrateTYPMA+".output1D", clp+".input.inputR", force=True)
+                                if "R_" in attr: #hack to set operation as substract in PMA node for Right side
+                                    cmds.setAttr(integrateTYPMA+".operation", 2)
+                                cmds.setAttr(fCtrl+"."+self.calibrateName+"TY", lock=True)
+                            else:
+                                cmds.connectAttr(calibrateMD+".outputX", clp+".input.inputR", force=True)
+                            cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)
+                            cmds.connectAttr(invMD+".outputX", fCtrl+"."+attr, force=True)
+                            cmds.setAttr(fCtrl+"."+attr, lock=True)
+                        
+                        if self.facialUserType == self.bsType:
+                            # try to connect attributes into blendShape node:
+                            if connectBS and self.bsNode:
+                                addedSide = False
+                                storedAttr = attr
+                                for i, alias in enumerate(aliasList):
+                                    if not side == None and not addedSide:
+                                        attr = side+"_"+attr
+                                        addedSide = True
+                                    if attr in alias:
+                                        try:
+                                            cmds.connectAttr(fCtrl+"."+attr, self.bsNode+"."+alias, force=True)
+                                        except:
+                                            try:
+                                                cmds.connectAttr(fCtrl+"."+storedAttr, self.bsNode+"."+alias, force=True)
+                                            except:
+                                                pass
+#                        else: # setup to using facial joints:
+#                            if connectJnt:
+#                                sidedNodeList = None
+#                                try:
+#                                    sidedNodeList = self.tweaksDic[attr]
+#                                except:
+#                                    pass
+#                                if sidedNodeList:
+#                                    # sideNode is like MIDDLE or SIDED:
+#                                    for sidedNode in sidedNodeList:
+#                                        toNodeList = None
+#                                        try:
+#                                            toNodeList = self.tweaksDic[attr][sidedNode]
+#                                        except:
+#                                            pass
+#                                        if toNodeList:
+#                                            # toNodeBase is igual to facial control offset group target:
+#                                            for toNodeBaseName in toNodeList:
+#                                                toNode = None
+#                                                toNodeSided = toNodeBaseName
+#                                                addedSide = False
+#                                                toNodeTargedList = []
+#                                                for jntTarget in self.jntTargetList:
+#                                                    toNodeSided = toNodeBaseName
+#                                                    if sidedNode == SIDED:
+#                                                        if not addedSide:
+#                                                            if not side == None:
+#                                                                # check prefix:
+#                                                                if jntTarget[1] == "_":
+#                                                                    if side == jntTarget[0]:
+#                                                                        toNodeSided = side+"_"+toNodeBaseName
+#                                                                        if jntTarget.startswith(toNodeSided):    
+#                                                                            toNode = jntTarget
+#                                                                            addedSide = True
+#                                                            elif toNodeSided in jntTarget:
+#                                                                if attr[1] == "_":
+#                                                                    if attr[0] == jntTarget[0]:
+#                                                                        toNode = jntTarget
+#                                                                        addedSide = True
+#                                                                else:
+#                                                                    toNodeTargedList.append(jntTarget)
+#                                                                    toNode = jntTarget
+#                                                    elif jntTarget.startswith(toNodeSided):
+#                                                        if cmds.objExists(jntTarget):
+#                                                            toNode = jntTarget
+#                                                if toNode:
+#                                                    if not toNodeTargedList:
+#                                                        toNodeTargedList.append(toNode)
+#                                                    for toNode in toNodeTargedList:
+#                                                        if cmds.objExists(toNode):
+#                                                            # caculate factor for scaled item:
+#                                                            sizeFactor = self.dpGetSizeFactor(toNode)
+#                                                            if not sizeFactor:
+#                                                                sizeFactor = 1
+#                                                            toAttrList = self.tweaksDic[attr][sidedNode][toNodeBaseName]
+#                                                            for toAttr in toAttrList:
+#                                                                # read stored values in order to call function to make the setup:
+#                                                                oMin = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][0]
+#                                                                oMax = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][1]
+#                                                                self.dpCreateRemapNode(fCtrl, attr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
+#                                                                self.RmVNumber = self.RmVNumber+1
+            if calibrationList:
+                self.ctrls.setCalibrationAttr(fCtrl, calibrationList)
+            # parenting the hierarchy:
+#            if not cmds.objExists(self.headFacialCtrlsGrp):
+#                cmds.group(name=self.headFacialCtrlsGrp, empty=True)
+#            cmds.parent(fCtrlGrp, self.headFacialCtrlsGrp)
+        
+#        cmds.select(self.headFacialCtrlsGrp)
+        return fCtrl, fCtrlGrp
+    
+    
+    def dpLockLimitAttr(self, fCtrl, ctrlName, lockList, limitList, limitMinY, *args):
+        """ Lock or limit attributes for XYZ.
+        """
+        axisList = ["X", "Y", "Z"]
+        for i, axis in enumerate(axisList):
+            if lockList[i]:
+                cmds.setAttr(fCtrl+".translate"+axis, lock=True, keyable=False)
+            else:
+                # add calibrate attributes:
+                cmds.addAttr(fCtrl, longName=self.calibrateName+"T"+axis, attributeType="float", defaultValue=1, minValue=0.001)
+                if limitList[i]:
+                    if i == 0: #X
+                        cmds.transformLimits(fCtrl, enableTranslationX=(1, 1))
+                    elif i == 1: #Y
+                        cmds.transformLimits(fCtrl, enableTranslationY=(1, 1))
+                    else: #Z
+                        cmds.transformLimits(fCtrl, enableTranslationZ=(1, 1))
+                    self.dpLimitTranslate(fCtrl, ctrlName, axis, limitMinY)
+
+    
+    def dpLimitTranslate(self, fCtrl, ctrlName, axis, limitMinY=False, *args):
+        """ Create a hyperbolic setup to limit min and max value for translation of the control.
+            Resuming it's just divide 1 by the calibrate value.
+        """
+        hyperboleTLimitMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_MD")
+        hyperboleInvMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_Inv_MD")
+        cmds.setAttr(hyperboleTLimitMD+".input1X", 1)
+        cmds.setAttr(hyperboleTLimitMD+".operation", 2)
+        cmds.setAttr(hyperboleInvMD+".input2X", -1)
+        cmds.connectAttr(fCtrl+"."+self.calibrateName+"T"+axis, hyperboleTLimitMD+".input2X", force=True)
+        cmds.connectAttr(hyperboleTLimitMD+".outputX", fCtrl+".maxTransLimit.maxTrans"+axis+"Limit", force=True)
+        cmds.connectAttr(hyperboleTLimitMD+".outputX", hyperboleInvMD+".input1X", force=True)
+        if not limitMinY:
+            cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
+        else:
+            cmds.transformLimits(fCtrl, translationY=(0, 1))
+    
+    
+    def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
+        """ Creates the nodes to remap values and connect it to final output (toNode) item.
+        """
+        fromNodeName = self.utils.extractSuffix(fromNode)
+        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
+        outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
+        if "t" in toAttr:
+            if not cmds.objExists(fromNode+".sizeFactor"):
+                cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
+            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
+            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
+            cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
+            cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
+            cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
+        else:
+            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
+            cmds.connectAttr(fromNode+"."+outMaxAttr, remap+".outputMax", force=True)
+        cmds.setAttr(remap+".inputMin", iMin)
+        cmds.setAttr(remap+".inputMax", iMax)
+        cmds.setAttr(remap+".outputMin", oMin)
+        cmds.connectAttr(fromNode+"."+fromAttr, remap+".inputValue", force=True)
+        # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
+        connectedList = cmds.listConnections(toNode+"."+toAttr, destination=False, source=True, plugs=False)
+        if connectedList:
+            if cmds.objectType(connectedList[0]) == "plusMinusAverage":
+                inputList = cmds.listConnections(connectedList[0]+".input1D", destination=False, source=True, plugs=False)
+                cmds.connectAttr(remap+".outValue", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
+            else:
+                if cmds.objectType(connectedList[0]) == "unitConversion":
+                    connectedAttr = cmds.listConnections(connectedList[0]+".input", destination=False, source=True, plugs=True)[0]
+                else:
+                    connectedAttr = cmds.listConnections(toNode+"."+toAttr, destination=False, source=True, plugs=True)[0]
+                pma = cmds.createNode("plusMinusAverage", name=toNode+"_"+toAttr.upper()+"_PMA")
+                cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
+                cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
+                cmds.connectAttr(pma+".output1D", toNode+"."+toAttr, force=True)
+                if cmds.objectType(connectedList[0]) == "unitConversion":
+                    cmds.delete(connectedList[0])
+        else:
+            cmds.connectAttr(remap+".outValue", toNode+"."+toAttr, force=True)
+    
+
+    def dpGetSizeFactor(self, toNode, *args):
+        """ Get the child control size value and return it.
+        """
+        childrenList = cmds.listRelatives(toNode, children=True, type="transform")
+        if childrenList:
+            for child in childrenList:
+                if cmds.objExists(child+".dpControl"):
+                    if cmds.getAttr(child+".dpControl") == 1:
+                        if cmds.objExists(child+".size"):
+                            sizeValue = cmds.getAttr(child+".size")
+                            return sizeValue
     
     
     def integratingInfo(self, *args):
