@@ -245,12 +245,20 @@ class RibbonClass(object):
             cornerAutoRotateRev = cmds.createNode("reverse", name=prefix+myName+"_"+cornerName+"_AutoRotate_Rev")
             cornerAutoRotateInvPinMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Pin_Inv_MD"))
             cornerAutoRotateInvMidMD = cmds.createNode("multiplyDivide", name=cornerAutoRotateMD.replace("MD", "Mid_Inv_MD"))
-            extremDup = cmds.duplicate(lista[2], name=lista[2].replace("Jnt", "Orig_Jxt"))[0]
-            cmds.delete(cmds.listRelatives(extremDup, children=True, fullPath=True))
+            extremLoc = cmds.spaceLocator(name=lista[2].replace("Jnt", "AutoRotate_Loc"))[0]
+            cmds.delete(cmds.parentConstraint(lista[2], extremLoc, maintainOffset=False))
+            cornerAutoRotGrp = cmds.group(extremLoc, name=extremLoc+"_Grp")
+            extremOrigLoc = cmds.duplicate(extremLoc, name=lista[2].replace("Jnt", "AutoRotate_Orig_Loc"))[0]
+            for axis in ["X", "Y", "Z"]:
+                cmds.connectAttr(lista[2]+".rotate"+axis, extremLoc+".rotate"+axis, force=True)
+                cmds.setAttr(extremOrigLoc+".rotate"+axis, cmds.getAttr(extremLoc+".rotate"+axis))
+            cmds.setAttr(cornerAutoRotGrp+".inheritsTransform", 0)
+            cmds.setAttr(cornerAutoRotGrp+".visibility", 0)
+            cmds.parent(cornerAutoRotGrp, staticGrp)
             cmds.connectAttr(self.elbowctrlCtrl+".autoRotate", cornerAutoRotateMD+".input1Z", force=True)
             cmds.connectAttr(self.elbowctrlCtrl+".autoRotate", cornerAutoRotateRev+".inputZ", force=True)
-            cmds.connectAttr(extremDup+".worldInverseMatrix[0]", cornerAutoRotateMM+".matrixIn[0]", force=True)
-            cmds.connectAttr(lista[2]+".worldMatrix[0]", cornerAutoRotateMM+".matrixIn[1]", force=True)
+            cmds.connectAttr(extremOrigLoc+".worldInverseMatrix[0]", cornerAutoRotateMM+".matrixIn[0]", force=True)
+            cmds.connectAttr(extremLoc+".worldMatrix[0]", cornerAutoRotateMM+".matrixIn[1]", force=True)
             cmds.connectAttr(cornerAutoRotateMM+".matrixSum", cornerAutoRotateDM+".inputMatrix", force=True)
             cmds.connectAttr(cornerAutoRotateDM+".outputQuatX", cornerAutoRotateQtE+".inputQuatX", force=True)
             cmds.connectAttr(cornerAutoRotateDM+".outputQuatY", cornerAutoRotateQtE+".inputQuatY", force=True)
@@ -258,11 +266,10 @@ class RibbonClass(object):
             cmds.connectAttr(cornerAutoRotateDM+".outputQuatW", cornerAutoRotateQtE+".inputQuatW", force=True)
             cmds.connectAttr(cornerAutoRotateMD+".outputZ", cornerAutoRotateInvPinMD+".input1Z", force=True)
             cmds.connectAttr(cornerAutoRotateRev+".outputZ", cornerAutoRotateInvMidMD+".input1Z", force=True)
+            cmds.connectAttr(cornerAutoRotateQtE+".outputRotateZ", cornerAutoRotateMD+".input2Z", force=True)
             if arm:
-                cmds.connectAttr(cornerAutoRotateQtE+".outputRotateX", cornerAutoRotateMD+".input2Z", force=True)
                 cmds.connectAttr(cornerAutoRotateInvPinMD+".outputZ", self.elbowctrlZero0+".rotateX", force=True)
             else: #leg
-                cmds.connectAttr(cornerAutoRotateQtE+".outputRotateY", cornerAutoRotateMD+".input2Z", force=True)
                 cmds.connectAttr(cornerAutoRotateInvPinMD+".outputZ", self.elbowctrlZero0+".rotateY", force=True)
 
         # implementing pin setup to ribbon corner offset control:
