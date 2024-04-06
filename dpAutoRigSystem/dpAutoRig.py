@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.08"
-DPAR_UPDATELOG = "N809 - Limb corner autoRotate."
+DPAR_VERSION_PY3 = "4.04.09"
+DPAR_UPDATELOG = "N813 - Custom asset name to publishing."
 
 
 
