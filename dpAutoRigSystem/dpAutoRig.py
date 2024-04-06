@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.07"
-DPAR_UPDATELOG = "N811 - Implemented Root pivot controller setup."
+DPAR_VERSION_PY3 = "4.04.09"
+DPAR_UPDATELOG = "N813 - Custom asset name to publishing."
 
 
 
