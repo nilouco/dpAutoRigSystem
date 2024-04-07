@@ -27,6 +27,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.correctiveCtrlGrpList = []
         self.aInnerCtrls = []
         self.redeclareVariables(self.guideName)
+        self.facialFactor = 0.15
         
         self.RmVNumber = 0
         # redefining Tweaks variables:
@@ -100,6 +101,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         for attr in self.facialAttrList:
             cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool')
             cmds.setAttr(self.moduleGrp+"."+attr, 1)
+        cmds.addAttr(self.moduleGrp, longName="connectUserType", attributeType='long', defaultValue=0) #bs
 
         # create cvJointLoc and cvLocators:
         self.cvNeckLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Neck0", r=0.5, d=1, rot=(-90, 90, 0), guide=True)
@@ -226,6 +228,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvFaceLoc+".translateX", 2.4)
         cmds.setAttr(self.cvFaceLoc+".translateY", 1.5)
         cmds.setAttr(self.cvFaceLoc+".translateZ", 0.7)
+        for facialLoc in [self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc]:
+            cmds.setAttr(facialLoc+".visibility", 0)
         # make parenting between cvLocs:
         cmds.parent(self.cvNeckLoc, self.moduleGrp)
         cmds.parent(self.cvHeadLoc, self.cvNeckLoc)
@@ -586,6 +590,12 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 grimaceCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c064_grimace"]+"_Ctrl"
                 faceCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c065_face"]+"_Ctrl"
                 
+                # connect facial controllers to blendShape node or tweakers:
+                self.connectUserType = self.bsType
+                userType = cmds.getAttr(self.moduleGrp+".connectUserType")
+                if userType == 1:
+                    self.connectUserType = self.jointsType
+
                 # get the number of joints to be created for the neck:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
 
@@ -650,15 +660,35 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip")
                 self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
                 self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip")
+                
+                # Connect to blendShape node or tweakers controllers:
+                self.connectBS = False
+                self.connectJnt = True
+                if self.connectUserType == self.bsType:
+                    self.connectBS = True
+                    self.connectJnt = False
                 # facial controls
                 if cmds.getAttr(self.moduleGrp+".facial"):
                     if cmds.getAttr(self.moduleGrp+".facialBrow"):
-                        
-                        #lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, connectBS, connectJnt, "red", True, False)
-                        lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, True, False, "red", True, False)
+                        self.lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "red", True, False)
+                        self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "blue", True, False)
+                    if cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                        if self.connectUserType == self.bsType:
+                            self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, self.connectBS, self.connectJnt, "red", True, False)
+                            self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, self.connectBS, self.connectJnt, "blue", True, False)
+                    if cmds.getAttr(self.moduleGrp+".facialMouth"):
+                        self.lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "red", True, True)
+                        self.rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "blue", True, True)
+                    if cmds.getAttr(self.moduleGrp+".facialLips"):
+                        self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, self.connectBS, self.connectJnt, "yellow", True, True)
+                    if cmds.getAttr(self.moduleGrp+".facialSneer"):
+                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, self.connectBS, self.connectJnt, "cyan", True, True)
+                    if cmds.getAttr(self.moduleGrp+".facialGrimace"):
+                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, self.connectBS, self.connectJnt, "cyan", True, True)
+                    if cmds.getAttr(self.moduleGrp+".facialFace"):
+                        self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, self.connectBS, self.connectJnt, "cyan", False, False)
 
-
-
+                # colorize controllers
                 self.upperCtrlList.append(self.upperHeadCtrl)
                 self.aCtrls.append([self.upperLipCtrl, self.lowerLipCtrl])
                 self.aLCtrls.append([self.lCornerLipCtrl])
@@ -710,13 +740,35 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.utils.originedFrom(objName=self.headSubCtrl, attrString=self.cvHeadLoc)
                 self.utils.originedFrom(objName=self.upperJawCtrl, attrString=self.cvUpperJawLoc)
                 self.utils.originedFrom(objName=self.upperHeadCtrl, attrString=self.cvUpperHeadLoc)
+                self.utils.originedFrom(objName=self.upperLipCtrl, attrString=self.cvUpperLipLoc)
                 self.utils.originedFrom(objName=self.jawCtrl, attrString=self.cvJawLoc)
                 self.utils.originedFrom(objName=self.chinCtrl, attrString=self.cvChinLoc)
                 self.utils.originedFrom(objName=self.chewCtrl, attrString=self.cvChewLoc+";"+self.cvEndJoint)
                 self.utils.originedFrom(objName=self.lCornerLipCtrl, attrString=self.cvLCornerLipLoc)
                 self.utils.originedFrom(objName=self.rCornerLipCtrl, attrString=self.cvRCornerLipLoc)
-                self.utils.originedFrom(objName=self.upperLipCtrl, attrString=self.cvUpperLipLoc)
                 self.utils.originedFrom(objName=self.lowerLipCtrl, attrString=self.cvLowerLipLoc)
+                # facial origined from
+                if cmds.getAttr(self.moduleGrp+".facial"):
+                    if cmds.getAttr(self.moduleGrp+".facialBrow"):
+                        if cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                            cmds.setAttr(self.upperHeadCtrl+".originedFrom", self.cvUpperHeadLoc+";"+self.cvBrowLoc+";"+self.cvEyelidLoc, type="string")
+                        else:
+                            cmds.setAttr(self.upperHeadCtrl+".originedFrom", self.cvUpperHeadLoc+";"+self.cvBrowLoc, type="string")
+                    elif cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                        cmds.setAttr(self.upperHeadCtrl+".originedFrom", self.cvUpperHeadLoc+";"+self.cvEyelidLoc, type="string")
+                    if cmds.getAttr(self.moduleGrp+".facialMouth"):
+                        if cmds.getAttr(self.moduleGrp+".facialLips"):
+                            cmds.setAttr(self.upperJawCtrl+".originedFrom", self.cvUpperJawLoc+";"+self.cvMouthLoc+";"+self.cvLipsLoc, type="string")
+                        else:
+                            cmds.setAttr(self.upperJawCtrl+".originedFrom", self.cvUpperJawLoc+";"+self.cvMouthLoc, type="string")
+                    elif cmds.getAttr(self.moduleGrp+".facialLips"):
+                        cmds.setAttr(self.upperJawCtrl+".originedFrom", self.cvUpperJawLoc+";"+self.cvLipsLoc, type="string")
+                    if cmds.getAttr(self.moduleGrp+".facialSneer"):
+                        cmds.setAttr(self.upperLipCtrl+".originedFrom", self.cvUpperLipLoc+";"+self.cvSneerLoc, type="string")
+                    if cmds.getAttr(self.moduleGrp+".facialGrimace"):
+                        cmds.setAttr(self.lowerLipCtrl+".originedFrom", self.cvLowerLipLoc+";"+self.cvGrimaceLoc, type="string")
+                    if cmds.getAttr(self.moduleGrp+".facialFace"):
+                        cmds.setAttr(self.headSubCtrl+".originedFrom", self.cvHeadLoc+";"+self.cvFaceLoc, type="string")
                 
                 # temporary parentConstraints:
                 for n in range(0, self.nJoints):
@@ -963,6 +1015,39 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # arrange controllers hierarchy
                 cmds.parent(self.zeroCtrlList[-1], self.zeroCtrlList[1], self.headCtrl, absolute=True) #headSubCtrl
                 cmds.parent(self.zeroCtrlList[1], self.headSubCtrl, absolute=True) #upperJawCtrl
+                # facial controls hierarchy
+                if cmds.getAttr(self.moduleGrp+".facial"):
+                    if cmds.getAttr(self.moduleGrp+".facialBrow"):
+                        cmds.parent(lBrowCtrlGrp, rBrowCtrlGrp, self.upperHeadCtrl)
+                        cmds.delete(cmds.parentConstraint(self.cvBrowLoc, lBrowCtrlGrp, maintainOffset=False))
+                        cmds.delete(cmds.parentConstraint(self.cvBrowLoc, rBrowCtrlGrp, maintainOffset=False))
+                        cmds.setAttr(rBrowCtrlGrp+".translateX", (-1*cmds.getAttr(rBrowCtrlGrp+".translateX")))
+                        cmds.setAttr(rBrowCtrlGrp+".rotateY", 180)
+                    if cmds.getAttr(self.moduleGrp+".facialEyelid"):
+                        if self.connectUserType == self.bsType:
+                            cmds.parent(lEyelidCtrlGrp, rEyelidCtrlGrp, self.upperHeadCtrl)
+                            cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, lEyelidCtrlGrp, maintainOffset=False))
+                            cmds.delete(cmds.parentConstraint(self.cvEyelidLoc, rEyelidCtrlGrp, maintainOffset=False))
+                            cmds.setAttr(rEyelidCtrlGrp+".translateX", (-1*cmds.getAttr(rEyelidCtrlGrp+".translateX")))
+                    if cmds.getAttr(self.moduleGrp+".facialMouth"):
+                        cmds.parent(lMouthCtrlGrp, rMouthCtrlGrp, self.upperJawCtrl)
+                        cmds.delete(cmds.parentConstraint(self.cvMouthLoc, lMouthCtrlGrp, maintainOffset=False))
+                        cmds.delete(cmds.parentConstraint(self.cvMouthLoc, rMouthCtrlGrp, maintainOffset=False))
+                        cmds.setAttr(rMouthCtrlGrp+".translateX", (-1*cmds.getAttr(rMouthCtrlGrp+".translateX")))
+                        cmds.setAttr(rMouthCtrlGrp+".rotateY", 180)
+                    if cmds.getAttr(self.moduleGrp+".facialLips"):
+                        cmds.parent(lipsCtrlGrp, self.upperJawCtrl)
+                        cmds.delete(cmds.parentConstraint(self.cvLipsLoc, lipsCtrlGrp, maintainOffset=False))
+                    if cmds.getAttr(self.moduleGrp+".facialSneer"):
+                        cmds.parent(sneerCtrlGrp, self.upperJawCtrl)
+                        cmds.delete(cmds.parentConstraint(self.cvSneerLoc, sneerCtrlGrp, maintainOffset=False))
+                    if cmds.getAttr(self.moduleGrp+".facialGrimace"):
+                        cmds.parent(grimaceCtrlGrp, self.chinCtrl)
+                        cmds.delete(cmds.parentConstraint(self.cvGrimaceLoc, grimaceCtrlGrp, maintainOffset=False))
+                        cmds.setAttr(grimaceCtrlGrp+".rotateX", 180)
+                    if cmds.getAttr(self.moduleGrp+".facialFace"):
+                        cmds.parent(faceCtrlGrp, self.headSubCtrl)
+                        cmds.delete(cmds.parentConstraint(self.cvFaceLoc, faceCtrlGrp, maintainOffset=False))
                 
                 # calibration attributes:
                 neckCalibrationList = [self.dpUIinst.lang['c047_autoRotate']]
@@ -1046,7 +1131,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if cmds.objectType(self.bsNode) == "blendShape":
                         aliasList = cmds.aliasAttr(self.bsNode, query=True)
             # create control calling dpControls function:
-            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, d=0, rot=rotVector)
+            fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector)
             # add head or jaw influence attribute
             if headDefInfluence:
                 self.ctrls.addDefInfluenceAttrs(fCtrl, 1)                
@@ -1058,6 +1143,11 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # lock or limit XYZ axis:
             self.dpLockLimitAttr(fCtrl, ctrlName, [lockX, lockY, lockZ], [limitX, limitY, limitZ], limitMinY)
             self.ctrls.setLockHide([fCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+            scaleFactorValue = self.facialFactor*self.ctrlRadius
+            cmds.addAttr(fCtrl, longName="scaleFactor", attributeType="float", defaultValue=scaleFactorValue, minValue=0.001)
+            cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleX", force=True)
+            cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleY", force=True)
+            cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
             # start work with custom attributes
             if attrList:
                 for a, attr in enumerate(attrList):
@@ -1184,12 +1274,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 #                                                                self.RmVNumber = self.RmVNumber+1
             if calibrationList:
                 self.ctrls.setCalibrationAttr(fCtrl, calibrationList)
-            # parenting the hierarchy:
-#            if not cmds.objExists(self.headFacialCtrlsGrp):
-#                cmds.group(name=self.headFacialCtrlsGrp, empty=True)
-#            cmds.parent(fCtrlGrp, self.headFacialCtrlsGrp)
-        
-#        cmds.select(self.headFacialCtrlsGrp)
         return fCtrl, fCtrlGrp
     
     
@@ -1272,6 +1356,18 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         else:
             cmds.connectAttr(remap+".outValue", toNode+"."+toAttr, force=True)
     
+
+    def dpChangeType(self, *args):
+        """ Get and return the user selected type of controls.
+            Change interface to be more clear.
+        """
+        typeSelectedRadioButton = cmds.radioCollection(self.facialTypeRC, query=True, select=True)
+        self.connectUserType = cmds.radioButton(typeSelectedRadioButton, query=True, annotation=True)
+        if self.connectUserType == self.bsType:
+            cmds.setAttr(self.moduleGrp+".connectUserType", 0)
+        elif self.connectUserType == self.jointsType:
+            cmds.setAttr(self.moduleGrp+".connectUserType", 1)
+
 
     def dpGetSizeFactor(self, toNode, *args):
         """ Get the child control size value and return it.

@@ -274,7 +274,8 @@ class Utils(object):
         """ Add attribute as string and set is as attrName got.
         """
         if objName != "" and attrString != "":
-            cmds.addAttr(objName, longName="originedFrom", dataType='string')
+            if not cmds.objExists(objName+".originedFrom"):
+                cmds.addAttr(objName, longName="originedFrom", dataType='string')
             cmds.setAttr(objName+".originedFrom", attrString, type='string')
 
 

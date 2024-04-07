@@ -398,8 +398,15 @@ class LayoutClass(object):
                     cmds.text(label=', '.join(self.grimaceTgtList[:2]+self.grimaceTgtList[4:]), parent=facialCBLayout)
                     self.facialFaceCB = cmds.checkBox('facialFaceCB', label=self.dpUIinst.lang["c065_face"], value=cmds.getAttr(self.moduleGrp+".facialFace"), changeCommand=partial(self.changeFacialElement, "facialFaceCB", "facialFace"), parent=facialCBLayout)
                     cmds.text(label=', '.join(self.faceTgtList), parent=facialCBLayout)
-
-
+                    cmds.separator(style='none', height=5, parent=facialCBLayout)
+                    self.facialTypeLayout = cmds.columnLayout('facialTypeLayout', parent=self.facialCtrlFrameLayout)
+                    userType = cmds.getAttr(self.moduleGrp+".connectUserType")
+                    self.facialTypeRC = cmds.radioCollection('facialTypeRC', parent=self.facialTypeLayout)
+                    bs = cmds.radioButton(label=self.dpUIinst.lang['m170_blendShapes']+" - "+self.dpUIinst.lang['i185_animation']+": #_Recept_BS", annotation=self.bsType, onCommand=self.dpChangeType)
+                    jnt = cmds.radioButton(label=self.dpUIinst.lang['i181_facialJoint']+" - "+self.dpUIinst.lang['i186_gaming'], annotation=self.jointsType, onCommand=self.dpChangeType)
+                    cmds.radioCollection(self.facialTypeRC, edit=True, select=bs)
+                    if userType:
+                        cmds.radioCollection(self.facialTypeRC, edit=True, select=jnt)
 
             except:
                 pass
