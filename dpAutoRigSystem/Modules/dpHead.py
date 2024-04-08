@@ -2,8 +2,6 @@
 from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
-import os
-import json
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -28,57 +26,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.aInnerCtrls = []
         self.redeclareVariables(self.guideName)
         self.facialFactor = 0.15
-        
-        self.RmVNumber = 0
-        # redefining Tweaks variables:
-        self.dpInitTweaksVariables()
-        self.bsNode = None
-        # declaring gaming dictionary:
-#        self.tweaksDic = self.dpInitTweaksDic()
-    
-    
-    def dpInitTweaksVariables(self, *args):
-        # part names:
-        mainName = self.dpUIinst.lang['c058_main']
-        tweaksName = self.dpUIinst.lang['m081_tweaks']
-        middleName = self.dpUIinst.lang['c029_middle']
-        eyebrowName = self.dpUIinst.lang['c041_eyebrow']
-        cornerName = self.dpUIinst.lang['c043_corner']
-        upperName = self.dpUIinst.lang['c044_upper']
-        lowerName = self.dpUIinst.lang['c045_lower']
-        lipName = self.dpUIinst.lang['c039_lip']
-        squintName = self.dpUIinst.lang['c054_squint']
-        cheekName = self.dpUIinst.lang['c055_cheek']
-        self.calibrateName = self.dpUIinst.lang["c111_calibrate"].lower()
-        # eyebrows names:
-        self.eyebrowMiddleName = tweaksName+"_"+middleName+"_"+eyebrowName
-        self.eyebrowName1 = tweaksName+"_"+eyebrowName+"_01"
-        self.eyebrowName2 = tweaksName+"_"+eyebrowName+"_02"
-        self.eyebrowName3 = tweaksName+"_"+eyebrowName+"_03"
-        # squints names:
-        self.squintName1 = tweaksName+"_"+squintName+"_01"
-        self.squintName2 = tweaksName+"_"+squintName+"_02"
-        self.squintName3 = tweaksName+"_"+squintName+"_03"
-        # cheeks names:
-        self.cheekName1 = tweaksName+"_"+cheekName+"_01"
-        # lip names:
-        self.upperLipMiddleName = tweaksName+"_"+upperName+"_"+lipName+"_00"
-        self.upperLipName1 = tweaksName+"_"+upperName+"_"+lipName+"_01"
-        self.upperLipName2 = tweaksName+"_"+upperName+"_"+lipName+"_02"
-        self.lowerLipMiddleName = tweaksName+"_"+lowerName+"_"+lipName+"_00"
-        self.lowerLipName1 = tweaksName+"_"+lowerName+"_"+lipName+"_01"
-        self.lowerLipName2 = tweaksName+"_"+lowerName+"_"+lipName+"_02"
-        self.lipCornerName = tweaksName+"_"+cornerName+"_"+lipName
-        # list:
-        self.tweaksNameList = [self.eyebrowMiddleName, self.eyebrowName1, self.eyebrowName2, self.eyebrowName3, \
-                                self.squintName1, self.squintName2, self.squintName3, \
-                                self.cheekName1, \
-                                self.upperLipMiddleName, self.upperLipName1, self.upperLipName2, self.lowerLipMiddleName, self.lowerLipName1, self.lowerLipName2, self.lipCornerName]
-        self.tweaksNameStrList = ["eyebrowMiddleName", "eyebrowName1", "eyebrowName2", "eyebrowName3", \
-                                "squintName1", "squintName2", "squintName3", \
-                                "cheekName1", \
-                                "upperLipMiddleName", "upperLipName1", "upperLipName2", "lowerLipMiddleName", "lowerLipName1", "lowerLipName2", "lipCornerName"]
-    
+
     
     def createModuleLayout(self, *args):
         dpBaseClass.StartClass.createModuleLayout(self)
@@ -580,15 +528,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 rCornerLipCtrlName = self.dpUIinst.lang['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.lang['c043_corner']+self.dpUIinst.lang['c039_lip']+"_Ctrl"
                 upperLipCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+self.dpUIinst.lang['c039_lip']+"_Ctrl"
                 lowerLipCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+self.dpUIinst.lang['c039_lip']+"_Ctrl"
-                lBrowCtrlName = self.dpUIinst.lang['p002_left']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c060_brow"]+"_Ctrl"
-                rBrowCtrlName = self.dpUIinst.lang['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c060_brow"]+"_Ctrl"
-                lEyelidCtrlName = self.dpUIinst.lang['p002_left']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c042_eyelid"]+"_Ctrl"
-                rEyelidCtrlName = self.dpUIinst.lang['p003_right']+"_"+self.userGuideName+"_"+self.dpUIinst.lang["c042_eyelid"]+"_Ctrl"
-                mouthCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c061_mouth"]+"_Ctrl"
-                lipsCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c062_lips"]+"_Ctrl"
-                sneerCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c063_sneer"]+"_Ctrl"
-                grimaceCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c064_grimace"]+"_Ctrl"
-                faceCtrlName = side+self.userGuideName+"_"+self.dpUIinst.lang["c065_face"]+"_Ctrl"
+                self.calibrateName = self.dpUIinst.lang["c111_calibrate"].lower()
                 
                 # connect facial controllers to blendShape node or tweakers:
                 self.connectUserType = self.bsType
@@ -661,32 +601,26 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
                 self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip")
                 
-                # Connect to blendShape node or tweakers controllers:
-                self.connectBS = False
-                self.connectJnt = True
-                if self.connectUserType == self.bsType:
-                    self.connectBS = True
-                    self.connectJnt = False
                 # facial controls
                 if cmds.getAttr(self.moduleGrp+".facial"):
                     if cmds.getAttr(self.moduleGrp+".facialBrow"):
-                        self.lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "red", True, False)
-                        self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "blue", True, False)
+                        self.lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "red", True, False)
+                        self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "blue", True, False)
                     if cmds.getAttr(self.moduleGrp+".facialEyelid"):
                         if self.connectUserType == self.bsType:
-                            self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, self.connectBS, self.connectJnt, "red", True, False)
-                            self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, self.connectBS, self.connectJnt, "blue", True, False)
+                            self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
+                            self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
                     if cmds.getAttr(self.moduleGrp+".facialMouth"):
-                        self.lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "red", True, True)
-                        self.rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, self.connectBS, self.connectJnt, "blue", True, True)
+                        self.lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "red", True, True)
+                        self.rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "blue", True, True)
                     if cmds.getAttr(self.moduleGrp+".facialLips"):
-                        self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, self.connectBS, self.connectJnt, "yellow", True, True)
+                        self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, "yellow", True, True)
                     if cmds.getAttr(self.moduleGrp+".facialSneer"):
-                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, self.connectBS, self.connectJnt, "cyan", True, True)
+                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True)
                     if cmds.getAttr(self.moduleGrp+".facialGrimace"):
-                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, self.connectBS, self.connectJnt, "cyan", True, True)
+                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True)
                     if cmds.getAttr(self.moduleGrp+".facialFace"):
-                        self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, self.connectBS, self.connectJnt, "cyan", False, False)
+                        self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, "cyan", False, False)
 
                 # colorize controllers
                 self.upperCtrlList.append(self.upperHeadCtrl)
@@ -1098,38 +1032,27 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.deleteModule()
     
     
-    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, connectBS=True, connectJnt=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, *args):
+    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, *args):
         """ Important function to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
                 axisDirectionList = [-1, 1, -1, 1, -1, 1] # neg, pos, neg, pos, neg, pos
             Returns the created Facial control and its zeroOut group.
         """
-        # force limits when working on facial joints:
-        if connectJnt:
-            limitX = True
-            limitY = True
-            limitZ = True
-        
         # declaring variables:
         fCtrl = None
         fCtrlGrp = None
-        
         calibrationList = []
         transfList = ["tx", "tx", "ty", "ty", "tz", "tz"]
         # naming:
-        if not side == None:
+        ctrlName = self.userGuideName+"_"+ctrlName
+        if side:
             ctrlName = side+"_"+ctrlName
         fCtrlName = ctrlName+"_Ctrl"
         # skip if already there is this ctrl object:
         if cmds.objExists(fCtrlName):
             return None, None
         else:
-            if self.facialUserType == self.bsType:
-                if connectBS and self.bsNode:
-                    # validating blendShape node:
-                    if cmds.objectType(self.bsNode) == "blendShape":
-                        aliasList = cmds.aliasAttr(self.bsNode, query=True)
             # create control calling dpControls function:
             fCtrl = self.ctrls.cvControl(cvCtrl, fCtrlName, r=1, d=0, rot=rotVector)
             # add head or jaw influence attribute
@@ -1193,85 +1116,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)
                             cmds.connectAttr(invMD+".outputX", fCtrl+"."+attr, force=True)
                             cmds.setAttr(fCtrl+"."+attr, lock=True)
-                        
-                        if self.facialUserType == self.bsType:
-                            # try to connect attributes into blendShape node:
-                            if connectBS and self.bsNode:
-                                addedSide = False
-                                storedAttr = attr
-                                for i, alias in enumerate(aliasList):
-                                    if not side == None and not addedSide:
-                                        attr = side+"_"+attr
-                                        addedSide = True
-                                    if attr in alias:
-                                        try:
-                                            cmds.connectAttr(fCtrl+"."+attr, self.bsNode+"."+alias, force=True)
-                                        except:
-                                            try:
-                                                cmds.connectAttr(fCtrl+"."+storedAttr, self.bsNode+"."+alias, force=True)
-                                            except:
-                                                pass
-#                        else: # setup to using facial joints:
-#                            if connectJnt:
-#                                sidedNodeList = None
-#                                try:
-#                                    sidedNodeList = self.tweaksDic[attr]
-#                                except:
-#                                    pass
-#                                if sidedNodeList:
-#                                    # sideNode is like MIDDLE or SIDED:
-#                                    for sidedNode in sidedNodeList:
-#                                        toNodeList = None
-#                                        try:
-#                                            toNodeList = self.tweaksDic[attr][sidedNode]
-#                                        except:
-#                                            pass
-#                                        if toNodeList:
-#                                            # toNodeBase is igual to facial control offset group target:
-#                                            for toNodeBaseName in toNodeList:
-#                                                toNode = None
-#                                                toNodeSided = toNodeBaseName
-#                                                addedSide = False
-#                                                toNodeTargedList = []
-#                                                for jntTarget in self.jntTargetList:
-#                                                    toNodeSided = toNodeBaseName
-#                                                    if sidedNode == SIDED:
-#                                                        if not addedSide:
-#                                                            if not side == None:
-#                                                                # check prefix:
-#                                                                if jntTarget[1] == "_":
-#                                                                    if side == jntTarget[0]:
-#                                                                        toNodeSided = side+"_"+toNodeBaseName
-#                                                                        if jntTarget.startswith(toNodeSided):    
-#                                                                            toNode = jntTarget
-#                                                                            addedSide = True
-#                                                            elif toNodeSided in jntTarget:
-#                                                                if attr[1] == "_":
-#                                                                    if attr[0] == jntTarget[0]:
-#                                                                        toNode = jntTarget
-#                                                                        addedSide = True
-#                                                                else:
-#                                                                    toNodeTargedList.append(jntTarget)
-#                                                                    toNode = jntTarget
-#                                                    elif jntTarget.startswith(toNodeSided):
-#                                                        if cmds.objExists(jntTarget):
-#                                                            toNode = jntTarget
-#                                                if toNode:
-#                                                    if not toNodeTargedList:
-#                                                        toNodeTargedList.append(toNode)
-#                                                    for toNode in toNodeTargedList:
-#                                                        if cmds.objExists(toNode):
-#                                                            # caculate factor for scaled item:
-#                                                            sizeFactor = self.dpGetSizeFactor(toNode)
-#                                                            if not sizeFactor:
-#                                                                sizeFactor = 1
-#                                                            toAttrList = self.tweaksDic[attr][sidedNode][toNodeBaseName]
-#                                                            for toAttr in toAttrList:
-#                                                                # read stored values in order to call function to make the setup:
-#                                                                oMin = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][0]
-#                                                                oMax = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][1]
-#                                                                self.dpCreateRemapNode(fCtrl, attr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
-#                                                                self.RmVNumber = self.RmVNumber+1
             if calibrationList:
                 self.ctrls.setCalibrationAttr(fCtrl, calibrationList)
         return fCtrl, fCtrlGrp
@@ -1367,19 +1211,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.moduleGrp+".connectUserType", 0)
         elif self.connectUserType == self.jointsType:
             cmds.setAttr(self.moduleGrp+".connectUserType", 1)
-
-
-    def dpGetSizeFactor(self, toNode, *args):
-        """ Get the child control size value and return it.
-        """
-        childrenList = cmds.listRelatives(toNode, children=True, type="transform")
-        if childrenList:
-            for child in childrenList:
-                if cmds.objExists(child+".dpControl"):
-                    if cmds.getAttr(child+".dpControl") == 1:
-                        if cmds.objExists(child+".size"):
-                            sizeValue = cmds.getAttr(child+".size")
-                            return sizeValue
     
     
     def integratingInfo(self, *args):
