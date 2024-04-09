@@ -997,10 +997,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                     self.dpUIinst.lang['c109_close'].lower()+self.dpUIinst.lang['c111_calibrate']+"Y",
                                     self.dpUIinst.lang['c109_close'].lower()+self.dpUIinst.lang['c111_calibrate']+"Z"
                 ]
-                self.ctrls.setCalibrationAttr(self.neckCtrlList[0], neckCalibrationList)
-                self.ctrls.setCalibrationAttr(self.jawCtrl, jawCalibrationList)
-                self.ctrls.setCalibrationAttr(self.upperLipCtrl, lipCalibrationList)
-                self.ctrls.setCalibrationAttr(self.lowerLipCtrl, lipCalibrationList)
+                self.ctrls.setStringAttrFromList(self.neckCtrlList[0], neckCalibrationList)
+                self.ctrls.setStringAttrFromList(self.jawCtrl, jawCalibrationList)
+                self.ctrls.setStringAttrFromList(self.upperLipCtrl, lipCalibrationList)
+                self.ctrls.setStringAttrFromList(self.lowerLipCtrl, lipCalibrationList)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
                 self.toCtrlHookGrp     = cmds.group(self.zeroNeckCtrlList[0], self.zeroCtrlList[2], self.zeroCtrlList[8], self.zeroCtrlList[9], name=side+self.userGuideName+"_Control_Grp")
@@ -1072,14 +1072,19 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleY", force=True)
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
             # start work with custom attributes
+            facialAttrList = []
             if attrList:
                 for a, attr in enumerate(attrList):
                     if not attr == None:
+                        ctrlAttr = attr
+                        if side:
+                            ctrlAttr = side+"_"+attr
+                        facialAttrList.append(ctrlAttr)
                         if directConnection:
                             cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0, minValue=0, maxValue=1)
                             cmds.setAttr(fCtrl+"."+attr, keyable=True)
                         else:
-                            cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0)
+                            cmds.addAttr(fCtrl, longName=ctrlAttr, attributeType="float", defaultValue=0)
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
                             clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
@@ -1114,10 +1119,12 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             else:
                                 cmds.connectAttr(calibrateMD+".outputX", clp+".input.inputR", force=True)
                             cmds.connectAttr(clp+".outputR", invMD+".input1X", force=True)
-                            cmds.connectAttr(invMD+".outputX", fCtrl+"."+attr, force=True)
-                            cmds.setAttr(fCtrl+"."+attr, lock=True)
+                            cmds.connectAttr(invMD+".outputX", fCtrl+"."+ctrlAttr, force=True)
+                            cmds.setAttr(fCtrl+"."+ctrlAttr, lock=True)
+            if facialAttrList:
+                self.ctrls.setStringAttrFromList(fCtrl, facialAttrList, "facialList")
             if calibrationList:
-                self.ctrls.setCalibrationAttr(fCtrl, calibrationList)
+                self.ctrls.setStringAttrFromList(fCtrl, calibrationList)
         return fCtrl, fCtrlGrp
     
     

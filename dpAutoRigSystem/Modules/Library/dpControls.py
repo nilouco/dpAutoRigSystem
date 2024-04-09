@@ -1033,7 +1033,7 @@ class ControlClass(object):
                             for node in allNodeList:
                                 self.mirrorCalibration(node, fromPrefix, toPrefix)
             else:
-                attrList = self.getCalibrationAttr(nodeName)
+                attrList = self.getListFromStringAttr(nodeName)
                 if attrList:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
@@ -1054,7 +1054,7 @@ class ControlClass(object):
                     destinationList = currentSelectionList[1:]
         if sourceItem:
             if not attrList:
-                attrList = self.getCalibrationAttr(sourceItem)
+                attrList = self.getListFromStringAttr(sourceItem)
             if attrList:
                 self.transferAttr(sourceItem, destinationList, attrList)
             if verbose:
@@ -1063,23 +1063,25 @@ class ControlClass(object):
             print(self.dpUIinst.lang['i042_notSelection'])
 
 
-    def setCalibrationAttr(self, nodeName, attrList, *args):
-        """ Set the calibration attribute that contains a list of attributes to be used in the transfer calibration.
-            Add calibrationList attribute if it doesn't exists.
+    def setStringAttrFromList(self, nodeName, attrList, attrName="calibrationList", *args):
+        """ Set the given attribute that contains a list of the given list.
+            Add a string attribute if it doesn't exists.
+            Useful for calibrationList attribute.
         """
         if cmds.objExists(nodeName):
             if attrList:
                 calibrationAttr = ';'.join(attrList)
-                if not cmds.objExists(nodeName+".calibrationList"):
-                    cmds.addAttr(nodeName, longName="calibrationList", dataType="string")
-                cmds.setAttr(nodeName+".calibrationList", calibrationAttr, type="string")
+                if not cmds.objExists(nodeName+"."+attrName):
+                    cmds.addAttr(nodeName, longName=attrName, dataType="string")
+                cmds.setAttr(nodeName+"."+attrName, calibrationAttr, type="string")
 
 
-    def getCalibrationAttr(self, nodeName, *args):
-        """ Return the calibrationList attribute if it exists in the given nodeName.
+    def getListFromStringAttr(self, nodeName, attrName="calibrationList", *args):
+        """ Return the list from a string if it exists in the given nodeName.
+            Useful to ready calibrationList attributes by default.
         """
-        if cmds.objExists(nodeName+".calibrationList"):
-            return list(cmds.getAttr(nodeName+".calibrationList").split(";"))
+        if cmds.objExists(nodeName+"."+attrName):
+            return list(cmds.getAttr(nodeName+"."+attrName).split(";"))
 
 
     def getControlList(self, *args):
@@ -1290,7 +1292,7 @@ class ControlClass(object):
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
-        self.setCalibrationAttr(jcrCtrl, toCalibrationList)
+        self.setStringAttrFromList(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
 
 

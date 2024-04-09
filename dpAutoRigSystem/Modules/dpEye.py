@@ -408,7 +408,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.dpUIinst.lang['c052_fix']+self.dpUIinst.lang['c029_middle']+"TranslateZ",
             self.dpUIinst.lang['c107_reduce']+self.dpUIinst.lang['c029_middle']+"Open"
         ]
-        self.ctrls.setCalibrationAttr(eyelidCtrl, eyelidCalibrationList)
+        self.ctrls.setStringAttrFromList(eyelidCtrl, eyelidCalibrationList)
         return eyelidCtrl, eyelidCtrlZero
         
         

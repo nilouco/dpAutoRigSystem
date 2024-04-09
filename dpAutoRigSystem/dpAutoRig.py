@@ -2170,7 +2170,7 @@ class DP_AutoRig_UI(object):
             self.ctrls.setLockHide([self.masterCtrl], ['sx', 'sy', 'sz'])
             self.ctrls.setLockHide([self.optionCtrl], ['rigScaleOutput'])
             self.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-            self.ctrls.setCalibrationAttr(self.optionCtrl, ['rigScaleMultiplier'])
+            self.ctrls.setStringAttrFromList(self.optionCtrl, ['rigScaleMultiplier'])
             cmds.parent(self.rootCtrl, self.masterCtrl)
             cmds.parent(self.masterCtrl, self.globalCtrl)
             cmds.parent(self.globalCtrl, self.ctrlsGrp)

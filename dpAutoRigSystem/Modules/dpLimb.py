@@ -1718,10 +1718,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 fkExtremCalibrationList = [self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize()]
                 fkBeforeCalibrationList = [self.dpUIinst.lang['c032_follow']]
                 if self.limbStyle == self.dpUIinst.lang['m155_quadrupedExtra']:
-                    self.ctrls.setCalibrationAttr(self.quadExtraCtrl, ['autoOrient'])
-                self.ctrls.setCalibrationAttr(self.ikExtremCtrl, ikExtremCalibrationList)
-                self.ctrls.setCalibrationAttr(self.fkCtrlList[-1], fkExtremCalibrationList)
-                self.ctrls.setCalibrationAttr(self.fkCtrlList[0], fkBeforeCalibrationList)
+                    self.ctrls.setStringAttrFromList(self.quadExtraCtrl, ['autoOrient'])
+                self.ctrls.setStringAttrFromList(self.ikExtremCtrl, ikExtremCalibrationList)
+                self.ctrls.setStringAttrFromList(self.fkCtrlList[-1], fkExtremCalibrationList)
+                self.ctrls.setStringAttrFromList(self.fkCtrlList[0], fkBeforeCalibrationList)
 
                 # integrating dics:
                 self.extremJntList.append(self.skinJointList[-2])

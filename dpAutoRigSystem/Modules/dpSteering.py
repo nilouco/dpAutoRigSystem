@@ -175,7 +175,7 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                             self.dpUIinst.lang['c071_limit'],
                                             self.dpUIinst.lang['c049_intensity']
                                             ]
-                self.ctrls.setCalibrationAttr(self.steeringCtrl, steeringCalibrationList)
+                self.ctrls.setStringAttrFromList(self.steeringCtrl, steeringCalibrationList)
 
                 # grouping:
                 cmds.parent(zeroOutCtrlGrpList[0], self.mainCtrl)
