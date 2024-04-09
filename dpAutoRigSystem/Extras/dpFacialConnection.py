@@ -58,10 +58,7 @@ class FacialConnection(object):
                 # load fields:
                 self.userType = TYPE_BS
                 self.bsNode = None
-                if cmds.objExists(BODY_BSNAME):
-                    self.dpLoadBSTgtList(BODY_BSNAME)
-                elif cmds.objExists(HEAD_BSNAME):
-                    self.dpLoadBSTgtList(HEAD_BSNAME)
+
                 self.dpLoadJointNode(self.tweaksNameList)
 
         # declaring gaming dictionary:
@@ -216,22 +213,42 @@ class FacialConnection(object):
             mel.eval("warning \""+self.dpUIinst.lang["i042_notSelection"]+"\";")
 
 
-    def dpConnectToBlendShape(self, *args):
+    def dpConnectToBlendShape(self, ctrlList=None, bsList=None, *args):
+        """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
         """
-        """
-        print("connecting to the blendShapes forever!!!")
-        # TODO
-        # WIP
-        facialCtrlDic = {}
-        ctrlList = self.ctrls.getControlList()
+        facialCtrlDic, bsDic = {}, {}
+        # get facialList attr from dpAR controls found
+        if not ctrlList:
+            ctrlList = self.ctrls.getControlList()
         if ctrlList:
             for ctrl in ctrlList:
                 if cmds.objExists(ctrl+".facialList"):
                     facialCtrlDic[ctrl] = self.ctrls.getListFromStringAttr(ctrl, "facialList")
-        print("facialCtrlDic =", facialCtrlDic)
-
-
-
+        # get target list from existing blendShape nodes
+        if not bsList:
+            bsList = cmds.ls(selection=False, type="blendShape")
+        if bsList:
+            for bsNode in bsList:
+                targetList = cmds.listAttr(bsNode+".w", multi=True)
+                if targetList:
+                    bsDic[bsNode] = targetList
+        # connect them
+        if facialCtrlDic and bsDic:
+            for facialCtrl in list(facialCtrlDic.keys()):
+                for bsNode in list(bsDic.keys()):
+                    for facialAttr in facialCtrlDic[facialCtrl]:
+                        for targetAttr in bsDic[bsNode]:
+                            connectIt = False
+                            if targetAttr.endswith(facialAttr+"_Tgt"):
+                                connectIt = True
+                            elif targetAttr.endswith(facialAttr):
+                                connectIt = True
+                            elif facialAttr == targetAttr:
+                                connectIt = True
+                            # not including here the (facialAttr in targetAttr) statement to try avoid connect into combination alias
+                            if connectIt:
+                                cmds.connectAttr(facialCtrl+"."+facialAttr, bsNode+"."+targetAttr, force=True)
+                                print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
 
 
     def dpConnectToJoints(self, *args):
@@ -426,44 +443,6 @@ class FacialConnection(object):
         return fCtrl, fCtrlGrp
     
     
-    
-    def dpLoadBSNode(self, *args):
-        """ Load selected object as blendShapeNode
-        """
-        selectedList = cmds.ls(selection=True)
-        if selectedList:
-            if cmds.objectType(selectedList[0]) == "blendShape":
-                cmds.textField(self.bsNodeTextField, edit=True, text=selectedList[0])
-                self.dpLoadBSTgtList(selectedList[0])
-                self.bsNode = selectedList[0]
-            elif cmds.objectType(selectedList[0]) == "transform":
-                meshList = cmds.listRelatives(selectedList[0], children=True, shapes=True, noIntermediate=True, type="mesh")
-                if meshList:
-                    bsNodeList = cmds.listConnections(meshList[0], type="blendShape")
-                    if bsNodeList:
-                        self.dpLoadBSTgtList(bsNodeList[0])
-                        self.bsNode = bsNodeList[0]
-                    else:
-                        mel.eval("warning \""+self.dpUIinst.lang["e018_selectBlendShape"]+"\";")
-                else:
-                    mel.eval("warning \""+self.dpUIinst.lang["e018_selectBlendShape"]+"\";")
-            else:
-                mel.eval("warning \""+self.dpUIinst.lang["e018_selectBlendShape"]+"\";")
-        else:
-            mel.eval("warning \""+self.dpUIinst.lang["e018_selectBlendShape"]+"\";")
-    
-    
-    def dpLoadBSTgtList(self, bsNodeName, *args):
-        """ Add target list found in the blendShape node to target textScroll list
-        """
-        if cmds.objExists(bsNodeName):
-            if cmds.objectType(bsNodeName) == "blendShape":
-                tgtList = cmds.blendShape(bsNodeName, query=True, target=True)
-                if tgtList:
-                    cmds.textScrollList(self.bsTargetScrollList, edit=True, removeAll=True)
-                    cmds.textScrollList(self.bsTargetScrollList, edit=True, append=tgtList)
-                    cmds.textField(self.bsNodeTextField, edit=True, text=bsNodeName)
-                    self.bsNode = bsNodeName
     
     
     def dpLoadJointNode(self, itemList, *args):
