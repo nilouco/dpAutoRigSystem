@@ -3,7 +3,6 @@ from maya import cmds
 from maya import mel
 import os
 import json
-from ..Modules.Library import dpControls
 
 # global variables to this module:
 CLASS_NAME = "FacialConnection"
@@ -37,7 +36,7 @@ class FacialConnection(object):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ctrls = dpUIinst.ctrls
         self.ui = ui
         self.headFacialCtrlsGrp = self.dpUIinst.lang["c024_head"]+"_"+self.dpUIinst.lang["c059_facial"]+"_Ctrls_Grp"
         self.jntTargetList = []
@@ -47,8 +46,6 @@ class FacialConnection(object):
                             "L_LipsSide", "L_MouthSmile", "L_MouthSad", "L_MouthWide", "L_MouthNarrow", "L_Sneer", "L_Grimace", "L_Puff",
                             "Pucker", "LipsUp", "LipsDown", "LipsFront", "LipsBack", "UpperLipFront", "UpperLipBack", "LowerLipFront", "LowerLipBack", "SoftSmile", "BigSmile", "AAA", "OOO", "UUU", "FFF", "MMM"
                             ]
-        # redefining Tweaks variables:
-        self.dpInitTweaksVariables()
         # call main function:
         if self.ui:
             self.dpFacialConnectionUI(self)
@@ -61,8 +58,7 @@ class FacialConnection(object):
 
                 self.dpLoadJointNode(self.tweaksNameList)
 
-        # declaring gaming dictionary:
-        self.tweaksDic = self.dpInitTweaksDic()
+        
     
     
     def dpInitTweaksVariables(self, *args):
@@ -213,17 +209,25 @@ class FacialConnection(object):
             mel.eval("warning \""+self.dpUIinst.lang["i042_notSelection"]+"\";")
 
 
-    def dpConnectToBlendShape(self, ctrlList=None, bsList=None, *args):
-        """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
+    def dpGetFacialCtrlDic(self, ctrlList, *args):
+        """ Return the facial control dic with facialList attributes.
         """
-        facialCtrlDic, bsDic = {}, {}
-        # get facialList attr from dpAR controls found
+        resultDic = {}
         if not ctrlList:
             ctrlList = self.ctrls.getControlList()
         if ctrlList:
             for ctrl in ctrlList:
                 if cmds.objExists(ctrl+".facialList"):
-                    facialCtrlDic[ctrl] = self.ctrls.getListFromStringAttr(ctrl, "facialList")
+                    resultDic[ctrl] = self.ctrls.getListFromStringAttr(ctrl, "facialList")
+        return resultDic
+    
+
+    def dpConnectToBlendShape(self, ctrlList=None, bsList=None, *args):
+        """ Find all dpControl and list their facial attributes to connect into existing alias in all blendShape nodes.
+        """
+        bsDic = {}
+        # get facialList attr from found dpAR controls
+        facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
         # get target list from existing blendShape nodes
         if not bsList:
             bsList = cmds.ls(selection=False, type="blendShape")
@@ -251,12 +255,93 @@ class FacialConnection(object):
                                 print(self.dpUIinst.lang['m143_connected'], facialCtrl+"."+facialAttr, "->", bsNode+"."+targetAttr)
 
 
-    def dpConnectToJoints(self, *args):
+    def dpConnectToJoints(self, ctrlList=None, *args):
         """
         """
         print("here we are full of love with facial joints my friend...")
         # TODO
 
+        #WIP
+        facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
+        if facialCtrlDic:
+            
+            print("here 0001")
+            # redefining Tweaks variables:
+            self.dpInitTweaksVariables()
+            # declaring gaming dictionary:
+            self.tweaksDic = self.dpInitTweaksDic()
+            print("here 0002")
+
+            if self.tweaksDic:
+                
+                for facialCtrl in list(facialCtrlDic.keys()):
+                    for facialAttr in facialCtrlDic[facialCtrl]:
+                        print("here 0003, facialAttr =", facialAttr)
+
+                        sidedNodeList = None
+                        try:
+                            sidedNodeList = self.tweaksDic[facialAttr]
+                        except:
+                            try:
+                                sidedNodeList = self.tweaksDic[facialAttr[facialAttr.find("_")+1:]]
+                                print("by second part")
+                            except:
+                                pass
+                        print("sidedNodeList =", sidedNodeList)
+                        if sidedNodeList:
+                            # sideNode is like MIDDLE or SIDED:
+                            for sidedNode in sidedNodeList:
+                                toNodeList = None
+                                try:
+                                    toNodeList = self.tweaksDic[attr][sidedNode]
+                                except:
+                                    pass
+                                if toNodeList:
+                                    # toNodeBase is equal to facial control offset group target:
+                                    for toNodeBaseName in toNodeList:
+                                        toNode = None
+                                        toNodeSided = toNodeBaseName
+                                        addedSide = False
+                                        toNodeTargedList = []
+                                        for jntTarget in self.jntTargetList:
+                                            toNodeSided = toNodeBaseName
+                                            if sidedNode == SIDED:
+                                                if not addedSide:
+                                                    if not side == None:
+                                                        # check prefix:
+                                                        if jntTarget[1] == "_":
+                                                            if side == jntTarget[0]:
+                                                                toNodeSided = side+"_"+toNodeBaseName
+                                                                if jntTarget.startswith(toNodeSided):    
+                                                                    toNode = jntTarget
+                                                                    addedSide = True
+                                                    elif toNodeSided in jntTarget:
+                                                        if attr[1] == "_":
+                                                            if attr[0] == jntTarget[0]:
+                                                                toNode = jntTarget
+                                                                addedSide = True
+                                                        else:
+                                                            toNodeTargedList.append(jntTarget)
+                                                            toNode = jntTarget
+                                            elif jntTarget.startswith(toNodeSided):
+                                                if cmds.objExists(jntTarget):
+                                                    toNode = jntTarget
+                                        if toNode:
+                                            if not toNodeTargedList:
+                                                toNodeTargedList.append(toNode)
+                                            for toNode in toNodeTargedList:
+                                                if cmds.objExists(toNode):
+                                                    # caculate factor for scaled item:
+                                                    sizeFactor = self.dpGetSizeFactor(toNode)
+                                                    if not sizeFactor:
+                                                        sizeFactor = 1
+                                                    toAttrList = self.tweaksDic[attr][sidedNode][toNodeBaseName]
+                                                    for toAttr in toAttrList:
+                                                        # read stored values in order to call function to make the setup:
+                                                        oMin = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][0]
+                                                        oMax = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][1]
+                                                        self.dpCreateRemapNode(fCtrl, attr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
+                                                        self.RmVNumber = self.RmVNumber+1
 
 
 

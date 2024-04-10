@@ -2,6 +2,7 @@
 from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
+from ..Extras import dpFacialConnection
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -26,6 +27,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.aInnerCtrls = []
         self.redeclareVariables(self.guideName)
         self.facialFactor = 0.15
+        self.dpFacialConnect = dpFacialConnection.FacialConnection(self.dpUIinst, ui=False)
 
     
     def createModuleLayout(self, *args):
@@ -1025,6 +1027,13 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                
+            # connect to facial controllers to blendShapes or facial joints
+            if cmds.getAttr(self.moduleGrp+".facial"):
+                if self.connectUserType == self.bsType:
+                    self.dpFacialConnect.dpConnectToBlendShape()
+                else:
+                    self.dpFacialConnect.dpConnectToJoints()
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)
