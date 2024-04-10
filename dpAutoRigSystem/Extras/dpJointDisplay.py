@@ -25,9 +25,14 @@ class JointDisplay(object):
         self.multiChildLabelList = []
         self.noneLabelList = []
         #start
+        self.ui = ui
         self.closeUI()
         self.jointDisplayUI()
-        # self.scriptJob()
+        
+        # Call Main function
+        if self.ui:
+            self.jointDisplayUI()
+            cmds.scriptJob(event=('SelectionChanged', self.refreshPreview), parent='dpRenamerWin', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
 
     def closeUI(self, *args, **kwargs):
         if cmds.window('jointDisplayWindow', query=True, exists=True):
@@ -82,6 +87,12 @@ class JointDisplay(object):
         cmds.showWindow(jointDisplayWindow)
 
 
+    def originalJointList(self):
+        """ Search all joints   """
+        cmds.ls(type = 'joint')
+
+
+
 #TODO
     # FUNCTIONS   
     # -> Build UI -- OK
@@ -98,9 +109,12 @@ class JointDisplay(object):
 
     # Algoritm
 
+    # -> Populate OriginalList
     # -> Close UI if exists
     # -> Open UI
     # -> List All joints in the scene and show it
     # -> If the search field have any character filter it and populate in the boards.
     # -> If I select any joint in the some board, and press a button, Do this action
     # -> If I choose the button to change all joints, Do this action
+
+    
