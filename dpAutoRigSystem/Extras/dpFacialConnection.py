@@ -49,16 +49,6 @@ class FacialConnection(object):
         # call main function:
         if self.ui:
             self.dpFacialConnectionUI(self)
-
-            TEMP = None
-            if TEMP:
-                # load fields:
-                self.userType = TYPE_BS
-                self.bsNode = None
-
-                self.dpLoadJointNode(self.tweaksNameList)
-
-        
     
     
     def dpInitTweaksVariables(self, *args):
@@ -262,86 +252,145 @@ class FacialConnection(object):
         # TODO
 
         #WIP
-        facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
-        if facialCtrlDic:
+        # redefining Tweaks variables to get the tweaks name list
+        self.dpInitTweaksVariables()
+        # get joint target list
+        self.dpGetJointNode(self.tweaksNameList)
+        if self.jntTargetList:
+
+            print("self.jntTargetList =", self.jntTargetList)
+
+            facialCtrlDic = self.dpGetFacialCtrlDic(ctrlList)
+            print("facialCtrlDic =", facialCtrlDic)
             
-            print("here 0001")
-            # redefining Tweaks variables:
-            self.dpInitTweaksVariables()
-            # declaring gaming dictionary:
-            self.tweaksDic = self.dpInitTweaksDic()
-            print("here 0002")
-
-            if self.tweaksDic:
+            if facialCtrlDic:
                 
-                for facialCtrl in list(facialCtrlDic.keys()):
-                    for facialAttr in facialCtrlDic[facialCtrl]:
-                        print("here 0003, facialAttr =", facialAttr)
+                
+                # declaring gaming dictionary:
+                self.tweaksDic = self.dpInitTweaksDic()
+                print("self.tweaksDic =", self.tweaksDic)
+                
 
-                        sidedNodeList = None
-                        try:
-                            sidedNodeList = self.tweaksDic[facialAttr]
-                        except:
-                            try:
-                                sidedNodeList = self.tweaksDic[facialAttr[facialAttr.find("_")+1:]]
-                                print("by second part")
-                            except:
-                                pass
-                        print("sidedNodeList =", sidedNodeList)
-                        if sidedNodeList:
-                            # sideNode is like MIDDLE or SIDED:
-                            for sidedNode in sidedNodeList:
-                                toNodeList = None
-                                try:
-                                    toNodeList = self.tweaksDic[attr][sidedNode]
-                                except:
-                                    pass
-                                if toNodeList:
-                                    # toNodeBase is equal to facial control offset group target:
-                                    for toNodeBaseName in toNodeList:
-                                        toNode = None
-                                        toNodeSided = toNodeBaseName
-                                        addedSide = False
-                                        toNodeTargedList = []
-                                        for jntTarget in self.jntTargetList:
-                                            toNodeSided = toNodeBaseName
-                                            if sidedNode == SIDED:
-                                                if not addedSide:
-                                                    if not side == None:
-                                                        # check prefix:
-                                                        if jntTarget[1] == "_":
-                                                            if side == jntTarget[0]:
-                                                                toNodeSided = side+"_"+toNodeBaseName
-                                                                if jntTarget.startswith(toNodeSided):    
-                                                                    toNode = jntTarget
-                                                                    addedSide = True
-                                                    elif toNodeSided in jntTarget:
-                                                        if attr[1] == "_":
-                                                            if attr[0] == jntTarget[0]:
-                                                                toNode = jntTarget
-                                                                addedSide = True
-                                                        else:
-                                                            toNodeTargedList.append(jntTarget)
+                if self.tweaksDic:
+                    
+                    for facialCtrl in list(facialCtrlDic.keys()):
+                        print("facialCtrl = ", facialCtrl)
+
+                        for facialAttr in facialCtrlDic[facialCtrl]:
+                            print("FACIALATTR =", facialAttr)
+                            
+                            sidePrefix = None
+                            sidedAttr = facialAttr
+                            if facialAttr[1] == "_":
+                                sidePrefix = facialAttr[0]
+                                #facialAttr = facialAttr[2:]
+                                sidedAttr = facialAttr[2:]
+                            
+                            print("sidePrefix =", sidePrefix)
+
+                            #for attrDic in list(self.tweaksDic[facialAttr].keys()):
+                            for attrDic in list(self.tweaksDic[sidedAttr].keys()):
+                            
+                            
+                            
+                                print("attrDic =", attrDic)
+#                                if sidePrefix:
+#                                    if attrDic.startswith(sidePrefix):
+#                                        print("BINGO!!!!! ====", attrDic)
+
+                                        
+                            
+                            
+                            
+                            
+                            
+                                sidedNodeList = None
+                                #try:
+                                    #sidedNodeList = self.tweaksDic[facialAttr]
+                                sidedNodeList = self.tweaksDic[sidedAttr]
+                                #except:
+                                #    print("NOT WORKED sidedAttr =", sidedAttr)
+                                #    pass
+                                if sidedNodeList:
+                                    print("sidedNodeList =", sidedNodeList)
+                                    # sidedNode is like MIDDLE or SIDED:
+                                    for sidedNode in sidedNodeList:
+                                        toNodeList = None
+                                        #try:
+                                        #    #toNodeList = self.tweaksDic[facialAttr][sidedNode]
+                                        toNodeList = self.tweaksDic[sidedAttr][sidedNode]
+                                        #except:
+                                        #    print("NNNOOOOOOOO here sidedNode,", sidedNode)
+                                        #    pass
+                                        if toNodeList:
+                                            print("toNodeList =", toNodeList)
+                                            # toNodeBase is igual to facial control offset group target:
+                                            for toNodeBaseName in toNodeList:
+                                                toNode = None
+                                                toNodeSided = toNodeBaseName
+                                                addedSide = False
+                                                toNodeTargedList = []
+                                                for jntTarget in self.jntTargetList:
+                                                    toNodeSided = toNodeBaseName
+                                                    #if sidedNode == SIDED:
+                                                    #    if not addedSide:
+                                                    #        if sidePrefix:
+                                                    #            if attrDic.startswith(sidePrefix):
+                                                    #                print("BINGO!!!!! ====", attrDic)
+                                                    #                toNodeSided = sidePrefix+"_"+toNodeBaseName
+                                                    #                if jntTarget.startswith(toNodeSided):
+                                                    #                    toNode = jntTarget
+                                                    #                    addedSide = True
+                                                            #if not side == None:
+                                                            #    # check prefix:
+                                                            #    if jntTarget[1] == "_":
+                                                            #        if side == jntTarget[0]:
+                                                            #            toNodeSided = side+"_"+toNodeBaseName
+                                                            #            if jntTarget.startswith(toNodeSided):    
+                                                            #                toNode = jntTarget
+                                                            #                addedSide = True
+                                                            #elif toNodeSided in jntTarget:
+                                                    #            elif toNodeSided in jntTarget:
+                                                    #                if facialAttr[1] == "_":
+                                                    #                    if facialAttr[0] == jntTarget[0]:
+                                                    #                        toNode = jntTarget
+                                                    #                        addedSide = True
+                                                    #                else:
+                                                    #                    toNodeTargedList.append(jntTarget)
+                                                    #                    toNode = jntTarget
+                                                    #elif jntTarget.startswith(toNodeSided):
+                                                    if jntTarget.startswith(toNodeSided):
+                                                        if cmds.objExists(jntTarget):
                                                             toNode = jntTarget
-                                            elif jntTarget.startswith(toNodeSided):
-                                                if cmds.objExists(jntTarget):
-                                                    toNode = jntTarget
-                                        if toNode:
-                                            if not toNodeTargedList:
-                                                toNodeTargedList.append(toNode)
-                                            for toNode in toNodeTargedList:
-                                                if cmds.objExists(toNode):
-                                                    # caculate factor for scaled item:
-                                                    sizeFactor = self.dpGetSizeFactor(toNode)
-                                                    if not sizeFactor:
-                                                        sizeFactor = 1
-                                                    toAttrList = self.tweaksDic[attr][sidedNode][toNodeBaseName]
-                                                    for toAttr in toAttrList:
-                                                        # read stored values in order to call function to make the setup:
-                                                        oMin = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][0]
-                                                        oMax = self.tweaksDic[attr][sidedNode][toNodeBaseName][toAttr][1]
-                                                        self.dpCreateRemapNode(fCtrl, attr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
-                                                        self.RmVNumber = self.RmVNumber+1
+                                                    elif sidePrefix:
+                                                        if attrDic.startswith(sidePrefix):
+                                                            print("BINGO!!!!! ====", attrDic)
+                                                            toNodeSided = sidePrefix+"_"+toNodeBaseName
+                                                            if jntTarget.startswith(toNodeSided):
+                                                                toNode = jntTarget
+                                                    #            addedSide = True
+                                                if toNode:
+                                                    if not toNodeTargedList:
+                                                        toNodeTargedList.append(toNode)
+                                                    for toNode in toNodeTargedList:
+                                                        if cmds.objExists(toNode):
+                                                            # caculate factor for scaled item:
+                                                            sizeFactor = self.dpGetSizeFactor(toNode)
+                                                            if not sizeFactor:
+                                                                sizeFactor = 1
+                                                            #toAttrList = self.tweaksDic[facialAttr][sidedNode][toNodeBaseName]
+                                                            toAttrList = self.tweaksDic[sidedAttr][sidedNode][toNodeBaseName]
+                                                            for toAttr in toAttrList:
+                                                                # read stored values in order to call function to make the setup:
+                                                                #oMin = self.tweaksDic[facialAttr][sidedNode][toNodeBaseName][toAttr][0]
+                                                                #oMax = self.tweaksDic[facialAttr][sidedNode][toNodeBaseName][toAttr][1]
+                                                                oMin = self.tweaksDic[sidedAttr][sidedNode][toNodeBaseName][toAttr][0]
+                                                                oMax = self.tweaksDic[sidedAttr][sidedNode][toNodeBaseName][toAttr][1]
+                                                                print("HERE ====", facialCtrl, facialAttr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
+                                                                ### HERE ==== Head_Grimace_Ctrl Grimace Tweaks_Lower_Lip_00 Tweaks_Lower_Lip_00_Ctrl_Offset_Grp ty 52 0.2721433937549591 0 -0.14
+
+                                                                self.dpCreateRemapNode(facialCtrl, facialAttr, toNodeBaseName, toNode, toAttr, self.RmVNumber, sizeFactor, oMin, oMax)
+                                                                self.RmVNumber = self.RmVNumber+1
 
 
 
@@ -530,8 +579,8 @@ class FacialConnection(object):
     
     
     
-    def dpLoadJointNode(self, itemList, *args):
-        """ Load the respective items to build the joint target list (offset group node).
+    def dpGetJointNode(self, itemList, *args):
+        """ Load the respective items to build the joint target list (offset group node) and returns it.
         """
         leftPrefix = self.dpUIinst.lang["p002_left"]+"_"
         rightPrefix = self.dpUIinst.lang["p003_right"]+"_"
@@ -541,30 +590,14 @@ class FacialConnection(object):
             leftName   = leftPrefix+item+offsetSuffix
             rightName  = rightPrefix+item+offsetSuffix
             if cmds.objExists(centerName):
-                self.dpLoadJointTgtList(centerName)
+                self.jntTargetList.append(centerName)
             if cmds.objExists(leftName):
-                self.dpLoadJointTgtList(leftName)
+                self.jntTargetList.append(leftName)
             if cmds.objExists(rightName):
-                self.dpLoadJointTgtList(rightName)
+                self.jntTargetList.append(rightName)
+        return self.jntTargetList
     
     
-    def dpLoadJointTgtList(self, item, *args):
-        # get current list
-        currentList = cmds.textScrollList(self.jntTargetScrollList, query=True, allItems=True)
-        if currentList:
-            # clear current list
-            cmds.textScrollList(self.jntTargetScrollList, edit=True, removeAll=True)
-            # avoid repeated items
-            if not item in currentList:
-                currentList.append(item)
-            # refresh textScrollList
-            cmds.textScrollList(self.jntTargetScrollList, edit=True, append=currentList)
-        else:
-            # add selected items in the empyt target scroll list
-            cmds.textScrollList(self.jntTargetScrollList, edit=True, append=item)
-        self.jntTargetList = cmds.textScrollList(self.jntTargetScrollList, query=True, allItems=True)
-    
-
     def dpGetSizeFactor(self, toNode, *args):
         """ Get the child control size value and return it.
         """
@@ -576,3 +609,45 @@ class FacialConnection(object):
                         if cmds.objExists(child+".size"):
                             sizeValue = cmds.getAttr(child+".size")
                             return sizeValue
+                        
+
+    def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
+        """ Creates the nodes to remap values and connect it to final output (toNode) item.
+        """
+        fromNodeName = self.utils.extractSuffix(fromNode)
+        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
+        outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
+        if "t" in toAttr:
+            if not cmds.objExists(fromNode+".sizeFactor"):
+                cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
+            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
+            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
+            cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
+            cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
+            cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
+        else:
+            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
+            cmds.connectAttr(fromNode+"."+outMaxAttr, remap+".outputMax", force=True)
+        cmds.setAttr(remap+".inputMin", iMin)
+        cmds.setAttr(remap+".inputMax", iMax)
+        cmds.setAttr(remap+".outputMin", oMin)
+        cmds.connectAttr(fromNode+"."+fromAttr, remap+".inputValue", force=True)
+        # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
+        connectedList = cmds.listConnections(toNode+"."+toAttr, destination=False, source=True, plugs=False)
+        if connectedList:
+            if cmds.objectType(connectedList[0]) == "plusMinusAverage":
+                inputList = cmds.listConnections(connectedList[0]+".input1D", destination=False, source=True, plugs=False)
+                cmds.connectAttr(remap+".outValue", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
+            else:
+                if cmds.objectType(connectedList[0]) == "unitConversion":
+                    connectedAttr = cmds.listConnections(connectedList[0]+".input", destination=False, source=True, plugs=True)[0]
+                else:
+                    connectedAttr = cmds.listConnections(toNode+"."+toAttr, destination=False, source=True, plugs=True)[0]
+                pma = cmds.createNode("plusMinusAverage", name=toNode+"_"+toAttr.upper()+"_PMA")
+                cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
+                cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
+                cmds.connectAttr(pma+".output1D", toNode+"."+toAttr, force=True)
+                if cmds.objectType(connectedList[0]) == "unitConversion":
+                    cmds.delete(connectedList[0])
+        else:
+            cmds.connectAttr(remap+".outValue", toNode+"."+toAttr, force=True)

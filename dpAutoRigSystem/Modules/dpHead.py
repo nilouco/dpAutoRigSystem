@@ -1175,46 +1175,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.transformLimits(fCtrl, translationY=(0, 1))
     
     
-    def dpCreateRemapNode(self, fromNode, fromAttr, toNodeBaseName, toNode, toAttr, number, sizeFactor, oMin=0, oMax=1, iMin=0, iMax=1, *args):
-        """ Creates the nodes to remap values and connect it to final output (toNode) item.
-        """
-        fromNodeName = self.utils.extractSuffix(fromNode)
-        remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
-        outMaxAttr = toNodeBaseName+"_"+str(number).zfill(2)+"_"+toAttr.upper()
-        if "t" in toAttr:
-            if not cmds.objExists(fromNode+".sizeFactor"):
-                cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
-            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
-            md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
-            cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
-            cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
-            cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
-        else:
-            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
-            cmds.connectAttr(fromNode+"."+outMaxAttr, remap+".outputMax", force=True)
-        cmds.setAttr(remap+".inputMin", iMin)
-        cmds.setAttr(remap+".inputMax", iMax)
-        cmds.setAttr(remap+".outputMin", oMin)
-        cmds.connectAttr(fromNode+"."+fromAttr, remap+".inputValue", force=True)
-        # check if there's an input connection and create a plusMinusAverage if we don't have one to connect in:
-        connectedList = cmds.listConnections(toNode+"."+toAttr, destination=False, source=True, plugs=False)
-        if connectedList:
-            if cmds.objectType(connectedList[0]) == "plusMinusAverage":
-                inputList = cmds.listConnections(connectedList[0]+".input1D", destination=False, source=True, plugs=False)
-                cmds.connectAttr(remap+".outValue", connectedList[0]+".input1D["+str(len(inputList))+"]", force=True)
-            else:
-                if cmds.objectType(connectedList[0]) == "unitConversion":
-                    connectedAttr = cmds.listConnections(connectedList[0]+".input", destination=False, source=True, plugs=True)[0]
-                else:
-                    connectedAttr = cmds.listConnections(toNode+"."+toAttr, destination=False, source=True, plugs=True)[0]
-                pma = cmds.createNode("plusMinusAverage", name=toNode+"_"+toAttr.upper()+"_PMA")
-                cmds.connectAttr(connectedAttr, pma+".input1D[0]", force=True)
-                cmds.connectAttr(remap+".outValue", pma+".input1D[1]", force=True)
-                cmds.connectAttr(pma+".output1D", toNode+"."+toAttr, force=True)
-                if cmds.objectType(connectedList[0]) == "unitConversion":
-                    cmds.delete(connectedList[0])
-        else:
-            cmds.connectAttr(remap+".outValue", toNode+"."+toAttr, force=True)
+    
     
 
     def dpChangeType(self, *args):
