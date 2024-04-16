@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-04-09",
+    "_updated"       : "2024-04-16",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -610,10 +610,10 @@
     "m137_input"                : "Entrada",
     "m138_output"               : "Saída",
     "m139_facialCtrlsAttr"      : "Controles faciais e atributos para criar:",
-    "m140_0000000"     : "",
-    "m141_0000000"     : "",
-    "m142_0000000"     : "",
-    "m143_0000000"     : "",
+    "m140_createTargets"        : "Criar targets padrão",
+    "m141_createTargetsDesc"    : "Vai criar targets padrão para as blendShapes duplicando e renomeando a mesh selecionada.",
+    "m142_connectFacialAttr"    : "Conecta os controles faciais da Cabeça em:",
+    "m143_connected"            : "Conectado",
     "m144_0000000"     : "",
     "m145_loadGeo"              : "Carregar a geometria para atachar:",
     "m146_geo"                  : "Geometria",
