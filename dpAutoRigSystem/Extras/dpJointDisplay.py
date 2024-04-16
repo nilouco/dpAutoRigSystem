@@ -28,8 +28,9 @@ class JointDisplay(object):
         self.noneLabelList = []
         # call main function
         if self.ui:
+            self.refreshLists(self)
             self.dpJointDisplayUI(self)
-            cmds.scriptJob(event=('SelectionChanged', self.refreshLists), parent='dpJointDisplayWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+            #cmds.scriptJob(event=('SelectionChanged', self.refreshLists), parent='dpJointDisplayWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
 
 
     
@@ -80,6 +81,7 @@ class JointDisplay(object):
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
+        
         # defining move buttons
         cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedToRight', parent=buttonLayout)
         cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedLeft', parent=buttonLayout)
@@ -107,18 +109,22 @@ class JointDisplay(object):
         """
         jointList = cmds.ls(type='joint')
         if jointList:
-            self.allJointsList.append(jointList)
-            return print(self.allJointsList)
+            for joint in jointList:
+                self.allJointsList.append(joint)
+            print(f'All joints List : {self.allJointsList}')
+            return self.allJointsList
         else:
-            return print(f'No exists joints in the scene')
-    
+            return None
+
     
     def populateLabelList(self, *args, **kwargs):
         """ Populate each list with label joint type
         """
-        
         if self.getJointList():
-            for jnt in self.getJointList(self):
+            print(f'Appended LIST {self.getJointList()}')
+            print(f'LIST ALL JOINT {self.allJointsList}')
+            
+            for jnt in self.allJointsList:
                 if cmds.getAttr(jnt +'.drawStyle') == 0:
                     try:
                         self.boneLabelList.append(jnt)
