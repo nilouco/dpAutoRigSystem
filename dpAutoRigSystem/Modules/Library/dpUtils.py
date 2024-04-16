@@ -520,6 +520,7 @@ class Utils(object):
             Return a list of modules to be rigged.
         """
         modulesToBeRiggedList = []
+        headModuleList = []
         allNamespaceList = cmds.namespaceInfo(listNamespace=True)
         for guideModule in instanceList:
             # verify integrity of the guideModule:
@@ -528,7 +529,14 @@ class Utils(object):
                 if guideNamespaceName in allNamespaceList:
                     userGuideName = guideModule.userGuideName
                     if not cmds.objExists(userGuideName+'_Static_Grp'):
-                        modulesToBeRiggedList.append(guideModule)
+                        if not "dpHead" in str(guideModule):
+                            modulesToBeRiggedList.append(guideModule)
+                        else:
+                            # store Head guides to rigger later
+                            headModuleList.append(guideModule)
+        if headModuleList:
+            # hack to rig Head modules at the end in order to call FacialConnection properly for joint target Singles tweakers.
+            modulesToBeRiggedList.extend(headModuleList)
         return modulesToBeRiggedList
 
 
