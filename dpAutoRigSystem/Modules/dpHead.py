@@ -618,9 +618,9 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if cmds.getAttr(self.moduleGrp+".facialLips"):
                         self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, "yellow", True, True)
                     if cmds.getAttr(self.moduleGrp+".facialSneer"):
-                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True)
+                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True)
                     if cmds.getAttr(self.moduleGrp+".facialGrimace"):
-                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True)
+                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True, True)
                     if cmds.getAttr(self.moduleGrp+".facialFace"):
                         self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, "cyan", False, False)
 
@@ -1041,7 +1041,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.deleteModule()
     
     
-    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, *args):
+    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
         """ Important function to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
@@ -1079,7 +1079,13 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.addAttr(fCtrl, longName="scaleFactor", attributeType="float", defaultValue=scaleFactorValue, minValue=0.001)
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleX", force=True)
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleY", force=True)
-            cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
+            if invertZ: # grimace hack to invert front and back values from Z axis
+                invZMD = cmds.createNode("multiplyDivide", name=ctrlName+"_InvZ_MD")
+                cmds.setAttr(invZMD+".input2Z", -1)
+                cmds.connectAttr(fCtrl+".scaleFactor", invZMD+".input1Z", force=True)
+                cmds.connectAttr(invZMD+".outputZ", fCtrlGrp+".scaleZ", force=True)
+            else:
+                cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleZ", force=True)
             # start work with custom attributes
             facialAttrList = []
             if attrList:
@@ -1173,9 +1179,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(hyperboleInvMD+".outputX", fCtrl+".minTransLimit.minTrans"+axis+"Limit", force=True)
         else:
             cmds.transformLimits(fCtrl, translationY=(0, 1))
-    
-    
-    
     
 
     def dpChangeType(self, *args):
