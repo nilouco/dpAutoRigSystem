@@ -149,6 +149,7 @@ class LayoutClass(object):
                 self.correctiveExists = cmds.objExists(self.moduleGrp+".corrective")
                 self.nMainCtrlAttrExists = cmds.objExists(self.moduleGrp+".mainControls")
                 self.dynamicExists = cmds.objExists(self.moduleGrp+".dynamic")
+                self.deformerExists = cmds.objExists(self.moduleGrp+".deformer")
                 self.facialExists = cmds.objExists(self.moduleGrp+".facial")
                 
                 # UI
@@ -371,12 +372,17 @@ class LayoutClass(object):
                                 self.nMainCtrlIF = cmds.intField(value=nMainCtrlAttr, minValue=1, changeCommand=partial(self.changeMainCtrlsNumber, 0), editable=False, parent=self.mainCtrlColumn)
                                 cmds.setAttr(self.moduleGrp+".mainControls", 0)
 
+                if self.deformerExists:
+                    self.deformerLayout = cmds.rowLayout('deformerLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
+                    cmds.text(self.dpUIinst.lang['c097_deformer'].capitalize(), parent=self.deformerLayout)
+                    self.deformerCB = cmds.checkBox('deformerCB', label="", value=cmds.getAttr(self.moduleGrp+".deformer"), changeCommand=self.changeDeformer, parent=self.deformerLayout)
+                
                 # create head facial controllers layout:
                 if self.facialExists:
                     self.facialLayout = cmds.rowLayout('facialLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
                     cmds.text(self.dpUIinst.lang['c059_facial'].capitalize(), parent=self.facialLayout)
                     facialValue = cmds.getAttr(self.moduleGrp+".facial")
-                    self.facialCB = cmds.checkBox(label="", value=facialValue, changeCommand=self.changeFacial, parent=self.facialLayout)
+                    self.facialCB = cmds.checkBox('facialCB', label="", value=facialValue, changeCommand=self.changeFacial, parent=self.facialLayout)
                     collapsed = False
                     if not facialValue:
                         collapsed = True
@@ -502,10 +508,11 @@ class LayoutClass(object):
                 return "stopIt"
     
     
-    def changeFlip(self, *args):
+    def changeFlip(self, flipValue, *args):
         """ Set the attribute value for flip.
         """
-        cmds.setAttr(self.moduleGrp+".flip", cmds.checkBox(self.flipCB, query=True, value=True))
+        #flipValue = cmds.checkBox(self.flipCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".flip", flipValue)
     
     
     def changeShapeSize(self, *args):
@@ -539,10 +546,10 @@ class LayoutClass(object):
             cmds.setAttr(self.moduleGrp+".mirrorName", item, type='string')
     
     
-    def changeArticulation(self, *args):
+    def changeArticulation(self, articulationValue, *args):
         """ Set the attribute value for articulation.
         """
-        articulationValue = cmds.checkBox(self.articCB, query=True, value=True)
+        #articulationValue = cmds.checkBox(self.articCB, query=True, value=True)
         cmds.setAttr(self.moduleGrp+".articulation", articulationValue)
         try:
             cmds.checkBox(self.correctiveCB, edit=True, enable=articulationValue)
@@ -550,10 +557,11 @@ class LayoutClass(object):
             pass
 
 
-    def changeCorrective(self, *args):
+    def changeCorrective(self, correctiveValue, *args):
         """ Set the attribute value for corrective.
         """
-        cmds.setAttr(self.moduleGrp+".corrective", cmds.checkBox(self.correctiveCB, query=True, value=True))
+        #correctiveValue = cmds.checkBox(self.correctiveCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".corrective", correctiveValue)
     
     
     def changeDegree(self, item, *args):
@@ -567,10 +575,11 @@ class LayoutClass(object):
                 cmds.setAttr(self.moduleGrp+".degree", 1)
     
 
-    def changeDynamic(self, *args):
+    def changeDynamic(self, dynamicValue, *args):
         """ Set the attribute value for dynamic.
         """
-        cmds.setAttr(self.moduleGrp+".dynamic", cmds.checkBox(self.dynamicCB, query=True, value=True))
+        #dynamicValue = cmds.checkBox(self.dynamicCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".dynamic", dynamicValue)
 
     
     def createPreviewMirror(self, *args):

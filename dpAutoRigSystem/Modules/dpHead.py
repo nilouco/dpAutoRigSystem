@@ -41,13 +41,15 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".flip", 0)
+        #cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 0)
+        #cmds.setAttr(self.moduleGrp+".articulation", 0)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".corrective", 0)
+        #cmds.setAttr(self.moduleGrp+".corrective", 0)
+        cmds.addAttr(self.moduleGrp, longName="deformer", attributeType='bool')
+        #cmds.setAttr(self.moduleGrp+".deformer", 0)
         cmds.addAttr(self.moduleGrp, longName="facial", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".facial", 0)
+        #cmds.setAttr(self.moduleGrp+".facial", 0)
         for attr in self.facialAttrList:
             cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool')
             cmds.setAttr(self.moduleGrp+"."+attr, 1)
@@ -72,6 +74,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvSneerLoc   = self.ctrls.cvLocator(ctrlName=self.guideName+"_Sneer", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_050_FacialSneer"))
         self.cvGrimaceLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Grimace", r=0.2, d=1, guide=True, rot=(0, 0, 180), color="cyan", cvType=self.ctrls.getControlModuleById("id_051_FacialGrimace"))
         self.cvFaceLoc    = self.ctrls.cvLocator(ctrlName=self.guideName+"_Face", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_052_FacialFace"))
+        self.cvDeformerCenterLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_DeformerCenter", r=0.5, d=1, guide=True, color="cyan")
+        self.cvDeformerRadiusLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_DeformerRadius", r=0.3, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_100_HeadDeformerRadius"))
 
         # create jointGuides:
         self.jGuideNeck0 = cmds.joint(name=self.guideName+"_JGuideNeck0", radius=0.001)
@@ -132,6 +136,12 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvChinLoc+".translateZ", 1.0)
         cmds.setAttr(self.cvChewLoc+".translateY", 2.3)
         cmds.setAttr(self.cvChewLoc+".translateZ", 1.3)
+        # deformers
+        cmds.setAttr(self.cvDeformerCenterLoc+".translateY", 4.0)
+        cmds.setAttr(self.cvDeformerCenterLoc+".translateZ", 0.5)
+        cmds.setAttr(self.cvDeformerRadiusLoc+".translateX", 3.0)
+        cmds.setAttr(self.cvDeformerRadiusLoc+".translateY", 7.0)
+        cmds.setAttr(self.cvDeformerRadiusLoc+".translateZ", 3.5)
         # lip cvLocs:
         cmds.setAttr(self.cvUpperLipLoc+".translateY", 2.9)
         cmds.setAttr(self.cvUpperLipLoc+".translateZ", 3.5)
@@ -178,7 +188,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvFaceLoc+".translateX", 2.4)
         cmds.setAttr(self.cvFaceLoc+".translateY", 1.5)
         cmds.setAttr(self.cvFaceLoc+".translateZ", 0.7)
-        for facialLoc in [self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc]:
+        for facialLoc in [self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvDeformerCenterLoc]:
             cmds.setAttr(facialLoc+".visibility", 0)
         # make parenting between cvLocs:
         cmds.parent(self.cvNeckLoc, self.moduleGrp)
@@ -194,8 +204,23 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parent(self.cvSneerLoc, self.cvUpperLipLoc)
         cmds.parent(self.cvGrimaceLoc, self.cvLowerLipLoc)
         cmds.parent(self.cvFaceLoc, self.cvHeadLoc)
+        cmds.parent(self.cvDeformerCenterLoc, self.cvUpperHeadLoc)
+        cmds.parent(self.cvDeformerRadiusLoc, self.cvDeformerCenterLoc)
+        # deformer cube setup
+        defCubeList = cmds.polyCube(name=self.guideName+"_DeformerCube_Geo", constructionHistory=True)
+        self.deformerCube = defCubeList[0]
+        defPolyCube = cmds.rename(defCubeList[1], self.guideName+"_DeformerCube_PCu")
+        cmds.setAttr(self.deformerCube+".translateY", 4.0)
+        cmds.setAttr(self.deformerCube+".translateZ", 0.5)
+        cmds.parent(self.deformerCube, self.cvDeformerCenterLoc)
+        defRadiusMD = cmds.createNode("multiplyDivide", name=self.guideName+"_DeformerCube_MD")
+        for axis, attr in zip(["X", "Y", "Z"], ["width", "height", "depth"]):
+            cmds.setAttr(defRadiusMD+".input2"+axis, 2)
+            cmds.connectAttr(self.cvDeformerRadiusLoc+".translate"+axis, defRadiusMD+".input1"+axis)
+            cmds.connectAttr(defRadiusMD+".output"+axis, defPolyCube+"."+attr)
+        cmds.setAttr(self.deformerCube+".template", 1)
         # include nodes into net
-        self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
+        self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
                                 ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
     
 
@@ -259,6 +284,17 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             dpLayoutClass.LayoutClass.createPreviewMirror(self)
         cmds.select(self.moduleGrp)
     
+
+    def changeDeformer(self, deformerValue, *args):
+        """ Set the attribute value for deformer and show or hide guide locators.
+        """
+        #deformerValue = cmds.checkBox(self.deformerCB, query=True, value=True)
+        cmds.setAttr(self.moduleGrp+".deformer", deformerValue)
+        cmds.setAttr(self.cvDeformerCenterLoc+".visibility", deformerValue)
+        
+
+
+
 
     def changeFacial(self, value, *args):
         """ Enable or disable the Facial Controls UI.
