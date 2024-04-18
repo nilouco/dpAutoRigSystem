@@ -329,16 +329,16 @@ class FacialConnection(object):
         fromNodeName = self.utils.extractSuffix(fromNode)
         remap = cmds.createNode("remapValue", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_RmV")
         outMaxAttr = jntTarget.split(self.offsetSuffix)[0]+"_"+str(number).zfill(2)+"_"+toAttr.upper()
+        if not cmds.objExists(fromNode+"."+outMaxAttr):
+            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
         if "t" in toAttr:
             if not cmds.objExists(fromNode+".sizeFactor"):
                 cmds.addAttr(fromNode, longName="sizeFactor", attributeType="float", defaultValue=sizeFactor, keyable=False)
-            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
             md = cmds.createNode("multiplyDivide", name=fromNodeName+"_"+fromAttr+"_"+str(number).zfill(2)+"_"+toAttr.upper()+"_SizeFactor_MD")
             cmds.connectAttr(fromNode+"."+outMaxAttr, md+".input1X", force=True)
             cmds.connectAttr(fromNode+".sizeFactor", md+".input2X", force=True)
             cmds.connectAttr(md+".outputX", remap+".outputMax", force=True)
         else:
-            cmds.addAttr(fromNode, longName=outMaxAttr, attributeType="float", defaultValue=oMax, keyable=False)
             cmds.connectAttr(fromNode+"."+outMaxAttr, remap+".outputMax", force=True)
         cmds.setAttr(remap+".inputMin", iMin)
         cmds.setAttr(remap+".inputMax", iMax)
