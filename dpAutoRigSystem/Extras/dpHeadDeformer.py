@@ -11,19 +11,21 @@ ICON = "/Icons/dp_headDeformer.png"
 DPHEADDEFINFLUENCE = "dpHeadDeformerInfluence"
 DPJAWDEFINFLUENCE = "dpJawDeformerInfluence"
 
-DP_HEADDEFORMER_VERSION = 3.2
+DP_HEADDEFORMER_VERSION = 3.3
 
 
 class HeadDeformer(object):
-    def __init__(self, dpUIinst, *args, **kwargs):
+    def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
         self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ui = ui
         self.headCtrl = None
         self.wellDone = True
         # call main function
-        self.dpHeadDeformer(self)
+        if self.ui:
+            self.dpHeadDeformer(self)
     
     
     def dpHeadDeformerPromptDialog(self, *args):
@@ -60,13 +62,14 @@ class HeadDeformer(object):
                 return deformerName+"_"
             
 
-    def dpHeadDeformer(self, *args):
+    def dpHeadDeformer(self, dialogName=None, hdList=None, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
-        # defining variables
-        dialogName = self.dpHeadDeformerPromptDialog()
+        if self.ui:
+            dialogName = self.dpHeadDeformerPromptDialog()
         if dialogName == None:
             return
+        # defining variables
         deformerName = self.addDeformerInName(dialogName, True)
         clusterName = self.addDeformerInName(dialogName, False)
         mainCtrlName = deformerName+"_Main"
@@ -93,9 +96,10 @@ class HeadDeformer(object):
             middleCtrlName = middleCtrlName+numbering
             topCtrlName = topCtrlName+numbering
 
-        # get a list of selected items
-        selList = cmds.ls(selection=True)       
-        if selList:
+        if not hdList:
+            # get a list of selected items
+            hdList = cmds.ls(selection=True)       
+        if hdList:
             # lattice deformer
             latticeDefList = cmds.lattice(name=deformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
             latticePointsList = latticeDefList[1]+".pt[0:5][2:5][0:5]"
@@ -368,6 +372,15 @@ class HeadDeformer(object):
             if self.dpUIinst.lang["c025_jaw"] in mainCtrl:
                 cmds.setAttr(mainCtrlGrp+".rotateX", 145)
                 cmds.delete(clusterGrp, subCtrlGrpList, symmetryCtrlZeroList)
+            
+            # calibration attributes:
+            hdCalibrationList = [
+                                    calibrateName+"X",
+                                    calibrateName+"Y",
+                                    calibrateName+"Z",
+                                    calibrateName+"Reduce"
+                                ]
+            self.ctrls.setStringAttrFromList(arrowCtrl, hdCalibrationList)
             
             # finish selection the arrow control
             cmds.select(arrowCtrl)
