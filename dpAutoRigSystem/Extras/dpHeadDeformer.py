@@ -100,6 +100,7 @@ class HeadDeformer(object):
             # get a list of selected items
             hdList = cmds.ls(selection=True)       
         if hdList:
+            cmds.select(hdList)
             # lattice deformer
             latticeDefList = cmds.lattice(name=deformerName+"_FFD", divisions=(6, 6, 6), ldivisions=(6, 6, 6), outsideLattice=2, outsideFalloffDistance=1, objectCentered=True) #[Deformer/Set, Lattice, Base], mode=falloff
             latticePointsList = latticeDefList[1]+".pt[0:5][2:5][0:5]"

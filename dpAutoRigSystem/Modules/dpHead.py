@@ -3,6 +3,7 @@ from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
 from ..Extras import dpFacialConnection
+from ..Extras import dpHeadDeformer
 
 # global variables to this module:    
 CLASS_NAME = "Head"
@@ -28,6 +29,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.redeclareVariables(self.guideName)
         self.facialFactor = 0.15
         self.dpFacialConnect = dpFacialConnection.FacialConnection(self.dpUIinst, ui=False)
+        self.dpHeadDeformer = dpHeadDeformer.HeadDeformer(self.dpUIinst, ui=False)
 
     
     def createModuleLayout(self, *args):
@@ -74,7 +76,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvSneerLoc   = self.ctrls.cvLocator(ctrlName=self.guideName+"_Sneer", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_050_FacialSneer"))
         self.cvGrimaceLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_Grimace", r=0.2, d=1, guide=True, rot=(0, 0, 180), color="cyan", cvType=self.ctrls.getControlModuleById("id_051_FacialGrimace"))
         self.cvFaceLoc    = self.ctrls.cvLocator(ctrlName=self.guideName+"_Face", r=0.2, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_052_FacialFace"))
-        self.cvDeformerCenterLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_DeformerCenter", r=0.5, d=1, guide=True, color="cyan")
+        self.cvDeformerCenterLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_DeformerCenter", r=0.6, d=1, guide=True, color="cyan")
         self.cvDeformerRadiusLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_DeformerRadius", r=0.3, d=1, guide=True, color="cyan", cvType=self.ctrls.getControlModuleById("id_100_HeadDeformerRadius"))
 
         # create jointGuides:
@@ -142,6 +144,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvDeformerRadiusLoc+".translateX", 3.0)
         cmds.setAttr(self.cvDeformerRadiusLoc+".translateY", 7.0)
         cmds.setAttr(self.cvDeformerRadiusLoc+".translateZ", 3.5)
+        cmds.transformLimits(self.cvDeformerRadiusLoc, enableTranslationX=(1, 0), translationX=(0.001, 1), enableTranslationY=(1, 0), translationY=(0.001, 1), enableTranslationZ=(1, 0), translationZ=(0.001, 1))
         # lip cvLocs:
         cmds.setAttr(self.cvUpperLipLoc+".translateY", 2.9)
         cmds.setAttr(self.cvUpperLipLoc+".translateZ", 3.5)
@@ -291,9 +294,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         #deformerValue = cmds.checkBox(self.deformerCB, query=True, value=True)
         cmds.setAttr(self.moduleGrp+".deformer", deformerValue)
         cmds.setAttr(self.cvDeformerCenterLoc+".visibility", deformerValue)
-        
-
-
 
 
     def changeFacial(self, value, *args):
@@ -474,6 +474,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 self.facialAttrList[5] : self.cvGrimaceLoc,
                                 self.facialAttrList[6] : self.cvFaceLoc
                             }
+        self.deformerCube = side+middle+guide+"_DeformerCube_Geo"
         
 
     def rigModule(self, *args):
@@ -1061,6 +1062,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
 
+                # head deformer
+                if cmds.getAttr(self.moduleGrp+".deformer"):
+                    self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube])
+
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 
@@ -1070,6 +1075,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.dpFacialConnect.dpConnectToBlendShape()
                 else:
                     self.dpFacialConnect.dpConnectToJoints()
+
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)
