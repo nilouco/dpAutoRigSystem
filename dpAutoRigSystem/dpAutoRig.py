@@ -783,7 +783,7 @@ class DP_AutoRig_UI(object):
         if not self.rebuilding:
             self.resetAllButtonColors()
             self.pipeliner.refreshAssetData()
-        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
 
 
     def jobWinClose(self, *args):
@@ -830,11 +830,12 @@ class DP_AutoRig_UI(object):
         # re-create module layout:
         if selectedGuideNodeList:
             for moduleInstance in self.moduleInstancesList:
-                cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
-                for selectedGuide in selectedGuideNodeList:
-                    selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
-                    if selectedGuideInfo == str(moduleInstance):
-                        moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
+                if moduleInstance.selectButton:
+                    cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
+                    for selectedGuide in selectedGuideNodeList:
+                        selectedGuideInfo = cmds.getAttr(selectedGuide+"."+MODULE_INSTANCE_INFO_ATTR)
+                        if selectedGuideInfo == str(moduleInstance):
+                            moduleInstance.reCreateEditSelectedModuleLayout(bSelect=False)
         # delete module layout:
         else:
             try:
@@ -843,11 +844,8 @@ class DP_AutoRig_UI(object):
                 for moduleInstance in self.moduleInstancesList:
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
-                pass
-        
-        # re-select items:
-        #if selectedList:
-        #    cmds.select(selectedList)
+                pass        
+
         # call reload the geometries in skin UI:
         self.reloadPopulatedGeoms()
     

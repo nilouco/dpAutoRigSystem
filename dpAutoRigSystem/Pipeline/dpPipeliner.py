@@ -650,14 +650,16 @@ class Pipeliner(object):
             folderName = currentPath[currentPath.rfind("/")+1:]
         shortSceneName = self.getCurrentFileName()
         if shortSceneName:
+            assetName = shortSceneName
             if "_" in shortSceneName:
                 assetName = shortSceneName[:shortSceneName.find("_")]
-        for ext in [".ma", ".mb"]:
-            if assetName.endswith(ext):
-                assetName = assetName[:-3]
-        if folderName == assetName:
-            return [True, assetName]
-        elif assetName:
+            for ext in [".ma", ".mb"]:
+                if assetName.endswith(ext):
+                    assetName = assetName[:-3]
+        if folderName or assetName:
+            if folderName == assetName:
+                return [True, assetName]
+        if assetName:
             return [False, assetName]
         elif folderName:
             return [False, folderName]
