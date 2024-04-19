@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.09"
-DPAR_UPDATELOG = "N813 - Custom asset name to publishing."
+DPAR_VERSION_PY3 = "4.04.10"
+DPAR_UPDATELOG = "N815 - Fixed finger module nomenclature."
 
 
 
