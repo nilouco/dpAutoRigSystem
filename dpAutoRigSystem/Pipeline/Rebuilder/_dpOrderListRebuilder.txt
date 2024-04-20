@@ -7,5 +7,6 @@ dpShaderIO
 dpGuideIO
 dpRigItIO
 dpSkinningIO
+dpDeformerIO
 dpParentIO
 dpControlShapeIO

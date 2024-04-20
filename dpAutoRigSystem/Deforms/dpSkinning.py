@@ -99,24 +99,6 @@ class Skinning(dpWeights.Weights):
                 self.dpUIinst.logger.infoWin('i028_skinButton', 'i029_skinNothing', ' ', 'center', 205, 270)
 
     
-    def checkExistingSkinClusterNode(self, item, deleteIt=False, *args):
-        """ Return a list with:
-                True/False if there's/not a skinCluster.
-                The current deformer list by default.
-                A list with existing skinCluster nodes.
-            Delete existing skinCluster node if there's one using the deleteIt parametter as True.
-        """
-        result = [False, None, None]
-        inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
-        if inputDeformerList:
-            skinClusterList = cmds.ls(inputDeformerList, type="skinCluster")
-            if skinClusterList:
-                if deleteIt:
-                    cmds.delete(skinClusterList)
-                result = [True, inputDeformerList, skinClusterList]
-        return result
-
-
     def serializeCopySkin(self, sourceList, destinationList, oneSource=True, byUVs=False, *args):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
@@ -138,9 +120,9 @@ class Skinning(dpWeights.Weights):
                     for item in reversed(destinationList): #to avoid find the same item in the same given list
                         if not sourceItem == item:
                             if sourceItem[sourceItem.rfind("|")+1:] == item[item.rfind("|")+1:]:
-                                if self.checkExistingSkinClusterNode(sourceItem)[0]:
+                                if self.checkExistingDeformerNode(sourceItem)[0]:
                                     self.runCopySkin(sourceItem, item, byUVs)
-                                elif self.checkExistingSkinClusterNode(item)[0]:
+                                elif self.checkExistingDeformerNode(item)[0]:
                                     self.runCopySkin(item, sourceItem, byUVs)
                                 # To avoid repeat the same item in the same given list
                                 ranList.append(item)
@@ -155,14 +137,14 @@ class Skinning(dpWeights.Weights):
         """
         i = 0
         defOrderIdx = None
-        sourceDefList = self.checkExistingSkinClusterNode(sourceItem)[2]
+        sourceDefList = self.checkExistingDeformerNode(sourceItem)[2]
         if sourceDefList:
             # get correct naming
             skinClusterName = self.utils.extractSuffix(destinationItem)
             if "|" in skinClusterName:
                 skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
             # clean-up current destination skinCluster
-            destDefList = self.checkExistingSkinClusterNode(destinationItem, True)
+            destDefList = self.checkExistingDeformerNode(destinationItem, deleteIt=True)
             if destDefList[0] and destDefList[2]:
                 defOrderIdx = self.getDeformerOrder(destDefList)
             for sourceDef in reversed(sourceDefList): #create reversed to have the multiple skinClusters in the good deformer order
@@ -202,7 +184,7 @@ class Skinning(dpWeights.Weights):
             shapeList = cmds.listRelatives(sourceItem, shapes=True, fullPath=True)
             if shapeList:
                 # check if there's a skinCluster node connected to the first selected item
-                if self.checkExistingSkinClusterNode(shapeList):
+                if self.checkExistingDeformerNode(shapeList):
                     if ui:
                         byUVs = self.getByUVsFromUI()
                     # call copySkin function
@@ -271,7 +253,7 @@ class Skinning(dpWeights.Weights):
         needToCreateSkinCluster = True
         incomingJointList = self.getIncomingJoints(mesh, skinClusterName, skinWeightDic)
         missingJntList = self.createMissingJoints(incomingJointList)
-        skinClusterInfoList = self.checkExistingSkinClusterNode(mesh)
+        skinClusterInfoList = self.checkExistingDeformerNode(mesh)
         if skinClusterInfoList[0]:
             if missingJntList:
                 for scNode in skinClusterInfoList[2]:
@@ -309,7 +291,7 @@ class Skinning(dpWeights.Weights):
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('SkinningIO: '+repr(progressAmount)+' - '+mesh))
             skinWeightsDic[mesh] = {}
             # get skinCluster nodes for the given mesh
-            skinClusterInfoList = self.checkExistingSkinClusterNode(mesh)
+            skinClusterInfoList = self.checkExistingDeformerNode(mesh)
             if skinClusterInfoList[0]:
                 for skinClusterNode in skinClusterInfoList[2]:
                     # get skinCluster data
@@ -385,31 +367,3 @@ class Skinning(dpWeights.Weights):
                         self.dpUIinst.pipeliner.saveJsonFile(skinClusterDic, filename)
                     else:
                         self.importSkinWeightsFromFile([mesh], path[0], filename)
-
-
-    def getSkinnedModelList(self, *args):
-        """ Returns the skinned mesh transforms as a list.
-            It ignores transforms with the "dpDoNotSkinIt" attribute.
-        """
-        skinnedModelList, ranList = [], []
-        allMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
-        if allMeshList:
-            for item in allMeshList:
-                transformNode = item[:item[1:].find("|")+1]
-                if not transformNode in ranList:
-                    ranList.append(transformNode)
-                    transformList = cmds.listRelatives(transformNode, allDescendents=True, children=True, fullPath=True, type="transform")
-                    if transformList:
-                        transformList.append(transformNode)
-                    else:
-                        transformList = [transformNode]
-                    for childNode in transformList:
-                        if not cmds.objExists(childNode+"."+self.ignoreSkinningAttr):
-                            if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
-                                childNode = childNode[childNode.rfind("|")+1:] #unique name
-                            else:
-                                print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
-                            if self.checkExistingSkinClusterNode(childNode)[0]:
-                                if not childNode in skinnedModelList:
-                                    skinnedModelList.append(childNode)
-        return skinnedModelList

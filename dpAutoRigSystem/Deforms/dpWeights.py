@@ -63,7 +63,7 @@ class Weights(object):
     def normalizeMeshWeights(self, mesh, *args):
         """ Just normalize the skinCluster weigths for the given mesh.
         """
-        for skinClusterNode in self.checkExistingSkinClusterNode(mesh)[2]:
+        for skinClusterNode in self.checkExistingDeformerNode(mesh)[2]:
             self.unlockJoints(skinClusterNode)
             cmds.skinPercent(skinClusterNode, mesh, normalize=True)
 
@@ -79,3 +79,50 @@ class Weights(object):
             if matrixItemList:
                 matrixDic[matrixItemList[0]] = m
         return matrixDic
+
+
+    def getDeformedModelList(self, desiredTypeList=["skinCluster"], ignoreAttr="None", *args):
+        """ Returns a list of deformed mesh transforms.
+            Use given lists and attribute to filter the results.
+        """
+        deformedModelList, ranList = [], []
+        allMeshList = cmds.ls(selection=False, noIntermediate=True, long=True, type="mesh")
+        if allMeshList:
+            for item in allMeshList:
+                transformNode = item[:item[1:].find("|")+1]
+                if not transformNode in ranList:
+                    ranList.append(transformNode)
+                    transformList = cmds.listRelatives(transformNode, allDescendents=True, children=True, fullPath=True, type="transform")
+                    if transformList:
+                        transformList.append(transformNode)
+                    else:
+                        transformList = [transformNode]
+                    for childNode in transformList:
+                        if not cmds.objExists(childNode+"."+ignoreAttr):
+                            if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
+                                childNode = childNode[childNode.rfind("|")+1:] #unique name
+                            else:
+                                print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
+                            for desiredType in desiredTypeList:
+                                if self.checkExistingDeformerNode(childNode, deformerType=desiredType)[0]:
+                                    if not childNode in deformedModelList:
+                                        deformedModelList.append(childNode)
+        return deformedModelList
+
+
+    def checkExistingDeformerNode(self, item, deleteIt=False, deformerType="skinCluster", *args):
+        """ Return a list with:
+                True/False if there's/not a deformer.
+                The current deformer list by default.
+                A list with existing deformer nodes by givenType.
+            Delete existing deformer node if there's one using the deleteIt parametter as True.
+        """
+        result = [False, None, None]
+        inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
+        if inputDeformerList:
+            defList = cmds.ls(inputDeformerList, type=deformerType)
+            if defList:
+                if deleteIt:
+                    cmds.delete(defList)
+                result = [True, inputDeformerList, defList]
+        return result

@@ -4,27 +4,28 @@ from .. import dpBaseActionClass
 import os
 
 # global variables to this module:
-CLASS_NAME = "SkinningIO"
-TITLE = "r016_skinningIO"
-DESCRIPTION = "r017_skinningIODesc"
-ICON = "/Icons/dp_skinningIO.png"
+CLASS_NAME = "DeformerIO"
+TITLE = "r033_deformerIO"
+DESCRIPTION = "r034_deformerIODesc"
+ICON = "/Icons/dp_deformerIO.png"
 
-DP_SKINNINGIO_VERSION = 1.0
+DP_DEFORMERIO_VERSION = 1.0
 
 
-class SkinningIO(dpBaseActionClass.ActionStartClass):
+class DeformerIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_SKINNINGIO_VERSION
+        self.version = DP_DEFORMERIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_skinningIO"
-        self.startName = "dpSkinning"
-        self.importRefName = "dpSkinningIO_Import"
+        self.ioDir = "s_deformerIO"
+        self.startName = "dpDeformer"
+        self.importRefName = "dpDeformerIO_Import"
+#        self.desiredDeformerTypeList = 
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -51,8 +52,13 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                     if objList:
                         meshList = objList
                     else:
-                        meshList = self.dpUIinst.skin.getDeformedModelList(desiredTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                        meshList = self.dpUIinst.skin.getDeformedModelList(ignore=["skinCluster", "blendShape"])
                     if meshList:
+
+                        
+                        print("meshList = ", meshList)
+
+
                         progressAmount = 0
                         maxProcess = len(meshList)
                         if self.verbose:
@@ -60,7 +66,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                             progressAmount += 1
                             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                         try:
-                            # export skinning data
+                            # export deformer data
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
                             jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
                             skinWeightDic = self.dpUIinst.skin.getSkinWeightData(meshList)
