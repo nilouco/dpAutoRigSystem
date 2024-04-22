@@ -13,26 +13,26 @@ class Weights(object):
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
         self.typeAttrDic = {
-                            "cluster"         : ["envelope", "relative", "angleInterpolation"],
-                            "deltaMush"       : ["envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],
-                            "tension"         : ["envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "squashConstraint", "stretchConstraint", "relative", "pinBorderVertices", "shearStrength", "bendStrength"],
-                            "solidify"        : ["envelope", "normalScale", "tangentPlaneScale", "scaleEnvelope", "attachmentMode", "useBorderFalloff", "stabilizationLevel", "borderFalloffBlur"],
-                            "ffd"             : ["envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
-                            "proximityWrap"   : ["envelope", "maxDrivers", "falloffScale", "dropoffRateScale", "scaleCompensation", "wrapMode", "coordinateFrames", "smoothNormals", "spanSamples", "smoothInfluences", "softNormalization", "useBindTags"],
-                            "wrap"            : ["envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
-                            "shrinkWrap"      : ["envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection", "inputEnvelope"],
-                            "morph"           : ["envelope", "morphMode", "morphSpace", "useComponentLookup", "scaleEnvelope", "uniformScaleWeight", "normalScale", "tangentPlaneScale", "tangentialDamping", "inwardConstraint", "outwardConstraint"],
-                            "wire"            : ["envelope", "crossingEffect", "tension", "localInfluence", "rotation", "dropoffDistance", "scale", "wireLocatorEnvelope", "wireLocatorTwist"],
-                            "sculpt"          : ["envelope", "mode", "dropoffType", "maximumDisplacement", "dropoffDistance", "insideMode"],
-                            "textureDeformer" : ["envelope", "strength", "offset", "vectorStrengthX", "vectorStrengthY", "vectorStrengthZ", "vectorOffsetX", "vectorOffsetY", "vectorOffsetZ", "handleVisibility", "pointSpace"],
-                            "jiggle"          : ["envelope", "currentTime", "enable", "ignoreTransform", "forceAlongNormal", "forceOnTangent", "motionMultiplier", "stiffness", "damping", "jiggleWeight", "directionBias"],
-                            "deformBend"      : ["curvature", "lowBound", "highBound"],
-                            "deformFlare"     : ["startFlareX", "startFlareZ", "endFlareX", "endFlareZ", "curve", "lowBound", "highBound"],
-                            "deformSine"      : ["amplitude", "wavelength", "offset", "dropoff", "lowBound", "highBound"],
-                            "deformSquash"    : ["factor", "expand", "maxExpandPos", "startSmoothness", "endSmoothness", "lowBound", "highBound"],
-                            "deformTwist"     : ["startAngle", "endAngle", "lowBound", "highBound"],
-                            "deformWave"      : ["amplitude", "wavelength", "offset", "dropoff", "dropoffPosition", "minRadius", "maxRadius"],
-                            }
+                            "cluster"         : [None, "envelope", "relative", "angleInterpolation"],
+                            "deltaMush"       : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],
+                            "tension"         : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "squashConstraint", "stretchConstraint", "relative", "pinBorderVertices", "shearStrength", "bendStrength"],
+                            "solidify"        : [None, "envelope", "normalScale", "tangentPlaneScale", "scaleEnvelope", "attachmentMode", "useBorderFalloff", "stabilizationLevel", "borderFalloffBlur"],
+                            "ffd"             : [None, "envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
+                            "proximityWrap"   : [None, "envelope", "maxDrivers", "falloffScale", "dropoffRateScale", "scaleCompensation", "wrapMode", "coordinateFrames", "smoothNormals", "spanSamples", "smoothInfluences", "softNormalization", "useBindTags"],
+                            "wrap"            : [None, "envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
+                            "shrinkWrap"      : [None, "envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection", "inputEnvelope"],
+                            "morph"           : [None, "envelope", "morphMode", "morphSpace", "useComponentLookup", "scaleEnvelope", "uniformScaleWeight", "normalScale", "tangentPlaneScale", "tangentialDamping", "inwardConstraint", "outwardConstraint"],
+                            "wire"            : [None, "envelope", "crossingEffect", "tension", "localInfluence", "rotation", "dropoffDistance", "scale", "wireLocatorEnvelope", "wireLocatorTwist"],
+                            "sculpt"          : [None, "envelope", "mode", "dropoffType", "maximumDisplacement", "dropoffDistance", "insideMode"],
+                            "textureDeformer" : [None, "envelope", "strength", "offset", "vectorStrengthX", "vectorStrengthY", "vectorStrengthZ", "vectorOffsetX", "vectorOffsetY", "vectorOffsetZ", "handleVisibility", "pointSpace"],
+                            "jiggle"          : [None, "envelope", "currentTime", "enable", "ignoreTransform", "forceAlongNormal", "forceOnTangent", "motionMultiplier", "stiffness", "damping", "jiggleWeight", "directionBias"],
+                            "deformBend"      : ["deformerData", "curvature", "lowBound", "highBound"],
+                            "deformFlare"     : ["deformerData", "startFlareX", "startFlareZ", "endFlareX", "endFlareZ", "curve", "lowBound", "highBound"],
+                            "deformSine"      : ["deformerData", "amplitude", "wavelength", "offset", "dropoff", "lowBound", "highBound"],
+                            "deformSquash"    : ["deformerData", "factor", "expand", "maxExpandPos", "startSmoothness", "endSmoothness", "lowBound", "highBound"],
+                            "deformTwist"     : ["deformerData", "startAngle", "endAngle", "lowBound", "highBound"],
+                            "deformWave"      : ["deformerData", "amplitude", "wavelength", "offset", "dropoff", "dropoffPosition", "minRadius", "maxRadius"],
+                            } #first element used to find the attribute node listing connection
     
     
     def getIOFileName(self, mesh, *args):
@@ -153,13 +153,21 @@ class Weights(object):
         return result
 
 
-    def getDeformerData(self, deformerNode, *args):
+    def getDeformerInfo(self, deformerNode, *args):
         """ Return the dictionary with attributes and values.
         """
         defDic = {}
         if deformerNode:
             defType = cmds.objectType(deformerNode)
             defDic[defType] = {}
-            for attr in list(self.typeAttrDic[defType]):
-                defDic[defType][attr] = cmds.getAttr(deformerNode+"."+attr)
+            for n, attr in enumerate(list(self.typeAttrDic[defType])):
+                if n == 0:
+                    defDic[defType]["nonLinear"] = None
+                    if attr:
+                        connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=True, source=False)
+                        if connectedNodeList:
+                            deformerNode = connectedNodeList[0]
+                            defDic[defType]["nonLinear"] = defType.replace("deform", "").lower()
+                else:
+                    defDic[defType][attr] = cmds.getAttr(deformerNode+"."+attr)
         return defDic
