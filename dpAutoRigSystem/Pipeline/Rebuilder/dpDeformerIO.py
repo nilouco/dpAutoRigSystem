@@ -1,7 +1,21 @@
 # importing libraries:
 from maya import cmds
 from .. import dpBaseActionClass
+from ...Deforms import dpWeights
 import os
+
+
+
+
+
+from importlib import reload
+reload(dpWeights)
+
+
+
+
+
+
 
 # global variables to this module:
 CLASS_NAME = "DeformerIO"
@@ -25,7 +39,7 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
         self.ioDir = "s_deformerIO"
         self.startName = "dpDeformer"
         self.importRefName = "dpDeformerIO_Import"
-#        self.desiredDeformerTypeList = 
+        self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -52,30 +66,102 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                     if objList:
                         meshList = objList
                     else:
-                        meshList = self.dpUIinst.skin.getDeformedModelList(ignore=["skinCluster", "blendShape"])
+                        meshList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True)
                     if meshList:
-
-                        
+                        hasDef = False
                         print("meshList = ", meshList)
+                        
+                        inputDeformerList = cmds.listHistory(meshList, pruneDagObjects=False, interestLevel=True)
+                        for deformerType in list(self.defWeights.typeAttrDic.keys()):
+                            if cmds.ls(inputDeformerList, type=deformerType):
+                                hasDef = True
+                                break
+                        
+                        #deformerTypeList = self.defWeights.getDeformedModelList(deformTypeList=self.defWeights.typeAttrDic.keys())
+                        print("inputDeformerList = ", inputDeformerList)
+                        #print("deformerTypeList = ", deformerTypeList)
+                        #if transformList:
+
+                        if hasDef:
+
+                            # WIP
+                            #
+                            deformerDataDic = {}
 
 
-                        progressAmount = 0
-                        maxProcess = len(meshList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                        try:
-                            # export deformer data
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            skinWeightDic = self.dpUIinst.skin.getSkinWeightData(meshList)
-                            self.pipeliner.saveJsonFile(skinWeightDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                            progressAmount = 0
+                            maxProcess = len(meshList)
+
+                            for deformerType in list(self.defWeights.typeAttrDic.keys()):
+                                deformerList = cmds.ls(selection=False, type=deformerType)
+                                if deformerList:
+                                    for deformerNode in deformerList:
+                                        if deformerNode in inputDeformerList:
+
+                                            print("deformerNode =", deformerNode)
+
+                                            deformerDataDic[deformerNode] = self.defWeights.getDeformerData(deformerNode)
+                                            
+
+                                            
+                                            
+                                                
+                                            # Get shape indexes for the deformer so we can query the deformer weights
+                                            shapeList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
+                                            indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
+                                            shapeToIndexDic = dict(zip(shapeList, indexList))
+                                            
+                                            print("shapeList =", shapeList)
+                                            print("indexList =", indexList)
+                                            print("shapeToIndexDic =", shapeToIndexDic)
+
+                                            deformerDataDic[deformerNode][deformerType]["shapeList"] = shapeList
+                                            deformerDataDic[deformerNode][deformerType]["indexList"] = indexList
+                                            deformerDataDic[deformerNode][deformerType]["shapeToIndexDic"] = shapeToIndexDic
+                                            
+                                            for shape in shapeList:
+                                                print("shape =", shape)
+                                                # Get weights
+                                                index = shapeToIndexDic[shape]
+                                                print("index =", index)
+                                                weights = self.defWeights.getDeformerWeights(deformerNode, index)
+                                                print("weights =", weights)
+                                                deformerDataDic[deformerNode][deformerType]["weights"] = weights
+                                                print("deformerDataDic =", deformerDataDic)
+                                                #{
+
+                                                #                                        "envelope" : cmds.getAttr()
+
+
+                                                #}
+
+
+#                            for meshNode in meshList:
+#                                defNodeList = []
+#                                histList = cmds.listHistory(meshNode, pruneDagObjects=False, interestLevel=True)
+#                                if histList:
+#                                    for histNode in histList:
+#                                            if cmds.objectType(histNode) == deformerType:
+#                                                defNodeList.append(histNode)
+#                                                print("meshNode, histNode, deformerType, defNodeList = ", meshNode, histNode, deformerType, defNodeList)
+
+
+                            if self.verbose:
+                                # Update progress window
+                                progressAmount += 1
+                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            try:
+                                # export deformer data
+                                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
+                                self.pipeliner.saveJsonFile(deformerDataDic, jsonName)
+                                self.wellDoneIO(jsonName)
+                            except Exception as e:
+                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" deformers")
                     else:
-                        self.notWorkedWellIO("Render_Grp")
+                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
                 else: #import
                     self.exportedList = self.getExportedList()
                     if self.exportedList:
@@ -86,34 +172,15 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                             maxProcess = len(skinWeightDic.keys())
                             wellImported = True
                             toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
-                            
-                            # reference old wip rig version to compare meshes changes
-                            #refNodeList = self.referOldWipFile()
-                            refNodeList = None
-
                             for mesh in skinWeightDic.keys():
                                 if self.verbose:
                                     # Update progress window
                                     progressAmount += 1
                                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                                 if cmds.objExists(mesh):
-                                    if refNodeList:
-                                        for refNodeName in refNodeList:
-                                            if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
-                                                if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
-                                                    changedShapeMeshList.append(mesh)
-                                                    wellImported = False
-                                                elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
-                                                    changedTopoMeshList.append(mesh)
-                                                    wellImported = False
-                                                else:
-                                                    toImportList.append(mesh)
-                                    else:
-                                        toImportList.append(mesh)
+                                    toImportList.append(mesh)
                                 else:
                                     notFoundMeshList.append(mesh)
-                            if refNodeList:
-                                cmds.file(self.refPathName, removeReference=True)
                             if toImportList:
                                 try:
                                     # import skin weights
@@ -146,24 +213,3 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
         self.refreshView()
         return self.dataLogDic
 
-
-    def referOldWipFile(self, *args):
-        """ Reference the latest wip rig file before the current, and return it's tranform elements, if there.
-        """
-        refNodeList = []
-        wipFilesList = next(os.walk(self.pipeliner.pipeData['assetPath']))[2]
-        if len(wipFilesList) > 1:
-            wipFilesList.sort()
-            if len(self.exportedList) > 1:
-                self.refPathName = self.exportedList[-2][len(self.startName)+1:-5]
-                if os.path.isfile(self.pipeliner.pipeData['assetPath']+"/"+self.refPathName+".ma"):
-                    self.refPathName = self.refPathName+".ma"
-                else:
-                    self.refPathName = self.refPathName+".mb"
-                self.refPathName = self.pipeliner.pipeData['assetPath']+"/"+wipFilesList[-2]
-                cmds.file(self.refPathName, reference=True, namespace=self.importRefName)
-                refNode = cmds.file(self.refPathName, referenceNode=True, query=True)
-                refNodeList = cmds.referenceQuery(refNode, nodes=True)
-                if refNodeList:
-                    refNodeList = cmds.ls(refNodeList, type="transform")
-        return refNodeList

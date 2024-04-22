@@ -12,6 +12,27 @@ class Weights(object):
         # defining variables:
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
+        self.typeAttrDic = {
+                            "cluster"         : ["envelope", "relative", "angleInterpolation"],
+                            "deltaMush"       : ["envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],
+                            "tension"         : ["envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "squashConstraint", "stretchConstraint", "relative", "pinBorderVertices", "shearStrength", "bendStrength"],
+                            "solidify"        : ["envelope", "normalScale", "tangentPlaneScale", "scaleEnvelope", "attachmentMode", "useBorderFalloff", "stabilizationLevel", "borderFalloffBlur"],
+                            "ffd"             : ["envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
+                            "proximityWrap"   : ["envelope", "maxDrivers", "falloffScale", "dropoffRateScale", "scaleCompensation", "wrapMode", "coordinateFrames", "smoothNormals", "spanSamples", "smoothInfluences", "softNormalization", "useBindTags"],
+                            "wrap"            : ["envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
+                            "shrinkWrap"      : ["envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection", "inputEnvelope"],
+                            "morph"           : ["envelope", "morphMode", "morphSpace", "useComponentLookup", "scaleEnvelope", "uniformScaleWeight", "normalScale", "tangentPlaneScale", "tangentialDamping", "inwardConstraint", "outwardConstraint"],
+                            "wire"            : ["envelope", "crossingEffect", "tension", "localInfluence", "rotation", "dropoffDistance", "scale", "wireLocatorEnvelope", "wireLocatorTwist"],
+                            "sculpt"          : ["envelope", "mode", "dropoffType", "maximumDisplacement", "dropoffDistance", "insideMode"],
+                            "textureDeformer" : ["envelope", "strength", "offset", "vectorStrengthX", "vectorStrengthY", "vectorStrengthZ", "vectorOffsetX", "vectorOffsetY", "vectorOffsetZ", "handleVisibility", "pointSpace"],
+                            "jiggle"          : ["envelope", "currentTime", "enable", "ignoreTransform", "forceAlongNormal", "forceOnTangent", "motionMultiplier", "stiffness", "damping", "jiggleWeight", "directionBias"],
+                            "deformBend"      : ["curvature", "lowBound", "highBound"],
+                            "deformFlare"     : ["startFlareX", "startFlareZ", "endFlareX", "endFlareZ", "curve", "lowBound", "highBound"],
+                            "deformSine"      : ["amplitude", "wavelength", "offset", "dropoff", "lowBound", "highBound"],
+                            "deformSquash"    : ["factor", "expand", "maxExpandPos", "startSmoothness", "endSmoothness", "lowBound", "highBound"],
+                            "deformTwist"     : ["startAngle", "endAngle", "lowBound", "highBound"],
+                            "deformWave"      : ["amplitude", "wavelength", "offset", "dropoff", "dropoffPosition", "minRadius", "maxRadius"],
+                            }
     
     
     def getIOFileName(self, mesh, *args):
@@ -39,25 +60,28 @@ class Weights(object):
         """ Read the deformer information to return a dictionary with influence index or connected matrix nodes as keys and the weight as values.
         """
         weightPlug = deformerNode+".weightList["+str(idx)+"].weights"
-        weightKeyList = cmds.getAttr(weightPlug, multiIndices=True)
-        if infList:
-            matrixList = []
-            for item in weightKeyList:
-                sourceList = cmds.listConnections(deformerNode+".matrix["+str(item)+"]", source=True, destination=False)
-                if sourceList:
-                    matrixList.append(sourceList[0])
-            weightKeyList = matrixList
-        for weightIndex in weightKeyList:
-            valueList = cmds.getAttr(weightPlug)[0]
-            return dict(zip(weightKeyList, valueList))
-
+        if cmds.objExists(weightPlug):
+            weightKeyList = cmds.getAttr(weightPlug, multiIndices=True)
+            if infList:
+                matrixList = []
+                for item in weightKeyList:
+                    sourceList = cmds.listConnections(deformerNode+".matrix["+str(item)+"]", source=True, destination=False)
+                    if sourceList:
+                        matrixList.append(sourceList[0])
+                weightKeyList = matrixList
+            if weightKeyList:
+                for weightIndex in weightKeyList:
+                    valueList = cmds.getAttr(weightPlug)[0]
+                    #if any(x != 1.0 for x in valueList):
+                    return dict(zip(weightKeyList, valueList))
+        
 
     def unlockJoints(self, skinCluster, *args):
         """ Just unlock joints from a given skinCluster node.
         """
         jointsList = cmds.skinCluster(skinCluster, inf=True, q=True)
         for joint in jointsList:
-            cmds.setAttr(joint+'.liw', 0)
+            cmds.setAttr(joint+".liw", 0)
 
 
     def normalizeMeshWeights(self, mesh, *args):
@@ -81,7 +105,7 @@ class Weights(object):
         return matrixDic
 
 
-    def getDeformedModelList(self, desiredTypeList=["skinCluster"], ignoreAttr="None", *args):
+    def getDeformedModelList(self, deformerTypeList=["skinCluster"], ignoreAttr="None", *args):
         """ Returns a list of deformed mesh transforms.
             Use given lists and attribute to filter the results.
         """
@@ -99,12 +123,13 @@ class Weights(object):
                         transformList = [transformNode]
                     for childNode in transformList:
                         if not cmds.objExists(childNode+"."+ignoreAttr):
+                            inputDeformerList = cmds.listHistory(childNode, pruneDagObjects=False, interestLevel=True)
                             if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
                                 childNode = childNode[childNode.rfind("|")+1:] #unique name
                             else:
-                                print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
-                            for desiredType in desiredTypeList:
-                                if self.checkExistingDeformerNode(childNode, deformerType=desiredType)[0]:
+                                print(self.dpUIinst.lang["i299_notUniqueName"], childNode)
+                            for deformerType in deformerTypeList:
+                                if cmds.ls(inputDeformerList, type=deformerType):
                                     if not childNode in deformedModelList:
                                         deformedModelList.append(childNode)
         return deformedModelList
@@ -118,7 +143,7 @@ class Weights(object):
             Delete existing deformer node if there's one using the deleteIt parametter as True.
         """
         result = [False, None, None]
-        inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
+        inputDeformerList = cmds.listHistory(item, pruneDagObjects=False, interestLevel=True)
         if inputDeformerList:
             defList = cmds.ls(inputDeformerList, type=deformerType)
             if defList:
@@ -126,3 +151,15 @@ class Weights(object):
                     cmds.delete(defList)
                 result = [True, inputDeformerList, defList]
         return result
+
+
+    def getDeformerData(self, deformerNode, *args):
+        """ Return the dictionary with attributes and values.
+        """
+        defDic = {}
+        if deformerNode:
+            defType = cmds.objectType(deformerNode)
+            defDic[defType] = {}
+            for attr in list(self.typeAttrDic[defType]):
+                defDic[defType][attr] = cmds.getAttr(deformerNode+"."+attr)
+        return defDic

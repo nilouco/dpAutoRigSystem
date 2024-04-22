@@ -51,7 +51,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                     if objList:
                         meshList = objList
                     else:
-                        meshList = self.dpUIinst.skin.getDeformedModelList(desiredTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                        meshList = self.dpUIinst.skin.getDeformedModelList(deformerTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if meshList:
                         progressAmount = 0
                         maxProcess = len(meshList)
