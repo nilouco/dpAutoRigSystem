@@ -72,6 +72,7 @@ class JointDisplay(object):
         multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=colunmLayout)
         noneTitle = cmds.text('noneTitle', label='None',parent=colunmLayout)
 
+        # bone display panels
         # boneFieldColunm = cmds.textScrollList('boneFieldColunm', parent=colunmLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
         self.boneFieldColunm = cmds.textScrollList('boneFieldColunm', enable=True, append=self.boneLabelList, parent=colunmLayout, allowMultiSelection=True)
         self.jointFieldColunm = cmds.textScrollList('jointFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.jointLabelList)
@@ -102,16 +103,20 @@ class JointDisplay(object):
         """
         self.getJointList(self)
         self.populateLabelList(self)
+        self.dpJointDisplayUI(self)
 
 
     def getJointList(self, *args, **kwargs):
         """ Get all joints in the scene
         """
+        getlistPass = 0
         jointList = cmds.ls(type='joint')
         if jointList:
             for joint in jointList:
                 self.allJointsList.append(joint)
             print(f'All joints List : {self.allJointsList}')
+            print(f'Pass Get List : {getlistPass}')
+
             return self.allJointsList
         else:
             return None
@@ -120,8 +125,7 @@ class JointDisplay(object):
     def populateLabelList(self, *args, **kwargs):
         """ Populate each list with label joint type
         """
-        if self.getJointList():
-            print(f'Appended LIST {self.getJointList()}')
+        if self.allJointsList:
             print(f'LIST ALL JOINT {self.allJointsList}')
             
             for jnt in self.allJointsList:
@@ -152,7 +156,10 @@ class JointDisplay(object):
 
     def movedToRight(self):
         """ """
-    
+        # Get active selection of button list
+        # Change the current joint drawStyle label
+        # Call refresh list
+        # 
     
     
     
@@ -190,4 +197,7 @@ class JointDisplay(object):
     #     """
 
 
-    # Stop trying solve the move button 
+
+    # LAST STOP
+    
+    # - Do the move button  function
