@@ -68,88 +68,43 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                     else:
                         meshList = cmds.listRelatives(cmds.ls(selection=False, type="mesh"), parent=True)
                     if meshList:
+                        # finding deformers
                         hasDef = False
-                        print("meshList = ", meshList)
-                        
                         inputDeformerList = cmds.listHistory(meshList, pruneDagObjects=False, interestLevel=True)
                         for deformerType in list(self.defWeights.typeAttrDic.keys()):
                             if cmds.ls(inputDeformerList, type=deformerType):
                                 hasDef = True
                                 break
-                        
-                        #deformerTypeList = self.defWeights.getDeformedModelList(deformTypeList=self.defWeights.typeAttrDic.keys())
-                        print("inputDeformerList = ", inputDeformerList)
-                        #print("deformerTypeList = ", deformerTypeList)
-                        #if transformList:
-
                         if hasDef:
-
-                            # WIP
-                            #
+                            # Declaring the data dictionary to export it
                             deformerDataDic = {}
-
-
                             progressAmount = 0
-                            maxProcess = len(meshList)
-
+                            maxProcess = len(list(self.defWeights.typeAttrDic.keys()))
+                            # run for all deformer types to get info
                             for deformerType in list(self.defWeights.typeAttrDic.keys()):
+                                if self.verbose:
+                                    # Update progress window
+                                    progressAmount += 1
+                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                                 deformerList = cmds.ls(selection=False, type=deformerType)
                                 if deformerList:
                                     for deformerNode in deformerList:
                                         if deformerNode in inputDeformerList:
-
-                                            print("deformerNode =", deformerNode)
-
-                                            deformerDataDic[deformerNode] = self.defWeights.getDeformerData(deformerNode)
-                                            
-
-                                            
-                                            
-                                                
+                                            # get the attributes and values for this deformer node
+                                            deformerDataDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
                                             # Get shape indexes for the deformer so we can query the deformer weights
                                             shapeList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
                                             indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
                                             shapeToIndexDic = dict(zip(shapeList, indexList))
-                                            
-                                            print("shapeList =", shapeList)
-                                            print("indexList =", indexList)
-                                            print("shapeToIndexDic =", shapeToIndexDic)
-
+                                            # update dictionary
                                             deformerDataDic[deformerNode][deformerType]["shapeList"] = shapeList
                                             deformerDataDic[deformerNode][deformerType]["indexList"] = indexList
                                             deformerDataDic[deformerNode][deformerType]["shapeToIndexDic"] = shapeToIndexDic
-                                            
                                             for shape in shapeList:
-                                                print("shape =", shape)
                                                 # Get weights
                                                 index = shapeToIndexDic[shape]
-                                                print("index =", index)
                                                 weights = self.defWeights.getDeformerWeights(deformerNode, index)
-                                                print("weights =", weights)
                                                 deformerDataDic[deformerNode][deformerType]["weights"] = weights
-                                                print("deformerDataDic =", deformerDataDic)
-                                                #{
-
-                                                #                                        "envelope" : cmds.getAttr()
-
-
-                                                #}
-
-
-#                            for meshNode in meshList:
-#                                defNodeList = []
-#                                histList = cmds.listHistory(meshNode, pruneDagObjects=False, interestLevel=True)
-#                                if histList:
-#                                    for histNode in histList:
-#                                            if cmds.objectType(histNode) == deformerType:
-#                                                defNodeList.append(histNode)
-#                                                print("meshNode, histNode, deformerType, defNodeList = ", meshNode, histNode, deformerType, defNodeList)
-
-
-                            if self.verbose:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                             try:
                                 # export deformer data
                                 self.pipeliner.makeDirIfNotExists(self.ioPath)
@@ -212,4 +167,3 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
         self.endProgressBar()
         self.refreshView()
         return self.dataLogDic
-
