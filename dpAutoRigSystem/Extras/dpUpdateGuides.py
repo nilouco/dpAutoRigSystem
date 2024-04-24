@@ -362,8 +362,9 @@ class UpdateGuides(object):
 
 
     def createNewGuides(self):
+        beforeNewGuidesMTBRList = self.dpUIinst.modulesToBeRiggedList
         for guide in self.updateData:
-            guideType = self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideModuleName
+            guideType = beforeNewGuidesMTBRList[self.updateData[guide]['idx']].guideModuleName
             # create the new guide
             currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules")
             # rename as it's predecessor
