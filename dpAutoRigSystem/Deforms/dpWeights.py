@@ -19,19 +19,19 @@ class Weights(object):
                             "solidify"        : [None, "envelope", "normalScale", "tangentPlaneScale", "scaleEnvelope", "attachmentMode", "useBorderFalloff", "stabilizationLevel", "borderFalloffBlur"],
                             "ffd"             : [None, "envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
                             "proximityWrap"   : [None, "envelope", "maxDrivers", "falloffScale", "dropoffRateScale", "scaleCompensation", "wrapMode", "coordinateFrames", "smoothNormals", "spanSamples", "smoothInfluences", "softNormalization", "useBindTags"],
-                            "wrap"            : [None, "envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
-                            "shrinkWrap"      : [None, "envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection", "inputEnvelope"],
+                            "wrap"            : ["driverPoints", "envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
+                            "shrinkWrap"      : ["targetGeom", "envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection"],
                             "morph"           : [None, "envelope", "morphMode", "morphSpace", "useComponentLookup", "scaleEnvelope", "uniformScaleWeight", "normalScale", "tangentPlaneScale", "tangentialDamping", "inwardConstraint", "outwardConstraint"],
                             "wire"            : [None, "envelope", "crossingEffect", "tension", "localInfluence", "rotation", "dropoffDistance", "scale", "wireLocatorEnvelope", "wireLocatorTwist"],
                             "sculpt"          : [None, "envelope", "mode", "dropoffType", "maximumDisplacement", "dropoffDistance", "insideMode"],
                             "textureDeformer" : [None, "envelope", "strength", "offset", "vectorStrengthX", "vectorStrengthY", "vectorStrengthZ", "vectorOffsetX", "vectorOffsetY", "vectorOffsetZ", "handleVisibility", "pointSpace"],
                             "jiggle"          : [None, "envelope", "currentTime", "enable", "ignoreTransform", "forceAlongNormal", "forceOnTangent", "motionMultiplier", "stiffness", "damping", "jiggleWeight", "directionBias"],
-                            "deformBend"      : ["deformerData", "curvature", "lowBound", "highBound"],
-                            "deformFlare"     : ["deformerData", "startFlareX", "startFlareZ", "endFlareX", "endFlareZ", "curve", "lowBound", "highBound"],
-                            "deformSine"      : ["deformerData", "amplitude", "wavelength", "offset", "dropoff", "lowBound", "highBound"],
-                            "deformSquash"    : ["deformerData", "factor", "expand", "maxExpandPos", "startSmoothness", "endSmoothness", "lowBound", "highBound"],
-                            "deformTwist"     : ["deformerData", "startAngle", "endAngle", "lowBound", "highBound"],
-                            "deformWave"      : ["deformerData", "amplitude", "wavelength", "offset", "dropoff", "dropoffPosition", "minRadius", "maxRadius"],
+                            "deformBend"      : ["deformerData", "envelope", "curvature", "lowBound", "highBound"],
+                            "deformFlare"     : ["deformerData", "envelope", "startFlareX", "startFlareZ", "endFlareX", "endFlareZ", "curve", "lowBound", "highBound"],
+                            "deformSine"      : ["deformerData", "envelope", "amplitude", "wavelength", "offset", "dropoff", "lowBound", "highBound"],
+                            "deformSquash"    : ["deformerData", "envelope", "factor", "expand", "maxExpandPos", "startSmoothness", "endSmoothness", "lowBound", "highBound"],
+                            "deformTwist"     : ["deformerData", "envelope", "startAngle", "endAngle", "lowBound", "highBound"],
+                            "deformWave"      : ["deformerData", "envelope", "amplitude", "wavelength", "offset", "dropoff", "dropoffPosition", "minRadius", "maxRadius"],
                             } #first element used to find the attribute node listing connection
     
     
@@ -156,18 +156,30 @@ class Weights(object):
     def getDeformerInfo(self, deformerNode, *args):
         """ Return the dictionary with attributes and values.
         """
-        defDic = {}
+        defDic = {"attributes" : {}}
         if deformerNode:
             defType = cmds.objectType(deformerNode)
-            defDic[defType] = {}
+            defDic["type"] = defType
             for n, attr in enumerate(list(self.typeAttrDic[defType])):
                 if n == 0:
-                    defDic[defType]["nonLinear"] = None
+                    defDic["nonLinear"] = None
+                    defDic["relatedNode"] = None
                     if attr:
-                        connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=True, source=False)
-                        if connectedNodeList:
-                            deformerNode = connectedNodeList[0]
-                            defDic[defType]["nonLinear"] = defType.replace("deform", "").lower()
+                        connectedNodeList = None
+                        if attr == "driverPoints": #wrap
+                            connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
+                            if connectedNodeList:
+                                defDic["relatedNode"] = connectedNodeList[0]
+                        elif attr == "targetGeom": #shrinkWrap
+                            connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
+                            if connectedNodeList:
+                                defDic["relatedNode"] = connectedNodeList[0]
+                        else: #nonLinear
+                            connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=True, source=False)
+                            if connectedNodeList:
+                                deformerNode = connectedNodeList[0]
+                                defDic["nonLinear"] = defType.replace("deform", "").lower()
                 else:
-                    defDic[defType][attr] = cmds.getAttr(deformerNode+"."+attr)
+                    defDic["attributes"][attr] = cmds.getAttr(deformerNode+"."+attr)
+            defDic["name"] = deformerNode
         return defDic
