@@ -474,6 +474,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 self.facialAttrList[5] : self.cvGrimaceLoc,
                                 self.facialAttrList[6] : self.cvFaceLoc
                             }
+        self.cvDeformerCenterLoc = side+middle+guide+"_DeformerCenter"
+        self.cvDeformerRadiusLoc = side+middle+guide+"_DeformerRadius"
         self.deformerCube = side+middle+guide+"_DeformerCube_Geo"
         
 
