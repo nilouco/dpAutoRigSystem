@@ -74,10 +74,10 @@ class JointDisplay(object):
 
         # bone display panels
         # boneFieldColunm = cmds.textScrollList('boneFieldColunm', parent=colunmLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
-        self.boneFieldColunm = cmds.textScrollList('boneFieldColunm', enable=True, append=self.boneLabelList, parent=colunmLayout, allowMultiSelection=True)
-        self.jointFieldColunm = cmds.textScrollList('jointFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.jointLabelList)
-        self.multiChildFieldColunm = cmds.textScrollList('multiChildFieldColunm', enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.multiChildLabelList)
-        self.noneFieldColunm = cmds.textScrollList('noneFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.noneLabelList)
+        self.boneFieldColunm = cmds.textScrollList('boneFieldColunm', enable=True, append=self.boneLabelList, parent=colunmLayout, allowMultiSelection=True, selectCommand=lambda: self.activeBoard(self.boneFieldColunm))
+        self.jointFieldColunm = cmds.textScrollList('jointFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeBoard(self.jointFieldColunm))
+        self.multiChildFieldColunm = cmds.textScrollList('multiChildFieldColunm', enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeBoard(self.multiChildFieldColunm))
+        self.noneFieldColunm = cmds.textScrollList('noneFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeBoard(self.noneFieldColunm))
 
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
@@ -159,33 +159,52 @@ class JointDisplay(object):
         # Get active selection of button list
         # Change the current joint drawStyle label
         # Call refresh list
-        # 
+        # Search which board is selected. 
+        # selectedItem = cmds.textScrollList(boardList, query=True, selectItem=True)
+        # for board in boardList:
+
+
+    def activeBoard(self, board):
+        self.board = board
+        selectedBoard = None
+        if self.board == 'boneFieldColunm':
+            selectedBoard = 0
+            board = 'boneFieldColunm'
+        elif self.board == 'jointFieldColunm':
+            selectedBoard = 1
+            board = 'jointFieldColunm'
+        elif self.board == 'multiChildFieldColunm':
+            selectedBoard = 2
+            board = 'multiChildFieldColunm'
+        elif self.board == 'noneFieldColunm':
+            selectedBoard = 3
+            board = 'noneFieldColunm'
+        return print(f'SELECTED BOARD $$$$$$$$$$$$$$$$ {board[board.rfind("|")+1:]}')
+
+
+
     
     
-    
-    
-    def activeSelection():
-        """ Get the active selection
-        """
+    # def activeSelection():
+    #      Get the active selection
+
     
         #TODO
         # - Search the active selection
 
 
     # def mainfilter():
-    #     """ Filter list to populate the 
-    #     """
+    #     Filter list to populate the 
         
     #     #TODO
     #     # create a filter to populate list that will be searched 
 
     
     # def refreshLists(self,*args, **kwargs):
-    #     """ Refresh the code
-    #     """
+    #     
+
     #     self.getJointList()
     #     self.populateLabelList()
-
 
         
         #TODO
@@ -193,11 +212,50 @@ class JointDisplay(object):
         # populate fields
 
     # def activeSelectionBoard():
-    #     """ Find the active selection and indicate the board
-    #     """
-
+    #     Find the active selection and indicate the board
+    #     
 
 
     # LAST STOP
     
     # - Do the move button  function
+
+
+#Study 
+
+# # Global variable to store the active textScrollList
+# active_list = None
+
+# def set_active_list(list_name):
+#     global active_list
+#     active_list = list_name
+#     print(f"Active list set to: {active_list}")
+
+# def print_selection():
+#     if active_list:
+#         selected_items = cmds.textScrollList(active_list, query=True, selectItem=True)
+#         print(f"Selected Items in {active_list}: {selected_items}")
+#     else:
+#         print("No list is currently active.")
+
+# def create_ui():
+#     window = cmds.window(title="Select Items")
+#     layout = cmds.columnLayout()
+    
+#     # List 1
+#     list1 = cmds.textScrollList(numberOfRows=8, allowMultiSelection=True,
+#                                 append=['Item1', 'Item2', 'Item3', 'Item4'],
+#                                 selectCommand=lambda: set_active_list(list1))
+    
+#     # List 2
+#     list2 = cmds.textScrollList(numberOfRows=8, allowMultiSelection=True,
+#                                 append=['ItemA', 'ItemB', 'ItemC', 'ItemD'],
+#                                 selectCommand=lambda: set_active_list(list2))
+
+#     # Button to print the selection from the active list
+#     cmds.button(label="Print Selection", command=lambda x: print_selection())
+    
+#     cmds.showWindow(window)
+
+# # Call to create the UI
+# create_ui()
