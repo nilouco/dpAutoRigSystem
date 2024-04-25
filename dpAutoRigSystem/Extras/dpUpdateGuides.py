@@ -343,12 +343,11 @@ class UpdateGuides(object):
             if guideVersion != self.currentDpArVersion:
                 # Create the database holder where the key is the baseGuide
                 self.updateData[baseGuide] = {}
+                self.updateData[baseGuide]["guideModuleName"] = self.guidesDictionary[baseGuide]["guideModuleName"]
                 guideAttrList = self.listKeyUserAttr(baseGuide)
                 # Create de attributes dictionary for each baseGuide
                 self.updateData[baseGuide]['attributes'], self.updateData[baseGuide]['transformAttributes'] = self.splitTransformAttrValues(baseGuide, guideAttrList)
-
-                self.updateData[baseGuide]['idx'] = instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])
-                
+                self.updateData[baseGuide]['instance'] = self.dpUIinst.modulesToBeRiggedList[instancedModulesStrList.index(self.updateData[baseGuide]['attributes']['moduleInstanceInfo'])]
                 self.updateData[baseGuide]['children'] = {}
                 self.updateData[baseGuide]['parent'] = self.getGuideParent(baseGuide)
                 childrenList = self.listChildren(baseGuide)
@@ -362,16 +361,14 @@ class UpdateGuides(object):
 
 
     def createNewGuides(self):
-        beforeNewGuidesMTBRList = self.dpUIinst.modulesToBeRiggedList
         for guide in self.updateData:
-            guideType = beforeNewGuidesMTBRList[self.updateData[guide]['idx']].guideModuleName
+            guideType = self.updateData[guide]['guideModuleName']
             # create the new guide
             currentNewGuide = self.dpUIinst.initGuide("dp"+guideType, "Modules")
             # rename as it's predecessor
             guideName = self.updateData[guide]['attributes']['customName']
             currentNewGuide.editUserName(guideName)
             self.updateData[guide]['newGuide'] = currentNewGuide.moduleGrp
-            self.updateData[guide]['guideModuleName'] = guideType
             self.newGuidesInstanceList.append(currentNewGuide)
             if self.ui:
                 cmds.refresh()
@@ -381,9 +378,9 @@ class UpdateGuides(object):
         for guide in self.updateData:
             currentCustomName = self.updateData[guide]['attributes']['customName']
             if currentCustomName == '' or currentCustomName == None:
-                self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].editUserName(self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].moduleGrp.split(':')[0]+'_OLD')
+                self.updateData[guide]['instance'].editUserName(self.updateData[guide]['instance'].moduleGrp.split(':')[0]+'_OLD')
             else:
-                self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].editUserName(currentCustomName+'_OLD')
+                self.updateData[guide]['instance'].editUserName(currentCustomName+'_OLD')
 
 
     def retrieveNewParent(self, currentParent):
@@ -507,9 +504,9 @@ class UpdateGuides(object):
             mel.eval('print \"dpAR: '+self.dpUIinst.lang['e000_guideNotFound']+'\\n\";')
         allNamespaceList = cmds.namespaceInfo(listOnlyNamespaces=True)
         for guide in self.updateData:
-             if self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace in allNamespaceList:
-                    cmds.namespace(moveNamespace=(self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, ':'), force=True)
-                    cmds.namespace(removeNamespace=self.dpUIinst.modulesToBeRiggedList[self.updateData[guide]['idx']].guideNamespace, force=True)
+             if self.updateData[guide]['instance'].guideNamespace in allNamespaceList:
+                    cmds.namespace(moveNamespace=(self.updateData[guide]['instance'].guideNamespace, ':'), force=True)
+                    cmds.namespace(removeNamespace=self.updateData[guide]['instance'].guideNamespace, force=True)
         self.dpUIinst.reloadMainUI()
 
 
