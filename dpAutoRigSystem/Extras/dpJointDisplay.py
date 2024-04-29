@@ -164,34 +164,17 @@ class JointDisplay(object):
         # for board in boardList:
 
 
-    def activeBoard(self, board):
-        self.board = board
-        selectedBoard = 0
-        if self.board == 'boneFieldcolumn':
-            selectedBoard = 0
-            board = 'boneFieldcolumn'
-        elif self.board == 'jointFieldcolumn':
-            selectedBoard = 1
-            board = 'jointFieldcolumn'
-        elif self.board == 'multiChildFieldcolumn':
-            selectedBoard = 2
-            board = 'multiChildFieldcolumn'
-        elif self.board == 'noneFieldcolumn':
-            selectedBoard = 3
-            board = 'noneFieldcolumn'
-        return print(f'SELECTED BOARD $$$$$$$$$$$$$$$$ {board[board.rfind("|")+1:]}')
-
-    def deselectBoard(self):
-        selectedBoard = self.activeBoard(board)
-        print(f'Active board&&&&&&&&&&{selectedBoard}')
-        # print(f'SELECTED BOARDD %%%%%%%%{self.selectedBoard}')
+    def activeBoard(self, ActiveBoard):
+        ''' Figure out which board column is selected'''
+        self.ActiveBoard = ActiveBoard
         boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
-        for board in boardList:
-            print(f'BOARDDDD ACTUAL {board}')
-            if board != selectedBoard:
-                cmds.textScrollList(board, edit=True, deselectAll=True)
-        print(f'>>>>>>>>>>>>><<<<<<<<<<<<<<<{selectedBoard}')
-
+        board=[]
+        for item in boardList:
+            if item == self.ActiveBoard[self.ActiveBoard.rfind("|")+1:]:
+                board.append(item)
+            if item != self.ActiveBoard[self.ActiveBoard.rfind("|")+1:]:
+                cmds.textScrollList(item, edit=True, deselectAll=True) 
+        # return print(f'RETURNED - - - - - {board}')
 
     
     
