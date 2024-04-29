@@ -64,20 +64,20 @@ class JointDisplay(object):
         self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="Test", changeCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
 
         # creating column Layout
-        colunmLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout)
+        columnLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout)
 
         # creating titles
-        boneTitle = cmds.text('boneTitle', label='Bone',parent=colunmLayout)
-        jointTitle = cmds.text('jointTitle',label='Joint',parent=colunmLayout)
-        multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=colunmLayout)
-        noneTitle = cmds.text('noneTitle', label='None',parent=colunmLayout)
+        boneTitle = cmds.text('boneTitle', label='Bone',parent=columnLayout)
+        jointTitle = cmds.text('jointTitle',label='Joint',parent=columnLayout)
+        multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=columnLayout)
+        noneTitle = cmds.text('noneTitle', label='None',parent=columnLayout)
 
         # bone display panels
-        # boneFieldColunm = cmds.textScrollList('boneFieldColunm', parent=colunmLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
-        self.boneFieldColunm = cmds.textScrollList('boneFieldColunm', enable=True, append=self.boneLabelList, parent=colunmLayout, allowMultiSelection=True, selectCommand=lambda: self.activeBoard(self.boneFieldColunm))
-        self.jointFieldColunm = cmds.textScrollList('jointFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeBoard(self.jointFieldColunm))
-        self.multiChildFieldColunm = cmds.textScrollList('multiChildFieldColunm', enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeBoard(self.multiChildFieldColunm))
-        self.noneFieldColunm = cmds.textScrollList('noneFieldColunm',enable=True, parent=colunmLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeBoard(self.noneFieldColunm))
+        # boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', parent=columnLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
+        self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, append=self.boneLabelList, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeBoard(self.boneFieldcolumn), deselectAll=True)
+        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeBoard(self.jointFieldcolumn), deselectAll=True)
+        self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeBoard(self.multiChildFieldcolumn), deselectAll=True)
+        self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeBoard(self.noneFieldcolumn), deselectAll=True)
 
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
@@ -166,21 +166,31 @@ class JointDisplay(object):
 
     def activeBoard(self, board):
         self.board = board
-        selectedBoard = None
-        if self.board == 'boneFieldColunm':
+        selectedBoard = 0
+        if self.board == 'boneFieldcolumn':
             selectedBoard = 0
-            board = 'boneFieldColunm'
-        elif self.board == 'jointFieldColunm':
+            board = 'boneFieldcolumn'
+        elif self.board == 'jointFieldcolumn':
             selectedBoard = 1
-            board = 'jointFieldColunm'
-        elif self.board == 'multiChildFieldColunm':
+            board = 'jointFieldcolumn'
+        elif self.board == 'multiChildFieldcolumn':
             selectedBoard = 2
-            board = 'multiChildFieldColunm'
-        elif self.board == 'noneFieldColunm':
+            board = 'multiChildFieldcolumn'
+        elif self.board == 'noneFieldcolumn':
             selectedBoard = 3
-            board = 'noneFieldColunm'
+            board = 'noneFieldcolumn'
         return print(f'SELECTED BOARD $$$$$$$$$$$$$$$$ {board[board.rfind("|")+1:]}')
 
+    def deselectBoard(self):
+        selectedBoard = self.activeBoard(board)
+        print(f'Active board&&&&&&&&&&{selectedBoard}')
+        # print(f'SELECTED BOARDD %%%%%%%%{self.selectedBoard}')
+        boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
+        for board in boardList:
+            print(f'BOARDDDD ACTUAL {board}')
+            if board != selectedBoard:
+                cmds.textScrollList(board, edit=True, deselectAll=True)
+        print(f'>>>>>>>>>>>>><<<<<<<<<<<<<<<{selectedBoard}')
 
 
     
@@ -223,39 +233,31 @@ class JointDisplay(object):
 
 #Study 
 
-# # Global variable to store the active textScrollList
-# active_list = None
+# import maya.cmds as cmds
 
-# def set_active_list(list_name):
-#     global active_list
-#     active_list = list_name
-#     print(f"Active list set to: {active_list}")
-
-# def print_selection():
-#     if active_list:
-#         selected_items = cmds.textScrollList(active_list, query=True, selectItem=True)
-#         print(f"Selected Items in {active_list}: {selected_items}")
-#     else:
-#         print("No list is currently active.")
+# def deselect_other_lists(current_list, all_lists):
+#     """ Deselect all items in other lists except for the current list. """
+#     for list_id in all_lists:
+#         if list_id != current_list:
+#             cmds.textScrollList(list_id, edit=True, deselectAll=True)
 
 # def create_ui():
-#     window = cmds.window(title="Select Items")
-#     layout = cmds.columnLayout()
+#     """ Create the UI window with four textScrollList controls. """
+#     window = cmds.window(title="Multiple TextScrollLists")
+#     cmds.columnLayout(adjustableColumn=True)
     
-#     # List 1
-#     list1 = cmds.textScrollList(numberOfRows=8, allowMultiSelection=True,
-#                                 append=['Item1', 'Item2', 'Item3', 'Item4'],
-#                                 selectCommand=lambda: set_active_list(list1))
+#     # Create multiple text scroll lists
+#     lists = []
+#     lists.append(cmds.textScrollList('tsList1', append=['Item1', 'Item2', 'Item3', 'Item4'], allowMultiSelection=True))
+#     lists.append(cmds.textScrollList('tsList2', append=['ItemA', 'ItemB', 'ItemC', 'ItemD'], allowMultiSelection=True))
+#     lists.append(cmds.textScrollList('tsList3', append=['Item5', 'Item6', 'Item7', 'Item8'], allowMultiSelection=True))
+#     lists.append(cmds.textScrollList('tsList4', append=['ItemE', 'ItemF', 'ItemG', 'ItemH'], allowMultiSelection=True))
     
-#     # List 2
-#     list2 = cmds.textScrollList(numberOfRows=8, allowMultiSelection=True,
-#                                 append=['ItemA', 'ItemB', 'ItemC', 'ItemD'],
-#                                 selectCommand=lambda: set_active_list(list2))
-
-#     # Button to print the selection from the active list
-#     cmds.button(label="Print Selection", command=lambda x: print_selection())
+#     # Attach a command to each list to manage deselection
+#     for list_id in lists:
+#         cmds.textScrollList(list_id, edit=True, selectCommand=lambda x=list_id: deselect_other_lists(x, lists))
     
 #     cmds.showWindow(window)
 
-# # Call to create the UI
+# # Call the function to create the UI
 # create_ui()
