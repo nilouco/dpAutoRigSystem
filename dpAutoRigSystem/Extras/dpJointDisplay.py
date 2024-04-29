@@ -157,6 +157,8 @@ class JointDisplay(object):
     def movedToRight(self):
         """ """
         # Get active selection of button list
+        activeBoard = self.activeBoard()
+        
         # Change the current joint drawStyle label
         # Call refresh list
         # Search which board is selected. 
@@ -164,17 +166,17 @@ class JointDisplay(object):
         # for board in boardList:
 
 
-    def activeBoard(self, ActiveBoard):
+    def activeBoard(self, selectedBoard):
         ''' Figure out which board column is selected'''
-        self.ActiveBoard = ActiveBoard
+        self.selectedBoard = selectedBoard
         boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
         board=[]
         for item in boardList:
-            if item == self.ActiveBoard[self.ActiveBoard.rfind("|")+1:]:
+            if item == self.selectedBoard[self.selectedBoard.rfind("|")+1:]:
                 board.append(item)
-            if item != self.ActiveBoard[self.ActiveBoard.rfind("|")+1:]:
+            if item != self.selectedBoard[self.selectedBoard.rfind("|")+1:]:
                 cmds.textScrollList(item, edit=True, deselectAll=True) 
-        # return print(f'RETURNED - - - - - {board}')
+        return board
 
     
     
