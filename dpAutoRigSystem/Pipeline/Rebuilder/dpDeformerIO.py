@@ -164,42 +164,30 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                             wrapList = cmds.ls(hist, type="wrap")[0]
                                             newDefNode = cmds.rename(wrapList, deformerDataDic[deformerNode]["name"])
                                         elif deformerDataDic[deformerNode]["type"] == "shrinkWrap":
-                                            cmds.select(deformerDataDic[deformerNode]["shapeList"], deformerDataDic[deformerNode]["relatedNode"])
-                                            print("hehrher sisrhignk =", deformerDataDic[deformerNode]["shapeList"], deformerDataDic[deformerNode]["relatedNode"])
-                                            newDefNode = cmds.deformer(type=deformerDataDic[deformerNode]["type"], name=deformerDataDic[deformerNode]["name"])[0]
-
-
-
-                                        # wrap
-
-
-
-                                        # shrinkWrap
-                                        # wire
-
-                                        # nonLinear
-                                            # bend
-                                            # flare
-                                            # sine
-                                            # squash
-                                            # twist
-                                            # wave
-
-
-                                        else:
+                                            newDefNode = cmds.deformer(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["type"], name=deformerDataDic[deformerNode]["name"])[0] #shrinkWrap
+                                            for cAttr in ["continuity", "smoothUVs", "keepBorder", "boundaryRule", "keepHardEdge", "propagateEdgeHardness", "keepMapBorders"]:
+                                                cmds.connectAttr(deformerDataDic[deformerNode]["relatedNode"]+"."+cAttr, newDefNode+"."+cAttr, force=True)
+                                            cmds.connectAttr(deformerDataDic[deformerNode]["relatedNode"]+".worldMesh", newDefNode+".targetGeom", force=True)
+                                        elif deformerDataDic[deformerNode]["type"] == "wire":
+                                            newDefNode = cmds.wire(deformerDataDic[deformerNode]["shapeList"], wire=deformerDataDic[deformerNode]["relatedNode"], name=deformerDataDic[deformerNode]["name"])[0] #wire
+                                        elif deformerDataDic[deformerNode]["nonLinear"]:
+                                            newDefNode = cmds.nonLinear(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["nonLinear"], name=deformerDataDic[deformerNode]["name"])[0] #bend, flare, sine, squash, twist, wave
+                                        else: #solidify, proximityWrap, morph, textureDeformer, jiggle
                                             newDefNode = cmds.deformer(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["type"], name=deformerDataDic[deformerNode]["name"])[0]
-
                                         # import attribute values
                                         if newDefNode:
                                             for attr in deformerDataDic[deformerNode]["attributes"].keys():
                                                 cmds.setAttr(newDefNode+"."+attr, deformerDataDic[deformerNode]["attributes"][attr])
-                                        # 
-    #                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
                                         
                                         
                                         # TODO
                                         # import weights
                                         # deformer order
+                                        # 
+    #                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
+                                        #
+                                        #
+                                        
 
                                     except Exception as e:
                                         self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+str(e))

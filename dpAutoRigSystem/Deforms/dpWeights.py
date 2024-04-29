@@ -22,7 +22,7 @@ class Weights(object):
                             "wrap"            : ["driverPoints", "envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
                             "shrinkWrap"      : ["targetGeom", "envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection"],
                             "morph"           : [None, "envelope", "morphMode", "morphSpace", "useComponentLookup", "scaleEnvelope", "uniformScaleWeight", "normalScale", "tangentPlaneScale", "tangentialDamping", "inwardConstraint", "outwardConstraint"],
-                            "wire"            : [None, "envelope", "crossingEffect", "tension", "localInfluence", "rotation", "dropoffDistance", "scale", "wireLocatorEnvelope", "wireLocatorTwist"],
+                            "wire"            : ["deformedWire", "envelope", "crossingEffect", "tension", "localInfluence", "rotation"],
                             "sculpt"          : [None, "envelope", "mode", "dropoffType", "maximumDisplacement", "dropoffDistance", "insideMode"],
                             "textureDeformer" : [None, "envelope", "strength", "offset", "vectorStrengthX", "vectorStrengthY", "vectorStrengthZ", "vectorOffsetX", "vectorOffsetY", "vectorOffsetZ", "handleVisibility", "pointSpace"],
                             "jiggle"          : [None, "envelope", "currentTime", "enable", "ignoreTransform", "forceAlongNormal", "forceOnTangent", "motionMultiplier", "stiffness", "damping", "jiggleWeight", "directionBias"],
@@ -166,19 +166,14 @@ class Weights(object):
                     defDic["relatedNode"] = None
                     if attr:
                         connectedNodeList = None
-                        if attr == "driverPoints": #wrap
-                            connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
-                            if connectedNodeList:
-                                defDic["relatedNode"] = connectedNodeList[0]
-                        elif attr == "targetGeom": #shrinkWrap
-                            connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
-                            if connectedNodeList:
-                                defDic["relatedNode"] = connectedNodeList[0]
-                        else: #nonLinear
+                        connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
+                        if attr == "deformerData": #nonLinear
                             connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=True, source=False)
                             if connectedNodeList:
                                 deformerNode = connectedNodeList[0]
                                 defDic["nonLinear"] = defType.replace("deform", "").lower()
+                        if connectedNodeList:
+                            defDic["relatedNode"] = connectedNodeList[0]
                 else:
                     defDic["attributes"][attr] = cmds.getAttr(deformerNode+"."+attr)
             defDic["name"] = deformerNode
