@@ -178,3 +178,12 @@ class Weights(object):
                     defDic["attributes"][attr] = cmds.getAttr(deformerNode+"."+attr)
             defDic["name"] = deformerNode
         return defDic
+
+
+    def setDeformerWeights(self, deformerNode, weightsDic, idx=0, *args):
+        """ Set the deformer weights to the given node.
+        """
+        for vtx in weightsDic.keys():
+            print(deformerNode+".weightList["+str(idx)+"].weights["+str(vtx)+"]")
+            print("weightsDic[vtx] =", weightsDic[vtx])
+            cmds.setAttr(deformerNode+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weightsDic[vtx])

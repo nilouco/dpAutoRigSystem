@@ -179,12 +179,21 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                             for attr in deformerDataDic[deformerNode]["attributes"].keys():
                                                 cmds.setAttr(newDefNode+"."+attr, deformerDataDic[deformerNode]["attributes"][attr])
                                         
+
+                                        # WIP
+
+                                        # import weights
+                                        weightsDic = deformerDataDic[deformerNode]["weights"]
+                                        if weightsDic:
+                                            print("\n-----\nweightsDic =", weightsDic)
+                                            for s, shape in enumerate(deformerDataDic[deformerNode]["shapeList"]):
+                                                self.defWeights.setDeformerWeights(deformerDataDic[deformerNode]["name"], weightsDic, s)
+
+
                                         
                                         # TODO
-                                        # import weights
                                         # deformer order
                                         # 
-    #                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
                                         #
                                         #
                                         

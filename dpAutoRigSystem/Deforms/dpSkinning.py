@@ -309,7 +309,7 @@ class Skinning(dpWeights.Weights):
         """
         # workaround to have all weights in a temporary joint
         cmds.select(clear=True)
-        tmpJoint = cmds.joint(name="Temp_Jnt")
+        tmpJoint = cmds.joint(name="dpTemp_Jnt")
         cmds.skinCluster(skinClusterName, edit=True, addInfluence=tmpJoint, toSelectedBones=True, lockWeights=False, weight=1.0)
         try:
             cmds.skinPercent(skinClusterName, mesh, transformValue=[(tmpJoint, 1)])
