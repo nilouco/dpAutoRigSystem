@@ -181,9 +181,7 @@ class Weights(object):
 
 
     def setDeformerWeights(self, deformerNode, weightsDic, idx=0, *args):
-        """ Set the deformer weights to the given node.
+        """ Set the deformer weights to the given node for the indexed shape.
         """
         for vtx in weightsDic.keys():
-            print(deformerNode+".weightList["+str(idx)+"].weights["+str(vtx)+"]")
-            print("weightsDic[vtx] =", weightsDic[vtx])
             cmds.setAttr(deformerNode+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weightsDic[vtx])

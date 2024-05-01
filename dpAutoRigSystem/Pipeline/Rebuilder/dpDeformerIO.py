@@ -101,11 +101,14 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                             deformerDataDic[deformerNode]["shapeList"] = shapeList
                                             deformerDataDic[deformerNode]["indexList"] = indexList
                                             deformerDataDic[deformerNode]["shapeToIndexDic"] = shapeToIndexDic
+                                            deformerDataDic[deformerNode]["weights"] = {}
                                             for shape in shapeList:
                                                 # Get weights
                                                 index = shapeToIndexDic[shape]
                                                 weights = self.defWeights.getDeformerWeights(deformerNode, index)
-                                                deformerDataDic[deformerNode]["weights"] = weights
+                                                if deformerDataDic[deformerNode]["relatedNode"]: #nonLinear
+                                                    weights = self.defWeights.getDeformerWeights(deformerDataDic[deformerNode]["relatedNode"], index)
+                                                deformerDataDic[deformerNode]["weights"][index] = weights
                             try:
                                 # export deformer data
                                 self.pipeliner.makeDirIfNotExists(self.ioPath)
@@ -146,6 +149,7 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                                     try:
                                         newDefNode = None
+
                                         # create a new deformer if it doesn't exists
                                         if deformerDataDic[deformerNode]["type"] == "cluster":
                                             newDefNode = cmds.cluster(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"])[0] #[cluster, handle]
@@ -178,22 +182,23 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         if newDefNode:
                                             for attr in deformerDataDic[deformerNode]["attributes"].keys():
                                                 cmds.setAttr(newDefNode+"."+attr, deformerDataDic[deformerNode]["attributes"][attr])
-                                        
 
-                                        # WIP
-
-                                        # import weights
+                                        # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
                                         weightsDic = deformerDataDic[deformerNode]["weights"]
                                         if weightsDic:
-                                            print("\n-----\nweightsDic =", weightsDic)
                                             for s, shape in enumerate(deformerDataDic[deformerNode]["shapeList"]):
-                                                self.defWeights.setDeformerWeights(deformerDataDic[deformerNode]["name"], weightsDic, s)
+                                                if weightsDic[str(s)]:
+                                                    # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear
+                                                    self.defWeights.setDeformerWeights(deformerDataDic[deformerNode]["name"], weightsDic[str(s)], s)
 
 
                                         
+                                        # WIP
                                         # TODO
                                         # deformer order
-                                        # 
+                                        # lattice boundingBOx
+                                        # wire curve
+                                        # wrap geometry setup
                                         #
                                         #
                                         
