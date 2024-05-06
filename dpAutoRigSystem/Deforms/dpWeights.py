@@ -17,7 +17,7 @@ class Weights(object):
                             "deltaMush"       : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "distanceWeight", "displacement", "scaleX", "scaleY", "scaleZ", "pinBorderVertices"],
                             "tension"         : [None, "envelope", "smoothingIterations", "smoothingStep", "inwardConstraint", "outwardConstraint", "squashConstraint", "stretchConstraint", "relative", "pinBorderVertices", "shearStrength", "bendStrength"],
                             "solidify"        : [None, "envelope", "normalScale", "tangentPlaneScale", "scaleEnvelope", "attachmentMode", "useBorderFalloff", "stabilizationLevel", "borderFalloffBlur"],
-                            "ffd"             : [None, "envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
+                            "ffd"             : ["deformedLatticeMatrix", "envelope", "localInfluenceS", "localInfluenceT", "localInfluenceU", "local", "outsideLattice", "outsideFalloffDist", "usePartialResolution", "partialResolution", "bindToOriginalGeometry", "freezeGeometry"],
                             "proximityWrap"   : [None, "envelope", "maxDrivers", "falloffScale", "dropoffRateScale", "scaleCompensation", "wrapMode", "coordinateFrames", "smoothNormals", "spanSamples", "smoothInfluences", "softNormalization", "useBindTags"],
                             "wrap"            : ["driverPoints", "envelope", "weightThreshold", "maxDistance", "autoWeightThreshold", "exclusiveBind", "falloffMode", "envelope"],
                             "shrinkWrap"      : ["targetGeom", "envelope", "targetSmoothLevel", "projection", "closestIfNoIntersection", "reverse", "bidirectional", "boundingBoxCenter", "axisReference", "alongX", "alongY", "alongZ", "offset", "targetInflation", "falloff", "falloffIterations", "shapePreservationEnable", "shapePreservationSteps", "shapePreservationReprojection"],
@@ -164,14 +164,19 @@ class Weights(object):
                 if n == 0:
                     defDic["nonLinear"] = None
                     defDic["relatedNode"] = None
+                    defDic["relatedData"] = None
                     if attr:
                         connectedNodeList = None
                         connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=False, source=True)
                         if attr == "deformerData": #nonLinear
                             connectedNodeList = cmds.listConnections(deformerNode+"."+attr, destination=True, source=False)
                             if connectedNodeList:
+                                defDic["relatedData"] = cmds.listRelatives(deformerNode, parent=True, type="transform")[0]
                                 deformerNode = connectedNodeList[0]
                                 defDic["nonLinear"] = defType.replace("deform", "").lower()
+                        if defType == "ffd": #lattice
+                            defDic["relatedData"] = self.getLatticePoints(connectedNodeList[0])
+                            defDic["baseLatticeMatrix"] = cmds.listConnections(deformerNode+".baseLatticeMatrix", destination=False, source=True)[0]
                         if connectedNodeList:
                             defDic["relatedNode"] = connectedNodeList[0]
                 else:
@@ -185,3 +190,26 @@ class Weights(object):
         """
         for vtx in weightsDic.keys():
             cmds.setAttr(deformerNode+".weightList["+str(idx)+"].weights["+str(vtx)+"]", weightsDic[vtx])
+
+
+    def getLatticePoints(self, latticeNode, *args):
+        """ Return the points position of the given lattice node.
+        """
+        pointList = []
+        # loop for all 3D points
+        for s in range(0, cmds.getAttr(latticeNode+".sDivisions")):
+            for t in range(0, cmds.getAttr(latticeNode+".tDivisions")):
+                for u in range(0, cmds.getAttr(latticeNode+".uDivisions")):
+                    pointList.append(cmds.getAttr(latticeNode+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]")[0])
+        return pointList
+
+
+    def setLatticePoints(self, latticeHandle, pointList, *args):
+        """ Loop for all lattice 3D points and set them position.
+        """
+        i = 0
+        for s in range(0, cmds.getAttr(latticeHandle+".sDivisions")):
+            for t in range(0, cmds.getAttr(latticeHandle+".tDivisions")):
+                for u in range(0, cmds.getAttr(latticeHandle+".uDivisions")):
+                    cmds.xform(latticeHandle+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]", translation=pointList[i])
+                    i += 1

@@ -106,8 +106,10 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                                 # Get weights
                                                 index = shapeToIndexDic[shape]
                                                 weights = self.defWeights.getDeformerWeights(deformerNode, index)
-                                                if deformerDataDic[deformerNode]["relatedNode"]: #nonLinear
-                                                    weights = self.defWeights.getDeformerWeights(deformerDataDic[deformerNode]["relatedNode"], index)
+                                                if deformerDataDic[deformerNode]["relatedNode"]: 
+                                                    if not deformerType == "ffd":
+                                                        # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
+                                                        weights = self.defWeights.getDeformerWeights(deformerDataDic[deformerNode]["relatedNode"], index)
                                                 deformerDataDic[deformerNode]["weights"][index] = weights
                             try:
                                 # export deformer data
@@ -158,7 +160,11 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         elif deformerDataDic[deformerNode]["type"] == "tension":
                                             newDefNode = cmds.tension(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"])[0] #[tension]
                                         elif deformerDataDic[deformerNode]["type"] == "ffd":
-                                            newDefNode = cmds.lattice(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"])[0] #[set, ffd, base]
+                                            latticeList = cmds.lattice(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"]) #[set, ffd, base] 
+                                            newDefNode = latticeList[0]
+                                            self.defWeights.setLatticePoints(latticeList[1], deformerDataDic[deformerNode]["relatedData"])
+                                            cmds.rename(latticeList[1], deformerDataDic[deformerNode]["relatedNode"])
+                                            cmds.rename(latticeList[2], deformerDataDic[deformerNode]["baseLatticeMatrix"])
                                         elif deformerDataDic[deformerNode]["type"] == "sculpt":
                                             newDefNode = cmds.sculpt(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"])[0] #[sculpt, sculptor, orig]
                                         elif deformerDataDic[deformerNode]["type"] == "wrap":
@@ -175,9 +181,12 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         elif deformerDataDic[deformerNode]["type"] == "wire":
                                             newDefNode = cmds.wire(deformerDataDic[deformerNode]["shapeList"], wire=deformerDataDic[deformerNode]["relatedNode"], name=deformerDataDic[deformerNode]["name"])[0] #wire
                                         elif deformerDataDic[deformerNode]["nonLinear"]:
-                                            newDefNode = cmds.nonLinear(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["nonLinear"], name=deformerDataDic[deformerNode]["name"])[0] #bend, flare, sine, squash, twist, wave
+                                            nonLinearList = cmds.nonLinear(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["nonLinear"], name=deformerDataDic[deformerNode]["name"]) #[def, handle] bend, flare, sine, squash, twist, wave
+                                            newDefNode = nonLinearList[0]
+                                            cmds.rename(nonLinearList[1], deformerDataDic[deformerNode]["relatedData"])
                                         else: #solidify, proximityWrap, morph, textureDeformer, jiggle
                                             newDefNode = cmds.deformer(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["type"], name=deformerDataDic[deformerNode]["name"])[0]
+                                        
                                         # import attribute values
                                         if newDefNode:
                                             for attr in deformerDataDic[deformerNode]["attributes"].keys():
@@ -188,15 +197,14 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         if weightsDic:
                                             for s, shape in enumerate(deformerDataDic[deformerNode]["shapeList"]):
                                                 if weightsDic[str(s)]:
-                                                    # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear
+                                                    # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
                                                     self.defWeights.setDeformerWeights(deformerDataDic[deformerNode]["name"], weightsDic[str(s)], s)
 
+                                        ##
 
-                                        
-                                        # WIP
                                         # TODO
-                                        # deformer order
-                                        # lattice boundingBOx
+                                        #
+                                        #
                                         # wire curve
                                         # wrap geometry setup
                                         #
