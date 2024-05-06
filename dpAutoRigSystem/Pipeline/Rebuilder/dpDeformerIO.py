@@ -166,7 +166,10 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                             cmds.rename(latticeList[1], deformerDataDic[deformerNode]["relatedNode"])
                                             cmds.rename(latticeList[2], deformerDataDic[deformerNode]["relatedData"]["baseLatticeMatrix"])
                                         elif deformerDataDic[deformerNode]["type"] == "sculpt":
-                                            newDefNode = cmds.sculpt(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"])[0] #[sculpt, sculptor, orig]
+                                            sculptList = cmds.sculpt(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"]) #[sculpt, sculptor, orig]
+                                            newDefNode = sculptList[0]
+                                            cmds.rename(sculptList[1], deformerDataDic[deformerNode]["relatedData"]["sculptor"])
+                                            cmds.rename(sculptList[2], deformerDataDic[deformerNode]["relatedData"]["originLocator"])
                                         elif deformerDataDic[deformerNode]["type"] == "wrap":
                                             cmds.select(deformerDataDic[deformerNode]["shapeList"], deformerDataDic[deformerNode]["relatedNode"])
                                             mel.eval("CreateWrap;")
@@ -208,8 +211,6 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         ##
 
                                         # TODO
-                                        #
-                                        # scuptor and origLocator
                                         # wrap geometry setup
                                         #
                                         #

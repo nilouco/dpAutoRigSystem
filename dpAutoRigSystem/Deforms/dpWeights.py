@@ -175,14 +175,13 @@ class Weights(object):
                                 deformerNode = connectedNodeList[0]
                                 defDic["nonLinear"] = defType.replace("deform", "").lower()
                         if defType == "ffd": #lattice
-                            defDic["relatedData"] = {
-                                                        "pointList" : self.getLatticePoints(connectedNodeList[0]),
-                                                        "baseLatticeMatrix" : cmds.listConnections(deformerNode+".baseLatticeMatrix", destination=False, source=True)[0]
-                                                    }
-                        if defType == "wire":
+                            defDic["relatedData"] = self.getLatticeInfo(connectedNodeList[0], deformerNode)
+                        elif defType == "wire":
                             defDic["relatedData"] = self.getCurveInfo(connectedNodeList[0])
                         if connectedNodeList:
                             defDic["relatedNode"] = connectedNodeList[0]
+                    if defType == "sculpt":
+                        defDic["relatedData"] = self.getSculptInfo(deformerNode)
                 else:
                     defDic["attributes"][attr] = cmds.getAttr(deformerNode+"."+attr)
             defDic["name"] = deformerNode
@@ -219,6 +218,15 @@ class Weights(object):
                     i += 1
 
 
+    def getLatticeInfo(self, connectedNode, deformerNode, *args):
+        """
+        """
+        return {
+                "pointList" : self.getLatticePoints(connectedNode),
+                "baseLatticeMatrix" : cmds.listConnections(deformerNode+".baseLatticeMatrix", destination=False, source=True)[0]
+               }
+
+
     def getCurveInfo(self, curve, *args):
         """ Return a dictionary with the information about the curve like points, degree, spans, form and knots.
         """
@@ -233,3 +241,12 @@ class Weights(object):
                     }
         cmds.delete(crvInfo)
         return resultDic
+
+
+    def getSculptInfo(self, deformerNode, *args):
+        """ Return a dictionary of the connected nodes on sculptObjectGeometry and startPosition of the given sculpt deformer node.
+        """
+        return {
+                "sculptor"      : cmds.listConnections(deformerNode+".sculptObjectGeometry", destination=False, source=True)[0],
+                "originLocator" : cmds.listConnections(deformerNode+".startPosition", destination=False, source=True)[0]
+                }
