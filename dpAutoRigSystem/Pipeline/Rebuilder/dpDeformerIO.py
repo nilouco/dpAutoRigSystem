@@ -3,20 +3,6 @@ from maya import cmds
 from maya import mel
 from .. import dpBaseActionClass
 from ...Deforms import dpWeights
-import os
-
-
-
-
-
-from importlib import reload
-reload(dpWeights)
-
-
-
-
-
-
 
 # global variables to this module:
 CLASS_NAME = "DeformerIO"
@@ -171,11 +157,12 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                             cmds.rename(sculptList[1], deformerDataDic[deformerNode]["relatedData"]["sculptor"])
                                             cmds.rename(sculptList[2], deformerDataDic[deformerNode]["relatedData"]["originLocator"])
                                         elif deformerDataDic[deformerNode]["type"] == "wrap":
-                                            cmds.select(deformerDataDic[deformerNode]["shapeList"], deformerDataDic[deformerNode]["relatedNode"])
-                                            mel.eval("CreateWrap;")
-                                            hist = cmds.listHistory(deformerDataDic[deformerNode]["shapeList"])
-                                            wrapList = cmds.ls(hist, type="wrap")[0]
-                                            newDefNode = cmds.rename(wrapList, deformerDataDic[deformerNode]["name"])
+                                            if cmds.objExists(deformerDataDic[deformerNode]["relatedNode"]):
+                                                cmds.select(deformerDataDic[deformerNode]["shapeList"], deformerDataDic[deformerNode]["relatedNode"])
+                                                mel.eval("CreateWrap;")
+                                                hist = cmds.listHistory(deformerDataDic[deformerNode]["shapeList"])
+                                                wrapList = cmds.ls(hist, type="wrap")[0]
+                                                newDefNode = cmds.rename(wrapList, deformerDataDic[deformerNode]["name"])
                                         elif deformerDataDic[deformerNode]["type"] == "shrinkWrap":
                                             newDefNode = cmds.deformer(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["type"], name=deformerDataDic[deformerNode]["name"])[0] #shrinkWrap
                                             for cAttr in ["continuity", "smoothUVs", "keepBorder", "boundaryRule", "keepHardEdge", "propagateEdgeHardness", "keepMapBorders"]:
@@ -194,7 +181,13 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                             cmds.rename(nonLinearList[1], deformerDataDic[deformerNode]["relatedData"])
                                         else: #solidify, proximityWrap, morph, textureDeformer, jiggle
                                             newDefNode = cmds.deformer(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["type"], name=deformerDataDic[deformerNode]["name"])[0]
-                                        
+                                        if deformerDataDic[deformerNode]["type"] == "morph":
+                                            if cmds.objExists(deformerDataDic[deformerNode]["relatedNode"]):
+                                                cmds.connectAttr(deformerDataDic[deformerNode]["relatedNode"]+".worldMesh[0]", newDefNode+".morphTarget[0]", force=True)
+                                            else:
+                                                wellImported = False
+                                                self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+deformerDataDic[deformerNode]["relatedNode"])
+                                            
                                         # import attribute values
                                         if newDefNode:
                                             for attr in deformerDataDic[deformerNode]["attributes"].keys():
@@ -207,14 +200,6 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                                 if weightsDic[str(s)]:
                                                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
                                                     self.defWeights.setDeformerWeights(deformerDataDic[deformerNode]["name"], weightsDic[str(s)], s)
-
-                                        ##
-
-                                        # TODO
-                                        # wrap geometry setup
-                                        #
-                                        #
-                                        
 
                                     except Exception as e:
                                         self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+str(e))

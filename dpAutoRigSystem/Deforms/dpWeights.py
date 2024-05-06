@@ -182,6 +182,8 @@ class Weights(object):
                             defDic["relatedNode"] = connectedNodeList[0]
                     if defType == "sculpt":
                         defDic["relatedData"] = self.getSculptInfo(deformerNode)
+                    elif defType == "morph":
+                        defDic["relatedNode"] = cmds.listConnections(deformerNode+".morphTarget[0]", destination=False, source=True)[0]
                 else:
                     defDic["attributes"][attr] = cmds.getAttr(deformerNode+"."+attr)
             defDic["name"] = deformerNode
