@@ -162,9 +162,9 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                         elif deformerDataDic[deformerNode]["type"] == "ffd":
                                             latticeList = cmds.lattice(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"]) #[set, ffd, base] 
                                             newDefNode = latticeList[0]
-                                            self.defWeights.setLatticePoints(latticeList[1], deformerDataDic[deformerNode]["relatedData"])
+                                            self.defWeights.setLatticePoints(latticeList[1], deformerDataDic[deformerNode]["relatedData"]["pointList"])
                                             cmds.rename(latticeList[1], deformerDataDic[deformerNode]["relatedNode"])
-                                            cmds.rename(latticeList[2], deformerDataDic[deformerNode]["baseLatticeMatrix"])
+                                            cmds.rename(latticeList[2], deformerDataDic[deformerNode]["relatedData"]["baseLatticeMatrix"])
                                         elif deformerDataDic[deformerNode]["type"] == "sculpt":
                                             newDefNode = cmds.sculpt(deformerDataDic[deformerNode]["shapeList"], name=deformerDataDic[deformerNode]["name"])[0] #[sculpt, sculptor, orig]
                                         elif deformerDataDic[deformerNode]["type"] == "wrap":
@@ -179,6 +179,11 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
                                                 cmds.connectAttr(deformerDataDic[deformerNode]["relatedNode"]+"."+cAttr, newDefNode+"."+cAttr, force=True)
                                             cmds.connectAttr(deformerDataDic[deformerNode]["relatedNode"]+".worldMesh", newDefNode+".targetGeom", force=True)
                                         elif deformerDataDic[deformerNode]["type"] == "wire":
+                                            if not cmds.objExists(deformerDataDic[deformerNode]["relatedNode"]):
+                                                isPeriodic = False
+                                                if deformerDataDic[deformerNode]["relatedData"]["form"] == 2:
+                                                    isPeriodic = True
+                                                cmds.curve(name=deformerDataDic[deformerNode]["relatedNode"], periodic=isPeriodic, point=deformerDataDic[deformerNode]["relatedData"]["point"], degree=deformerDataDic[deformerNode]["relatedData"]["degree"], knot=deformerDataDic[deformerNode]["relatedData"]["knot"])
                                             newDefNode = cmds.wire(deformerDataDic[deformerNode]["shapeList"], wire=deformerDataDic[deformerNode]["relatedNode"], name=deformerDataDic[deformerNode]["name"])[0] #wire
                                         elif deformerDataDic[deformerNode]["nonLinear"]:
                                             nonLinearList = cmds.nonLinear(deformerDataDic[deformerNode]["shapeList"], type=deformerDataDic[deformerNode]["nonLinear"], name=deformerDataDic[deformerNode]["name"]) #[def, handle] bend, flare, sine, squash, twist, wave
@@ -204,8 +209,7 @@ class DeformerIO(dpBaseActionClass.ActionStartClass):
 
                                         # TODO
                                         #
-                                        #
-                                        # wire curve
+                                        # scuptor and origLocator
                                         # wrap geometry setup
                                         #
                                         #

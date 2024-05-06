@@ -175,8 +175,12 @@ class Weights(object):
                                 deformerNode = connectedNodeList[0]
                                 defDic["nonLinear"] = defType.replace("deform", "").lower()
                         if defType == "ffd": #lattice
-                            defDic["relatedData"] = self.getLatticePoints(connectedNodeList[0])
-                            defDic["baseLatticeMatrix"] = cmds.listConnections(deformerNode+".baseLatticeMatrix", destination=False, source=True)[0]
+                            defDic["relatedData"] = {
+                                                        "pointList" : self.getLatticePoints(connectedNodeList[0]),
+                                                        "baseLatticeMatrix" : cmds.listConnections(deformerNode+".baseLatticeMatrix", destination=False, source=True)[0]
+                                                    }
+                        if defType == "wire":
+                            defDic["relatedData"] = self.getCurveInfo(connectedNodeList[0])
                         if connectedNodeList:
                             defDic["relatedNode"] = connectedNodeList[0]
                 else:
@@ -213,3 +217,19 @@ class Weights(object):
                 for u in range(0, cmds.getAttr(latticeHandle+".uDivisions")):
                     cmds.xform(latticeHandle+".pt["+str(s)+"]["+str(t)+"]["+str(u)+"]", translation=pointList[i])
                     i += 1
+
+
+    def getCurveInfo(self, curve, *args):
+        """ Return a dictionary with the information about the curve like points, degree, spans, form and knots.
+        """
+        crvInfo = cmds.createNode("curveInfo")
+        cmds.connectAttr(cmds.listRelatives(curve, children=True, type="shape")[0]+".worldSpace", crvInfo+".inputCurve", force=True)
+        resultDic = {
+                        "point"  : cmds.getAttr(curve+".cv[*]"),
+                        "degree" : cmds.getAttr(curve+".degree"),
+                        "spans"  : cmds.getAttr(curve+".spans"),
+                        "form"   : cmds.getAttr(curve+".form"),
+                        "knot"   : cmds.getAttr(crvInfo+".knots[*]")
+                    }
+        cmds.delete(crvInfo)
+        return resultDic
