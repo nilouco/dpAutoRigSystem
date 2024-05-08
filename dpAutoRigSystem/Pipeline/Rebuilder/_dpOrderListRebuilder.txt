@@ -8,5 +8,6 @@ dpGuideIO
 dpRigItIO
 dpSkinningIO
 dpDeformerIO
+dpOrderIO
 dpParentIO
 dpControlShapeIO

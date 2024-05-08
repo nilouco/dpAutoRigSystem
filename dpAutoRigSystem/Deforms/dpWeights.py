@@ -123,13 +123,12 @@ class Weights(object):
                         transformList = [transformNode]
                     for childNode in transformList:
                         if not cmds.objExists(childNode+"."+ignoreAttr):
-                            inputDeformerList = cmds.listHistory(childNode, pruneDagObjects=False, interestLevel=True)
                             if len(cmds.ls(childNode[childNode.rfind("|")+1:])) == 1:
                                 childNode = childNode[childNode.rfind("|")+1:] #unique name
                             else:
-                                print(self.dpUIinst.lang["i299_notUniqueName"], childNode)
-                            for deformerType in deformerTypeList:
-                                if cmds.ls(inputDeformerList, type=deformerType):
+                                print(self.dpUIinst.lang['i299_notUniqueName'], childNode)
+                            for desiredType in deformerTypeList:
+                                if self.checkExistingDeformerNode(childNode, deformerType=desiredType)[0]:
                                     if not childNode in deformedModelList:
                                         deformedModelList.append(childNode)
         return deformedModelList
@@ -143,7 +142,7 @@ class Weights(object):
             Delete existing deformer node if there's one using the deleteIt parametter as True.
         """
         result = [False, None, None]
-        inputDeformerList = cmds.listHistory(item, pruneDagObjects=False, interestLevel=True)
+        inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
         if inputDeformerList:
             defList = cmds.ls(inputDeformerList, type=deformerType)
             if defList:
@@ -252,3 +251,16 @@ class Weights(object):
                 "sculptor"      : cmds.listConnections(deformerNode+".sculptObjectGeometry", destination=False, source=True)[0],
                 "originLocator" : cmds.listConnections(deformerNode+".startPosition", destination=False, source=True)[0]
                 }
+
+    def getOrderList(self, mesh, *args):
+        """ Return a list of deformer order of the given node.
+        """
+        resultList = []
+        deformerList = list(self.typeAttrDic.keys())
+        deformerList.extend(["skinCluster", "blendShape", "nonLinear"])
+        inputDeformerList = cmds.listHistory(mesh, pruneDagObjects=True, interestLevel=True)
+        if inputDeformerList:
+            for item in inputDeformerList:
+                if cmds.objectType(item) in deformerList:
+                    resultList.append(item)
+        return resultList
