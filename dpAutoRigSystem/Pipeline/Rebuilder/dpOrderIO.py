@@ -6,6 +6,7 @@ from ...Deforms import dpWeights # need it or we can just use dpUIinst.skin inst
 
 
 
+
 from importlib import reload
 reload(dpWeights)
 
@@ -63,12 +64,6 @@ class OrderIO(dpBaseActionClass.ActionStartClass):
                     else:
                         meshList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.typeAttrDic.keys(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if meshList:
-                        #
-                        # WIP
-                        #
-                        print("MESH LIST HERE 00000 =", meshList)
-
-
                         orderDic = {}
                         progressAmount = 0
                         maxProcess = len(meshList)
@@ -92,66 +87,38 @@ class OrderIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
                 else: #import
-
-
-                    # 
-                    # TODO
-                    #
-                    #
-
                     self.exportedList = self.getExportedList()
                     if self.exportedList:
                         self.exportedList.sort()
-                        skinWeightDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                        if skinWeightDic:
+                        orderDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
+                        if orderDic:
                             progressAmount = 0
-                            maxProcess = len(skinWeightDic.keys())
+                            maxProcess = len(orderDic.keys())
                             wellImported = True
-                            toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
-                            
-                            # reference old wip rig version to compare meshes changes
-                            #refNodeList = self.referOldWipFile()
-                            refNodeList = None
-
-                            for mesh in skinWeightDic.keys():
+                            toImportList, notFoundMeshList, = [], []
+                            for mesh in orderDic.keys():
                                 if self.verbose:
                                     # Update progress window
                                     progressAmount += 1
                                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                                 if cmds.objExists(mesh):
-                                    if refNodeList:
-                                        for refNodeName in refNodeList:
-                                            if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
-                                                if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
-                                                    changedShapeMeshList.append(mesh)
-                                                    wellImported = False
-                                                elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
-                                                    changedTopoMeshList.append(mesh)
-                                                    wellImported = False
-                                                else:
-                                                    toImportList.append(mesh)
-                                    else:
-                                        toImportList.append(mesh)
+                                    toImportList.append(mesh)
                                 else:
                                     notFoundMeshList.append(mesh)
-                            if refNodeList:
-                                cmds.file(self.refPathName, removeReference=True)
                             if toImportList:
-                                try:
-                                    # import skin weights
-                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
-                                    self.wellDoneIO(', '.join(toImportList))
-                                except Exception as e:
-                                    self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
+                                for mesh in toImportList:
+                                    try:
+                                        # reorder deformers
+                                        deformerList = orderDic[mesh]
+                                        if deformerList:
+                                            self.defWeights.setOrderList(mesh, deformerList)
+                                        self.wellDoneIO(', '.join(toImportList))
+                                    except Exception as e:
+                                        self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
                             else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
-                            if not wellImported:
-                                if changedShapeMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
-                                elif changedTopoMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
-                                elif notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(orderDic.keys())))
+                        if not wellImported:
+                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:

@@ -252,6 +252,7 @@ class Weights(object):
                 "originLocator" : cmds.listConnections(deformerNode+".startPosition", destination=False, source=True)[0]
                 }
 
+
     def getOrderList(self, mesh, *args):
         """ Return a list of deformer order of the given node.
         """
@@ -263,4 +264,23 @@ class Weights(object):
             for item in inputDeformerList:
                 if cmds.objectType(item) in deformerList:
                     resultList.append(item)
+        return resultList
+
+
+    def setOrderList(self, mesh, deformerList, *args):
+        """ Set the deformer order in the given mesh using the deformerList argument.
+        """
+        # pair up the deformer list properly
+        orderedDeformerPairs = self.getPairsFromList(deformerList)
+        for pair in orderedDeformerPairs:
+            cmds.reorderDeformers(pair[0], pair[1], mesh)
+
+
+    def getPairsFromList(self, lst, *args):
+        """ Returns pairs like 1-2, 2-3, 3-4, 4-5, etc...
+        """
+        resultList = []
+        for i, item in enumerate(lst):
+            if i < len(lst)-1:
+                resultList.append([item, lst[i+1]])
         return resultList
