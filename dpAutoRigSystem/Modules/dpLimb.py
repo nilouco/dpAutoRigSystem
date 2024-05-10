@@ -961,10 +961,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 fkIsolateParentConst = cmds.parentConstraint(self.shoulderRefGrp, self.masterCtrlRef, self.zeroFkCtrlList[1], skipTranslate=["x", "y", "z"], maintainOffset=True, name=self.zeroFkCtrlList[1]+"_PaC")[0]
                 cmds.addAttr(self.fkCtrlList[1], longName=self.dpUIinst.lang['m095_isolate'].lower(), attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 self.addFollowAttrName(self.fkCtrlList[1], self.dpUIinst.lang['m095_isolate'].lower())
-                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True)
+                cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), fkIsolateParentConst+"."+self.masterCtrlRef+"W1", force=True)
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), self.fkIsolateRevNode+".inputX", force=True)
-                cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.masterCtrlRef+"W1", force=True)
+                cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True) 
                 self.afkIsolateConst.append(fkIsolateParentConst)
 
                 # create orient constrain in order to blend ikFk:
