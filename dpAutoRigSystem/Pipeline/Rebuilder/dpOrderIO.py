@@ -62,7 +62,7 @@ class OrderIO(dpBaseActionClass.ActionStartClass):
                     if objList:
                         meshList = objList
                     else:
-                        meshList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.typeAttrDic.keys(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                        meshList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if meshList:
                         orderDic = {}
                         progressAmount = 0
@@ -106,15 +106,21 @@ class OrderIO(dpBaseActionClass.ActionStartClass):
                                 else:
                                     notFoundMeshList.append(mesh)
                             if toImportList:
+                                warningStatus = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
+                                cmds.scriptEditorInfo(edit=True, suppressWarnings=True)
                                 for mesh in toImportList:
                                     try:
                                         # reorder deformers
                                         deformerList = orderDic[mesh]
                                         if deformerList:
-                                            self.defWeights.setOrderList(mesh, deformerList)
-                                        self.wellDoneIO(', '.join(toImportList))
+                                            if len(deformerList) > 1:
+                                                self.defWeights.setOrderList(mesh, deformerList)
                                     except Exception as e:
+                                        wellImported = False
                                         self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
+                                cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
+                                if wellImported:
+                                    self.wellDoneIO(', '.join(toImportList))
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(orderDic.keys())))
                         if not wellImported:

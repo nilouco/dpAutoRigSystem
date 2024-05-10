@@ -253,12 +253,19 @@ class Weights(object):
                 }
 
 
+    def getAllDeformerTypeList(self, *args):
+        """ Return a list of all current supported deformer types.
+        """
+        deformerList = list(self.typeAttrDic.keys())
+        deformerList.extend(["skinCluster", "blendShape", "nonLinear"])
+        return deformerList
+
+
     def getOrderList(self, mesh, *args):
         """ Return a list of deformer order of the given node.
         """
         resultList = []
-        deformerList = list(self.typeAttrDic.keys())
-        deformerList.extend(["skinCluster", "blendShape", "nonLinear"])
+        deformerList = self.getAllDeformerTypeList()
         inputDeformerList = cmds.listHistory(mesh, pruneDagObjects=True, interestLevel=True)
         if inputDeformerList:
             for item in inputDeformerList:
