@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 
-
 DP_WEIGTHS_VERSION = 1.0
 
 
