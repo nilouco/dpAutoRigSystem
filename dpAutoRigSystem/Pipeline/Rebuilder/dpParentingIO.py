@@ -3,26 +3,26 @@ from maya import cmds
 from .. import dpBaseActionClass
 
 # global variables to this module:
-CLASS_NAME = "ParentIO"
-TITLE = "r019_parentIO"
-DESCRIPTION = "r020_parentIODesc"
-ICON = "/Icons/dp_parentIO.png"
+CLASS_NAME = "ParentingIO"
+TITLE = "r019_parentingIO"
+DESCRIPTION = "r020_parentingIODesc"
+ICON = "/Icons/dp_parentingIO.png"
 
-DP_PARENTIO_VERSION = 1.0
+DP_PARENTINGIO_VERSION = 1.0
 
 
-class ParentIO(dpBaseActionClass.ActionStartClass):
+class ParentingIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_PARENTIO_VERSION
+        self.version = DP_PARENTINGIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_parentIO"
-        self.startName = "dpParent"
+        self.ioDir = "s_parentingIO"
+        self.startName = "dpParenting"
     
 
     def runAction(self, firstMode=True, objList=None, *args):

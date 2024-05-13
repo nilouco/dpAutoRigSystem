@@ -4,26 +4,26 @@ from .. import dpBaseActionClass
 from ...Deforms import dpWeights #do we need it or can we just use dpUIinst.skin instead?
 
 # global variables to this module:
-CLASS_NAME = "OrderIO"
-TITLE = "r035_orderIO"
-DESCRIPTION = "r036_orderIODesc"
-ICON = "/Icons/dp_orderIO.png"
+CLASS_NAME = "InputOrderIO"
+TITLE = "r035_inputOrderIO"
+DESCRIPTION = "r036_inputOrderIODesc"
+ICON = "/Icons/dp_inputOrderIO.png"
 
-DP_ORDERIO_VERSION = 1.0
+DP_INPUTORDERIO_VERSION = 1.0
 
 
-class OrderIO(dpBaseActionClass.ActionStartClass):
+class InputOrderIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_ORDERIO_VERSION
+        self.version = DP_INPUTORDERIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_orderIO"
-        self.startName = "dpOrder"
+        self.ioDir = "s_inputOrderIO"
+        self.startName = "dpInputOrder"
         self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 

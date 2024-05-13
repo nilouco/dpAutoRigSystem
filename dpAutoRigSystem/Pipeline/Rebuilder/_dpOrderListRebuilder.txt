@@ -7,7 +7,8 @@ dpShaderIO
 dpGuideIO
 dpRigItIO
 dpSkinningIO
-dpDeformerIO
-dpOrderIO
-dpParentIO
+dpDeformationIO
+dpInputOrderIO
+dpParentingIO
+dpTransformationIO
 dpControlShapeIO

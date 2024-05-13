@@ -5,27 +5,27 @@ from .. import dpBaseActionClass
 from ...Deforms import dpWeights
 
 # global variables to this module:
-CLASS_NAME = "DeformerIO"
-TITLE = "r033_deformerIO"
-DESCRIPTION = "r034_deformerIODesc"
-ICON = "/Icons/dp_deformerIO.png"
+CLASS_NAME = "DeformationIO"
+TITLE = "r033_deformationIO"
+DESCRIPTION = "r034_deformationIODesc"
+ICON = "/Icons/dp_deformationIO.png"
 
-DP_DEFORMERIO_VERSION = 1.0
+DP_DEFORMATIONIO_VERSION = 1.0
 
 
-class DeformerIO(dpBaseActionClass.ActionStartClass):
+class DeformationIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_DEFORMERIO_VERSION
+        self.version = DP_DEFORMATIONIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_deformerIO"
-        self.startName = "dpDeformer"
-        self.importRefName = "dpDeformerIO_Import"
+        self.ioDir = "s_deformationIO"
+        self.startName = "dpDeformation"
+        self.importRefName = "dpDeformationIO_Import"
         self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 
