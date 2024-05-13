@@ -3,6 +3,7 @@ from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
+from .Library import dpControls
 from .Library import dpSoftIk
 from .Library import dpIkFkSnap
 from ..Extras import dpCorrectionManager
@@ -21,7 +22,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 3.0
+DP_LIMB_VERSION = 3.1
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -965,7 +966,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.fkIsolateRevNode = cmds.createNode('reverse', name=side+self.userGuideName+"_FkIsolate_Rev")
                 cmds.connectAttr(self.fkCtrlList[1]+'.'+self.dpUIinst.lang['m095_isolate'].lower(), self.fkIsolateRevNode+".inputX", force=True)
                 cmds.connectAttr(self.fkIsolateRevNode+'.outputX', fkIsolateParentConst+"."+self.shoulderRefGrp+"W0", force=True) 
-                self.afkIsolateConst.append(fkIsolateParentConst)
+                self.afkIsolateConst.append(fkIsolateParentConst)                    
 
                 # create orient constrain in order to blend ikFk:
                 ikFkRevNode = dpUtils.createJointBlend(self.ikJointList[1:], self.fkJointList[1:], self.skinJointList[1:], "Fk_ikFkBlend", attrNameLower, self.worldRef)
@@ -1999,6 +2000,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                
+                # set default value if the module is ARM.
+                if self.limbTypeName == ARM:
+                    dpControls.ControlClass.setupDefaultValues(resetMode=False, ctrlList=None)
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)
