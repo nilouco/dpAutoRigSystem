@@ -1140,3 +1140,24 @@ class Utils(object):
                             if cmds.getAttr(item+"."+netAttr) == 1:
                                 netList.append(item)
         return netList
+
+
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, *args):
+        """ Remove camera and/or constraints from the given list and return it.
+        """
+        cameraList = ["|persp", "|top", "|side", "|front"]
+        constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint"]
+        toRemoveList = []
+        for item in itemList:
+            if filterCamera:
+                for cameraName in cameraList:
+                    if item.endswith(cameraName):
+                        toRemoveList.append(item)
+            if filterConstraint:
+                itemType = cmds.objectType(item)
+                if itemType in constraintList:
+                    toRemoveList.append(item)
+        if toRemoveList:
+            for toRemoveNode in toRemoveList:
+                itemList.remove(toRemoveNode)
+        return itemList

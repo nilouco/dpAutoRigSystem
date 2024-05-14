@@ -58,7 +58,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                             progressAmount += 1
                             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                         # define list to export
-                        transformList = self.filterTransformList(transformList)
+                        transformList = self.utils.filterTransformList(transformList)
                         transformList = self.reorderList(transformList)
                         parentDic = {"Parent" : transformList}
                         try:
@@ -79,7 +79,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                             parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if parentDic:
                                 currentTransformList = cmds.ls(selection=False, long=True, type="transform")
-                                currentTransformList = self.filterTransformList(currentTransformList)
+                                currentTransformList = self.utils.filterTransformList(currentTransformList)
                                 currentTransformList = self.reorderList(currentTransformList)
                                 if not currentTransformList == parentDic["Parent"]:
                                     progressAmount = 0
@@ -149,27 +149,6 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
         self.endProgressBar()
         self.refreshView()
         return self.dataLogDic
-
-
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, *args):
-        """ Remove camera and/or constraints from the given list and return it.
-        """
-        cameraList = ["|persp", "|top", "|side", "|front"]
-        constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint"]
-        toRemoveList = []
-        for item in itemList:
-            if filterCamera:
-                for cameraName in cameraList:
-                    if item.endswith(cameraName):
-                        toRemoveList.append(item)
-            if filterConstraint:
-                itemType = cmds.objectType(item)
-                if itemType in constraintList:
-                    toRemoveList.append(item)
-        if toRemoveList:
-            for toRemoveNode in toRemoveList:
-                itemList.remove(toRemoveNode)
-        return itemList
 
 
     def reorderList(self, itemList, *args):
