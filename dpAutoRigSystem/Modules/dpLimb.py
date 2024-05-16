@@ -3,7 +3,6 @@ from maya import cmds
 from . import dpBaseClass
 from . import dpLayoutClass
 from .Library import dpUtils
-from .Library import dpControls
 from .Library import dpSoftIk
 from .Library import dpIkFkSnap
 from ..Extras import dpCorrectionManager
