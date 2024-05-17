@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.10"
-DPAR_UPDATELOG = "N815 - Fixed finger module nomenclature."
+DPAR_VERSION_PY3 = "4.04.11"
+DPAR_UPDATELOG = "N816 - Fixed limb isolate attribute."
 
 
 
