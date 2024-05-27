@@ -1044,6 +1044,8 @@ class Rivet(object):
             If the installed version is above the minimal it returns True, otherwise False
         """ 
         mayaVersion = cmds.about(installedVersion=True)
-        installedVersion = float(mayaVersion.split(" ")[-1])
-        minimalVersion = float(self.mayaMinimalVersion)
-        return installedVersion > minimalVersion
+        mayaVersion = mayaVersion.split(" ")[-1]
+        if mayaVersion.count(".") > 1:
+            mayaVersion = mayaVersion[:mayaVersion.rfind(".")]
+        installedVersion = float(mayaVersion)
+        return installedVersion > self.mayaMinimalVersion

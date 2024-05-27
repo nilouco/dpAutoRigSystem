@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.11"
-DPAR_UPDATELOG = "N816 - Fixed limb isolate attribute."
+DPAR_VERSION_PY3 = "4.04.12"
+DPAR_UPDATELOG = "N817 - Rivet take into account new maya 2023 version."
 
 
 
