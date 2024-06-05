@@ -61,7 +61,7 @@ class JointDisplay(object):
         
         # filter
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=jointDisplayMainLayout)
-        self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="Test", changeCommand=self.refreshLists, adjustableColumn=2, parent=filterLayout)
+        self.jointFilter = cmds.textFieldButtonGrp("jointFilter", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand="Test", changeCommand=lambda:self.refreshLists(), adjustableColumn=2, parent=filterLayout)
 
         # creating column Layout
         columnLayout = cmds.rowColumnLayout('scrollLayout', numberOfColumns=4, rowOffset=[1,'both', 5] ,columnWidth=[(1, 150), (2, 150), (3, 150), (4, 150)], columnSpacing=[(1, 5), (2, 5), (3, 5), (4, 5)], parent=jointDisplayMainLayout)
@@ -84,8 +84,8 @@ class JointDisplay(object):
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
         
         # defining move buttons
-        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedToRight', parent=buttonLayout)
-        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='MovedLeft', parent=buttonLayout)
+        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=lambda:self.moveToLeft(), parent=buttonLayout)
+        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight(), parent=buttonLayout)
         changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
         cmds.menuItem( label='Bone', parent=changeAllMenu)
         cmds.menuItem( label='Joint', parent=changeAllMenu )
@@ -154,11 +154,23 @@ class JointDisplay(object):
                     except:
                         pass
 
-    def movedToRight(self):
+    def moveToRight(self):
         """ """
         # Get active selection of button list
-        activeBoard = self.activeBoard()
-        
+        activeBoard = self.activeBoard(self)
+
+        # Change the current joint drawStyle label
+        # Call refresh list
+        # Search which board is selected. 
+        # selectedItem = cmds.textScrollList(boardList, query=True, selectItem=True)
+        # for board in boardList:
+    
+    
+    def moveToLeft(self):
+        """ """
+        # Get active selection of button list
+        activeBoard = self.activeBoard(self)
+
         # Change the current joint drawStyle label
         # Call refresh list
         # Search which board is selected. 
