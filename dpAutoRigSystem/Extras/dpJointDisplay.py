@@ -47,7 +47,7 @@ class JointDisplay(object):
     #     return self.itemF
     
     def dpJointDisplayUI(self, *args):
-        """ Create a window in order to load the original model and targets to be mirrored.
+        """ Create a window in order to load the joints in the scene.
         """
         # call close UI function
         self.dpCloseJointDisplayUI()
@@ -74,18 +74,18 @@ class JointDisplay(object):
 
         # bone display panels
         # boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', parent=columnLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
-        self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, append=self.boneLabelList, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeBoard(self.boneFieldcolumn), deselectAll=True)
-        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeBoard(self.jointFieldcolumn), deselectAll=True)
-        self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeBoard(self.multiChildFieldcolumn), deselectAll=True)
-        self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeBoard(self.noneFieldcolumn), deselectAll=True)
+        self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, append=self.boneLabelList, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True)
+        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
+        self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True)
+        self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True)
 
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
         
         # defining move buttons
-        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=lambda:self.moveToLeft(), parent=buttonLayout)
-        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight(), parent=buttonLayout)
+        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft(self), parent=buttonLayout)
+        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='self.moveToRight(self)', parent=buttonLayout)
         changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
         cmds.menuItem( label='Bone', parent=changeAllMenu)
         cmds.menuItem( label='Joint', parent=changeAllMenu )
@@ -101,12 +101,12 @@ class JointDisplay(object):
     def refreshLists(self,*args, **kwargs):
         """ Refresh the code
         """
-        self.getJointList(self)
+        self.getAllJointList(self)
         self.populateLabelList(self)
         self.dpJointDisplayUI(self)
 
 
-    def getJointList(self, *args, **kwargs):
+    def getAllJointList(self, *args, **kwargs):
         """ Get all joints in the scene
         """
         getlistPass = 0
@@ -157,7 +157,16 @@ class JointDisplay(object):
     def moveToRight(self):
         """ """
         # Get active selection of button list
-        activeBoard = self.activeBoard(self)
+        print(f'Move to Right Press')
+        selectedJoints = lambda: self.activeSelection()
+
+        if selectedJoints:
+            for jnt in selectedJoints:
+                currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
+                print(f'DrawStyle atual {currentDrawStyle}')
+                cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
+            self.refreshLists()
+
 
         # Change the current joint drawStyle label
         # Call refresh list
@@ -166,10 +175,11 @@ class JointDisplay(object):
         # for board in boardList:
     
     
-    def moveToLeft(self):
+    def moveToLeft(self, *args, **kwargs):
         """ """
         # Get active selection of button list
-        activeBoard = self.activeBoard(self)
+        print(f'Move to Left Press')
+        #activeBoard = self.activeBoard(self)
 
         # Change the current joint drawStyle label
         # Call refresh list
@@ -178,22 +188,29 @@ class JointDisplay(object):
         # for board in boardList:
 
 
-    def activeBoard(self, selectedBoard):
+    def activeBoard(self, board, *args, **kwargs):
         ''' Figure out which board column is selected'''
-        self.selectedBoard = selectedBoard
+        self.board = board
         boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
         board=[]
         for item in boardList:
-            if item == self.selectedBoard[self.selectedBoard.rfind("|")+1:]:
+            if item == self.board[self.board.rfind("|")+1:]:
                 board.append(item)
-            if item != self.selectedBoard[self.selectedBoard.rfind("|")+1:]:
+            if item != self.board[self.board.rfind("|")+1:]:
                 cmds.textScrollList(item, edit=True, deselectAll=True) 
         return board
 
+    # def searchActiveBoard(self,):
     
-    
-    # def activeSelection():
-    #      Get the active selection
+    def activeSelection(self, selectedBoard, *args, **kwargs):
+        """Get the active selection"""
+        print(f'BOARD SELECIONADO {selectedBoard[selectedBoard.rfind("|")+1:]}')
+        
+        self.selectedBoard = selectedBoard
+        self.activeBoard(board= self.selectedBoard)
+        self.selectionList = cmds.textScrollList(selectedBoard, query=True, selectItem=True)
+        print(f'SELECAO ATIVA ______ {self.selectionList}')
+        return self.selectionList
 
     
         #TODO
@@ -210,7 +227,7 @@ class JointDisplay(object):
     # def refreshLists(self,*args, **kwargs):
     #     
 
-    #     self.getJointList()
+    #     self.getAllJointList()
     #     self.populateLabelList()
 
         
@@ -226,35 +243,7 @@ class JointDisplay(object):
     # LAST STOP
     
     # - Do the move button  function
+    # - Error in the funcion button
 
 
 #Study 
-
-# import maya.cmds as cmds
-
-# def deselect_other_lists(current_list, all_lists):
-#     """ Deselect all items in other lists except for the current list. """
-#     for list_id in all_lists:
-#         if list_id != current_list:
-#             cmds.textScrollList(list_id, edit=True, deselectAll=True)
-
-# def create_ui():
-#     """ Create the UI window with four textScrollList controls. """
-#     window = cmds.window(title="Multiple TextScrollLists")
-#     cmds.columnLayout(adjustableColumn=True)
-    
-#     # Create multiple text scroll lists
-#     lists = []
-#     lists.append(cmds.textScrollList('tsList1', append=['Item1', 'Item2', 'Item3', 'Item4'], allowMultiSelection=True))
-#     lists.append(cmds.textScrollList('tsList2', append=['ItemA', 'ItemB', 'ItemC', 'ItemD'], allowMultiSelection=True))
-#     lists.append(cmds.textScrollList('tsList3', append=['Item5', 'Item6', 'Item7', 'Item8'], allowMultiSelection=True))
-#     lists.append(cmds.textScrollList('tsList4', append=['ItemE', 'ItemF', 'ItemG', 'ItemH'], allowMultiSelection=True))
-    
-#     # Attach a command to each list to manage deselection
-#     for list_id in lists:
-#         cmds.textScrollList(list_id, edit=True, selectCommand=lambda x=list_id: deselect_other_lists(x, lists))
-    
-#     cmds.showWindow(window)
-
-# # Call the function to create the UI
-# create_ui()
