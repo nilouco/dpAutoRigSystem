@@ -94,18 +94,19 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                                         item = item[item.rfind("|")+1:] #short name (after last "|")
                                     if cmds.objExists(item):
                                         for attr in transformDic[item].keys():
-                                            # unlock attribute
-                                            wasLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                            cmds.setAttr(item+"."+attr, lock=False)
-                                            try:
-                                                # set transformation value
-                                                cmds.setAttr(item+"."+attr, transformDic[item][attr])
-                                                # lock attribute again if it was locked
-                                                cmds.setAttr(item+"."+attr, lock=wasLocked)
-                                                if not item in wellImportedList:
-                                                    wellImportedList.append(item)
-                                            except Exception as e:
-                                                self.notWorkedWellIO(item+" - "+str(e))
+                                            if not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                                                # unlock attribute
+                                                wasLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                                cmds.setAttr(item+"."+attr, lock=False)
+                                                try:
+                                                    # set transformation value
+                                                    cmds.setAttr(item+"."+attr, transformDic[item][attr])
+                                                    # lock attribute again if it was locked
+                                                    cmds.setAttr(item+"."+attr, lock=wasLocked)
+                                                    if not item in wellImportedList:
+                                                        wellImportedList.append(item)
+                                                except Exception as e:
+                                                    self.notWorkedWellIO(item+" - "+str(e))
                                     else:
                                         notFoundNodesList.append(item)
                                 if wellImportedList:

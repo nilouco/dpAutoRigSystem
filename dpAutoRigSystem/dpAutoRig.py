@@ -2550,7 +2550,7 @@ class DP_AutoRig_UI(object):
                                     addCorrective         = self.integratedTaskDic[fatherGuide]['addCorrective']
                                     ankleArticList        = self.integratedTaskDic[fatherGuide]['ankleArticList'][s]
                                     ankleCorrectiveList   = self.integratedTaskDic[fatherGuide]['ankleCorrectiveList'][s]
-                                    jaxRotZMDList         = self.integratedTaskDic[fatherGuide]['jaxRotZMDList'][s]
+                                    jaxRotZMDList         = self.integratedTaskDic[fatherGuide]['jaxRotZMDList']
                                     # do task actions in order to integrate the limb and foot:
                                     cmds.cycleCheck(evaluation=False)
                                     cmds.delete(ikHandleConstList, parentConst, scaleConst) #there's an undesirable cycleCheck evaluation error here when we delete ikHandleConstList!
@@ -2581,7 +2581,8 @@ class DP_AutoRig_UI(object):
                                             cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")
                                             if addCorrective:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
-                                                cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList+".input1Z", force=True)
+                                                if jaxRotZMDList:
+                                                    cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList[s]+".input1Z", force=True)
                                                 for netNode in ankleCorrectiveList:
                                                     if netNode:
                                                         if cmds.objExists(netNode):
