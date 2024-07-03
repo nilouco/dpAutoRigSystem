@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.12"
-DPAR_UPDATELOG = "N817 - Rivet take into account new maya 2023 version."
+DPAR_VERSION_PY3 = "4.04.13"
+DPAR_UPDATELOG = "N820 - Remove user defined attributes to created proxies."
 
 
 
