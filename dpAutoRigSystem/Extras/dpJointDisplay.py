@@ -179,7 +179,9 @@ class JointDisplay(object):
         """ """
         # Get active selection of button list
         print(f'Move to Left Press')
-        #activeBoard = self.activeBoard(self)
+        activeJoints = self.activeSelection()
+        return print(activeJoints)
+        # activeBoard = self.activeBoard(self)
 
         # Change the current joint drawStyle label
         # Call refresh list
@@ -202,19 +204,18 @@ class JointDisplay(object):
 
     # def searchActiveBoard(self,):
     
-    def activeSelection(self, selectedBoard, *args, **kwargs):
+    def activeSelection(self, selectedBoard, selectionList, *args, **kwargs):
         """Get the active selection"""
         print(f'BOARD SELECIONADO {selectedBoard[selectedBoard.rfind("|")+1:]}')
         
         self.selectedBoard = selectedBoard
+        self.selectionList = selectionList
         self.activeBoard(board= self.selectedBoard)
         self.selectionList = cmds.textScrollList(selectedBoard, query=True, selectItem=True)
         print(f'SELECAO ATIVA ______ {self.selectionList}')
         return self.selectionList
 
-    
-        #TODO
-        # - Search the active selection
+
 
 
     # def mainfilter():
