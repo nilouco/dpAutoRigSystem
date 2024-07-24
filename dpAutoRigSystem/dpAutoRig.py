@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.13"
-DPAR_UPDATELOG = "N820 - Remove user defined attributes to created proxies."
+DPAR_VERSION_PY3 = "4.04.14"
+DPAR_UPDATELOG = "N228 - Scalable Spine."
 
 
 
