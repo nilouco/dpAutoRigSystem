@@ -10,7 +10,7 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
-DP_SPINE_VERSION = 2.1
+DP_SPINE_VERSION = 2.2
 
 
 class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -388,16 +388,18 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 middleScaleYMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_MiddleScaleY_MD")
                 cmds.setAttr(middleScaleYMD+".operation", 2)
                 cmds.setAttr(middleScaleYMD+".input1X", 1)
+                sizeCtrlList = [self.hipsBCtrl]
+                sizeGrpList = []
                 for r, rbnJntGrp in enumerate(rbnJointGrpList):
+                    sizeGrpList.append(cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Size_Grp")))
+                    scaleGrp = cmds.group(sizeGrpList[-1], name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
+                    cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=scaleGrp+"_ScC")
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
-                        scaleGrp = cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
-                        self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
-                        cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
                         cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
-                    else:
-                        cmds.scaleConstraint(self.toScalableHookGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
-                if scaleGrp:
-                    cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
+                        self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
+                        cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
+                        sizeCtrlList.append(side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(r)+"_Ctrl")
+                sizeCtrlList.append(self.chestBCtrl)
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_Rbn_ArcLenShape")
                 arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]
@@ -522,6 +524,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
                 cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
                 
+                # adding size feature:
+                for a, b in zip(sizeCtrlList, sizeGrpList):
+                    self.connectSizeAxis(a, b)
+
                 # update spine volume variation setup
                 currentVV = cmds.getAttr(rbnMD+'.outputX')
                 cmds.setAttr(rbnVVMD+'.input1X', currentVV)
@@ -554,6 +560,16 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
+
+
+    def connectSizeAxis(self, fromNode, toNode, *args):
+        """ Just connect sizeXYZ to scaleXYZ of given nodes.
+        """
+        for axis in ["X", "Y", "Z"]:
+            if not cmds.objExists(fromNode+".size"+axis):
+                cmds.addAttr(fromNode, longName="size"+axis, attributeType="float", defaultValue=1, keyable=True)
+            cmds.connectAttr(fromNode+".size"+axis, toNode+".scale"+axis, force=True)
+
 
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)
