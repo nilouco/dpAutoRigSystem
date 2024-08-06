@@ -84,7 +84,7 @@ class JointDisplay(object):
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
         
         # defining move buttons
-        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft(self), parent=buttonLayout)
+        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command="self.moveToLeft(self)", parent=buttonLayout)
         cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='self.moveToRight(self)', parent=buttonLayout)
         changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
         cmds.menuItem( label='Bone', parent=changeAllMenu)
@@ -158,7 +158,7 @@ class JointDisplay(object):
         """ """
         # Get active selection of button list
         print(f'Move to Right Press')
-        selectedJoints = lambda: self.activeSelection()
+        selectedJoints = "lambda: self.activeSelection()"
 
         if selectedJoints:
             for jnt in selectedJoints:
@@ -178,9 +178,9 @@ class JointDisplay(object):
     def moveToLeft(self, *args, **kwargs):
         """ """
         # Get active selection of button list
-        print(f'Move to Left Press')
-        activeJoints = self.activeSelection()
-        return print(activeJoints)
+        #print(f'Move to Left Press')
+        #"activeJoints = self.activeSelection()"
+        #return print(activeJoints)
         # activeBoard = self.activeBoard(self)
 
         # Change the current joint drawStyle label
@@ -243,7 +243,13 @@ class JointDisplay(object):
 
     # LAST STOP
     
-    # - Do the move button  function
+    # 
+    # - Error in the activeSelection() function
+    #    - Need 2 positional argument "selectedBoard, selectionList"
+    #  
+    # - Doing the move button  function
+    #   Error on the active selection function
+    #   need to call action to move the joint label
     # - Error in the funcion button
 
 
