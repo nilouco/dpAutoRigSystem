@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.14"
-DPAR_UPDATELOG = "N228 - Scalable Spine."
+DPAR_VERSION_PY3 = "4.04.15"
+DPAR_UPDATELOG = "N834 - Auto keyframe from IkFk change issue."
 
 
 
