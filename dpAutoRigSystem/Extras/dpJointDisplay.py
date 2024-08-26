@@ -154,18 +154,18 @@ class JointDisplay(object):
                     except:
                         pass
 
-    def moveToRight(self):
+    def moveToRight(self, *args):
         """ """
         # Get active selection of button list
         print(f'Move to Right Press')
-        selectedJoints = "lambda: self.activeSelection()"
+        selectedJoints = lambda: self.activeSelection()
 
         if selectedJoints:
             for jnt in selectedJoints:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
                 print(f'DrawStyle atual {currentDrawStyle}')
                 cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
-            self.refreshLists()
+            #self.refreshLists()
 
 
         # Change the current joint drawStyle label
@@ -204,12 +204,12 @@ class JointDisplay(object):
 
     # def searchActiveBoard(self,):
     
-    def activeSelection(self, selectedBoard, selectionList, *args, **kwargs):
+    def activeSelection(self, selectedBoard, *args, **kwargs):
         """Get the active selection"""
         print(f'BOARD SELECIONADO {selectedBoard[selectedBoard.rfind("|")+1:]}')
         
         self.selectedBoard = selectedBoard
-        self.selectionList = selectionList
+        self.selectionList = []
         self.activeBoard(board= self.selectedBoard)
         self.selectionList = cmds.textScrollList(selectedBoard, query=True, selectItem=True)
         print(f'SELECAO ATIVA ______ {self.selectionList}')
