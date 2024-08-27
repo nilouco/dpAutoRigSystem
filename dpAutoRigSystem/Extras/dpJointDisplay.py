@@ -68,29 +68,32 @@ class JointDisplay(object):
 
         # creating titles
         boneTitle = cmds.text('boneTitle', label='Bone',parent=columnLayout)
-        jointTitle = cmds.text('jointTitle',label='Joint',parent=columnLayout)
         multiChildTitle = cmds.text('multiChildTitle',label='Multi-Child as box',parent=columnLayout)
         noneTitle = cmds.text('noneTitle', label='None',parent=columnLayout)
+        jointTitle = cmds.text('jointTitle',label='Joint',parent=columnLayout)
+        
 
         # bone display panels
         # boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', parent=columnLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
         self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, append=self.boneLabelList, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True)
-        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
         self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True)
         self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True)
-
+        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
+        
+    
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=jointDisplayMainLayout)
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
         
         # defining move buttons
         cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command="self.moveToLeft(self)", parent=buttonLayout)
-        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command='self.moveToRight(self)', parent=buttonLayout)
+        cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
         changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
         cmds.menuItem( label='Bone', parent=changeAllMenu)
-        cmds.menuItem( label='Joint', parent=changeAllMenu )
         cmds.menuItem( label='Multi-Child as box', parent=changeAllMenu )
         cmds.menuItem( label='None', parent=changeAllMenu )
+        cmds.menuItem( label='Joint', parent=changeAllMenu )
+        
         cmds.button("cancel", label=self.dpUIinst.lang['i132_cancel'], backgroundColor=(0.5, 0.5, 0.5), width=100, command='Cancel', parent=buttonLayout)
         cmds.separator(style='none', height=10, parent=buttonLayout)
 
@@ -154,18 +157,26 @@ class JointDisplay(object):
                     except:
                         pass
 
-    def moveToRight(self, *args):
+    def moveToRight(self, activeBoard,*args):
         """ """
         # Get active selection of button list
-        print(f'Move to Right Press')
-        selectedJoints = lambda: self.activeSelection()
+        print(f'Move to Right Pressed')
+        selectedJoints = self.activeSelection(self.selectedBoard)
+        print(selectedJoints)
 
         if selectedJoints:
             for jnt in selectedJoints:
                 currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
-                print(f'DrawStyle atual {currentDrawStyle}')
-                cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
+                if currentDrawStyle < 3:
+                    print(f'DrawStyle atual {currentDrawStyle}')
+                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
+                else: 
+                    currentDrawStyle = 0
+                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
+        
             #self.refreshLists()
+        else:
+            pass
 
 
         # Change the current joint drawStyle label
@@ -190,7 +201,7 @@ class JointDisplay(object):
         # for board in boardList:
 
 
-    def activeBoard(self, board, *args, **kwargs):
+    def deselectOtherBoards(self, board, *args, **kwargs):
         ''' Figure out which board column is selected'''
         self.board = board
         boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
@@ -200,9 +211,9 @@ class JointDisplay(object):
                 board.append(item)
             if item != self.board[self.board.rfind("|")+1:]:
                 cmds.textScrollList(item, edit=True, deselectAll=True) 
-        return board
+        
 
-    # def searchActiveBoard(self,):
+    # def searchdeselectOtherBoards(self,):
     
     def activeSelection(self, selectedBoard, *args, **kwargs):
         """Get the active selection"""
@@ -210,7 +221,7 @@ class JointDisplay(object):
         
         self.selectedBoard = selectedBoard
         self.selectionList = []
-        self.activeBoard(board= self.selectedBoard)
+        self.deselectOtherBoards(board= self.selectedBoard)
         self.selectionList = cmds.textScrollList(selectedBoard, query=True, selectItem=True)
         print(f'SELECAO ATIVA ______ {self.selectionList}')
         return self.selectionList
@@ -246,6 +257,7 @@ class JointDisplay(object):
     # 
     # - Error in the activeSelection() function
     #    - Need 2 positional argument "selectedBoard, selectionList"
+    #    - Verify fuction Button MoveRight
     #  
     # - Doing the move button  function
     #   Error on the active selection function
