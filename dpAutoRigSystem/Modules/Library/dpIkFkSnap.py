@@ -15,7 +15,7 @@ from maya.api import OpenMaya
 from ...Extras import dpCustomAttr
 import math
 
-DP_IKFKSNAP_VERSION = 2.1
+DP_IKFKSNAP_VERSION = 2.2
 
 
 
@@ -145,58 +145,60 @@ class IkFkSnapClass(object):
     def snapIkToFk(self, *args):
         """ Switch from ik to fk keeping the same position.
         """
-        self.bakeFollowRotation(self.ikBeforeCtrl)
-        self.bakeFollowRotation(self.fkCtrlList[0])
-        self.transferAttrFromTo(self.ikExtremCtrl, self.fkCtrlList[2], [self.uniformScaleAttr])
-        # snap fk ctrl to ik jnt
-        for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
-            cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
+        if cmds.getAttr(self.worldRef+".ikFkSnap"):
+            self.bakeFollowRotation(self.ikBeforeCtrl)
+            self.bakeFollowRotation(self.fkCtrlList[0])
+            self.transferAttrFromTo(self.ikExtremCtrl, self.fkCtrlList[2], [self.uniformScaleAttr])
+            # snap fk ctrl to ik jnt
+            for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
+                cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
 
 
     def snapFkToIk(self, *args):
         """ Switch from fk to ik keeping the same position.
         """
-        self.bakeFollowRotation(self.ikBeforeCtrl)
-        self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
-        self.zeroKeyAttrValue(self.ikExtremSubCtrl, ["tx", "ty", "tz", "rx", "ry", "rz"])
-        self.transferAttrFromTo(self.fkCtrlList[2], self.ikExtremCtrl, [self.uniformScaleAttr])
-        # extrem ctrl
-        fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
-        toIkM = OpenMaya.MMatrix(self.extremOffsetMatrix) * fkM #need redefine to load matrix in scriptNode
-        cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
-        # poleVector ctrl
-        startPos, cornerPos, endPos, chainLen, pvRatio = self.getChainPosition()
-        # calculate the position of the base middle locator
-        pvBasePosX = (endPos[0] - startPos[0]) * pvRatio+startPos[0]
-        pvBasePosY = (endPos[1] - startPos[1]) * pvRatio+startPos[1]
-        pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio+startPos[2]
-        # working with vectors
-        cornerBasePosX = cornerPos[0] - pvBasePosX
-        cornerBasePosY = cornerPos[1] - pvBasePosY
-        cornerBasePosZ = cornerPos[2] - pvBasePosZ
-        # magnitude of the vector
-        magDir = math.sqrt(cornerBasePosX**2+cornerBasePosY**2+cornerBasePosZ**2)
-        # normalize the vector
-        normalDirX = cornerBasePosX / magDir
-        normalDirY = cornerBasePosY / magDir
-        normalDirZ = cornerBasePosZ / magDir
-        # calculate the poleVector position by multiplying the unitary vector by the chain length
-        pvDistX = normalDirX * chainLen
-        pvDistY = normalDirY * chainLen
-        pvDistZ = normalDirZ * chainLen
-        # get the poleVector position
-        pvPosX = pvBasePosX+pvDistX
-        pvPosY = pvBasePosY+pvDistY
-        pvPosZ = pvBasePosZ+pvDistZ
-        # place poleVector controller in the correct position
-        cmds.move(pvPosX, pvPosY, pvPosZ, self.ikPoleVectorCtrl, objectSpace=False, worldSpaceDistance=True)
-        # reset footRoll attributes
-        userDefAttrList = cmds.listAttr(self.ikExtremCtrl, userDefined=True, keyable=True)
-        if userDefAttrList:
-            for attr in userDefAttrList:
-                for revFootAttr in self.revFootAttrList:
-                    if revFootAttr in attr:
-                        cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
+        if cmds.getAttr(self.worldRef+".ikFkSnap"):
+            self.bakeFollowRotation(self.ikBeforeCtrl)
+            self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
+            self.zeroKeyAttrValue(self.ikExtremSubCtrl, ["tx", "ty", "tz", "rx", "ry", "rz"])
+            self.transferAttrFromTo(self.fkCtrlList[2], self.ikExtremCtrl, [self.uniformScaleAttr])
+            # extrem ctrl
+            fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
+            toIkM = OpenMaya.MMatrix(self.extremOffsetMatrix) * fkM #need redefine to load matrix in scriptNode
+            cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
+            # poleVector ctrl
+            startPos, cornerPos, endPos, chainLen, pvRatio = self.getChainPosition()
+            # calculate the position of the base middle locator
+            pvBasePosX = (endPos[0] - startPos[0]) * pvRatio+startPos[0]
+            pvBasePosY = (endPos[1] - startPos[1]) * pvRatio+startPos[1]
+            pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio+startPos[2]
+            # working with vectors
+            cornerBasePosX = cornerPos[0] - pvBasePosX
+            cornerBasePosY = cornerPos[1] - pvBasePosY
+            cornerBasePosZ = cornerPos[2] - pvBasePosZ
+            # magnitude of the vector
+            magDir = math.sqrt(cornerBasePosX**2+cornerBasePosY**2+cornerBasePosZ**2)
+            # normalize the vector
+            normalDirX = cornerBasePosX / magDir
+            normalDirY = cornerBasePosY / magDir
+            normalDirZ = cornerBasePosZ / magDir
+            # calculate the poleVector position by multiplying the unitary vector by the chain length
+            pvDistX = normalDirX * chainLen
+            pvDistY = normalDirY * chainLen
+            pvDistZ = normalDirZ * chainLen
+            # get the poleVector position
+            pvPosX = pvBasePosX+pvDistX
+            pvPosY = pvBasePosY+pvDistY
+            pvPosZ = pvBasePosZ+pvDistZ
+            # place poleVector controller in the correct position
+            cmds.move(pvPosX, pvPosY, pvPosZ, self.ikPoleVectorCtrl, objectSpace=False, worldSpaceDistance=True)
+            # reset footRoll attributes
+            userDefAttrList = cmds.listAttr(self.ikExtremCtrl, userDefined=True, keyable=True)
+            if userDefAttrList:
+                for attr in userDefAttrList:
+                    for revFootAttr in self.revFootAttrList:
+                        if revFootAttr in attr:
+                            cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
 
 
     def getOffsetXform(self, wm, wim, *args):
@@ -363,57 +365,59 @@ class IkFkSnap(object):
     def snapIkToFk(self, *args):
         """ Switch from ik to fk keeping the same position.
         """
-        self.bakeFollowRotation(self.ikBeforeCtrl)
-        self.bakeFollowRotation(self.fkCtrlList[0])
-        self.transferAttrFromTo(self.ikExtremCtrl, self.fkCtrlList[2], [self.uniformScaleAttr])
-        # snap fk ctrl to ik jnt
-        for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
-            cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
+        if cmds.getAttr(self.worldRef+".ikFkSnap"):
+            self.bakeFollowRotation(self.ikBeforeCtrl)
+            self.bakeFollowRotation(self.fkCtrlList[0])
+            self.transferAttrFromTo(self.ikExtremCtrl, self.fkCtrlList[2], [self.uniformScaleAttr])
+            # snap fk ctrl to ik jnt
+            for ctrl, jnt in zip(self.fkCtrlList, self.ikJointList):
+                cmds.xform(ctrl, matrix=(cmds.xform(jnt, matrix=True, query=True, worldSpace=True)), worldSpace=True)
     
     def snapFkToIk(self, *args):
         """ Switch from fk to ik keeping the same position.
         """
-        self.bakeFollowRotation(self.ikBeforeCtrl)
-        self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
-        self.zeroKeyAttrValue(self.ikExtremSubCtrl, ["tx", "ty", "tz", "rx", "ry", "rz"])
-        self.transferAttrFromTo(self.fkCtrlList[2], self.ikExtremCtrl, [self.uniformScaleAttr])
-        # extrem ctrl
-        fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
-        toIkM = OpenMaya.MMatrix(self.extremOffsetMatrix) * fkM
-        cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
-        # poleVector ctrl
-        startPos, cornerPos, endPos, chainLen, pvRatio = self.getChainPosition()
-        # calculate the position of the base middle locator
-        pvBasePosX = (endPos[0] - startPos[0]) * pvRatio+startPos[0]
-        pvBasePosY = (endPos[1] - startPos[1]) * pvRatio+startPos[1]
-        pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio+startPos[2]
-        # working with vectors
-        cornerBasePosX = cornerPos[0] - pvBasePosX
-        cornerBasePosY = cornerPos[1] - pvBasePosY
-        cornerBasePosZ = cornerPos[2] - pvBasePosZ
-        # magnitude of the vector
-        magDir = math.sqrt(cornerBasePosX**2+cornerBasePosY**2+cornerBasePosZ**2)
-        # normalize the vector
-        normalDirX = cornerBasePosX / magDir
-        normalDirY = cornerBasePosY / magDir
-        normalDirZ = cornerBasePosZ / magDir
-        # calculate the poleVector position by multiplying the unitary vector by the chain length
-        pvDistX = normalDirX * chainLen
-        pvDistY = normalDirY * chainLen
-        pvDistZ = normalDirZ * chainLen
-        # get the poleVector position
-        pvPosX = pvBasePosX+pvDistX
-        pvPosY = pvBasePosY+pvDistY
-        pvPosZ = pvBasePosZ+pvDistZ
-        # place poleVector controller in the correct position
-        cmds.move(pvPosX, pvPosY, pvPosZ, self.ikPoleVectorCtrl, objectSpace=False, worldSpaceDistance=True)
-        # reset footRoll attributes
-        userDefAttrList = cmds.listAttr(self.ikExtremCtrl, userDefined=True, keyable=True)
-        if userDefAttrList:
-            for attr in userDefAttrList:
-                for revFootAttr in self.revFootAttrList:
-                    if revFootAttr in attr:
-                        cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
+        if cmds.getAttr(self.worldRef+".ikFkSnap"):
+            self.bakeFollowRotation(self.ikBeforeCtrl)
+            self.zeroKeyAttrValue(self.ikExtremCtrl, ["twist"])
+            self.zeroKeyAttrValue(self.ikExtremSubCtrl, ["tx", "ty", "tz", "rx", "ry", "rz"])
+            self.transferAttrFromTo(self.fkCtrlList[2], self.ikExtremCtrl, [self.uniformScaleAttr])
+            # extrem ctrl
+            fkM = OpenMaya.MMatrix(cmds.getAttr(self.fkCtrlList[-1]+".worldMatrix[0]"))
+            toIkM = OpenMaya.MMatrix(self.extremOffsetMatrix) * fkM
+            cmds.xform(self.ikExtremCtrl, matrix=list(toIkM), worldSpace=True)
+            # poleVector ctrl
+            startPos, cornerPos, endPos, chainLen, pvRatio = self.getChainPosition()
+            # calculate the position of the base middle locator
+            pvBasePosX = (endPos[0] - startPos[0]) * pvRatio+startPos[0]
+            pvBasePosY = (endPos[1] - startPos[1]) * pvRatio+startPos[1]
+            pvBasePosZ = (endPos[2] - startPos[2]) * pvRatio+startPos[2]
+            # working with vectors
+            cornerBasePosX = cornerPos[0] - pvBasePosX
+            cornerBasePosY = cornerPos[1] - pvBasePosY
+            cornerBasePosZ = cornerPos[2] - pvBasePosZ
+            # magnitude of the vector
+            magDir = math.sqrt(cornerBasePosX**2+cornerBasePosY**2+cornerBasePosZ**2)
+            # normalize the vector
+            normalDirX = cornerBasePosX / magDir
+            normalDirY = cornerBasePosY / magDir
+            normalDirZ = cornerBasePosZ / magDir
+            # calculate the poleVector position by multiplying the unitary vector by the chain length
+            pvDistX = normalDirX * chainLen
+            pvDistY = normalDirY * chainLen
+            pvDistZ = normalDirZ * chainLen
+            # get the poleVector position
+            pvPosX = pvBasePosX+pvDistX
+            pvPosY = pvBasePosY+pvDistY
+            pvPosZ = pvBasePosZ+pvDistZ
+            # place poleVector controller in the correct position
+            cmds.move(pvPosX, pvPosY, pvPosZ, self.ikPoleVectorCtrl, objectSpace=False, worldSpaceDistance=True)
+            # reset footRoll attributes
+            userDefAttrList = cmds.listAttr(self.ikExtremCtrl, userDefined=True, keyable=True)
+            if userDefAttrList:
+                for attr in userDefAttrList:
+                    for revFootAttr in self.revFootAttrList:
+                        if revFootAttr in attr:
+                            cmds.setAttr(self.ikExtremCtrl+"."+attr, 0)
 
     def getOffsetXform(self, wm, wim, *args):
         """ Return the offset xform matrix (multiplied matrices) from given xform matrices.
