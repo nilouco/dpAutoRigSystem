@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.15"
-DPAR_UPDATELOG = "N834 - Auto keyframe from IkFk change issue."
+DPAR_VERSION_PY3 = "4.04.16"
+DPAR_UPDATELOG = "N808 - Reinstaller advisor."
 
 
 
@@ -51,6 +51,22 @@ def dpARLoadingWindow():
 dpARLoadingWindow()
 
 ###################### End: Loading.
+
+
+###################### Start: Download master.
+
+def dpARDownloadMaster():
+    """ Help user to download a dpAutoRigSystem master file from GitHub to reinstall it
+    """
+    confirm = cmds.confirmDialog(title="Reinstall", message="There's an unexpected issue, sorry!\nPlease reinstall the dpAutoRigSystem.\nRemember to delete the current folder before install a new one from:\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/", button="Download", dismissString="No")
+    if confirm == "Download":
+        if os.name == "nt":
+            DOWNLOAD_FOLDER = f"{os.getenv('USERPROFILE')}\\Downloads"
+        else:  # PORT: For *Nix systems
+            DOWNLOAD_FOLDER = f"{os.getenv('HOME')}/Downloads"
+        urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", DOWNLOAD_FOLDER+"/dpAutoRigSystem-master.zip")
+
+###################### End: Download master.
 
 
 # importing libraries:
@@ -95,6 +111,7 @@ try:
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
+    dpARDownloadMaster()
     try:
         clearDPARLoadingWindow()
         self.jobWinClose()
@@ -291,6 +308,7 @@ class DP_AutoRig_UI(object):
             except:
                 pass
             print(self.langDic[self.langName]['i008_errorUI'])
+            dpARDownloadMaster()
             clearDPARLoadingWindow()
             return
         

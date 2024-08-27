@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-02-02",
+    "_updated"       : "2024-08-26",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -147,8 +147,8 @@
     "e006_firstSkinnedGeo"         : "Selecione primeiro a geometria skinada, por favor.",
     "e007_notSkinFound"            : "Não tem skinCluster na primeira geometria skinada.",
     "e008_failCheckUpdate"         : "Não foi possível verificar por atualização, desculpe.",
-    "e009_failDownloadUpdate"      : "Não foi possível baixar o arquivo de update, desculpe.\n\nVerifique sua conexão com a internet\nou a permissão de salvar no diretório\n\n",
-    "e010_failInstallUpdate"       : "Não foi possível instalar a atualização, desculpe.\n\nVerifique sua conexão com a internet\nou tente fazer manualmente\nbaixando a nova versão do site GitHub\n\n",
+    "e009_failDownloadUpdate"      : "Não foi possível baixar o arquivo de update, desculpe.\n\nVerifique sua conexão com a internet\nou a permissão de salvar no diretório\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
+    "e010_failInstallUpdate"       : "Não foi possível instalar a atualização, desculpe.\n\nVerifique sua conexão com a internet\nou tente fazer manualmente\nbaixando a nova versão do site GitHub\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e011_notSelShape"             : "Nada selecionado para adicionar ou substituir as formas, desculpe.",
     "e012_cantLoadRibbon"          : "Não foi possível carregar a extensão jcRibbon para criar bend no módulo Limb, desculpe.",
     "e013_cantLoadIkSpringSolver"  : "Não foi possível carregar o plugin ikSpringSolver, desculpe.\nAplicado o ikRPSolver como padrão.",
