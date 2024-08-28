@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-08-26",
+    "_updated"       : "2024-08-28",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -459,6 +459,7 @@
     "i297_removeGeometry"    : "Supprimer la géométrie attachée",
     "i298_rivetHeldGeo"      : "La géométrie qui retenait le(s) rivet(s)",
     "i299_noConnectionGeo"   : "n'a plus de connexion, souhaitez-vous la supprimer?",
+    "i300_didntChangeInf"    : "Pas changé l'influence de:\n",
 
     "m001_fkLine"               : "Ligne Fk",
     "m002_fkLineDesc"           : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
