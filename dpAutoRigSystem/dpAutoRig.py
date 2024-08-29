@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.16"
-DPAR_UPDATELOG = "N808 - Reinstaller advisor."
+DPAR_VERSION_PY3 = "4.04.17"
+DPAR_UPDATELOG = "N819- Try/except add or remove skinCluster influence."
 
 
 
