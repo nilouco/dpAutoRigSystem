@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.17"
-DPAR_UPDATELOG = "N819- Try/except add or remove skinCluster influence."
+DPAR_VERSION_PY3 = "4.04.18"
+DPAR_UPDATELOG = "N826 - RootPivot_Ctrl parenting."
 
 
 
@@ -2162,11 +2162,13 @@ class DP_AutoRig_UI(object):
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
+        if (self.ctrlCreated):
+            self.rootPivotCtrlGrp = dpUtils.zeroOut([self.rootPivotCtrl])[0]
+            cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
             self.optionCtrlGrp = dpUtils.zeroOut([self.optionCtrl])[0]
-            self.rootPivotCtrlGrp = dpUtils.zeroOut([self.rootPivotCtrl])[0]
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
@@ -2184,7 +2186,6 @@ class DP_AutoRig_UI(object):
             self.ctrls.setLockHide([self.optionCtrl], ['rigScaleOutput'])
             self.ctrls.setNonKeyable([self.optionCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
             self.ctrls.setCalibrationAttr(self.optionCtrl, ['rigScaleMultiplier'])
-            cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
             cmds.parent(self.rootCtrl, self.masterCtrl)
             cmds.parent(self.masterCtrl, self.globalCtrl)
             cmds.parent(self.globalCtrl, self.ctrlsGrp)
