@@ -157,7 +157,7 @@ class JointDisplay(object):
                     except:
                         pass
 
-    def moveToRight(self, activeBoard,*args):
+    def moveToRight(self,*args):
         """ """
         # Get active selection of button list
         print(f'Move to Right Pressed')
@@ -215,7 +215,7 @@ class JointDisplay(object):
 
     # def searchdeselectOtherBoards(self,):
     
-    def activeSelection(self, selectedBoard, *args, **kwargs):
+    def activeSelection(self, selectedBoard, *args):
         """Get the active selection"""
         print(f'BOARD SELECIONADO {selectedBoard[selectedBoard.rfind("|")+1:]}')
         
