@@ -2165,6 +2165,7 @@ class DP_AutoRig_UI(object):
         if (self.ctrlCreated):
             self.rootPivotCtrlGrp = dpUtils.zeroOut([self.rootPivotCtrl])[0]
             cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
+            self.changeRootToCtrlsVisConstraint()
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
@@ -2220,7 +2221,18 @@ class DP_AutoRig_UI(object):
             cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
             cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
             self.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-        
+    
+
+    def changeRootToCtrlsVisConstraint(self, *args):
+        """ Just recreate the Root_Ctrl output connections to a constraint, now using the ctrlsVisibilityGrp as source node instead.
+            It keeps the dpAR compatibility to old rigs.
+        """
+        changeAttrList = ["rotateOrder", "translate", "rotate", "scale", "parentMatrix[0]", "rotatePivot", "rotatePivotTranslate"]
+        for attr in changeAttrList:
+            pacList = cmds.listConnections(self.rootCtrl+"."+attr, destination=True, source=False, plugs=True)
+            for pac in pacList:
+                cmds.connectAttr(self.ctrlsVisGrp+"."+attr, pac, force=True)
+
 
     def validateMasterGrp(self, nodeGrp, *args):
         """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
