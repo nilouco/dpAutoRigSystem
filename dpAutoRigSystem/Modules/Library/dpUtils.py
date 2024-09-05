@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 2.8
+DP_UTILS_VERSION = 2.9
 
 
 # UTILS functions:
@@ -1122,3 +1122,18 @@ def reapplyDeformers(item, defList):
         if cmds.objExists(deformerNode):
             if not cmds.objectType(deformerNode) == "tweak":
                 cmds.deformer(deformerNode, edit=True, geometry=item)
+
+
+def getTransformData(item, t=True, r=True, s=True, useWorldSpace=True):
+    """ Return the queried transformation data for the given node.
+    """
+    resultDic = {}
+    if item:
+        if cmds.objExists(item):
+            if t:
+                resultDic["translation"] = cmds.xform(item, query=True, translation=t, worldSpace=useWorldSpace)
+            if r:
+                resultDic["rotation"] = cmds.xform(item, query=True, rotation=r, worldSpace=useWorldSpace)
+            if s:
+                resultDic["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=useWorldSpace)
+    return resultDic

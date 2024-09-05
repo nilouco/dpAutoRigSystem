@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.18"
-DPAR_UPDATELOG = "N826 - RootPivot_Ctrl parenting."
+DPAR_VERSION_PY3 = "4.04.19"
+DPAR_UPDATELOG = "N819 - Fix Eye specular mirror."
 
 
 
