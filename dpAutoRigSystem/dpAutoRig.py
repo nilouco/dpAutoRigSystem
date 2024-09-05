@@ -2230,8 +2230,9 @@ class DP_AutoRig_UI(object):
         changeAttrList = ["rotateOrder", "translate", "rotate", "scale", "parentMatrix[0]", "rotatePivot", "rotatePivotTranslate"]
         for attr in changeAttrList:
             pacList = cmds.listConnections(self.rootCtrl+"."+attr, destination=True, source=False, plugs=True)
-            for pac in pacList:
-                cmds.connectAttr(self.ctrlsVisGrp+"."+attr, pac, force=True)
+            if pacList:
+                for pac in pacList:
+                    cmds.connectAttr(self.ctrlsVisGrp+"."+attr, pac, force=True)
 
 
     def validateMasterGrp(self, nodeGrp, *args):
