@@ -683,35 +683,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             for k, w in zip(tempList, rEyeFkCtrlData["translation"]):
                                 translationList.append(k+w)
                             cmds.xform(self.eyeSpecScaleZeroGrp, translation=translationList, worldSpace=True)
-                    """ if s == 1:
-                        if self.mirrorAxis == "X":
-                            currentTX = cmds.getAttr(self.eyeSpecScaleZeroGrp+".translateX")
-                            currentTX = currentTX*(-1)
-                            currentRY = cmds.getAttr(self.eyeSpecScaleZeroGrp+".rotateY")
-                            currentRY = currentRY*(-1)
-                            currentRZ = cmds.getAttr(self.eyeSpecScaleZeroGrp+".rotateZ")
-                            currentRZ = currentRZ*(-1)
-                            #cmds.setAttr(self.eyeSpecScaleZeroGrp+".translateX", currentTX)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".rotateY", currentRY)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".rotateZ", currentRZ)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleY", -1)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleZ", -1)
-                        if self.mirrorAxis == "Y":
-                            currentTY = cmds.getAttr(self.eyeSpecScaleZeroGrp+".translateY")
-                            currentTY = currentTY*(-1)
-                            currentRX = cmds.getAttr(self.eyeSpecScaleZeroGrp+".rotateX")
-                            currentRX = currentRX*(-1)
-                            currentRZ = cmds.getAttr(self.eyeSpecScaleZeroGrp+".rotateZ")
-                            currentRZ = currentRZ*(-1)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".rotateX", currentRX)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".rotateZ", currentRZ)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".translateY", currentTY)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleX", -1)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleZ", -1)
-                        if self.mirrorAxis == "Z":
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleX", -1)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleY", -1)
-                            cmds.setAttr(self.eyeSpecScaleZeroGrp+".scaleZ", -1) """
+                            cmds.xform(self.eyeSpecScaleZeroGrp, rotation=lEyeSpecScaleZeroGrpData["rotation"], worldSpace=True)
 
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):

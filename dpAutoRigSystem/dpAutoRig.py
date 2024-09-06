@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.19"
+DPAR_VERSION_PY3 = "4.04.20"
 DPAR_UPDATELOG = "N819 - Fix Eye specular mirror."
 
 
