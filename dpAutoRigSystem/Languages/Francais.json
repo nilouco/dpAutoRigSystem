@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-08-28",
+    "_updated"       : "2024-09-06",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -137,6 +137,7 @@
     "c123_outer"             : "Exterieur",
     "c124_corrective"        : "corrective",
     "c125_last"              : "Dernier",
+    "c126_display"           : "Montrer",
     
     "e000_guideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_guideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
