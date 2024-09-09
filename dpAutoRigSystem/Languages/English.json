@@ -807,5 +807,7 @@
     "v088_softenEdges"            : "Soften Edges",
     "v089_softenEdgesDesc"        : "This validator will verify soften edges in the geometries.",
     "v090_overrideCleaner"        : "Override cleaner",
-    "v091_overrideCleanerDesc"    : "This validator will verify there nodes with overrides\nand remove them."
+    "v091_overrideCleanerDesc"    : "This validator will verify if there nodes with overrides\nand remove them.",
+    "v092_unlockAttributes"       : "Unlock attributes",
+    "v093_unlockAttributesDesc"   : "This validator will verify and unlock attributes."
 }
