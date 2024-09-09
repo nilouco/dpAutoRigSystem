@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.20"
-DPAR_UPDATELOG = "N819 - Fix Eye specular mirror."
+DPAR_VERSION_PY3 = "4.04.21"
+DPAR_UPDATELOG = "N821 - Remove override validator checkin."
 
 
 
