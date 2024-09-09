@@ -10,7 +10,7 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
-DP_SPINE_VERSION = 2.2
+DP_SPINE_VERSION = 2.3
 
 
 class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -39,6 +39,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.aOuterCtrls = []
         self.aRbnJointList = []
         self.aClusterGrp = []
+        self.shapeVisAttrList = []
 
 
     def createModuleLayout(self, *args):
@@ -256,7 +257,24 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
                 self.tipCtrl = self.ctrls.cvControl("id_090_SpineTip", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X")
                 self.tipList.append(self.tipCtrl)
-                
+                # optimize control CV shapes:
+                tempBaseCluster = cmds.cluster(self.baseCtrl)[1]
+                tempTipCluster = cmds.cluster(self.tipCtrl)[1]
+                if self.currentStyle == 0: #default
+                    cmds.setAttr(tempBaseCluster+".translateY", 0.2*self.ctrlRadius)
+                    cmds.setAttr(tempTipCluster+".translateY", -0.2*self.ctrlRadius)
+                else:
+                    cmds.setAttr(tempBaseCluster+".translateY", -0.2*self.ctrlRadius)
+                    cmds.setAttr(tempTipCluster+".translateY", 0.2*self.ctrlRadius)
+                cmds.delete([self.baseCtrl, self.tipCtrl], constructionHistory=True)
+                # shape visibility
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+endName+self.dpUIinst.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+baseName+self.dpUIinst.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+endName+self.dpUIinst.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+baseName+self.dpUIinst.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                self.shapeVisAttrList.append(attrNameLower+endName+self.dpUIinst.lang['c126_display'])
+                self.shapeVisAttrList.append(attrNameLower+baseName+self.dpUIinst.lang['c126_display'])
+
                 # Setup axis order
                 if self.rigType == dpBaseClass.RigType.quadruped:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
@@ -587,5 +605,6 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "OuterCtrls": self.aOuterCtrls,
                 "jointList": self.aRbnJointList,
                 "scalableGrp": self.aClusterGrp,
+                "shapeVisAttrList": self.shapeVisAttrList
             }
         }

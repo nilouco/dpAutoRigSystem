@@ -2785,6 +2785,7 @@ class DP_AutoRig_UI(object):
                                 mScaleVVAttr = self.integratedTaskDic[moduleDic]['MasterScaleVolumeVariationAttrList'][s]
                                 ikFkBlendAttr = self.integratedTaskDic[moduleDic]['IkFkBlendAttrList'][s]
                                 clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                shapeVisAttrList = self.integratedTaskDic[moduleDic]["shapeVisAttrList"]
                                 cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC")
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
@@ -2797,6 +2798,13 @@ class DP_AutoRig_UI(object):
                                 cmds.addAttr(self.optionCtrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
                                 cmds.setAttr(hipsA+'.'+ikFkBlendAttr, keyable=False)
+                                if shapeVisAttrList:
+                                    for shapeVisAttr in shapeVisAttrList:
+                                        if not cmds.objExists(self.optionCtrl+"."+shapeVisAttr):
+                                            cmds.addAttr(self.optionCtrl, longName=shapeVisAttr, attributeType="long", min=0, max=1, defaultValue=0, keyable=False)
+                                            cmds.setAttr(self.optionCtrl+'.'+shapeVisAttr, channelBox=True)
+                                            cmds.connectAttr(self.optionCtrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
+                                            cmds.setAttr(hipsA+'.'+shapeVisAttr, keyable=False)
                                 if bColorize:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
