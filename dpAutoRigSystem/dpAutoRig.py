@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.19"
-DPAR_UPDATELOG = "N833 - Spine base and tip controllers display."
+DPAR_VERSION_PY3 = "4.04.20"
+DPAR_UPDATELOG = "N819 - Fix Eye specular mirror."
 
 
 
