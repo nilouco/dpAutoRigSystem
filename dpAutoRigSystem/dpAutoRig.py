@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.22"
-DPAR_UPDATELOG = "N822 - Unlock attributes validator checkin."
+DPAR_VERSION_PY3 = "4.04.23"
+DPAR_UPDATELOG = "N832 - Correction manager filter name."
 
 
 

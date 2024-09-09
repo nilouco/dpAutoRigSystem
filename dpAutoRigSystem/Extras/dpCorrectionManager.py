@@ -15,7 +15,7 @@ ICON = "/Icons/dp_correctionManager.png"
 ANGLE = "Angle"
 DISTANCE = "Distance"
 
-DP_CORRECTIONMANAGER_VERSION = 2.7
+DP_CORRECTIONMANAGER_VERSION = 2.8
 
 
 class CorrectionManager(object):
@@ -80,6 +80,8 @@ class CorrectionManager(object):
         cmds.separator(style='in', height=15, width=100, parent=correctionManagerLayout)
         # existing:
         cmds.text("existingTxt", label=self.dpUIinst.lang['m071_existing'], align="left", height=25, font='boldLabelFont', parent=correctionManagerLayout)
+        self.filterNameTF = cmds.textField('filterNameTF', width=30, changeCommand=self.populateNetUI, parent=correctionManagerLayout)
+        cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         self.existingNetTSL = cmds.textScrollList('existingNetTSL', width=20, allowMultiSelection=False, selectCommand=self.actualizeEditLayout, parent=correctionManagerLayout)
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         # edit selected net layout:
@@ -301,7 +303,7 @@ class CorrectionManager(object):
                 cmds.select(selList[0])
                 self.net = selList[0]
         self.recreateSelectedLayout()
-        
+
 
     def populateNetUI(self, *args):
         """ Check existing network node to populate UI.
@@ -311,6 +313,11 @@ class CorrectionManager(object):
         currentNetList = cmds.ls(selection=False, type="network")
         if currentNetList:
             self.netList = []
+            filterName = cmds.textField(self.filterNameTF, query=True, text=True)
+            if filterName:
+                self.net = None
+                self.clearEditLayout()
+                currentNetList = dpUtils.filterName(filterName, currentNetList, " ")
             for item in currentNetList:
                 if cmds.objExists(item+".dpNetwork"):
                     if cmds.getAttr(item+".dpNetwork") == 1:
