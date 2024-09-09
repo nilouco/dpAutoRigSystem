@@ -13,6 +13,7 @@
     "OverrideCleaner"           : true,
     "ShowBPCleaner"             : true,
     "SoftenEdges"               : true,
+    "UnlockAttributes"          : true,
     "UnlockInitialShadingGroup" : true,
     "UnlockNormals"             : true,
     "VaccineCleaner"            : true,

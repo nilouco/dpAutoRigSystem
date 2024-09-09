@@ -3,15 +3,15 @@ from maya import cmds
 from .. import dpBaseValidatorClass
 
 # global variables to this module:
-CLASS_NAME = 'OverrideCleaner'
-TITLE = 'v090_overrideCleaner'
-DESCRIPTION = 'v091_overrideCleanerDesc'
-ICON = '/Icons/dp_overrideCleaner.png'
+CLASS_NAME = 'UnlockAttributes'
+TITLE = 'v092_unlockAttributes'
+DESCRIPTION = 'v093_unlockAttributesDesc'
+ICON = '/Icons/dp_unlockAttributes.png'
 
-DP_OVERRIDECLEANER_VERSION = 1.1
+DP_UNLOCKATTRIBUTES_VERSION = 1.0
 
 
-class OverrideCleaner(dpBaseValidatorClass.ValidatorStartClass):
+class UnlockAttributes(dpBaseValidatorClass.ValidatorStartClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs['CLASS_NAME'] = CLASS_NAME
@@ -41,7 +41,7 @@ class OverrideCleaner(dpBaseValidatorClass.ValidatorStartClass):
         if objList:
             nodeList = objList
         if nodeList:
-            overridedList = []
+            lockedAttrDic = {}
             progressAmount = 0
             maxProcess = len(nodeList)
             for item in nodeList:
@@ -49,12 +49,12 @@ class OverrideCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     # Update progress window
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                if cmds.objExists(item+".overrideEnabled"):
-                    if cmds.getAttr(item+".overrideEnabled") == 1:
-                        overridedList.append(item)
+                lockedAttrList = cmds.listAttr(item, locked=True)
+                if lockedAttrList:
+                    lockedAttrDic[item] = lockedAttrList
             # conditional to check here
-            if overridedList:
-                for item in overridedList:
+            if lockedAttrDic:
+                for item in lockedAttrDic.keys():
                     self.checkedObjList.append(item)
                     self.foundIssueList.append(True)
                     if self.verifyMode:
@@ -62,13 +62,13 @@ class OverrideCleaner(dpBaseValidatorClass.ValidatorStartClass):
                     else: #fix
                         try:
                             cmds.lockNode(item, lock=False, lockUnpublished=False)
-                            cmds.setAttr(item+".overrideEnabled", lock=False)
-                            cmds.setAttr(item+".overrideEnabled", 0)
+                            for attr in lockedAttrDic[item]:
+                                cmds.setAttr(item+"."+attr, lock=False)
                             self.resultOkList.append(True)
-                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item)
+                            self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+item+" = "+str(lockedAttrDic[item]))
                         except:
                             self.resultOkList.append(False)
-                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item)
+                            self.messageList.append(self.dpUIinst.lang['v005_cantFix']+": "+item+" = "+attr)
         else:
             self.notFoundNodes()
         # --- validator code --- end

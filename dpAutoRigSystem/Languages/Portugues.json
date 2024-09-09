@@ -806,6 +806,8 @@
     "v088_softenEdges"            : "Suavizar bordas",
     "v089_softenEdgesDesc"        : "Este validador verificará suavização de arestas nas geometrias.",
     "v090_overrideCleaner"        : "Override limpador",
-    "v091_overrideCleanerDesc"    : "Este validador verificará se existem overrides\ne removerá-los."
+    "v091_overrideCleanerDesc"    : "Este validador verificará se existem overrides\ne removerá-los.",
+    "v092_unlockAttributes"       : "Unlock atributos",
+    "v093_unlockAttributesDesc"   : "Esse validador verificará e vai dar unlock nos atributos."
     
 }

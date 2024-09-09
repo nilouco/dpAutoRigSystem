@@ -806,6 +806,8 @@
     "v088_softenEdges"            : "Adoucir les bords",
     "v089_softenEdgesDesc"        : "Ce validateur vérifiera l'adoucissement des bords dans les géométries.",
     "v090_overrideCleaner"        : "Override nettoyer",
-    "v091_overrideCleanerDesc"    : "Ce validateur vérifiera s'il y a des overrides\net va les remover."
+    "v091_overrideCleanerDesc"    : "Ce validateur vérifiera s'il y a des overrides\net va les remover.",
+    "v092_unlockAttributes"       : "Unlock attributs",
+    "v093_unlockAttributesDesc"   : "Ce validateur vérifiera et va faire l'unlock des attributs."
 
 }
