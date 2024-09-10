@@ -62,6 +62,8 @@ def Quadruped(dpUIinst):
         breathName = dpUIinst.lang['c095_breath']
         bellyName = dpUIinst.lang['c096_belly']
         baseName = dpUIinst.lang['c106_base']
+        upperName = dpUIinst.lang['c044_upper']
+        lowerName = dpUIinst.lang['c045_lower']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -335,6 +337,21 @@ def Quadruped(dpUIinst):
                 
                 # woking with EAR system:
                 # create FkLine module instance:
+                earBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing ear base guide informations:
+                earBaseInstance.editUserName(earName+baseName)
+                cmds.setAttr(earBaseInstance.moduleGrp+".translateX", 0.11)
+                cmds.setAttr(earBaseInstance.moduleGrp+".translateY", 14)
+                cmds.setAttr(earBaseInstance.moduleGrp+".translateZ", 10)
+                cmds.setAttr(earBaseInstance.moduleGrp+".rotateX", 90)
+                cmds.setAttr(earBaseInstance.moduleGrp+".rotateY", 20)
+                cmds.setAttr(earBaseInstance.moduleGrp+".rotateZ", 127)
+                cmds.setAttr(earBaseInstance.annotation+".translateX", 4)
+                cmds.setAttr(earBaseInstance.annotation+".translateY", 0)
+                cmds.setAttr(earBaseInstance.radiusCtrl+".translateX", 0.5)
+                cmds.setAttr(earBaseInstance.cvEndJoint+".translateZ", 0.5)
+
+                # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear base guide informations:
                 earInstance.editUserName(earName)
@@ -348,17 +365,57 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earInstance.annotation+".translateY", 0)
                 cmds.setAttr(earInstance.annotation+".translateZ", 1.4)
                 cmds.setAttr(earInstance.radiusCtrl+".translateX", 1)
-                # change the number of joints to the ear module:
-                earInstance.changeJointNumber(2)
-                
-                # parent ear guide to spine guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
+                cmds.setAttr(earInstance.moduleGrp+".mainControls", 1)
                 cmds.setAttr(earInstance.moduleGrp+".scaleX", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)
+                # change the number of joints to the ear module:
+                earInstance.changeJointNumber(2)
+                
+                # create FkLine module instance:
+                earUpperInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing ear upper guide informations:
+                earUpperInstance.editUserName(upperName+earName)
+                cmds.setAttr(earUpperInstance.moduleGrp+".translateX", 1.401)
+                cmds.setAttr(earUpperInstance.moduleGrp+".translateY", 15.365)
+                cmds.setAttr(earUpperInstance.moduleGrp+".translateZ", 9.88)
+                cmds.setAttr(earUpperInstance.moduleGrp+".rotateX", 90)
+                cmds.setAttr(earUpperInstance.moduleGrp+".rotateY", 20)
+                cmds.setAttr(earUpperInstance.moduleGrp+".rotateZ", 127)
+                cmds.setAttr(earUpperInstance.annotation+".translateX", 4)
+                cmds.setAttr(earUpperInstance.annotation+".translateY", 0)
+                cmds.setAttr(earUpperInstance.radiusCtrl+".translateX", 0.3)
+                cmds.setAttr(earUpperInstance.cvEndJoint+".translateZ", 0.5)
+                cmds.setAttr(earUpperInstance.moduleGrp+".scaleX", 0.4)
+                cmds.setAttr(earUpperInstance.moduleGrp+".scaleY", 0.4)
+                cmds.setAttr(earUpperInstance.moduleGrp+".scaleZ", 0.4)
+
+                # create FkLine module instance:
+                earLowerInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing ear upper guide informations:
+                earLowerInstance.editUserName(lowerName+earName)
+                cmds.setAttr(earLowerInstance.moduleGrp+".translateX", 1.796)
+                cmds.setAttr(earLowerInstance.moduleGrp+".translateY", 14.839)
+                cmds.setAttr(earLowerInstance.moduleGrp+".translateZ", 10.12)
+                cmds.setAttr(earLowerInstance.moduleGrp+".rotateX", 90)
+                cmds.setAttr(earLowerInstance.moduleGrp+".rotateY", 20)
+                cmds.setAttr(earLowerInstance.moduleGrp+".rotateZ", 127)
+                cmds.setAttr(earLowerInstance.annotation+".translateX", 4)
+                cmds.setAttr(earLowerInstance.annotation+".translateY", 0)
+                cmds.setAttr(earLowerInstance.radiusCtrl+".translateX", 0.3)
+                cmds.setAttr(earLowerInstance.cvEndJoint+".translateZ", 0.5)
+                cmds.setAttr(earLowerInstance.moduleGrp+".scaleX", 0.4)
+                cmds.setAttr(earLowerInstance.moduleGrp+".scaleY", 0.4)
+                cmds.setAttr(earLowerInstance.moduleGrp+".scaleZ", 0.4)
+
+                # parent ears guides to spine and other ear guides:
+                cmds.parent(earBaseInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
+                cmds.parent(earUpperInstance.moduleGrp, earInstance.cvJointLoc, absolute=True)
+                cmds.parent(earLowerInstance.moduleGrp, earInstance.cvJointLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, earBaseInstance.moduleGrp, absolute=True)
                 # setting X mirror:
-                earInstance.changeMirror("X")
-                cmds.setAttr(earInstance.moduleGrp+".flip", 1)
+                earBaseInstance.changeMirror("X")
+                cmds.setAttr(earBaseInstance.moduleGrp+".flip", 1)
                 
                 # Update progress window
                 progressAmount += 1

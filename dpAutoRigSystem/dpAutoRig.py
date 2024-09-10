@@ -19,7 +19,7 @@
 
 
 DPAR_VERSION_PY3 = "4.04.24"
-DPAR_UPDATELOG = "N829 - Tail base and main controllers."
+DPAR_UPDATELOG = "N829 - Tail base and main controllers.\nN181 - Quadruped Ears Up and Down\nAlso Ear base and main controllers."
 
 
 
