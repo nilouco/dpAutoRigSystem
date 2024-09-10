@@ -9,7 +9,7 @@ TITLE = "m037_quadruped"
 DESCRIPTION = "m038_quadrupedDesc"
 ICON = "/Icons/dp_quadruped.png"
 
-DP_QUADRUPED_VERSION = 2.1
+DP_QUADRUPED_VERSION = 2.2
 
 
 def getUserDetail(opt1, opt2, cancel, userMessage):
@@ -61,6 +61,7 @@ def Quadruped(dpUIinst):
         userMessage = dpUIinst.lang['i177_chooseMessage']
         breathName = dpUIinst.lang['c095_breath']
         bellyName = dpUIinst.lang['c096_belly']
+        baseName = dpUIinst.lang['c106_base']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -281,7 +282,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(frontFootInstance.cvRFDLoc+".translateX", -1.5)
             cmds.setAttr(frontFootInstance.cvRFELoc+".translateZ", 1)
             
-            # parent fron foot guide to front leg ankle guide:
+            # parent front foot guide to front leg ankle guide:
             cmds.parent(frontFootInstance.moduleGrp, frontLegLimbInstance.cvExtremLoc, absolute=True)
             
             # Update progress window
@@ -301,15 +302,33 @@ def Quadruped(dpUIinst):
             cmds.setAttr(tailInstance.annotation+".translateX", 4)
             cmds.setAttr(tailInstance.annotation+".translateY", 0)
             cmds.setAttr(tailInstance.radiusCtrl+".translateX", 1)
+            cmds.setAttr(tailInstance.moduleGrp+".mainControls", 1)
             # change the number of joints to the tail module:
             tailInstance.changeJointNumber(3)
             
-            # parent tail guide to spine guide:
-            cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+            if userDetail == simple:
+                # parent tail guide to spine guide:
+                cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             
             # complete part:
             if userDetail == complete:
                 
+                # create FkLine module instance:
+                tailBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing tail base guide informations:
+                tailBaseInstance.editUserName(tailName+baseName)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".translateY", 10.0)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".translateZ", -7)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".rotateX", 180)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".rotateZ", 90)
+                cmds.setAttr(tailBaseInstance.annotation+".translateX", 4)
+                cmds.setAttr(tailBaseInstance.annotation+".translateY", 0)
+                
+                # parent tail base guide to spine guide:
+                cmds.parent(tailBaseInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+                # parent tail guide to tail base guide:
+                cmds.parent(tailInstance.moduleGrp, tailBaseInstance.moduleGrp, absolute=True)
+
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+earName))
