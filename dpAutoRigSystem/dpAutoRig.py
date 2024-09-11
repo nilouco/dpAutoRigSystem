@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.23"
-DPAR_UPDATELOG = "N832 - Correction manager filter name."
+DPAR_VERSION_PY3 = "4.04.24"
+DPAR_UPDATELOG = "N829 - Tail base and main controllers.\nN181 - Quadruped Ears Up and Down\nAlso Ear base and main controllers.\nN847 - Quadruped ik spaceSwitch."
 
 
 

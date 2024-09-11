@@ -7,7 +7,7 @@ TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 ICON = "/Icons/dp_limbSpaceSwitch.png"
 
-DP_LIMBSPACESWITCH_VERSION = 2.2
+DP_LIMBSPACESWITCH_VERSION = 2.3
 
 
 class LimbSpaceSwitch(object):
@@ -76,7 +76,12 @@ class LimbSpaceSwitch(object):
         """ Set attributes and call setDrivenKey method.
         """
         sideList = [self.dpUIinst.lang['p002_left'], self.dpUIinst.lang['p003_right']]
-        limbList = [self.dpUIinst.lang['c037_arm']+"_"+self.dpUIinst.lang['c004_arm_extrem'], self.dpUIinst.lang['c006_leg_main']+"_"+self.dpUIinst.lang['c009_leg_extrem']]
+        limbList = [
+                    self.dpUIinst.lang['c037_arm']+"_"+self.dpUIinst.lang['c004_arm_extrem'],
+                    self.dpUIinst.lang['c006_leg_main']+"_"+self.dpUIinst.lang['c009_leg_extrem'],
+                    self.dpUIinst.lang['c006_leg_main']+self.dpUIinst.lang['c056_front']+"_"+self.dpUIinst.lang['c009_leg_extrem'],
+                    self.dpUIinst.lang['c006_leg_main']+self.dpUIinst.lang['c057_back']+"_"+self.dpUIinst.lang['c009_leg_extrem']
+                    ]
         for side in sideList:
             for x, limbNode in enumerate(limbList):
                 ikCtrl = side+"_"+limbNode+"_Ik_Ctrl"
