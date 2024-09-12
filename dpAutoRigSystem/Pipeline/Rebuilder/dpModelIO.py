@@ -105,7 +105,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
     def getModelToExportList(self, *args):
         """ Returns a list of higher father mesh node list or the children nodes in Render_Grp.
         """
-        meshList = []
+        meshList, tempList = [], []
         renderGrp = self.utils.getNodeByMessage("renderGrp")
         if renderGrp:
             meshList = cmds.listRelatives(renderGrp, allDescendents=True, fullPath=True, noIntermediate=True, type="mesh") or []
@@ -119,6 +119,19 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                         fatherNode = item[:item[1:].find("|")+1]
                         if fatherNode:
                             if not cmds.objExists(fatherNode+".masterGrp"):
-                                if not fatherNode in meshList:
-                                    meshList.append(fatherNode)
-                return meshList
+                                if not fatherNode in tempList:
+                                    tempList.append(fatherNode)
+        if tempList:
+            for node in tempList:
+                isCleaned = True
+                if not cmds.objExists(node+".guideBase") and not cmds.objExists(node+".dpGuide"):
+                    childrenList = cmds.listRelatives(node, children=True, allDescendents=True)
+                    if childrenList:
+                        for child in childrenList:
+                            if cmds.objExists(child+".guideBase") or cmds.objExists(child+".dpGuide"):
+                                isCleaned = False
+                else:
+                    isCleaned = False
+                if isCleaned:
+                    meshList.append(node)
+        return meshList
