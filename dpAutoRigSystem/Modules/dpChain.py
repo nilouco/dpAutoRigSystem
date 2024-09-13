@@ -299,7 +299,6 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.rename(cmds.listRelatives(cmds.listRelatives(self.ikStaticDataGrp, children=True, allDescendents=True, type="follicle")[0], parent=True)[0], dynName+"_Dyn_Fol")
         dynCrv = cmds.rename("dpHairSystemOutputCurves|curve1", dynName+"_Dyn_Crv")
         # ikHandle
-        
         ikSplineList = cmds.ikHandle(startJoint=firstDynJnt, endEffector=dynJntList[-2], name=dynName+"_Dyn_IkH", solver="ikSplineSolver", parentCurve=False, curve=dynCrv, createCurve=False) #[Handle, Effector]
         ikSplineList[1] = cmds.rename(ikSplineList[1], dynName+"_Dyn_Eff")
         cmds.parent(ikSplineList[0], self.ikStaticDataGrp)
@@ -762,6 +761,8 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(self.base, side+self.userGuideName+'_'+self.mirrorGrp)
+                self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
+                self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)

@@ -218,7 +218,7 @@ class ControlClass(object):
         cmds.setAttr(ribbonNurbsPlane+".visibility", 0)
         self.setNotRenderable([ribbonNurbsPlaneShape])
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        cmds.addAttr(ribbonNurbsPlane, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+        self.utils.addCustomAttr([ribbonNurbsPlane], self.dpUIinst.skin.ignoreSkinningAttr)
         # create groups to be used as a root of the ribbon system:
         ribbonGrp = cmds.group(ribbonNurbsPlane, n=name+"_Rbn_RibbonJoint_Grp")
         # create joints:
@@ -254,6 +254,8 @@ class ControlClass(object):
             cmds.parent(posGrp, ribbonGrp, absolute=True)
             # joint labelling:
             self.utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
+            self.utils.addCustomAttr([posGrp, upGrp, aimGrp, jointGrp], self.utils.ignoreTransformIOAttr)
+        self.utils.addCustomAttr([ribbonGrp], self.utils.ignoreTransformIOAttr)
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
 
 

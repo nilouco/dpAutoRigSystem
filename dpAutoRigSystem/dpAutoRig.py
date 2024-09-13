@@ -1106,7 +1106,7 @@ class DP_AutoRig_UI(object):
                         transformNameList = cmds.listRelatives(meshName, parent=True, fullPath=True, type="transform")
                         if transformNameList:
                             # do not add ribbon nurbs plane to the list:
-                            if not cmds.objExists(transformNameList[0]+".dpDoNotSkinIt"):
+                            if not cmds.objExists(transformNameList[0]+"."+self.skin.ignoreSkinningAttr):
                                 if not transformNameList[0] in geomList:
                                     if chooseGeom == "allGeoms":
                                         geomList.append(transformNameList[0])
@@ -2154,7 +2154,7 @@ class DP_AutoRig_UI(object):
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
-            self.optionCtrlGrp = self.utils.zeroOut([self.optionCtrl])[0]
+            self.optionCtrlGrp = self.utils.zeroOut([self.optionCtrl], notTransformIO=False)[0]
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')

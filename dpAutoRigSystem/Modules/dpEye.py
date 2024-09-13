@@ -780,6 +780,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                self.utils.addCustomAttr([self.eyeGrp, self.upLocGrp, self.lUpGrpLoc, self.eyeScaleGrp], self.utils.ignoreTransformIOAttr)
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)

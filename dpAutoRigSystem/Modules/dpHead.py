@@ -222,6 +222,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(self.cvDeformerRadiusLoc+".translate"+axis, defRadiusMD+".input1"+axis)
             cmds.connectAttr(defRadiusMD+".output"+axis, defPolyCube+"."+attr)
         cmds.setAttr(self.deformerCube+".template", 1)
+        self.utils.addCustomAttr([self.deformerCube], self.dpUIinst.skin.ignoreSkinningAttr)
         # include nodes into net
         self.addNodeToGuideNet([self.cvNeckLoc, self.cvHeadLoc, self.cvJawLoc, self.cvChinLoc, self.cvChewLoc, self.cvLCornerLipLoc, self.cvUpperJawLoc, self.cvUpperHeadLoc, self.cvUpperLipLoc, self.cvLowerLipLoc, self.cvDeformerCenterLoc, self.cvDeformerRadiusLoc, self.cvBrowLoc, self.cvEyelidLoc, self.cvMouthLoc, self.cvLipsLoc, self.cvSneerLoc, self.cvGrimaceLoc, self.cvFaceLoc, self.cvEndJoint],\
                                 ["Neck0", "Head", "Jaw", "Chin", "Chew", "LCornerLip", "UpperJaw", "UpperHead", "UpperLip", "LowerLip", "Brow", "Eyelid", "Mouth", "Lips", "Sneer", "Grimace", "Face", "JointEnd"])
@@ -345,6 +346,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # create move group and its attributes:
         if not cmds.objExists(drivenGrp):
             drivenGrp = cmds.group(attrCtrl, name=drivenGrp)
+            self.utils.addCustomAttr([drivenGrp], self.utils.ignoreTransformIOAttr)
         if not cmds.objExists(self.jawCtrl+"."+startRotName):
             if positiveRotation: #open
                 cmds.addAttr(self.jawCtrl, longName=startRotName, attributeType='float', defaultValue=5, minValue=0, keyable=True)
@@ -833,6 +835,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for n in range(0, self.nJoints):
                     self.neckPivot = cmds.xform(self.neckCtrlList[n], query=True, worldSpace=True, translation=True)
                     self.neckOrientGrp = cmds.group(self.neckCtrlList[n], name=self.neckCtrlList[n]+"_Orient_Grp")
+                    self.utils.addCustomAttr([self.neckOrientGrp], self.utils.ignoreTransformIOAttr)
                     cmds.xform(self.neckOrientGrp, pivots=(self.neckPivot[0], self.neckPivot[1], self.neckPivot[2]), worldSpace=True)
                     cmds.addAttr(self.neckCtrlList[n], longName=self.dpUIinst.lang['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=self.autoRotateCalc(n), keyable=True)
                     neckARMDName = self.dpUIinst.lang['c047_autoRotate'][0].capitalize()+self.dpUIinst.lang['c047_autoRotate'][1:]
@@ -1070,6 +1073,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+
+                self.utils.addCustomAttr([self.lLipGrp, self.rLipGrp, self.headOrientGrp, self.worldRef], self.utils.ignoreTransformIOAttr)
+                if self.correctiveCtrlGrpList:
+                    self.utils.addCustomAttr(self.correctiveCtrlGrpList, self.utils.ignoreTransformIOAttr)
                 
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.moduleGrp+".facial"):

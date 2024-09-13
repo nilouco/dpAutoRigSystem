@@ -393,6 +393,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for r, rbnJntGrp in enumerate(rbnJointGrpList):
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
                         scaleGrp = cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
+                        self.utils.addCustomAttr([scaleGrp], self.utils.ignoreTransformIOAttr)
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
                         cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
                         cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
@@ -551,6 +552,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['sx', 'sy', 'sz'])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                self.utils.addCustomAttr([middleOrigGrp], self.utils.ignoreTransformIOAttr)
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)

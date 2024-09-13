@@ -20,10 +20,11 @@ DP_UTILS_VERSION = 3.0
 
 class Utils(object):
     def __init__(self, *args):
-        """ Initialize the module class loading variables and store them in a dictionary.
+        """ Initialize the module class loading variables.
         """
         # define variables
         self.dpOrderList = "dpOrderList"
+        self.ignoreTransformIOAttr = "dpNotTransformIO"
         
 
     # UTILS functions:
@@ -232,7 +233,7 @@ class Utils(object):
                         pass
 
 
-    def zeroOut(self, transformList=[], offset=False):
+    def zeroOut(self, transformList=[], offset=False, notTransformIO=True):
         """ Create a group over the transform, parent the transform in it and set zero all transformations of the transform node.
             If don't have a transformList given, try to get the current selection.
             If want to create with offset, it'll be an offset group between zeroGrp and transform.
@@ -266,8 +267,21 @@ class Utils(object):
                     cmds.parent(offsetGrp, zeroGrp, absolute=True)
                 else:
                     cmds.parent(transform, zeroGrp, absolute=True)
+                if notTransformIO:
+                    self.addCustomAttr([zeroGrp], self.ignoreTransformIOAttr)
+                    if offset:
+                        self.addCustomAttr([offsetGrp], self.ignoreTransformIOAttr)
                 zeroList.append(zeroGrp)
         return zeroList
+
+
+    def addCustomAttr(self, nodeList, attrName, attrType="bool", keyableAttr=True, defaultValueAttr=True, *args):
+        """ Useful method to add the same attribute and values to a list of given nodes.
+        """
+        if nodeList and attrName:
+            for node in nodeList:
+                if not cmds.objExists(node+"."+attrName):
+                    cmds.addAttr(node, longName=attrName, attributeType=attrType, keyable=keyableAttr, defaultValue=defaultValueAttr)
 
 
     def originedFrom(self, objName="", attrString=""):
@@ -418,6 +432,7 @@ class Utils(object):
             cmds.connectAttr(nullB+".tz", distBet+".point2Z")
             dist = cmds.getAttr(distBet+".distance")
             if keep:
+                self.addCustomAttr([nullA, nullB, nullC], self.ignoreTransformIOAttr)
                 return [dist, distBet, nullA, nullB, nullC, pointConst]
             else:
                 cmds.delete(distBet, nullA, nullB, nullC, pointConst)
@@ -1142,8 +1157,8 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, *args):
-        """ Remove camera, constraints, follicles from the given list and return it.
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterEffector=True, *args):
+        """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
         cameraList = ["|persp", "|top", "|side", "|front"]
         constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint"]
@@ -1161,9 +1176,21 @@ class Utils(object):
                 if cmds.listRelatives(item, children=True, type="follicle"):
                     toRemoveList.append(item)
             if filterJoint:
-                if cmds.listRelatives(item, children=True, type="joint"):
+                if cmds.listRelatives(item, children=True, type="joint") or itemType == "joint":
+                    toRemoveList.append(item)
+            if filterLocator:
+                if cmds.listRelatives(item, children=True, type="locator"):
+                    toRemoveList.append(item)
+            if filterHandle:
+                if cmds.listRelatives(item, children=True, type="ikHandle") or itemType == "ikHandle":
+                    toRemoveList.append(item)
+                if cmds.listRelatives(item, children=True, type="clusterHandle") or itemType == "clusterHandle":
+                    toRemoveList.append(item)
+            if filterEffector:
+                if cmds.listRelatives(item, children=True, type="ikEffector") or itemType == "ikEffector":
                     toRemoveList.append(item)
         if toRemoveList:
+            toRemoveList = list(set(toRemoveList))
             for toRemoveNode in toRemoveList:
                 itemList.remove(toRemoveNode)
         return itemList

@@ -61,9 +61,14 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                         transformDic = {}
                         transformList = self.utils.filterTransformList(transformList)
                         for item in transformList:
-                            dataDic = self.getTransformation(item)
-                            if dataDic:
-                                transformDic[item] = dataDic
+                            useThisTransform = True
+                            if cmds.objExists(item+".dpNotTransformIO"):
+                                if cmds.getAttr(item+".dpNotTransformIO") == 1:
+                                    useThisTransform = False
+                            if useThisTransform:
+                                dataDic = self.getTransformation(item)
+                                if dataDic:
+                                    transformDic[item] = dataDic
                         try:
                             # export json file
                             self.pipeliner.makeDirIfNotExists(self.ioPath)

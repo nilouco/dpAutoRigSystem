@@ -279,6 +279,8 @@ class RibbonClass(object):
             
             cmds.delete(grp)
 
+        self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
+
         # extraCtrlList:
         extraCtrlList = upLimb['extraCtrlList']
         extraCtrlList.extend(downLimb['extraCtrlList'])
@@ -295,12 +297,13 @@ class RibbonClass(object):
         self.dpUIinst.ctrls.setLockHide([curve], ['v'])
         if zero:
             grp = cmds.group(curve, n=myName+'_Grp')
+            self.utils.addCustomAttr([grp], self.utils.ignoreTransformIOAttr)
         return [grp, curve]
     
     
     def createElbowCtrl(self, myName='Limb_Ctrl', zero=True, armStyle=True, *args):
         """ Create the Ribbon Corner (Elbow) control.
-            Returns the group, the control curve and it's zeroOut group.
+            Returns the group, the control curve and its zeroOut group.
         """
         if armStyle:
             curve = self.ctrls.cvControl("id_039_RibbonCorner", myName, r=self.ctrlRadius, d=self.curveDegree, rot=(0, 90, 0), guideSource=self.limbInstance.guideName+"_Corner")
@@ -314,6 +317,7 @@ class RibbonClass(object):
                 cmds.rotate(0, -90, -90, zero)
             else:
                 cmds.rotate(-90, 0, -90, zero)
+            self.utils.addCustomAttr([zero, grp], self.utils.ignoreTransformIOAttr)
         cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         cmds.addAttr(curve, longName='pin', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         self.dpUIinst.ctrls.setLockHide([curve], ['v'])
@@ -346,7 +350,7 @@ class RibbonClass(object):
             ribbon = cmds.nurbsPlane(ax=axis, w=1, lr=numJoints, d=3, u=1, v=numJoints, ch=0, name=name+'_Plane')[0]
             cmds.rebuildSurface(ribbon, ch=0, rpo=1, rt=0, end=1, kr=0, kcp=0, kc=0, su=1, du=1, dv=3, tol=0.01, fr=0, dir=0) 
         # make this ribbonNurbsPlane as not skinable from dpAR_UI:
-        cmds.addAttr(ribbon, longName="dpDoNotSkinIt", attributeType="bool", keyable=True, defaultValue=True)
+        self.utils.addCustomAttr([ribbon], self.dpUIinst.skin.ignoreSkinningAttr)
         #call the function to create follicles and joint in the nurbsPlane
         results = self.createFollicles(rib=ribbon, num=numJoints, name=name, horizontal=horizontal, side=s, jointLabelAdd=jointLabelAdd, jointLabelName=jointLabelName)
         rb_Jnt = results[0]
@@ -791,6 +795,7 @@ class RibbonClass(object):
         if not upCtrl == None:
             bttm_LocGrp = cmds.group(bttm_Loc[2], name=bttm_Loc[2]+"_Grp")
             bttm_LocTwistBoneGrp = cmds.group(bttm_LocGrp, name=bttm_Loc[2]+"_TwistBone_Grp")
+            self.utils.addCustomAttr([bttm_LocGrp, bttm_LocTwistBoneGrp], self.utils.ignoreTransformIOAttr)
             bttm_LocPos = cmds.xform(bttm_Loc[0], query=True, worldSpace=True, translation=True)
             cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocGrp+".scalePivot", bttm_LocGrp+".rotatePivot", absolute=True)
             cmds.move(bttm_LocPos[0], bttm_LocPos[1], bttm_LocPos[2], bttm_LocTwistBoneGrp+".scalePivot", bttm_LocTwistBoneGrp+".rotatePivot", absolute=True)
@@ -828,6 +833,8 @@ class RibbonClass(object):
         for jnt in rb_Jnt:
             rbAddScalePMA = jnt.replace("_Jnt", "_AddScale_PMA")
             cmds.setAttr(rbAddScalePMA+".input1D[0]", 1-cmds.getAttr(rbAddScalePMA+".input1D[1]"))
+
+        self.utils.addCustomAttr([mid_Ctrl, extraCtrlGrp, locatorsGrp, skinJntGrp, finalSystemGrp], self.utils.ignoreTransformIOAttr)
 
         #change renderStats
         ribbonShape = cmds.listRelatives(ribbon, s=True, f=True)[0]
