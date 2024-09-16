@@ -255,7 +255,7 @@ class ControlClass(object):
             # joint labelling:
             self.utils.setJointLabel(joint, jointLabelNumber, 18, jointLabelName+"_%02d"%(j+1))
             self.utils.addCustomAttr([posGrp, upGrp, aimGrp, jointGrp], self.utils.ignoreTransformIOAttr)
-        self.utils.addCustomAttr([ribbonGrp], self.utils.ignoreTransformIOAttr)
+        self.utils.addCustomAttr([ribbonGrp, ribbonNurbsPlane], self.utils.ignoreTransformIOAttr)
         return [ribbonNurbsPlane, ribbonNurbsPlaneShape, jointGrpList, jointList]
 
 

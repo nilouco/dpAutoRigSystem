@@ -313,12 +313,16 @@ class Utils(object):
         return originedFromDic
 
 
-    def addHook(self, objName="", hookType="staticHook"):
+    def addHook(self, objName="", hookType="staticHook", addNotTransformIO=True):
         """ Add attribute as boolean and set it as True = 1.
         """
         if objName != "":
-            cmds.addAttr(objName, longName=hookType, attributeType='bool')
-            cmds.setAttr(objName+"."+hookType, 1)
+            if cmds.objExists(objName):
+                if not cmds.objExists(objName+"."+hookType):
+                    cmds.addAttr(objName, longName=hookType, attributeType='bool')
+                    cmds.setAttr(objName+"."+hookType, 1)
+                if addNotTransformIO:
+                    self.addCustomAttr([objName], self.ignoreTransformIOAttr)
 
 
     def hook(self):
@@ -1157,7 +1161,7 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterEffector=True, *args):
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, *args):
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
         cameraList = ["|persp", "|top", "|side", "|front"]
@@ -1186,6 +1190,10 @@ class Utils(object):
                     toRemoveList.append(item)
                 if cmds.listRelatives(item, children=True, type="clusterHandle") or itemType == "clusterHandle":
                     toRemoveList.append(item)
+            if filterLinearDeform:
+                for defName in ["deformBend", "deformTwist", "deformSquash", "deformFlare", "deformSine", "deformWave"]:
+                    if cmds.listRelatives(item, children=True, type=defName):
+                        toRemoveList.append(item)
             if filterEffector:
                 if cmds.listRelatives(item, children=True, type="ikEffector") or itemType == "ikEffector":
                     toRemoveList.append(item)

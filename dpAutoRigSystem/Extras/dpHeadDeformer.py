@@ -383,6 +383,8 @@ class HeadDeformer(object):
                                 ]
             self.ctrls.setStringAttrFromList(arrowCtrl, hdCalibrationList)
             
+            self.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, mainCtrlGrp, arrowCtrlGrp], self.utils.ignoreTransformIOAttr)
+
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:

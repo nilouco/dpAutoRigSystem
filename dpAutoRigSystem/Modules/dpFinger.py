@@ -292,6 +292,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.fingerCtrl+'.visibility', keyable=False)
                     # put another group over the control in order to use this to connect values from mainFingerCtrl:
                     self.sdkGrp = cmds.group(self.fingerCtrl, name=side+self.userGuideName+"_%02d_SDK_Grp"%(n))
+                    self.utils.addCustomAttr([self.sdkGrp], self.utils.ignoreTransformIOAttr)
                     if n == 1:
                         # change pivot of this group to control pivot:
                         pivotPos = cmds.xform(self.fingerCtrl, query=True, worldSpace=True, rotatePivot=True)
@@ -548,7 +549,6 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
-                self.utils.addCustomAttr([self.sdkGrp], self.utils.ignoreTransformIOAttr)
             # finalize this rig:
             self.integratingInfo()
             cmds.select(clear=True)

@@ -273,7 +273,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.centerList, self.leftList, self.rightList = [], [], []
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
-                # creating top nose top controls and joints:
+                # creating top nose controls and joints:
                 for n in range(0, self.nJoints):
                     cmds.select(clear=True)
                     # declare guide:
@@ -286,13 +286,13 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvTopLoc1")
+                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvTopLoc1")
                     self.centerList.append(self.noseCtrl)
-                    # position and orientation of joint and control:
-                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.noseCtrl, maintainOffset=False))
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.utils.zeroOut([self.noseCtrl])[0]
+                    # position and orientation of joint and control:
+                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.jnt, maintainOffset=False))
+                    cmds.delete(cmds.parentConstraint(self.cvTopLoc, self.zeroOutCtrlGrp, maintainOffset=False))
                     # hide visibility attribute:
                     cmds.setAttr(self.noseCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:

@@ -219,11 +219,11 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # create a control:
                     self.jntCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
                     self.fkCtrlList.append(self.jntCtrl)
-                    # position and orientation of joint and control:
-                    cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
-                    cmds.delete(cmds.parentConstraint(self.guide, self.jntCtrl, maintainOffset=False))
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.utils.zeroOut([self.jntCtrl])[0]
+                    # position and orientation of joint and control:
+                    cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))
+                    cmds.delete(cmds.parentConstraint(self.guide, self.zeroOutCtrlGrp, maintainOffset=False))
                     # hide visibility attribute:
                     cmds.setAttr(self.jntCtrl+'.visibility', keyable=False)
                     # fixing flip mirror:
