@@ -219,18 +219,6 @@ class Skinning(dpWeights.Weights):
             return True
 
             
-    def getIncomingJoints(self, mesh, skinClusterName, skinWeightDic, *args):
-        """ Return the joint list of given skinWeightDic of a skinClusterName in a mesh.
-        """
-        incomingJointList = []
-        for item in skinWeightDic[mesh][skinClusterName]['skinJointsWeights']:
-            for jnt in item.keys():
-                if not jnt in incomingJointList:
-                    incomingJointList.append(jnt)
-        incomingJointList.sort()
-        return incomingJointList
-
-
     def createMissingJoints(self, incomingJointList, *args):
         """ Create missing joints if we don't have them in the scene.
         """
@@ -251,17 +239,19 @@ class Skinning(dpWeights.Weights):
             Return a dictionary with the joint name and it's matrix index connection.
         """
         needToCreateSkinCluster = True
-        incomingJointList = self.getIncomingJoints(mesh, skinClusterName, skinWeightDic)
+        incomingJointList = skinWeightDic[mesh][skinClusterName]['skinInfList']
         missingJntList = self.createMissingJoints(incomingJointList)
         skinClusterInfoList = self.checkExistingDeformerNode(mesh)
         if skinClusterInfoList[0]:
-            if missingJntList:
-                for scNode in skinClusterInfoList[2]:
-                    if scNode == skinClusterName:
+            for scNode in skinClusterInfoList[2]:
+                if scNode == skinClusterName:
+                    if missingJntList:
                         for jnt in missingJntList:
                             # add influence
                             cmds.skinCluster(mesh, edit=True, addInfluence=jnt, lockWeights=True, weight=0.0)
                             needToCreateSkinCluster = False
+                    else:
+                        cmds.delete(scNode)
         if needToCreateSkinCluster:
             if cmds.about(version=True) >= "2024": #accepting multiple skinClusters
                 cmds.skinCluster(incomingJointList, mesh, multi=True, name=skinClusterName, toSelectedBones=True, skinMethod=skinWeightDic[mesh][skinClusterName]['skinMethodToUse'], obeyMaxInfluences=skinWeightDic[mesh][skinClusterName]['skinMaintainMaxInf'], maximumInfluences=skinWeightDic[mesh][skinClusterName]['skinMaxInf'])[0]
@@ -299,6 +289,7 @@ class Skinning(dpWeights.Weights):
                         "skinMethodToUse"    : cmds.skinCluster(skinClusterNode, query=True, skinMethod=True),
                         "skinMaintainMaxInf" : cmds.skinCluster(skinClusterNode, query=True, obeyMaxInfluences=True),
                         "skinMaxInf"         : cmds.skinCluster(skinClusterNode, query=True, maximumInfluences=True),
+                        "skinInfList"        : cmds.skinCluster(skinClusterNode, query=True, influence=True),
                         "skinJointsWeights"  : self.getSkinWeights(mesh, skinClusterNode, True)
                     }
         return skinWeightsDic    
