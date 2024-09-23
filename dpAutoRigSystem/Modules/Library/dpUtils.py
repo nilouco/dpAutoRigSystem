@@ -1140,10 +1140,12 @@ class Utils(object):
     def reapplyDeformers(self, item, defList):
         """ Reapply the given deformer list to the destination given item except the tweak node.
         """
-        for deformerNode in defList:
-            if cmds.objExists(deformerNode):
-                if not cmds.objectType(deformerNode) == "tweak":
-                    cmds.deformer(deformerNode, edit=True, geometry=item)
+        if item and defList:
+            if cmds.objExists(item):
+                for deformerNode in defList:
+                    if cmds.objExists(deformerNode):
+                        if not cmds.objectType(deformerNode) == "tweak":
+                            cmds.deformer(deformerNode, edit=True, geometry=item)
 
 
     def getNetworkNodeByAttr(self, netAttr, *args):
@@ -1202,3 +1204,17 @@ class Utils(object):
             for toRemoveNode in toRemoveList:
                 itemList.remove(toRemoveNode)
         return itemList
+
+
+    def deleteOrigShape(self, item, deleteIntermediate=True, *args):
+        """ Delete Orig shape if it exists.
+        """
+        if item:
+            for child in cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True):
+                #if "Orig" in child:
+                if child.endswith("Orig"):
+                    cmds.delete(child)
+                elif cmds.getAttr(child+".intermediateObject") == 1:
+                    cmds.delete(child)
+                else:
+                    self.removeUserDefinedAttr(child)

@@ -606,6 +606,7 @@ class ControlClass(object):
                         sourceVis = None
                         defList = False
                         dupSourceItem = cmds.duplicate(sourceItem)[0]
+                        self.utils.deleteOrigShape(dupSourceItem)
                         if keepColor:
                             self.setSourceColorOverride(dupSourceItem, [destTransform])
                         destShapeList = cmds.listRelatives(destTransform, shapes=True, type="nurbsCurve", fullPath=True)
@@ -639,24 +640,24 @@ class ControlClass(object):
                                 cmds.connectAttr(sourceVis, dupSourceShape+".visibility", force=True)
                             if not force:
                                 cmds.parent(dupSourceShape, destTransform, relative=True, shape=True)
-                            else:
+                            elif cmds.objExists(dupSourceShape):
                                 # make sure we use the current shape of a froze transform, usefull to mirror control shapes
                                 forcedShape = cmds.parent(dupSourceShape, destTransform, absolute=True, shape=True)[0]
-                                forcedTransform = cmds.listRelatives(forcedShape, parent=True, type="transform")
+                                forcedTransform = cmds.listRelatives(forcedShape, parent=True, type="transform", fullPath=True)
+                                histList = cmds.listHistory(forcedShape)
+                                # workaround to avoid undesirable warning about tweak nodes
+                                cmds.delete(forcedShape, constructionHistory=True)
+                                for x in histList:
+                                    if "tweak" in x:
+                                        if cmds.objExists(x):
+                                            cmds.delete(x)
                                 cmds.makeIdentity(forcedTransform, apply=True, translate=True, rotate=True, scale=True)
                                 cmds.parent(forcedShape, destTransform, relative=True, shape=True)
                                 cmds.delete(forcedTransform)
-                                if defList:
-                                    if cmds.objExists(forcedShape):
-                                        histList = cmds.listHistory(forcedShape)
-                                        if histList:
-                                            for defNode in histList:
-                                                if cmds.objExists(defNode):
-                                                    if cmds.objectType(defNode) == "transformGeometry":
-                                                        cmds.delete(forcedShape, constructionHistory=True)
-                                                        self.utils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
-                                                        break
-                        cmds.delete(dupSourceItem)
+                                if defList and histList:
+                                    self.utils.reapplyDeformers(destTransform+"|"+forcedShape, defList)
+                        if cmds.objExists(dupSourceItem):
+                            cmds.delete(dupSourceItem)
                         self.renameShape([destTransform])
                         # restore children transforms to correct parent hierarchy:
                         if destChildrenList:
@@ -1432,6 +1433,7 @@ class ControlClass(object):
                     if cmds.objExists(destinationNode):
                         # do mirror algorithm
                         duplicatedSource = cmds.duplicate(nodeName, name=nodeName+"_Duplicated_TEMP")[0]
+                        self.utils.deleteOrigShape(duplicatedSource)
                         duplicatedGrp = cmds.group(duplicatedSource, name=duplicatedSource+"_Grp")
                         mirrorShapeGrp = cmds.group(empty=True, name=duplicatedSource+"_MirrorShape_Grp")
                         cmds.parent(duplicatedGrp, mirrorShapeGrp)

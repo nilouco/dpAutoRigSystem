@@ -346,9 +346,13 @@ class LayoutClass(object):
                 # create corrective layout:
                 if self.correctiveExists:
                     self.correctiveLayout = cmds.rowLayout('correctiveLayout', numberOfColumns=4, columnWidth4=(100, 50, 80, 70), columnAlign=[(1, 'right'), (4, 'right')], adjustableColumn=4, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 10)], parent="selectedModuleColumn" )
-                    cmds.text(self.dpUIinst.lang['c124_corrective'].capitalize(), parent=self.correctiveLayout)
+                    self.correctiveTxt = cmds.text(self.dpUIinst.lang['c124_corrective'].capitalize(), parent=self.correctiveLayout)
                     correctiveValue = cmds.getAttr(self.moduleGrp+".corrective")
                     self.correctiveCB = cmds.checkBox(label="", value=correctiveValue, changeCommand=self.changeCorrective, parent=self.correctiveLayout)
+                    if self.articulationExists:
+                        articulationValue = cmds.getAttr(self.moduleGrp+".articulation")
+                        cmds.text(self.correctiveTxt, edit=True, enable=articulationValue)
+                        cmds.checkBox(self.correctiveCB, edit=True, enable=articulationValue)
 
                 # create dynamic layout:
                 if self.dynamicExists:
@@ -552,7 +556,11 @@ class LayoutClass(object):
         #articulationValue = cmds.checkBox(self.articCB, query=True, value=True)
         cmds.setAttr(self.moduleGrp+".articulation", articulationValue)
         try:
+            cmds.text(self.correctiveTxt, edit=True, enable=articulationValue)
             cmds.checkBox(self.correctiveCB, edit=True, enable=articulationValue)
+            if not articulationValue:
+                cmds.checkBox(self.correctiveCB, edit=True, value=articulationValue)
+                cmds.setAttr(self.moduleGrp+".corrective", articulationValue)
         except:
             pass
 

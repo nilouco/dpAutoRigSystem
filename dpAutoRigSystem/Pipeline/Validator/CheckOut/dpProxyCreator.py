@@ -162,11 +162,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                         # create proxy geometry
                         dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
                         self.utils.removeUserDefinedAttr(dup)
-                        for dupItem in cmds.listRelatives(dup, children=True, allDescendents=True):
-                            if "Orig" in dupItem:
-                                cmds.delete(dupItem)
-                            else:
-                                self.utils.removeUserDefinedAttr(dupItem)
+                        self.utils.deleteOrigShape(dup)
                         if nodeFaceList:
                             faceDupList = [w.replace(source, dup) for w in nodeFaceList]
                             cmds.delete(faceDupList)
