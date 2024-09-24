@@ -1110,9 +1110,11 @@ class ControlClass(object):
         """
         currentPath = cmds.file(query=True, sceneName=True)
         if not currentPath:
-            print(self.dpUIinst.lang['i201_saveScene'])
-            return
-        
+            if path and "dpData" in path:
+                currentPath = path.split("dpData")[0]
+            else:
+                print(self.dpUIinst.lang['i201_saveScene'])
+                return
         if not nodeList:
             nodeList = self.getControlList()
         if nodeList:
@@ -1200,8 +1202,11 @@ class ControlClass(object):
             if IO:
                 currentPath = cmds.file(query=True, sceneName=True)
                 if not currentPath:
-                    print(self.dpUIinst.lang['i201_saveScene'])
-                    return
+                    if path and "dpData" in path:
+                        currentPath = path.split("dpData")[0]
+                    else:
+                        print(self.dpUIinst.lang['i201_saveScene'])
+                        return
                 dpFolder = currentPath[:currentPath.rfind("/")+1]+self.dpUIinst.dpData+"/"+dir
                 dpControlShapeFile = "/"+dir+"_"+currentPath[currentPath.rfind("/")+1:]
                 path = dpFolder+dpControlShapeFile
