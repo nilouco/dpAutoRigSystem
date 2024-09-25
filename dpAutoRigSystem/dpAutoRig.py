@@ -302,9 +302,7 @@ class DP_AutoRig_UI(object):
         # call UI window: Also ensure that when thedock controler X button is hit, the window is killed and the dock control too
         self.iUIKilledId = cmds.scriptJob(uiDeleted=[self.allUIs["dpAutoRigWin"], self.jobWinClose])
         self.pDockCtrl = cmds.dockControl('dpAutoRigSystem', area="left", content=self.allUIs["dpAutoRigWin"], visibleChangeCommand=self.jobDockVisChange)
-
-        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), killWithScene=False, compressUndo=True)
-
+        self.refreshAssetSaveJob = cmds.scriptJob(event=('SceneSaved', partial(self.refreshMainUI, True)), parent='dpAutoRigSystem', killWithScene=True, compressUndo=True)
         self.ctrls.startCorrectiveEditMode()
         clearDPARLoadingWindow()
         self.refreshMainUI()
@@ -756,14 +754,13 @@ class DP_AutoRig_UI(object):
         # --
         # call tabLayouts:
         cmds.tabLayout(self.allUIs["mainTabLayout"], edit=True, tabLabel=((self.allUIs["riggingTabLayout"], 'Rigging'), (self.allUIs["skinningTabLayout"], 'Skinning'), (self.allUIs["controlTabLayout"], 'Control'), (self.allUIs["extraTabLayout"], 'Extra'), (self.allUIs["validatorTabLayout"], self.lang['v000_validator']), (self.allUIs["rebuilderTabLayout"], self.lang['r000_rebuilder'])))
-        cmds.select(clear=True)
+        self.selList = cmds.ls(selection=True)
     
 
     def reloadMainUI(self, *args):
         """ This scriptJob active when we got one new scene in order to reload the UI.
         """
         from maya import cmds
-        cmds.select(clear=True)
         cmds.evalDeferred("import sys; sys.modules['dpAutoRigSystem.dpAutoRig'].DP_AutoRig_UI()", lowestPriority=True)
         self.refreshMainUI()
     
@@ -773,8 +770,8 @@ class DP_AutoRig_UI(object):
             Useful to rebuilding process when creating a new scene
         """
         if savedScene:
+            self.selList = cmds.ls(selection=True)
             self.rebuilding = False
-        cmds.select(clear=True)
         self.populateCreatedGuideModules()
         self.checkImportedGuides()
         self.checkGuideNets()
@@ -783,10 +780,11 @@ class DP_AutoRig_UI(object):
         if not self.rebuilding:
             self.resetAllButtonColors()
             self.pipeliner.refreshAssetData()
-        try:
-            self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
-        except:
-            self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
+        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
+        if savedScene:
+            cmds.select(clear=True)
+            if self.selList:
+                cmds.select(self.selList)
 
 
     def jobWinClose(self, *args):
