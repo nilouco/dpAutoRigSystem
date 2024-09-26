@@ -785,6 +785,7 @@ class DP_AutoRig_UI(object):
             cmds.select(clear=True)
             if self.selList:
                 cmds.select(self.selList)
+        self.rebuilding = False
 
 
     def jobWinClose(self, *args):
@@ -2261,7 +2262,9 @@ class DP_AutoRig_UI(object):
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
-        if not self.rebuilding:
+        if self.rebuilding:
+            self.populateCreatedGuideModules()
+        else:
             self.refreshMainUI()
         
         # get a list of modules to be rigged and re-declare the riggedModuleDic to store for log in the end:
