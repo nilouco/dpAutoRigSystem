@@ -5,6 +5,7 @@ from . import dpLayoutClass
 from .Library import dpUtils
 from .Library import dpSoftIk
 from .Library import dpIkFkSnap
+from .Library import dpPinSnap
 from ..Extras import dpCorrectionManager
 from functools import partial
 from importlib import reload
@@ -1960,6 +1961,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # ikFkSnap
                 dpIkFkSnap.IkFkSnapClass(self.dpUIinst, side+self.userGuideName, self.worldRef, self.fkCtrlList, [self.ikCornerCtrl, self.ikExtremCtrl, self.ikExtremSubCtrl], self.ikJointList, [self.dpUIinst.lang['c018_revFoot_roll'], self.dpUIinst.lang['c019_revFoot_spin'], self.dpUIinst.lang['c020_revFoot_turn']], self.dpUIinst.lang['c040_uniformScale'])
                 
+                # pinSnap
+                if self.getHasBend():
+                    dpPinSnap.PinSnapClass(self.dpUIinst, side+self.userGuideName, self.worldRef, self.bendGrps['ctrlList'][2])
+
+
                 # calibration attribute:
                 if self.limbTypeName == ARM:
                     ikExtremCalibrationList = [
