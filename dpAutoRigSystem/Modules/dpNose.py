@@ -35,11 +35,10 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 0)
         cmds.addAttr(self.moduleGrp, longName="nostril", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".nostril", 1)
+        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=1, maxValue=3, attributeType='long')
         # create cvJointLoc and cvLocators:
         self.cvTopLoc      = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_cvTopLoc1", r=0.3, d=1, guide=True)
         self.cvMiddleLoc   = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_cvMiddleLoc", r=0.2, d=1, guide=True)
@@ -273,6 +272,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.centerList, self.leftList, self.rightList = [], [], []
                 # get the number of joints to be created:
                 self.nJoints = cmds.getAttr(self.base+".nJoints")
+                self.headDefValue = cmds.getAttr(self.base+".deformedBy")
                 # creating top nose controls and joints:
                 for n in range(0, self.nJoints):
                     cmds.select(clear=True)
@@ -286,7 +286,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvTopLoc1")
+                    self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTopLoc1")
                     self.centerList.append(self.noseCtrl)
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.utils.zeroOut([self.noseCtrl])[0]
@@ -388,14 +388,14 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.utils.setJointLabel(self.rNostrilJnt, 2, 18, self.userGuideName+"_%02d_"%(n+4)+self.dpUIinst.lang['m079_nostril'])
                 
                 # creating controls:
-                self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvMiddleLoc")
-                self.tipCtrl = self.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.ctrlRadius * 0.3), d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvTipLoc")
-                self.bottomCtrl = self.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, dir="-Y", headDef=1, guideSource=self.guideName+"_cvBottomLoc")
-                self.lSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=1, guideSource=self.guideName+"_cvLSideLoc")
-                self.rSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=1, guideSource=self.guideName+"_cvRSideLoc")
+                self.middleCtrl = self.ctrls.cvControl("id_076_NoseMiddle", ctrlName=middleCtrlName, r=(self.ctrlRadius), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvMiddleLoc")
+                self.tipCtrl = self.ctrls.cvControl("id_077_NoseTip", ctrlName=tipCtrlName, r=(self.ctrlRadius * 0.3), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTipLoc")
+                self.bottomCtrl = self.ctrls.cvControl("id_080_NoseBottom", ctrlName=bottomCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, dir="-Y", headDef=self.headDefValue, guideSource=self.guideName+"_cvBottomLoc")
+                self.lSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=lSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.guideName+"_cvLSideLoc")
+                self.rSideCtrl = self.ctrls.cvControl("id_078_NoseSide", ctrlName=rSideCtrlName, r=(self.ctrlRadius * 0.5), d=self.curveDegree, rot=(0, 0, -90), headDef=self.headDefValue, guideSource=self.guideName+"_cvRSideLoc")
                 if self.addNostril:
-                    self.lNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvLNostrilLoc")
-                    self.rNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=1, guideSource=self.guideName+"_cvRNostrilLoc")
+                    self.lNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=lNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvLNostrilLoc")
+                    self.rNostrilCtrl = self.ctrls.cvControl("id_079_Nostril", ctrlName=rNostrilCtrlName, r=(self.ctrlRadius * 0.2), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvRNostrilLoc")
                     self.leftList.append(self.lNostrilCtrl)
                     self.rightList.append(self.rNostrilCtrl)
                 self.centerList.append(self.middleCtrl)

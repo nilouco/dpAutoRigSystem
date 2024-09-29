@@ -47,14 +47,10 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".flip", 0)
-        
         cmds.addAttr(self.moduleGrp, longName="indirectSkin", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".indirectSkin", 0)
         cmds.addAttr(self.moduleGrp, longName='holder', attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".holder", 0)
         cmds.addAttr(self.moduleGrp, longName='sdkLocator', attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".sdkLocator", 0)
+        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -189,7 +185,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             indirectSkinRot=(0, 0, 90)
                         else:
                             indirectSkinRot=(0, 0, -90)
-                self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot, guideSource=self.guideName+"_JointLoc1")
+                self.singleCtrl = self.ctrls.cvControl(ctrlTypeID, side+self.userGuideName+"_Ctrl", r=self.ctrlRadius, d=self.curveDegree, rot=indirectSkinRot, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.guideName+"_JointLoc1")
                 self.utils.originedFrom(objName=self.singleCtrl, attrString=self.base+";"+self.guide+";"+self.cvEndJoint+";"+self.radiusGuide)
                 # position and orientation of joint and control:
                 cmds.delete(cmds.parentConstraint(self.guide, self.jnt, maintainOffset=False))

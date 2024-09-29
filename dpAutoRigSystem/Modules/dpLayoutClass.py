@@ -151,6 +151,7 @@ class LayoutClass(object):
                 self.dynamicExists = cmds.objExists(self.moduleGrp+".dynamic")
                 self.deformerExists = cmds.objExists(self.moduleGrp+".deformer")
                 self.facialExists = cmds.objExists(self.moduleGrp+".facial")
+                self.deformedByExists = cmds.objExists(self.moduleGrp+".deformedBy")
                 
                 # UI
                 # edit label of frame layout:
@@ -417,6 +418,24 @@ class LayoutClass(object):
                     cmds.radioCollection(self.facialTypeRC, edit=True, select=bs)
                     if userType:
                         cmds.radioCollection(self.facialTypeRC, edit=True, select=jnt)
+                    
+                if self.deformedByExists:
+                    self.deformedByLayout = cmds.rowLayout('deformedByLayout', numberOfColumns=3, columnWidth3=(100, 170, 30), columnAlign=[(1, 'right'), (3, 'right')], adjustableColumn=3, columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2)], parent="selectedModuleColumn" )
+                    cmds.text(self.dpUIinst.lang['i313_deformedBy'], parent=self.deformedByLayout)
+                    self.deformedByMenu = cmds.optionMenu("deformedByMenu", label='', changeCommand=self.changeDeformedBy, parent=self.deformedByLayout)
+                    self.deformedByMenuItemList = ['0 - None', '1 - Head Deformer', '2 - Jaw Deformer', '3 - Head and Jaw Deformers']
+                    for item in self.deformedByMenuItemList:
+                        cmds.menuItem(label=item, parent=self.deformedByMenu)
+                    currentDeformedByValue = cmds.getAttr(self.moduleGrp+".deformedBy")
+                    # set layout with the current value:
+                    if currentDeformedByValue == 1:
+                        cmds.optionMenu(self.deformedByMenu, edit=True, value='1 - Head Deformer')
+                    elif currentDeformedByValue == 2:
+                        cmds.optionMenu(self.deformedByMenu, edit=True, value='2 - Jaw Deformer')
+                    elif currentDeformedByValue == 3:
+                        cmds.optionMenu(self.deformedByMenu, edit=True, value='3 - Head and Jaw Deformers')
+                    else:
+                        cmds.optionMenu(self.deformedByMenu, edit=True, value='0 - None')
 
             except:
                 pass
@@ -573,7 +592,7 @@ class LayoutClass(object):
     
     
     def changeDegree(self, item, *args):
-        """ This function receives the degree menu name item and set it as a string in the guide base (moduleGrp).
+        """ This function receives the degree menu name item string and set it as a int in the guide base (moduleGrp).
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
@@ -722,3 +741,11 @@ class LayoutClass(object):
                 cmds.setAttr(self.previewMirrorGrp+'.scale'+axis, -1)
         
         cmds.select(self.moduleGrp)
+
+
+    def changeDeformedBy(self, item, *args):
+        """ This function receives the deformedBy menu name item and set it as a integer value in the guide base (moduleGrp).
+        """
+        # verify integrity of the guideModule:
+        if self.verifyGuideModuleIntegrity():
+            cmds.setAttr(self.moduleGrp+".deformedBy", int(item[0]))

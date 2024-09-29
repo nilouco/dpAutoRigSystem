@@ -28,7 +28,7 @@ def Quadruped(dpUIinst):
     """
     # check modules integrity:
     guideDir = 'Modules'
-    checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose']
+    checkModuleList = ['dpLimb', 'dpFoot', 'dpSpine', 'dpHead', 'dpFkLine', 'dpEye', 'dpNose', 'dpSingle']
     checkResultList = dpUIinst.startGuideModules(guideDir, "check", None, checkModuleList=checkModuleList)
     
     if len(checkResultList) == 0:
@@ -165,8 +165,6 @@ def Quadruped(dpUIinst):
             backLegLimbInstance.changeType(legName)
             # change limb guide to back leg style (quadruped):
             backLegLimbInstance.changeStyle(quadrupedStyleName)
-            # set for not use bend ribbons as default:
-            backLegLimbInstance.changeBend(False)
             # change name to back leg:
             backLegLimbInstance.editUserName(legName+backName)
             cmds.setAttr(backLegLimbInstance.annotation+".translateY", -4)
@@ -233,8 +231,6 @@ def Quadruped(dpUIinst):
             frontLegLimbInstance.changeType(legName)
             # change limb guide to front leg style (biped):
             frontLegLimbInstance.changeStyle(quadrupedStyleName)
-            # set for not use bend ribbons as default:
-            frontLegLimbInstance.changeBend(False)
             # change name to front leg:
             frontLegLimbInstance.editUserName(legName+frontName)
             cmds.setAttr(frontLegLimbInstance.annotation+".translateY", -4)
@@ -324,6 +320,12 @@ def Quadruped(dpUIinst):
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+earName))
                 cmds.refresh()
                 
+                # set guides attributes to complete system
+                headInstance.changeDeformer(1)
+                headInstance.changeFacial(1)
+                backLegLimbInstance.setCorrective(1)
+                frontLegLimbInstance.setCorrective(1)
+
                 # woking with EAR system:
                 # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
@@ -339,6 +341,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earInstance.annotation+".translateY", 0)
                 cmds.setAttr(earInstance.annotation+".translateZ", 1.4)
                 cmds.setAttr(earInstance.radiusCtrl+".translateX", 1)
+                cmds.setAttr(earInstance.moduleGrp+".deformedBy", 1)
                 # change the number of joints to the ear module:
                 earInstance.changeJointNumber(2)
                 
@@ -366,6 +369,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(upperTeethInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(upperTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethInstance.moduleGrp+".shapeSize", 0.5)
+                cmds.setAttr(upperTeethInstance.moduleGrp+".deformedBy", 3)
                 # create FkLine module instance:
                 upperTeethMiddleInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeethMiddle base guide informations:
@@ -375,6 +379,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(upperTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(upperTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+                cmds.setAttr(upperTeethMiddleInstance.moduleGrp+".deformedBy", 3)
                 upperTeethMiddleInstance.displayAnnotation(0)
                 # parent upperTeethMiddle guide to upperTeeth guide:
                 cmds.parent(upperTeethMiddleInstance.moduleGrp, upperTeethInstance.cvJointLoc, absolute=True)
@@ -388,6 +393,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(upperTeethSideInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(upperTeethSideInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".shapeSize", 0.3)
+                cmds.setAttr(upperTeethSideInstance.moduleGrp+".deformedBy", 3)
                 upperTeethSideInstance.changeMirror("X")
                 cmds.setAttr(upperTeethSideInstance.moduleGrp+".flip", 1)
                 upperTeethSideInstance.displayAnnotation(0)
@@ -402,6 +408,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(lowerTeethInstance.radiusCtrl+".translateX", 0.5)
                 cmds.setAttr(lowerTeethInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethInstance.moduleGrp+".shapeSize", 0.5)
+                cmds.setAttr(lowerTeethInstance.moduleGrp+".deformedBy", 3)
                 # parent lowerTeeth guide to head guide:
                 cmds.parent(lowerTeethInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 # create FkLine module instance:
@@ -413,6 +420,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(lowerTeethMiddleInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(lowerTeethMiddleInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".shapeSize", 0.3)
+                cmds.setAttr(lowerTeethMiddleInstance.moduleGrp+".deformedBy", 3)
                 lowerTeethMiddleInstance.displayAnnotation(0)
                 # parent lowerTeeth guide to lowerTeeth guide:
                 cmds.parent(lowerTeethMiddleInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
@@ -426,6 +434,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(lowerTeethSideInstance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(lowerTeethSideInstance.cvEndJoint+".translateZ", 0.1)
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".shapeSize", 0.3)
+                cmds.setAttr(lowerTeethSideInstance.moduleGrp+".deformedBy", 3)
                 lowerTeethSideInstance.changeMirror("X")
                 cmds.setAttr(lowerTeethSideInstance.moduleGrp+".flip", 1)
                 lowerTeethSideInstance.displayAnnotation(0)
@@ -453,6 +462,7 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(tongueInstance.cvJointLoc+".translateZ", 0.3)
                 cmds.setAttr(tongueInstance.cvEndJoint+".translateZ", 0.2)
                 cmds.setAttr(tongueInstance.moduleGrp+".shapeSize", 0.4)
+                cmds.setAttr(tongueInstance.moduleGrp+".deformedBy", 3)
                 # parent tongue guide to head guide:
                 cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
                 
@@ -696,13 +706,14 @@ def Quadruped(dpUIinst):
                 cmds.refresh()
                 
                 # create breath module instance:
-                breathInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                breathInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # change name to breath:
                 breathInstance.editUserName(breathName)
                 # editing breath base guide informations:
                 cmds.setAttr(breathInstance.radiusCtrl+".translateX", 0.8)
                 cmds.setAttr(breathInstance.moduleGrp+".translateY", 7)
                 cmds.setAttr(breathInstance.moduleGrp+".translateZ", 4)
+                cmds.setAttr(breathInstance.moduleGrp+".indirectSkin", 1)
                 
                 # parent breath guide to spine chest guide:
                 cmds.parent(breathInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
@@ -713,13 +724,14 @@ def Quadruped(dpUIinst):
                 cmds.refresh()
                 
                 # create belly module instance:
-                bellyInstance = dpUIinst.initGuide('dpFkLine', guideDir)
+                bellyInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # change name to belly:
                 bellyInstance.editUserName(bellyName)
                 # editing belly base guide informations:
                 cmds.setAttr(bellyInstance.radiusCtrl+".translateX", 0.8)
                 cmds.setAttr(bellyInstance.moduleGrp+".translateY", 8.5)
                 cmds.setAttr(bellyInstance.moduleGrp+".translateZ", -3.5)
+                cmds.setAttr(bellyInstance.moduleGrp+".indirectSkin", 1)
                 
                 # parent breath guide to spine chest guide:
                 cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)

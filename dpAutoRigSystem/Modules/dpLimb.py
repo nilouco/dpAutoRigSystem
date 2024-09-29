@@ -106,11 +106,9 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
         cmds.addAttr(self.moduleGrp, longName="additional", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".additional", 0)
         cmds.addAttr(self.moduleGrp, longName="softIk", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".softIk", 1)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".corrective", 0)
 
         # create cvJointLoc and cvLocators:
         self.cvBeforeLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_Before", r=0.3, d=1, guide=True)

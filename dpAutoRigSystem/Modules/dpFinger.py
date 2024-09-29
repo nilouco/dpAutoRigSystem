@@ -35,7 +35,6 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
         cmds.setAttr(self.moduleGrp+".articulation", 1)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".corrective", 0)
 
         self.cvJointLoc1 = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)

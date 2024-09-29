@@ -33,18 +33,11 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
-        
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".flip", 0)
-        
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".articulation", 0)
-
         cmds.addAttr(self.moduleGrp, longName="mainControls", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".mainControls", 0)
-
-        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, attributeType='long')
-        cmds.setAttr(self.moduleGrp+".nMain", 1)
+        cmds.addAttr(self.moduleGrp, longName="nMain", minValue=1, defaultValue=1, attributeType='long')
+        cmds.addAttr(self.moduleGrp, longName="deformedBy", minValue=0, defaultValue=0, maxValue=3, attributeType='long')
         
         self.cvJointLoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLoc1", r=0.3, d=1, guide=True)
         self.jGuide1 = cmds.joint(name=self.guideName+"_JGuide1", radius=0.001)
@@ -217,7 +210,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
-                    self.jntCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, guideSource=self.guideName+"_JointLoc"+str(n+1))
+                    self.jntCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.guideName+"_JointLoc"+str(n+1))
                     self.fkCtrlList.append(self.jntCtrl)
                     # zeroOut controls:
                     self.zeroOutCtrlGrp = self.utils.zeroOut([self.jntCtrl])[0]

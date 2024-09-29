@@ -43,15 +43,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="nJoints", attributeType='long')
         cmds.setAttr(self.moduleGrp+".nJoints", 1)
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        #cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="articulation", attributeType='bool')
-        #cmds.setAttr(self.moduleGrp+".articulation", 0)
         cmds.addAttr(self.moduleGrp, longName="corrective", attributeType='bool')
-        #cmds.setAttr(self.moduleGrp+".corrective", 0)
         cmds.addAttr(self.moduleGrp, longName="deformer", attributeType='bool')
-        #cmds.setAttr(self.moduleGrp+".deformer", 0)
         cmds.addAttr(self.moduleGrp, longName="facial", attributeType='bool')
-        #cmds.setAttr(self.moduleGrp+".facial", 0)
         for attr in self.facialAttrList:
             cmds.addAttr(self.moduleGrp, longName=attr, attributeType='bool')
             cmds.setAttr(self.moduleGrp+"."+attr, 1)
@@ -304,7 +299,10 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         collapsed = False
         if not value:
             collapsed = True
-        cmds.frameLayout(self.facialCtrlFrameLayout, edit=True, collapse=collapsed, enable=value)
+        try:
+            cmds.frameLayout(self.facialCtrlFrameLayout, edit=True, collapse=collapsed, enable=value)
+        except:
+            pass #maybe it's just a call from a procedural integrated module script
         cmds.setAttr(self.moduleGrp+".facial", value)
         for item in list(self.facialLocDic.keys()):
             cmds.setAttr(self.facialLocDic[item]+".visibility", False)

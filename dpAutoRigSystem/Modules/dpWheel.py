@@ -40,7 +40,6 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.addAttr(self.moduleGrp, longName="startFrame", attributeType='long', defaultValue=1)
         cmds.addAttr(self.moduleGrp, longName="showControls", attributeType='bool')
         cmds.addAttr(self.moduleGrp, longName="steering", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.setAttr(self.moduleGrp+".showControls", 1)
         cmds.setAttr(self.moduleGrp+".steering", 0)
         

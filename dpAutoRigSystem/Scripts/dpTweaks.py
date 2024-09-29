@@ -125,6 +125,7 @@ def Tweaks(dpUIinst):
                 eyebrowMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 eyebrowMainInstance.editUserName(eyebrowMainName)
                 eyebrowMainInstance.changeMirror("X")
+                cmds.setAttr(eyebrowMainInstance.moduleGrp+".deformedBy", 1)
                 
                 eyebrowInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
                 eyebrowInstance1.editUserName(eyebrowName1)
@@ -145,6 +146,7 @@ def Tweaks(dpUIinst):
 
                 lipMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 lipMainInstance.editUserName(lipMainName)
+                cmds.setAttr(lipMainInstance.moduleGrp+".deformedBy", 3)
                 
                 upperLipMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 upperLipMiddleInstance.editUserName(upperLipMiddleName)
@@ -186,6 +188,7 @@ def Tweaks(dpUIinst):
                         eyelidMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                         eyelidMainInstance.editUserName(eyelidMainName)
                         eyelidMainInstance.changeMirror("X")
+                        cmds.setAttr(eyelidMainInstance.moduleGrp+".deformedBy", 1)
                         
                         upperEyelidInstance0 = dpUIinst.initGuide('dpSingle', guideDir)
                         upperEyelidInstance0.editUserName(upperEyelidName0)
@@ -227,6 +230,7 @@ def Tweaks(dpUIinst):
                     squintMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                     squintMainInstance.editUserName(squintMainName)
                     squintMainInstance.changeMirror("X")
+                    cmds.setAttr(squintMainInstance.moduleGrp+".deformedBy", 1)
                     
                     squintInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
                     squintInstance1.editUserName(checkText=squintName1)

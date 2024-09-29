@@ -35,7 +35,6 @@ class Suspension(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.createGuide(self)
         # Custom GUIDE:
         cmds.addAttr(self.moduleGrp, longName="flip", attributeType='bool')
-        cmds.setAttr(self.moduleGrp+".flip", 0)
         cmds.addAttr(self.moduleGrp, longName="fatherB", dataType='string')
         
         self.cvALoc = self.ctrls.cvJointLoc(ctrlName=self.guideName+"_JointLocA", r=0.3, d=1, guide=True)

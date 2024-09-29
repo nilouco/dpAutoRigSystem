@@ -780,7 +780,10 @@ class DP_AutoRig_UI(object):
         if not self.rebuilding:
             self.resetAllButtonColors()
             self.pipeliner.refreshAssetData()
-        self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
+        try:
+            self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=True, killWithScene=True, compressUndo=True)
+        except:
+            self.iSelChangeJobId = cmds.scriptJob(event=('SelectionChanged', self.jobSelectedGuide), parent='languageMenu', replacePrevious=False, killWithScene=True, compressUndo=True)
         if savedScene:
             cmds.select(clear=True)
             if self.selList:
