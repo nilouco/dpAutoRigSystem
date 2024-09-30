@@ -28,9 +28,9 @@ class JointDisplay(object):
         self.noneLabelList = []
         # call main function
         if self.ui:
-            self.refreshLists(self)
             self.dpJointDisplayUI(self)
-            #cmds.scriptJob(event=('SelectionChanged', self.refreshLists), parent='dpJointDisplayWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
+            self.refreshLists(self)
+            cmds.scriptJob(event=('SelectionChanged', self.refreshLists), parent='dpJointDisplayWindow', replacePrevious=True, killWithScene=True, compressUndo=True, force=True)
 
 
     
@@ -50,7 +50,7 @@ class JointDisplay(object):
         """ Create a window in order to load the joints in the scene.
         """
         # call close UI function
-        self.dpCloseJointDisplayUI()
+        self.dpCloseJointDisplayUI(self)
         # ctarting UI
         jointDisplay_winWidth  = 500
         jointDisplay_winHeight = 175
@@ -75,10 +75,10 @@ class JointDisplay(object):
 
         # bone display panels
         # boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', parent=columnLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
-        self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, append=self.boneLabelList, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True)
-        self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, append=self.multiChildLabelList, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True)
-        self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.noneLabelList, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True)
-        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, append=self.jointLabelList, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
+        self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True)
+        self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True)
+        self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True)
+        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
         
     
         # bottom layout for buttons
@@ -105,8 +105,12 @@ class JointDisplay(object):
         """ Refresh the code
         """
         self.getAllJointList(self)
+        print(f'GetAllJointList ---- OK')
         self.populateLabelList(self)
-        self.dpJointDisplayUI(self)
+        print(f'PopulateLabelList ---- OK')
+        self.refreshPreview()
+        print(f'RefreshPreview ---- OK')
+
 
 
     def getAllJointList(self, *args, **kwargs):
@@ -120,21 +124,18 @@ class JointDisplay(object):
             print(f'All joints List : {self.allJointsList}')
             print(f'Pass Get List : {getlistPass}')
 
-            return self.allJointsList
-        else:
-            return None
-
     
     def populateLabelList(self, *args, **kwargs):
         """ Populate each list with label joint type
         """
         if self.allJointsList:
-            print(f'LIST ALL JOINT {self.allJointsList}')
-            
+            # print(f'LIST ALL JOINT {self.allJointsList}')
             for jnt in self.allJointsList:
                 if cmds.getAttr(jnt +'.drawStyle') == 0:
+                    print(f'{jnt} Exist')
                     try:
                         self.boneLabelList.append(jnt)
+                        self.refreshPreview()
                         print(f'{jnt} was appended to boneLabelList')
                     except:
                         pass
@@ -156,6 +157,26 @@ class JointDisplay(object):
                         print(f'{jnt} was appended to jointLabelList')
                     except:
                         pass
+
+    def refreshPreview(self, *args):
+        if self.allJointsList:
+            if self.boneLabelList:
+                cmds.textScrollList(self.boneFieldcolumn, edit=True, removeAll=True)
+                cmds.textScrollList(self.boneFieldcolumn, edit=True, append=self.boneLabelList)
+            if self.multiChildLabelList:
+                cmds.textScrollList(self.multiChildFieldcolumn, edit=True, removeAll=True)
+                cmds.textScrollList(self.multiChildFieldcolumn, edit=True, append=self.multiChildLabelList)
+            if self.noneLabelList:
+                cmds.textScrollList(self.noneFieldcolumn, edit=True, removeAll=True)
+                cmds.textScrollList(self.noneFieldcolumn, edit=True, append=self.noneLabelList)
+            if self.jointLabelList:
+                cmds.textScrollList(self.jointFieldcolumn, edit=True, removeAll=True)
+                cmds.textScrollList(self.jointFieldcolumn, edit=True, append=self.jointLabelList)
+
+
+
+
+
 
     def moveToRight(self,*args):
         """ """
