@@ -62,7 +62,7 @@ class HeadDeformer(object):
                 return deformerName+"_"
             
 
-    def dpHeadDeformer(self, dialogName=None, hdList=None, *args):
+    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         if self.ui:
@@ -70,9 +70,10 @@ class HeadDeformer(object):
         if dialogName == None:
             return
         # defining variables
+        self.headCtrl = ctrl
         deformerName = self.addDeformerInName(dialogName, True)
         clusterName = self.addDeformerInName(dialogName, False)
-        mainCtrlName = deformerName+"_Main"
+        mainCtrlName = deformerName+"_"+self.dpUIinst.lang["c058_main"]
         centerSymmetryName = clusterName+self.dpUIinst.lang["c098_center"]+self.dpUIinst.lang["c101_symmetry"]
         topSymmetryName = clusterName+self.dpUIinst.lang["c099_top"]+self.dpUIinst.lang["c101_symmetry"]
         intensityName = clusterName+self.dpUIinst.lang["c049_intensity"]
@@ -335,12 +336,13 @@ class HeadDeformer(object):
                                 if shape:
                                     cmds.deformer(deformerName+"_FFD", edit=True, geometry=shape)
                                 
-            # try to integrate to Head_Head_Ctrl
-            if headSubCtrl:
-                if len(headSubCtrl) > 1:
-                    mel.eval("warning" + "\"" + self.dpUIinst.lang["i075_moreOne"] + " Head control.\"" + ";")
-                else:
-                    self.headCtrl = headSubCtrl[0]
+            # try to integrate to Head_Head_Sub_Ctrl
+            if not self.headCtrl:
+                if headSubCtrl:
+                    if len(headSubCtrl) > 1:
+                        mel.eval("warning" + "\"" + self.dpUIinst.lang["i075_moreOne"] + " Head control.\"" + ";")
+                    else:
+                        self.headCtrl = headSubCtrl[0]
             if self.headCtrl:
                 # correcting topSymetry pivot to match headCtrl pivot
                 cmds.matchTransform(topSymmetryCtrl, topClusterList[1], self.headCtrl, pivots=True)

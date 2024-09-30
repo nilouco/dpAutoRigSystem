@@ -1067,7 +1067,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 # head deformer
                 if cmds.getAttr(self.moduleGrp+".deformer"):
-                    self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube])
+                    self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl)
 
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
