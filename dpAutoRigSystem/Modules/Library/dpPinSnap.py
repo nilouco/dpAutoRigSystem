@@ -53,7 +53,7 @@ class PinSnapClass(object):
         cmds.connectAttr(self.worldRef+".message", self.pinSnapNet+".worldRef", force=True)
         cmds.connectAttr(self.pinOffsetCtrl+".message", self.pinSnapNet+".pinOffsetCtrl", force=True)
         # exchange pin connections to new attribute
-        cmds.addAttr(self.pinOffsetCtrl, longName="pinConnections", attributeType="double", min=0, max=1, defaultValue=0)
+        cmds.addAttr(self.pinOffsetCtrl, longName="pinConnections", attributeType="long", min=0, max=1, defaultValue=0)
         pinConnections = cmds.listConnections(self.pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
         if pinConnections:
             for connection in pinConnections:
