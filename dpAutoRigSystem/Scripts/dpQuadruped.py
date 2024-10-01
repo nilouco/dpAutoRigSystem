@@ -214,7 +214,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(backFootInstance.cvRFALoc+".translateX", 0)
             cmds.setAttr(backFootInstance.cvRFBLoc+".translateX", 0)
             cmds.setAttr(backFootInstance.cvRFDLoc+".translateX", -1.5)
-            cmds.setAttr(backFootInstance.cvRFELoc+".translateZ", 1)
+            cmds.setAttr(backFootInstance.cvRFFLoc+".translateZ", 1)
             
             # parent back foot guide to back leg ankle guide:
             cmds.parent(backFootInstance.moduleGrp, backLegLimbInstance.cvExtremLoc, absolute=True)
@@ -282,7 +282,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(frontFootInstance.cvRFALoc+".translateX", 0)
             cmds.setAttr(frontFootInstance.cvRFBLoc+".translateX", 0)
             cmds.setAttr(frontFootInstance.cvRFDLoc+".translateX", -1.5)
-            cmds.setAttr(frontFootInstance.cvRFELoc+".translateZ", 1)
+            cmds.setAttr(frontFootInstance.cvRFFLoc+".translateZ", 1)
             
             # parent front foot guide to front leg ankle guide:
             cmds.parent(frontFootInstance.moduleGrp, frontLegLimbInstance.cvExtremLoc, absolute=True)
@@ -568,7 +568,7 @@ def Quadruped(dpUIinst):
                 toe1FrontInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -593,7 +593,7 @@ def Quadruped(dpUIinst):
                 toe2FrontInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -618,7 +618,7 @@ def Quadruped(dpUIinst):
                 toe3FrontInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -643,7 +643,7 @@ def Quadruped(dpUIinst):
                 toe4FrontInstance.displayAnnotation(0)
                 
                 # parent toe4 guide to foot middle guide:
-                cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -668,7 +668,7 @@ def Quadruped(dpUIinst):
                 toe1BackInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -693,7 +693,7 @@ def Quadruped(dpUIinst):
                 toe2BackInstance.displayAnnotation(0)
                 
                 # parent toe2 guide to foot middle guide:
-                cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -718,7 +718,7 @@ def Quadruped(dpUIinst):
                 toe3BackInstance.displayAnnotation(0)
                 
                 # parent toe3 guide to foot middle guide:
-                cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -743,7 +743,7 @@ def Quadruped(dpUIinst):
                 toe4BackInstance.displayAnnotation(0)
                 
                 # parent toe4 guide to foot middle guide:
-                cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
 
                 # Update progress window
                 progressAmount += 1
