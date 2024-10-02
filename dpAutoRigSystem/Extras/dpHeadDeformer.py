@@ -62,7 +62,7 @@ class HeadDeformer(object):
                 return deformerName+"_"
             
 
-    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, *args):
+    def dpHeadDeformer(self, dialogName=None, hdList=None, ctrl=None, deformedByList=None, *args):
         """ Create the arrow curve and deformers (squash and bends).
         """
         if self.ui:
@@ -320,10 +320,11 @@ class HeadDeformer(object):
                                         if condition in item:
                                             self.ctrls.addDefInfluenceAttrs(item, defInfluenceType=2)
 
-            # apply influence deformer only in shape controls which have the attribute
-            allTransformList = cmds.ls(selection=False, type="transform")
-            if allTransformList:
-                for item in allTransformList:
+            # apply influence deformer only in child shape controls which have the attribute or given nodes
+            if not deformedByList:
+                deformedByList = cmds.ls(selection=False, type="transform")
+            if deformedByList:
+                for item in deformedByList:
                     if cmds.objExists(item+".controlID"):
                         if not self.dpUIinst.lang["c025_jaw"] in arrowCtrl:
                             if cmds.objExists(item+"."+DPHEADDEFINFLUENCE) and cmds.getAttr(item+"."+DPHEADDEFINFLUENCE):
@@ -359,7 +360,7 @@ class HeadDeformer(object):
             cmds.parent(offsetGrp, clusterGrp, latticeGrp, dataGrp)
             
             # try to integrate to Scalable_Grp
-            for item in allTransformList:
+            for item in cmds.ls(selection=False, type="transform"):
                 if cmds.objExists(item+".masterGrp") and cmds.getAttr(item+".masterGrp") == 1:
                     scalableGrp = cmds.listConnections(item+".scalableGrp")[0]
                     cmds.parent(dataGrp, scalableGrp)

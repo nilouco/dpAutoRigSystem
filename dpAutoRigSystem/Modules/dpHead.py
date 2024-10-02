@@ -641,27 +641,36 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.rCornerLipCtrl = self.ctrls.cvControl("id_027_HeadLipCorner", ctrlName=rCornerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_RCornerLip")
                 self.upperLipCtrl = self.ctrls.cvControl("id_072_HeadUpperLip", ctrlName=upperLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_UpperLip")
                 self.lowerLipCtrl = self.ctrls.cvControl("id_073_HeadLowerLip", ctrlName=lowerLipCtrlName, r=(self.ctrlRadius * 0.1), d=self.curveDegree, headDef=3, guideSource=self.guideName+"_LowerLip")
+                headDefCtrlList = [self.upperJawCtrl, self.upperHeadCtrl, self.jawCtrl, self.chinCtrl, self.chewCtrl, self.lCornerLipCtrl, self.rCornerLipCtrl, self.upperLipCtrl, self.lowerLipCtrl]
                 
                 # facial controls
+                facialCtrlList = []
                 if cmds.getAttr(self.moduleGrp+".facial"):
                     if cmds.getAttr(self.moduleGrp+".facialBrow"):
-                        self.lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "red", True, False)
-                        self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "blue", True, False)
+                        self.lBrowCtrl, lBrowCtrlGrp = self.dpCreateFacialCtrl(side, self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "red", True, False)
+                        self.rBrowCtrl, rBrowCtrlGrp = self.dpCreateFacialCtrl(side, self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c060_brow"], "id_046_FacialBrow", self.browTgtList, (0, 0, 0), False, False, True, True, True, True, False, "blue", True, False)
+                        facialCtrlList.extend([self.lBrowCtrl, self.rBrowCtrl])
                     if cmds.getAttr(self.moduleGrp+".facialEyelid"):
                         if self.connectUserType == self.bsType:
-                            self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
-                            self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
+                            self.lEyelidCtrl, lEyelidCtrlGrp = self.dpCreateFacialCtrl(side, self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "red", True, False)
+                            self.rEyelidCtrl, rEyelidCtrlGrp = self.dpCreateFacialCtrl(side, self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c042_eyelid"], "id_047_FacialEyelid", self.eyelidTgtList, (0, 0, 90), True, False, True, False, True, True, False, "blue", True, False)
+                            facialCtrlList.extend([self.lEyelidCtrl, self.rEyelidCtrl])
                     if cmds.getAttr(self.moduleGrp+".facialMouth"):
-                        self.lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "red", True, True)
-                        self.rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "blue", True, True)
+                        self.lMouthCtrl, lMouthCtrlGrp = self.dpCreateFacialCtrl(side, self.dpUIinst.lang["p002_left"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "red", True, True)
+                        self.rMouthCtrl, rMouthCtrlGrp = self.dpCreateFacialCtrl(side, self.dpUIinst.lang["p003_right"], self.dpUIinst.lang["c061_mouth"], "id_048_FacialMouth", self.mouthTgtList, (0, 0, -90), False, False, True, True, True, True, False, "blue", True, True)
+                        facialCtrlList.extend([self.lMouthCtrl, self.rMouthCtrl])
                     if cmds.getAttr(self.moduleGrp+".facialLips"):
-                        self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, "yellow", True, True)
+                        self.lipsCtrl, lipsCtrlGrp = self.dpCreateFacialCtrl(side, None, self.dpUIinst.lang["c062_lips"], "id_049_FacialLips", self.lipsTgtList, (0, 0, 0), False, False, False, True, True, True, False, "yellow", True, True)
+                        facialCtrlList.append(self.lipsCtrl)
                     if cmds.getAttr(self.moduleGrp+".facialSneer"):
-                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True)
+                        self.sneerCtrl, sneerCtrlGrp = self.dpCreateFacialCtrl(side, None, self.dpUIinst.lang["c063_sneer"], "id_050_FacialSneer", self.sneerTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True)
+                        facialCtrlList.append(self.sneerCtrl)
                     if cmds.getAttr(self.moduleGrp+".facialGrimace"):
-                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True, True)
+                        self.grimaceCtrl, grimaceCtrlGrp = self.dpCreateFacialCtrl(side, None, self.dpUIinst.lang["c064_grimace"], "id_051_FacialGrimace", self.grimaceTgtList, (0, 0, 0), False, False, False, True, True, True, False, "cyan", True, True, True, True, True)
+                        facialCtrlList.append(self.grimaceCtrl)
                     if cmds.getAttr(self.moduleGrp+".facialFace"):
-                        self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, "cyan", False, False)
+                        self.faceCtrl, faceCtrlGrp = self.dpCreateFacialCtrl(side, None, self.dpUIinst.lang["c065_face"], "id_052_FacialFace", self.faceTgtList, (0, 0, 0), True, True, True, True, True, True, True, "cyan", False, False)
+                        facialCtrlList.append(self.faceCtrl)
 
                 # colorize controllers
                 self.upperCtrlList.append(self.upperHeadCtrl)
@@ -1064,10 +1073,12 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.hookSetup()
                 if hideJoints:
                     cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
-
+                
                 # head deformer
                 if cmds.getAttr(self.moduleGrp+".deformer"):
-                    self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl)
+                    # collect nodes to be deformedBy this Head module:
+                    deformedByList = headDefCtrlList + self.getDeformedByList(s, sideList) + facialCtrlList
+                    self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList)
 
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
@@ -1090,7 +1101,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.deleteModule()
     
     
-    def dpCreateFacialCtrl(self, side, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
+    def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
         """ Important function to receive called parameters and create the specific asked control.
             Convention:
                 transfList = ["tx", "tx", "ty", "ty", "tz", "tz]
@@ -1103,9 +1114,9 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         calibrationList = []
         transfList = ["tx", "tx", "ty", "ty", "tz", "tz"]
         # naming:
-        ctrlName = self.userGuideName+"_"+ctrlName
-        if side:
-            ctrlName = side+"_"+ctrlName
+        ctrlName = side+self.userGuideName+"_"+ctrlName
+        if sideName:
+            ctrlName = sideName+"_"+ctrlName
         fCtrlName = ctrlName+"_Ctrl"
         # skip if already there is this ctrl object:
         if cmds.objExists(fCtrlName):
@@ -1141,8 +1152,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for a, attr in enumerate(attrList):
                     if not attr == None:
                         ctrlAttr = attr
-                        if side:
-                            ctrlAttr = side+"_"+attr
+                        if sideName:
+                            ctrlAttr = sideName+"_"+attr
                         facialAttrList.append(ctrlAttr)
                         if directConnection:
                             cmds.addAttr(fCtrl, longName=attr, attributeType="float", defaultValue=0, minValue=0, maxValue=1)
@@ -1242,6 +1253,33 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.setAttr(self.moduleGrp+".connectUserType", 1)
     
     
+    def getDeformedByList(self, s, sideList, *args):
+        """ Returns the defomedBy list for this Head module based in the integrated hook dictionary.
+        """
+        guideList, resultList = [], []
+        for item in self.dpUIinst.hookDic.keys():
+            if self.guideName in self.dpUIinst.hookDic[item]['fatherGuide']:
+                if not item in guideList:
+                    guideList.append(item.split(":")[0])
+                    if self.dpUIinst.hookDic[item]['childrenList']:
+                        for child in self.dpUIinst.hookDic[item]['childrenList']:
+                            if not child in guideList:
+                                guideList.append(child.split(":")[0])
+        if guideList:
+            allList = cmds.ls(selection=False, type="transform")
+            for node in allList:
+                if cmds.objExists(node+".guideSource"):
+                    guideSource = cmds.getAttr(node+".guideSource")
+                    if guideSource.split(":")[0] in guideList:
+                        if not node in resultList:
+                            if self.mirrorAxis != 'off':
+                                if node.startswith(sideList[s]):
+                                    resultList.append(node)
+                            else:
+                                resultList.append(node)
+        return resultList
+
+
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.

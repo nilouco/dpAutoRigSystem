@@ -260,26 +260,29 @@ class Weights(object):
         return deformerList
 
 
-    def getOrderList(self, mesh, *args):
+    def getOrderList(self, node, *args):
         """ Return a list of deformer order of the given node.
         """
         resultList = []
         deformerList = self.getAllDeformerTypeList()
-        inputDeformerList = cmds.listHistory(mesh, pruneDagObjects=True, interestLevel=True)
+        inputDeformerList = cmds.listHistory(node, pruneDagObjects=True, interestLevel=True)
         if inputDeformerList:
             for item in inputDeformerList:
                 if cmds.objectType(item) in deformerList:
-                    resultList.append(item)
+                    if not item in resultList:
+                      resultList.append(item)
         return resultList
 
 
-    def setOrderList(self, mesh, deformerList, *args):
-        """ Set the deformer order in the given mesh using the deformerList argument.
+    def setOrderList(self, node, desiredList, *args):
+        """ Set the deformer order in the given node using the deformerList argument.
         """
-        # pair up the deformer list properly
-        orderedDeformerPairs = self.getPairsFromList(deformerList)
-        for pair in orderedDeformerPairs:
-            cmds.reorderDeformers(pair[0], pair[1], mesh)
+        currentOrderList = self.getOrderList(node)
+        if not currentOrderList == desiredList:
+            # pair up the deformer list properly
+            orderedDeformerPairs = self.getPairsFromList(desiredList)
+            for pair in orderedDeformerPairs:
+                cmds.reorderDeformers(pair[0], pair[1], node)
 
 
     def getPairsFromList(self, lst, *args):
