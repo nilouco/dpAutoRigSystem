@@ -52,12 +52,6 @@ class PinSnapClass(object):
         cmds.connectAttr(self.pinSnapNet+".message", self.worldRef+".pinSnapNet", force=True)
         cmds.connectAttr(self.worldRef+".message", self.pinSnapNet+".worldRef", force=True)
         cmds.connectAttr(self.pinOffsetCtrl+".message", self.pinSnapNet+".pinOffsetCtrl", force=True)
-        # exchange pin connections to new attribute
-        #cmds.addAttr(self.pinOffsetCtrl, longName="pinConnections", attributeType="long", min=0, max=1, defaultValue=0)
-        #pinConnections = cmds.listConnections(self.pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
-        #if pinConnections:
-        #    for connection in pinConnections:
-        #        cmds.connectAttr(self.pinOffsetCtrl+".pinConnections", connection, force=True)
 
 
     ###
@@ -72,19 +66,39 @@ class PinSnapClass(object):
         self.pinSnapState = cmds.getAttr(self.pinSnapNet+".pinState")
         currentValue = cmds.getAttr(self.pinOffsetCtrl+".pin")
         self.pinOffsetCtrl = cmds.listConnections(self.pinSnapNet+".pinOffsetCtrl")[0]
+        ctrlPos = self.getPosition(self.pinOffsetCtrl)[0]
+        ctrlRot = self.getPosition(self.pinOffsetCtrl)[1]
         if self.pinSnapState == 0: #pinOn
             if currentValue == 1:
+                pinConnections = cmds.listConnections(self.pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
                 self.changePinSnapAttr(0, False)
-                transformTemp = cmds.duplicate(self.pinOffsetCtrl, name=self.pinOffsetCtrl+"PIN1_TMP", transformsOnly=True, parentOnly=True)
-                cmds.parent(transformTemp, world=True)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, False)
                 self.changePinSnapAttr(1, True)
+                self.snapPin(self.pinOffsetCtrl, ctrlPos, ctrlRot)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, True)
         else: #pinOff
             if currentValue == 0:
+                pinConnections = cmds.listConnections(self.pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
                 self.changePinSnapAttr(1, False)
-                transformTemp = cmds.duplicate(self.pinOffsetCtrl, name=self.pinOffsetCtrl+"PIN0_TMP", transformsOnly=True, parentOnly=True)
-                cmds.parent(transformTemp, world=True)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, False)
                 self.changePinSnapAttr(0, True)
+                self.snapPin(self.pinOffsetCtrl, ctrlPos, ctrlRot)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, True)
 
+
+    def reconnectingAttr(self, pinOffsetCtrl, connections, connect, *args):
+        if connections:
+            for connection in connections:
+                if connect == True:
+                    cmds.connectAttr(pinOffsetCtrl+".pin", connection)
+                else:
+                    cmds.disconnectAttr(pinOffsetCtrl+".pin", connection)
+
+    def getPosition(self, pinOffsetCtrl, *args):
+        self.pinOffsetCtrl = pinOffsetCtrl
+        ctrlPos = cmds.xform(self.pinOffsetCtrl, query=True, worldSpace=True, translation=True)
+        ctrlRot = cmds.xform(self.pinOffsetCtrl, query=True, worldSpace=True, rotation=True)
+        return [ctrlPos, ctrlRot]
 
     def changePinSnapAttr(self, pinSnapValue, setState, *args):
         """ 0 = unpin offset ctrl
@@ -95,28 +109,13 @@ class PinSnapClass(object):
             self.pinSnapState = pinSnapValue
             cmds.setAttr(self.pinSnapNet+".pinState", pinSnapValue)
 
-
-    def snapPin(self, pinOffsetCtrl, transformTemp, *args):
+    def snapPin(self, pinOffsetCtrl, ctrlPos, ctrlRot, *args):
         """ Function to get offsetCtrl position, change attribute's connections and set offsetCtrl position
         """
         selection = cmds.ls(sl=True)
         self.pinOffsetCtrl = pinOffsetCtrl
-        pinConnections = cmds.listConnections(pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
-        if pinConnections:
-           for connection in pinConnections:
-               cmds.disconnectAttr(pinOffsetCtrl+".pin", connection)
-        transformTemp = cmds.duplicate(self.pinOffsetCtrl, name=self.pinOffsetCtrl+"_TMP", transformsOnly=True, parentOnly=True)
-        cmds.parent(transformTemp, world=True)
-
-        
-        #cmds.setAttr(self.pinOffsetCtrl+".pinConnections", value)
-        cmds.matchTransform(self.pinOffsetCtrl, transformTemp)
-
-        # RECONECTAR parents
-
-        #if cmds.keyframe(self.pinOffsetCtrl+".pin", query=True, keyframeCount=True) > 0:
-        #    cmds.setKeyframe(pinOffsetCtrl+".pinConnections")
-        #cmds.delete(transformTemp)
+        cmds.xform(self.pinOffsetCtrl, worldSpace=True, translation=ctrlPos)
+        cmds.xform(self.pinOffsetCtrl, worldSpace=True, rotation=ctrlRot)
         cmds.select(selection)
 
 
@@ -151,19 +150,39 @@ class PinSnap(object):
         self.pinSnapState = cmds.getAttr(self.pinSnapNet+".pinState")
         currentValue = cmds.getAttr(self.pinOffsetCtrl+".pin")
         self.pinOffsetCtrl = cmds.listConnections(self.pinSnapNet+".pinOffsetCtrl")[0]
+        ctrlPos = self.getPosition(self.pinOffsetCtrl)[0]
+        ctrlRot = self.getPosition(self.pinOffsetCtrl)[1]
         if self.pinSnapState == 0: #pinOn
             if currentValue == 1:
+                pinConnections = cmds.listConnections(self.pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
                 self.changePinSnapAttr(0, False)
-                transformTemp = cmds.duplicate(self.pinOffsetCtrl, name=self.pinOffsetCtrl+"PIN1_TMP", transformsOnly=True, parentOnly=True)
-                cmds.parent(transformTemp, world=True)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, False)
                 self.changePinSnapAttr(1, True)
+                self.snapPin(self.pinOffsetCtrl, ctrlPos, ctrlRot)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, True)
         else: #pinOff
             if currentValue == 0:
+                pinConnections = cmds.listConnections(self.pinOffsetCtrl+".pin", source=False, destination=True, plugs=True)
                 self.changePinSnapAttr(1, False)
-                transformTemp = cmds.duplicate(self.pinOffsetCtrl, name=self.pinOffsetCtrl+"PIN0_TMP", transformsOnly=True, parentOnly=True)
-                cmds.parent(transformTemp, world=True)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, False)
                 self.changePinSnapAttr(0, True)
+                self.snapPin(self.pinOffsetCtrl, ctrlPos, ctrlRot)
+                self.reconnectingAttr(self.pinOffsetCtrl, pinConnections, True)
 
+
+    def reconnectingAttr(self, pinOffsetCtrl, connections, connect, *args):
+        if connections:
+            for connection in connections:
+                if connect == True:
+                    cmds.connectAttr(pinOffsetCtrl+".pin", connection)
+                else:
+                    cmds.disconnectAttr(pinOffsetCtrl+".pin", connection)
+
+    def getPosition(self, pinOffsetCtrl, *args):
+        self.pinOffsetCtrl = pinOffsetCtrl
+        ctrlPos = cmds.xform(self.pinOffsetCtrl, query=True, worldSpace=True, translation=True)
+        ctrlRot = cmds.xform(self.pinOffsetCtrl, query=True, worldSpace=True, rotation=True)
+        return [ctrlPos, ctrlRot]
 
     def changePinSnapAttr(self, pinSnapValue, setState, *args):
         """ 0 = unpin offset ctrl
@@ -174,22 +193,14 @@ class PinSnap(object):
             self.pinSnapState = pinSnapValue
             cmds.setAttr(self.pinSnapNet+".pinState", pinSnapValue)
 
-
-    def snapPin(self, pinOffsetCtrl, value, *args):
+    def snapPin(self, pinOffsetCtrl, ctrlPos, ctrlRot, *args):
         """ Function to get offsetCtrl position, change attribute's connections and set offsetCtrl position
         """
         selection = cmds.ls(sl=True)
         self.pinOffsetCtrl = pinOffsetCtrl
-        transformTemp = cmds.duplicate(self.pinOffsetCtrl, name=self.pinOffsetCtrl+"_TMP", transformsOnly=True, parentOnly=True)
-        cmds.parent(transformTemp, world=True)
-        print(">>>>>>>>>>>>>>>>>>>>>DUPLICATEPIN<<<<<<<<<<<<<<<<<<<<<")
-        #cmds.setAttr(self.pinOffsetCtrl+".pinConnections", value)
-        cmds.matchTransform(self.pinOffsetCtrl, transformTemp)
-        #if cmds.keyframe(self.pinOffsetCtrl+".pin", query=True, keyframeCount=True) > 0:
-        #    cmds.setKeyframe(pinOffsetCtrl+".pinConnections")
-        #cmds.delete(transformTemp)
+        cmds.xform(self.pinOffsetCtrl, worldSpace=True, translation=ctrlPos)
+        cmds.xform(self.pinOffsetCtrl, worldSpace=True, rotation=ctrlRot)
         cmds.select(selection)
-
 
 # fire scriptNode
 for net in cmds.ls(type="network"):
