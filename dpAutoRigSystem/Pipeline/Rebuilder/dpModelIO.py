@@ -62,8 +62,15 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                                 # export alembic
                                 self.pipeliner.makeDirIfNotExists(self.ioPath)
                                 ioItems = ' -root '.join(meshList)
+                                meshList.extend(cmds.listRelatives(meshList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
+                                attrStr = ""
+                                for mesh in meshList:
+                                    userDefAttrList = cmds.listAttr(mesh, userDefined=True)
+                                    if userDefAttrList:
+                                        for userDefAttr in userDefAttrList:
+                                            attrStr += " -attr "+userDefAttr
                                 abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".abc"
-                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
+                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+attrStr+" -file "+abcName)
                                 if nodeStateDic:
                                     self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
                                 self.wellDoneIO(', '.join(meshList))
