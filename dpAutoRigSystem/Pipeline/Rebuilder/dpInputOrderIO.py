@@ -47,21 +47,21 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
                 if self.firstMode: #export
-                    meshList = None
+                    deformedList = None
                     if objList:
-                        meshList = objList
+                        deformedList = objList
                     else:
-                        meshList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
-                    if meshList:
+                        deformedList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
+                    if deformedList:
                         orderDic = {}
                         progressAmount = 0
-                        maxProcess = len(meshList)
-                        for mesh in meshList:
+                        maxProcess = len(deformedList)
+                        for item in deformedList:
                             if self.verbose:
                                 # Update progress window
                                 progressAmount += 1
                                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                            orderDic[mesh] = self.defWeights.getOrderList(mesh)
+                            orderDic[item] = self.defWeights.getOrderList(item)
                         if orderDic:
                             try:
                                 # export order list data
@@ -70,7 +70,7 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                                 self.pipeliner.saveJsonFile(orderDic, jsonName)
                                 self.wellDoneIO(jsonName)
                             except Exception as e:
-                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                                self.notWorkedWellIO(', '.join(deformedList)+": "+str(e))
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" - deformed meshes")
                     else:
@@ -85,25 +85,25 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                             maxProcess = len(orderDic.keys())
                             wellImported = True
                             toImportList, notFoundMeshList, = [], []
-                            for mesh in orderDic.keys():
+                            for item in orderDic.keys():
                                 if self.verbose:
                                     # Update progress window
                                     progressAmount += 1
                                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                                if cmds.objExists(mesh):
-                                    toImportList.append(mesh)
+                                if cmds.objExists(item):
+                                    toImportList.append(item)
                                 else:
-                                    notFoundMeshList.append(mesh)
+                                    notFoundMeshList.append(item)
                             if toImportList:
                                 warningStatus = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
                                 cmds.scriptEditorInfo(edit=True, suppressWarnings=True)
-                                for mesh in toImportList:
+                                for item in toImportList:
                                     try:
                                         # reorder deformers
-                                        deformerList = orderDic[mesh]
+                                        deformerList = orderDic[item]
                                         if deformerList:
                                             if len(deformerList) > 1:
-                                                self.defWeights.setOrderList(mesh, deformerList)
+                                                self.defWeights.setOrderList(item, deformerList)
                                     except Exception as e:
                                         wellImported = False
                                         self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))

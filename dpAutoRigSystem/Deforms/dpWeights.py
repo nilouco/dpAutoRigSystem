@@ -293,3 +293,17 @@ class Weights(object):
             if i < len(lst)-1:
                 resultList.append([item, lst[i+1]])
         return resultList
+
+
+    def assignDeformer(self, deformerNode, itemList, *args):
+        """ Assign the deformer node to the given item list if it isn't assigned yet.
+        """
+        if deformerNode and itemList:
+            for item in itemList:
+                needToAddDef = True
+                inputDeformerList = cmds.listHistory(item, pruneDagObjects=True, interestLevel=True)
+                if inputDeformerList:
+                    if deformerNode in inputDeformerList:
+                        needToAddDef = False
+                if needToAddDef:
+                    cmds.deformer(deformerNode, edit=True, geometry=item)

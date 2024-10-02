@@ -136,8 +136,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                     try:
                                         wellImported = self.importDeformation(deformerNode, wellImported)
                                     except Exception as e:
-                                        print("deformerNode 1 EXCEPTION =", deformerNode)
-                                        self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+str(e)+"heeeererer 111111")
+                                        self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+str(e))
                                 if notFoundMeshList: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
                                     for deformerNode in notFoundMeshList:
                                         for shapeNode in self.deformerDataDic[deformerNode]["shapeList"]:
@@ -176,11 +175,11 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
     def importDeformation(self, deformerNode, wellImported, *args):
         """ Import deformer data creating a new deformer node, set values and weights.
         """
-        print("type === ", self.deformerDataDic[deformerNode]["type"] )
         newDefNode = None
         # verify if the deformer node exists to don't recreate it and import data
         if cmds.objExists(deformerNode):
             newDefNode = deformerNode
+            self.defWeights.assignDeformer(deformerNode, self.deformerDataDic[deformerNode]["shapeList"])
         else:
             # create a new deformer if it doesn't exists
             if self.deformerDataDic[deformerNode]["type"] == "cluster":
@@ -241,8 +240,8 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
         weightsDic = self.deformerDataDic[deformerNode]["weights"]
         if weightsDic:
-            for s, shape in enumerate(self.deformerDataDic[deformerNode]["shapeList"]):
-                if weightsDic[str(s)]:
+            for index in self.deformerDataDic[deformerNode]["indexList"]:
+                if weightsDic[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
-                    self.defWeights.setDeformerWeights(self.deformerDataDic[deformerNode]["name"], weightsDic[str(s)], s)
+                    self.defWeights.setDeformerWeights(self.deformerDataDic[deformerNode]["name"], weightsDic[str(index)], index)
         return wellImported

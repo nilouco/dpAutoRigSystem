@@ -6,9 +6,9 @@ dpBlendShapeIO
 dpShaderIO
 dpGuideIO
 dpRigItIO
+dpParentingIO
+dpTransformationIO
 dpSkinningIO
 dpDeformationIO
 dpInputOrderIO
-dpParentingIO
-dpTransformationIO
 dpControlShapeIO
