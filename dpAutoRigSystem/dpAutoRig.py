@@ -18,7 +18,7 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.25"
+DPAR_VERSION_PY3 = "4.04.26"
 DPAR_UPDATELOG = "N844 - Hold elbow/knee offset pin position."
 
 
