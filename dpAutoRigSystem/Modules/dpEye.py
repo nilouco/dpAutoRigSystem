@@ -544,6 +544,8 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
+                if s == 1:
+                    lEyeFkCtrlData = self.utils.getTransformData(self.fkEyeCtrl)
                 self.fkEyeCtrl = self.ctrls.cvControl("id_014_EyeFk", side+self.userGuideName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc1")
                 self.utils.originedFrom(objName=self.fkEyeCtrl, attrString=self.base+";"+self.guide+";"+self.radiusGuide)
                 self.fkEyeSubCtrl = self.ctrls.cvControl("id_070_EyeFkSub", side+self.userGuideName+"_Fk_Sub_Ctrl", r=(0.75*self.ctrlRadius), d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc1")
@@ -661,40 +663,26 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # specular scale control:
                     self.eyeSpecScaleCtrl = self.ctrls.cvControl("id_091_EyeSpecScale", ctrlName=side+self.userGuideName+"_SpecScale_Ctrl", r=0.2*self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_SpecularLoc")
                     cmds.delete(cmds.parentConstraint(self.cvSpecularLoc, self.eyeSpecScaleCtrl, maintainOffset=False))
-                    eyeSpecScaleZeroGrp = self.utils.zeroOut([self.eyeSpecScaleCtrl])
-                    cmds.parent(eyeSpecScaleZeroGrp, self.eyeSpecCtrl)
+                    if s == 1:
+                        noWSLEyeSpecScaleZeroGrpData = self.utils.getTransformData(self.eyeSpecScaleZeroGrp, useWorldSpace=False)
+                        lEyeSpecScaleZeroGrpData = self.utils.getTransformData(self.eyeSpecScaleZeroGrp)
+                        rEyeFkCtrlData = self.utils.getTransformData(self.fkEyeCtrl)
+                    self.eyeSpecScaleZeroGrp = self.utils.zeroOut([self.eyeSpecScaleCtrl])[0]
+                    cmds.parent(self.eyeSpecScaleZeroGrp, self.eyeSpecCtrl)
                     cmds.parentConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=False, name=self.eyeSpecScaleJnt+"_PaC")
                     cmds.scaleConstraint(self.eyeSpecScaleCtrl, self.eyeSpecScaleJnt, maintainOffset=True, name=self.eyeSpecScaleJnt+"_ScC")
                     # fixing flip mirror:
                     if s == 1:
-                        if self.mirrorAxis == "X":
-                            currentTX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateX")
-                            currentTX = currentTX*(-1)
-                            currentRY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateY")
-                            currentRY = currentRY*(-1)
-                            currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
-                            currentRZ = currentRZ*(-1)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateX", currentTX)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateY", currentRY)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
-                        if self.mirrorAxis == "Y":
-                            currentTY = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".translateY")
-                            currentTY = currentTY*(-1)
-                            currentRX = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateX")
-                            currentRX = currentRX*(-1)
-                            currentRZ = cmds.getAttr(eyeSpecScaleZeroGrp[0]+".rotateZ")
-                            currentRZ = currentRZ*(-1)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateX", currentRX)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".rotateZ", currentRZ)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".translateY", currentTY)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
-                        if self.mirrorAxis == "Z":
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleX", -1)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleY", -1)
-                            cmds.setAttr(eyeSpecScaleZeroGrp[0]+".scaleZ", -1)
+                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                            cmds.xform(self.eyeSpecScaleZeroGrp, translation=noWSLEyeSpecScaleZeroGrpData["translation"], worldSpace=False)
+                        else:
+                            translationList, tempList = [], []
+                            for i, j in zip(lEyeSpecScaleZeroGrpData["translation"], lEyeFkCtrlData["translation"]):
+                                tempList.append(i-j)
+                            for k, w in zip(tempList, rEyeFkCtrlData["translation"]):
+                                translationList.append(k+w)
+                            cmds.xform(self.eyeSpecScaleZeroGrp, translation=translationList, worldSpace=True)
+                            cmds.xform(self.eyeSpecScaleZeroGrp, rotation=lEyeSpecScaleZeroGrpData["rotation"], worldSpace=True)
 
                 # create eyelid setup:
                 if self.getModuleAttr(EYELID):

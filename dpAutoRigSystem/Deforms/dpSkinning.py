@@ -3,7 +3,7 @@ from maya import cmds
 from maya import mel
 from . import dpWeights
 
-DP_SKINNING_VERSION = 1.4
+DP_SKINNING_VERSION = 1.5
 
 
 class Skinning(dpWeights.Weights):
@@ -77,11 +77,20 @@ class Skinning(dpWeights.Weights):
         # check if we have repeated listed geometries in case of the user choose to not display long names:
         if self.validateGeoList(geomSkinList, mode):
             if jointSkinList and geomSkinList:
+                notSkinnedList = []
                 for geomSkin in geomSkinList:
                     if (mode == "Add"):
-                        cmds.skinCluster(geomSkin, edit=True, addInfluence=jointSkinList, toSelectedBones=True, lockWeights=True, weight=0.0)
+                        for joint in jointSkinList:
+                            try:
+                                cmds.skinCluster(geomSkin, edit=True, addInfluence=joint, toSelectedBones=True, lockWeights=True, weight=0.0)
+                            except:
+                                notSkinnedList.append(joint)
                     elif (mode == "Remove"):
-                        cmds.skinCluster(geomSkin, edit=True, removeInfluence=jointSkinList, toSelectedBones=True)
+                        for joint in jointSkinList:
+                            try:
+                                cmds.skinCluster(geomSkin, edit=True, removeInfluence=joint, toSelectedBones=True)
+                            except:
+                                notSkinnedList.append(joint)
                     else: # None = create a new skinCluster node
                         baseName = self.utils.extractSuffix(geomSkin)
                         skinClusterName = baseName+"_SC"
@@ -89,9 +98,12 @@ class Skinning(dpWeights.Weights):
                             skinClusterName = skinClusterName[skinClusterName.rfind("|")+1:]
                         newSkinClusterNode = cmds.skinCluster(jointSkinList, geomSkin, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=skinClusterName)[0]
                         cmds.rename(cmds.listConnections(newSkinClusterNode+".bindPose", destination=False, source=True), newSkinClusterNode.replace("_SC", "_BP"))
-                print(self.dpUIinst.lang['i077_skinned'] + ', '.join(geomSkinList))
+                print(self.dpUIinst.lang['i077_skinned']+', '.join(geomSkinList))
                 if logWin:
-                    self.dpUIinst.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                    if notSkinnedList:
+                        self.dpUIinst.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList)+'\n\n'+self.dpUIinst.lang['i300_didntChangeInf']+'\n'.join(notSkinnedList), 'center', 205, 270)
+                    else:
+                        self.dpUIinst.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
                 cmds.select(geomSkinList)
         else:
             print(self.dpUIinst.lang['i029_skinNothing'])

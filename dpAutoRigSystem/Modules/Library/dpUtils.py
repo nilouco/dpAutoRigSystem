@@ -15,7 +15,7 @@ import datetime
 from io import TextIOWrapper
 from importlib import reload
 
-DP_UTILS_VERSION = 3.0
+DP_UTILS_VERSION = 3.1
 
 
 class Utils(object):
@@ -1215,6 +1215,31 @@ class Utils(object):
                 if child.endswith("Orig"):
                     cmds.delete(child)
                 elif cmds.getAttr(child+".intermediateObject") == 1:
-                    cmds.delete(child)
+                    if deleteIntermediate:
+                        cmds.delete(child)
                 else:
                     self.removeUserDefinedAttr(child)
+
+
+    def reapplyDeformers(self, item, defList, *args):
+        """ Reapply the given deformer list to the destination given item except the tweak node.
+        """
+        for deformerNode in defList:
+            if cmds.objExists(deformerNode):
+                if not cmds.objectType(deformerNode) == "tweak":
+                    cmds.deformer(deformerNode, edit=True, geometry=item)
+
+
+    def getTransformData(self, item, t=True, r=True, s=True, useWorldSpace=True, *args):
+        """ Return the queried transformation data for the given node.
+        """
+        resultDic = {}
+        if item:
+            if cmds.objExists(item):
+                if t:
+                    resultDic["translation"] = cmds.xform(item, query=True, translation=t, worldSpace=useWorldSpace)
+                if r:
+                    resultDic["rotation"] = cmds.xform(item, query=True, rotation=r, worldSpace=useWorldSpace)
+                if s:
+                    resultDic["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=useWorldSpace)
+        return resultDic

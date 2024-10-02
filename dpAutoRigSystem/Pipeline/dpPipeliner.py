@@ -24,6 +24,8 @@ class Pipeliner(object):
         self.webhookFile = "dpWebhook.json"
         self.hookFile = "dpHook.json"
         self.callbackFile = "dpPublishCallback.py"
+        self.customAssetNameFile = "dpCustomAssetName.json"
+        self.pipeData = self.getPipelineData()
         self.declarePipelineAnnotation()
         self.refreshAssetData()
 
@@ -97,7 +99,7 @@ class Pipeliner(object):
         """
         jsonHookPath = os.path.join(os.path.dirname(os.path.abspath(__file__)), self.hookFile).replace("\\", "/")
         return self.updateDataByJsonPath(jsonHookPath)
-
+    
 
     def getInfoByPath(self, field, dependent, path=None, cut=False, *args):
         """ Use field as the given data to return the result about.
@@ -124,6 +126,19 @@ class Pipeliner(object):
             self.pipeData[field] = name
             return self.pipeData[field]
 
+
+    def getCustomAssetNameInfo(self, assetName, *args):
+        """ Returns the path content of the dpCustomAssetName json file if it exists.
+            Otherwise returns the given assetName.
+        """
+        if assetName:
+            if os.path.exists(self.pipeData['path']+"/"+self.customAssetNameFile):
+                content = self.getJsonContent(self.pipeData['path']+"/"+self.customAssetNameFile)
+                if content:
+                    if assetName in list(content.keys()):
+                        return content[assetName]
+        return assetName
+    
 
     def declareDefaultPipelineInfo(self, *args):
         """ Returns a default pipeline info data to load the UI if there isn't any.

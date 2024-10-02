@@ -17,8 +17,9 @@
 #
 ###################################################################
 
-DPAR_VERSION_PY3 = "4.04.00"
-DPAR_UPDATELOG = "Release version."
+
+DPAR_VERSION_PY3 = "4.04.25"
+DPAR_UPDATELOG = "N849 - Middle reverseFoot bottom new pivot."
 
 
 
@@ -50,6 +51,22 @@ def dpARLoadingWindow():
 dpARLoadingWindow()
 
 ###################### End: Loading.
+
+
+###################### Start: Download master.
+
+def dpARDownloadMaster():
+    """ Help user to download a dpAutoRigSystem master file from GitHub to reinstall it
+    """
+    confirm = cmds.confirmDialog(title="Reinstall", message="There's an unexpected issue, sorry!\nPlease reinstall the dpAutoRigSystem.\nRemember to delete the current folder before install a new one from:\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/", button="Download", dismissString="No")
+    if confirm == "Download":
+        if os.name == "nt":
+            DOWNLOAD_FOLDER = f"{os.getenv('USERPROFILE')}\\Downloads"
+        else:  # PORT: For *Nix systems
+            DOWNLOAD_FOLDER = f"{os.getenv('HOME')}/Downloads"
+        urllib.request.urlretrieve("https://github.com/nilouco/dpAutoRigSystem/zipball/master/", DOWNLOAD_FOLDER+"/dpAutoRigSystem-master.zip")
+
+###################### End: Download master.
 
 
 # importing libraries:
@@ -96,6 +113,7 @@ try:
 except Exception as e:
     print("Error: importing python modules!!!\n")
     print(e)
+    dpARDownloadMaster()
     try:
         clearDPARLoadingWindow()
         self.jobWinClose()
@@ -296,6 +314,7 @@ class DP_AutoRig_UI(object):
             except:
                 pass
             print(self.langDic[self.langName]['i008_errorUI'])
+            dpARDownloadMaster()
             clearDPARLoadingWindow()
             return
         
@@ -2153,6 +2172,11 @@ class DP_AutoRig_UI(object):
         self.masterCtrl = self.getBaseCtrl("id_004_Master", "masterCtrl", self.prefix+"Master_Ctrl", fMasterRadius, iDegree=3)
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
+        self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
+        if (self.ctrlCreated):
+            self.rootPivotCtrlGrp = dpUtils.zeroOut([self.rootPivotCtrl])[0]
+            cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
+            self.changeRootToCtrlsVisConstraint()
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
         if (self.ctrlCreated):
             cmds.makeIdentity(self.optionCtrl, apply=True)
@@ -2185,6 +2209,12 @@ class DP_AutoRig_UI(object):
         # set lock and hide attributes
         self.ctrls.setLockHide([self.scalableGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'v'])
         self.ctrls.setLockHide([self.rootCtrl, self.globalCtrl], ['sx', 'sy', 'sz', 'v'])
+        self.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
+
+        # root pivot control setup
+        for axis in ["X", "Y", "Z"]:
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
+            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
 
         cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
         cmds.select(None)
@@ -2202,7 +2232,19 @@ class DP_AutoRig_UI(object):
             cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
             cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
             self.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-        
+    
+
+    def changeRootToCtrlsVisConstraint(self, *args):
+        """ Just recreate the Root_Ctrl output connections to a constraint, now using the ctrlsVisibilityGrp as source node instead.
+            It keeps the dpAR compatibility to old rigs.
+        """
+        changeAttrList = ["rotateOrder", "translate", "rotate", "scale", "parentMatrix[0]", "rotatePivot", "rotatePivotTranslate"]
+        for attr in changeAttrList:
+            pacList = cmds.listConnections(self.rootCtrl+"."+attr, destination=True, source=False, plugs=True)
+            if pacList:
+                for pac in pacList:
+                    cmds.connectAttr(self.ctrlsVisGrp+"."+attr, pac, force=True)
+
 
     def validateMasterGrp(self, nodeGrp, *args):
         """ Check if the current nodeGrp is a valid masterGrp (All_Grp) verifying it's message attribute connections.
@@ -2761,6 +2803,7 @@ class DP_AutoRig_UI(object):
                                 mScaleVVAttr = self.integratedTaskDic[moduleDic]['MasterScaleVolumeVariationAttrList'][s]
                                 ikFkBlendAttr = self.integratedTaskDic[moduleDic]['IkFkBlendAttrList'][s]
                                 clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
+                                shapeVisAttrList = self.integratedTaskDic[moduleDic]["shapeVisAttrList"]
                                 cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC")
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
@@ -2773,6 +2816,13 @@ class DP_AutoRig_UI(object):
                                 cmds.addAttr(self.optionCtrl, longName=ikFkBlendAttr, attributeType="float", min=0, max=1, defaultValue=0, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+ikFkBlendAttr, hipsA+'.'+ikFkBlendAttr)
                                 cmds.setAttr(hipsA+'.'+ikFkBlendAttr, keyable=False)
+                                if shapeVisAttrList:
+                                    for shapeVisAttr in shapeVisAttrList:
+                                        if not cmds.objExists(self.optionCtrl+"."+shapeVisAttr):
+                                            cmds.addAttr(self.optionCtrl, longName=shapeVisAttr, attributeType="long", min=0, max=1, defaultValue=0, keyable=False)
+                                            cmds.setAttr(self.optionCtrl+'.'+shapeVisAttr, channelBox=True)
+                                            cmds.connectAttr(self.optionCtrl+'.'+shapeVisAttr, hipsA+'.'+shapeVisAttr)
+                                            cmds.setAttr(hipsA+'.'+shapeVisAttr, keyable=False)
                                 if bColorize:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['OuterCtrls'][s], "yellow")
@@ -3103,7 +3153,12 @@ class DP_AutoRig_UI(object):
                     cmds.addAttr(self.optionCtrl, longName="control", min=0, max=1, defaultValue=1, attributeType="long", keyable=False)
                     cmds.connectAttr(self.optionCtrl+".control", self.ctrlsVisGrp+".visibility", force=True)
                     cmds.setAttr(self.optionCtrl+".control", channelBox=True)
-                
+
+                if not cmds.objExists(self.optionCtrl+".rootPivot"):
+                    cmds.addAttr(self.optionCtrl, longName="rootPivot", min=0, max=1, defaultValue=0, attributeType="long", keyable=False)
+                    cmds.connectAttr(self.optionCtrl+".rootPivot", self.rootPivotCtrlGrp+".visibility", force=True)
+                    cmds.setAttr(self.optionCtrl+".rootPivot", channelBox=True)
+
                 # try to organize Option_Ctrl attributes:
                 # get current user defined attributes:
                 currentAttrList = cmds.listAttr(self.optionCtrl, userDefined=True)

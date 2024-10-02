@@ -103,5 +103,7 @@
     "id_096_FkLineMain"          : {"type" : "Circle",           "degree" : 3},
     "id_097_HeadDeformerMain"    : {"type" : "Circle",           "degree" : 3},
     "id_098_HeadDeformerSub"     : {"type" : "Square",           "degree" : 3},
+    "id_099_RootPivot"           : {"type" : "Locator",          "degree" : 3},
     "id_100_HeadDeformerRadius"  : {"type" : "Ball",             "degree" : 1}
+
 }

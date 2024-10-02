@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-09-28",
+    "_updated"       : "2024-10-02",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -137,6 +137,7 @@
     "c123_outer"             : "Externo",
     "c124_corrective"        : "corretivo",
     "c125_last"              : "Ultimo",
+    "c126_display"           : "Mostrar",
 
     "e000_guideNotFound"           : "Guia não encontrada nessa cena.",
     "e001_guideNotChecked"         : "Guia(s) não encontrada(s) no diretorio respectivo...",
@@ -147,8 +148,8 @@
     "e006_firstSkinnedGeo"         : "Selecione primeiro a geometria skinada, por favor.",
     "e007_notSkinFound"            : "Não tem skinCluster na primeira geometria skinada.",
     "e008_failCheckUpdate"         : "Não foi possível verificar por atualização, desculpe.",
-    "e009_failDownloadUpdate"      : "Não foi possível baixar o arquivo de update, desculpe.\n\nVerifique sua conexão com a internet\nou a permissão de salvar no diretório\n\n",
-    "e010_failInstallUpdate"       : "Não foi possível instalar a atualização, desculpe.\n\nVerifique sua conexão com a internet\nou tente fazer manualmente\nbaixando a nova versão do site GitHub\n\n",
+    "e009_failDownloadUpdate"      : "Não foi possível baixar o arquivo de update, desculpe.\n\nVerifique sua conexão com a internet\nou a permissão de salvar no diretório\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
+    "e010_failInstallUpdate"       : "Não foi possível instalar a atualização, desculpe.\n\nVerifique sua conexão com a internet\nou tente fazer manualmente\nbaixando a nova versão do site GitHub\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e011_notSelShape"             : "Nada selecionado para adicionar ou substituir as formas, desculpe.",
     "e012_cantLoadRibbon"          : "Não foi possível carregar a extensão jcRibbon para criar bend no módulo Limb, desculpe.",
     "e013_cantLoadIkSpringSolver"  : "Não foi possível carregar o plugin ikSpringSolver, desculpe.\nAplicado o ikRPSolver como padrão.",
@@ -475,6 +476,19 @@
     "i312_sTransformationIOAnn" : "O diretório onde será exportado ou importado os dados de transformações.",
     "i313_deformedBy"           : "Deformado por",
 
+
+    
+    "i292_selectAll"         : "Selecionar todos",
+    "i293_removing"          : "Removendo",
+    "i294_rivetNotFine"      : "Pelo menos um dos itens selecionados já possui um rivet, você gostaria de removê-lo antes de criar o novo (altamente recomendado).",
+    "i295_creatingRivet"     : "Criando Rivet",
+    "i296_working"           : "Trabalhando",
+    "i297_removeGeometry"    : "Remover geometria anexada",
+    "i298_rivetHeldGeo"      : "A geometria que segurava o(s) rebite(s)",
+    "i299_noConnectionGeo"   : "não tem mais nenhuma conexão, gostaria de removê-la?",
+    "i300_didntChangeInf"    : "Não alterado a influência para:\n",
+
+
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
     "m003_segments"              : "Segmentos",
@@ -709,6 +723,12 @@
     "m232_morphDeformer"         : "Deformador Morph",
     "m233_wrapDeformer"          : "Deformador Wrap",
     
+
+    
+    "m234_unableRemRivet"       : "Incapaz de remover o rivet: ",
+    "m235_noItemSelect"         : "Nenhum item selecionado, por favor selecione um item para remover.",
+    "m236_removedRivet"         : "Removido rivet com sucesso!",
+    
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
     "p003_right"      : "D",
@@ -852,6 +872,12 @@
     "v084_unusedNodeCleaner"      : "Node não usados limpador",
     "v085_unusedNodeCleanerDesc"  : "Esse validador vai remover rendering nodes desnecessários.",
     "v086_invertedNormals"        : "Normais invertidas",
-    "v087_invertedNormalsDesc"    : "Esse validador vai verificar por normais invertidas nas geometrias."
-
+    "v087_invertedNormalsDesc"    : "Esse validador vai verificar por normais invertidas nas geometrias.",
+    "v088_softenEdges"            : "Suavizar bordas",
+    "v089_softenEdgesDesc"        : "Este validador verificará suavização de arestas nas geometrias.",
+    "v090_overrideCleaner"        : "Override limpador",
+    "v091_overrideCleanerDesc"    : "Este validador verificará se existem overrides\ne removerá-los.",
+    "v092_unlockAttributes"       : "Unlock atributos",
+    "v093_unlockAttributesDesc"   : "Esse validador verificará e vai dar unlock nos atributos."
+    
 }

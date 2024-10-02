@@ -103,5 +103,7 @@
     "id_096_FkLineMain"          : {"type" : "Cube", "degree" : 1},
     "id_097_HeadDeformerMain"    : {"type" : "Cube", "degree" : 1},
     "id_098_HeadDeformerSub"     : {"type" : "Cube", "degree" : 1},
+    "id_099_RootPivot"           : {"type" : "Cube", "degree" : 1},
     "id_100_HeadDeformerRadius"  : {"type" : "Cube", "degree" : 1}
+
 }

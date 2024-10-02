@@ -495,7 +495,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(ikJoint+".scaleY", scaleBC+".color2G", force=True)
                         cmds.connectAttr(ikJoint+".scaleZ", scaleBC+".color2B", force=True)
                         if self.nJoints == 2:
-                            if not "00" in ikJoint: # to avoid thumb cycle error about the stretch
+                            if not "00_Ik_Jxt" in ikJoint: # to avoid thumb cycle error about the stretch
                                 cmds.connectAttr(self.stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
                         else:
                             cmds.connectAttr(self.stretchCond+".outColorR", ikJoint+".scaleZ", force=True)
@@ -504,7 +504,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(scaleBC+".output.outputG", skinJoint+".scaleY", force=True)
                         cmds.connectAttr(scaleBC+".output.outputB", skinJoint+".scaleZ", force=True)
                         cmds.setAttr(ikJoint+".segmentScaleCompensate", 1)
-                        if "01" in ikJoint:
+                        if "01_Ik_Jxt" in ikJoint:
                             if not self.nJoints == 2: # to avoid thumb cycle error when parenting All_Grp transform node
                                 cmds.pointConstraint(self.fingerCtrl, ikJoint, maintainOffset=True, name=ikJoint+"_PoC")
                         if self.nJoints > 2:

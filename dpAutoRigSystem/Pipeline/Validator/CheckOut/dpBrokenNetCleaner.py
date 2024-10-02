@@ -51,11 +51,14 @@ class BrokenNetCleaner(dpBaseActionClass.ActionStartClass):
                     progressAmount += 1
                     cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 # conditional to check here
-                if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"):
+                if cmds.objExists(item+".originalLoc") and cmds.objExists(item+".actionLoc"): #correctionManater
                     if not cmds.listConnections(item+".originalLoc", source=True, destination=False) or not cmds.listConnections(item+".actionLoc", source=True, destination=False):
                         self.cleanUpNetwork(item)
-                elif cmds.objExists(item+".worldRef"):
+                elif cmds.objExists(item+".worldRef"): #ikFkSnap
                     if not cmds.listConnections(item+".worldRef", source=True, destination=False):
+                        self.cleanUpNetwork(item)
+                elif cmds.objExists(item+".follicle"): #rivet
+                    if not cmds.listConnections(item+".follicle", source=True, destination=False):
                         self.cleanUpNetwork(item)
         else:
             self.notFoundNodes()

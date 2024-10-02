@@ -61,6 +61,9 @@ def Quadruped(dpUIinst):
         userMessage = dpUIinst.lang['i177_chooseMessage']
         breathName = dpUIinst.lang['c095_breath']
         bellyName = dpUIinst.lang['c096_belly']
+        baseName = dpUIinst.lang['c106_base']
+        upperName = dpUIinst.lang['c044_upper']
+        lowerName = dpUIinst.lang['c045_lower']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -184,7 +187,6 @@ def Quadruped(dpUIinst):
             cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateX", 20)
             cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateY", 10)
             cmds.setAttr(backLegLimbInstance.cvBeforeLoc+".rotateZ", -105)
-            cmds.setAttr(backLegLimbInstance.cvMainLoc+".rotateY", 25)
             cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateX", 0.7)
             cmds.setAttr(backLegLimbInstance.cvCornerLoc+".translateZ", -0.7)
             
@@ -214,7 +216,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(backFootInstance.cvRFALoc+".translateX", 0)
             cmds.setAttr(backFootInstance.cvRFBLoc+".translateX", 0)
             cmds.setAttr(backFootInstance.cvRFDLoc+".translateX", -1.5)
-            cmds.setAttr(backFootInstance.cvRFELoc+".translateZ", 1)
+            cmds.setAttr(backFootInstance.cvRFFLoc+".translateZ", 1)
             
             # parent back foot guide to back leg ankle guide:
             cmds.parent(backFootInstance.moduleGrp, backLegLimbInstance.cvExtremLoc, absolute=True)
@@ -250,7 +252,7 @@ def Quadruped(dpUIinst):
             cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateX", -15)
             cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateY", 15)
             cmds.setAttr(frontLegLimbInstance.cvBeforeLoc+".rotateZ", -90)
-            cmds.setAttr(frontLegLimbInstance.cvMainLoc+".rotateY", -27)
+            cmds.setAttr(frontLegLimbInstance.mainAic+".offsetY", -1)
             cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateX", -2.0)
             cmds.setAttr(frontLegLimbInstance.cvCornerLoc+".translateZ", -0.6)
             
@@ -282,9 +284,9 @@ def Quadruped(dpUIinst):
             cmds.setAttr(frontFootInstance.cvRFALoc+".translateX", 0)
             cmds.setAttr(frontFootInstance.cvRFBLoc+".translateX", 0)
             cmds.setAttr(frontFootInstance.cvRFDLoc+".translateX", -1.5)
-            cmds.setAttr(frontFootInstance.cvRFELoc+".translateZ", 1)
+            cmds.setAttr(frontFootInstance.cvRFFLoc+".translateZ", 1)
             
-            # parent fron foot guide to front leg ankle guide:
+            # parent front foot guide to front leg ankle guide:
             cmds.parent(frontFootInstance.moduleGrp, frontLegLimbInstance.cvExtremLoc, absolute=True)
             
             # Update progress window
@@ -305,16 +307,33 @@ def Quadruped(dpUIinst):
             cmds.setAttr(tailInstance.annotation+".translateX", 4)
             cmds.setAttr(tailInstance.annotation+".translateY", 0)
             cmds.setAttr(tailInstance.radiusCtrl+".translateX", 1)
+            cmds.setAttr(tailInstance.moduleGrp+".mainControls", 1)
             # change the number of joints to the tail module:
             tailInstance.changeJointNumber(3)
             
-            # parent tail guide to spine guide:
-            cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
-            
+            if userDetail == simple:
+                # parent tail guide to spine guide:
+                cmds.parent(tailInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             
             # complete part:
             if userDetail == complete:
                 
+                # create FkLine module instance:
+                tailBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing tail base guide informations:
+                tailBaseInstance.editUserName(tailName+baseName)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".translateY", 10.0)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".translateZ", -7)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".rotateX", 180)
+                cmds.setAttr(tailBaseInstance.moduleGrp+".rotateZ", 90)
+                cmds.setAttr(tailBaseInstance.annotation+".translateX", 4)
+                cmds.setAttr(tailBaseInstance.annotation+".translateY", 0)
+                
+                # parent tail base guide to spine guide:
+                cmds.parent(tailBaseInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
+                # parent tail guide to tail base guide:
+                cmds.parent(tailInstance.moduleGrp, tailBaseInstance.moduleGrp, absolute=True)
+
                 # Update progress window
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+earName))
@@ -327,6 +346,21 @@ def Quadruped(dpUIinst):
                 frontLegLimbInstance.setCorrective(1)
 
                 # woking with EAR system:
+                # create FkLine module instance:
+                earBaseInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing ear base guide informations:
+                earBaseInstance.editUserName(earName+baseName)
+                cmds.setAttr(earBaseInstance.moduleGrp+".translateX", 0.11)
+                cmds.setAttr(earBaseInstance.moduleGrp+".translateY", 14)
+                cmds.setAttr(earBaseInstance.moduleGrp+".translateZ", 10)
+                cmds.setAttr(earBaseInstance.moduleGrp+".rotateX", 90)
+                cmds.setAttr(earBaseInstance.moduleGrp+".rotateY", 20)
+                cmds.setAttr(earBaseInstance.moduleGrp+".rotateZ", 127)
+                cmds.setAttr(earBaseInstance.annotation+".translateX", 4)
+                cmds.setAttr(earBaseInstance.annotation+".translateY", 0)
+                cmds.setAttr(earBaseInstance.radiusCtrl+".translateX", 0.5)
+                cmds.setAttr(earBaseInstance.cvEndJoint+".translateZ", 0.5)
+
                 # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
                 # editing ear base guide informations:
@@ -341,18 +375,58 @@ def Quadruped(dpUIinst):
                 cmds.setAttr(earInstance.annotation+".translateY", 0)
                 cmds.setAttr(earInstance.annotation+".translateZ", 1.4)
                 cmds.setAttr(earInstance.radiusCtrl+".translateX", 1)
+                cmds.setAttr(earInstance.moduleGrp+".mainControls", 1)
                 cmds.setAttr(earInstance.moduleGrp+".deformedBy", 1)
-                # change the number of joints to the ear module:
-                earInstance.changeJointNumber(2)
-                
-                # parent ear guide to spine guide:
-                cmds.parent(earInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
                 cmds.setAttr(earInstance.moduleGrp+".scaleX", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleY", 0.5)
                 cmds.setAttr(earInstance.moduleGrp+".scaleZ", 0.5)
+                # change the number of joints to the ear module:
+                earInstance.changeJointNumber(2)
+                
+                # create FkLine module instance:
+                earUpperInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing ear upper guide informations:
+                earUpperInstance.editUserName(upperName+earName)
+                cmds.setAttr(earUpperInstance.moduleGrp+".translateX", 1.401)
+                cmds.setAttr(earUpperInstance.moduleGrp+".translateY", 15.365)
+                cmds.setAttr(earUpperInstance.moduleGrp+".translateZ", 9.88)
+                cmds.setAttr(earUpperInstance.moduleGrp+".rotateX", 90)
+                cmds.setAttr(earUpperInstance.moduleGrp+".rotateY", 20)
+                cmds.setAttr(earUpperInstance.moduleGrp+".rotateZ", 127)
+                cmds.setAttr(earUpperInstance.annotation+".translateX", 4)
+                cmds.setAttr(earUpperInstance.annotation+".translateY", 0)
+                cmds.setAttr(earUpperInstance.radiusCtrl+".translateX", 0.3)
+                cmds.setAttr(earUpperInstance.cvEndJoint+".translateZ", 0.5)
+                cmds.setAttr(earUpperInstance.moduleGrp+".scaleX", 0.4)
+                cmds.setAttr(earUpperInstance.moduleGrp+".scaleY", 0.4)
+                cmds.setAttr(earUpperInstance.moduleGrp+".scaleZ", 0.4)
+
+                # create FkLine module instance:
+                earLowerInstance = dpUIinst.initGuide('dpFkLine', guideDir, RigType.quadruped)
+                # editing ear upper guide informations:
+                earLowerInstance.editUserName(lowerName+earName)
+                cmds.setAttr(earLowerInstance.moduleGrp+".translateX", 1.796)
+                cmds.setAttr(earLowerInstance.moduleGrp+".translateY", 14.839)
+                cmds.setAttr(earLowerInstance.moduleGrp+".translateZ", 10.12)
+                cmds.setAttr(earLowerInstance.moduleGrp+".rotateX", 90)
+                cmds.setAttr(earLowerInstance.moduleGrp+".rotateY", 20)
+                cmds.setAttr(earLowerInstance.moduleGrp+".rotateZ", 127)
+                cmds.setAttr(earLowerInstance.annotation+".translateX", 4)
+                cmds.setAttr(earLowerInstance.annotation+".translateY", 0)
+                cmds.setAttr(earLowerInstance.radiusCtrl+".translateX", 0.3)
+                cmds.setAttr(earLowerInstance.cvEndJoint+".translateZ", 0.5)
+                cmds.setAttr(earLowerInstance.moduleGrp+".scaleX", 0.4)
+                cmds.setAttr(earLowerInstance.moduleGrp+".scaleY", 0.4)
+                cmds.setAttr(earLowerInstance.moduleGrp+".scaleZ", 0.4)
+
+                # parent ears guides to spine and other ear guides:
+                cmds.parent(earBaseInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
+                cmds.parent(earUpperInstance.moduleGrp, earInstance.cvJointLoc, absolute=True)
+                cmds.parent(earLowerInstance.moduleGrp, earInstance.cvJointLoc, absolute=True)
+                cmds.parent(earInstance.moduleGrp, earBaseInstance.moduleGrp, absolute=True)
                 # setting X mirror:
-                earInstance.changeMirror("X")
-                cmds.setAttr(earInstance.moduleGrp+".flip", 1)
+                earBaseInstance.changeMirror("X")
+                cmds.setAttr(earBaseInstance.moduleGrp+".flip", 1)
                 
                 # Update progress window
                 progressAmount += 1
@@ -516,7 +590,7 @@ def Quadruped(dpUIinst):
                 toe1FrontInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe1FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -542,7 +616,7 @@ def Quadruped(dpUIinst):
                 toe2FrontInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe2FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -568,7 +642,7 @@ def Quadruped(dpUIinst):
                 toe3FrontInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe3FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -594,7 +668,7 @@ def Quadruped(dpUIinst):
                 toe4FrontInstance.displayAnnotation(0)
                 
                 # parent toe4 guide to foot middle guide:
-                cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe4FrontInstance.moduleGrp, frontFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -620,7 +694,7 @@ def Quadruped(dpUIinst):
                 toe1BackInstance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe1BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -646,7 +720,7 @@ def Quadruped(dpUIinst):
                 toe2BackInstance.displayAnnotation(0)
                 
                 # parent toe2 guide to foot middle guide:
-                cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe2BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -672,7 +746,7 @@ def Quadruped(dpUIinst):
                 toe3BackInstance.displayAnnotation(0)
                 
                 # parent toe3 guide to foot middle guide:
-                cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe3BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -698,7 +772,7 @@ def Quadruped(dpUIinst):
                 toe4BackInstance.displayAnnotation(0)
                 
                 # parent toe4 guide to foot middle guide:
-                cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe4BackInstance.moduleGrp, backFootInstance.cvRFFLoc, absolute=True)
 
                 # Update progress window
                 progressAmount += 1

@@ -9,7 +9,7 @@ TITLE = "m011_spine"
 DESCRIPTION = "m012_spineDesc"
 ICON = "/Icons/dp_spine.png"
 
-DP_SPINE_VERSION = 2.2
+DP_SPINE_VERSION = 2.4
 
 
 class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -38,6 +38,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.aOuterCtrls = []
         self.aRbnJointList = []
         self.aClusterGrp = []
+        self.shapeVisAttrList = []
 
 
     def createModuleLayout(self, *args):
@@ -258,7 +259,24 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.baseCtrl = self.ctrls.cvControl("id_089_SpineBase", side+self.userGuideName+"_"+baseName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc1")
                 self.tipCtrl = self.ctrls.cvControl("id_090_SpineTip", side+self.userGuideName+"_"+endName+"_Ctrl", r=0.75*self.ctrlRadius, d=self.curveDegree, dir="+X", guideSource=self.guideName+"_JointLoc"+str(self.nJoints))
                 self.tipList.append(self.tipCtrl)
-                
+                # optimize control CV shapes:
+                tempBaseCluster = cmds.cluster(self.baseCtrl)[1]
+                tempTipCluster = cmds.cluster(self.tipCtrl)[1]
+                if self.currentStyle == 0: #default
+                    cmds.setAttr(tempBaseCluster+".translateY", 0.2*self.ctrlRadius)
+                    cmds.setAttr(tempTipCluster+".translateY", -0.2*self.ctrlRadius)
+                else:
+                    cmds.setAttr(tempBaseCluster+".translateY", -0.2*self.ctrlRadius)
+                    cmds.setAttr(tempTipCluster+".translateY", 0.2*self.ctrlRadius)
+                cmds.delete([self.baseCtrl, self.tipCtrl], constructionHistory=True)
+                # shape visibility
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+endName+self.dpUIinst.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.addAttr(self.hipsACtrl, longName=attrNameLower+baseName+self.dpUIinst.lang['c126_display'], attributeType="long", minValue=0, maxValue=1, defaultValue=0, keyable=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+endName+self.dpUIinst.lang['c126_display'], cmds.listRelatives(self.tipCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                cmds.connectAttr(self.hipsACtrl+"."+attrNameLower+baseName+self.dpUIinst.lang['c126_display'], cmds.listRelatives(self.baseCtrl, children=True, type="shape")[0]+".visibility", force=True)
+                self.shapeVisAttrList.append(attrNameLower+endName+self.dpUIinst.lang['c126_display'])
+                self.shapeVisAttrList.append(attrNameLower+baseName+self.dpUIinst.lang['c126_display'])
+
                 # Setup axis order
                 if self.rigType == dpBaseClass.RigType.quadruped:
                     cmds.setAttr(self.hipsACtrl + ".rotateOrder", 1)
@@ -390,17 +408,22 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 middleScaleYMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_MiddleScaleY_MD")
                 cmds.setAttr(middleScaleYMD+".operation", 2)
                 cmds.setAttr(middleScaleYMD+".input1X", 1)
+                sizeCtrlList = [self.hipsBCtrl]
+                sizeGrpList = []
                 for r, rbnJntGrp in enumerate(rbnJointGrpList):
+                    sizeGrpList.append(cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Size_Grp")))
+                    scaleGrp = cmds.group(sizeGrpList[-1], name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
+                    cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=scaleGrp+"_ScC")
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
                         scaleGrp = cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
                         self.utils.addCustomAttr([scaleGrp], self.utils.ignoreTransformIOAttr)
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
                         cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
                         cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
-                    else:
-                        cmds.scaleConstraint(self.toScalableHookGrp, rbnJntGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
-                if scaleGrp:
-                    cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
+                        self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
+                        cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
+                        sizeCtrlList.append(side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(r)+"_Ctrl")
+                sizeCtrlList.append(self.chestBCtrl)
                 # calculate the distance to volumeVariation:
                 arcLenShape = cmds.createNode('arcLengthDimension', name=side+self.userGuideName+"_Rbn_ArcLenShape")
                 arcLenFather = cmds.listRelatives(arcLenShape, parent=True)[0]
@@ -525,6 +548,10 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.hipsFkCtrlZero+".visibility", force=True)
                 cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.chestFkCtrlZero+".visibility", force=True)
                 
+                # adding size feature:
+                for a, b in zip(sizeCtrlList, sizeGrpList):
+                    self.connectSizeAxis(a, b)
+
                 # update spine volume variation setup
                 currentVV = cmds.getAttr(rbnMD+'.outputX')
                 cmds.setAttr(rbnVVMD+'.input1X', currentVV)
@@ -559,6 +586,16 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
 
+
+    def connectSizeAxis(self, fromNode, toNode, *args):
+        """ Just connect sizeXYZ to scaleXYZ of given nodes.
+        """
+        for axis in ["X", "Y", "Z"]:
+            if not cmds.objExists(fromNode+".size"+axis):
+                cmds.addAttr(fromNode, longName="size"+axis, attributeType="float", defaultValue=1, keyable=True)
+            cmds.connectAttr(fromNode+".size"+axis, toNode+".scale"+axis, force=True)
+
+
     def integratingInfo(self, *args):
         dpBaseClass.StartClass.integratingInfo(self)
         """ This method will create a dictionary with informations about integrations system between modules.
@@ -575,5 +612,6 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 "OuterCtrls": self.aOuterCtrls,
                 "jointList": self.aRbnJointList,
                 "scalableGrp": self.aClusterGrp,
+                "shapeVisAttrList": self.shapeVisAttrList
             }
         }

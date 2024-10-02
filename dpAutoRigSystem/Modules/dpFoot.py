@@ -49,8 +49,10 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cvRFCLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_RfC", r=0.3, d=1, guide=True)
         self.cvRFDLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_RfD", r=0.3, d=1, guide=True)
         self.cvRFELoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_RfE", r=0.3, d=1, guide=True)
+        self.cvRFFLoc = self.ctrls.cvLocator(ctrlName=self.guideName+"_RfF", r=0.3, d=1, guide=True)
         # create jointGuides:
         self.jGuideFoot = cmds.joint(name=self.guideName+"_JGuideFoot", radius=0.001)
+        self.jGuideRFF = cmds.joint(name=self.guideName+"_JGuideRfF", radius=0.001)
         self.jGuideRFE = cmds.joint(name=self.guideName+"_JGuideRfE", radius=0.001)
         cmds.select(clear=True)
         self.jGuideRFA = cmds.joint(name=self.guideName+"_JGuideRfA", radius=0.001)
@@ -65,17 +67,18 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.jGuideRFC+".template", 1)
         cmds.setAttr(self.jGuideRFD+".template", 1)
         cmds.setAttr(self.jGuideRFE+".template", 1)
+        cmds.setAttr(self.jGuideRFF+".template", 1)
         cmds.parent(self.jGuideFoot, self.jGuideRFA, self.moduleGrp, relative=True)
         # create cvEnd:
         self.cvEndJoint = self.ctrls.cvLocator(ctrlName=self.guideName+"_JointEnd", r=0.1, d=1, guide=True)
-        cmds.parent(self.cvEndJoint, self.cvRFELoc)
+        cmds.parent(self.cvEndJoint, self.cvRFFLoc)
         cmds.setAttr(self.cvEndJoint+".tz", 1.3)
         self.jGuideEnd = cmds.joint(name=self.guideName+"_JGuideEnd", radius=0.001)
         cmds.setAttr(self.jGuideEnd+".template", 1)
-        cmds.parent(self.jGuideEnd, self.jGuideRFE)
+        cmds.parent(self.jGuideEnd, self.jGuideRFF)
         # make parents between cvLocs:
-        cmds.parent(self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.moduleGrp)
-        cmds.parent(self.cvRFELoc, self.cvFootLoc)
+        cmds.parent(self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.moduleGrp)
+        cmds.parent(self.cvRFFLoc, self.cvFootLoc)
         # connect cvLocs in jointGuides:
         self.ctrls.directConnect(self.cvFootLoc, self.jGuideFoot, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         cmds.parentConstraint(self.cvRFALoc, self.jGuideRFA, maintainOffset=False, name=self.jGuideRFA+"_PaC")
@@ -83,6 +86,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.parentConstraint(self.cvRFCLoc, self.jGuideRFC, maintainOffset=False, name=self.jGuideRFC+"_PaC")
         cmds.parentConstraint(self.cvRFDLoc, self.jGuideRFD, maintainOffset=False, name=self.jGuideRFD+"_PaC")
         cmds.parentConstraint(self.cvRFELoc, self.jGuideRFE, maintainOffset=False, name=self.jGuideRFE+"_PaC")
+        cmds.parentConstraint(self.cvRFFLoc, self.jGuideRFF, maintainOffset=False, name=self.jGuideRFF+"_PaC")
         cmds.parentConstraint(self.cvRFALoc, self.jGuideRFAC, maintainOffset=False, name=self.jGuideRFAC+"_PaC")
         self.ctrls.directConnect(self.cvEndJoint, self.jGuideEnd, ['tx', 'ty', 'tz', 'rx', 'ry', 'rz'])
         # limit, lock and hide cvEnd:
@@ -92,8 +96,11 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.cvFootLoc+".translateZ", 2)
         cmds.setAttr(self.cvFootLoc+".rotateX", 90)
         cmds.setAttr(self.cvFootLoc+".rotateZ", -90)
-        cmds.setAttr(self.cvRFELoc+".translateY", -1)
-        cmds.setAttr(self.cvRFELoc+".translateZ", 2.5)
+        cmds.setAttr(self.cvRFFLoc+".translateY", -1)
+        cmds.setAttr(self.cvRFFLoc+".translateZ", 2.5)
+        cmds.setAttr(self.cvRFELoc+".translateX", -2.5)
+        cmds.setAttr(self.cvRFELoc+".rotateX", 90)
+        cmds.setAttr(self.cvRFELoc+".rotateZ", -90)
         cmds.setAttr(self.cvRFALoc+".translateX", -0.6)
         cmds.setAttr(self.cvRFALoc+".translateY", -1)
         cmds.setAttr(self.cvRFALoc+".rotateX", 90)
@@ -111,8 +118,13 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.moduleGrp+".rotateX", -90)
         cmds.setAttr(self.moduleGrp+".rotateY", 90)
         # include nodes into net
-        self.addNodeToGuideNet([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvEndJoint], ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "JointEnd"])
+        self.addNodeToGuideNet([self.cvFootLoc, self.cvRFALoc, self.cvRFBLoc, self.cvRFCLoc, self.cvRFDLoc, self.cvRFELoc, self.cvRFFLoc, self.cvEndJoint], ["Foot", "RfA", "RfB", "RfC", "RfD", "RfE", "RfF", "JointEnd"])
 
+        # bottom setup
+        cvRFEZeroOut = self.utils.zeroOut([self.cvRFELoc], True)
+        cvRFEOffsetGrp = cmds.listRelatives(cvRFEZeroOut, children=True)[0]
+        cmds.parentConstraint(self.cvRFFLoc, cvRFEOffsetGrp, maintainOffset=True, skipTranslate="y", name=cvRFEOffsetGrp+"_PaC")
+        
 
     def rigModule(self, *args):
         dpBaseClass.StartClass.rigModule(self)
@@ -169,6 +181,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.cvRFCLoc = side+self.userGuideName+"_Guide_RfC"
                 self.cvRFDLoc = side+self.userGuideName+"_Guide_RfD"
                 self.cvRFELoc = side+self.userGuideName+"_Guide_RfE"
+                self.cvRFFLoc = side+self.userGuideName+"_Guide_RfF"
                 self.cvEndJoint = side+self.userGuideName+"_Guide_JointEnd"
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
 
@@ -182,6 +195,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 ballRFAttr = self.dpUIinst.lang['c014_revFoot_E']
                 footRFAttr = self.dpUIinst.lang['c015_revFoot_F']
                 sideRFAttr = self.dpUIinst.lang['c016_revFoot_G']
+                bottomRFAttr = self.dpUIinst.lang['c100_bottom'].lower()
                 rfRoll = self.dpUIinst.lang['c018_revFoot_roll'].capitalize()
                 rfSpin = self.dpUIinst.lang['c019_revFoot_spin'].capitalize()
                 rfTurn = self.dpUIinst.lang['c020_revFoot_turn'].capitalize()
@@ -211,12 +225,13 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.middleFootJnt+".segmentScaleCompensate", 0)
 
                 # reverse foot controls:
-                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, guideSource=self.guideName+"_RfA")
-                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, guideSource=self.guideName+"_RfB")
-                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), guideSource=self.guideName+"_RfC")
-                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0), guideSource=self.guideName+"_RfD")
-                self.RFECtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, rot=(0, 90, 0), guideSource=self.guideName+"_RfE")
-                self.ballRFList.append(self.RFECtrl)
+                self.RFACtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+outsideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
+                self.RFBCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+insideRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree)
+                self.RFCCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+heelRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
+                self.RFDCtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+toeRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
+                self.RFECtrl = self.ctrls.cvControl("id_018_FootReverse", side+self.userGuideName+"_"+bottomRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.1), d=self.curveDegree, dir="+Y", rot=(0, 90, 0))
+                self.RFFCtrl = self.ctrls.cvControl("id_019_FootReverseE", side+self.userGuideName+"_"+ballRFAttr.capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, rot=(0, 90, 0))
+                self.ballRFList.append(self.RFFCtrl)
                 
                 # reverse foot groups:
                 self.RFAGrp = cmds.group(self.RFACtrl, name=self.RFACtrl+"_Grp")
@@ -224,47 +239,49 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.RFCGrp = cmds.group(self.RFCCtrl, name=self.RFCCtrl+"_Grp")
                 self.RFDGrp = cmds.group(self.RFDCtrl, name=self.RFDCtrl+"_Grp")
                 self.RFEGrp = cmds.group(self.RFECtrl, name=self.RFECtrl+"_Grp")
-                rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp]
+                self.RFFGrp = cmds.group(self.RFFCtrl, name=self.RFFCtrl+"_Grp")
+                rfGrpList = [self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp, self.RFFGrp]
                 
                 # putting groups in the correct place:
-                tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footJnt, maintainOffset=False)
-                tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootJxt, maintainOffset=False)
-                tempToDelC = cmds.parentConstraint(self.cvEndJoint, self.endJnt, maintainOffset=False)
-                tempToDelD = cmds.parentConstraint(self.cvEndJoint, self.endBJnt, maintainOffset=False)
-                tempToDelE = cmds.parentConstraint(self.cvRFALoc, self.RFAGrp, maintainOffset=False)
-                tempToDelF = cmds.parentConstraint(self.cvRFBLoc, self.RFBGrp, maintainOffset=False)
-                tempToDelG = cmds.parentConstraint(self.cvRFCLoc, self.RFCGrp, maintainOffset=False)
-                tempToDelH = cmds.parentConstraint(self.cvRFDLoc, self.RFDGrp, maintainOffset=False)
-                tempToDelI = cmds.parentConstraint(self.cvRFELoc, self.RFEGrp, maintainOffset=False)
-                cmds.delete(tempToDelA, tempToDelB, tempToDelC, tempToDelD, tempToDelE, tempToDelF, tempToDelG, tempToDelH, tempToDelI)
+                cmds.matchTransform(self.footJnt, self.cvFootLoc, position=True, rotation=True)
+                cmds.matchTransform(self.middleFootJxt, self.cvRFFLoc, position=True, rotation=True)
+                cmds.matchTransform(self.endJnt, self.cvEndJoint, position=True, rotation=True)
+                cmds.matchTransform(self.endBJnt, self.cvEndJoint, position=True, rotation=True)
+                cmds.matchTransform(self.RFAGrp, self.cvRFALoc, position=True, rotation=True)
+                cmds.matchTransform(self.RFBGrp, self.cvRFBLoc, position=True, rotation=True)
+                cmds.matchTransform(self.RFCGrp, self.cvRFCLoc, position=True, rotation=True)
+                cmds.matchTransform(self.RFDGrp, self.cvRFDLoc, position=True, rotation=True)
+                cmds.matchTransform(self.RFEGrp, self.cvRFELoc, position=True, rotation=True)
+                cmds.matchTransform(self.RFFGrp, self.cvRFFLoc, position=True, rotation=True)
 
                 # edit ball controller shape
                 if s == 0: #left
-                    tempBallCluster = cmds.cluster((cmds.listRelatives(self.RFECtrl, children=True, type="shape")[0])+".cv[3:5]")[1]
+                    tempBallCluster = cmds.cluster((cmds.listRelatives(self.RFFCtrl, children=True, type="shape")[0])+".cv[3:5]")[1]
                 else: #right
-                    tempBallCluster = cmds.cluster((cmds.listRelatives(self.RFECtrl, children=True, type="shape")[0])+".cv[0:2]")[1]
+                    tempBallCluster = cmds.cluster((cmds.listRelatives(self.RFFCtrl, children=True, type="shape")[0])+".cv[0:2]")[1]
                 cmds.setAttr(tempBallCluster+".translateY", self.ctrlRadius*0.3)
-                cmds.delete(self.RFECtrl, constructionHistory=True)
-                tempBallClusterB = cmds.cluster(self.RFECtrl)[1]
-                cmds.parentConstraint(self.cvFootLoc, self.cvRFELoc, tempBallClusterB, maintainOffset=False)
-                cmds.delete(self.RFECtrl, constructionHistory=True)
+                cmds.delete(self.RFFCtrl, constructionHistory=True)
+                tempBallClusterB = cmds.cluster(self.RFFCtrl)[1]
+                cmds.parentConstraint(self.cvFootLoc, self.cvRFFLoc, tempBallClusterB, maintainOffset=False)
+                cmds.delete(self.RFFCtrl, constructionHistory=True)
                 
                 # mounting hierarchy:
                 cmds.parent(self.RFBGrp, self.RFACtrl)
                 cmds.parent(self.RFCGrp, self.RFBCtrl)
                 cmds.parent(self.RFDGrp, self.RFCCtrl)
                 cmds.parent(self.RFEGrp, self.RFDCtrl)
+                cmds.parent(self.RFFGrp, self.RFECtrl)
                 
                 # reverse foot zero out groups:
+                self.RFFZero = self.utils.zeroOut([self.RFFGrp])[0]
+                self.RFFZeroExtra = self.utils.zeroOut([self.RFFZero])[0]
+                self.RFFZeroFollow = self.utils.zeroOut([self.RFFZero])[0]
                 self.RFEZero = self.utils.zeroOut([self.RFEGrp])[0]
-                self.RFEZeroExtra = self.utils.zeroOut([self.RFEZero])[0]
-                self.RFEZeroFollow = self.utils.zeroOut([self.RFEZero])[0]
                 self.RFDZero = self.utils.zeroOut([self.RFDGrp])[0]
                 self.RFCZero = self.utils.zeroOut([self.RFCGrp])[0]
                 self.RFBZero = self.utils.zeroOut([self.RFBGrp])[0]
                 self.RFAZero = self.utils.zeroOut([self.RFAGrp])[0]
                 self.RFAZeroExtra = self.utils.zeroOut([self.RFAZero])[0]
-                rfJointZeroList = [self.RFAZero, self.RFBZero, self.RFCZero, self.RFDZero, self.RFEZero]
                 
                 # fixing side rool rotation order:
                 cmds.setAttr(self.RFBZero+".rotateOrder", 5)
@@ -287,9 +304,8 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfE")
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
-                tempToDelA = cmds.parentConstraint(self.cvFootLoc, self.footCtrl, maintainOffset=False)
-                tempToDelB = cmds.parentConstraint(self.cvRFELoc, self.middleFootCtrl, maintainOffset=False)
-                cmds.delete(tempToDelA, tempToDelB)
+                cmds.matchTransform(self.footCtrl, self.cvFootLoc)
+                cmds.matchTransform(self.middleFootCtrl, self.cvRFFLoc)
                 if s == 1:
                     cmds.setAttr(self.middleFootCtrl+".scaleX", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
@@ -298,13 +314,13 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.middleFootCtrlList.append(self.middleFootCtrl)
 
                 # mount hierarchy:
-                cmds.parent(self.footCtrlZeroList[1], self.RFDCtrl, absolute=True)
+                cmds.parent(self.footCtrlZeroList[1], self.RFECtrl, absolute=True)
                 cmds.parent(ikHandleMiddleList[0], self.middleFootCtrl, absolute=True)
                 self.toLimbIkHandleGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c009_leg_extrem']+"_Grp")
                 self.toLimbIkHandleGrpList.append(self.toLimbIkHandleGrp)
-                cmds.parent(ikHandleAnkleList[0], self.toLimbIkHandleGrp, self.RFECtrl, absolute=True)
+                cmds.parent(ikHandleAnkleList[0], self.toLimbIkHandleGrp, self.RFFCtrl, absolute=True)
                 cmds.makeIdentity(self.toLimbIkHandleGrp, apply=True, translate=True, rotate=True, scale=True)
-                parentConst = cmds.parentConstraint(self.RFECtrl, self.footJnt, maintainOffset=True, name=self.footJnt+"_PaC")[0]
+                parentConst = cmds.parentConstraint(self.RFFCtrl, self.footJnt, maintainOffset=True, name=self.footJnt+"_PaC")[0]
                 self.parentConstList.append(parentConst)
                 self.footJntList.append(self.footJnt)
                 cmds.parent(self.RFAZeroExtra, self.footCtrl, absolute=True)
@@ -315,7 +331,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.scaleConstraint(self.middleFootCtrl, self.middleFootJnt, maintainOffset=True, name=self.middleFootJnt+"_ScC")
 
                 # add attributes to footCtrl and connect them to reverseFoot groups rotation:
-                rfAttrList = [outsideRFAttr, insideRFAttr, heelRFAttr, toeRFAttr, ballRFAttr]
+                rfAttrList = [outsideRFAttr, insideRFAttr, heelRFAttr, toeRFAttr, bottomRFAttr, ballRFAttr]
                 rfTypeAttrList = [rfRoll, rfSpin]
                 for j, rfAttr in enumerate(rfAttrList):
                     for t, rfType in enumerate(rfTypeAttrList):
@@ -339,7 +355,8 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.utils.originedFrom(objName=self.RFBCtrl, attrString=self.cvRFBLoc)
                 self.utils.originedFrom(objName=self.RFCCtrl, attrString=self.cvRFCLoc)
                 self.utils.originedFrom(objName=self.RFDCtrl, attrString=self.cvRFDLoc)
-                self.utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFELoc+";"+self.cvEndJoint)
+                self.utils.originedFrom(objName=self.RFECtrl, attrString=self.cvRFELoc)
+                self.utils.originedFrom(objName=self.middleFootCtrl, attrString=self.cvRFFLoc+";"+self.cvEndJoint)
 
                 # creating pre-defined attributes for footRoll and sideRoll attributes, also rollAngle:
                 cmds.addAttr(self.footCtrl, longName=footRFAttr+rfRoll, attributeType='float', keyable=True)
@@ -416,11 +433,11 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(anglePlantMD+".outputX", anglePlantRmV+".outputMax", force=True)
                 cmds.connectAttr(self.footCtrl+"."+footRFAttr+rfRoll, anglePlantRmV+".inputValue", force=True)
                 cmds.connectAttr(anglePlantRmV+".outColorR", anglePlantCnd+".colorIfTrueR", force=True)
-                cmds.connectAttr(anglePlantCnd+".outColorR", self.RFEZeroExtra+".rotateX", force=True)
+                cmds.connectAttr(anglePlantCnd+".outColorR", self.RFFZeroExtra+".rotateX", force=True)
                 
                 # connect to groups in order to rotate them:
                 cmds.connectAttr(footSR+".outValueY", self.RFDZero+".rotateX", force=True)
-                cmds.connectAttr(footSR+".outValueX", self.RFEZero+".rotateX", force=True)
+                cmds.connectAttr(footSR+".outValueX", self.RFFZero+".rotateX", force=True)
                 if s == 0: #left
                     cmds.connectAttr(footPlantCnd+".outColorR", self.footCtrlZeroList[1]+".rotateX", force=True)
                 else: #fix right side mirror
@@ -430,13 +447,13 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(footPlantInvMD+".outputX", self.footCtrlZeroList[1]+".rotateX", force=True)
                 
                 # create follow attribute to footBall control to space switch to middle control space:
-                cmds.addAttr(self.RFECtrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
-                pacFootBall = cmds.parentConstraint(self.middleFootCtrl, self.RFDCtrl, self.RFEZeroFollow, maintainOffset=True, name=self.RFEZeroFollow+"_PaC")[0]
+                cmds.addAttr(self.RFFCtrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
+                pacFootBall = cmds.parentConstraint(self.middleFootCtrl, self.RFECtrl, self.RFFZeroFollow, maintainOffset=True, name=self.RFFZeroFollow+"_PaC")[0]
                 cmds.setAttr(pacFootBall+".interpType", 0)
-                cmds.connectAttr(self.RFECtrl+".follow", pacFootBall+"."+self.middleFootCtrl+"W0")
-                footBallRevNode = cmds.createNode("reverse", name=self.RFECtrl+"_PaC_Rev")
-                cmds.connectAttr(self.RFECtrl+".follow", footBallRevNode+".inputX")
-                cmds.connectAttr(footBallRevNode+".outputX", pacFootBall+"."+self.RFDCtrl+"W1")
+                cmds.connectAttr(self.RFFCtrl+".follow", pacFootBall+"."+self.middleFootCtrl+"W0")
+                footBallRevNode = cmds.createNode("reverse", name=self.RFFCtrl+"_PaC_Rev")
+                cmds.connectAttr(self.RFFCtrl+".follow", footBallRevNode+".inputX")
+                cmds.connectAttr(footBallRevNode+".outputX", pacFootBall+"."+self.RFECtrl+"W1")
 
                 # organizing keyable attributes:
                 self.ctrls.setLockHide([self.middleFootCtrl, self.footCtrl], ['v'], l=False)
@@ -448,7 +465,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 mdNode = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_Vis_MD")
                 cmds.connectAttr(self.footCtrl+".visIkFk", mdNode+".input2X", force=True)
                 cmds.connectAttr(self.footCtrl+"."+showCtrlsAttr, mdNode+".input1X", force=True)
-                showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl, self.RFECtrl]
+                showHideCtrlList = [self.RFACtrl, self.RFBCtrl, self.RFCCtrl, self.RFDCtrl, self.RFECtrl, self.RFFCtrl]
                 for rfCtrl in showHideCtrlList:
                     rfCtrlShape = cmds.listRelatives(rfCtrl, children=True, type='nurbsCurve')[0]
                     cmds.connectAttr(mdNode+".outputX", rfCtrlShape+".visibility", force=True)

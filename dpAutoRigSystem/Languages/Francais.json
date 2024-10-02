@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-09-28",
+    "_updated"       : "2024-10-02",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -137,6 +137,7 @@
     "c123_outer"             : "Exterieur",
     "c124_corrective"        : "corrective",
     "c125_last"              : "Dernier",
+    "c126_display"           : "Montrer",
     
     "e000_guideNotFound"           : "Guide pas trouvé dans cette scène.",
     "e001_guideNotChecked"         : "Guide(s) pas trouvée(s) dans le dossier respectif...",
@@ -147,8 +148,8 @@
     "e006_firstSkinnedGeo"         : "Selectionner le premiere geometrie skinnée, s'il vous plaît.",
     "e007_notSkinFound"            : "Il n'y a pas de skinCluster dans la premiere geometrie selectionnée.",
     "e008_failCheckUpdate"         : "Ce n'est pas possible verifier des mis à jour, désolé.",
-    "e009_failDownloadUpdate"      : "Ce n'est pas possible télécharger le\nfichier de mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou la permission pour salvegarder dans le dossier\n\n",
-    "e010_failInstallUpdate"       : "Ce n'est pas possible installer\nle mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou essayer de le faire à la main\npar le téléchargement de la nouvelle version\ndu site web GitHub\n\n",
+    "e009_failDownloadUpdate"      : "Ce n'est pas possible télécharger le\nfichier de mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou la permission pour salvegarder dans le dossier\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
+    "e010_failInstallUpdate"       : "Ce n'est pas possible installer\nle mis à jour, désolé.\n\nVérifier votre connection avec l'internet\nou essayer de le faire à la main\npar le téléchargement de la nouvelle version\ndu site web GitHub\n\nhttps://github.com/nilouco/dpAutoRigSystem/zipball/master/\n\n",
     "e011_notSelShape"             : "Il y a rien selectionné pour ajouter ou remplacer des formes, désolé.",
     "e012_cantLoadRibbon"          : "Ce n'est pas possible charger l'extention jcRibbon pour creer des controlleurs bend dans le Limb module, désolé.",
     "e013_cantLoadIkSpringSolver"  : "Ce n'est pas possible charger le plugin ikSpringSolver, sorry.\nOn utilise le ikRPSolver par default.",
@@ -475,6 +476,18 @@
     "i312_sTransformationIOAnn" : "Le dossier ou on va importer et exporter les donnés des transformations.",
     "i313_deformedBy"           : "Deformé par",
 
+
+    "i292_selectAll"         : "Tout sélectionner",
+    "i293_removing"          : "Suppression",
+    "i294_rivetNotFine"      : "Au moins un des éléments sélectionnés possède déjà un rivet, vous souhaitez le retirer avant d'en créer un nouveau (fortement recommandé).",
+    "i295_creatingRivet"     : "Création de rivets",
+    "i296_working"           : "Travaillant",
+    "i297_removeGeometry"    : "Supprimer la géométrie attachée",
+    "i298_rivetHeldGeo"      : "La géométrie qui retenait le(s) rivet(s)",
+    "i299_noConnectionGeo"   : "n'a plus de connexion, souhaitez-vous la supprimer?",
+    "i300_didntChangeInf"    : "Pas changé l'influence de:\n",
+
+
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
     "m003_segments"              : "Segments",
@@ -708,6 +721,12 @@
     "m231_proxyCreatorDesc"      : "Ce module va creer a mesh proxy pour le rig courant.",
     "m232_morphDeformer"         : "Déformateur Morph",
     "m233_wrapDeformer"          : "Déformateur Wrap",
+    
+
+    
+    "m234_unableRemRivet"       : "Impossible de retirer le rivet: ",
+    "m235_noItemSelect"         : "Aucun élément sélectionné, veuillez sélectionner un élément à supprimer.",
+    "m236_removedRivet"         : "Le rivet a été bien supprimé!",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -852,6 +871,12 @@
     "v084_unusedNodeCleaner"      : "Node non utilisés nettoyeur",
     "v085_unusedNodeCleanerDesc"  : "Ce validateur va nettoyer des rendering nodes non necessáires dans le fichier.",
     "v086_invertedNormals"        : "Normals inverées.",
-    "v087_invertedNormalsDesc"    : "Ce validateur va vérifier pour normales inversées dans les géometries."
+    "v087_invertedNormalsDesc"    : "Ce validateur va vérifier pour normales inversées dans les géometries.",
+    "v088_softenEdges"            : "Adoucir les bords",
+    "v089_softenEdgesDesc"        : "Ce validateur vérifiera l'adoucissement des bords dans les géométries.",
+    "v090_overrideCleaner"        : "Override nettoyer",
+    "v091_overrideCleanerDesc"    : "Ce validateur vérifiera s'il y a des overrides\net va les remover.",
+    "v092_unlockAttributes"       : "Unlock attributs",
+    "v093_unlockAttributesDesc"   : "Ce validateur vérifiera et va faire l'unlock des attributs."
 
 }

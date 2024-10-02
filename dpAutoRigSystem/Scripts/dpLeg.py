@@ -119,7 +119,7 @@ def Leg(dpUIinst):
                 toe1Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -145,7 +145,7 @@ def Leg(dpUIinst):
                 toe2Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -171,7 +171,7 @@ def Leg(dpUIinst):
                 toe3Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -197,7 +197,7 @@ def Leg(dpUIinst):
                 toe4Instance.displayAnnotation(0)
                 
                 # parent toe4 guide to foot middle guide:
-                cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
                 
                 # Update progress window
                 progressAmount += 1
@@ -223,7 +223,7 @@ def Leg(dpUIinst):
                 toe5Instance.displayAnnotation(0)
                 
                 # parent toe1 guide to foot middle guide:
-                cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFELoc, absolute=True)
+                cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
             
             # Close progress window
             cmds.progressWindow(endProgress=True)
