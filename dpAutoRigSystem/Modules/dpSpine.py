@@ -420,7 +420,6 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
                         cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=rbnJntGrp+"_ScC")
                         cmds.connectAttr(middleScaleYMD+".outputX", self.aRbnJointList[r]+".scaleY", force=True)
-                        self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
                         cmds.connectAttr(scaleGrp+".scaleY", middleScaleYMD+".input2X", force=True)
                         sizeCtrlList.append(side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(r)+"_Ctrl")
                 sizeCtrlList.append(self.chestBCtrl)

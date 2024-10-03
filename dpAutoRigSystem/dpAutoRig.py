@@ -2173,8 +2173,10 @@ class DP_AutoRig_UI(object):
         self.globalCtrl = self.getBaseCtrl("id_003_Global", "globalCtrl", self.prefix+"Global_Ctrl", self.ctrls.dpCheckLinearUnit(13))
         self.rootCtrl   = self.getBaseCtrl("id_005_Root", "rootCtrl", self.prefix+"Root_Ctrl", self.ctrls.dpCheckLinearUnit(8))
         self.rootPivotCtrl = self.getBaseCtrl("id_099_RootPivot", "rootPivotCtrl", self.prefix+"Root_Pivot_Ctrl", self.ctrls.dpCheckLinearUnit(1), iDegree=3)
+        needConnectPivotAttr = False
         if (self.ctrlCreated):
-            self.rootPivotCtrlGrp = dpUtils.zeroOut([self.rootPivotCtrl])[0]
+            needConnectPivotAttr = True
+            self.rootPivotCtrlGrp = self.utils.zeroOut([self.rootPivotCtrl])[0]
             cmds.parent(self.rootPivotCtrlGrp, self.rootCtrl)
             self.changeRootToCtrlsVisConstraint()
         self.optionCtrl = self.getBaseCtrl("id_006_Option", "optionCtrl", self.prefix+"Option_Ctrl", self.ctrls.dpCheckLinearUnit(16))
@@ -2212,9 +2214,10 @@ class DP_AutoRig_UI(object):
         self.ctrls.setLockHide([self.rootPivotCtrl], ['rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v', 'ro'])
 
         # root pivot control setup
-        for axis in ["X", "Y", "Z"]:
-            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
-            cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
+        if needConnectPivotAttr:
+            for axis in ["X", "Y", "Z"]:
+                cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".rotatePivot"+axis, force=True)
+                cmds.connectAttr(self.rootPivotCtrl+".translate"+axis, self.rootCtrl+".scalePivot"+axis, force=True)
 
         cmds.setAttr(self.masterCtrl+".visibility", keyable=False)
         cmds.select(None)

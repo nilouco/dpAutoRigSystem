@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseValidatorClass
+from ... import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = 'UnlockAttributes'
@@ -8,23 +8,24 @@ TITLE = 'v092_unlockAttributes'
 DESCRIPTION = 'v093_unlockAttributesDesc'
 ICON = '/Icons/dp_unlockAttributes.png'
 
-DP_UNLOCKATTRIBUTES_VERSION = 1.0
+DP_UNLOCKATTRIBUTES_VERSION = 1.1
 
 
-class UnlockAttributes(dpBaseValidatorClass.ValidatorStartClass):
+class UnlockAttributes(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         # Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs['CLASS_NAME'] = CLASS_NAME
         kwargs['TITLE'] = TITLE
         kwargs['DESCRIPTION'] = DESCRIPTION
         kwargs['ICON'] = ICON
-        dpBaseValidatorClass.ValidatorStartClass.__init__(self, *args, **kwargs)
+        self.version = DP_UNLOCKATTRIBUTES_VERSION
+        dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
 
 
-    def runValidator(self, verifyMode=True, objList=None, *args):
+    def runAction(self, firstMode=True, objList=None, *args):
         ''' Main method to process this validator instructions.
             It's in verify mode by default.
-            If verifyMode parameter is False, it'll run in fix mode.
+            If firstMode parameter is False, it'll run in fix mode.
             Returns dataLog with the validation result as:
                 - checkedObjList = node list of checked items
                 - foundIssueList = True if an issue was found, False if there isn't an issue for the checked node
@@ -32,7 +33,7 @@ class UnlockAttributes(dpBaseValidatorClass.ValidatorStartClass):
                 - messageList = reported text
         '''
         # starting
-        self.verifyMode = verifyMode
+        self.firstMode = firstMode
         self.cleanUpToStart()
 
         # ---
@@ -57,7 +58,7 @@ class UnlockAttributes(dpBaseValidatorClass.ValidatorStartClass):
                 for item in lockedAttrDic.keys():
                     self.checkedObjList.append(item)
                     self.foundIssueList.append(True)
-                    if self.verifyMode:
+                    if self.firstMode:
                         self.resultOkList.append(False)
                     else: #fix
                         try:

@@ -17,7 +17,7 @@
 from maya import cmds
 from . import dpControls
 
-DP_RIBBONCLASS_VERSION = 2.5
+DP_RIBBONCLASS_VERSION = 2.6
 
 
 class RibbonClass(object):
@@ -236,8 +236,8 @@ class RibbonClass(object):
                 cmds.setAttr(pac+"."+iniJxt+"W1", 0.3)
 
         # corner autoRotate setup
-        loadedQuatNode = dpUtils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
-        loadedMatrixPlugin = dpUtils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
+        loadedQuatNode = self.utils.checkLoadedPlugin("quatNodes", self.dpUIinst.lang['e014_cantLoadQuatNode'])
+        loadedMatrixPlugin = self.utils.checkLoadedPlugin("matrixNodes", self.dpUIinst.lang['e002_matrixPluginNotFound'])
         if loadedQuatNode and loadedMatrixPlugin:
             cornerAutoRotateMD = cmds.createNode("multiplyDivide", name=prefix+myName+"_"+cornerName+"_AutoRotate_MD")
             cornerAutoRotateMM = cmds.createNode("multMatrix", name=prefix+myName+"_"+cornerName+"_AutoRotate_MM")
@@ -369,8 +369,8 @@ class RibbonClass(object):
             if armStyle:
                 cmds.rotate(0, -90, -90, zero1)
             else:
-                cmds.rotate(-90, 0, -90, zero)
-            self.utils.addCustomAttr([zero, grp], self.utils.ignoreTransformIOAttr)
+                cmds.rotate(-90, 0, -90, zero1)
+            self.utils.addCustomAttr([zero1, grp], self.utils.ignoreTransformIOAttr)
         cmds.addAttr(curve, longName='autoBend', attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
         if armStyle:
             cmds.addAttr(curve, longName='autoRotate', attributeType='float', minValue=0, maxValue=1, defaultValue=0.2, keyable=True)

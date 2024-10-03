@@ -20,7 +20,7 @@ ICON = "/Icons/dp_limb.png"
 ARM = "Arm"
 LEG = "Leg"
 
-DP_LIMB_VERSION = 3.2
+DP_LIMB_VERSION = 3.3
 
 
 class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
@@ -233,7 +233,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         self.cornerDrvNullGrp =  self.guideName+"_Corner_Drv_Null_Grp"
 
         # creating group to mainLoc:
-        self.cvMainLocGrp = dpUtils.zeroOut([self.cvMainLoc])[0]
+        self.cvMainLocGrp = self.utils.zeroOut([self.cvMainLoc])[0]
 
         # checking limbType to create correctly up vector values:
         if  self.getLimbType()==ARM:
