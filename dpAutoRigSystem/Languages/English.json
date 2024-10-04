@@ -775,6 +775,8 @@
     "r040_rivetIODesc"          : "This action will work with rivets\nexporting and importing them data.",
     "r041_calibrationIO"        : "Calibration IO",
     "r042_calibrationIODesc"    : "This action will work with controllers calibration\nexporting and importing them data.",
+    "r043_attributeIO"          : "Attribute IO",
+    "r044_attributeIODesc"      : "This action will work with controllers attributes\nexporting and importing them userDefined data.",
     
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

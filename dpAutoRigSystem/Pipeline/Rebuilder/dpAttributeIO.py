@@ -3,26 +3,26 @@ from maya import cmds
 from .. import dpBaseActionClass
 
 # global variables to this module:
-CLASS_NAME = "CalibrationIO"
-TITLE = "r041_calibrationIO"
-DESCRIPTION = "r042_calibrationIODesc"
-ICON = "/Icons/dp_calibrationIO.png"
+CLASS_NAME = "AttributeIO"
+TITLE = "r043_attributeIO"
+DESCRIPTION = "r044_attributeIODesc"
+ICON = "/Icons/dp_attributeIO.png"
 
-DP_CALIBRATIONIO_VERSION = 1.0
+DP_ATTRIBUTEIO_VERSION = 1.0
 
 
-class CalibrationIO(dpBaseActionClass.ActionStartClass):
+class AttributeIO(dpBaseActionClass.ActionStartClass):
     def __init__(self, *args, **kwargs):
         #Add the needed parameter to the kwargs dict to be able to maintain the parameter order
         kwargs["CLASS_NAME"] = CLASS_NAME
         kwargs["TITLE"] = TITLE
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
-        self.version = DP_CALIBRATIONIO_VERSION
+        self.version = DP_ATTRIBUTEIO_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
         self.setActionType("r000_rebuilder")
-        self.ioDir = "s_calibrationIO"
-        self.startName = "dpCalibration"
+        self.ioDir = "s_attributeIO"
+        self.startName = "dpAttribute"
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -49,9 +49,10 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                     ctrlList = objList
                 else:
                     ctrlList = self.dpUIinst.ctrls.getControlList()
+#                    ctrlList = cmds.ls(selection=False)
                 if ctrlList:
                     if self.firstMode: #export
-                        toExportDataDic = self.getCalibrationDataDic(ctrlList)
+                        toExportDataDic = self.getAttributeDataDic(ctrlList, True)
                         try:
                             # export json file
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
@@ -65,34 +66,36 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                             exportedList = self.getExportedList()
                             if exportedList:
                                 exportedList.sort()
-                                calibrationDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if calibrationDic:
+                                attributeDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                                if attributeDic:
                                     progressAmount = 0
-                                    maxProcess = len(calibrationDic.keys())
+                                    maxProcess = len(attributeDic.keys())
                                     # define lists to check result
                                     wellImportedList = []
-                                    for item in calibrationDic.keys():
+                                    for item in attributeDic.keys():
                                         notFoundNodesList = []
                                         progressAmount += 1
                                         cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
-                                        # check transformations
+                                        # check attributes
                                         if not cmds.objExists(item):
                                             item = item[item.rfind("|")+1:] #short name (after last "|")
                                         if cmds.objExists(item):
-                                            for attr in calibrationDic[item].keys():
-                                                if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                                                    # unlock attribute
-                                                    wasLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                                    cmds.setAttr(item+"."+attr, lock=False)
-                                                    try:
-                                                        # set calibration value
-                                                        cmds.setAttr(item+"."+attr, calibrationDic[item][attr])
-                                                        # lock attribute again if it was locked
-                                                        cmds.setAttr(item+"."+attr, lock=wasLocked)
-                                                        if not item in wellImportedList:
-                                                            wellImportedList.append(item)
-                                                    except Exception as e:
-                                                        self.notWorkedWellIO(item+" - "+str(e))
+                                            for attr in attributeDic[item].keys():
+                                                if not cmds.objExists(item+"."+attr):
+                                                    if not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                                                        # unlock attribute
+                                                        wasLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                                        cmds.setAttr(item+"."+attr, lock=False)
+                                                        try:
+                                                            # add and set attribute value
+#                                                            cmds.addAttr()
+                                                            cmds.setAttr(item+"."+attr, attributeDic[item][attr]['value'])
+                                                            # lock attribute again if it was locked
+                                                            cmds.setAttr(item+"."+attr, lock=wasLocked)
+                                                            if not item in wellImportedList:
+                                                                wellImportedList.append(item)
+                                                        except Exception as e:
+                                                            self.notWorkedWellIO(item+" - "+str(e))
                                         else:
                                             notFoundNodesList.append(item)
                                     if wellImportedList:
@@ -122,10 +125,12 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def getCalibrationDataDic(self, ctrlList, *args):
-        """ Processes the given controller list to collect and mount the calibration data.
+    def getAttributeDataDic(self, ctrlList, filterUserDefined=False, *args):
+        """ Processes the given controller list to collect and mount the attributes data.
             Returns the dictionary to export.
+            {ctrl : {attr : [attrType, [attrDefaultValue, attrEnumValues], attrValue]}}
         """
+        defaultValueTypeList = ["bool", "long",  "short",  "byte",  "char",  "enum",  "'float'",  "double",  "doubleAngle",  "doubleLinear"]
         if ctrlList:
             dic = {}
             progressAmount = 0
@@ -135,9 +140,22 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
             for ctrl in ctrlList:
-                calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
-                if calibrationList:
+                attrList = cmds.listAttr(ctrl, userDefined=filterUserDefined)
+                if attrList:
                     dic[ctrl] = {}
-                    for attr in calibrationList:
-                        dic[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
+                    for attr in attrList:
+                        if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
+                            attrType = cmds.getAttr(ctrl+"."+attr, type=True)
+                            attrDefaultValue = [None, None]
+                            if attrType in defaultValueTypeList:
+                                if attrType == "enum":
+                                    attrDefaultValue = [cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), cmds.attributeQuery(attr, node=ctrl, listEnum=True)]
+                                else:
+                                    attrDefaultValue = [cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), None]
+#                            dic[ctrl][attr] = [attrType, attrDefaultValue, cmds.getAttr(ctrl+"."+attr)]
+                            dic[ctrl][attr] = {
+                                                "type" : attrType,
+                                                "defaultValue" : attrDefaultValue,
+                                                "value" : cmds.getAttr(ctrl+"."+attr)
+                                                }
             return dic

@@ -2,6 +2,7 @@
 from maya import cmds
 from .. import dpBaseActionClass
 import json
+import ast
 
 # global variables to this module:
 CLASS_NAME = "GuideIO"
@@ -70,7 +71,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                     for moduleInstance in self.dpUIinst.moduleInstancesList:
                                         if str(moduleInstance) == moduleInstanceInfoString:
                                             moduleInstance.serializeGuide(False) #serialize it without build it
-                                toExportDataDic[net] = json.loads(cmds.getAttr(net+".afterData"))
+                                toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
                         if toExportDataDic:
                             try:
                                 # export json file

@@ -2,7 +2,7 @@
 from maya import cmds
 import time
 
-DP_LOGGER_VERSION = 1.0
+DP_LOGGER_VERSION = 1.1
 
 
 class Logger(object):
@@ -10,12 +10,11 @@ class Logger(object):
         """ Initialize the module class loading variables.
         """
         # defining variables:
-        if dpUIinst:
-            self.dpUIinst = dpUIinst
-            self.ui = ui
-            self.verbose = verbose
-            self.lang = dpUIinst.lang
-            self.utils = dpUIinst.utils
+        self.dpUIinst = dpUIinst
+        self.ui = ui
+        self.verbose = verbose
+        self.lang = dpUIinst.lang
+        self.utils = dpUIinst.utils
         
 
     def infoWin(self, title, description, text, align, width, height, *args):

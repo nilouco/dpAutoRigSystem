@@ -775,6 +775,8 @@
     "r040_rivetIODesc"          : "Essa ação vai trabalhar os rivets\nexportando e importando seus dados.",
     "r041_calibrationIO"        : "Calibração IO",
     "r042_calibrationIODesc"    : "Essa ação vai trabalhar a calibração dos controles\nexportando e importando seus dados.",
+    "r043_attributeIO"          : "Atributo IO",
+    "r044_attributeIODesc"      : "Essa ação vai trabalhar os atributos dos controles\nexportando e importando seus dados de userDefined.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

@@ -203,7 +203,7 @@ class DP_AutoRig_UI(object):
         self.utils = dpUtils.Utils()
         self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager()
-        self.logger = dpLogger.Logger(None) #placeholder
+#        self.logger = dpLogger.Logger(None) #placeholder
         
         try:
             # store all UI elements in a dictionary:
@@ -272,26 +272,6 @@ class DP_AutoRig_UI(object):
                 print("Error: Cannot load json validator preset files!\n")
                 return
             
-            # create menu:
-            self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
-            cmds.menuItem('translator_MI', label='Translator', command=self.translator)
-            cmds.menuItem('pipeliner_MI', label='Pipeliner', command=partial(self.pipeliner.mainUI, self))
-            cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "controls", CONTROLS_PRESETS, True))
-            cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
-            # window menu:
-            self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
-            cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.reloadMainUI)
-            cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
-            # help menu:
-            self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
-            cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
-            cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
-            cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
-            cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
-            cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
-            cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
-            cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
-            cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, DPAR_SITE))
             
             # create the main layout:
             self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
@@ -426,6 +406,27 @@ class DP_AutoRig_UI(object):
         self.logger = dpLogger.Logger(self)
         # --
 
+        # create menu:
+        self.allUIs["createMenu"] = cmds.menu('createMenu', label='Create')
+        cmds.menuItem('translator_MI', label='Translator', command=self.translator)
+        cmds.menuItem('pipeliner_MI', label='Pipeliner', command=partial(self.pipeliner.mainUI, self))
+        cmds.menuItem('createControlPreset_MI', label='Controls Preset', command=partial(self.createPreset, "controls", CONTROLS_PRESETS, True))
+        cmds.menuItem('createValidatorPreset_MI', label='Validator Preset', command=partial(self.createPreset, "validator", VALIDATOR_PRESETS, False))
+        # window menu:
+        self.allUIs["windowMenu"] = cmds.menu( 'windowMenu', label='Window')
+        cmds.menuItem('reloadUI_MI', label='Reload UI', command=self.reloadMainUI)
+        cmds.menuItem('quit_MI', label='Quit', command=self.deleteExistWindow)
+        # help menu:
+        self.allUIs["helpMenu"] = cmds.menu( 'helpMenu', label='Help', helpMenu=True)
+        cmds.menuItem('about_MI"', label='About', command=partial(self.logger.infoWin, 'm015_about', 'i006_aboutDesc', None, 'center', 305, 250))
+        cmds.menuItem('author_MI', label='Author', command=partial(self.logger.infoWin, 'm016_author', 'i007_authorDesc', None, 'center', 305, 250))
+        cmds.menuItem('collaborators_MI', label='Collaborators', command=partial(self.logger.infoWin, 'i165_collaborators', 'i166_collabDesc', "\n\n"+self.langDic[ENGLISH]['_collaborators'], 'center', 305, 250))
+        cmds.menuItem('donate_MI', label='Donate', command=partial(self.donateWin))
+        cmds.menuItem('idiom_MI', label='Idioms', command=partial(self.logger.infoWin, 'm009_idioms', 'i012_idiomsDesc', None, 'center', 305, 250))
+        cmds.menuItem('terms_MI', label='Terms and Conditions', command=self.checkTermsAndCond)
+        cmds.menuItem('update_MI', label='Update', command=partial(self.checkForUpdate, True))
+        cmds.menuItem('help_MI', label='Help...', command=partial(self.utils.visitWebSite, DPAR_SITE))
+        
         # creating tabs - mainTabLayout:
         self.allUIs["mainTabLayout"] = cmds.tabLayout('mainTabLayout', innerMarginWidth=5, innerMarginHeight=5, parent=self.allUIs["mainLayout"])
         cmds.formLayout( self.allUIs["mainLayout"], edit=True, attachForm=((self.allUIs["mainTabLayout"], 'top', 0), (self.allUIs["mainTabLayout"], 'left', 0), (self.allUIs["mainTabLayout"], 'bottom', 0), (self.allUIs["mainTabLayout"], 'right', 0)) )
