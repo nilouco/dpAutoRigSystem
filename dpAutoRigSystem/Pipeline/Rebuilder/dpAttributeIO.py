@@ -146,16 +146,27 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                     for attr in attrList:
                         if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
                             attrType = cmds.getAttr(ctrl+"."+attr, type=True)
+                            dic[ctrl][attr] = {
+                                                "type" : attrType,
+                                                "value" : cmds.getAttr(ctrl+"."+attr),
+                                                "channelBox" : cmds.getAttr(ctrl+"."+attr, channelBox=True),
+                                                "keyable" : cmds.getAttr(ctrl+"."+attr, keyable=True),
+                                                "lock" : cmds.getAttr(ctrl+"."+attr, lock=True)
+                            }
                             attrDefaultValue = [None, None]
                             if attrType in defaultValueTypeList:
                                 if attrType == "enum":
                                     attrDefaultValue = [cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), cmds.attributeQuery(attr, node=ctrl, listEnum=True)]
                                 else:
                                     attrDefaultValue = [cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), None]
-#                            dic[ctrl][attr] = [attrType, attrDefaultValue, cmds.getAttr(ctrl+"."+attr)]
-                            dic[ctrl][attr] = {
-                                                "type" : attrType,
-                                                "defaultValue" : attrDefaultValue,
-                                                "value" : cmds.getAttr(ctrl+"."+attr)
-                                                }
+                                dic[ctrl][attr]["defaultValue"] = attrDefaultValue
+                                maxExists = cmds.attributeQuery(attr, node=ctrl, maxExists=True) or None
+                                if maxExists:
+                                    dic[ctrl][attr]["maxExists"] = maxExists
+                                    dic[ctrl][attr]["maximum"] = cmds.attributeQuery(attr, node=ctrl, maximum=True)
+
+                                minExists = cmds.attributeQuery(attr, node=ctrl, minExists=True) or None
+                                if minExists:
+                                    dic[ctrl][attr]["minExists"] = minExists
+                                    dic[ctrl][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)
             return dic
