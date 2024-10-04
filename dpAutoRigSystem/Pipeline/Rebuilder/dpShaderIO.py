@@ -44,6 +44,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
         if self.pipeliner.checkAssetContext():
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
+                self.customAttrList = ["cosinePower", "specularRoughness", "specularIOR", "specularAnisotropy", "specularRotation", "base", "diffuseRoughness", "metalness", "transmission", "transmissionDepth", "transmissionScatterAnisotropy", "transmissionDispersion", "transmissionExtraRoughness"]
                 if self.firstMode: #export
                     shaderList = None
                     if objList:
@@ -63,7 +64,6 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                             texture = None
                             color = None
                             specularColor = None
-                            cosinePower = None
                             cmds.hyperShade(objects=shader)
                             assignedList = cmds.ls(selection=True)
                             if assignedList:
@@ -82,8 +82,6 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                 transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
                                 if cmds.objExists(shader+".specularColor"):
                                     specularColor = cmds.getAttr(shader+".specularColor")[0]
-                                if cmds.objExists(shader+".cosinePower"):
-                                    cosinePower = cmds.getAttr(shader+".cosinePower")
                                 # data dictionary to export
                                 shaderDic[shader] = {"assigned"        : assignedList,
                                                     "color"            : color,
@@ -93,9 +91,12 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                                     "texture"          : texture,
                                                     "transparency"     : transparency,
                                                     "transparencyAttr" : transparencyAttr,
-                                                    "specularColor"    : specularColor,
-                                                    "cosinePower"      : cosinePower
+                                                    "specularColor"    : specularColor
                                                     }
+                                # custom shader attributes
+                                for attr in self.customAttrList:
+                                    if cmds.objExists(shader+"."+attr):
+                                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
                             cmds.select(clear=True)
                         try:
                             # export json file
@@ -132,8 +133,9 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                                         if shaderDic[item]['specularColor']:
                                             specularColorList = shaderDic[item]['specularColor']
                                             cmds.setAttr(shader+".specularColor", specularColorList[0], specularColorList[1], specularColorList[2], type="double3")
-                                        if shaderDic[item]['cosinePower']:
-                                            cmds.setAttr(shader+".cosinePower", shaderDic[item]['cosinePower'])
+                                        for attr in self.customAttrList:
+                                            if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
+                                                cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
                                     # apply shader to meshes
                                     for mesh in shaderDic[item]['assigned']:
                                         if cmds.objExists(mesh):

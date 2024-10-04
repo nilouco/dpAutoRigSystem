@@ -111,7 +111,8 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                             cmds.delete(net)
                                     if toInitializeGuide:
                                         try:
-                                            self.netDic = json.loads(self.importedDataDic[net])
+                                            #self.netDic = json.loads(self.importedDataDic[net])
+                                            self.netDic = self.importedDataDic[net]
                                             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
                                             # create a module instance:
                                             self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
@@ -215,7 +216,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         """ Rebuild the Guide_Base parenting.
         """
         for net in self.importedDataDic.keys():
-            netDic = json.loads(self.importedDataDic[net])
+            netDic = self.importedDataDic[net]
             for item in list(netDic["GuideData"]):
                 if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                     fatherNodeData = netDic["GuideData"][item]['FatherNode']

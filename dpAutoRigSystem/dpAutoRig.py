@@ -203,7 +203,6 @@ class DP_AutoRig_UI(object):
         self.utils = dpUtils.Utils()
         self.pipeliner = dpPipeliner.Pipeliner(self)
         self.packager = dpPackager.Packager()
-#        self.logger = dpLogger.Logger(None) #placeholder
         
         try:
             # store all UI elements in a dictionary:

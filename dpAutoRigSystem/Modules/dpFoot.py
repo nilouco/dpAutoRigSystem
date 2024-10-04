@@ -301,11 +301,11 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
 
                 self.revFootCtrlShapeList.append(cmds.listRelatives(self.footCtrl, children=True, type='nurbsCurve')[0])
 
-                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfE")
+                self.middleFootCtrl = self.ctrls.cvControl("id_021_FootMiddle", side+self.userGuideName+"_"+self.dpUIinst.lang['c017_revFoot_middle'].capitalize()+"_Ctrl", r=(self.ctrlRadius*0.5), d=self.curveDegree, guideSource=self.guideName+"_RfF")
                 cmds.setAttr(self.middleFootCtrl+'.overrideEnabled', 1)
                 cmds.setAttr(self.middleFootCtrl+".rotateOrder", 4)
-                cmds.matchTransform(self.footCtrl, self.cvFootLoc)
-                cmds.matchTransform(self.middleFootCtrl, self.cvRFFLoc)
+                cmds.matchTransform(self.footCtrl, self.cvFootLoc, position=True, rotation=True)
+                cmds.matchTransform(self.middleFootCtrl, self.cvRFFLoc, position=True, rotation=True)
                 if s == 1:
                     cmds.setAttr(self.middleFootCtrl+".scaleX", -1)
                     cmds.setAttr(self.middleFootCtrl+".scaleY", -1)
