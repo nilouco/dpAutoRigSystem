@@ -599,7 +599,7 @@ class StartClass(object):
                         if buildIt:
                             cmds.deleteAttr(self.guideNet+"."+beforeAttr)
             afterDataDic["GuideData"] = guideDic
-            cmds.setAttr(self.guideNet+".afterData", json.dumps(afterDataDic), type="string")
+            cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
             if buildIt:
                 cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node
 

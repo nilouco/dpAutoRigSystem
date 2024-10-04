@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-10-02",
+    "_updated"       : "2024-10-03",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -475,18 +475,16 @@
     "i311_sInputOrderIOAnn"     : "The folder to export and import defomer order data.",
     "i312_sTransformationIOAnn" : "The folder to export and import transformations data.",
     "i313_deformedBy"           : "Deformed by",
-
-
-
-    "i292_selectAll"         : "Select All",
-    "i293_removing"          : "Removing",
-    "i294_rivetNotFine"      : "At least one of the selected items already has a rivet, would you like to remove then before create the new one (high recommended).",
-    "i295_creatingRivet"     : "Creating Rivet",
-    "i296_working"           : "Working",
-    "i297_removeGeometry"    : "Remove attached geometry",
-    "i298_rivetHeldGeo"      : "The geometry that held the rivet(s)",
-    "i299_noConnectionGeo"   : "does not have any connections left, would you like to remove it?",
-    "i300_didntChangeInf"    : "Didn't change influence for:\n",
+    "i314_selectAll"            : "Select All",
+    "i315_removing"             : "Removing",
+    "i316_rivetNotFine"         : "At least one of the selected items already has a rivet, would you like to remove then before create the new one (high recommended).",
+    "i317_creatingRivet"        : "Creating Rivet",
+    "i318_working"              : "Working",
+    "i319_removeGeometry"       : "Remove attached geometry",
+    "i320_rivetHeldGeo"         : "The geometry that held the rivet(s)",
+    "i321_noConnectionGeo"      : "does not have any connections left, would you like to remove it?",
+    "i322_didntChangeInf"       : "Didn't change influence for:\n",
+    "i323_sRivetIOAnn"          : "The folder to export and import rivet data.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -721,12 +719,9 @@
     "m231_proxyCreatorDesc"      : "This module will generate a proxy mesh for the current rig.",
     "m232_morphDeformer"         : "Morph Deformer",
     "m233_wrapDeformer"          : "Wrap Deformer",
-    
-    
-
-    "m234_unableRemRivet"       : "Unable to remove rivet: ",
-    "m235_noItemSelect"         : "No items selected, please select an item to remove.",
-    "m236_removedRivet"         : "Removed rivet with success!",
+    "m234_unableRemRivet"        : "Unable to remove rivet: ",
+    "m235_noItemSelect"          : "No items selected, please select an item to remove.",
+    "m236_removedRivet"          : "Removed rivet with success!",
 
     "p001_prefixText" : "Attention: The prefix text cannot start with number, whitespace or have special characters, sorry.",
     "p002_left"       : "L",
@@ -775,6 +770,8 @@
     "r036_inputOrderIODesc"     : "This action will work with deformer order\nexporting and importing them lists.",
     "r037_transformationIO"     : "Transformation IO",
     "r038_transformationIODesc" : "This action will work with transformations\nexporting and importing them data.",
+    "r039_rivetIO"              : "Rivet IO",
+    "r040_rivetIODesc"          : "This action will work with rivets\nexporting and importing them data.",
     
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

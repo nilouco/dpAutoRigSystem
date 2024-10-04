@@ -1243,3 +1243,4 @@ class Utils(object):
                 if s:
                     resultDic["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=useWorldSpace)
         return resultDic
+

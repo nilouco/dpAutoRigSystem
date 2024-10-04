@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-10-02",
+    "_updated"       : "2024-10-03",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -475,19 +475,16 @@
     "i311_sInputOrderIOAnn"     : "O diretório onde será exportado ou importado os dados da ordem de deformadores.",
     "i312_sTransformationIOAnn" : "O diretório onde será exportado ou importado os dados de transformações.",
     "i313_deformedBy"           : "Deformado por",
-
-
-    
-    "i292_selectAll"         : "Selecionar todos",
-    "i293_removing"          : "Removendo",
-    "i294_rivetNotFine"      : "Pelo menos um dos itens selecionados já possui um rivet, você gostaria de removê-lo antes de criar o novo (altamente recomendado).",
-    "i295_creatingRivet"     : "Criando Rivet",
-    "i296_working"           : "Trabalhando",
-    "i297_removeGeometry"    : "Remover geometria anexada",
-    "i298_rivetHeldGeo"      : "A geometria que segurava o(s) rebite(s)",
-    "i299_noConnectionGeo"   : "não tem mais nenhuma conexão, gostaria de removê-la?",
-    "i300_didntChangeInf"    : "Não alterado a influência para:\n",
-
+    "i314_selectAll"            : "Selecionar todos",
+    "i315_removing"             : "Removendo",
+    "i316_rivetNotFine"         : "Pelo menos um dos itens selecionados já possui um rivet, você gostaria de removê-lo antes de criar o novo (altamente recomendado).",
+    "i317_creatingRivet"        : "Criando Rivet",
+    "i318_working"              : "Trabalhando",
+    "i319_removeGeometry"       : "Remover geometria anexada",
+    "i320_rivetHeldGeo"         : "A geometria que segurava o(s) rebite(s)",
+    "i321_noConnectionGeo"      : "não tem mais nenhuma conexão, gostaria de removê-la?",
+    "i322_didntChangeInf"       : "Não alterado a influência para:\n",
+    "i323_sRivetIOAnn"          : "O diretório onde será exportado ou importado os dados dos rivets.",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -722,12 +719,9 @@
     "m231_proxyCreatorDesc"      : "Esse modulo vai criar uma mesh proxy para o rig atual.",
     "m232_morphDeformer"         : "Deformador Morph",
     "m233_wrapDeformer"          : "Deformador Wrap",
-    
-
-    
-    "m234_unableRemRivet"       : "Incapaz de remover o rivet: ",
-    "m235_noItemSelect"         : "Nenhum item selecionado, por favor selecione um item para remover.",
-    "m236_removedRivet"         : "Removido rivet com sucesso!",
+    "m234_unableRemRivet"        : "Incapaz de remover o rivet: ",
+    "m235_noItemSelect"          : "Nenhum item selecionado, por favor selecione um item para remover.",
+    "m236_removedRivet"          : "Removido rivet com sucesso!",
     
     "p001_prefixText" : "Atenção: O texto do prefixo não pode começar com números, espaço em branco ou ter caracteres especiais, desculpe.",
     "p002_left"       : "E",
@@ -776,6 +770,8 @@
     "r036_inputOrderIODesc"     : "Essa ação vai trabalhar a ordem de deformação\nexportando e importando suas listas.",
     "r037_transformationIO"     : "Transformação IO",
     "r038_transformationIODesc" : "Essa ação vai trabalhar a transformação\nexportando e importando seus dados.",
+    "r039_rivetIO"              : "Rivet IO",
+    "r040_rivetIODesc"          : "Essa ação vai trabalhar os rivets\nexportando e importando seus dados.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",

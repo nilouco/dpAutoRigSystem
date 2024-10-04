@@ -9,7 +9,7 @@ import shutil
 PIPE_FOLDER = "_dpPipeline"
 DISCORD_URL = "https://discord.com/api/webhooks"
 
-DP_PIPELINER_VERSION = 1.10
+DP_PIPELINER_VERSION = 1.11
 
 
 class Pipeliner(object):
@@ -147,7 +147,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Info",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-01-01",
-        "updated" : "2024-05-13",
+        "updated" : "2024-10-03",
         
         "f_drive"            : "",
         "f_studio"           : "",
@@ -169,6 +169,7 @@ class Pipeliner(object):
         "s_inputOrderIO"     : self.dpUIinst.dpData+"/dpInputOrder",
         "s_parentingIO"      : self.dpUIinst.dpData+"/dpParenting",
         "s_transformationIO" : self.dpUIinst.dpData+"/dpTransformation",
+        "s_rivetIO"          : self.dpUIinst.dpData+"/dpRivet",
         "s_old"              : "dpOld",
         "s_dropbox"          : "Job",
         "s_webhook"          : "",
@@ -211,7 +212,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2024-05-13",
+        "updated" : "2024-10-03",
         
         "f_drive"            : "i228_fDriveAnn",
         "f_studio"           : "i229_fStudioAnn",
@@ -233,6 +234,7 @@ class Pipeliner(object):
         "s_inputOrdererIO"   : "i311_sInputOrderIOAnn",
         "s_parentingIO"      : "i300_sParentingIOAnn",
         "s_transformationIO" : "i312_sTransformationIOAnn",
+        "s_rivetIO"          : "i323_sRivetIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
         "s_prefix"           : "i239_sPrefixAnn",

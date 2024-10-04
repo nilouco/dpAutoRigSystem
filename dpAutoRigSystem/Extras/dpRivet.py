@@ -20,6 +20,7 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
+import json
 from functools import partial
 from ..Modules.Library import dpControls
 
@@ -34,7 +35,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.2
+DP_RIVET_VERSION = 2.3
 
 
 class Rivet(object):
@@ -47,6 +48,7 @@ class Rivet(object):
         self.itemType = None
         self.meshNode = None
         self.selectedUVSet = None
+        self.deformerToUse = MORPH
         self.morphDeformer = MORPH
         self.wrapDeformer = WRAP
         self.mayaMinimalVersion = 2022.3
@@ -115,7 +117,7 @@ class Rivet(object):
         removeLayout = cmds.columnLayout("removeLayout", columnOffset=("left", 10), parent=rivetTabsLayout)
         cmds.separator(style='none', height=10, parent=removeLayout)
         removeButtonsRL = cmds.rowLayout(numberOfColumns=2, columnAlign=[(1, 'left'), (2, 'right')], parent=removeLayout)
-        cmds.button(label=self.dpUIinst.lang["i292_selectAll"], width=153, command=self.selectAll, parent=removeButtonsRL)
+        cmds.button(label=self.dpUIinst.lang["i314_selectAll"], width=153, command=self.selectAll, parent=removeButtonsRL)
         cmds.button(label=self.dpUIinst.lang["m181_refresh"], width=153, command=self.refreshRivetList, parent=removeButtonsRL)
         cmds.separator(style='none', height=5, parent=removeLayout)
         self.filterRivetList = cmds.textField("filterRivetList", width=310, changeCommand=self.refreshRivetList, parent=removeLayout)
@@ -159,22 +161,12 @@ class Rivet(object):
         cmds.select(selectionList)
 
 
-    def riseRivetNetNodes(self):
-        """ Find all network nodes that have dpRivetNet attribute, and return them as a list.
-        """
-        netNodeList = cmds.ls(type="network")
-        rivetNetworkNodesList = None
-        if len(netNodeList) != 0:
-            rivetNetworkNodesList = list(filter(lambda netNode: cmds.objExists(f"{netNode}.dpRivetNet"), netNodeList))
-        return rivetNetworkNodesList
-    
-
     def removeRivetFromList(self, indexList, itemList):
         """ Receive two lists, the item list has the node with rivet and the index list has the correct index to find the network node.
         """
         self.disablePac(indexList)
         for i, index in enumerate(indexList):
-            self.setProgressBar(i+1, self.dpUIinst.lang['i293_removing'])
+            self.setProgressBar(i+1, self.dpUIinst.lang['i315_removing'])
             netNode = self.rivetNetNodeList[index]
             if netNode:
                 self.removeRivetFromNetNode(netNode)
@@ -193,13 +185,13 @@ class Rivet(object):
     
 
     def removeRivetFromUI(self, *args):
-        """ Remove rivets selected on the controllers list in the ui.
+        """ Remove selected rivets on the controllers list in the ui.
         """
         selectionList = cmds.textScrollList(self.rivetControllersList, query=True, selectItem=True)
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            cmds.progressWindow(title=f"{self.dpUIinst.lang['i293_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(trueIndexList), status=self.dpUIinst.lang['i293_removing'])
+            cmds.progressWindow(title=f"{self.dpUIinst.lang['i315_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(trueIndexList), status=self.dpUIinst.lang['i315_removing'])
             self.removeRivetFromList(trueIndexList, selectionList)
             self.checkRivetGrp()
             cmds.progressWindow(endProgress=True)
@@ -251,7 +243,7 @@ class Rivet(object):
             skinClusterList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='skinCluster')
             blendShapeList = cmds.ls(cmds.listHistory(attachedGeometry, pruneDagObjects=True), type='blendShape')
             if len(skinClusterList) == 0 and len(blendShapeList) == 0:
-                removeAttachedGeo = cmds.confirmDialog(title=self.dpUIinst.lang['i297_removeGeometry'], icon="question", message=f"{self.dpUIinst.lang['i298_rivetHeldGeo']} {attachedGeometry} {self.dpUIinst.lang['i299_noConnectionGeo']}", button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
+                removeAttachedGeo = cmds.confirmDialog(title=self.dpUIinst.lang['i319_removeGeometry'], icon="question", message=f"{self.dpUIinst.lang['i320_rivetHeldGeo']} {attachedGeometry} {self.dpUIinst.lang['i321_noConnectionGeo']}", button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
 
                 if removeAttachedGeo == self.dpUIinst.lang['i071_yes']:
                     currentParent = cmds.listRelatives(attachedGeometry, parent=True)
@@ -268,11 +260,11 @@ class Rivet(object):
     def itemsWithRivetList(self):
         """ From all rivet network nodes, rise a controllers list to fill ui.
         """
-        rivetNetNodes = self.riseRivetNetNodes()
-        if rivetNetNodes:
+        rivetNetList = self.utils.getNetworkNodeByAttr("dpRivetNet")
+        if rivetNetList:
             controllerList = []
             self.rivetNetNodeList = []
-            for rivetNode in rivetNetNodes:
+            for rivetNode in rivetNetList:
                 rivetControlList = cmds.listConnections(f"{rivetNode}.itemNode", destination=False)
                 if rivetControlList:
                     controllerList.append(rivetControlList[0])
@@ -385,11 +377,11 @@ class Rivet(object):
             needToRemove = toCreateSet & hasRivetSet
         if needToRemove:
             if len(needToRemove) > 0:
-                removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i294_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
+                removeExistingRivet = cmds.confirmDialog(title=self.dpUIinst.lang['i074_attention'], icon="warning", message=self.dpUIinst.lang['i316_rivetNotFine'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no'], self.dpUIinst.lang['i132_cancel']], defaultButton=self.dpUIinst.lang['i071_yes'], cancelButton=self.dpUIinst.lang['i132_cancel'], dismissString=self.dpUIinst.lang['i132_cancel'])
 
                 if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    cmds.progressWindow(title=f"{self.dpUIinst.lang['i293_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(needToRemoveList), status=self.dpUIinst.lang['i293_removing'])
+                    cmds.progressWindow(title=f"{self.dpUIinst.lang['i315_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(needToRemoveList), status=self.dpUIinst.lang['i315_removing'])
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
                     cmds.progressWindow(endProgress=True)
                 elif removeExistingRivet == self.dpUIinst.lang['i072_no']:
@@ -398,7 +390,7 @@ class Rivet(object):
                     return
 
         # call run function to create Rivet setup using UI values
-        cmds.progressWindow(title=self.dpUIinst.lang['i295_creatingRivet'], progress=0, maxValue=len(itemList), status=self.dpUIinst.lang['i296_working'])
+        cmds.progressWindow(title=self.dpUIinst.lang['i317_creatingRivet'], progress=0, maxValue=len(itemList), status=self.dpUIinst.lang['i318_working'])
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         cmds.progressWindow(endProgress=True)
         self.utils.closeUI('dpRivetWindow')
@@ -557,11 +549,12 @@ class Rivet(object):
         return invTGrp, invRGrp
     
     
-    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, *args):
+    def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, reuseFaceToRivet=False, *args):
         """ Create the Rivet setup.
-            Returns follicle node.
+            Returns the network node. 
         """
         # declaring variables
+        self.originedGeo = geoToAttach
         self.shapeToAttachList = None
         self.shapeToAttach = None
         self.cpNode = None
@@ -601,7 +594,11 @@ class Rivet(object):
             
         # if Create FaceToRivet is activated, it will create a new geometry with cut faces, wrap in the original and parent in the Model_Grp
         if faceToRivet:
-            geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4, geoToAttach)
+            if reuseFaceToRivet and cmds.objExists(reuseFaceToRivet):
+                geoToAttach = reuseFaceToRivet
+            else:
+                geoToAttach = self.createFaceToRivet(itemList, self.extractGeoToRivet(geoToAttach), 4)
+            self.deformFaceToRivet(geoToAttach, self.originedGeo)
             modelGrp = self.utils.getNodeByMessage("modelsGrp")
             if modelGrp:
                 self.ctrls.colorShape([modelGrp], [0.51, 1, 0.667], outliner=True) #green
@@ -781,15 +778,17 @@ class Rivet(object):
                 cmds.addAttr(self.net, longName="deformerGeo", attributeType="message")
                 cmds.addAttr(self.net, longName="deformerNode", attributeType="message")
                 cmds.addAttr(self.net, longName="pacNode", attributeType="message")
+                cmds.addAttr(self.net, longName="rivetData", dataType="string")
                 # set
                 cmds.setAttr(self.net+".dpNetwork", 1)
                 cmds.setAttr(self.net+".dpRivetNet", 1)
+                cmds.setAttr(self.net+".rivetData", json.dumps(self.getRivetData(itemList[r], geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset)), type="string")
                 # connect
                 cmds.connectAttr(rivet+".message", self.net+".rivet", force=True)
                 cmds.connectAttr(folTransf+".message", self.net+".follicle", force=True)
                 cmds.connectAttr(geoToAttach+".message", self.net+".geoToAttach", force=True)
                 cmds.connectAttr(f"{rivetPac}.message", f"{self.net}.pacNode", force=True)
-                    
+                
                 if faceToRivet:
                     cmds.connectAttr(self.deformerNodeList[0]+".message", self.net+".deformerGeo", force=True)
                     cmds.connectAttr(self.deformerNodeList[1]+".message", self.net+".deformerNode", force=True)
@@ -811,7 +810,7 @@ class Rivet(object):
                             currentLongName = f"rivetNet{newIndex}"
                             cmds.addAttr(itemList[r], longName=currentLongName, attributeType="message")
                             cmds.connectAttr(self.net+".message", f"{itemList[r]}.{currentLongName}", force=True)
-                
+            
             # check invert group (back) in order to avoid double transformations:
             if addInvert:
                 for rivet in self.rivetList:
@@ -826,45 +825,73 @@ class Rivet(object):
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
 
         cmds.select(clear=True)
-        return folTransf
+        return self.net
     
+
+    def getRivetData(self, itemNode, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset, *args):
+        """ Collect all rivet data and return it as a dictionary.
+        """
+        dataDic = {
+                    "rivetNetName"    : self.net,
+                    "itemNode"        : itemNode,
+                    "geoToAttach"     : self.originedGeo,
+                    "uvSetName"       : uvSetName,
+                    "itemList"        : itemList,
+                    "attachTranslate" : attachTranslate,
+                    "attachRotate"    : attachRotate,
+                    "addFatherGrp"    : addFatherGrp,
+                    "addInvert"       : addInvert,
+                    "invT"            : invT,
+                    "invR"            : invR,
+                    "faceToRivet"     : faceToRivet,
+                    "rivetGrpName"    : rivetGrpName,
+                    "askComponent"    : askComponent,
+                    "useOffset"       : useOffset,
+                    "deformerToUse"   : self.deformerToUse,
+                    "reuseFaceToRivet": geoToAttach
+        }
+        return dataDic
+
 
     def extractGeoToRivet(self, geo, *args):
         """ Turn off skinCluster and blendShape envelope if exists, duplicate the selected geometry
-            apply initial shading and remove it from any display layer
+            apply initial shading and remove it from any display layer,
+            if the faceToRivet geometry doesn't exist yet.
         """ 
-        # Get the history to turn off envelopes if exists
-        histList = cmds.listHistory(geo)
-        shapeList = cmds.listRelatives(geo, shapes=True)
-        if shapeList:
-            # check if there's a skinCluster node connected to the first selected item
-            checkSkin = self.dpCheckNodeExists(shapeList, "skinCluster")
-            checkBS = self.dpCheckNodeExists(shapeList, "blendShape")
-            if checkSkin == 1:
-                skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
-                cmds.setAttr(skinClusterNode+".envelope", 0)
-            if checkBS == 2:
-                blendShapeNode = cmds.ls(histList, type="blendShape")[0]
-                cmds.setAttr(blendShapeNode+".envelope", 0)
-            # Duplicate geometry after turn off skinCluster and blendShape. 
-            toRivetGeo = cmds.duplicate(geo)[0]
-            self.utils.removeUserDefinedAttr(toRivetGeo)
-            # Unparenting
-            if cmds.listRelatives(toRivetGeo, allParents=True):
-                cmds.parent(toRivetGeo, world=True)
-            # Unlock attributes and apply initialShading
-            self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
-            cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
-            cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
-            self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
-            # Renaming
-            toRivetGeo = cmds.rename(toRivetGeo, self.getFaceToRivetGeoName(geo))
-            # Turning on nodes
-            if checkSkin == 1:
-                cmds.setAttr(skinClusterNode+".envelope", 1)
-            if checkBS == 2:
-                cmds.setAttr(blendShapeNode+".envelope", 1)
-            return toRivetGeo
+        faceToRivetGeoName = self.getFaceToRivetGeoName(geo)
+        if not cmds.objExists(faceToRivetGeoName):
+            # Get the history to turn off envelopes if exists
+            histList = cmds.listHistory(geo)
+            shapeList = cmds.listRelatives(geo, shapes=True)
+            if shapeList:
+                # check if there's a skinCluster node connected to the first selected item
+                checkSkin = self.dpCheckNodeExists(shapeList, "skinCluster")
+                checkBS = self.dpCheckNodeExists(shapeList, "blendShape")
+                if checkSkin == 1:
+                    skinClusterNode = cmds.ls(histList, type="skinCluster")[0]
+                    cmds.setAttr(skinClusterNode+".envelope", 0)
+                if checkBS == 2:
+                    blendShapeNode = cmds.ls(histList, type="blendShape")[0]
+                    cmds.setAttr(blendShapeNode+".envelope", 0)
+                # Duplicate geometry after turn off skinCluster and blendShape. 
+                toRivetGeo = cmds.duplicate(geo)[0]
+                self.utils.removeUserDefinedAttr(toRivetGeo)
+                # Unparenting
+                if cmds.listRelatives(toRivetGeo, allParents=True):
+                    cmds.parent(toRivetGeo, world=True)
+                # Unlock attributes and apply initialShading
+                self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ", "visibility"], False, True, True)
+                cmds.sets(toRivetGeo, edit=True, forceElement="initialShadingGroup")
+                cmds.editDisplayLayerMembers("defaultLayer", toRivetGeo, noRecurse=False)
+                self.dpUIinst.ctrls.setLockHide([toRivetGeo], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
+                # Renaming
+                cmds.rename(toRivetGeo, faceToRivetGeoName)
+                # Turning on nodes
+                if checkSkin == 1:
+                    cmds.setAttr(skinClusterNode+".envelope", 1)
+                if checkBS == 2:
+                    cmds.setAttr(blendShapeNode+".envelope", 1)
+        return faceToRivetGeoName
     
 
     def getFaceToRivetGeoName(self, geo, *args):
@@ -884,7 +911,7 @@ class Rivet(object):
         return toRivetName+"_FaceToRivet_"+str(i).zfill(2)+"_Geo"
 
     
-    def createFaceToRivet(self, controlList, geometry, growMultiplier, origGeo, *args):
+    def createFaceToRivet(self, controlList, geometry, growMultiplier, *args):
         """ Get the pivot coordinates from each control to get the nearest face from control to the geometry.
             After the initial selection it will grow 4 times by default.
             It uses delta to delete the extra faces, than glue it to the original model with Morph or Wrap deformer.
@@ -904,7 +931,7 @@ class Rivet(object):
                 for i in range(3)
             ]
             faceCoordinateList.append(avgCoordinates)
-        # Select the neareest face from each pivot.
+        # Select the nearest face from each pivot.
         for control, pivot in pivotList.items():
             nearestFace = None
             minimalDistance = None
@@ -933,14 +960,21 @@ class Rivet(object):
         cmds.polyAutoProjection(geometry, constructionHistory=False)
         cmds.selectMode(object=True)
         cmds.scriptEditorInfo(edit=True, suppressWarnings=False, suppressInfo=True, suppressErrors=False, suppressResults=False)
-        # Create deformer by user selection
-        deformerSelectedRadioButton = cmds.radioCollection(self.deformerCollection, query=True, select=True)
-        deformerSelected = cmds.radioButton(deformerSelectedRadioButton, query=True, annotation=True)
-        if deformerSelected == self.morphDeformer:
-            self.deformerNodeList = self.applyMorphDeformer(geometry, origGeo)
-        elif deformerSelected == self.wrapDeformer:
-            self.deformerNodeList = self.applyWrapDeformer(geometry, origGeo)
         return geometry
+    
+
+    def deformFaceToRivet(self, geometry, origGeo, *args):
+        """ Do deformation from original mesh to faceToRivet geo.
+        """
+        if self.ui:
+            # Create deformer by user selection
+            deformerSelectedRadioButton = cmds.radioCollection(self.deformerCollection, query=True, select=True)
+            self.deformerToUse = cmds.radioButton(deformerSelectedRadioButton, query=True, annotation=True)
+        if self.deformerToUse:
+            if self.deformerToUse == self.morphDeformer:
+                self.deformerNodeList = self.applyMorphDeformer(geometry, origGeo)
+            elif self.deformerToUse == self.wrapDeformer:
+                self.deformerNodeList = self.applyWrapDeformer(geometry, origGeo)
 
 
     def dpCheckNodeExists(self, shapeList, type, *args):
@@ -1000,7 +1034,8 @@ class Rivet(object):
         # Parent in modelsGrp
         modelGrp = self.utils.getNodeByMessage("modelsGrp")
         if modelGrp:
-            cmds.parent(morphGeo, modelGrp)
+            if not morphGeo in cmds.listRelatives(modelGrp, allDescendents=True, children=True):
+                cmds.parent(morphGeo, modelGrp)
         return morphGeo, morphNode
 
 
@@ -1026,7 +1061,9 @@ class Rivet(object):
         # Parent in modelsGrp
         modelGrp = self.utils.getNodeByMessage("modelsGrp")
         if modelGrp:
-            cmds.parent(wrapGeo, baseShape, modelGrp)
+            for w in [wrapGeo, baseShape]:
+                if not w in cmds.listRelatives(modelGrp, allDescendents=True, children=True):
+                    cmds.parent(wrapGeo, baseShape, modelGrp)
         return wrapGeo, wrapNode
 
 

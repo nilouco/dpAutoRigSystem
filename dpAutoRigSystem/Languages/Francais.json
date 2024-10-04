@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-10-02",
+    "_updated"       : "2024-10-03",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -475,18 +475,16 @@
     "i311_sInputOrderIOAnn"     : "Le dossier ou on va importer et exporter les donnés des ordres de déformateurs.",
     "i312_sTransformationIOAnn" : "Le dossier ou on va importer et exporter les donnés des transformations.",
     "i313_deformedBy"           : "Deformé par",
-
-
-    "i292_selectAll"         : "Tout sélectionner",
-    "i293_removing"          : "Suppression",
-    "i294_rivetNotFine"      : "Au moins un des éléments sélectionnés possède déjà un rivet, vous souhaitez le retirer avant d'en créer un nouveau (fortement recommandé).",
-    "i295_creatingRivet"     : "Création de rivets",
-    "i296_working"           : "Travaillant",
-    "i297_removeGeometry"    : "Supprimer la géométrie attachée",
-    "i298_rivetHeldGeo"      : "La géométrie qui retenait le(s) rivet(s)",
-    "i299_noConnectionGeo"   : "n'a plus de connexion, souhaitez-vous la supprimer?",
-    "i300_didntChangeInf"    : "Pas changé l'influence de:\n",
-
+    "i314_selectAll"            : "Tout sélectionner",
+    "i315_removing"             : "Suppression",
+    "i316_rivetNotFine"         : "Au moins un des éléments sélectionnés possède déjà un rivet, vous souhaitez le retirer avant d'en créer un nouveau (fortement recommandé).",
+    "i317_creatingRivet"        : "Création de rivets",
+    "i318_working"              : "Travaillant",
+    "i319_removeGeometry"       : "Supprimer la géométrie attachée",
+    "i320_rivetHeldGeo"         : "La géométrie qui retenait le(s) rivet(s)",
+    "i321_noConnectionGeo"      : "n'a plus de connexion, souhaitez-vous la supprimer?",
+    "i322_didntChangeInf"       : "Pas changé l'influence de:\n",
+    "i323_sRivetIOAnn"          : "Le dossier ou on va importer et exporter les donnés des rivets.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -721,12 +719,9 @@
     "m231_proxyCreatorDesc"      : "Ce module va creer a mesh proxy pour le rig courant.",
     "m232_morphDeformer"         : "Déformateur Morph",
     "m233_wrapDeformer"          : "Déformateur Wrap",
-    
-
-    
-    "m234_unableRemRivet"       : "Impossible de retirer le rivet: ",
-    "m235_noItemSelect"         : "Aucun élément sélectionné, veuillez sélectionner un élément à supprimer.",
-    "m236_removedRivet"         : "Le rivet a été bien supprimé!",
+    "m234_unableRemRivet"        : "Impossible de retirer le rivet: ",
+    "m235_noItemSelect"          : "Aucun élément sélectionné, veuillez sélectionner un élément à supprimer.",
+    "m236_removedRivet"          : "Le rivet a été bien supprimé!",
 
     "p001_prefixText" : "Attention: Le préfixe ne peut pas commencer avec un numéro, un espace blanc ou des caractères spéciaux, désole.",
     "p002_left"       : "G",
@@ -774,7 +769,9 @@
     "r035_inputOrderIO"         : "L'Input Ordre IO",
     "r036_inputOrderIODesc"     : "Cet action va travailler l'ordre de déformatation\nl'export et l'import de ces listes.",
     "r037_transformationIO"     : "Transformation IO",
-    "r038_transformationIODesc" : "This action will work with transformations\nexporting and importing them data.",
+    "r038_transformationIODesc" : "Cet action va travailler les nodes de transformation\nl'export et l'import de ces donées.",
+    "r039_rivetIO"              : "Rivet IO",
+    "r040_rivetIODesc"          : "Cet action va travailler des rivets\nl'export et l'import de ces donées.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

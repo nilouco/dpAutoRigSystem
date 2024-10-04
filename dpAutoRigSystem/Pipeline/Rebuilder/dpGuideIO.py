@@ -70,7 +70,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                     for moduleInstance in self.dpUIinst.moduleInstancesList:
                                         if str(moduleInstance) == moduleInstanceInfoString:
                                             moduleInstance.serializeGuide(False) #serialize it without build it
-                                toExportDataDic[net] = cmds.getAttr(net+".afterData")
+                                toExportDataDic[net] = json.loads(cmds.getAttr(net+".afterData"))
                         if toExportDataDic:
                             try:
                                 # export json file
