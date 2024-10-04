@@ -13,3 +13,4 @@ dpSkinningIO
 dpDeformationIO
 dpInputOrderIO
 dpControlShapeIO
+dpCalibrationIO

@@ -18,8 +18,8 @@
 ###################################################################
 
 
-DPAR_VERSION_PY3 = "4.04.25"
-DPAR_UPDATELOG = "N849 - Middle reverseFoot bottom new pivot."
+DPAR_VERSION_PY3 = "4.04.26"
+DPAR_UPDATELOG = "N790 - Rebuilder."
 
 
 

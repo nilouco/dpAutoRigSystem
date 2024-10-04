@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-10-03",
+    "_updated"       : "2024-10-04",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -485,6 +485,7 @@
     "i321_noConnectionGeo"      : "não tem mais nenhuma conexão, gostaria de removê-la?",
     "i322_didntChangeInf"       : "Não alterado a influência para:\n",
     "i323_sRivetIOAnn"          : "O diretório onde será exportado ou importado os dados dos rivets.",
+    "i324_sCalibrationIOAnn"    : "O diretório onde será exportado ou importado os dados de calibrações.",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",
@@ -772,6 +773,8 @@
     "r038_transformationIODesc" : "Essa ação vai trabalhar a transformação\nexportando e importando seus dados.",
     "r039_rivetIO"              : "Rivet IO",
     "r040_rivetIODesc"          : "Essa ação vai trabalhar os rivets\nexportando e importando seus dados.",
+    "r041_calibrationIO"        : "Calibração IO",
+    "r042_calibrationIODesc"    : "Essa ação vai trabalhar a calibração dos controles\nexportando e importando seus dados.",
     
     "t000_translator"      : "Tradutor",
     "t001_greeting"        : "Obrigado pela sua ajuda nesse projeto.\n\nAntes de começar a traduzir as frases,\nprecisamos coletar algumas informações,\npara completar o arquivo...",
