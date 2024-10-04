@@ -1224,10 +1224,11 @@ class Utils(object):
     def reapplyDeformers(self, item, defList, *args):
         """ Reapply the given deformer list to the destination given item except the tweak node.
         """
-        for deformerNode in defList:
-            if cmds.objExists(deformerNode):
-                if not cmds.objectType(deformerNode) == "tweak":
-                    cmds.deformer(deformerNode, edit=True, geometry=item)
+        if cmds.objExists(item):
+            for deformerNode in defList:
+                if cmds.objExists(deformerNode):
+                    if not cmds.objectType(deformerNode) == "tweak":
+                        cmds.deformer(deformerNode, edit=True, geometry=item)
 
 
     def getTransformData(self, item, t=True, r=True, s=True, useWorldSpace=True, *args):
