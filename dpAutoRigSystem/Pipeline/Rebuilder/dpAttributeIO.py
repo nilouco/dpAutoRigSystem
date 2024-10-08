@@ -23,6 +23,7 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_attributeIO"
         self.startName = "dpAttribute"
+        self.defaultValueTypeList = ["bool", "long",  "short",  "byte",  "char",  "enum",  "'float'",  "double",  "doubleAngle",  "doubleLinear"]
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -49,10 +50,9 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                     ctrlList = objList
                 else:
                     ctrlList = self.dpUIinst.ctrls.getControlList()
-#                    ctrlList = cmds.ls(selection=False)
                 if ctrlList:
                     if self.firstMode: #export
-                        toExportDataDic = self.getAttributeDataDic(ctrlList, True)
+                        toExportDataDic = self.getAttributeDataDic(ctrlList)
                         try:
                             # export json file
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
@@ -66,13 +66,13 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                             exportedList = self.getExportedList()
                             if exportedList:
                                 exportedList.sort()
-                                attributeDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if attributeDic:
+                                attrDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                                if attrDic:
                                     progressAmount = 0
-                                    maxProcess = len(attributeDic.keys())
+                                    maxProcess = len(attrDic.keys())
                                     # define lists to check result
                                     wellImportedList = []
-                                    for item in attributeDic.keys():
+                                    for item in attrDic.keys():
                                         notFoundNodesList = []
                                         progressAmount += 1
                                         cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
@@ -80,22 +80,36 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                                         if not cmds.objExists(item):
                                             item = item[item.rfind("|")+1:] #short name (after last "|")
                                         if cmds.objExists(item):
-                                            for attr in attributeDic[item].keys():
+                                            for attr in attrDic[item]["attributes"].keys():
                                                 if not cmds.objExists(item+"."+attr):
-                                                    if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                                                        # unlock attribute
-                                                        wasLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                                        cmds.setAttr(item+"."+attr, lock=False)
-                                                        try:
-                                                            # add and set attribute value
-#                                                            cmds.addAttr()
-                                                            cmds.setAttr(item+"."+attr, attributeDic[item][attr]['value'])
-                                                            # lock attribute again if it was locked
-                                                            cmds.setAttr(item+"."+attr, lock=wasLocked)
-                                                            if not item in wellImportedList:
-                                                                wellImportedList.append(item)
-                                                        except Exception as e:
-                                                            self.notWorkedWellIO(item+" - "+str(e))
+                                                    try:
+                                                        # add and set attribute value
+                                                        if attrDic[item]["attributes"][attr]['type'] == "string":
+                                                            cmds.addAttr(item, longName=attr, dataType="string")
+                                                            cmds.setAttr(item+"."+attr, attrDic[item]["attributes"][attr]['value'], type="string")
+                                                        elif attrDic[item]["attributes"][attr]['type'] == "enum":
+                                                            cmds.addAttr(item, longName=attr, attributeType="enum", enumName=attrDic[item]["attributes"][attr]['enumName'])
+                                                        else:
+                                                            if attrDic[item]["attributes"][attr]['minExists']:
+                                                                if attrDic[item]["attributes"][attr]['maxExists']:
+                                                                    cmds.addAttr(item, longName=attr, attributeType=attrDic[item]["attributes"][attr]['type'], minValue=attrDic[item]["attributes"][attr]['minimum'], maxValue=attrDic[item]["attributes"][attr]['maximum'], defaultValue=attrDic[item]["attributes"][attr]['default'])
+                                                                else:
+                                                                    cmds.addAttr(item, longName=attr, attributeType=attrDic[item]["attributes"][attr]['type'], minValue=attrDic[item]["attributes"][attr]['minimum'], defaultValue=attrDic[item]["attributes"][attr]['default'])
+                                                            elif attrDic[item]["attributes"][attr]['maxExists']:
+                                                                cmds.addAttr(item, longName=attr, attributeType=attrDic[item]["attributes"][attr]['type'], maxValue=attrDic[item]["attributes"][attr]['maximum'], defaultValue=attrDic[item]["attributes"][attr]['default'])
+                                                            else:
+                                                                cmds.addAttr(item, longName=attr, attributeType=attrDic[item]["attributes"][attr]['type'], defaultValue=attrDic[item]["attributes"][attr]['default'])
+                                                        if attrDic[item]["attributes"][attr]['type'] in self.defaultValueTypeList:
+                                                            cmds.setAttr(item+"."+attr, attrDic[item]["attributes"][attr]['value'])
+                                                            cmds.setAttr(item+"."+attr, keyable=attrDic[item]["attributes"][attr]['nonKeyable'])
+                                                            cmds.setAttr(item+"."+attr, channelBox=attrDic[item]["attributes"][attr]['show'])
+                                                            cmds.setAttr(item+"."+attr, lock=attrDic[item]["attributes"][attr]['locked'])
+                                                        if not item in wellImportedList:
+                                                            wellImportedList.append(item)
+                                                    except Exception as e:
+                                                        self.notWorkedWellIO(item+" - "+str(e))
+                                            # reorder attr
+                                            self.dpUIinst.reorderAttributes([item], attrDic[item]["order"])
                                         else:
                                             notFoundNodesList.append(item)
                                     if wellImportedList:
@@ -125,12 +139,10 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def getAttributeDataDic(self, ctrlList, filterUserDefined=False, *args):
+    def getAttributeDataDic(self, ctrlList, *args):
         """ Processes the given controller list to collect and mount the attributes data.
             Returns the dictionary to export.
-            {ctrl : {attr : [attrType, [attrDefaultValue, attrEnumValues], attrValue]}}
         """
-        defaultValueTypeList = ["bool", "long",  "short",  "byte",  "char",  "enum",  "'float'",  "double",  "doubleAngle",  "doubleLinear"]
         if ctrlList:
             dic = {}
             progressAmount = 0
@@ -140,33 +152,29 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
             for ctrl in ctrlList:
-                attrList = cmds.listAttr(ctrl, userDefined=filterUserDefined)
+                attrList = cmds.listAttr(ctrl, userDefined=True)
                 if attrList:
-                    dic[ctrl] = {}
+                    dic[ctrl] = {"attributes" : {},
+                                 "order" : attrList}
+                    nonKeyableList = cmds.listAttr(ctrl, channelBox=True)
                     for attr in attrList:
                         if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
                             attrType = cmds.getAttr(ctrl+"."+attr, type=True)
-                            dic[ctrl][attr] = {
+                            dic[ctrl]["attributes"][attr] = {
                                                 "type" : attrType,
                                                 "value" : cmds.getAttr(ctrl+"."+attr),
-                                                "channelBox" : cmds.getAttr(ctrl+"."+attr, channelBox=True),
-                                                "keyable" : cmds.getAttr(ctrl+"."+attr, keyable=True),
-                                                "lock" : cmds.getAttr(ctrl+"."+attr, lock=True)
-                            }
-                            attrDefaultValue = [None, None]
-                            if attrType in defaultValueTypeList:
+                                                "locked" : cmds.getAttr(ctrl+"."+attr, lock=True)
+                                                }
+                            if attrType in self.defaultValueTypeList:
                                 if attrType == "enum":
-                                    attrDefaultValue = [cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), cmds.attributeQuery(attr, node=ctrl, listEnum=True)]
-                                else:
-                                    attrDefaultValue = [cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True), None]
-                                dic[ctrl][attr]["defaultValue"] = attrDefaultValue
-                                maxExists = cmds.attributeQuery(attr, node=ctrl, maxExists=True) or None
-                                if maxExists:
-                                    dic[ctrl][attr]["maxExists"] = maxExists
-                                    dic[ctrl][attr]["maximum"] = cmds.attributeQuery(attr, node=ctrl, maximum=True)
-
-                                minExists = cmds.attributeQuery(attr, node=ctrl, minExists=True) or None
-                                if minExists:
-                                    dic[ctrl][attr]["minExists"] = minExists
-                                    dic[ctrl][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)
+                                    dic[ctrl]["attributes"][attr]["enumName"] = cmds.attributeQuery(attr, node=ctrl, listEnum=True)[0]
+                                dic[ctrl]["attributes"][attr]["default"] = cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True)
+                                dic[ctrl]["attributes"][attr]["maxExists"] = cmds.attributeQuery(attr, node=ctrl, maxExists=True) or False
+                                if dic[ctrl]["attributes"][attr]["maxExists"]:
+                                    dic[ctrl]["attributes"][attr]["maximum"] = cmds.attributeQuery(attr, node=ctrl, maximum=True)[0]
+                                dic[ctrl]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=ctrl, minExists=True) or False
+                                if dic[ctrl]["attributes"][attr]["minExists"]:
+                                    dic[ctrl]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)[0]
+                            dic[ctrl]["attributes"][attr]["show"] = cmds.getAttr(ctrl+"."+attr, keyable=True) or cmds.getAttr(ctrl+"."+attr, channelBox=True)
+                            dic[ctrl]["attributes"][attr]["nonKeyable"] = attr in nonKeyableList
             return dic
