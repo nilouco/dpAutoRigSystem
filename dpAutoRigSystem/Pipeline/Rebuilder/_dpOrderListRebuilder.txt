@@ -8,10 +8,10 @@ dpGuideIO
 dpRigItIO
 dpParentingIO
 dpRivetIO
-dpTransformationIO
 dpSkinningIO
 dpDeformationIO
 dpInputOrderIO
+dpTransformationIO
 dpControlShapeIO
 dpAttributeIO
 dpCalibrationIO

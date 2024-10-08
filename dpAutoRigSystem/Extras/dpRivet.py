@@ -1032,10 +1032,7 @@ class Rivet(object):
         componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
         cmds.rename(componentMatchNode, toRivetName+"_CpM")
         # Parent in modelsGrp
-        modelGrp = self.utils.getNodeByMessage("modelsGrp")
-        if modelGrp:
-            if not morphGeo in cmds.listRelatives(modelGrp, allDescendents=True, children=True):
-                cmds.parent(morphGeo, modelGrp)
+        self.parentToTransform([morphGeo], self.utils.getNodeByMessage("modelsGrp"))
         return morphGeo, morphNode
 
 
@@ -1059,12 +1056,21 @@ class Rivet(object):
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
         # Parent in modelsGrp
-        modelGrp = self.utils.getNodeByMessage("modelsGrp")
-        if modelGrp:
-            for w in [wrapGeo, baseShape]:
-                if not w in cmds.listRelatives(modelGrp, allDescendents=True, children=True):
-                    cmds.parent(wrapGeo, baseShape, modelGrp)
+        self.parentToTransform([wrapGeo, baseShape], self.utils.getNodeByMessage("modelsGrp"))
         return wrapGeo, wrapNode
+
+
+    def parentToTransform(self, itemList, destParent, *args):
+        """ Just check if the item is child of the destination parent node then parent it if needed.
+        """
+        if itemList and destParent:
+            if cmds.objExists(destParent):
+                for item in itemList:
+                    childrenList = cmds.listRelatives(destParent, allDescendents=True, children=True)
+                    if not childrenList:
+                        cmds.parent(item, destParent)
+                    elif not item in childrenList:
+                        cmds.parent(item, destParent)
 
 
     def findOrig(self, geoList, *args):
