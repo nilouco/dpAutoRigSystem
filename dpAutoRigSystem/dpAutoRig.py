@@ -2288,7 +2288,8 @@ class DP_AutoRig_UI(object):
                             dpRAttr.dpMoveAttr(1, [obj], [desAttr])
                     else:
                         delta = delta+1
-                cmds.progressWindow(endProgress=True)
+                if verbose:
+                    cmds.progressWindow(endProgress=True)
                 dpRAttr.dpCloseReorderAttrUI()
 
     
@@ -3201,6 +3202,9 @@ class DP_AutoRig_UI(object):
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpLimbSpaceSwitch", EXTRAS)
             
+            # nodes treatment
+            self.utils.unitConversionTreatment()
+
             # show dialogBox if detected a bug:
             if integrate == 1:
                 if self.detectedBug:

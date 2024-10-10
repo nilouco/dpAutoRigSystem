@@ -1244,3 +1244,28 @@ class Utils(object):
                 if s:
                     resultDic["scale"] = cmds.xform(item, query=True, scale=s, worldSpace=useWorldSpace)
         return resultDic
+
+
+    def unitConversionTreatment(self, itemList=None, *args):
+        """ Rename unitConversion nodes to something like this:
+            [IN]capitals+#+attr+_+[OUT]capitals+#+attr+"_UC"
+        """
+        if not itemList:
+            itemList = cmds.ls(selection=False, type="unitConversion")
+        if itemList:
+            for item in itemList:
+                if not item.endswith("_UC"):
+                    newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
+                    newName += "_"
+                    newName += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
+                    newName += "_UC"
+                    cmds.rename(item, newName)
+
+
+    def getCapitalsName(self, plug, *args):
+        """ Returns a string of all capital letters from a given name.
+            Example:
+                    Head_Head_Ctrl.rotateX = HHCrotateX
+                    L_Arm_Wrist_Ctrl.translateZ = LAWCtranslateZ
+        """
+        return str("".join([n for n in plug.split(".")[0] if n.isupper() or n.isnumeric()])+plug.split(".")[1].replace("[", "").replace("]", ""))
