@@ -14,4 +14,5 @@ dpInputOrderIO
 dpTransformationIO
 dpControlShapeIO
 dpAttributeIO
+dpConnectionIO
 dpCalibrationIO

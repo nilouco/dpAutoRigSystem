@@ -2260,7 +2260,7 @@ class DP_AutoRig_UI(object):
         return cmds.getAttr(nodeGrp+"."+MASTER_ATTR)
 
 
-    def reorderAttributes(self, objList, attrList, *args):
+    def reorderAttributes(self, objList, attrList, verbose=True, *args):
         """ Reorder Attributes of a given objectList following the desiredAttribute list.
             Useful for organize the Option_Ctrl attributes, for example.
         """
@@ -2268,15 +2268,17 @@ class DP_AutoRig_UI(object):
             for obj in objList:
                 # load dpReorderAttribute:
                 dpRAttr = dpReorderAttr.ReorderAttr(self, False)
-                # Reordering Option_Ctrl attributos progress window
-                progressAmount = 0
-                cmds.progressWindow(title='Reordering Attributes', progress=progressAmount, status='Reordering: 0%', isInterruptable=False)
-                nbDesAttr = len(attrList)
+                if verbose:
+                    # Reordering Option_Ctrl attributos progress window
+                    progressAmount = 0
+                    cmds.progressWindow(title='Reordering Attributes', progress=progressAmount, status='Reordering: 0%', isInterruptable=False)
+                    nbDesAttr = len(attrList)
                 delta = 0
                 for i, desAttr in enumerate(attrList):
-                    # update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + repr(progressAmount) + ' '+ obj + ' attributes'))
+                    if verbose:
+                        # update progress window
+                        progressAmount += 1
+                        cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + repr(progressAmount) + ' '+ obj + ' attributes'))
                     # get current user defined attributes:
                     currentAttrList = cmds.listAttr(obj, userDefined=True)
                     if desAttr in currentAttrList:

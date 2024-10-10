@@ -67,38 +67,7 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                                 exportedList.sort()
                                 calibrationDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                                 if calibrationDic:
-                                    progressAmount = 0
-                                    maxProcess = len(calibrationDic.keys())
-                                    # define lists to check result
-                                    wellImportedList = []
-                                    for item in calibrationDic.keys():
-                                        notFoundNodesList = []
-                                        progressAmount += 1
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
-                                        # check transformations
-                                        if not cmds.objExists(item):
-                                            item = item[item.rfind("|")+1:] #short name (after last "|")
-                                        if cmds.objExists(item):
-                                            for attr in calibrationDic[item].keys():
-                                                if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                                                    # unlock attribute
-                                                    wasLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                                    cmds.setAttr(item+"."+attr, lock=False)
-                                                    try:
-                                                        # set calibration value
-                                                        cmds.setAttr(item+"."+attr, calibrationDic[item][attr])
-                                                        # lock attribute again if it was locked
-                                                        cmds.setAttr(item+"."+attr, lock=wasLocked)
-                                                        if not item in wellImportedList:
-                                                            wellImportedList.append(item)
-                                                    except Exception as e:
-                                                        self.notWorkedWellIO(item+" - "+str(e))
-                                        else:
-                                            notFoundNodesList.append(item)
-                                    if wellImportedList:
-                                        self.wellDoneIO(', '.join(wellImportedList))
-                                    else:
-                                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+                                    self.importCalibrationData(calibrationDic)
                                 else:
                                     self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             else:
@@ -141,3 +110,40 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                     for attr in calibrationList:
                         dic[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
             return dic
+
+    def importCalibrationData(self, calibrationDic, *args):
+        """ Import the calibration setup from the given calibration data dictionary.
+        """
+        progressAmount = 0
+        maxProcess = len(calibrationDic.keys())
+        # define lists to check result
+        wellImportedList = []
+        for item in calibrationDic.keys():
+            if self.verbose:
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            notFoundNodesList = []
+            # check transformations
+            if not cmds.objExists(item):
+                item = item[item.rfind("|")+1:] #short name (after last "|")
+            if cmds.objExists(item):
+                for attr in calibrationDic[item].keys():
+                    if not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                        # unlock attribute
+                        wasLocked = cmds.getAttr(item+"."+attr, lock=True)
+                        cmds.setAttr(item+"."+attr, lock=False)
+                        try:
+                            # set calibration value
+                            cmds.setAttr(item+"."+attr, calibrationDic[item][attr])
+                            # lock attribute again if it was locked
+                            cmds.setAttr(item+"."+attr, lock=wasLocked)
+                            if not item in wellImportedList:
+                                wellImportedList.append(item)
+                        except Exception as e:
+                            self.notWorkedWellIO(item+" - "+str(e))
+            else:
+                notFoundNodesList.append(item)
+        if wellImportedList:
+            self.wellDoneIO(', '.join(wellImportedList))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
