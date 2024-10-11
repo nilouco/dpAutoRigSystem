@@ -413,6 +413,7 @@ class StartClass(object):
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
+            self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
             try:
                 # clear selected module layout:
                 self.clearSelectedModuleLayout()
@@ -602,6 +603,18 @@ class StartClass(object):
             cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
             if buildIt:
                 cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node
+
+
+    def renameUnitConversion(self, unitConversionList=None, *args):
+        """ Rename just the new unitConverson created after the beginning of the module building.
+        """
+        if not unitConversionList:
+            unitConversionList = cmds.ls(selection=False, type="unitConversion")
+        if unitConversionList:
+            if self.oldUnitConversionList:
+                unitConversionList = list(set(unitConversionList)-set(self.oldUnitConversionList))
+            if unitConversionList:
+                self.utils.unitConversionTreatment(unitConversionList)
 
 
     # Getters:

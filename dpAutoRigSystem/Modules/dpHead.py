@@ -1099,6 +1099,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
+        self.renameUnitConversion()
     
     
     def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):

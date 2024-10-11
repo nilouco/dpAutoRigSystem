@@ -553,6 +553,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
+        self.renameUnitConversion()
 
 
     def integratingInfo(self, *args):

@@ -3203,7 +3203,7 @@ class DP_AutoRig_UI(object):
             self.initExtraModule("dpLimbSpaceSwitch", EXTRAS)
             
             # nodes treatment
-            self.utils.unitConversionTreatment()
+#            self.utils.unitConversionTreatment()
 
             # show dialogBox if detected a bug:
             if integrate == 1:

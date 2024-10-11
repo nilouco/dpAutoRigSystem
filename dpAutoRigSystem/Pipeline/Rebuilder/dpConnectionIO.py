@@ -62,40 +62,19 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                         except Exception as e:
                             self.notWorkedWellIO(jsonName+": "+str(e))
                     else: #import
-                        try:
+#                        try:
                             exportedList = self.getExportedList()
                             if exportedList:
                                 exportedList.sort()
-                                attrDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if attrDic:
-                                    progressAmount = 0
-                                    maxProcess = len(attrDic.keys())
-                                    # define lists to check result
-                                    wellImportedList = []
-                                    for item in attrDic.keys():
-                                        notFoundNodesList = []
-                                        if self.verbose:
-                                            progressAmount += 1
-                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
-                                        # check connections
-
-                                        # WIP
-
-
-                                        if cmds.objExists(item):
-                                            wellImportedList.append(item)
-                                        else:
-                                            notFoundNodesList.append(item)
-                                    if wellImportedList:
-                                        self.wellDoneIO(', '.join(wellImportedList))
-                                    else:
-                                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+                                connectDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                                if connectDic:
+                                    self.importConnectionData(connectDic)
                                 else:
                                     self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+#                        except Exception as e:
+#                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
@@ -155,7 +134,81 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             if infoList:
                 for info in infoList:
                     if cmds.objectType(info[:info.find(".")]) == "unitConversion":
-                        resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".output", sourceConnection, destinationConnection)})
+                        if sourceConnection:
+                            resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".input", sourceConnection, destinationConnection)})
+                        else:
+                            resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".output", sourceConnection, destinationConnection)})
                     else:
-                        resultList.append({info : self.getConnectionInfoList(info, sourceConnection, destinationConnection)})
+                        resultList.append({info : []})
         return resultList
+
+
+    def importConnectionData(self, connectDic, *args):
+        """
+        """
+
+        progressAmount = 0
+        maxProcess = len(connectDic.keys())
+        # define lists to check result
+        wellImportedList = []
+        for item in connectDic.keys():
+            notFoundNodesList = []
+            if self.verbose:
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            # check connections
+
+            # WIP
+
+            for attr in connectDic[item].keys():
+                if cmds.objExists(item+"."+attr):
+                    for i, io in enumerate(["in", "out"]): # input and output
+                        if connectDic[item][attr][io]: # have connection
+                            for j, ioDic in enumerate(connectDic[item][attr][io]):
+                                plug = list(ioDic.keys())[0]
+                                subPlug = ioDic[plug]
+                                if subPlug: # has unitConversion node
+                                    subPlug = list(ioDic[plug][0].keys())[0]
+                                    print("subPlug = ", subPlug)
+                                    if cmds.objExists(subPlug):
+                                        print("exists unitConversion node")
+
+
+                                if not cmds.objExists(plug):
+                                    if cmds.objectType(plug.split(".")[0]) == "unitConversion":
+                                        plug = list(list(connectDic[item][attr][io][0].keys())[0].keys())[0]
+        #                                print("plug ======", plug)
+
+
+                                #else:
+                                #    if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) == [plug]:
+                                #        isLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                #        cmds.setAttr(item+"."+attr, lock=False)
+                                #        cmds.connectAttr(plug, item+"."+attr, force=True)
+                                #        if isLocked:
+                                #            cmds.setAttr(item+"."+attr, lock=True)
+                                #        if not item in wellImportedList:
+                                #            wellImportedList.append(item)
+                            
+
+                        # output
+                        if connectDic[item][attr]['out']:
+                            for outPlugDic in connectDic[item][attr]['out']:
+                                #print("yes out", attr)
+                                pass
+#for i, idx in enumerate( list(connectDic[item][attr]['in'][0].keys())[0].keys()):
+#   plug = list(list(connectDic[item][attr]['in'][0].keys())[0].keys())[i]
+                else:
+                    #print("nnooooooo exists =", item, attr)
+                    pass
+
+
+
+            if cmds.objExists(item):
+                wellImportedList.append(item)
+            else:
+                notFoundNodesList.append(item)
+        if wellImportedList:
+            self.wellDoneIO(', '.join(wellImportedList))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
