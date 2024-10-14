@@ -138,15 +138,17 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                             resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".input", sourceConnection, destinationConnection)})
                         else:
                             resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".output", sourceConnection, destinationConnection)})
+                        resultList[-1][list(resultList[-1].keys())[0]].append(cmds.getAttr(info[:info.find(".")]+".conversionFactor"))
                     else:
-                        resultList.append({info : []})
+                        resultList.append(info)
         return resultList
 
 
     def importConnectionData(self, connectDic, *args):
+        """ Import connection data.
+            Check if need to create an unitConversion node and set its conversionFactor value.
+            Only redo the connection if it doesn't exists yet.
         """
-        """
-
         progressAmount = 0
         maxProcess = len(connectDic.keys())
         # define lists to check result
@@ -157,58 +159,55 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                 progressAmount += 1
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
             # check connections
-
-            # WIP
-
             for attr in connectDic[item].keys():
                 if cmds.objExists(item+"."+attr):
-                    for i, io in enumerate(["in", "out"]): # input and output
-                        if connectDic[item][attr][io]: # have connection
-                            for j, ioDic in enumerate(connectDic[item][attr][io]):
-                                plug = list(ioDic.keys())[0]
-                                subPlug = ioDic[plug]
-                                if subPlug: # has unitConversion node
-                                    subPlug = list(ioDic[plug][0].keys())[0]
-                                    print("subPlug = ", subPlug)
-                                    if cmds.objExists(subPlug):
-                                        print("exists unitConversion node")
-
-
-                                if not cmds.objExists(plug):
-                                    if cmds.objectType(plug.split(".")[0]) == "unitConversion":
-                                        plug = list(list(connectDic[item][attr][io][0].keys())[0].keys())[0]
-        #                                print("plug ======", plug)
-
-
-                                #else:
-                                #    if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) == [plug]:
-                                #        isLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                #        cmds.setAttr(item+"."+attr, lock=False)
-                                #        cmds.connectAttr(plug, item+"."+attr, force=True)
-                                #        if isLocked:
-                                #            cmds.setAttr(item+"."+attr, lock=True)
-                                #        if not item in wellImportedList:
-                                #            wellImportedList.append(item)
-                            
-
-                        # output
-                        if connectDic[item][attr]['out']:
-                            for outPlugDic in connectDic[item][attr]['out']:
-                                #print("yes out", attr)
-                                pass
-#for i, idx in enumerate( list(connectDic[item][attr]['in'][0].keys())[0].keys()):
-#   plug = list(list(connectDic[item][attr]['in'][0].keys())[0].keys())[i]
+                    for i, io in enumerate(["in", "out"]): #input and output
+                        if connectDic[item][attr][io]: #there's connection
+                            for ioInfo in connectDic[item][attr][io]:
+                                if isinstance(ioInfo, dict): #is dictionary, so there's an unitConversion node
+                                    plug = list(ioInfo.keys())[0]
+                                    if not cmds.objExists(plug):
+                                        uc = cmds.createNode("unitConversion", name=plug.split(".")[0])
+                                        cmds.setAttr(uc+".conversionFactor", ioInfo[plug][1])
+                                    else:
+                                        uc = plug.split(".")[0]
+                                    if i == 0: #in
+                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) == [uc+".output"]:
+                                            isLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                            cmds.setAttr(item+"."+attr, lock=False)
+                                            cmds.connectAttr(uc+".output", item+"."+attr, force=True)
+                                            if isLocked:
+                                                cmds.setAttr(item+"."+attr, lock=True)
+                                        if not cmds.listConnections(uc+".input", plugs=True, source=True, destination=False) == [ioInfo[plug][0]]:
+                                            cmds.connectAttr(ioInfo[plug][0], uc+".input", force=True)
+                                    else: #out
+                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) == [uc+".input"]:
+                                            cmds.connectAttr(item+"."+attr, uc+".input", force=True)
+                                        if not cmds.listConnections(uc+".output", plugs=True, source=False, destination=True) == [ioInfo[plug][0]]:
+                                            isLocked = cmds.getAttr(ioInfo[plug][0], lock=True)
+                                            cmds.setAttr(ioInfo[plug][0], lock=False)
+                                            cmds.connectAttr(uc+".output", ioInfo[plug][0], force=True)
+                                            if isLocked:
+                                                cmds.setAttr(ioInfo[plug][0], lock=True)
+                                elif i == 0: #in
+                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) == [ioInfo]:
+                                        isLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                        cmds.setAttr(item+"."+attr, lock=False)
+                                        cmds.connectAttr(ioInfo, item+"."+attr, force=True)
+                                        if isLocked:
+                                            cmds.setAttr(item+"."+attr, lock=True)
+                                else: #out
+                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) == [ioInfo]:
+                                        isLocked = cmds.getAttr(ioInfo, lock=True)
+                                        cmds.setAttr(ioInfo, lock=False)
+                                        cmds.connectAttr(item+"."+attr, ioInfo, force=True)
+                                        if isLocked:
+                                            cmds.setAttr(ioInfo, lock=True)
+                                if not item in wellImportedList:
+                                    wellImportedList.append(item)
                 else:
-                    #print("nnooooooo exists =", item, attr)
-                    pass
-
-
-
-            if cmds.objExists(item):
-                wellImportedList.append(item)
-            else:
-                notFoundNodesList.append(item)
-        if wellImportedList:
-            self.wellDoneIO(', '.join(wellImportedList))
-        else:
+                    notFoundNodesList.append(item+"."+attr)
+        if notFoundNodesList:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+        elif wellImportedList:
+            self.wellDoneIO(', '.join(wellImportedList))

@@ -109,14 +109,15 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                 if attrList:
                     dic[ctrl] = {"attributes" : {},
                                  "order" : attrList}
-                    nonKeyableList = cmds.listAttr(ctrl, channelBox=True)
                     for attr in attrList:
                         if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
                             attrType = cmds.getAttr(ctrl+"."+attr, type=True)
                             dic[ctrl]["attributes"][attr] = {
                                                 "type" : attrType,
                                                 "value" : cmds.getAttr(ctrl+"."+attr),
-                                                "locked" : cmds.getAttr(ctrl+"."+attr, lock=True)
+                                                "locked" : cmds.getAttr(ctrl+"."+attr, lock=True),
+                                                "keyable" : cmds.getAttr(ctrl+"."+attr, keyable=True),
+                                                "channelBox" : cmds.getAttr(ctrl+"."+attr, channelBox=True)
                                                 }
                             if attrType in self.defaultValueTypeList:
                                 if attrType == "enum":
@@ -128,11 +129,6 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                                 dic[ctrl]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=ctrl, minExists=True) or False
                                 if dic[ctrl]["attributes"][attr]["minExists"]:
                                     dic[ctrl]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)[0]
-                            dic[ctrl]["attributes"][attr]["show"] = cmds.getAttr(ctrl+"."+attr, keyable=True) or cmds.getAttr(ctrl+"."+attr, channelBox=True)
-                            if nonKeyableList:
-                                dic[ctrl]["attributes"][attr]["nonKeyable"] = attr in nonKeyableList
-                            else:
-                                dic[ctrl]["attributes"][attr]["nonKeyable"] = False
             return dic
 
 
@@ -174,8 +170,9 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                                     cmds.addAttr(item, longName=attr, attributeType=attrDic[item]["attributes"][attr]['type'], defaultValue=attrDic[item]["attributes"][attr]['default'])
                             if attrDic[item]["attributes"][attr]['type'] in self.defaultValueTypeList:
                                 cmds.setAttr(item+"."+attr, attrDic[item]["attributes"][attr]['value'])
-                                cmds.setAttr(item+"."+attr, keyable=attrDic[item]["attributes"][attr]['nonKeyable'])
-                                cmds.setAttr(item+"."+attr, channelBox=attrDic[item]["attributes"][attr]['show'])
+                                cmds.setAttr(item+"."+attr, keyable=attrDic[item]["attributes"][attr]['keyable'])
+                                if not attrDic[item]["attributes"][attr]['keyable']:
+                                    cmds.setAttr(item+"."+attr, channelBox=attrDic[item]["attributes"][attr]['channelBox'])
                                 cmds.setAttr(item+"."+attr, lock=attrDic[item]["attributes"][attr]['locked'])
                             if not item in wellImportedList:
                                 wellImportedList.append(item)

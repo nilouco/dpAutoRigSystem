@@ -101,9 +101,9 @@ class Skinning(dpWeights.Weights):
                 print(self.dpUIinst.lang['i077_skinned']+', '.join(geomSkinList))
                 if logWin:
                     if notSkinnedList:
-                        self.dpUIinst.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList)+'\n\n'+self.dpUIinst.lang['i322_didntChangeInf']+'\n'.join(notSkinnedList), 'center', 205, 270)
+                        self.dpUIinst.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList)+'\n\n'+self.dpUIinst.lang['i322_didntChangeInf']+'\n'.join(notSkinnedList), 'center', 205, 270)
                     else:
-                        self.dpUIinst.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
+                        self.dpUIinst.logger.infoWin('i028_skinButton', 'i077_skinned', '\n'.join(geomSkinList), 'center', 205, 270)
                 cmds.select(geomSkinList)
         else:
             print(self.dpUIinst.lang['i029_skinNothing'])
