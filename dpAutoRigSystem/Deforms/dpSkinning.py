@@ -331,7 +331,7 @@ class Skinning(dpWeights.Weights):
 
 
     def importSkinWeightsFromFile(self, meshList, path, filename, *args):
-        """ Import the skinCluster weights of the given mesh in the given path using the choose file extension (xml by default).
+        """ Import the skinCluster weights of the given mesh in the given path and filename.
         """
         progressAmount = 0
         maxProcess = len(meshList)
@@ -348,25 +348,26 @@ class Skinning(dpWeights.Weights):
                         self.setImportedSkinWeights(mesh, skinClusterName, skinWeightDic)
 
 
-    def ioSkinWeightsByUI(self, io=True, *args):
+    def ioSkinWeightsByUI(self, export=True, *args):
         """ Call export or import the skinCluster weights by UI.
-            Export: If IO parameter is True
-            Import: If IO parameter is False
+            Export: if export parameter is True
+            Import: if export parameter is False
         """
         meshList = cmds.ls(selection=True, type="transform")
         if not meshList:
             cmds.confirmDialog(title="SkinCluster Weights IO", message=self.dpUIinst.lang['i042_notSelection']+"\n"+self.dpUIinst.lang['m225_selectAnything'], button=[self.dpUIinst.lang['i038_canceled']])
             return
         action = self.dpUIinst.lang['i196_import']
-        if io:
+        if export:
             action = self.dpUIinst.lang['i164_export']
         path = cmds.fileDialog2(fileMode=3, caption=action+" "+self.dpUIinst.lang['i298_folder'], okCaption=action)
         if meshList and path:
             for mesh in meshList:
                 filename = path[0]+"/"+self.ioStartName+"_"+self.getIOFileName(mesh)+".json"
                 if cmds.listRelatives(mesh, children=True, allDescendents=True, type="mesh"):
-                    if io:
+                    if export:
                         skinClusterDic = self.getSkinWeightData([mesh])
                         self.dpUIinst.pipeliner.saveJsonFile(skinClusterDic, filename)
                     else:
-                        self.importSkinWeightsFromFile([mesh], path[0], filename)
+                        self.importSkinWeightsFromFile([mesh], path[0], self.ioStartName+"_"+self.getIOFileName(mesh)+".json")
+        cmds.progressWindow(endProgress=True)
