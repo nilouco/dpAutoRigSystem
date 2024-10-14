@@ -271,7 +271,7 @@ class HeadDeformer(object):
 
             # create groups
             arrowCtrlGrp = cmds.group(arrowCtrl, name=arrowCtrl+"_Grp")
-            self.utils.zeroOut([arrowCtrl])
+            self.utils.zeroOut([arrowCtrl], False, False)
             offsetGrp = cmds.group(name=deformerName+"_Offset_Grp", empty=True)
             dataGrp = cmds.group(name=deformerName+"_Data_Grp", empty=True)
             cmds.matchTransform(arrowCtrlGrp, latticeDefList[2], position=True, rotation=True)
