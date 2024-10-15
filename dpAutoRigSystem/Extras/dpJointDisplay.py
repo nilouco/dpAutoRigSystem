@@ -86,7 +86,7 @@ class JointDisplay(object):
         buttonLayout = cmds.rowColumnLayout("buttonLayout", childArray=True ,numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100),(3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 10), (4, "left", 250)], parent=jointDisplayMainLayout)
         
         # defining move buttons
-        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command="self.moveToLeft(self)", parent=buttonLayout)
+        cmds.button("moveLeft", label=self.dpUIinst.lang['c034_move'] + ' <<<', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToLeft, parent=buttonLayout)
         cmds.button("moveRight", label=self.dpUIinst.lang['c034_move'] + ' >>>', backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.moveToRight, parent=buttonLayout)
         changeAllMenu = cmds.optionMenu('changeAll',label=self.dpUIinst.lang['m098_jointDisplay'], backgroundColor=(0.6, 0.6, 0.6), width = 100, parent=buttonLayout)
         cmds.menuItem( label='Bone', parent=changeAllMenu)
@@ -104,11 +104,14 @@ class JointDisplay(object):
     def refreshLists(self,*args, **kwargs):
         """ Refresh the code
         """
+        self.cleanAllLists(self)
         self.getAllJointList(self)
         print(f'GetAllJointList ---- OK')
         self.populateLabelList(self)
         print(f'PopulateLabelList ---- OK')
-        self.refreshPreview()
+        
+
+        self.refreshPreview(self)
         print(f'RefreshPreview ---- OK')
 
 
@@ -128,20 +131,18 @@ class JointDisplay(object):
     def populateLabelList(self, *args, **kwargs):
         """ Populate each list with label joint type
         """
+        
         if self.allJointsList:
-            # print(f'LIST ALL JOINT {self.allJointsList}')
             for jnt in self.allJointsList:
                 if cmds.getAttr(jnt +'.drawStyle') == 0:
-                    print(f'{jnt} Exist')
                     try:
                         self.boneLabelList.append(jnt)
-                        self.refreshPreview()
                         print(f'{jnt} was appended to boneLabelList')
                     except:
                         pass
                 if cmds.getAttr(jnt +'.drawStyle') == 1:
                     try:
-                        self.multiChildLabelList.append(jnt)
+                        self.multiChildLabelList.append(jnt)                    
                         print(f'{jnt} was appended to multiChildLabelList')
                     except:
                         pass
@@ -158,24 +159,44 @@ class JointDisplay(object):
                     except:
                         pass
 
+
     def refreshPreview(self, *args):
-        if self.allJointsList:
-            if self.boneLabelList:
-                cmds.textScrollList(self.boneFieldcolumn, edit=True, removeAll=True)
-                cmds.textScrollList(self.boneFieldcolumn, edit=True, append=self.boneLabelList)
-            if self.multiChildLabelList:
-                cmds.textScrollList(self.multiChildFieldcolumn, edit=True, removeAll=True)
-                cmds.textScrollList(self.multiChildFieldcolumn, edit=True, append=self.multiChildLabelList)
-            if self.noneLabelList:
-                cmds.textScrollList(self.noneFieldcolumn, edit=True, removeAll=True)
-                cmds.textScrollList(self.noneFieldcolumn, edit=True, append=self.noneLabelList)
-            if self.jointLabelList:
-                cmds.textScrollList(self.jointFieldcolumn, edit=True, removeAll=True)
-                cmds.textScrollList(self.jointFieldcolumn, edit=True, append=self.jointLabelList)
+
+        cmds.textScrollList(self.boneFieldcolumn, edit=True, removeAll=True)
+        cmds.textScrollList(self.boneFieldcolumn, edit=True, append=self.boneLabelList)
+
+        cmds.textScrollList(self.multiChildFieldcolumn, edit=True, removeAll=True)
+        cmds.textScrollList(self.multiChildFieldcolumn, edit=True, append=self.multiChildLabelList)
+
+        cmds.textScrollList(self.noneFieldcolumn, edit=True, removeAll=True)
+        cmds.textScrollList(self.noneFieldcolumn, edit=True, append=self.noneLabelList)
+
+        cmds.textScrollList(self.jointFieldcolumn, edit=True, removeAll=True)
+        cmds.textScrollList(self.jointFieldcolumn, edit=True, append=self.jointLabelList)
+    
+    
+        
+        # if self.boneLabelList:
+        #     cmds.textScrollList(self.boneFieldcolumn, edit=True, removeAll=True)
+        #     cmds.textScrollList(self.boneFieldcolumn, edit=True, append=self.boneLabelList)
+        # if self.multiChildLabelList:
+        #     cmds.textScrollList(self.multiChildFieldcolumn, edit=True, removeAll=True)
+        #     cmds.textScrollList(self.multiChildFieldcolumn, edit=True, append=self.multiChildLabelList)
+        # if self.noneLabelList:
+        #     cmds.textScrollList(self.noneFieldcolumn, edit=True, removeAll=True)
+        #     cmds.textScrollList(self.noneFieldcolumn, edit=True, append=self.noneLabelList)
+        # if self.jointLabelList:
+        #     cmds.textScrollList(self.jointFieldcolumn, edit=True, removeAll=True)
+        #     cmds.textScrollList(self.jointFieldcolumn, edit=True, append=self.jointLabelList)
 
 
-
-
+    def cleanAllLists(self, *args):
+        """ Clear all Lists"""
+        self.allJointsList.clear()
+        self.boneLabelList.clear()
+        self.multiChildLabelList.clear()
+        self.noneLabelList.clear()
+        self.jointLabelList.clear()
 
 
     def moveToRight(self,*args):
@@ -194,32 +215,37 @@ class JointDisplay(object):
                 else: 
                     currentDrawStyle = 0
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
-        
-            #self.refreshLists()
-        else:
-            pass
-
-
-        # Change the current joint drawStyle label
-        # Call refresh list
-        # Search which board is selected. 
-        # selectedItem = cmds.textScrollList(boardList, query=True, selectItem=True)
-        # for board in boardList:
+            self.refreshLists(self)
     
     
     def moveToLeft(self, *args, **kwargs):
         """ """
         # Get active selection of button list
-        #print(f'Move to Left Press')
-        #"activeJoints = self.activeSelection()"
-        #return print(activeJoints)
-        # activeBoard = self.activeBoard(self)
+        print(f'Move to Right Pressed')
+        selectedJoints = self.activeSelection(self.selectedBoard)
+        print(selectedJoints)
 
-        # Change the current joint drawStyle label
-        # Call refresh list
-        # Search which board is selected. 
-        # selectedItem = cmds.textScrollList(boardList, query=True, selectItem=True)
-        # for board in boardList:
+        if selectedJoints:
+            for jnt in selectedJoints:
+                currentDrawStyle = cmds.getAttr(jnt +'.drawStyle')
+                if currentDrawStyle > 0 < 3 :
+                    print(f'DrawStyle atual {currentDrawStyle}')
+                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle - 1)
+                else: 
+                    currentDrawStyle = 3
+                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
+            self.refreshLists(self)
+    
+    
+    def mantainSelectedJoints(self, *args):
+        """ Mantain ative selected joints"""
+
+        selectedJointsUi = self.activeSelection(self.selectedBoard)
+        if selectedJointsUi:
+            print(f'Selected Joints UI ++++++++++++++{selectedJointsUi}')
+
+        # If selected joint
+
 
 
     def deselectOtherBoards(self, board, *args, **kwargs):
