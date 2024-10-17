@@ -101,10 +101,9 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
             progressAmount = 0
             maxProcess = len(ctrlList)
             for ctrl in ctrlList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                # Update progress window
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 attrList = cmds.listAttr(ctrl, userDefined=True)
                 if attrList:
                     dic[ctrl] = {"attributes" : {},
@@ -142,9 +141,8 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         wellImportedList = []
         for item in attrDic.keys():
             notFoundNodesList = []
-            if self.verbose:
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")

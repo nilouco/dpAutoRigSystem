@@ -263,6 +263,7 @@ class Skinning(dpWeights.Weights):
                             cmds.skinCluster(mesh, edit=True, addInfluence=jnt, lockWeights=True, weight=0.0)
                             needToCreateSkinCluster = False
                     else:
+                        cmds.lockNode(scNode, lock=False)
                         cmds.delete(scNode)
         if needToCreateSkinCluster:
             if cmds.about(version=True) >= "2024": #accepting multiple skinClusters
@@ -279,6 +280,18 @@ class Skinning(dpWeights.Weights):
         for vertex in range(0, len(vertexList)):
             skinWeightsList.append(self.getDeformerWeights(skinClusterNode, vertex, infList))
         return skinWeightsList
+    
+
+    def getSkinBlendWeights(self, mesh, skinClusterNode, *args):
+        """ Returns a dictionary with the skin blend weights by each mesh vertex that has non zero blend weight value.
+        """
+        skinBlendDic = {}
+        vertexList = cmds.ls(mesh+".vtx[*]", flatten=True)
+        for vertex in range(0, len(vertexList)):
+            blendValue = cmds.getAttr(skinClusterNode+".blendWeights["+str(vertex)+"]")
+            if not blendValue == 0:
+                skinBlendDic[vertex] = blendValue
+        return skinBlendDic
 
 
     def getSkinWeightData(self, meshList, *args):
@@ -298,11 +311,20 @@ class Skinning(dpWeights.Weights):
                 for skinClusterNode in skinClusterInfoList[2]:
                     # get skinCluster data
                     skinWeightsDic[mesh][skinClusterNode] = {
-                        "skinMethodToUse"    : cmds.skinCluster(skinClusterNode, query=True, skinMethod=True),
-                        "skinMaintainMaxInf" : cmds.skinCluster(skinClusterNode, query=True, obeyMaxInfluences=True),
-                        "skinMaxInf"         : cmds.skinCluster(skinClusterNode, query=True, maximumInfluences=True),
-                        "skinInfList"        : cmds.skinCluster(skinClusterNode, query=True, influence=True),
-                        "skinJointsWeights"  : self.getSkinWeights(mesh, skinClusterNode, True)
+                        "skinMethodToUse"           : cmds.skinCluster(skinClusterNode, query=True, skinMethod=True),
+                        "skinMaintainMaxInf"        : cmds.skinCluster(skinClusterNode, query=True, obeyMaxInfluences=True),
+                        "skinMaxInf"                : cmds.skinCluster(skinClusterNode, query=True, maximumInfluences=True),
+                        "skinInfList"               : cmds.skinCluster(skinClusterNode, query=True, influence=True),
+                        "skinSupportNonRigid"       : cmds.getAttr(skinClusterNode+".dqsSupportNonRigid"),
+                        "skinUseComponents"         : cmds.getAttr(skinClusterNode+".useComponents"),
+                        "skinDeformUserNormals"     : cmds.getAttr(skinClusterNode+".deformUserNormals"),
+                        "skinRelativeSpaceMode"     : cmds.getAttr(skinClusterNode+".relativeSpaceMode"),
+                        "skinNormalizeWeights"      : cmds.getAttr(skinClusterNode+".normalizeWeights"),
+                        "skinWeightDistribution"    : cmds.getAttr(skinClusterNode+".weightDistribution"),
+                        "skinMaxInfluences"         : cmds.getAttr(skinClusterNode+".maxInfluences"),
+                        "skinMaintainMaxInfluences" : cmds.getAttr(skinClusterNode+".maintainMaxInfluences"),
+                        "skinJointsWeights"         : self.getSkinWeights(mesh, skinClusterNode, True),
+                        "skinBlendWeights"          : self.getSkinBlendWeights(mesh, skinClusterNode)
                     }
         return skinWeightsDic    
 
@@ -330,6 +352,14 @@ class Skinning(dpWeights.Weights):
         self.normalizeMeshWeights(mesh)
 
 
+    def setImportedSkinBlendWeights(self, mesh, skinClusterName, skinWeightDic, *args):
+        """ Set the skinCluster blend weight values from the given dictionary.
+        """
+        if skinWeightDic[mesh][skinClusterName]['skinBlendWeights']:
+            for vertex in skinWeightDic[mesh][skinClusterName]['skinBlendWeights'].keys():
+                cmds.setAttr(skinClusterName+".blendWeights["+str(vertex)+"]", skinWeightDic[mesh][skinClusterName]['skinBlendWeights'][vertex])
+
+
     def importSkinWeightsFromFile(self, meshList, path, filename, *args):
         """ Import the skinCluster weights of the given mesh in the given path and filename.
         """
@@ -346,6 +376,15 @@ class Skinning(dpWeights.Weights):
                     for skinClusterName in skinWeightDic[mesh].keys():
                         self.updateOrCreateSkinCluster(mesh, skinClusterName, skinWeightDic)
                         self.setImportedSkinWeights(mesh, skinClusterName, skinWeightDic)
+                        self.setImportedSkinBlendWeights(mesh, skinClusterName, skinWeightDic)
+                        cmds.setAttr(skinClusterName+".dqsSupportNonRigid", skinWeightDic[mesh][skinClusterName]["skinSupportNonRigid"])
+                        cmds.setAttr(skinClusterName+".useComponents", skinWeightDic[mesh][skinClusterName]["skinUseComponents"])
+                        cmds.setAttr(skinClusterName+".deformUserNormals", skinWeightDic[mesh][skinClusterName]["skinDeformUserNormals"])
+                        cmds.setAttr(skinClusterName+".relativeSpaceMode", skinWeightDic[mesh][skinClusterName]["skinRelativeSpaceMode"])
+                        cmds.setAttr(skinClusterName+".normalizeWeights", skinWeightDic[mesh][skinClusterName]["skinNormalizeWeights"])
+                        cmds.setAttr(skinClusterName+".weightDistribution", skinWeightDic[mesh][skinClusterName]["skinWeightDistribution"])
+                        cmds.setAttr(skinClusterName+".maxInfluences", skinWeightDic[mesh][skinClusterName]["skinMaxInfluences"])
+                        cmds.setAttr(skinClusterName+".maintainMaxInfluences", skinWeightDic[mesh][skinClusterName]["skinMaintainMaxInfluences"])
 
 
     def ioSkinWeightsByUI(self, export=True, *args):

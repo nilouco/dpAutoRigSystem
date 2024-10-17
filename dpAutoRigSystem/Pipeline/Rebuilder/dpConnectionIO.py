@@ -101,10 +101,9 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             progressAmount = 0
             maxProcess = len(ctrlList)
             for ctrl in ctrlList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                # Update progress window
+                progressAmount += 1
+                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 if cmds.objExists(ctrl):
                     attrList = self.defaultAttrList
                     userDefList = cmds.listAttr(ctrl, userDefined=True)
@@ -155,9 +154,8 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         wellImportedList = []
         for item in connectDic.keys():
             notFoundNodesList = []
-            if self.verbose:
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
             # check connections
             for attr in connectDic[item].keys():
                 if cmds.objExists(item+"."+attr):

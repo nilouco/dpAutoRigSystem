@@ -99,10 +99,9 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
             dic = {}
             progressAmount = 0
             maxProcess = len(ctrlList)
-            if self.verbose:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+            # Update progress window
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
             for ctrl in ctrlList:
                 calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
                 if calibrationList:
@@ -119,9 +118,8 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
         # define lists to check result
         wellImportedList = []
         for item in calibrationDic.keys():
-            if self.verbose:
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            progressAmount += 1
+            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
             notFoundNodesList = []
             # check transformations
             if not cmds.objExists(item):
