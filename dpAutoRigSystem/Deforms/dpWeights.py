@@ -73,7 +73,7 @@ class Weights(object):
                     valueList = cmds.getAttr(weightPlug)[0]
                     #if any(x != 1.0 for x in valueList):
                     return dict(zip(weightKeyList, valueList))
-        
+    
 
     def unlockJoints(self, skinCluster, *args):
         """ Just unlock joints from a given skinCluster node.

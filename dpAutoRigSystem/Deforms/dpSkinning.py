@@ -247,7 +247,6 @@ class Skinning(dpWeights.Weights):
     def updateOrCreateSkinCluster(self, mesh, skinClusterName, skinWeightDic, *args):
         """ Add influence to the existing skinCluster.
             Create a new skinCluster if it needs.
-            Ensure we have a skinCluster node with all weights in just one joint to avoid import issue.
             Return a dictionary with the joint name and it's matrix index connection.
         """
         needToCreateSkinCluster = True
@@ -282,16 +281,16 @@ class Skinning(dpWeights.Weights):
         return skinWeightsList
     
 
-    def getSkinBlendWeights(self, mesh, skinClusterNode, *args):
+    def getSkinListWeights(self, mesh, skinClusterNode, attrName="blendWeights", *args):
         """ Returns a dictionary with the skin blend weights by each mesh vertex that has non zero blend weight value.
         """
-        skinBlendDic = {}
+        skinDataDic = {}
         vertexList = cmds.ls(mesh+".vtx[*]", flatten=True)
         for vertex in range(0, len(vertexList)):
-            blendValue = cmds.getAttr(skinClusterNode+".blendWeights["+str(vertex)+"]")
-            if not blendValue == 0:
-                skinBlendDic[vertex] = blendValue
-        return skinBlendDic
+            value = cmds.getAttr(skinClusterNode+"."+attrName+"["+str(vertex)+"]")
+            if not value == 0:
+                skinDataDic[vertex] = value
+        return skinDataDic
 
 
     def getSkinWeightData(self, meshList, *args):
@@ -324,20 +323,22 @@ class Skinning(dpWeights.Weights):
                         "skinMaxInfluences"         : cmds.getAttr(skinClusterNode+".maxInfluences"),
                         "skinMaintainMaxInfluences" : cmds.getAttr(skinClusterNode+".maintainMaxInfluences"),
                         "skinJointsWeights"         : self.getSkinWeights(mesh, skinClusterNode, True),
-                        "skinBlendWeights"          : self.getSkinBlendWeights(mesh, skinClusterNode)
+                        "skinBlendWeights"          : self.getSkinListWeights(mesh, skinClusterNode, "blendWeights"),
+                        "skinDropoffWeights"        : self.getSkinListWeights(mesh, skinClusterNode, "dropoff")
                     }
         return skinWeightsDic    
 
 
     def setImportedSkinWeights(self, mesh, skinClusterName, skinWeightDic, *args):
         """ Set the skinCluster weight values from the given dictionary.
+            Ensure we have a skinCluster node with all weights in just one joint to avoid import issue.
         """
         # workaround to have all weights in a temporary joint
         cmds.select(clear=True)
-        tmpJoint = cmds.joint(name="dpTemp_Jnt")
-        cmds.skinCluster(skinClusterName, edit=True, addInfluence=tmpJoint, toSelectedBones=True, lockWeights=False, weight=1.0)
+        self.tmpJoint = cmds.joint(name="dpTemp_Jnt")
+        cmds.skinCluster(skinClusterName, edit=True, addInfluence=self.tmpJoint, toSelectedBones=True, lockWeights=False, weight=1.0)
         try:
-            cmds.skinPercent(skinClusterName, mesh, transformValue=[(tmpJoint, 1)])
+            cmds.skinPercent(skinClusterName, mesh, transformValue=[(self.tmpJoint, 1)])
         except Exception as e:
             print(e)
         # get indices
@@ -348,16 +349,17 @@ class Skinning(dpWeights.Weights):
                 # set weights
                 cmds.setAttr(skinClusterName+".weightList["+str(v)+"].weights["+str(matrixDic[jntName])+"]", skinWeightDic[mesh][skinClusterName]['skinJointsWeights'][v][jntName])
         # remove temporary joint
-        cmds.delete(tmpJoint)
+        cmds.skinCluster(skinClusterName, edit=True, removeInfluence=self.tmpJoint, toSelectedBones=True)
+        cmds.delete(self.tmpJoint)
         self.normalizeMeshWeights(mesh)
 
 
-    def setImportedSkinBlendWeights(self, mesh, skinClusterName, skinWeightDic, *args):
-        """ Set the skinCluster blend weight values from the given dictionary.
+    def setImportedSkinListWeights(self, skinClusterName, skinWeightDic, attrName="blendWeights", *args):
+        """ Set the skinCluster blend or dropoff weight values from the given dictionary.
         """
-        if skinWeightDic[mesh][skinClusterName]['skinBlendWeights']:
-            for vertex in skinWeightDic[mesh][skinClusterName]['skinBlendWeights'].keys():
-                cmds.setAttr(skinClusterName+".blendWeights["+str(vertex)+"]", skinWeightDic[mesh][skinClusterName]['skinBlendWeights'][vertex])
+        if skinWeightDic:
+            for vertex in skinWeightDic.keys():
+                cmds.setAttr(skinClusterName+"."+attrName+"["+str(vertex)+"]", skinWeightDic[vertex])
 
 
     def importSkinWeightsFromFile(self, meshList, path, filename, *args):
@@ -367,6 +369,7 @@ class Skinning(dpWeights.Weights):
         maxProcess = len(meshList)
         # Starting progress window
         cmds.progressWindow(title=self.ioStartName, progress=0, status=self.ioStartName+': 0%', isInterruptable=False)
+        toRemoveTempJointList = []
         skinWeightDic = self.dpUIinst.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
             for mesh in meshList:
@@ -376,7 +379,8 @@ class Skinning(dpWeights.Weights):
                     for skinClusterName in skinWeightDic[mesh].keys():
                         self.updateOrCreateSkinCluster(mesh, skinClusterName, skinWeightDic)
                         self.setImportedSkinWeights(mesh, skinClusterName, skinWeightDic)
-                        self.setImportedSkinBlendWeights(mesh, skinClusterName, skinWeightDic)
+                        self.setImportedSkinListWeights(skinClusterName, skinWeightDic[mesh][skinClusterName]['skinBlendWeights'], "blendWeights")
+                        self.setImportedSkinListWeights(skinClusterName, skinWeightDic[mesh][skinClusterName]['skinDropoffWeights'], "dropoff")
                         cmds.setAttr(skinClusterName+".dqsSupportNonRigid", skinWeightDic[mesh][skinClusterName]["skinSupportNonRigid"])
                         cmds.setAttr(skinClusterName+".useComponents", skinWeightDic[mesh][skinClusterName]["skinUseComponents"])
                         cmds.setAttr(skinClusterName+".deformUserNormals", skinWeightDic[mesh][skinClusterName]["skinDeformUserNormals"])
