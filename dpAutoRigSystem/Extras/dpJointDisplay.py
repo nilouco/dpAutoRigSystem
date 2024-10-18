@@ -26,6 +26,7 @@ class JointDisplay(object):
         self.jointLabelList = []
         self.multiChildLabelList = []
         self.noneLabelList = []
+        self.selectionList = []
         # call main function
         if self.ui:
             self.dpJointDisplayUI(self)
@@ -161,33 +162,19 @@ class JointDisplay(object):
 
 
     def refreshPreview(self, *args):
-
+        # BoneFieldcolumn board
         cmds.textScrollList(self.boneFieldcolumn, edit=True, removeAll=True)
         cmds.textScrollList(self.boneFieldcolumn, edit=True, append=self.boneLabelList)
-
+        # BultiChildFieldcolumn board
         cmds.textScrollList(self.multiChildFieldcolumn, edit=True, removeAll=True)
         cmds.textScrollList(self.multiChildFieldcolumn, edit=True, append=self.multiChildLabelList)
-
+        # BoneFieldcolumn board
         cmds.textScrollList(self.noneFieldcolumn, edit=True, removeAll=True)
         cmds.textScrollList(self.noneFieldcolumn, edit=True, append=self.noneLabelList)
-
+        # JointFieldcolumn board
         cmds.textScrollList(self.jointFieldcolumn, edit=True, removeAll=True)
         cmds.textScrollList(self.jointFieldcolumn, edit=True, append=self.jointLabelList)
     
-    
-        
-        # if self.boneLabelList:
-        #     cmds.textScrollList(self.boneFieldcolumn, edit=True, removeAll=True)
-        #     cmds.textScrollList(self.boneFieldcolumn, edit=True, append=self.boneLabelList)
-        # if self.multiChildLabelList:
-        #     cmds.textScrollList(self.multiChildFieldcolumn, edit=True, removeAll=True)
-        #     cmds.textScrollList(self.multiChildFieldcolumn, edit=True, append=self.multiChildLabelList)
-        # if self.noneLabelList:
-        #     cmds.textScrollList(self.noneFieldcolumn, edit=True, removeAll=True)
-        #     cmds.textScrollList(self.noneFieldcolumn, edit=True, append=self.noneLabelList)
-        # if self.jointLabelList:
-        #     cmds.textScrollList(self.jointFieldcolumn, edit=True, removeAll=True)
-        #     cmds.textScrollList(self.jointFieldcolumn, edit=True, append=self.jointLabelList)
 
 
     def cleanAllLists(self, *args):
@@ -212,10 +199,14 @@ class JointDisplay(object):
                 if currentDrawStyle < 3:
                     print(f'DrawStyle atual {currentDrawStyle}')
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
+                    # self.keepSelectedObj(self)
                 else: 
                     currentDrawStyle = 0
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
+                    # self.keepSelectedObj(self)
             self.refreshLists(self)
+            self.keepSelectedObj(self)
+            
     
     
     def moveToLeft(self, *args, **kwargs):
@@ -235,14 +226,33 @@ class JointDisplay(object):
                     currentDrawStyle = 3
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
             self.refreshLists(self)
+
+
     
     
-    def mantainSelectedJoints(self, *args):
+    def keepSelectedObj(self, *args):
         """ Mantain ative selected joints"""
 
-        selectedJointsUi = self.activeSelection(self.selectedBoard)
-        if selectedJointsUi:
-            print(f'Selected Joints UI ++++++++++++++{selectedJointsUi}')
+        selectedUIJoints = self.selectionList
+        selectedUIBoard = self.selectedBoard
+        selectedList = []
+        toSelectList = []
+        boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
+        for obj in boardList:
+            for uiItem in cmds.textScrollList(obj, query=True, selectItem=True):
+                selectedList.append(uiItem)
+
+                    
+                print(f'Selected JOINTS KEEP SELECTED Function______{toSelectList}')
+
+
+            
+
+        cmds.textScrollList(selectedUIBoard, edit=True, selectItem=selectedUIJoints)
+
+        
+        # if selectedUIJoints:
+        #     print(f'Selected Joints UI ++++++++++++++{selectedUIJoints}')
 
         # If selected joint
 
@@ -262,12 +272,12 @@ class JointDisplay(object):
 
     # def searchdeselectOtherBoards(self,):
     
+
     def activeSelection(self, selectedBoard, *args):
         """Get the active selection"""
         print(f'BOARD SELECIONADO {selectedBoard[selectedBoard.rfind("|")+1:]}')
         
         self.selectedBoard = selectedBoard
-        self.selectionList = []
         self.deselectOtherBoards(board= self.selectedBoard)
         self.selectionList = cmds.textScrollList(selectedBoard, query=True, selectItem=True)
         print(f'SELECAO ATIVA ______ {self.selectionList}')
@@ -297,19 +307,6 @@ class JointDisplay(object):
     # def activeSelectionBoard():
     #     Find the active selection and indicate the board
     #     
-
-
-    # LAST STOP
-    
-    # 
-    # - Error in the activeSelection() function
-    #    - Need 2 positional argument "selectedBoard, selectionList"
-    #    - Verify fuction Button MoveRight
-    #  
-    # - Doing the move button  function
-    #   Error on the active selection function
-    #   need to call action to move the joint label
-    # - Error in the funcion button
 
 
 #Study 
