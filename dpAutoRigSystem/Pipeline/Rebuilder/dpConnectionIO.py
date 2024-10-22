@@ -62,7 +62,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                         except Exception as e:
                             self.notWorkedWellIO(jsonName+": "+str(e))
                     else: #import
-#                        try:
+                        try:
                             exportedList = self.getExportedList()
                             if exportedList:
                                 exportedList.sort()
@@ -73,8 +73,8 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                                     self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-#                        except Exception as e:
-#                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                        except Exception as e:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
