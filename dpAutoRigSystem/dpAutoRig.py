@@ -2635,6 +2635,7 @@ class DP_AutoRig_UI(object):
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
                                                 if jaxRotZMDList:
                                                     cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList[s]+".input1Z", force=True)
+                                                    self.utils.unitConversionTreatment(cmds.listConnections(jaxRotZMDList[s]+".input1Z", source=True, destination=False))
                                                 for netNode in ankleCorrectiveList:
                                                     if netNode:
                                                         if cmds.objExists(netNode):
