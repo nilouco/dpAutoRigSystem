@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-10-09",
+    "_updated"       : "2024-10-22",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -779,6 +779,7 @@
     "r044_attributeIODesc"      : "Cet action va travailler des attributs des controllers\nl'export et l'import de ces donées de userDefined.",
     "r045_connectionIO"         : "Connexion IO",
     "r046_connectionIODesc"     : "Cet action va travailler des connexions des controllers\nl'export et l'import de ces infor pour le réconstruire.",
+    "r047_notConnectedUC"       : "Il y a un node d'unitConversion non connecté.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

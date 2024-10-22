@@ -134,9 +134,11 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                 for info in infoList:
                     if cmds.objectType(info[:info.find(".")]) == "unitConversion":
                         if sourceConnection:
-                            resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".input", sourceConnection, destinationConnection)})
+                            connectionInfo = self.getConnectionInfoList(info[:info.find(".")]+".input", sourceConnection, destinationConnection) or [None]
+                            resultList.append({info : connectionInfo})
                         else:
-                            resultList.append({info : self.getConnectionInfoList(info[:info.find(".")]+".output", sourceConnection, destinationConnection)})
+                            connectionInfo = self.getConnectionInfoList(info[:info.find(".")]+".output", sourceConnection, destinationConnection) or [None]
+                            resultList.append({info : connectionInfo})
                         resultList[-1][list(resultList[-1].keys())[0]].append(cmds.getAttr(info[:info.find(".")]+".conversionFactor"))
                     else:
                         resultList.append(info)
@@ -169,33 +171,36 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                                         cmds.setAttr(uc+".conversionFactor", ioInfo[plug][1])
                                     else:
                                         uc = plug.split(".")[0]
-                                    if i == 0: #in
-                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) == [uc+".output"]:
-                                            isLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                            cmds.setAttr(item+"."+attr, lock=False)
-                                            cmds.connectAttr(uc+".output", item+"."+attr, force=True)
-                                            if isLocked:
-                                                cmds.setAttr(item+"."+attr, lock=True)
-                                        if not cmds.listConnections(uc+".input", plugs=True, source=True, destination=False) == [ioInfo[plug][0]]:
-                                            cmds.connectAttr(ioInfo[plug][0], uc+".input", force=True)
-                                    else: #out
-                                        if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) == [uc+".input"]:
-                                            cmds.connectAttr(item+"."+attr, uc+".input", force=True)
-                                        if not cmds.listConnections(uc+".output", plugs=True, source=False, destination=True) == [ioInfo[plug][0]]:
-                                            isLocked = cmds.getAttr(ioInfo[plug][0], lock=True)
-                                            cmds.setAttr(ioInfo[plug][0], lock=False)
-                                            cmds.connectAttr(uc+".output", ioInfo[plug][0], force=True)
-                                            if isLocked:
-                                                cmds.setAttr(ioInfo[plug][0], lock=True)
+                                    if not ioInfo[plug][0] == None:
+                                        if i == 0: #in
+                                            if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not uc+".output" in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
+                                                isLocked = cmds.getAttr(item+"."+attr, lock=True)
+                                                cmds.setAttr(item+"."+attr, lock=False)
+                                                cmds.connectAttr(uc+".output", item+"."+attr, force=True)
+                                                if isLocked:
+                                                    cmds.setAttr(item+"."+attr, lock=True)
+                                            if not cmds.listConnections(uc+".input", plugs=True, source=True, destination=False) or not ioInfo[plug][0] in cmds.listConnections(uc+".input", plugs=True, source=True, destination=False):
+                                                cmds.connectAttr(ioInfo[plug][0], uc+".input", force=True)
+                                        else: #out
+                                            if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) or not uc+".input" in cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True):
+                                                cmds.connectAttr(item+"."+attr, uc+".input", force=True)
+                                            if not cmds.listConnections(uc+".output", plugs=True, source=False, destination=True) or not ioInfo[plug][0] in cmds.listConnections(uc+".output", plugs=True, source=False, destination=True):
+                                                isLocked = cmds.getAttr(ioInfo[plug][0], lock=True)
+                                                cmds.setAttr(ioInfo[plug][0], lock=False)
+                                                cmds.connectAttr(uc+".output", ioInfo[plug][0], force=True)
+                                                if isLocked:
+                                                    cmds.setAttr(ioInfo[plug][0], lock=True)
+                                    else: #there is a not connected unitConversion node
+                                        self.notWorkedWellIO(self.dpUIinst.lang['r047_notConnectedUC']+": "+uc)
                                 elif i == 0: #in
-                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) == [ioInfo]:
+                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=True, destination=False):
                                         isLocked = cmds.getAttr(item+"."+attr, lock=True)
                                         cmds.setAttr(item+"."+attr, lock=False)
                                         cmds.connectAttr(ioInfo, item+"."+attr, force=True)
                                         if isLocked:
                                             cmds.setAttr(item+"."+attr, lock=True)
                                 else: #out
-                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) == [ioInfo]:
+                                    if not cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True) or not ioInfo in cmds.listConnections(item+"."+attr, plugs=True, source=False, destination=True):
                                         isLocked = cmds.getAttr(ioInfo, lock=True)
                                         cmds.setAttr(ioInfo, lock=False)
                                         cmds.connectAttr(item+"."+attr, ioInfo, force=True)
