@@ -44,8 +44,18 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
         if self.pipeliner.checkAssetContext():
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
-                self.customAttrList = ["cosinePower", "base", "diffuseRoughness", "metalness", "specular", "specularRoughness", "specularIOR", "specularAnisotropy", "specularRotation", "transmission", "transmissionDepth", "transmissionScatterAnisotropy", "transmissionDispersion", "transmissionExtraRoughness", "subsurface", "subsurfaceScale", "subsurfaceAnisotropy", "coat", "coatRoughness", "coatIOR", "coatAnisotropy", "coatRotation", "coatAffectColor", "coatAffectRoughness", "sheen", "sheenRoughness", "emission", "thinFilmThickness", "thinFilmIOR", "thinWalled"]
-                self.vectorColorList = ["specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "subsurfaceRadius", "coatColor", "sheenColor", "emissionColor"]
+                self.customAttrList = ["aiKdInd", "azimuthalWidthG", "azimuthalShiftG", "intensityG", "longitudinalWidthTRT", "longitudinalShiftTRT", "intensityTRT", 
+                                       "longitudinalWidthR", "longitudinalShiftR", "intensityR", "longitudinalWidthTT", "intensityTT", "longitudinalShiftTT", "azimuthalWidthTT",
+                                        "longitudinalWidthTT", "angle", "spreadX", "spreadY", "fresnelRefractiveIndex", "specularShift", "scatter", "scatterPower", 
+                                        "tubeDirection", "highlightSize", "roughness", "refractions", "refractiveIndex", "refractionLimit", "reflectionLimit", "reflectivity",
+                                        "specularRollOff", "eccentricity", "diffuse", "cosinePower", "base", "diffuseRoughness", "metalness", "specular", "specularRoughness",
+                                        "specularIOR", "specularAnisotropy", "specularRotation", "transmission", "transmissionDepth", "transmissionScatterAnisotropy", 
+                                        "transmissionDispersion", "transmissionExtraRoughness", "subsurface", "subsurfaceScale", "subsurfaceAnisotropy", "coat", "coatRoughness", 
+                                        "coatIOR", "coatAnisotropy", "coatRotation", "coatAffectColor", "coatAffectRoughness", "sheen", "sheenRoughness", "emission", "thinFilmThickness",
+                                        "thinFilmIOR", "thinWalled"]
+                self.vectorColorList = ["outColor", "outTransparency", "outGlowColor", "outMatteOpacity", "colorTT", "colorTRT", "tipColorD", "rootColorD", "whiteness", "reflectedColor",
+                                        "specularColor", "transmissionColor", "transmissionScatter", "subsurfaceColor", "subsurfaceRadius", "coatColor", "sheenColor", "emissionColor",
+                                        "ambientColor", "incandescence", ]
                 if self.firstMode: #export
                     shaderList = None
                     if objList:
