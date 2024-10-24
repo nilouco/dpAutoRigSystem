@@ -25,7 +25,6 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_deformationIO"
         self.startName = "dpDeformation"
-        self.importRefName = "dpDeformationIO_Import"
         self.defWeights = dpWeights.Weights(self.dpUIinst)
     
 

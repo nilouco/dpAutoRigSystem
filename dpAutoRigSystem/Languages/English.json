@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-10-22",
+    "_updated"       : "2024-10-23",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -486,6 +486,9 @@
     "i322_didntChangeInf"       : "Didn't change influence for:\n",
     "i323_sRivetIOAnn"          : "The folder to export and import rivet data.",
     "i324_sCalibrationIOAnn"    : "The folder to export and import calibration data.",
+    "i325_sAttributeIOAnn"      : "The folder to export and import attribute data.",
+    "i326_sComponentTagIOAnn"   : "The folder to export and import componentTag data.",
+    "i327_sConnectionIOAnn"     : "The folder to export and import connections data.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -780,6 +783,8 @@
     "r045_connectionIO"         : "Connection IO",
     "r046_connectionIODesc"     : "This action will work with connected nodes and attributes\nexporting and importing them info to rebuild them.",
     "r047_notConnectedUC"       : "There's a not connected unitConversion node.",
+    "r048_componentTagIO"       : "ComponentTag IO",
+    "r049_componentTagIODesc"   : "This action will work with componentTag info\nexporting and importing them data.",
     
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",

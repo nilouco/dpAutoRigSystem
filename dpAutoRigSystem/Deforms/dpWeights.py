@@ -188,6 +188,51 @@ class Weights(object):
         return defDic
 
 
+    def getComponentTagInfo(self, nodeList=None, *args):
+        """ Return the dictionary with the componentTag tagged info.
+        """
+        if not nodeList:
+            nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
+        tagInfoDic = {}
+        if nodeList:
+            for node in nodeList:
+                outAttr = cmds.deformableShape(node, localShapeOutAttr=True)[0]
+                tagHistList = cmds.geometryAttrInfo(node+"."+outAttr, componentTagHistory=True)
+                if tagHistList:
+                    tagInfoDic[node] = {}
+                    for tagDic in tagHistList:
+                        tagInfoDic[node][tagDic["key"]] = tagDic
+                        tagInfoDic[node][tagDic["key"]].update({"components": cmds.geometryAttrInfo(node+"."+outAttr, components=True, componentTagExpression=tagDic["key"])})
+        return tagInfoDic
+
+
+    def getComponentTagInfluencer(self, deformerList=None, *args):
+        """ Return the dictionary with the componentTag influencer info.
+        """
+        if not deformerList:
+            deformerList = []
+            for deformerType in self.typeAttrDic.keys():
+                defList = cmds.ls(selection=False, type=deformerType)
+                if defList:
+                    deformerList.extend(defList)
+        tagInfluenceDic = {}
+        if deformerList:
+            for deformerNode in deformerList:
+                if cmds.objExists(deformerNode+".originalGeometry"):
+                    origGeomList = cmds.getAttr(deformerNode+".originalGeometry", multiIndices=True)
+                    if origGeomList:
+                        hasTag = False
+                        for index in origGeomList:
+                            if not cmds.getAttr(deformerNode+".input["+str(index)+"].componentTagExpression") == "*":
+                                hasTag = True
+                                break
+                        if hasTag:
+                            tagInfluenceDic[deformerNode] = {"expression" : {}}
+                            for index in origGeomList:
+                                tagInfluenceDic[deformerNode]["expression"][index] = cmds.getAttr(deformerNode+".input["+str(index)+"].componentTagExpression")
+        return tagInfluenceDic
+    
+
     def setDeformerWeights(self, deformerNode, weightsDic, idx=0, *args):
         """ Set the deformer weights to the given node for the indexed shape.
         """

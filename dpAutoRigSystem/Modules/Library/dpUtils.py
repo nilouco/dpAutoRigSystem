@@ -1209,6 +1209,8 @@ class Utils(object):
     def deleteOrigShape(self, item, deleteIntermediate=True, *args):
         """ Delete Orig shape if it exists.
         """
+        #TODO maybe use this command instead?
+        #cmds.deformableShape(item, originalGeometry=True)
         if item:
             for child in cmds.listRelatives(item, children=True, allDescendents=True, fullPath=True):
                 #if "Orig" in child:

@@ -1076,6 +1076,8 @@ class Rivet(object):
     def findOrig(self, geoList, *args):
         """ Return the orig of the shapeList
         """
+        #TODO maybe use this command instead?
+        #cmds.deformableShape(item, originalGeometry=True)
         if geoList:
             for item in geoList:
                 if item.endswith("Orig"):
