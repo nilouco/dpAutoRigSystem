@@ -317,7 +317,6 @@ class Skinning(dpWeights.Weights):
                         "skinSupportNonRigid"       : cmds.getAttr(skinClusterNode+".dqsSupportNonRigid"),
                         "skinUseComponents"         : cmds.getAttr(skinClusterNode+".useComponents"),
                         "skinDeformUserNormals"     : cmds.getAttr(skinClusterNode+".deformUserNormals"),
-                        "skinRelativeSpaceMode"     : cmds.getAttr(skinClusterNode+".relativeSpaceMode"),
                         "skinNormalizeWeights"      : cmds.getAttr(skinClusterNode+".normalizeWeights"),
                         "skinWeightDistribution"    : cmds.getAttr(skinClusterNode+".weightDistribution"),
                         "skinMaxInfluences"         : cmds.getAttr(skinClusterNode+".maxInfluences"),
@@ -326,7 +325,9 @@ class Skinning(dpWeights.Weights):
                         "skinBlendWeights"          : self.getSkinListWeights(mesh, skinClusterNode, "blendWeights"),
                         "skinDropoffWeights"        : self.getSkinListWeights(mesh, skinClusterNode, "dropoff")
                     }
-        return skinWeightsDic    
+                    if cmds.objExists(skinClusterNode+".relativeSpaceMode"):
+                        skinWeightsDic["skinRelativeSpaceMode"] = cmds.getAttr(skinClusterNode+".relativeSpaceMode")
+        return skinWeightsDic
 
 
     def setImportedSkinWeights(self, mesh, skinClusterName, skinWeightDic, *args):
