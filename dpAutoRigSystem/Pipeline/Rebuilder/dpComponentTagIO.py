@@ -46,12 +46,12 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
         if self.pipeliner.checkAssetContext():
             self.ioPath = self.getIOPath(self.ioDir)
             if self.ioPath:
+                nodeList = None
+                if objList:
+                    nodeList = objList
+                else:
+                    nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
                 if self.firstMode: #export
-                    nodeList = None
-                    if objList:
-                        nodeList = objList
-                    else:
-                        nodeList = cmds.listRelatives(cmds.ls(selection=False, type=["mesh", "lattice"]), parent=True)
                     if nodeList:
                         # finding tags
                         hasTag = False
@@ -83,50 +83,45 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                         self.exportedList.sort()
                         self.tagDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
                         if self.tagDataDic:
-                            wellImported = True
-                            toImportList, notFoundnodeList, changedShapenodeList = [], [], []
-                            for node in self.tagDataDic.keys():
-                                # check mesh existing
-                                
-                                # WIP
-                                # ignore procedural tags?
-
-                                
-                                for shapeNode in self.tagDataDic[node]["shapeList"]:
-                                    if cmds.objExists(shapeNode):
-                                        if not node in toImportList:
-                                            toImportList.append(node)
+                            if self.tagDataDic["tagged"]:
+                                wellImported = True
+                                toImportList, notFoundnodeList, = [], []
+                                currentTaggedDic = self.defWeights.getComponentTagInfo(nodeList)
+                                for taggedNode in self.tagDataDic["tagged"].keys():
+                                    # check mesh existing
+                                    if cmds.objExists(taggedNode):
+                                        for tag in self.tagDataDic["tagged"][taggedNode].keys():
+                                            if not tag in currentTaggedDic[taggedNode]:
+                                                if not taggedNode in toImportList:
+                                                    toImportList.append([taggedNode, tag])
                                     else:
                                         notFoundnodeList.append(node)
-                            if toImportList:
-                                progressAmount = 0
-                                maxProcess = len(toImportList)
-                                for node in toImportList:
-                                    if self.verbose:
-                                        # Update progress window
-                                        progressAmount += 1
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                                    try:
-                                        wellImported = self.importDeformation(node, wellImported)
-                                    except Exception as e:
-                                        self.notWorkedWellIO(self.exportedList[-1]+": "+node+" - "+str(e))
-                                if notFoundnodeList: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
-                                    for node in notFoundnodeList:
-                                        for shapeNode in self.tagDataDic[node]["shapeList"]:
-                                            if cmds.objExists(shapeNode):
-                                                try:
-                                                    wellImported = self.importDeformation(node, wellImported)
-                                                except Exception as e:
-                                                    self.notWorkedWellIO(self.exportedList[-1]+": "+node+" - "+str(e))
-                                if wellImported:
-                                    self.wellDoneIO(', '.join(toImportList))
+                                if toImportList:
+                                    progressAmount = 0
+                                    maxProcess = len(toImportList)
+                                    for tagList in toImportList:
+                                        if self.verbose:
+                                            # Update progress window
+                                            progressAmount += 1
+                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                        try:
+                                            wellImported = self.defWeights.importComponentTag(tagList, wellImported)
+                                        except Exception as e:
+                                            self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(tagList)+" - "+str(e))
+                                    
+                                    #
+                                    # TODO
+                                    #
+                                    # export falloff
+                                    # import influencers
+                                    # import falloff
+                                    #
+                                    #
+
+                                    if wellImported:
+                                        self.wellDoneIO(str(toImportList))
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(self.tagDataDic.keys())))
-                            if not wellImported:
-                                if changedShapenodeList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapenodeList)))
-                                elif notFoundnodeList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundnodeList)))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
@@ -143,3 +138,4 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
         self.endProgressBar()
         self.refreshView()
         return self.dataLogDic
+    
