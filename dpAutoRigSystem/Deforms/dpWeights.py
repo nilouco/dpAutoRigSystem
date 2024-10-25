@@ -378,3 +378,30 @@ class Weights(object):
                                 needToAddDef = False
                 if needToAddDef:
                     cmds.deformer(deformerNode, edit=True, geometry=item)
+
+
+    def getShapeToIndexData(self, deformerNode, *args):
+        """ Return a shapeList, a indexList and a dictionary with the shape name as keys and deformer index as values.
+        """
+        shapeList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
+        indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
+        return shapeList, indexList, dict(zip(shapeList, indexList))
+    
+
+    def getCurrentDeformedIndex(self, deformerNode, shapeToIndexDic, index, *args):
+        """ Returns the current deformer index based on the shape and current deformer index list.
+        """
+        currentIndex = index
+        if deformerNode and shapeToIndexDic:
+            shapeName = None
+            for node in shapeToIndexDic.keys():
+                if shapeToIndexDic[node] == index:
+                    shapeName = node
+                    break
+            if shapeName:
+                currentShapeToIndexDic = self.getShapeToIndexData(deformerNode)[2]
+                if currentShapeToIndexDic:
+                    for item in currentShapeToIndexDic.keys():
+                        if item == shapeName:
+                            currentIndex = currentShapeToIndexDic[item]
+        return currentIndex

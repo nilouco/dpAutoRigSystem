@@ -79,9 +79,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                             # get the attributes and values for this deformer node
                                             self.deformerDataDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
                                             # Get shape indexes for the deformer so we can query the deformer weights
-                                            shapeList = cmds.ls(cmds.deformer(deformerNode, query=True, geometry=True), long=True)
-                                            indexList = cmds.deformer(deformerNode, query=True, geometryIndices=True)
-                                            shapeToIndexDic = dict(zip(shapeList, indexList))
+                                            shapeList, indexList, shapeToIndexDic = self.defWeights.getShapeToIndexData(deformerNode)
                                             # update dictionary
                                             self.deformerDataDic[deformerNode]["shapeList"] = shapeList
                                             self.deformerDataDic[deformerNode]["indexList"] = indexList
@@ -240,7 +238,8 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         weightsDic = self.deformerDataDic[deformerNode]["weights"]
         if weightsDic:
             for index in self.deformerDataDic[deformerNode]["indexList"]:
+                currentIndex = self.defWeights.getCurrentDeformedIndex(deformerNode, self.deformerDataDic[deformerNode]["shapeToIndexDic"], index)
                 if weightsDic[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
-                    self.defWeights.setDeformerWeights(self.deformerDataDic[deformerNode]["name"], weightsDic[str(index)], index)
+                    self.defWeights.setDeformerWeights(self.deformerDataDic[deformerNode]["name"], weightsDic[str(index)], currentIndex)
         return wellImported
