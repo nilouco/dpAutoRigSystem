@@ -372,5 +372,9 @@ class Weights(object):
                 if inputDeformerList:
                     if deformerNode in inputDeformerList:
                         needToAddDef = False
+                    else:
+                        for inputDef in inputDeformerList:
+                            if deformerNode == inputDef+"HandleShape": #hack to check if it's a nonLinear handle shape
+                                needToAddDef = False
                 if needToAddDef:
                     cmds.deformer(deformerNode, edit=True, geometry=item)

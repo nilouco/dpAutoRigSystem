@@ -390,7 +390,8 @@ class Skinning(dpWeights.Weights):
                         cmds.setAttr(skinClusterName+".maxInfluences", skinWeightDic[mesh][skinClusterName]["skinMaxInfluences"])
                         cmds.setAttr(skinClusterName+".maintainMaxInfluences", skinWeightDic[mesh][skinClusterName]["skinMaintainMaxInfluences"])
                         if cmds.objExists(skinClusterName+".relativeSpaceMode"):
-                            cmds.setAttr(skinClusterName+".relativeSpaceMode", skinWeightDic[mesh][skinClusterName]["skinRelativeSpaceMode"])
+                            if "skinRelativeSpaceMode" in skinWeightDic[mesh][skinClusterName].keys():
+                                cmds.setAttr(skinClusterName+".relativeSpaceMode", skinWeightDic[mesh][skinClusterName]["skinRelativeSpaceMode"])
 
 
     def ioSkinWeightsByUI(self, export=True, *args):
