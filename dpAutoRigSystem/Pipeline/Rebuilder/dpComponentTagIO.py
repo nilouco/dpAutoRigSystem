@@ -91,11 +91,13 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                                     # check mesh existing
                                     if cmds.objExists(taggedNode):
                                         for tag in self.tagDataDic["tagged"][taggedNode].keys():
-                                            if not tag in currentTaggedDic[taggedNode]:
+                                            if not currentTaggedDic:
+                                                toImportList.append([taggedNode, tag])
+                                            elif not tag in currentTaggedDic[taggedNode]:
                                                 if not taggedNode in toImportList:
                                                     toImportList.append([taggedNode, tag])
                                     else:
-                                        notFoundnodeList.append(node)
+                                        notFoundnodeList.append(taggedNode)
                                 if toImportList:
                                     progressAmount = 0
                                     maxProcess = len(toImportList)
@@ -105,7 +107,7 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                                             progressAmount += 1
                                             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                                         try:
-                                            wellImported = self.defWeights.importComponentTag(tagList, wellImported)
+                                            wellImported = self.defWeights.importComponentTag(tagList[0], tagList[1], self.tagDataDic["tagged"][tagList[0]][tagList[1]]["components"], wellImported)
                                         except Exception as e:
                                             self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(tagList)+" - "+str(e))
                                     

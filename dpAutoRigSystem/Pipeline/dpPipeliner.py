@@ -216,7 +216,7 @@ class Pipeliner(object):
         "name"    : "Default Pipeline Annotation",
         "author"  : "Danilo Pinheiro",
         "date"    : "2023-02-09",
-        "updated" : "2024-10-23",
+        "updated" : "2024-10-25",
         
         "f_drive"            : "i228_fDriveAnn",
         "f_studio"           : "i229_fStudioAnn",
@@ -235,7 +235,7 @@ class Pipeliner(object):
         "s_controlShapeIO"   : "i296_sControlShapeIOAnn",
         "s_skinningIO"       : "i297_sSkinningIOAnn",
         "s_deformationIO"    : "i310_sDeformationIOAnn",
-        "s_inputOrdererIO"   : "i311_sInputOrderIOAnn",
+        "s_inputOrderIO"     : "i311_sInputOrderIOAnn",
         "s_parentingIO"      : "i300_sParentingIOAnn",
         "s_transformationIO" : "i312_sTransformationIOAnn",
         "s_rivetIO"          : "i323_sRivetIOAnn",

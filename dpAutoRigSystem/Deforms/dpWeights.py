@@ -234,24 +234,22 @@ class Weights(object):
         return tagInfluenceDic
     
 
-    def importComponentTag(self, tagList, wellImported, *args):
+    def importComponentTag(self, taggedNode, tagName, componentList, wellImported, *args):
         """
-            tagList[0] = taggedNode
-            tagList[1] = tagName
+            Import componentList to the tagged node.
+            Need to eval a MEL command because seems the Python command isn't implemented properly in Maya2022.
         """
-        if tagList:
-            componentList = self.tagDataDic["tagged"][tagList[0]][tagList[1]]["components"]
-            index = 0
-            indexList = cmds.getAttr(tagList[0]+".componentTags", multiIndices=True)
-            if indexList:
-                index = len(indexList)+1
-            contents = " ".join(componentList)
-            try:
-                cmds.setAttr(tagList[0]+".componentTags["+str(index)+"].componentTagName", tagList[1], type="string")
-                #cmds.setAttr(tagList[0]+".componentTags["+str(index)+"].componentTagContents", len(componentList), contents, type="componentList")
-                mel.eval('setAttr '+tagList[0]+'.componentTags['+str(index)+'].componentTagContents -type componentList '+str(len(componentList))+' '+contents+';')
-            except:
-                wellImported = False
+        index = 0
+        indexList = cmds.getAttr(taggedNode+".componentTags", multiIndices=True)
+        if indexList:
+            index = len(indexList)+1
+        contents = " ".join(componentList)
+        try:
+            cmds.setAttr(taggedNode+".componentTags["+str(index)+"].componentTagName", tagName, type="string")
+            #cmds.setAttr(tagList[0]+".componentTags["+str(index)+"].componentTagContents", len(componentList), contents, type="componentList")
+            mel.eval('setAttr '+taggedNode+'.componentTags['+str(index)+'].componentTagContents -type componentList '+str(len(componentList))+' '+contents+';')
+        except:
+            wellImported = False
         return wellImported
 
 
