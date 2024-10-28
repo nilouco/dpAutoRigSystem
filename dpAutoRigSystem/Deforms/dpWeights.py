@@ -403,3 +403,17 @@ class Weights(object):
                         if item == shapeName:
                             currentIndex = currentShapeToIndexDic[item]
         return currentIndex
+
+
+    def checkUseComponentTag(self, deformerNode, *args):
+        """ Returns False if found an object set node in the deformer node given message output connections.
+        """
+        hasTag = True
+        if deformerNode:
+            messageOutputList = cmds.listConnections(deformerNode+".message", destination=True, source=False)
+            if messageOutputList:
+                for item in messageOutputList:
+                    if cmds.objectType(item) == "objectSet":
+                        hasTag = False
+                        break
+        return hasTag

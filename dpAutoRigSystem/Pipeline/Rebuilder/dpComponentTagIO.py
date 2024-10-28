@@ -83,8 +83,8 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                         self.exportedList.sort()
                         self.tagDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
                         if self.tagDataDic:
+                            wellImported = True
                             if self.tagDataDic["tagged"]:
-                                wellImported = True
                                 toImportList, notFoundnodeList, = [], []
                                 currentTaggedDic = self.defWeights.getComponentTagInfo(nodeList)
                                 for taggedNode in self.tagDataDic["tagged"].keys():
@@ -110,20 +110,38 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                                             wellImported = self.defWeights.importComponentTag(tagList[0], tagList[1], self.tagDataDic["tagged"][tagList[0]][tagList[1]]["components"], wellImported)
                                         except Exception as e:
                                             self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(tagList)+" - "+str(e))
-                                    
+                            
+                            #
+                            # WIP
+                            #
+                            
+                            # import influencers
+                            if self.tagDataDic["influencer"]:
+                                for infNode in self.tagDataDic["influencer"].keys():
+                                    # check deformer node existing
+                                    if cmds.objExists(infNode):
+                                        for infIndex in self.tagDataDic["influencer"][infNode]["expression"].keys():
+#                                            if not self.tagDataDic["influencer"][infNode]["expression"][infIndex] == "":
+    #                                            try:
+                                            cmds.setAttr(infNode+".input["+str(infIndex)+"].componentTagExpression", self.tagDataDic["influencer"][infNode]["expression"][infIndex], type="string")
+    #                                            except:
+    #                                                #not worked well here
+    #                                                pass
+                                            
+                                            
+                                
                                     #
                                     # TODO
                                     #
                                     # export falloff
-                                    # import influencers
                                     # import falloff
                                     #
                                     #
 
-                                    if wellImported:
-                                        self.wellDoneIO(str(toImportList))
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(self.tagDataDic.keys())))
+#                            if wellImported:
+                            self.wellDoneIO(str(self.tagDataDic["tagged"][taggedNode].keys()))
+#                            else:
+#                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(self.tagDataDic.keys())))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
@@ -140,4 +158,3 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
         self.endProgressBar()
         self.refreshView()
         return self.dataLogDic
-    
