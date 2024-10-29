@@ -296,6 +296,91 @@ class Weights(object):
         return wellImported
 
 
+    def importComponentTagInfo(self, taggedDic, nodeList, wellImported, *args):
+        """ Import component tag tagged "nodes" as "tag" info.
+        """
+        toImportList, self.notWorkWellInfoList = [], []
+        currentTaggedDic = self.getComponentTagInfo(nodeList)
+        for taggedNode in taggedDic.keys():
+            # check mesh existing
+            if cmds.objExists(taggedNode):
+                for tag in taggedDic[taggedNode].keys():
+                    if not currentTaggedDic:
+                        toImportList.append([taggedNode, tag])
+                    elif taggedNode in currentTaggedDic.keys():
+                        if not tag in currentTaggedDic[taggedNode]:
+                            if not taggedNode in toImportList:
+                                toImportList.append([taggedNode, tag])
+                    else:
+                        if not taggedNode in toImportList:
+                            toImportList.append([taggedNode, tag])
+            else:
+                self.notWorkWellInfoList.append(taggedNode)
+                wellImported = False
+        if toImportList:
+            for tagList in toImportList:
+                try:
+                    wellImported = self.importComponentTag(tagList[0], tagList[1], taggedDic[tagList[0]][tagList[1]]["components"], wellImported)
+                except Exception as e:
+                    self.notWorkWellInfoList.append(", ".join(tagList)+" - "+str(e))
+                    wellImported = False
+        return wellImported
+
+
+    def importComponentTagInfluencer(self, infDic, wellImported, *args):
+        """ Import component tag influencer info from deformer nodes.
+        """
+        self.notWorkWellInfoList = []
+        for infNode in infDic.keys():
+            # check deformer node existing
+            if cmds.objExists(infNode):
+                for infIndex in infDic[infNode]["expression"].keys():
+                    if not infDic[infNode]["expression"][infIndex] == "":
+                        try:
+                            cmds.setAttr(infNode+".input["+str(infIndex)+"].componentTagExpression", infDic[infNode]["expression"][infIndex], type="string")
+                        except Exception as e:
+                            self.notWorkWellInfoList.append(infNode+" - "+str(e))
+                            wellImported = False
+        return wellImported
+
+
+    def importComponentTagFalloff(self, falloffDic, wellImported, *args):
+        """ Import the component tag falloff info.
+            Create them if they don't exists.
+            Connect node attributes.
+            Set all specific node attributes for each falloff type.
+        """
+        self.notWorkWellInfoList = []
+        for falloffNode in falloffDic.keys():
+            # check falloff node existing
+            if not cmds.objExists(falloffNode):
+                falloffNode = cmds.createNode(falloffDic[falloffNode]["type"], name=falloffDic[falloffNode]["name"])
+            if not falloffNode:
+                self.notWorkWellInfoList.append(falloffNode)
+                wellImported = False
+            else:
+                # connect falloff
+                if falloffDic[falloffNode]["outputWeightFunction"]:
+                    for plug in falloffDic[falloffNode]["outputWeightFunction"]:
+                        if not cmds.listConnections(falloffNode+".outputWeightFunction", plugs=True, source=False, destination=True) or not plug in cmds.listConnections(falloffNode+".outputWeightFunction", plugs=True, source=False, destination=True):
+                            try:
+                                cmds.connectAttr(falloffNode+".outputWeightFunction", plug, force=True)
+                            except:
+                                self.notWorkWellInfoList.append(falloffNode+".outputWeightFunction -> "+plug)
+                                wellImported = False
+                # set falloff attributes
+                for attr in falloffDic[falloffNode]["attributes"].keys():
+                    try:
+                        cmds.setAttr(falloffNode+"."+attr, falloffDic[falloffNode]["attributes"][attr])
+                    except:
+                        try:
+                            cmds.setAttr(falloffNode+"."+attr, falloffDic[falloffNode]["attributes"][attr], type="string")
+                        except:
+                            self.notWorkWellInfoList.append(falloffNode+"."+attr)
+                            wellImported = False
+        return wellImported
+
+
     def setDeformerWeights(self, deformerNode, weightsDic, idx=0, *args):
         """ Set the deformer weights to the given node for the indexed shape.
         """

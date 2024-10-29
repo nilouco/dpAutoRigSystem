@@ -84,66 +84,23 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                         self.tagDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
                         if self.tagDataDic:
                             wellImported = True
+                            # import tagged (tag info into the received deformed mesh)
                             if self.tagDataDic["tagged"]:
-                                toImportList, notFoundnodeList, = [], []
-                                currentTaggedDic = self.defWeights.getComponentTagInfo(nodeList)
-                                for taggedNode in self.tagDataDic["tagged"].keys():
-                                    # check mesh existing
-                                    if cmds.objExists(taggedNode):
-                                        for tag in self.tagDataDic["tagged"][taggedNode].keys():
-                                            if not currentTaggedDic:
-                                                toImportList.append([taggedNode, tag])
-                                            elif not tag in currentTaggedDic[taggedNode]:
-                                                if not taggedNode in toImportList:
-                                                    toImportList.append([taggedNode, tag])
-                                    else:
-                                        notFoundnodeList.append(taggedNode)
-                                if toImportList:
-                                    progressAmount = 0
-                                    maxProcess = len(toImportList)
-                                    for tagList in toImportList:
-                                        if self.verbose:
-                                            # Update progress window
-                                            progressAmount += 1
-                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
-                                        try:
-                                            wellImported = self.defWeights.importComponentTag(tagList[0], tagList[1], self.tagDataDic["tagged"][tagList[0]][tagList[1]]["components"], wellImported)
-                                        except Exception as e:
-                                            self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(tagList)+" - "+str(e))
-                            
-                            #
-                            # WIP
-                            #
-                            
-                            # import influencers
+                                wellImported = self.defWeights.importComponentTagInfo(self.tagDataDic["tagged"], nodeList, wellImported)
+                                if not wellImported:
+                                    self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(self.defWeights.notWorkWellInfoList))
+                            # import influencers (tag info into the deformer node)
                             if self.tagDataDic["influencer"]:
-                                for infNode in self.tagDataDic["influencer"].keys():
-                                    # check deformer node existing
-                                    if cmds.objExists(infNode):
-                                        for infIndex in self.tagDataDic["influencer"][infNode]["expression"].keys():
-#                                            if not self.tagDataDic["influencer"][infNode]["expression"][infIndex] == "":
-    #                                            try:
-                                            cmds.setAttr(infNode+".input["+str(infIndex)+"].componentTagExpression", self.tagDataDic["influencer"][infNode]["expression"][infIndex], type="string")
-    #                                            except:
-    #                                                #not worked well here
-    #                                                pass
-                                            
-                                            
-                                
-                                    #
-                                    # TODO
-                                    #
-                                    # import falloff
-                                            # create falloffs nodes
-                                            # set attrs
-                                            # connect plugs
-                                    #
-                                    #
-
-#                            if wellImported:
-                            self.wellDoneIO(str(self.tagDataDic["tagged"][taggedNode].keys()))
-#                            else:
-#                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(self.tagDataDic.keys())))
+                                wellImported = self.defWeights.importComponentTagInfluencer(self.tagDataDic["influencer"], wellImported)
+                                if not wellImported:
+                                    self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(self.defWeights.notWorkWellInfoList))
+                            # import falloffs
+                            if self.tagDataDic["falloff"]:
+                                wellImported = self.defWeights.importComponentTagFalloff(self.tagDataDic["falloff"], wellImported)
+                                if not wellImported:
+                                    self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(self.defWeights.notWorkWellInfoList))
+                            if wellImported:
+                                self.wellDoneIO(", ".join(list(self.tagDataDic["tagged"].keys())))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:

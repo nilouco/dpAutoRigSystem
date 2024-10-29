@@ -204,12 +204,13 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         """
         transformAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ', 'scaleX', 'scaleY', 'scaleZ', 'visibility']
         for item in list(self.netDic["GuideData"]):
-            for attr in list(self.netDic["GuideData"][item]):
-                if attr in transformAttrList:
-                    if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
-                        if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
-                            cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])
-                cmds.refresh()
+            if self.netDic["GuideData"][item]:
+                for attr in list(self.netDic["GuideData"][item]):
+                    if attr in transformAttrList:
+                        if not cmds.getAttr(item+"."+attr, lock=True): #unlocked attribute
+                            if not cmds.listConnections(item+"."+attr, destination=False, source=True): #without input connection
+                                cmds.setAttr(item+"."+attr, self.netDic["GuideData"][item][attr])
+                    cmds.refresh()
 
 
     def setupGuideBaseParenting(self, *args):
