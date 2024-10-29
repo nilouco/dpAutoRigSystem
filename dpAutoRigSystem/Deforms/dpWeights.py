@@ -270,16 +270,17 @@ class Weights(object):
                 # specific multiIndices attributes
                 for multiAttr in multiAttrDic.keys():
                     if cmds.objExists(node+"."+multiAttr):
-                        for i, index in enumerate(cmds.getAttr(node+"."+multiAttr, multiIndices=True)):
-                            for name in multiAttrDic[multiAttr]:
-                                attrName = multiAttr+"["+str(index)+"]."+name
-                                falloffDic[node]["attributes"][attrName] = cmds.getAttr(node+"."+attrName)
+                        if cmds.getAttr(node+"."+multiAttr, multiIndices=True):
+                            for i, index in enumerate(cmds.getAttr(node+"."+multiAttr, multiIndices=True)):
+                                for name in multiAttrDic[multiAttr]:
+                                    attrName = multiAttr+"["+str(index)+"]."+name
+                                    falloffDic[node]["attributes"][attrName] = cmds.getAttr(node+"."+attrName)
         return falloffDic
     
 
-    def importComponentTag(self, taggedNode, tagName, componentList, wellImported, *args):
+    def importComponentTag(self, taggedNode, tagName, injestNode, componentList, wellImported, *args):
         """
-            Import componentList to the tagged node.
+            Import componentList to the tagged node using the injestNode as injestLocation parameter.
             Need to eval a MEL command because seems the Python command isn't implemented properly in Maya2022.
         """
         index = 0
@@ -288,9 +289,9 @@ class Weights(object):
             index = len(indexList)+1
         contents = " ".join(componentList)
         try:
-            cmds.setAttr(taggedNode+".componentTags["+str(index)+"].componentTagName", tagName, type="string")
+            cmds.setAttr(injestNode+".componentTags["+str(index)+"].componentTagName", tagName, type="string")
             #cmds.setAttr(tagList[0]+".componentTags["+str(index)+"].componentTagContents", len(componentList), contents, type="componentList")
-            mel.eval('setAttr '+taggedNode+'.componentTags['+str(index)+'].componentTagContents -type componentList '+str(len(componentList))+' '+contents+';')
+            mel.eval('setAttr '+injestNode+'.componentTags['+str(index)+'].componentTagContents -type componentList '+str(len(componentList))+' '+contents+';')
         except:
             wellImported = False
         return wellImported
@@ -306,21 +307,21 @@ class Weights(object):
             if cmds.objExists(taggedNode):
                 for tag in taggedDic[taggedNode].keys():
                     if not currentTaggedDic:
-                        toImportList.append([taggedNode, tag])
+                        toImportList.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
                     elif taggedNode in currentTaggedDic.keys():
                         if not tag in currentTaggedDic[taggedNode]:
-                            if not taggedNode in toImportList:
-                                toImportList.append([taggedNode, tag])
+                            if not [taggedNode, tag, taggedDic[taggedNode][tag]["node"]] in toImportList:
+                                toImportList.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
                     else:
-                        if not taggedNode in toImportList:
-                            toImportList.append([taggedNode, tag])
+                        if not [taggedNode, tag, taggedDic[taggedNode][tag]["node"]] in toImportList:
+                            toImportList.append([taggedNode, tag, taggedDic[taggedNode][tag]["node"]])
             else:
                 self.notWorkWellInfoList.append(taggedNode)
                 wellImported = False
         if toImportList:
             for tagList in toImportList:
                 try:
-                    wellImported = self.importComponentTag(tagList[0], tagList[1], taggedDic[tagList[0]][tagList[1]]["components"], wellImported)
+                    wellImported = self.importComponentTag(tagList[0], tagList[1], tagList[2], taggedDic[tagList[0]][tagList[1]]["components"], wellImported)
                 except Exception as e:
                     self.notWorkWellInfoList.append(", ".join(tagList)+" - "+str(e))
                     wellImported = False
