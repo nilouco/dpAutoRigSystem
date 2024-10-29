@@ -234,6 +234,49 @@ class Weights(object):
         return tagInfluenceDic
     
 
+    def getComponentTagFalloff(self, nodeList=None, *args):
+        """ Mount and return a dictionary with all componentTag falloff nodes to export them.
+        """
+        falloffDic = {}
+        falloffTypeAttrDic = {
+                            "primitiveFalloff" : ["primitive", "useOriginalGeometry", "vertexSpace", "positiveSizeX", "positiveSizeY", "positiveSizeZ", "negativeSizeX", "negativeSizeY", "negativeSizeZ"],
+                            "blendFalloff"     : ["baseWeight"],
+                            "uniformFalloff"   : ["uniformWeight"],
+                            "proximityFalloff" : ["useOriginalGeometry", "vertexSpace", "volume", "proximitySubset", "useBindTags", "bindTagsFilter"],
+                            "subsetFalloff"    : ["useFalloffTags", "falloffTags",  "withinBoundary",  "useOriginalGeometry",  "mode",  "scale"],
+                            "componentFalloff" : None,
+                            "transferFalloff"  : ["useBindTags", "bindTagsFilter"]
+                        }
+        commonAttrList = ["start", "end"]
+        multiAttrDic = { "ramp"             : ["ramp_Position", "ramp_FloatValue", "ramp_Interp"],
+                         "target"           : ["weight", "mode"],
+                         "weightInfoLayers" : ["defaultWeight"]
+                        }
+        if not nodeList:
+            nodeList = cmds.ls(selection=False, type=list(falloffTypeAttrDic.keys()))
+        if nodeList:
+            for node in nodeList:
+                nodeType = cmds.objectType(node)
+                falloffDic[node] = { "name" : node,
+                                     "type" : nodeType,
+                                     "outputWeightFunction" : cmds.listConnections(node+".outputWeightFunction", source=False, destination=True, plugs=True),
+                                     "attributes" : {}
+                                    }
+                # node attributes and common
+                if falloffTypeAttrDic[nodeType]:
+                    for attr in (falloffTypeAttrDic[nodeType] + commonAttrList):
+                        if cmds.objExists(node+"."+attr):
+                            falloffDic[node]["attributes"][attr] = cmds.getAttr(node+"."+attr)
+                # specific multiIndices attributes
+                for multiAttr in multiAttrDic.keys():
+                    if cmds.objExists(node+"."+multiAttr):
+                        for i, index in enumerate(cmds.getAttr(node+"."+multiAttr, multiIndices=True)):
+                            for name in multiAttrDic[multiAttr]:
+                                attrName = multiAttr+"["+str(index)+"]."+name
+                                falloffDic[node]["attributes"][attrName] = cmds.getAttr(node+"."+attrName)
+        return falloffDic
+    
+
     def importComponentTag(self, taggedNode, tagName, componentList, wellImported, *args):
         """
             Import componentList to the tagged node.

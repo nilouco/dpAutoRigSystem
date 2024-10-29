@@ -63,7 +63,7 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                             # Declaring the data dictionary to export it
                             self.tagDataDic = { "tagged"     : self.defWeights.getComponentTagInfo(nodeList),
                                                 "influencer" : self.defWeights.getComponentTagInfluencer(),
-                                                "falloff"    : {}
+                                                "falloff"    : self.defWeights.getComponentTagFalloff()
                                             }
                             try:
                                 # export data
@@ -133,8 +133,10 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                                     #
                                     # TODO
                                     #
-                                    # export falloff
                                     # import falloff
+                                            # create falloffs nodes
+                                            # set attrs
+                                            # connect plugs
                                     #
                                     #
 
