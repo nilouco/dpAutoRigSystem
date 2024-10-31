@@ -490,6 +490,7 @@
     "i326_sComponentTagIOAnn"   : "The folder to export and import componentTag data.",
     "i327_sConnectionIOAnn"     : "The folder to export and import connections data.",
     "i328_sConstraintIOAnn"     : "The folder to export and import constraints data.",
+    "i329_broken"               : "Broken",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

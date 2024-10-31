@@ -490,6 +490,7 @@
     "i326_sComponentTagIOAnn"   : "O diretório onde será exportado ou importado os dados de componentTag.",
     "i327_sConnectionIOAnn"     : "O diretório onde será exportado ou importado os dados de conexões.",
     "i328_sConstraintIOAnn"     : "O diretório onde será exportado ou importado os dados de constraints.",
+    "i329_broken"               : "Quabrado",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

@@ -23,10 +23,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_constraintIO"
         self.startName = "dpConstraint"
-
-
-
-        self.constraintTypeList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint"]
+        self.constraintTypeList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint", "poleVectorConstraint", "tangentConstraint"]
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -102,6 +99,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
         if constraintList:
             dic = {}
             attrList = ["interpType", "constraintOffsetPolarity", "aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
+            outputAttrList = ["constraintTranslateX", "constraintTranslateY",  "constraintTranslateZ",  "constraintRotateX",  "constraintRotateY",  "constraintRotateZ",  "constraintScaleX",  "constraintScaleY",  "constraintScaleZ"]
             #typeAttrDic = {
             #                "parentConstraint" : ["interpType"],
             #                "orientConstraint" : ["interpType"],
@@ -117,7 +115,9 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
                 cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                 # getting attributes if they exists
                 dic[const] = {"attributes" : {},
-                              "type"       : cmds.objectType(const)}
+                              "output"     : {},
+                              "type"       : cmds.objectType(const)
+                              }
                 for attr in attrList:
                     if cmds.objExists(const+"."+attr):
                         dic[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
@@ -138,6 +138,14 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
                         targetList = cmds.getAttr(const+".target", multiIndices=True)
                         for t in targetList:
                             dic[const]["target"][targetAttr] = {t : [cmds.listConnections(const+".target["+str(t)+"]."+targetAttr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(t)+"].targetWeight")]}
+                # store connection info to disconnect when import if need to skip the constraint driving
+                for outAttr in outputAttrList:
+                    dic[const]["output"][outAttr] = None
+                    if cmds.objExists(const+"."+outAttr):
+                        if cmds.listConnections(const+"."+outAttr, source=False, destination=True):
+                            dic[const]["output"][outAttr] = True
+                        else:
+                            dic[const]["output"][outAttr] = False
             return dic
 
 
@@ -150,60 +158,69 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
         # define lists to check result
         wellImportedList = []
         for item in constDic.keys():
-            notFoundNodesList = []
+            existingNodesList = []
             progressAmount += 1
             cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
-            # check attributes
+            # create constraint node if it needs
             if not cmds.objExists(item):
                 constType = constDic[item]["type"]
-
-            # WIP
-            
-#[, "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint", "pointOnPolyConstraint", "geometryConstraint", "normalConstraint"]
-
-                #if constType == "parentConstraint":
-                #    cmds.parentConstraint(constDic[item])
-
-
-
-                    #cmds.createNode(, , maintainOffset=True, name=item)
-            if cmds.objExists(item):
-                for attr in constDic[item]["attributes"].keys():
-                    if not cmds.objExists(item+"."+attr):
-                        try:
-                            # add and set attribute value
-                            if constDic[item]["attributes"][attr]['type'] == "string":
-                                cmds.addAttr(item, longName=attr, dataType="string")
-                                cmds.setAttr(item+"."+attr, constDic[item]["attributes"][attr]['value'], type="string")
-                            elif constDic[item]["attributes"][attr]['type'] == "enum":
-                                cmds.addAttr(item, longName=attr, attributeType="enum", enumName=constDic[item]["attributes"][attr]['enumName'])
-                            else:
-                                if constDic[item]["attributes"][attr]['minExists']:
-                                    if constDic[item]["attributes"][attr]['maxExists']:
-                                        cmds.addAttr(item, longName=attr, attributeType=constDic[item]["attributes"][attr]['type'], minValue=constDic[item]["attributes"][attr]['minimum'], maxValue=constDic[item]["attributes"][attr]['maximum'], defaultValue=constDic[item]["attributes"][attr]['default'])
-                                    else:
-                                        cmds.addAttr(item, longName=attr, attributeType=constDic[item]["attributes"][attr]['type'], minValue=constDic[item]["attributes"][attr]['minimum'], defaultValue=constDic[item]["attributes"][attr]['default'])
-                                elif constDic[item]["attributes"][attr]['maxExists']:
-                                    cmds.addAttr(item, longName=attr, attributeType=constDic[item]["attributes"][attr]['type'], maxValue=constDic[item]["attributes"][attr]['maximum'], defaultValue=constDic[item]["attributes"][attr]['default'])
-                                else:
-                                    cmds.addAttr(item, longName=attr, attributeType=constDic[item]["attributes"][attr]['type'], defaultValue=constDic[item]["attributes"][attr]['default'])
-                            if constDic[item]["attributes"][attr]['type'] in self.defaultValueTypeList:
-                                cmds.setAttr(item+"."+attr, constDic[item]["attributes"][attr]['value'])
-                                cmds.setAttr(item+"."+attr, keyable=constDic[item]["attributes"][attr]['keyable'])
-                                if not constDic[item]["attributes"][attr]['keyable']:
-                                    cmds.setAttr(item+"."+attr, channelBox=constDic[item]["attributes"][attr]['channelBox'])
-                                cmds.setAttr(item+"."+attr, lock=constDic[item]["attributes"][attr]['locked'])
-                            if not item in wellImportedList:
-                                wellImportedList.append(item)
-                        except Exception as e:
-                            self.notWorkedWellIO(item+" - "+str(e))
-                    else:
-                        wellImportedList.append(item)
-                # reorder attr
-                self.dpUIinst.reorderAttributes([item], constDic[item]["order"], False)
+                targetList, valueList = [], []
+                if constDic[item]["target"]:
+                    targetAttr = list(constDic[item]["target"].keys())[0]
+                    keyList = list(constDic[item]["target"][targetAttr].keys())
+                    keyList.sort()
+                    for k in keyList:
+                        targetList.append(constDic[item]["target"][targetAttr][k][0])
+                        valueList.append(constDic[item]["target"][targetAttr][k][1])
+                toNodeList = constDic[item]["constraintParentInverseMatrix"]
+                # create the missing constraint
+                if targetList and toNodeList:
+                    if constType == "parentConstraint":
+                        const = cmds.parentConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                    elif constType == "pointConstraint":
+                        const = cmds.pointConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                    elif constType == "orientConstraint":
+                        const = cmds.orientConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                    elif constType == "scaleConstraint":
+                        const = cmds.scaleConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                    elif constType == "aimConstraint":
+                        const = cmds.aimConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                    elif constType == "pointOnPolyConstraint":
+                        const = cmds.pointOnPolyConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
+                    elif constType == "geometryConstraint":
+                        const = cmds.geometryConstraint(targetList, toNodeList[0], name=item)[0]
+                    elif constType == "normalConstraint":
+                        const = cmds.normalConstraint(targetList, toNodeList[0], name=item)[0]
+                    elif constType == "poleVectorConstraint":
+                        const = cmds.poleVectorConstraint(targetList, toNodeList[0], name=item)[0]
+                    elif constType == "tangentConstraint":
+                        const = cmds.tangentConstraint(targetList, toNodeList[0], name=item)[0]
+                    # set attribute values
+                    if constDic[item]["attributes"]:
+                        for attr in constDic[item]["attributes"].keys():
+                            cmds.setAttr(const+"."+attr, constDic[item]["attributes"][attr])
+                    # set weight values
+                    for v, value in enumerate(valueList):
+                        cmds.setAttr(item+"."+targetList[v]+"W"+str(v), value)
+                    if constDic[item]["worldUpMatrix"]:
+                        cmds.connectAttr(constDic[item]["worldUpMatrix"][0]+".worldMatrix", const+".worldUpMatrix", force=True)
+                    # disconnect to keep the same exported skip option
+                    for outAttr in constDic[item]["output"].keys():
+                        if cmds.objExists(const+"."+outAttr):
+                            if not constDic[item]["output"][outAttr]:
+                                connectedList = cmds.listConnections(const+"."+outAttr, source=False, destination=True, plugs=True)
+                                if connectedList:
+                                    cmds.disconnectAttr(const+"."+outAttr, connectedList[0])
+                    wellImportedList.append(const)
+                else:
+                    cmds.createNode(constType, name=item) #broken node
+                    self.notWorkedWellIO(self.dpUIinst.lang['i329_broken']+" node - "+item)
             else:
-                notFoundNodesList.append(item)
+                existingNodesList.append(item)
         if wellImportedList:
             self.wellDoneIO(', '.join(wellImportedList))
         else:
-            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
+            if existingNodesList:
+                self.wellDoneIO(self.dpUIinst.lang['r032_notImportedData'])
+            else:
+                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(existingNodesList))
