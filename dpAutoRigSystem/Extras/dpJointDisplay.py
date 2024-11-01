@@ -28,6 +28,7 @@ class JointDisplay(object):
         self.noneLabelList = []
         self.selectionUiList = []
         self.selectedBoard = []
+        self.allBoardList = ['boneFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn', 'jointFieldcolumn']
         # call main function
         if self.ui:
             self.dpJointDisplayUI(self)
@@ -77,10 +78,10 @@ class JointDisplay(object):
 
         # bone display panels
         # boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', parent=columnLayout, allowMultiSelection=True, append=self.boneLabelList, enable=True)
-        self.boneFieldcolumn = cmds.textScrollList('boneFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True)
-        self.multiChildFieldcolumn = cmds.textScrollList('multiChildFieldcolumn', enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True)
-        self.noneFieldcolumn = cmds.textScrollList('noneFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True)
-        self.jointFieldcolumn = cmds.textScrollList('jointFieldcolumn',enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
+        self.boneFieldcolumn = cmds.textScrollList(self.allBoardList[0], enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.boneFieldcolumn), deselectAll=True)
+        self.multiChildFieldcolumn = cmds.textScrollList(self.allBoardList[1], enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.multiChildFieldcolumn), deselectAll=True)
+        self.noneFieldcolumn = cmds.textScrollList(self.allBoardList[2],enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.noneFieldcolumn), deselectAll=True)
+        self.jointFieldcolumn = cmds.textScrollList(self.allBoardList[3],enable=True, parent=columnLayout, allowMultiSelection=True, selectCommand=lambda: self.activeSelection(self.jointFieldcolumn), deselectAll=True)
         
     
         # bottom layout for buttons
@@ -199,13 +200,12 @@ class JointDisplay(object):
                 if currentDrawStyle < 3:
                     print(f'DrawStyle atual {currentDrawStyle}')
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle + 1)
-                    # self.keepSelectedObj(self)
                 else: 
                     currentDrawStyle = 0
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
-                    # self.keepSelectedObj(self)
             self.refreshLists(self)
             self.keepSelectedObj(self)
+
             
     
     
@@ -224,8 +224,10 @@ class JointDisplay(object):
                     cmds.setAttr(jnt +'.drawStyle', currentDrawStyle - 1)
                 else: 
                     currentDrawStyle = 3
-                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)
+                    cmds.setAttr(jnt +'.drawStyle', currentDrawStyle)          
             self.refreshLists(self)
+            self.keepSelectedObj(self)  
+
 
 
     
@@ -233,16 +235,30 @@ class JointDisplay(object):
     def keepSelectedObj(self, *args):
         """ Mantain ative selected joints"""
 
-
         selectedUIJoints = self.selectionUiList
         selectedUIBoard = self.selectedBoard
-        # for item in selectedUIBoard
-        for iten in selectedUIJoints:
-            print(iten)
-            cmds.textScrollList(selectedUIBoard, edit=True, selectItem=iten)
+        allboards = self.allBoardList
+        selectedItens = []
+
+        for board in allboards:
+            #Existe algum objeto da lista selectedUIJoints?
+            if selectedUIJoints:
+                selectedItens.append(cmds.textScrollList(board, query=True, selectItem=True))
+                for iten in selectedItens:
+                    cmds.textScrollList(board, edit=True, selectItem=iten)
+                selectedItens = []
+
+            # Se existe, seleciona ele.
+            # Se algum objeto contem no em algum board. Seleciona o objeto no respectivo board.
+            
 
 
-        """!!!!!!!!!!!!!!!!!!!!!!!!!!  OBS: MUDAR A LÓGICA PARA PROCURAR EM QUAL BOARD ESTÁ O JOINT SELECIONADO ANTES DE APERTARMOS O BOTÃO, E DEPOIS APLICAR O COMANDO"""
+
+                
+                
+
+
+        """!!!!!!!!!!!!!  STOOPED: Parei tentando encontrar """
         
         # selectedList = cmds.textScrollList(obj, query=True, selectItem=True)
         # toSelectList = []
@@ -273,7 +289,7 @@ class JointDisplay(object):
     def deselectOtherBoards(self, board, *args, **kwargs):
         ''' Figure out which board column is selected'''
         self.board = board
-        boardList = ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
+        boardList = self.allBoardList # ['boneFieldcolumn', 'jointFieldcolumn', 'multiChildFieldcolumn', 'noneFieldcolumn']
         board=[]
         for item in boardList:
             if item == self.board[self.board.rfind("|")+1:]:
