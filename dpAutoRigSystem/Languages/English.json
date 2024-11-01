@@ -5,7 +5,7 @@
     "_date"          : "2010-10-03",
     "_language"      : "English",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-10-30",
+    "_updated"       : "2024-10-31",
 
     "a000_presentation" : "This is the first sentence to translate.\nPlease use the text field bellow to write your translated text.\n\nYou can use buttons to:\nBack and review your translation.\nSame to use the same text to your language.\nNext to apply your translated text and move forward.\n\nUse Enter (Return) to a new line.\nSome texts don't accept special characters.\nOthers have punctuation or nothing.\n\nLet's start! Thank you.",
 
@@ -491,6 +491,7 @@
     "i327_sConnectionIOAnn"     : "The folder to export and import connections data.",
     "i328_sConstraintIOAnn"     : "The folder to export and import constraints data.",
     "i329_broken"               : "Broken",
+    "i330_sDrivenKeyIOAnn"      : "The folder to export and import set driven key nodes data.",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",
@@ -789,7 +790,9 @@
     "r049_componentTagIODesc"   : "This action will work with componentTag info\nexporting and importing them data.",
     "r050_constraintIO"         : "Constraint IO",
     "r051_constraintIODesc"     : "This action will work with constraints\nexporting and importing them data.",
-    
+    "r052_drivenKeyIO"          : "Driven key IO",
+    "r053_drivenKeyIODesc"      : "This action will work with set driven key nodes\nexporting and importing them data.",
+
     "t000_translator"      : "Translator",
     "t001_greeting"        : "Thank you for your help in this project.\n\nBefore start sentence translation,\nwe need to collect some info\nin order to complete the file...",
     "t002_yourName"        : "What's your name?",

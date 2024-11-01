@@ -16,5 +16,6 @@ dpTransformationIO
 dpControlShapeIO
 dpAttributeIO
 dpConstraintIO
+dpDrivenKeyIO
 dpConnectionIO
 dpCalibrationIO
