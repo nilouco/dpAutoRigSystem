@@ -62,7 +62,7 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                         except Exception as e:
                             self.notWorkedWellIO(jsonName+": "+str(e))
                     else: #import
-#                        try:
+                        try:
                             exportedList = self.getExportedList()
                             if exportedList:
                                 exportedList.sort()
@@ -73,8 +73,8 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                                     self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-#                        except Exception as e:
-#                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                        except Exception as e:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
@@ -99,7 +99,7 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
         if nodeList:
             dic = {}
             attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
-            keyAttrList = ["keyTanLocked", "keyWeightLocked", "keyTanInX", "keyTanInY", "keyTanOutX", "keyTanOutY", "keyBreakdown", "keyTickDrawSpecial"]
+            keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
             keyTimeAttrList = ["keyTime", "keyValue"]
             progressAmount = 0
             maxProcess = len(nodeList)
@@ -113,6 +113,16 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                               "keyTimeValue"     : {},
                               "keyTanInType"     : {},
                               "keyTanOutType"    : {},
+                              "keyTanInX"        : {},
+                              "keyTanInY"        : {},
+                              "keyTanOutX"       : {},
+                              "keyTanOutY"       : {},
+                              "keyTanLocked"     : {},
+                              "keyWeightLocked"  : {},
+                              "inAngle"          : {},
+                              "inWeight"         : {},
+                              "outAngle"         : {},
+                              "outWeight"        : {},
                               "input"            : cmds.listConnections(item+".input", source=True, destination=False, plugs=True),
                               "output"           : cmds.listConnections(item+".output", source=False, destination=True, plugs=True),
                               "curveColor"       : cmds.getAttr(item+".curveColor")[0],
@@ -133,8 +143,18 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                             dic[item]["keyTimeValue"][index][ktAttr] = cmds.getAttr(item+".keyTimeValue["+str(i)+"]."+ktAttr)
                         for kAttr in keyAttrList:
                             dic[item]["keys"][index][kAttr] = cmds.getAttr(item+"."+kAttr+"["+str(i)+"]")
-                        dic[item]["keyTanInType"][index] = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
-                        dic[item]["keyTanOutType"][index] = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
+                        dic[item]["keyTanInType"][index]    = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
+                        dic[item]["keyTanOutType"][index]   = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
+                        dic[item]["keyTanInX"][index]       = cmds.keyTangent(item, query=True, index=(i, i), ix=True)[0]
+                        dic[item]["keyTanInY"][index]       = cmds.keyTangent(item, query=True, index=(i, i), iy=True)[0]
+                        dic[item]["keyTanOutX"][index]      = cmds.keyTangent(item, query=True, index=(i, i), ox=True)[0]
+                        dic[item]["keyTanOutY"][index]      = cmds.keyTangent(item, query=True, index=(i, i), oy=True)[0]
+                        dic[item]["keyTanLocked"][index]    = cmds.keyTangent(item, query=True, index=(i, i), lock=True)[0]
+                        dic[item]["keyWeightLocked"][index] = cmds.keyTangent(item, query=True, index=(i, i), weightLock=True)[0]
+                        dic[item]["inAngle"][index]         = cmds.keyTangent(item, query=True, index=(i, i), inAngle=True)[0]
+                        dic[item]["inWeight"][index]        = cmds.keyTangent(item, query=True, index=(i, i), inWeight=True)[0]
+                        dic[item]["outAngle"][index]        = cmds.keyTangent(item, query=True, index=(i, i), outAngle=True)[0]
+                        dic[item]["outWeight"][index]       = cmds.keyTangent(item, query=True, index=(i, i), outWeight=True)[0]
             return dic
 
 
@@ -161,16 +181,23 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                 cmds.setAttr(node+".curveColor", drivenKeyDic[item]["curveColor"][0], drivenKeyDic[item]["curveColor"][1], drivenKeyDic[item]["curveColor"][2], type="double3")
                 cmds.keyTangent(node, edit=True, weightedTangents=drivenKeyDic[item]["weightedTangents"])
                 # set driven keys
-                print(drivenKeyDic[item]["size"])
                 for i in range(0, drivenKeyDic[item]["size"]):
                     cmds.setKeyframe(item, float=drivenKeyDic[item]["keyTimeValue"][str(i)]["keyTime"], value=drivenKeyDic[item]["keyTimeValue"][str(i)]["keyValue"])
                     for kAttr in drivenKeyDic[item]["keys"][str(i)].keys():
-                        try:
-                            cmds.setAttr(item+"."+kAttr+"["+str(i)+"]", drivenKeyDic[item]["keys"][str(i)][kAttr])
-                        except:
-                            print("not worked =", kAttr)
+                        cmds.setAttr(item+"."+kAttr+"["+str(i)+"]", drivenKeyDic[item]["keys"][str(i)][kAttr])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inTangentType=drivenKeyDic[item]["keyTanInType"][str(i)])
                     cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outTangentType=drivenKeyDic[item]["keyTanOutType"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ix=drivenKeyDic[item]["keyTanInX"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), iy=drivenKeyDic[item]["keyTanInY"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), ox=drivenKeyDic[item]["keyTanOutX"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), oy=drivenKeyDic[item]["keyTanOutX"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), lock=drivenKeyDic[item]["keyTanLocked"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inAngle=drivenKeyDic[item]["inAngle"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), inWeight=drivenKeyDic[item]["inWeight"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outAngle=drivenKeyDic[item]["outAngle"][str(i)])
+                    cmds.keyTangent(node, edit=True, index=(int(i), int(i)), outWeight=drivenKeyDic[item]["outWeight"][str(i)])
+                    if drivenKeyDic[item]["weightedTangents"]:
+                        cmds.keyTangent(node, edit=True, index=(int(i), int(i)), weightLock=drivenKeyDic[item]["keyWeightLocked"][str(i)])
                 # reconnect node
                 if drivenKeyDic[item]["input"]:
                     if cmds.objExists(drivenKeyDic[item]["input"][0]):
