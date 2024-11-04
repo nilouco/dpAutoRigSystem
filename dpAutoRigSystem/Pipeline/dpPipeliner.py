@@ -246,7 +246,7 @@ class Pipeliner(object):
         "s_componentTagIO"   : "i326_sComponentTagIOAnn",
         "s_connectionIO"     : "i327_sConnectionIOAnn",
         "s_constraintIO"     : "i328_sConstraintIOAnn",
-        "s_drivenKeyIO"      : "i330_sDrivenIOAnn",
+        "s_drivenKeyIO"      : "i330_sDrivenKeyIOAnn",
         "s_old"              : "i237_sOldAnn",
         "s_dropbox"          : "i238_sDropboxAnn",
         "s_prefix"           : "i239_sPrefixAnn",
