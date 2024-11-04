@@ -25,6 +25,7 @@ class Utils(object):
         # define variables
         self.dpOrderList = "dpOrderList"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
+        self.progress = False
         
 
     # UTILS functions:
@@ -1271,3 +1272,41 @@ class Utils(object):
                     L_Arm_Wrist_Ctrl.translateZ = LAWCtranslateZ
         """
         return str("".join([n for n in plug.split(".")[0] if n.isupper() or n.isnumeric()])+plug.split(".")[1].replace("[", "").replace("]", ""))
+
+
+    def setProgress(self, message="Rigging...", header="dpAutoRigSystem", max=100, amount=0, addOne=False, addNumber=True, cancelIt=False, endIt=False, isInterruptable=True, *args):
+        """ Centralize the progressWindow calling in one method.
+            Try to use the cmds.progressWindow as a more automate process.
+            
+            Arguments:
+                message = status
+                header = tittle
+                max = maxValue
+                amount = progress
+                addOne = increment amount plus 1
+                addNumber = add amount to the end of the message string
+                cancelIt = isCancelled
+                endIt = endProgress
+                isInterruptable = if we can interrupt the process or not. True by default.
+
+            Example:
+                dpUIinst.utils.setProgress(doingName+': '+backWheelName, addOne=True)
+        """
+        if addOne:
+            self.currentAmount += 1
+        else:
+            self.currentAmount = amount
+        if self.progress:
+            if endIt:
+                cmds.progressWindow(endProgress=True)
+                self.progress = False
+            elif cancelIt:
+                cmds.progressWindow(isCancelled=True)
+                self.progress = False
+            else: #edit
+                if addNumber:
+                    message = message+" # "+str(self.currentAmount)
+                cmds.progressWindow(edit=True, progress=self.currentAmount, status=message)
+        else: #create
+            cmds.progressWindow(title=header, progress=self.currentAmount, status=message, maxValue=max, isInterruptable=isInterruptable)
+            self.progress = True
