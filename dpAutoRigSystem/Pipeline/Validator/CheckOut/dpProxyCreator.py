@@ -136,12 +136,13 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                 sourceFaceList = cmds.ls(source+".f[*]", flatten=True)
                 for i, idx in enumerate(sourceFaceList):
                     percList = cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
-                    indexJointDic[i] = percList[0]
-                    if not len(percList) == 1:
-                        jointValueList = []
-                        for item in percList:
-                            jointValueList.append(cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=item, query=True))
-                        indexJointDic[i] = percList[jointValueList.index(max(jointValueList))]
+                    if percList:
+                        indexJointDic[i] = percList[0]
+                        if not len(percList) == 1:
+                            jointValueList = []
+                            for item in percList:
+                                jointValueList.append(cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=item, query=True))
+                            indexJointDic[i] = percList[jointValueList.index(max(jointValueList))]
                 for jnt in weightedInfluenceList:
                     nodeFaceList = []
                     skinnedFaceList = []
