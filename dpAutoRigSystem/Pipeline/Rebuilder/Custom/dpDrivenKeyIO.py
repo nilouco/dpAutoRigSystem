@@ -1,6 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseActionClass
+from ... import dpBaseActionClass
 
 # global variables to this module:
 CLASS_NAME = "DrivenKeyIO"

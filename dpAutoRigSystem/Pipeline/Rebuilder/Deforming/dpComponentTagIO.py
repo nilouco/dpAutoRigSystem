@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseActionClass
-from ...Deforms import dpWeights
+from ... import dpBaseActionClass
+from .... Deforms import dpWeights
 
 # global variables to this module:
 CLASS_NAME = "ComponentTagIO"

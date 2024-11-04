@@ -134,6 +134,10 @@ CHECKIN = "Pipeline/Validator/CheckIn"
 CHECKOUT = "Pipeline/Validator/CheckOut"
 VALIDATOR_PRESETS = "Pipeline/Validator/Presets"
 REBUILDER =  "Pipeline/Rebuilder"
+SOURCE =  "Pipeline/Rebuilder/Source"
+SETUP =  "Pipeline/Rebuilder/Setup"
+DEFORMING =  "Pipeline/Rebuilder/Deforming"
+CUSTOM =  "Pipeline/Rebuilder/Custom"
 BASE_NAME = "dpAR_"
 EYE = "Eye"
 HEAD = "Head"
@@ -759,7 +763,16 @@ class DP_AutoRig_UI(object):
         self.allUIs["rebuilderProcessLayout"] = cmds.frameLayout('rebuilderProcessLayout', label=self.lang['i292_processes'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderLayout"])
         # processes
         self.rebuilderModuleList = self.startGuideModules(REBUILDER, "start", "rebuilderProcessLayout")
-        cmds.separator(style="none", parent=self.allUIs["rebuilderProcessLayout"])
+        cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
+        self.allUIs["rebuilderSourceLayout"] = cmds.frameLayout('rebuilderSourceLayout', label=self.lang['i331_source'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
+        self.rebuilderModuleList = self.startGuideModules(SOURCE, "start", "rebuilderSourceLayout")
+        self.allUIs["rebuilderSetupLayout"] = cmds.frameLayout('rebuilderSetupLayout', label=self.lang['i332_setup'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
+        self.rebuilderModuleList = self.startGuideModules(SETUP, "start", "rebuilderSetupLayout")
+        self.allUIs["rebuilderDeformingLayout"] = cmds.frameLayout('rebuilderDeformingLayout', label=self.lang['i331_deforming'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
+        self.rebuilderModuleList = self.startGuideModules(DEFORMING, "start", "rebuilderDeformingLayout")
+        self.allUIs["rebuilderCustomLayout"] = cmds.frameLayout('rebuilderCustomLayout', label=self.lang['i331_custom'].upper(), collapsable=True, collapse=False, backgroundShade=True, marginHeight=10, marginWidth=10, parent=self.allUIs["rebuilderProcessLayout"])
+        self.rebuilderModuleList = self.startGuideModules(CUSTOM, "start", "rebuilderCustomLayout")
+        cmds.separator(style='none', parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectAllProcessCB"] = cmds.checkBox(label=self.lang['m004_select']+" "+self.lang['i211_all']+" "+self.lang['i292_processes'].lower(), value=True, changeCommand=partial(self.changeActiveAllModules, self.rebuilderInstanceList), parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["selectedRebuilders2Layout"] = cmds.paneLayout("selectedRebuilders2Layout", configuration="vertical2", separatorThickness=7.0, parent=self.allUIs["rebuilderProcessLayout"])
         self.allUIs["splitDataSelectProcessBT"] = cmds.button("splitDataSelectProcessBT", label=self.lang['r002_splitData'].upper(), command=partial(self.runSelectedActions, self.rebuilderInstanceList, True, True, actionType="r000_rebuilder"), parent=self.allUIs["selectedRebuilders2Layout"])
@@ -868,7 +881,7 @@ class DP_AutoRig_UI(object):
                 for moduleInstance in self.moduleInstancesList:
                     cmds.button(moduleInstance.selectButton, edit=True, label=" ", backgroundColor=(0.5, 0.5, 0.5))
             except:
-                pass        
+                pass
 
         # call reload the geometries in skin UI:
         self.reloadPopulatedGeoms()
@@ -1308,6 +1321,18 @@ class DP_AutoRig_UI(object):
             if guideDir == REBUILDER and not self.loadedRebuilder:
                 print(guideDir+" : "+str(guideModuleList))
                 self.loadedRebuilder = True
+            if guideDir == SOURCE and not self.loadedRebuilder:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedRebuilder = True
+            if guideDir == SETUP and not self.loadedRebuilder:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedRebuilder = True
+            if guideDir == DEFORMING and not self.loadedRebuilder:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedRebuilder = True
+            if guideDir == CUSTOM and not self.loadedRebuilder:
+                print(guideDir+" : "+str(guideModuleList))
+                self.loadedRebuilder = True
             if guideDir == "" and not self.loadedAddOns:
                 print(path+" : "+str(guideModuleList))
                 self.loadedAddOns = True
@@ -1382,7 +1407,7 @@ class DP_AutoRig_UI(object):
                     if validatorInstance.customName:
                         cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
                         validatorInstance.title = validatorInstance.customName
-            elif guideDir == REBUILDER.replace("/", "."):
+            elif guideDir == REBUILDER.replace("/", ".") or guideDir == SOURCE.replace("/", ".") or guideDir == SETUP.replace("/", ".") or guideDir == DEFORMING.replace("/", ".") or guideDir == CUSTOM.replace("/", "."):
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
                 rebuilderInstance.firstBT = cmds.button(label=rebuilderInstance.firstBTLabel, width=45, command=partial(rebuilderInstance.runAction, True), backgroundColor=(0.5, 0.5, 0.5), enable=rebuilderInstance.firstBTEnable, parent=moduleLayout)

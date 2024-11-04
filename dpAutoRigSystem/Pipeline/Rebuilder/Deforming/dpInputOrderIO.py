@@ -1,7 +1,7 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseActionClass
-from ...Deforms import dpWeights #do we need it or can we just use dpUIinst.skin instead?
+from ... import dpBaseActionClass
+from .... Deforms import dpWeights #do we need it or can we just use dpUIinst.skin instead?
 
 # global variables to this module:
 CLASS_NAME = "InputOrderIO"

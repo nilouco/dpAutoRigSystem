@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
-from .. import dpBaseActionClass
-import json
+from ... import dpBaseActionClass
 import ast
 
 # global variables to this module:

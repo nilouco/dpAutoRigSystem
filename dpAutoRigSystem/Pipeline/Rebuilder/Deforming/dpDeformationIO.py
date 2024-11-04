@@ -1,8 +1,8 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from .. import dpBaseActionClass
-from ...Deforms import dpWeights
+from ... import dpBaseActionClass
+from .... Deforms import dpWeights
 
 # global variables to this module:
 CLASS_NAME = "DeformationIO"
