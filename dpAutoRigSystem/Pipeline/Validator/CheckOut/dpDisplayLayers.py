@@ -106,7 +106,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
         # finishing
         self.updateButtonColors()
         self.reportLog()
-        self.endProgressBar()
+        self.endProgress()
         return self.dataLogDic
 
 

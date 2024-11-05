@@ -32,7 +32,7 @@ def Bike(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']
+        doingName = dpUIinst.lang['m094_doing']+": "
         # part names:
         chassisName = dpUIinst.lang['c091_chassis']
         forkName = dpUIinst.lang['m229_fork']
@@ -66,8 +66,8 @@ def Bike(dpUIinst):
                 maxProcess = 16
             
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName+': 0%', bikeGuideName, maxProcess)
-            dpUIinst.utils.setProgress(doingName+': 0%'+chassisName, addOne=True)
+            dpUIinst.utils.setProgress(doingName, bikeGuideName, maxProcess, addOne=False)
+            dpUIinst.utils.setProgress(doingName+chassisName)
             
             # woking with CHASSIS system:
             # create fkLine module instance:
@@ -79,7 +79,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # woking with HANDLEBAR system:
-            dpUIinst.utils.setProgress(doingName+': '+handlebarName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+handlebarName)
             # create fork instance:
             handlebarInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing fork base guide informations:
@@ -93,7 +93,7 @@ def Bike(dpUIinst):
             cmds.refresh()
 
             # woking with FORK system:
-            dpUIinst.utils.setProgress(doingName+': '+forkName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+forkName)
             # create fkLine module instance:
             forkInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             # editing fkLine base guide informations:
@@ -107,7 +107,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with PEDAL WHEEL system:
-            dpUIinst.utils.setProgress(doingName+': '+pedalName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+pedalName)
             # create pedal wheel module instance:
             pedalInstance = dpUIinst.initGuide('dpWheel', guideDir)
             pedalInstance.editUserName(pedalName)        
@@ -122,7 +122,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with LEFT PEDAL system:
-            dpUIinst.utils.setProgress(doingName+': '+leftPedalName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+leftPedalName)
             # create pedal fkLine module instance:
             leftPedalInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             leftPedalInstance.editUserName(leftPedalName)        
@@ -136,7 +136,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with RIGHT PEDAL system:
-            dpUIinst.utils.setProgress(doingName+': '+rightPedalName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+rightPedalName)
             # create pedal fkLine module instance:
             rightPedalInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             rightPedalInstance.editUserName(rightPedalName)        
@@ -150,7 +150,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with FRONT WHEEL system:
-            dpUIinst.utils.setProgress(doingName+': '+frontWheelName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+frontWheelName)
             # create wheel module instance:
             frontWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
             frontWheelInstance.editUserName(frontWheelName)        
@@ -168,7 +168,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # working with BACK WHEEL system:
-            dpUIinst.utils.setProgress(doingName+': '+backWheelName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+backWheelName)
             # create wheel module instance:
             backWheelInstance = dpUIinst.initGuide('dpWheel', guideDir)
             backWheelInstance.editUserName(backWheelName)        
@@ -186,7 +186,7 @@ def Bike(dpUIinst):
             cmds.refresh()
             
             # woking with SEAT system:
-            dpUIinst.utils.setProgress(doingName+': '+seatName, addOne=True)
+            dpUIinst.utils.setProgress(doingName+seatName)
             # create fkLine module instance:
             frontSeatInstance = dpUIinst.initGuide('dpFkLine', guideDir)
             frontSeatInstance.editUserName(seatName)
@@ -206,7 +206,7 @@ def Bike(dpUIinst):
             if userDetail == complete:
             
                 # woking with HORN system:
-                dpUIinst.utils.setProgress(doingName+': '+hornName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+hornName)
                 # create fkLine module instance:
                 hornInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing eyeLookAt base guide informations:
@@ -221,7 +221,7 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # create FRONT SUSPENSION module instance:
-                dpUIinst.utils.setProgress(doingName+': '+frontSuspensionName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+frontSuspensionName)
                 frontSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
                 frontSuspensionInstance.editUserName(frontSuspensionName)
                 # editing frontSuspension base guide informations:
@@ -236,7 +236,7 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # create BACK SUSPENSION module instance:
-                dpUIinst.utils.setProgress(doingName+': '+backSuspensionName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+backSuspensionName)
                 backSuspensionInstance = dpUIinst.initGuide('dpSuspension', guideDir)
                 backSuspensionInstance.editUserName(backSuspensionName)
                 # editing back suspension base guide informations:
@@ -251,7 +251,7 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # woking with MIRROR system:
-                dpUIinst.utils.setProgress(doingName+': '+mirrorName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+mirrorName)
                 # create fkLine module instance:
                 mirrorInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 mirrorInstance.editUserName(mirrorName)
@@ -274,7 +274,7 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # working with LEVER system:
-                dpUIinst.utils.setProgress(doingName+': '+leverName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+leverName)
                 # create fkLine module instance:
                 leverInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 leverInstance.editUserName(leverName)
@@ -292,7 +292,7 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # woking with FRONT BASKET system:
-                dpUIinst.utils.setProgress(doingName+': '+frontBasketName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+frontBasketName)
                 # create fkLine module instance:
                 frontBasketInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 frontBasketInstance.editUserName(frontBasketName)
@@ -307,7 +307,7 @@ def Bike(dpUIinst):
                 cmds.refresh()
                 
                 # woking with BACK BASKET system:
-                dpUIinst.utils.setProgress(doingName+': '+backBasketName, addOne=True)
+                dpUIinst.utils.setProgress(doingName+backBasketName)
                 # create fkLine module instance:
                 backBasketInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 backBasketInstance.editUserName(backBasketName)

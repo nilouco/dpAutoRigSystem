@@ -88,8 +88,7 @@ class ActionStartClass(object):
         if cmds.window('dpInfoWindow', query=True, exists=True):
             cmds.deleteUI('dpInfoWindow', window=True)
         if self.verbose:
-            # Starting progress window
-            cmds.progressWindow(title=self.dpUIinst.lang[self.actionType], progress=0, status=self.dpUIinst.lang[self.title]+': 0%', isInterruptable=False)
+            self.utils.setProgress(self.dpUIinst.lang[self.title]+': 0%', self.dpUIinst.lang[self.actionType], addOne=False)
 
 
     def resetButtonColors(self, *args):
@@ -181,11 +180,6 @@ class ActionStartClass(object):
             print("\n-------------\n"+self.dpUIinst.lang[self.actionType]+"\n"+self.dataLogDic["time"]+"\n"+logText)
             if not self.utils.exportLogDicToJson(self.dataLogDic, subFolder=self.dpUIinst.dpData+"/"+self.dpUIinst.dpLog):
                 print(self.dpUIinst.lang['i201_saveScene'])
-
-
-    def endProgressBar(self, *args):
-        if self.verbose:
-            cmds.progressWindow(endProgress=True)
 
     
     def notFoundNodes(self, item=None, *args):
@@ -307,3 +301,8 @@ class ActionStartClass(object):
                     if lockNodeStatus:
                         cmds.lockNode(node, lock=1)
         return resultDic
+
+
+    def endProgress(self, *args):
+        if self.verbose:
+            self.utils.setProgress(endIt=True)

@@ -1678,13 +1678,10 @@ class DP_AutoRig_UI(object):
             logText += "\nExported: "+publishLog["exportPath"]
             logText += "\nComments: "+publishLog["comments"]+"\n"
         if actionInstList:
-            progressAmount = 0
-            maxProcess = len(actionInstList)
-            cmds.progressWindow(title=self.lang[actionType], progress=progressAmount, status=self.lang[actionType]+': 0%', isInterruptable=False)
+            self.utils.setProgress(self.lang[actionType]+': 0%', self.lang[actionType], len(actionInstList))
             for a, actionInst in enumerate(actionInstList):
                 if actionInst.active:
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(actionInst.guideModuleName+': '+repr(progressAmount)))
+                    self.utils.setProgress(actionInst.guideModuleName)
                     actionInst.verbose = False
                     actionResultData[actionInst.guideModuleName] = actionInst.runAction(firstMode)
                     actionInst.verbose = True
@@ -1711,7 +1708,7 @@ class DP_AutoRig_UI(object):
                 actionResultData["Publisher"] = publishLog
             if not self.utils.exportLogDicToJson(actionResultData, subFolder=self.dpData+"/"+self.dpLog):
                 print(self.lang['i201_saveScene'])
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
         return actionResultData, False, 0
 
     
@@ -1785,7 +1782,7 @@ class DP_AutoRig_UI(object):
         extFilter = "*."+ext
         downloadFolder = cmds.fileDialog2(fileFilter=extFilter, dialogStyle=2)
         if downloadFolder:
-            cmds.progressWindow(title='Download Update', progress=50, status='Downloading...', isInterruptable=False)
+            self.utils.setProgress('Downloading...', 'Download Update', amount=50)
             try:
                 urllib.request.urlretrieve(url, downloadFolder[0])
                 self.logger.infoWin('i094_downloadUpdate', 'i096_downloaded', downloadFolder[0]+'\n\n'+self.lang['i018_thanks'], 'center', 205, 270)
@@ -1794,7 +1791,7 @@ class DP_AutoRig_UI(object):
                     cmds.deleteUI('dpUpdateWindow', window=True)
             except:
                 self.logger.infoWin('i094_downloadUpdate', 'e009_failDownloadUpdate', downloadFolder[0]+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
     
     
     def keepJsonFilesWhenUpdate(self, currentDir, tempUpdateDir, *args):
@@ -1829,24 +1826,16 @@ class DP_AutoRig_UI(object):
             # declaring variables:
             dpAR_Folder = "dpAutoRigSystem"
             dpAR_DestFolder = self.utils.findPath("dpAutoRig.py")
-            
-            # progress window:
-            installAmount = 0
-            cmds.progressWindow(title=self.lang['i098_installing'], progress=installAmount, status='Installing: 0%', isInterruptable=False)
-            maxInstall = 100
+            self.utils.setProgress('Installing: 0%', self.lang['i098_installing'])
             
             try:
                 # get remote file from url:
                 remoteSource = urllib.request.urlopen(url)
-
-                installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
+                self.utils.setProgress('Installing')
                 
                 # read the downloaded Zip file stored in the RAM memory:
                 dpAR_Zip = zipfile.ZipFile(io.BytesIO(remoteSource.read()))
-
-                installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
+                self.utils.setProgress('Installing')
 
                 # list Zip file contents in order to extract them in a temporarily folder:
                 zipNameList = dpAR_Zip.namelist()
@@ -1854,9 +1843,7 @@ class DP_AutoRig_UI(object):
                     if dpAR_Folder in fileName:
                         dpAR_Zip.extract(fileName, dpAR_DestFolder)
                 dpAR_Zip.close()
-
-                installAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
+                self.utils.setProgress('Installing')
                 
                 # declare temporarily folder:
                 dpAR_TempDir = dpAR_DestFolder+"/"+zipNameList[0]+dpAR_Folder
@@ -1881,9 +1868,7 @@ class DP_AutoRig_UI(object):
                 for sourceDir, dirList, fileList in os.walk(dpAR_TempDir):       
                     # declare destination directory:
                     destDir = sourceDir.replace(dpAR_TempDir, dpAR_DestFolder, 1).replace("\\", "/")
-                    
-                    installAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
+                    self.utils.setProgress('Installing')
                     
                     # make sure we have all folders needed, otherwise, create them in the destination directory:
                     if not os.path.exists(destDir):
@@ -1902,9 +1887,7 @@ class DP_AutoRig_UI(object):
                                 os.remove(destFile)
                         # copy the dpAR_File:
                         shutil.copy2(sourceFile, destDir)
-                        
-                        installAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxInstall, progress=installAmount, status=('Installing: ' + repr(installAmount)))
+                        self.utils.setProgress('Installing')
 
                 # delete the temporarily folder used to download and install the update:
                 folderToDelete = dpAR_DestFolder+"/"+zipNameList[0]
@@ -1920,7 +1903,7 @@ class DP_AutoRig_UI(object):
             except:
                 # report fail update installation:
                 self.logger.infoWin('i095_installUpdate', 'e010_failInstallUpdate', '\n\n'+newVersion+'\n\n'+self.lang['i097_sorry'], 'center', 205, 270)
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
         else:
             print(self.lang['i038_canceled'])
     
@@ -2294,16 +2277,11 @@ class DP_AutoRig_UI(object):
                 # load dpReorderAttribute:
                 dpRAttr = dpReorderAttr.ReorderAttr(self, False)
                 if verbose:
-                    # Reordering Option_Ctrl attributos progress window
-                    progressAmount = 0
-                    cmds.progressWindow(title='Reordering Attributes', progress=progressAmount, status='Reordering: 0%', isInterruptable=False)
-                    nbDesAttr = len(attrList)
+                    self.utils.setProgress('Reordering: 0%', 'Reordering Attributes', len(attrList), addOne=False)
                 delta = 0
                 for i, desAttr in enumerate(attrList):
                     if verbose:
-                        # update progress window
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=nbDesAttr, progress=progressAmount, status=('Reordering: ' + repr(progressAmount) + ' '+ obj + ' attributes'))
+                        self.utils.setProgress('Reordering Attributes: '+obj)
                     # get current user defined attributes:
                     currentAttrList = cmds.listAttr(obj, userDefined=True)
                     if desAttr in currentAttrList:
@@ -2314,7 +2292,7 @@ class DP_AutoRig_UI(object):
                     else:
                         delta = delta+1
                 if verbose:
-                    cmds.progressWindow(endProgress=True)
+                    self.utils.setProgress(endIt=True)
                 dpRAttr.dpCloseReorderAttrUI()
 
     
@@ -2373,9 +2351,7 @@ class DP_AutoRig_UI(object):
             self.unPinAllGuides()
             
             # Starting progress window
-            rigProgressAmount = 0
-            cmds.progressWindow(title='dpAutoRigSystem', progress=rigProgressAmount, status='Rigging : 0%', isInterruptable=False)
-            maxProcess = len(self.modulesToBeRiggedList)
+            self.utils.setProgress('Rigging:', 'dpAutoRigSystem', len(self.modulesToBeRiggedList), addOne=False)
             
             # clear all duplicated names in order to run without find same names if they exists:
             if cmds.objExists(self.guideMirrorGrp):
@@ -2416,8 +2392,7 @@ class DP_AutoRig_UI(object):
                 guideModuleCustomName = cmds.getAttr(guideModule.moduleGrp+'.customName')
                 
                 # Update progress window
-                rigProgressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+str(guideModuleCustomName)))
+                self.utils.setProgress('Rigging: '+str(guideModuleCustomName))
                 
                 # Rig it :)
                 guideModule.rigModule()
@@ -2448,8 +2423,7 @@ class DP_AutoRig_UI(object):
             
             if integrate == 1:
                 # Update progress window
-                rigProgressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=rigProgressAmount, status=('Rigging : ' + repr(rigProgressAmount) + ' '+self.lang['i010_integrateCB']))
+                self.utils.setProgress('Rigging: '+self.lang['i010_integrateCB'])
                 
                 # get all parent info from rigged modules:
                 self.originedFromDic = self.utils.getOriginedFromDic()
@@ -3130,7 +3104,7 @@ class DP_AutoRig_UI(object):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
             
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
@@ -3227,9 +3201,6 @@ class DP_AutoRig_UI(object):
                 
             #Try add hand follow (space switch attribute) on bipeds:
             self.initExtraModule("dpLimbSpaceSwitch", EXTRAS)
-            
-            # nodes treatment
-#            self.utils.unitConversionTreatment()
 
             # show dialogBox if detected a bug:
             if integrate == 1:

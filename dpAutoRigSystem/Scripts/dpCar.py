@@ -850,7 +850,7 @@ def Car(dpUIinst):
             
             
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
             cmds.select(chassisInstance.moduleGrp)

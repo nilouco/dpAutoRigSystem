@@ -216,7 +216,7 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
             self.messageList.append(self.dpUIinst.lang['v062_globalMissing'])
             self.updateButtonColors()
             self.reportLog()
-            self.endProgressBar()
+            self.utils.setProgress(endIt=True)
             return self.dataLogDic
 
         currentFileHierarchyDic = self.raiseHierarchy(rootNode)
@@ -254,7 +254,7 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
                 self.messageList.append(self.dpUIinst.lang['i201_saveScene'])
                 self.updateButtonColors()
                 self.reportLog()
-                self.endProgressBar()
+                self.utils.setProgress(endIt=True)
                 return self.dataLogDic
             
 
@@ -264,5 +264,5 @@ class ControlsHierarchy(dpBaseActionClass.ActionStartClass):
         # finishing
         self.updateButtonColors()
         self.reportLog()
-        self.endProgressBar()
+        self.endProgress()
         return self.dataLogDic

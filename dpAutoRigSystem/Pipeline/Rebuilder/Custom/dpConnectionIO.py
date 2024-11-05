@@ -87,7 +87,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         # finishing
         self.updateButtonColors()
         self.reportLog()
-        self.endProgressBar()
+        self.endProgress()
         self.refreshView()
         return self.dataLogDic
 

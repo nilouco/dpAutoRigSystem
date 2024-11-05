@@ -192,7 +192,7 @@ class Publisher(object):
         validatorsResult = self.runCheckedValidators() #verify mode
         if validatorsResult:
             mel.eval('warning \"'+validatorsResult+'\";')
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
         else:
             validatorsResult = self.dpUIinst.lang['v007_allOk']
         self.dpUIinst.logger.infoWin('i019_log', 'i224_diagnose', validatorsResult, "left", 250, 150)
@@ -215,9 +215,7 @@ class Publisher(object):
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            maxProcess = 4
-            progressAmount = 0
-            cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Starting...', isInterruptable=False)
+            self.utils.setProgress(self.dpUIinst.lang['i333_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
 
             # check if there'a a file name to publish this scene
             publishFileName = self.pipeliner.getPipeFileName(self.pipeliner.pipeData['publishPath'])
@@ -251,8 +249,7 @@ class Publisher(object):
                     self.abortPublishing(validatorsResult)
 
                 else:
-                    progressAmount += 1
-                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status='Storing data...', isInterruptable=False)
+                    self.utils.setProgress(self.dpUIinst.lang['i333_storingData']+"...", addNumber=False)
                     
                     self.pipeliner.pipeData.update(publishLog)
 
@@ -287,8 +284,7 @@ class Publisher(object):
                     else:
                         builtVersion = self.dpUIinst.dpARVersion
 
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['i227_getImage'], isInterruptable=False)
+                    self.utils.setProgress(self.dpUIinst.lang['i227_getImage']+"...", addNumber=False)
 
                     # publishing file
                     # create folders to publish file if needed
@@ -305,9 +301,10 @@ class Publisher(object):
                             # rigging preview image
                             if self.pipeliner.pipeData['b_imager']:
                                 self.pipeliner.pipeData['imagePreviewPath'] = self.packager.imager(self.pipeliner.pipeData, builtVersion, self.pipeliner.getToday())
-                    cmds.progressWindow(endProgress=True)
-                    progressAmount += 1
-                    cmds.progressWindow(title=self.publisherName, maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['i225_savingFile'], isInterruptable=False)
+                                self.utils.setProgress(endIt=True)
+                                self.utils.setProgress(self.dpUIinst.lang['i225_savingFile']+"...", self.publisherName, 8, addOne=False, addNumber=False)
+                    else:
+                        self.utils.setProgress(self.dpUIinst.lang['i225_savingFile']+"...", addNumber=False)
                     
                     # save published file
                     cmds.file(rename=self.pipeliner.pipeData['publishPath']+"/"+publishFileName)
@@ -315,26 +312,29 @@ class Publisher(object):
 
                     # packager
                     if self.pipeliner.pipeData['b_deliver']:
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['i226_exportFiles'], isInterruptable=False)
-
                         if self.pipeliner.pipeData['toClientPath']:
                             # toClient
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Zipping", addNumber=False)
                             zipFile = self.packager.zipToClient(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.pipeData['toClientPath'], self.pipeliner.getToday())
                             # dropbox
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Clouding", addNumber=False)
                             if zipFile:
                                 if self.pipeliner.pipeData['dropboxPath']:
                                     self.packager.toDropbox(zipFile, self.pipeliner.pipeData['dropboxPath'])
                             # open folder
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... Folder openning", addNumber=False)
                             self.packager.openFolder(self.pipeliner.pipeData['toClientPath'])
                         # hist
                         if self.pipeliner.pipeData['historyPath']:
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpHist", addNumber=False)
                             self.packager.toHistory(self.pipeliner.pipeData['scenePath'], self.pipeliner.pipeData['shortName'], self.pipeliner.pipeData['historyPath'])
                         # organize old published files
                         if self.pipeliner.assetNameList:
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpOld", addNumber=False)
                             self.packager.toOld(self.pipeliner.pipeData['publishPath'], publishFileName, self.pipeliner.assetNameList, self.pipeliner.pipeData['publishPath']+"/"+self.pipeliner.pipeData['s_old'])
                         # discord
                         if self.pipeliner.pipeData['b_discord']:
+                            self.utils.setProgress(self.dpUIinst.lang['i226_exportFiles']+"... dpLog", addNumber=False)
                             messageText = self.pipeliner.pipeData["sceneName"]+"\n"+self.pipeliner.pipeData['publishPath']+"/**"+self.pipeliner.pipeData['publishFileName']+"**\n*"+self.pipeliner.pipeData["comments"]+"*"
                             result = self.packager.toDiscord(self.pipeliner.pipeData['publishedWebhook'], messageText)
                             if result: #error
@@ -342,6 +342,7 @@ class Publisher(object):
 
                     # publishing callback
                     if self.pipeliner.pipeData['s_callback']:
+                        self.utils.setProgress("Callback...", addNumber=False)
                         if self.pipeliner.pipeData['callbackPath'] and self.pipeliner.pipeData['callbackFile']:
                             callbackResult = self.packager.toCallback(self.pipeliner.pipeData['callbackPath'], self.pipeliner.pipeData['callbackFile'], self.pipeliner.pipeData)
                             if callbackResult:
@@ -349,6 +350,7 @@ class Publisher(object):
 
                     # publisher log window
                     self.successPublishedWindow(publishFileName)
+                self.utils.setProgress(endIt=True)
                 self.utils.closeUI('dpPublisherWindow')
 
             else:
@@ -366,7 +368,7 @@ class Publisher(object):
         """
         # reopen current file
         cmds.file(self.pipeliner.pipeData['sceneName'], open=True, force=True)
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
         # report the error in a log window
         if raison:
             self.dpUIinst.logger.infoWin('i019_log', 'i216_publish', raison, "left", 250, 150)
@@ -377,7 +379,7 @@ class Publisher(object):
         """ If everything works well we can call a success publishing window here.
         """
         self.utils.closeUI('dpSuccessPublishedWindow')
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
         # window
         winWidth  = 250
         winHeight = 130

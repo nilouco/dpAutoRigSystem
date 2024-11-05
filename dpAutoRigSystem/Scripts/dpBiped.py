@@ -581,7 +581,7 @@ def Biped(dpUIinst):
                 cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
             cmds.select(spineInstance.moduleGrp)

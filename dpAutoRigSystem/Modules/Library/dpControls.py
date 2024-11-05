@@ -989,18 +989,16 @@ class ControlClass(object):
         importCalibrationPath = cmds.fileDialog2(fileMode=1, caption=self.dpUIinst.lang['i196_import']+" "+self.dpUIinst.lang['i193_calibration'])
         if not importCalibrationPath:
             return
-        progressAmount = 0
-        cmds.progressWindow(title=importCalibrationNamespace, progress=progressAmount, status='0% - '+self.dpUIinst.lang['i214_refFile'], isInterruptable=False)
+        self.utils.setProgress(self.dpUIinst.lang['i214_refFile'], importCalibrationNamespace, addOne=False)
         importCalibrationPath = next(iter(importCalibrationPath), None)
         # create a file reference:
         refFile = cmds.file(importCalibrationPath, reference=True, namespace=importCalibrationNamespace)
         refNode = cmds.file(importCalibrationPath, referenceNode=True, query=True)
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
-            maxProcess = len(refNodeList)
             for item in refNodeList:
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(repr(progressAmount)+' - '+self.dpUIinst.lang['i215_setAttr']))
+                self.utils.setProgress(max=len(refNodeList))
+                self.utils.setProgress(self.dpUIinst.lang['i215_setAttr'], addOne=True)
                 if cmds.objExists(item+".calibrationList"):
                     sourceRefNodeList.append(item)
         if sourceRefNodeList:
@@ -1010,7 +1008,7 @@ class ControlClass(object):
                     self.transferCalibration(sourceRefNode, [destinationNode], verbose=False)
         # remove referenced file:
         cmds.file(importCalibrationPath, removeReference=True)
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
         print("dpImportCalibrationPath: "+importCalibrationPath)
 
 
@@ -1130,10 +1128,7 @@ class ControlClass(object):
                         path = pathList[0] 
             if path:
                 if ui:
-                    # Starting progress window
-                    progressAmount = 0
-                    cmds.progressWindow(title=self.dpUIinst.lang['i164_export'], progress=progressAmount, status=self.doingName+': 0%', isInterruptable=False)
-                    maxProcess = len(nodeList)
+                    self.utils.setProgress(self.doingName+': 0%', self.dpUIinst.lang['i164_export'], len(nodeList), addOne=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1142,9 +1137,7 @@ class ControlClass(object):
                     cmds.group(name=dpSnapshotGrp, empty=True)
                 for item in nodeList:
                     if ui:
-                        # Update progress window
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.doingName+': ' + repr(progressAmount) + ' Shape'))
+                        self.utils.setProgress(self.doingName+': Shape')
                     snapshotName = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
@@ -1187,7 +1180,7 @@ class ControlClass(object):
             print(self.dpUIinst.lang['i202_noControls'])
         if ui:
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
 
 
     def importShape(self, nodeList=None, path=None, IO=False, ui=True, dir="dpControlShape", *args):
@@ -1227,15 +1220,10 @@ class ControlClass(object):
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
                         if ui:
-                            # Starting progress window
-                            progressAmount = 0
-                            cmds.progressWindow(title=self.dpUIinst.lang['i196_import'], progress=progressAmount, status=self.doingName+': 0%', isInterruptable=False)
-                            maxProcess = len(refNodeList)
+                            self.utils.setProgress(self.doingName+': 0%', self.dpUIinst.lang['i196_import'], len(refNodeList), addOne=False)
                         for sourceRefNode in refNodeList:
                             if ui:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.doingName+': ' + repr(progressAmount) + ' Shape'))
+                                self.utils.setProgress(self.doingName+': Shape')
                             if cmds.objectType(sourceRefNode) == "transform":
                                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)
                                 if cmds.objExists(destinationNode):
@@ -1247,7 +1235,7 @@ class ControlClass(object):
             print(self.dpUIinst.lang['i202_noControls'])
         if ui:
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
 
 
     def createCorrectiveJointCtrl(self, jcrName, correctiveNet, type='id_092_Correctives', radius=1, degree=3, *args):
@@ -1421,17 +1409,13 @@ class ControlClass(object):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
-                            # Starting progress window
-                            maxProcess = len(allNodeList)
-                            progressAmount = 0
-                            cmds.progressWindow(title=self.dpUIinst.lang['m010_mirror'], maxValue=maxProcess, progress=progressAmount, status=self.dpUIinst.lang['m067_shape'], isInterruptable=False)
+                            self.utils.setProgress(self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['m010_mirror'], len(allNodeList), addOne=False)
                             for node in allNodeList:
-                                progressAmount += 1
                                 if node in allControlList:
-                                    cmds.progressWindow(edit=True, progress=progressAmount, status=self.dpUIinst.lang['m067_shape']+" "+node, isInterruptable=False)                                   
+                                    self.utils.setProgress(self.dpUIinst.lang['m067_shape']+": "+node)
                                     self.mirrorShape(node, fromPrefix, toPrefix, axis)
                                     cmds.refresh()
-                        cmds.progressWindow(endProgress=True)
+                        self.utils.setProgress(endIt=True)
             else:
                 if cmds.objExists(nodeName+"."+DPCONTROL) and cmds.getAttr(nodeName+"."+DPCONTROL) == 1:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]

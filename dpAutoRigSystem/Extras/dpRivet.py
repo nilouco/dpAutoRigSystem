@@ -166,7 +166,7 @@ class Rivet(object):
         """
         self.disablePac(indexList)
         for i, index in enumerate(indexList):
-            self.setProgressBar(i+1, self.dpUIinst.lang['i315_removing'])
+            self.utils.setProgress(self.dpUIinst.lang['i315_removing'])
             netNode = self.rivetNetNodeList[index]
             if netNode:
                 self.removeRivetFromNetNode(netNode)
@@ -191,10 +191,10 @@ class Rivet(object):
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            cmds.progressWindow(title=f"{self.dpUIinst.lang['i315_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(trueIndexList), status=self.dpUIinst.lang['i315_removing'])
+            self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(trueIndexList), addOne=False)
             self.removeRivetFromList(trueIndexList, selectionList)
             self.checkRivetGrp()
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
         else:
             mel.eval('print \"dpAR: '+self.dpUIinst.lang['m235_noItemSelect']+'\\n\";')
         cmds.textScrollList(self.rivetControllersList, edit=True, deselectAll=True)
@@ -334,13 +334,6 @@ class Rivet(object):
                 self.dpAddSelect(itemList)
 
 
-    def setProgressBar(self, progressAmount, status):
-        """ Updates progress window amount and status.
-        """
-        if self.ui:
-            cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
-
-
     def riseRemoveAndIndexList(self, needToRemoveSet, hasRivetList):
         """ From a set of items to be removed rise all rivets and matching indexes needed to removal.
         """
@@ -381,18 +374,18 @@ class Rivet(object):
 
                 if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    cmds.progressWindow(title=f"{self.dpUIinst.lang['i315_removing']} {self.dpUIinst.lang['m083_rivet']}", progress=0, maxValue=len(needToRemoveList), status=self.dpUIinst.lang['i315_removing'])
+                    self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(needToRemoveList), addOne=False)
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
-                    cmds.progressWindow(endProgress=True)
+                    self.utils.setProgress(endIt=True)
                 elif removeExistingRivet == self.dpUIinst.lang['i072_no']:
                     pass
                 else:
                     return
 
         # call run function to create Rivet setup using UI values
-        cmds.progressWindow(title=self.dpUIinst.lang['i317_creatingRivet'], progress=0, maxValue=len(itemList), status=self.dpUIinst.lang['i318_working'])
+        self.utils.setProgress(self.dpUIinst.lang['i318_working'], self.dpUIinst.lang['i317_creatingRivet'], len(itemList), addOne=False)
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
         self.utils.closeUI('dpRivetWindow')
     
     
@@ -717,7 +710,7 @@ class Rivet(object):
                 
             # working with follicles and attaches
             for r, rivet in enumerate(self.rivetList):
-                self.setProgressBar(r+1, "Creating")
+                self.utils.setProgress(self.dpUIinst.lang['i317_creatingRivet'])
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)

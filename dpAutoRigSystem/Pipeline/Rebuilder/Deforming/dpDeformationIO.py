@@ -166,7 +166,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         cmds.select(clear=True)
         self.updateButtonColors()
         self.reportLog()
-        self.endProgressBar()
+        self.endProgress()
         self.refreshView()
         return self.dataLogDic
 

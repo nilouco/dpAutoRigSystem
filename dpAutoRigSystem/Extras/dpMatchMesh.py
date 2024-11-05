@@ -16,18 +16,13 @@ class MatchMesh(object):
     def __init__(self, dpUIinst, *args):
         # redeclaring variables
         self.dpUIinst = dpUIinst
+        self.utils = self.dpUIinst.utils
         # call main function
-        self.dpMain(self)
+        self.dpMatchMesh(self)
     
-    
-    def dpMain(self, *args):
-        """ Just main to call sqMatchMesh function.
-        """
-        self.dpMatchMesh()
-    
-    
+
     def dpMatchMesh(self, *args):
-        """ Get selection and transfere vertice information.
+        """ Get selection and transfere vertices information.
         """
         # declaring variables
         fromTransformDic, toTransformDic = {}, {}
@@ -37,7 +32,7 @@ class MatchMesh(object):
         selList = cmds.ls(selection=True)
         
         if(len(selList) <= 1):
-            cmds.warning("Select the FROM mesh first and the TO mesh after to transfer vertice data.")
+            cmds.warning(self.dpUIinst.lang['i040_notMatchSel'])
         else:
             # declaring current variables
             fromFather = None
@@ -82,7 +77,7 @@ class MatchMesh(object):
                     fromTransformDic[attr] = cmds.getAttr(fromTransform+"."+attr)
                     toTransformDic[attr] = cmds.getAttr(toTransform+"."+attr)
                 
-                # get list of mesh vertice proccess
+                # get list of mesh vertices proccess
                 # selecting meshes
                 cmds.select([fromMesh, toMesh])
                 meshList = om.MSelectionList()
@@ -126,25 +121,21 @@ class MatchMesh(object):
                     toMeshFn.getPoints(toVerticeList)
                     
                     # progress window
-                    progressAmount = 0
-                    cmds.progressWindow(title='Match Mesh Data', progress=progressAmount, status='Tranfering: 0%', isInterruptable=True)
+                    self.utils.setProgress(self.dpUIinst.lang['i035_transfData']+': 0%', 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected
-                    nbVertice = fromVerticeList.length()
                     for i in range(0, fromVerticeList.length()):
-                        # update progress window
-                        progressAmount += 1
                         # check if the dialog has been cancelled
                         if cmds.progressWindow(query=True, isCancelled=True):
                             cancelled = True
                             break
-                        cmds.progressWindow(edit=True, maxValue=nbVertice, progress=progressAmount, status=('Transfering: ' + repr(progressAmount) + ' vertex'))
+                        self.utils.setProgress(self.dpUIinst.lang['i035_transfData'])
                         
                         # transfer data
                         cmds.move(fromVerticeList[i].x, fromVerticeList[i].y, fromVerticeList[i].z, toMesh+".vtx["+str(i)+"]", absolute=True)
                     
-                    cmds.progressWindow(endProgress=True)
+                    self.utils.setProgress(endIt=True)
                     
                     if fromFather != None:
                         cmds.parent(fromTransform, fromFather)
@@ -154,13 +145,13 @@ class MatchMesh(object):
                         cmds.setAttr(toTransform+"."+attr, toTransformDic[attr])
                     
                     if not cancelled:
+                        cmds.select(selList)
+                        self.dpUIinst.logger.infoWin('m049_matchMesh', 'm049_matchMesh', " -> ".join(selList), "center", 300, 200)
                         print(self.dpUIinst.lang['i035_transfData'], self.dpUIinst.lang['i036_from'].upper(), ":", fromMesh, ",", self.dpUIinst.lang['i037_to'].upper(), ":", toMesh)
                     else:
                         print(self.dpUIinst.lang['i038_canceled'])
-                    
                 else:
                     mel.eval("warning \""+self.dpUIinst.lang['i039_notMatchDif']+"\";")
                 cmds.select(selList)
-            
             else:
                 mel.eval("warning \""+self.dpUIinst.lang['i040_notMatchSel']+"\";")

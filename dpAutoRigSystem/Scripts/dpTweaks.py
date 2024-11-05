@@ -413,7 +413,7 @@ def Tweaks(dpUIinst):
                 
                 
                 # Close progress window
-                cmds.progressWindow(endProgress=True)
+                self.utils.setProgress(endIt=True)
 
                 cmds.select(holderMainInstance.moduleGrp)
                 print(dpUIinst.lang['m093_createdTweaks'])

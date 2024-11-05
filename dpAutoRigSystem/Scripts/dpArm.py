@@ -93,7 +93,7 @@ def Arm(dpUIinst):
             cmds.refresh()
         
         # Close progress window
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
 
         # select the armGuide_Base:
         cmds.select(armBaseGuide)

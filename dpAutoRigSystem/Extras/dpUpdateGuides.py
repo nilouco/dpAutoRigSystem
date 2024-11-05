@@ -100,11 +100,6 @@ class UpdateGuides(object):
         cmds.window('updateGuidesWindow', edit=True, height=1)
         cmds.select(clear=True)
         cmds.showWindow('updateGuidesWindow')
-
-
-    def setProgressBar(self, progressAmount, status):
-        if self.ui:
-            cmds.progressWindow(edit=True, progress=progressAmount, status=status, isInterruptable=False)
     
 
     def filterNotNurbsCurveAndTransform(self, mayaObjList):
@@ -514,34 +509,32 @@ class UpdateGuides(object):
         """ Main method to update the guides in the scene.
         """
         self.closeExistWin('updateGuidesWindow')
-        if self.ui:
-            # Starts progress bar feedback
-            cmds.progressWindow(title='Updating Guides', progress=0, maxValue=7, status=self.dpUIinst.lang['m198_renameOldGuides'])
+        # Starts progress bar feedback
+        self.utils.setProgress(self.dpUIinst.lang['m198_renameOldGuides'], self.dpUIinst.lang['m186_updateGuides'], 7, addOne=False)
         # Rename guides to discard as *_OLD
         self.renameOldGuides()
-        self.setProgressBar(1, self.dpUIinst.lang['m199_creatingNewGuides'])
+        self.utils.setProgress(self.dpUIinst.lang['m199_creatingNewGuides'])
         # Create the new base guides to replace the old ones
         self.createNewGuides()
-        self.setProgressBar(2, self.dpUIinst.lang['m200_setAttrs'])
+        self.utils.setProgress(self.dpUIinst.lang['m200_setAttrs'])
         # Set all attributes except transforms, it's needed for parenting
         self.setNewGuideAttr('attributes')
-        self.setProgressBar(3, self.dpUIinst.lang['m201_parentGuides'])
+        self.utils.setProgress(self.dpUIinst.lang['m201_parentGuides'])
         # Parent all new guides;
         self.parentNewGuides()
-        self.setProgressBar(4, self.dpUIinst.lang['m202_setTranforms'])
+        self.utils.setProgress(self.dpUIinst.lang['m202_setTranforms'])
         # Set new base guides transform attrbutes
         self.setNewGuideAttr('transformAttributes')
-        self.setProgressBar(5, self.dpUIinst.lang['m203_setChildGuides'])
+        self.utils.setProgress(self.dpUIinst.lang['m203_setChildGuides'])
         # Set all children attributes
         self.setChildrenGuides()
-        self.setProgressBar(6, self.dpUIinst.lang['m201_parentGuides'])
+        self.utils.setProgress(self.dpUIinst.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parentRetainGuides()
         cmds.select(clear=True)
+        # Ends progress bar feedback
+        self.utils.setProgress(endIt=True)
         if self.ui:
-            self.setProgressBar(7, self.dpUIinst.lang['m204_finish'])
-            # Ends progress bar feedback
-            cmds.progressWindow(endProgress=True)
             # Calls for summary window
             self.summaryUI()
         else:

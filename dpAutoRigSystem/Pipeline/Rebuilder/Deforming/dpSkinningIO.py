@@ -53,12 +53,6 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                     else:
                         meshList = self.dpUIinst.skin.getDeformedModelList(deformerTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if meshList:
-                        progressAmount = 0
-                        maxProcess = len(meshList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                         try:
                             # export skinning data
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
@@ -76,8 +70,6 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                         self.exportedList.sort()
                         skinWeightDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
                         if skinWeightDic:
-                            progressAmount = 0
-                            maxProcess = len(skinWeightDic.keys())
                             wellImported = True
                             toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
                             
@@ -86,10 +78,6 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                             refNodeList = None
 
                             for mesh in skinWeightDic.keys():
-                                if self.verbose:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                                 if cmds.objExists(mesh):
                                     if refNodeList:
                                         for refNodeName in refNodeList:
@@ -136,7 +124,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
         # finishing
         self.updateButtonColors()
         self.reportLog()
-        self.endProgressBar()
+        self.endProgress()
         self.refreshView()
         return self.dataLogDic
 

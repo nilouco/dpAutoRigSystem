@@ -115,17 +115,13 @@ class Skinning(dpWeights.Weights):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
-        maxProcess = len(destinationList)
-        progressAmount = 0
-        cmds.progressWindow(title=self.dpUIinst.lang['i287_copy']+" Skinning", progress=progressAmount, status='Skinning: 0%', isInterruptable=False)
+        self.utils.setProgress('Skinning: ', self.dpUIinst.lang['i287_copy']+" Skinning", len(destinationList), addOne=False)
         for sourceItem in sourceList:
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('Skinning: '+repr(progressAmount)))
+            self.utils.setProgress("Skinning: ")
             if oneSource:
                 for item in destinationList:
                     self.runCopySkin(sourceItem, item, byUVs)
-                cmds.progressWindow(endProgress=True)
+                self.utils.setProgress(endIt=True)
                 return
             else:
                 if not sourceItem in ranList:
@@ -140,7 +136,7 @@ class Skinning(dpWeights.Weights):
                                 ranList.append(item)
                                 break
                     ranList.append(sourceItem)
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)
 
 
     def runCopySkin(self, sourceItem, destinationItem, byUVs=False, *args):
@@ -296,13 +292,10 @@ class Skinning(dpWeights.Weights):
     def getSkinWeightData(self, meshList, *args):
         """ Return the the skinCluster weights data of the given mesh list.
         """
-        progressAmount = 0
-        maxProcess = len(meshList)
-        cmds.progressWindow(title=self.ioStartName, progress=0, status=self.ioStartName+': 0%', isInterruptable=False)
+        self.utils.setProgress(self.ioStartName+': 0%', self.ioStartName, len(meshList), addOne=False)
         skinWeightsDic = {}
         for mesh in meshList:
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('SkinningIO: '+repr(progressAmount)+' - '+mesh))
+            self.utils.setProgress('SkinningIO: '+mesh)
             skinWeightsDic[mesh] = {}
             # get skinCluster nodes for the given mesh
             skinClusterInfoList = self.checkExistingDeformerNode(mesh)
@@ -366,16 +359,11 @@ class Skinning(dpWeights.Weights):
     def importSkinWeightsFromFile(self, meshList, path, filename, *args):
         """ Import the skinCluster weights of the given mesh in the given path and filename.
         """
-        progressAmount = 0
-        maxProcess = len(meshList)
-        # Starting progress window
-        cmds.progressWindow(title=self.ioStartName, progress=0, status=self.ioStartName+': 0%', isInterruptable=False)
-        toRemoveTempJointList = []
+        self.utils.setProgress(self.ioStartName+": 0%", self.ioStartName, len(meshList), addOne=False)
         skinWeightDic = self.dpUIinst.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
             for mesh in meshList:
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=('SkinningIO: '+repr(progressAmount)+' - '+mesh))
+                self.utils.setProgress("SkinningIO: "+mesh)
                 if cmds.objExists(mesh):
                     for skinClusterName in skinWeightDic[mesh].keys():
                         self.updateOrCreateSkinCluster(mesh, skinClusterName, skinWeightDic)
@@ -392,6 +380,7 @@ class Skinning(dpWeights.Weights):
                         if cmds.objExists(skinClusterName+".relativeSpaceMode"):
                             if "skinRelativeSpaceMode" in skinWeightDic[mesh][skinClusterName].keys():
                                 cmds.setAttr(skinClusterName+".relativeSpaceMode", skinWeightDic[mesh][skinClusterName]["skinRelativeSpaceMode"])
+        self.utils.setProgress(endIt=True)
 
 
     def ioSkinWeightsByUI(self, export=True, *args):
@@ -416,4 +405,4 @@ class Skinning(dpWeights.Weights):
                         self.dpUIinst.pipeliner.saveJsonFile(skinClusterDic, filename)
                     else:
                         self.importSkinWeightsFromFile([mesh], path[0], self.ioStartName+"_"+self.getIOFileName(mesh)+".json")
-        cmds.progressWindow(endProgress=True)
+        self.utils.setProgress(endIt=True)

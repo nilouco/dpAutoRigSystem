@@ -226,7 +226,7 @@ def Leg(dpUIinst):
                 cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
             
             # Close progress window
-            cmds.progressWindow(endProgress=True)
+            self.utils.setProgress(endIt=True)
 
             # select the legGuide_Base:
             cmds.select(legBaseGuide)

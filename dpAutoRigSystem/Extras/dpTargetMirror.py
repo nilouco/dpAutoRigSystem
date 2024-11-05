@@ -15,6 +15,7 @@ DP_TARGETMIRROR_VERSION = 2.6
 class TargetMirror(object):
     def __init__(self, dpUIinst, *args, **kwargs):
         self.dpUIinst = dpUIinst
+        self.utils = self.dpUIinst.utils
         # call main function
         self.dpTargetMirrorUI(self)
     
@@ -175,11 +176,8 @@ class TargetMirror(object):
             # get target list:
             targetList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
             if targetList:
-                # progress window
-                progressAmount = 0
-                cmds.progressWindow(title=self.dpUIinst.lang["m055_tgtMirror"], progress=progressAmount, status='Doing: 0%', isInterruptable=True)
+                self.utils.setProgress('Target: 0%', self.dpUIinst.lang["m055_tgtMirror"], len(targetList), addOne=False)
                 cancelled = False
-                nbTarget = len(targetList)
                 # get mirror information from UI
                 selectedMirror = cmds.radioCollection(self.mirrorAxisRC, query=True, select=True)
                 axis = cmds.radioButton(selectedMirror, query=True, annotation=True)
@@ -187,13 +185,11 @@ class TargetMirror(object):
                 # clear selection
                 cmds.select(clear=True)
                 for item in targetList:
-                    # update progress window
-                    progressAmount += 1
                     # check if the dialog has been cancelled
                     if cmds.progressWindow(query=True, isCancelled=True):
                         cancelled = True
                         break
-                    cmds.progressWindow(edit=True, maxValue=nbTarget, progress=progressAmount, status=('Doing: ' + repr(progressAmount) + ' target'))
+                    self.utils.setProgress("Target: "+item)
                     if not item == origNode:
                         # start copying
                         if self.dpCheckGeometry(item):
@@ -234,5 +230,5 @@ class TargetMirror(object):
                             # clear undo
                             if clearUndo:
                                 mel.eval("flushUndo;")
-                cmds.progressWindow(endProgress=True)
+                self.utils.setProgress(endIt=True)
             cmds.select(clear=True)

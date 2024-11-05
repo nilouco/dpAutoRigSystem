@@ -26,6 +26,7 @@ class Packager(object):
 
     def __init__(self) -> None:
         self.utils = dpUtils.Utils()
+        self.callback = None
     
     
     def zipToClient(self, filePath, fileName, destinationFolder, date=None, *args):
@@ -292,12 +293,12 @@ class Packager(object):
         if not callbackPath in sys.path:
            sys.path.append(callbackPath)
         try:
-            #import dpPublishCallback
-            dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
-            reload(dpCallback)
-            callback = dpCallback.Callback()
-            result = callback.main(data)
-            return result
+            if not self.callback:
+                #import dpPublishCallback
+                dpCallback = __import__(callbackFile, globals(), locals(), [], 0)
+                reload(dpCallback)
+                self.callback = dpCallback.Callback()
+            return self.callback.main(data)
         except:
             pass
 
