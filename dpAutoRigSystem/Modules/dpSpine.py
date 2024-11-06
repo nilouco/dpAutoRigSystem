@@ -578,6 +578,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([middleOrigGrp], self.utils.ignoreTransformIOAttr)
             # finalize this rig:
+            self.serializeGuide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:

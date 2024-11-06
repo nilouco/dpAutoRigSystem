@@ -1095,6 +1095,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.dpFacialConnect.dpConnectToJoints()
 
             # finalize this rig:
+            self.serializeGuide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:

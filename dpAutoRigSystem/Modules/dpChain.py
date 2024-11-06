@@ -757,6 +757,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
             # finalize this rig:
+            self.serializeGuide()
             self.integratingInfo()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
