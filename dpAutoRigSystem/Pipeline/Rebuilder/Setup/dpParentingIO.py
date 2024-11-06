@@ -51,14 +51,9 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                     else:
                         transformList = cmds.ls(selection=False, long=True, type="transform")
                     if transformList:
-                        progressAmount = 0
-                        maxProcess = len(transformList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                        self.utils.setProgress(max=len(transformList))
                         # define list to export
-                        transformList = self.utils.filterTransformList(transformList)
+                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.title)
                         transformList = self.reorderList(transformList)
                         parentDic = {"Parent" : transformList}
                         try:
@@ -79,19 +74,17 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                             parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if parentDic:
                                 currentTransformList = cmds.ls(selection=False, long=True, type="transform")
-                                currentTransformList = self.utils.filterTransformList(currentTransformList)
+                                currentTransformList = self.utils.filterTransformList(currentTransformList, verbose=self.verbose, title=self.title)
                                 currentTransformList = self.reorderList(currentTransformList)
                                 if not currentTransformList == parentDic["Parent"]:
-                                    progressAmount = 0
-                                    maxProcess = len(parentDic["Parent"])
+                                    self.utils.setProgress(max=len(parentDic["Parent"]))
                                     # define lists to check result
                                     wellImportedList = []
                                     parentIssueList = []
                                     notFoundNodesList = []
                                     # check parenting shaders
                                     for item in parentDic["Parent"]:
-                                        progressAmount += 1
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+                                        self.utils.setProgress(self.dpUIinst.lang[self.title])
                                         if not cmds.objExists(item):
                                             parentIssueList.append(item)
                                             shortItem = item[item.rfind("|")+1:]

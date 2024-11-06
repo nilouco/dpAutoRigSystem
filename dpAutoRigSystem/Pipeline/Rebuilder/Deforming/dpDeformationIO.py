@@ -62,16 +62,12 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                 hasDef = True
                                 break
                         if hasDef:
+                            self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()))
                             # Declaring the data dictionary to export it
                             self.deformerDataDic = {}
-                            progressAmount = 0
-                            maxProcess = len(self.defWeights.typeAttrDic.keys())
                             # run for all deformer types to get info
                             for deformerType in self.defWeights.typeAttrDic.keys():
-                                if self.verbose:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                self.utils.setProgress(self.dpUIinst.lang[self.title])
                                 deformerList = cmds.ls(selection=False, type=deformerType)
                                 if deformerList:
                                     for deformerNode in deformerList:
@@ -125,13 +121,9 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                     else:
                                         notFoundMeshList.append(deformerNode)
                             if toImportList:
-                                progressAmount = 0
-                                maxProcess = len(toImportList)
+                                self.utils.setProgress(max=len(toImportList))
                                 for deformerNode in toImportList:
-                                    if self.verbose:
-                                        # Update progress window
-                                        progressAmount += 1
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                                     try:
                                         wellImported = self.importDeformation(deformerNode, wellImported)
                                     except Exception as e:

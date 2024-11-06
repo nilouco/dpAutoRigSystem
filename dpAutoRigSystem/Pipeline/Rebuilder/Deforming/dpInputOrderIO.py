@@ -54,13 +54,9 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                         deformedList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if deformedList:
                         orderDic = {}
-                        progressAmount = 0
-                        maxProcess = len(deformedList)
+                        self.utils.setProgress(max=len(deformedList))
                         for item in deformedList:
-                            if self.verbose:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
                             orderDic[item] = self.defWeights.getOrderList(item)
                         if orderDic:
                             try:
@@ -81,15 +77,11 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                         self.exportedList.sort()
                         orderDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
                         if orderDic:
-                            progressAmount = 0
-                            maxProcess = len(orderDic.keys())
+                            self.utils.setProgress(max=len(orderDic.keys()))
                             wellImported = True
                             toImportList, notFoundMeshList, = [], []
                             for item in orderDic.keys():
-                                if self.verbose:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                                self.utils.setProgress(self.dpUIinst.lang[self.title])
                                 if cmds.objExists(item):
                                     toImportList.append(item)
                                 else:

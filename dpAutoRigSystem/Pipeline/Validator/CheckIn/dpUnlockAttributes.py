@@ -43,13 +43,9 @@ class UnlockAttributes(dpBaseActionClass.ActionStartClass):
             nodeList = objList
         if nodeList:
             lockedAttrDic = {}
-            progressAmount = 0
-            maxProcess = len(nodeList)
+            self.utils.setProgress(max=len(nodeList))
             for item in nodeList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 lockedAttrList = cmds.listAttr(item, locked=True)
                 if lockedAttrList:
                     lockedAttrDic[item] = lockedAttrList

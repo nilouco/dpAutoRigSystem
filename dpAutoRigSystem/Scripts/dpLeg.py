@@ -41,6 +41,7 @@ def Leg(dpUIinst):
         complete = dpUIinst.lang['i176_complete']
         cancel   = dpUIinst.lang['i132_cancel']
         userMessage = dpUIinst.lang['i177_chooseMessage']
+        legGuideName = dpUIinst.lang['m030_leg']+" "+dpUIinst.lang['i205_guide']
         
         # getting Simple or Complete module guides to create:
         userDetail = getUserDetail(simple, complete, cancel, userMessage)
@@ -52,20 +53,15 @@ def Leg(dpUIinst):
                 maxProcess = 7
                 
             # Starting progress window
-            progressAmount = 0
-            cmds.progressWindow(title='Leg Guides', progress=progressAmount, status=doingName+': 0%', isInterruptable=False)
+            dpUIinst.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False)
 
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+legName))
-            
+            dpUIinst.utils.setProgress(doingName+legName)
             # create leg module instance:
             legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
             # change limb guide to leg type:
             legLimbInstance.changeType(legName)
             # change name to leg:
             legLimbInstance.editUserName(legName)
-            
             # editing leg base guide informations:
             legBaseGuide = legLimbInstance.moduleGrp
             cmds.setAttr(legBaseGuide+".type", 1)
@@ -74,32 +70,26 @@ def Leg(dpUIinst):
             cmds.setAttr(legBaseGuide+".rotateX", 0)
             cmds.setAttr(legLimbInstance.radiusCtrl+".translateX", 1.5)
             legLimbInstance.changeStyle(dpUIinst.lang['m026_biped'])
-            
             # edit location of leg ankle guide:
             cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+footName))
             cmds.refresh()
             
+            dpUIinst.utils.setProgress(doingName+footName)
             # create foot module instance:
             footInstance = dpUIinst.initGuide('dpFoot', guideDir)
             footInstance.editUserName(footName)
             cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
             cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
-            
             # parent foot guide to leg ankle guide:
             cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
+            cmds.refresh()
             
+            #
             # complete part:
+            #
             if userDetail == complete:
                 
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_1'))
-                cmds.refresh()
-                
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe1 module instance:
                 toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -117,15 +107,11 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe1Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe1Instance.moduleGrp+".flip", 1)
                 toe1Instance.displayAnnotation(0)
-                
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_2'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe2 module instance:
                 toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -143,15 +129,11 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe2Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2Instance.moduleGrp+".flip", 1)
                 toe2Instance.displayAnnotation(0)
-                
-                # parent toe1 guide to foot middle guide:
+                # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_3'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe3 module instance:
                 toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -169,15 +151,11 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe3Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3Instance.moduleGrp+".flip", 1)
                 toe3Instance.displayAnnotation(0)
-                
-                # parent toe1 guide to foot middle guide:
+                # parent toe3 guide to foot middle guide:
                 cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_4'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe4 module instance:
                 toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -195,15 +173,11 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe4Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe4Instance.moduleGrp+".flip", 1)
                 toe4Instance.displayAnnotation(0)
-                
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_5'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe5 module instance:
                 toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -221,12 +195,11 @@ def Leg(dpUIinst):
                 cmds.setAttr(toe5Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe5Instance.moduleGrp+".flip", 1)
                 toe5Instance.displayAnnotation(0)
-                
-                # parent toe1 guide to foot middle guide:
+                # parent toe5 guide to foot middle guide:
                 cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
             
             # Close progress window
-            self.utils.setProgress(endIt=True)
+            dpUIinst.utils.setProgress(endIt=True)
 
             # select the legGuide_Base:
             cmds.select(legBaseGuide)

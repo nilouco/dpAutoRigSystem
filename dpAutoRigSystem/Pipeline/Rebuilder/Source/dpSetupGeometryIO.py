@@ -54,9 +54,7 @@ class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
                         else:
                             meshList = self.getGeometryToExportList()
                         if meshList:
-                            progressAmount = 0
-                            maxProcess = len(meshList)
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+str(meshList)))
+                            self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
                             try:
                                 nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
                                 # export alembic

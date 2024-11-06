@@ -101,12 +101,9 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
             attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
             keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
             keyTimeAttrList = ["keyTime", "keyValue"]
-            progressAmount = 0
-            maxProcess = len(nodeList)
+            self.utils.setProgress(max=len(nodeList))
             for item in nodeList:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # getting attributes if they exists
                 dic[item] = { "attributes"       : {},
                               "keys"             : {},
@@ -162,14 +159,12 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
         """ Import set driven key nodes from exported dictionary.
             Create missing set driven key nodes and set them values if they don't exists.
         """
-        progressAmount = 0
-        maxProcess = len(drivenKeyDic.keys())
+        self.utils.setProgress(max=len(drivenKeyDic.keys()))
         # define lists to check result
         wellImportedList = []
         for item in drivenKeyDic.keys():
             existingNodesList = []
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             # create set driven key node if it needs
             if not cmds.objExists(item):
                 drivenKeyType = drivenKeyDic[item]["type"]

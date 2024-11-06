@@ -77,13 +77,11 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
                             self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if self.importedDataDic:
                                 wellImported = True
-                                progressAmount = 0
-                                maxProcess = len(self.importedDataDic.keys())
+                                self.utils.setProgress(max=len(self.importedDataDic.keys()))
                                 for net in self.importedDataDic.keys():
-                                    progressAmount += 1
                                     try:
                                         netDic = self.importedDataDic[net]
-                                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+netDic['geoToAttach']))
+                                        self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+netDic['geoToAttach'])
                                         # recreate rivet:
                                         self.dpRivet.deformerToUse = netDic['deformerToUse']
                                         self.dpRivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['itemList'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
@@ -121,14 +119,11 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
         """
         if netList:
             dic = {}
-            progressAmount = 0
-            maxProcess = len(netList)
+            self.utils.setProgress(max=len(netList))
             i = 0
             for n, net in enumerate(netList):
                 if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # mount a dic
                 if cmds.objExists(net+".rivetData"):
                     data = json.loads(cmds.getAttr(net+".rivetData"))

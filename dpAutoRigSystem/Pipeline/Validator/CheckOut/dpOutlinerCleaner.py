@@ -42,11 +42,10 @@ class OutlinerCleaner(dpBaseActionClass.ActionStartClass):
         if not objList:
             objList = cmds.ls(selection=False, type="transform")
         if objList:
+            self.utils.setProgress(max=len(objList))
             for i, item in enumerate(objList):
                 if cmds.objExists(item):
-                    if self.verbose:
-                        # Update progress window
-                        cmds.progressWindow(edit=True, maxValue=len(objList), progress=i, status=(self.dpUIinst.lang[self.title]+': '+repr(i)))
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                     for hidden in hiddenList:
                         self.checkedObjList.append(item)
                         if hidden in item:

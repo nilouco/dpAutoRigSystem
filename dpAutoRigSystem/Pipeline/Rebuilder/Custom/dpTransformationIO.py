@@ -51,16 +51,12 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                     else:
                         transformList = cmds.ls(selection=False, long=True, type="transform")
                     if transformList:
-                        progressAmount = 0
-                        maxProcess = len(transformList)
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                        self.utils.setProgress(max=len(transformList))
                         # define dictionary to export
                         transformDic = {}
-                        transformList = self.utils.filterTransformList(transformList)
+                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.title)
                         for item in transformList:
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
                             useThisTransform = True
                             if cmds.objExists(item+".dpNotTransformIO"):
                                 if cmds.getAttr(item+".dpNotTransformIO") == 1:
@@ -86,15 +82,13 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                             exportedList.sort()
                             transformDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if transformDic:
-                                progressAmount = 0
-                                maxProcess = len(transformDic.keys())
+                                self.utils.setProgress(max=len(transformDic.keys()))
                                 # define lists to check result
                                 wellImportedList = []
                                 for item in transformDic.keys():
+                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                                     notFoundNodesList = []
                                     # check transformations
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
                                     if not cmds.objExists(item):
                                         item = item[item.rfind("|")+1:] #short name (after last "|")
                                     if cmds.objExists(item):

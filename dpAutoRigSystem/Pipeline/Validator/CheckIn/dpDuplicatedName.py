@@ -43,8 +43,7 @@ class DuplicatedName(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = cmds.ls(selection=False, long=False)
         if toCheckList:
-            progressAmount = 0
-            maxProcess = len(toCheckList)
+            self.utils.setProgress(max=len(toCheckList))
             foundDuplicated = False
             for node in toCheckList:
                 if "|" in node:
@@ -76,10 +75,7 @@ class DuplicatedName(dpBaseActionClass.ActionStartClass):
                 # compare each obj in the list with the others, deleting it from the original list in order to avoid compare itself
                 n = 0
                 for i, obj in enumerate(shortNameList):
-                    if self.verbose:
-                        # Update progress window
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                     # use another list without the first element to compare it the item repeats
                     anotherList = shortNameList[i+1:]
                     for item in anotherList:

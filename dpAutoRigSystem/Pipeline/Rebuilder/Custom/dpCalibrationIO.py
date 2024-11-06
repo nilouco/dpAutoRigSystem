@@ -97,12 +97,9 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
         """
         if ctrlList:
             dic = {}
-            progressAmount = 0
-            maxProcess = len(ctrlList)
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+            self.utils.setProgress(max=len(ctrlList))
             for ctrl in ctrlList:
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
                 if calibrationList:
                     dic[ctrl] = {}
@@ -113,13 +110,11 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
     def importCalibrationData(self, calibrationDic, *args):
         """ Import the calibration setup from the given calibration data dictionary.
         """
-        progressAmount = 0
-        maxProcess = len(calibrationDic.keys())
+        self.utils.setProgress(max=len(calibrationDic.keys()))
         # define lists to check result
         wellImportedList = []
         for item in calibrationDic.keys():
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             notFoundNodesList = []
             # check transformations
             if not cmds.objExists(item):

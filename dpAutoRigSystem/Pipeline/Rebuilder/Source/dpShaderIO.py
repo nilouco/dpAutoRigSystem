@@ -64,13 +64,9 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                         shaderList = self.getShaderToExportList()
                     if shaderList:
                         shaderDic = {}
-                        progressAmount = 0
-                        maxProcess = len(shaderList)
+                        self.utils.setProgress(max=len(shaderList))
                         for shader in shaderList:
-                            if self.verbose:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+shader))
+                            self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shader)
                             fileNode = None
                             texture = None
                             color = None

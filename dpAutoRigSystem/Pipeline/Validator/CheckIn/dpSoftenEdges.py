@@ -43,13 +43,9 @@ class SoftenEdges(dpBaseActionClass.ActionStartClass):
         else:
             allMeshList = cmds.ls(selection=False, type="mesh")
         if allMeshList:
-            progressAmount = 0
-            maxProcess = len(allMeshList)
+            self.utils.setProgress(max=len(allMeshList))
             for mesh in allMeshList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(mesh):
                     cmds.select(mesh)
                     # set selection only non-smoothed edges

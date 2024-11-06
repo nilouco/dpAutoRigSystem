@@ -43,13 +43,9 @@ class ImportReference(dpBaseActionClass.ActionStartClass):
         else:
             referenceList = cmds.file(query=True, reference=True)
         if referenceList:
-            progressAmount = 0
-            maxProcess = len(referenceList)
+            self.utils.setProgress(max=len(referenceList))
             for reference in referenceList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 self.checkedObjList.append(reference)
                 self.foundIssueList.append(True)
             if self.firstMode:

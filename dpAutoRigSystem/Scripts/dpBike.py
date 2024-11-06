@@ -32,7 +32,7 @@ def Bike(dpUIinst):
     
     if len(checkResultList) == 0:
         # defining naming:
-        doingName = dpUIinst.lang['m094_doing']+": "
+        doingName = dpUIinst.lang['m094_doing']
         # part names:
         chassisName = dpUIinst.lang['c091_chassis']
         forkName = dpUIinst.lang['m229_fork']
@@ -202,7 +202,9 @@ def Bike(dpUIinst):
             cmds.parent(frontSeatInstance.moduleGrp, chassisInstance.moduleGrp, absolute=True)
             cmds.refresh()
             
+            #
             # complete part:
+            #
             if userDetail == complete:
             
                 # woking with HORN system:

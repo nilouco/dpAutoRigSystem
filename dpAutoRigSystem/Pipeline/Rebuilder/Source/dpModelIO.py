@@ -54,9 +54,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                         else:
                             meshList = self.getModelToExportList()
                         if meshList:
-                            progressAmount = 0
-                            maxProcess = len(meshList)
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+str(meshList)))
+                            self.utils.setProgress(max=len(meshList))
                             try:
                                 nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
                                 # export alembic
@@ -65,6 +63,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                                 meshList.extend(cmds.listRelatives(meshList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
                                 attrStr = ""
                                 for mesh in meshList:
+                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                                     userDefAttrList = cmds.listAttr(mesh, userDefined=True)
                                     if userDefAttrList:
                                         for userDefAttr in userDefAttrList:
@@ -81,6 +80,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                     else: #import
                         exportedList = self.getExportedList()
                         if exportedList:
+                            self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
                             try:
                                 # import alembic
                                 exportedList.sort()

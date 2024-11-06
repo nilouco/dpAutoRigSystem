@@ -592,7 +592,7 @@
     "m091_createdArm"            : "Criado Guias para Braço.",
     "m092_createdLeg"            : "Criado Guias para Perna.",
     "m093_createdTweaks"         : "Criado Guias para Tweaks.",
-    "m094_doing"                 : "Fazendo",
+    "m094_doing"                 : "Fazendo: ",
     "m095_isolate"               : "Isolar",
     "m096_isolateDesc"           : "Esse script vai criar um setup de Isolação.\nPrecisa ter 3 nodes selecionados\nou sera criado usando o Root_Ctrl.",
     "m097_dynamic"               : "Dinamica",

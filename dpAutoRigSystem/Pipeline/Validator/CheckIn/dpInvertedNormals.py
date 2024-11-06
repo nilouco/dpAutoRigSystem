@@ -45,8 +45,7 @@ class InvertedNormals(dpBaseActionClass.ActionStartClass):
         else:
             objMeshList = cmds.ls(selection=False, type='mesh')
         if objMeshList:
-            progressAmount = 0
-            maxProcess = len(objMeshList)
+            self.utils.setProgress(max=len(objMeshList))
             geomIter = OpenMaya.MItDependencyNodes(OpenMaya.MFn.kMesh)
             while not geomIter.isDone():
                 nextGeom = False
@@ -58,10 +57,7 @@ class InvertedNormals(dpBaseActionClass.ActionStartClass):
                 parentNode = fnShapeNode.parent(0)
                 fnParentNode = OpenMaya.MFnDagNode(parentNode)
                 objName = fnParentNode.name()
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' '+shapeName))
+                self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shapeName)
                 # verify if objName or shapeName is in objMeshList
                 for obj in objMeshList:
                     if objName in obj or shapeName in obj:

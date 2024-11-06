@@ -52,13 +52,9 @@ class KeyframeCleaner(dpBaseActionClass.ActionStartClass):
                     if connectionList and not connectionList[0] in animatedList:
                         animatedList.append(connectionList[0])
                 if animatedList:
-                    progressAmount = 0
-                    maxProcess = len(animatedList)
+                    self.utils.setProgress(max=len(animatedList))
                     for item in animatedList:
-                        if self.verbose:
-                            # Update progress window
-                            progressAmount += 1
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                        self.utils.setProgress(self.dpUIinst.lang[self.title])
                         if item in toCheckList:
                             if cmds.objExists(item):
                                 crvList = cmds.listConnections(item, source=True, destination=False, type="animCurve") #blendWeighted/pairBlend

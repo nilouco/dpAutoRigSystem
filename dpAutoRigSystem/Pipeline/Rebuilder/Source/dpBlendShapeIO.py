@@ -60,16 +60,11 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                             bsList = cmds.ls(selection=False, type="blendShape")
                         if bsList:
                             bsDic = {}
-                            progressAmount = 0
-                            maxProcess = len(bsList)
+                            self.utils.setProgress(max=len(bsList))
                             for bsNode in bsList:
-
+                                self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+bsNode)
                                 bsDic[bsNode] = {}
                                 bsDic[bsNode]["targets"] = {}
-                                if self.verbose:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' - '+bsNode))
                                 # get blendShape node info
                                 bsDic[bsNode]['geometry'] = cmds.blendShape(bsNode, query=True, geometry=True)
                                 bsDic[bsNode]['envelope'] = cmds.getAttr(bsNode+".envelope")

@@ -73,11 +73,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                                             #if cmds.getAttr(meshTransform[0]+".visibility"):
                                             toProxyList.append(meshTransform[0])
                     if toProxyList:
-                        progressAmount = 0
-                        maxProcess = len(toProxyList)
-                        if self.verbose:
-                            # Update progress window
-                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                        self.utils.setProgress(max=len(toProxyList))
                         self.checkedObjList.append(proxyGrp)
                         self.foundIssueList.append(True)
                         if self.firstMode:
@@ -85,9 +81,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                         else: #fix
                             try:
                                 for sourceTransform in toProxyList:
-                                    # Update progress window
-                                    progressAmount += 1
-                                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+' '+sourceTransform))
+                                    self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+sourceTransform)
                                     self.createProxy(sourceTransform, proxyGrp)
                                 self.proxyIntegration(proxyGrp)
                                 self.resultOkList.append(True)

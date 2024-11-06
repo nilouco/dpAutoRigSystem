@@ -45,12 +45,8 @@ class HideCorrectives(dpBaseActionClass.ActionStartClass):
             else:
                 toCheckList = cmds.attributeQuery('correctiveCtrls', node=optionCtrl, exists=True)
             if toCheckList:
-                progressAmount = 0
-                maxProcess = 1
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(max=1)
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 item = optionCtrl+".correctiveCtrls"
                 # conditional to check here
                 checkChannelBox = cmds.getAttr(item, channelBox=True)

@@ -47,9 +47,8 @@ class HideDataGrp(dpBaseActionClass.ActionStartClass):
                 if cmds.objExists("Data_Grp"):
                     dataGrp = "Data_Grp"
         if dataGrp:
-            if self.verbose:
-                # Update progress window
-                cmds.progressWindow(edit=True, maxValue=1, progress=1, status=(self.dpUIinst.lang[self.title]+': '+repr(1)))
+            self.utils.setProgress(max=1)
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             self.checkedObjList.append(dataGrp)
             visibilityStatus = cmds.getAttr(dataGrp+".visibility")
             if visibilityStatus:

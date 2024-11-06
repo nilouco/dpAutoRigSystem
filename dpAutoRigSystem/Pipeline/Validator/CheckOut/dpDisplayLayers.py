@@ -73,12 +73,6 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
                         itemsInCtrlLayerList = cmds.editDisplayLayerMembers(self.ctrlLayerName, query=True)
                         # Check layers members
                         if itemsInGeoLayerList and itemsInCtrlLayerList:
-                            progressAmount = 0
-                            maxProcess = len(self.allCtrlsList)
-                            if self.verbose:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                             missingGeoList = list(set(allGeoList) - set(itemsInGeoLayerList))
                             remainingGeoList = list(set(itemsInGeoLayerList) - set(allGeoList))
                             missingCtrlList = list(set(self.allCtrlsList) - set(itemsInCtrlLayerList))
@@ -186,7 +180,9 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
             If it's not a list it will append the obj and run the main function.
         """
         if itemList:
+            self.utils.setProgress(max=len(itemList))
             for i, item in enumerate(itemList):
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if self.firstMode:
                     self.resultOkList.append(False)
                     self.checkedObjList.append(item)

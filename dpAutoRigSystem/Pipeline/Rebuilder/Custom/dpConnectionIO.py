@@ -98,12 +98,9 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         """
         if ctrlList:
             dic = {}
-            progressAmount = 0
-            maxProcess = len(ctrlList)
+            self.utils.setProgress(max=len(ctrlList))
             for ctrl in ctrlList:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(ctrl):
                     attrList = self.defaultAttrList
                     userDefList = cmds.listAttr(ctrl, userDefined=True)
@@ -150,14 +147,12 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        progressAmount = 0
-        maxProcess = len(connectDic.keys())
+        self.utils.setProgress(max=len(connectDic.keys()))
         # define lists to check result
         wellImportedList = []
         for item in connectDic.keys():
             notFoundNodesList = []
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             # check connections
             for attr in connectDic[item].keys():
                 if cmds.objExists(item+"."+attr):

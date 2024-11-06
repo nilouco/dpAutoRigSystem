@@ -62,14 +62,10 @@ class GeometryHistory(dpBaseActionClass.ActionStartClass):
             # Get shortName to better reading in display log
             geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
         if geoToCleanList:
+            self.utils.setProgress(max=len(geoToCleanList))
             for geo in geoToCleanList:
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(geo):
-                    progressAmount = 0
-                    maxProcess = len(geoToCleanList)
-                    if self.verbose:
-                    # Update progress window
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
                     self.checkedObjList.append(geo)
                     self.foundIssueList.append(True)
                     if self.firstMode:

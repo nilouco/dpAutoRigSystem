@@ -43,13 +43,9 @@ class ShowBPCleaner(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = cmds.ls(selection=False, type='script')
         if toCheckList:
-            progressAmount = 0
-            maxProcess = len(toCheckList)
+            self.utils.setProgress(max=len(toCheckList))
             for item in toCheckList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # conditional to check here
                 if "ShowBP" in item:
                     self.checkedObjList.append(item)

@@ -47,12 +47,8 @@ class WIPCleaner(dpBaseActionClass.ActionStartClass):
                 if cmds.objExists("WIP_Grp"):
                     wipGrp = "WIP_Grp"
         if wipGrp:
-            progressAmount = 0
-            maxProcess = len(wipGrp)
-            if self.verbose:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+            self.utils.setProgress(max=len(wipGrp))
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             self.checkedObjList.append(wipGrp)
             wipChildrenList = cmds.listRelatives(wipGrp, allDescendents=True, children=True, fullPath=True)
             if wipChildrenList:

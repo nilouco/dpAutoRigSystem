@@ -1164,13 +1164,15 @@ class Utils(object):
         return netList
 
 
-    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, *args):
+    def filterTransformList(self, itemList, filterCamera=True, filterConstraint=True, filterFollicle=True, filterJoint=True, filterLocator=True, filterHandle=True, filterLinearDeform=True, filterEffector=True, verbose=True, title="Rigging", *args):
         """ Remove camera, constraints, follicles, etc from the given list and return it.
         """
         cameraList = ["|persp", "|top", "|side", "|front"]
         constraintList = ["parentConstraint", "pointConstraint", "orientConstraint", "scaleConstraint", "aimConstraint"]
         toRemoveList = []
         for item in itemList:
+            if verbose:
+                self.setProgress(self.dpUIinst.lang[title])
             itemType = cmds.objectType(item)
             if filterCamera:
                 for cameraName in cameraList:
@@ -1285,9 +1287,8 @@ class Utils(object):
                 amount = progress
                 addOne = increment amount plus 1
                 addNumber = add amount to the end of the message string
-                cancelIt = isCancelled
                 endIt = endProgress
-                isInterruptable = if we can interrupt the process or not. True by default.
+                isInterruptable = if we can interrupt the process or not. False by default.
 
             Example:
                 self.utils.setProgress(messageName, titleName, 20, addOne=False)

@@ -70,13 +70,9 @@ class NamespaceCleaner(dpBaseActionClass.ActionStartClass):
                 # set both list together, excluding the duplicated names
                 namespaceToCleanList = list(set(namespaceWithGuidesList)) + list(set(namespaceWithoutGuidesList))
         if namespaceToCleanList:
-            progressAmount = 0
-            maxProcess = len(namespaceMainList)
+            self.utils.setProgress(max=len(namespaceMainList))
             for namespace in namespaceToCleanList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 self.checkedObjList.append(namespace)
                 self.foundIssueList.append(True)
             if self.firstMode:

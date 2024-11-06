@@ -46,6 +46,7 @@ def Tweaks(dpUIinst):
         holderName = dpUIinst.lang['c046_holder']
         squintName = dpUIinst.lang['c054_squint']
         cheekName = dpUIinst.lang['c055_cheek']
+        tweaksGuideName = dpUIinst.lang['m081_tweaks']+" "+dpUIinst.lang['i205_guide']
         
         holderMainName = tweaksName+"_"+holderName+"_"+mainName
         # eyebrows names:
@@ -110,14 +111,9 @@ def Tweaks(dpUIinst):
                     indSkinValue = 0
             
                 # Starting progress window
-                progressAmount = 0
-                cmds.progressWindow(title='Tweaks Guides', progress=progressAmount, status=dpUIinst.lang['m094_doing']+': 0%', isInterruptable=False)
+                dpUIinst.utils.setProgress(doingName, tweaksGuideName, maxProcess, addOne=False)
                 
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+eyebrowMainName))
-                
+                dpUIinst.utils.setProgress(doingName+eyebrowMainName)
                 # creating Single instances:
                 holderMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 holderMainInstance.editUserName(holderMainName)
@@ -138,11 +134,9 @@ def Tweaks(dpUIinst):
                 eyebrowInstance3 = dpUIinst.initGuide('dpSingle', guideDir)
                 eyebrowInstance3.editUserName(eyebrowName3)
                 eyebrowInstance3.changeMirror("X")
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+lipMainName))
                 cmds.refresh()
+                
+                dpUIinst.utils.setProgress(doingName+lipMainName)
 
                 lipMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 lipMainInstance.editUserName(lipMainName)
@@ -173,14 +167,15 @@ def Tweaks(dpUIinst):
                 lipCornerInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 lipCornerInstance.editUserName(lipCornerName)
                 lipCornerInstance.changeMirror("X")
+                cmds.refresh()
                 
+                #
+                # complete part:
+                #
                 if userDetail == complete:
                     
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+eyelidMainName))
-                    cmds.refresh()
-                    
+                    dpUIinst.utils.setProgress(doingName+eyelidMainName)
+
                     eyebrowMiddleInstance = dpUIinst.initGuide('dpSingle', guideDir)
                     eyebrowMiddleInstance.editUserName(eyebrowMiddleName)
                 
@@ -221,11 +216,9 @@ def Tweaks(dpUIinst):
                         eyelidCornerInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
                         eyelidCornerInstance1.editUserName(eyelidCornerName1)
                         eyelidCornerInstance1.changeMirror("X")
-                    
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+squintMainName))
-                    cmds.refresh()
+
+                    cmds.refresh()                    
+                    dpUIinst.utils.setProgress(doingName+squintMainName)
                     
                     squintMainInstance = dpUIinst.initGuide('dpSingle', guideDir)
                     squintMainInstance.editUserName(squintMainName)
@@ -243,7 +236,6 @@ def Tweaks(dpUIinst):
                     squintInstance3 = dpUIinst.initGuide('dpSingle', guideDir)
                     squintInstance3.editUserName(squintName3)
                     squintInstance3.changeMirror("X")
-
 
                     cheekInstance1 = dpUIinst.initGuide('dpSingle', guideDir)
                     cheekInstance1.editUserName(cheekName1)
@@ -285,9 +277,7 @@ def Tweaks(dpUIinst):
                 cmds.setAttr(holderMainInstance.radiusCtrl+".translateX", 2)
                 cmds.setAttr(holderMainInstance.moduleGrp+".holder", 0.7)
                 
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' hierarchy'))
+                dpUIinst.utils.setProgress(doingName+" hierarchy")
                 cmds.refresh()
                 
                 # working on hierarchy
@@ -310,7 +300,6 @@ def Tweaks(dpUIinst):
                 elif cmds.objExists("Head_UpperJaw_Ctrl"):
                     cmds.parent(holderMainInstance.moduleGrp, "Head_UpperJaw_Ctrl", relative=True)
                     
-                
                 # set tweaks guides position
                 cmds.setAttr(eyebrowMainInstance.moduleGrp+".translateX", 0.65)
                 cmds.setAttr(eyebrowMainInstance.moduleGrp+".translateY", 2.8)
@@ -413,7 +402,7 @@ def Tweaks(dpUIinst):
                 
                 
                 # Close progress window
-                self.utils.setProgress(endIt=True)
+                dpUIinst.utils.setProgress(endIt=True)
 
                 cmds.select(holderMainInstance.moduleGrp)
                 print(dpUIinst.lang['m093_createdTweaks'])

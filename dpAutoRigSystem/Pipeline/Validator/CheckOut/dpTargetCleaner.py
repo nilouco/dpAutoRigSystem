@@ -48,9 +48,7 @@ class TargetCleaner(dpBaseActionClass.ActionStartClass):
             if meshList:
                 toCheckList = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
         if toCheckList:
-            progressAmount = 0
-            maxProcess = len(toCheckList)
-
+            self.utils.setProgress(max=len(toCheckList))
             # get exception list to keep nodes in the scene
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             exceptionList = self.keepGrp(["renderGrp", "proxyGrp"])
@@ -79,10 +77,7 @@ class TargetCleaner(dpBaseActionClass.ActionStartClass):
                                         
             # run validation tasks
             for item in toCheckList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(item):
                     self.checkedObjList.append(item)
                     if not item in exceptionList:

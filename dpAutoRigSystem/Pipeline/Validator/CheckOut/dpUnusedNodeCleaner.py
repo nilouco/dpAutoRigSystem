@@ -44,19 +44,15 @@ class UnusedNodeCleaner(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = cmds.ls(selection=False, materials=True)
         if toCheckList:
-            if len(toCheckList) > 3: #discarting default materials
+            if len(toCheckList) > 3: #discarding default materials
                 # getting data to analyse
                 defaultMatList = ['lambert1', 'standardSurface1', 'particleCloud1']
                 allMatList = list(set(toCheckList) - set(defaultMatList))
                 usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
                 # conditional to check here
                 if not len(allMatList) == len(usedMatList):
-                    progressAmount = 0
-                    maxProcess = len(allMatList)
-                    if self.verbose:
-                        # Update progress window
-                        progressAmount += 1
-                        cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                    self.utils.setProgress(max=len(allMatList))
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
                     issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
                     self.checkedObjList.append(str(", ".join(issueMatList)))
                     self.foundIssueList.append(True)

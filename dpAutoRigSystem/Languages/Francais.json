@@ -592,7 +592,7 @@
     "m091_createdArm"            : "Créé de Guides pour le Bras.",
     "m092_createdLeg"            : "Créé de Guides pour la Jambre.",
     "m093_createdTweaks"         : "Créé de Guides pour les Tweaks.",
-    "m094_doing"                 : "En faire",
+    "m094_doing"                 : "En faire: ",
     "m095_isolate"               : "Isolé",
     "m096_isolateDesc"           : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés\nou il va utiliser le Root_Ctrl.",
     "m097_dynamic"               : "Dynamique",

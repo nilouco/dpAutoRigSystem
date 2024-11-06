@@ -43,13 +43,9 @@ class UnknownNodesCleaner(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = cmds.ls(selection=False, type='unknown')
         if toCheckList:
-            progressAmount = 0
-            maxProcess = len(toCheckList)
+            self.utils.setProgress(max=len(toCheckList))
             for item in toCheckList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # conditional to check here
                 self.checkedObjList.append(item)
                 self.foundIssueList.append(True)

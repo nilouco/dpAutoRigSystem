@@ -55,13 +55,9 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                         netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                     if netList:
                         toExportDataDic = {}
-                        progressAmount = 0
-                        maxProcess = len(netList)
+                        self.utils.setProgress(max=len(netList))
                         for net in netList:
-                            if self.verbose:
-                                # Update progress window
-                                progressAmount += 1
-                                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                            self.utils.setProgress(self.dpUIinst.lang[self.title])
                             # mount a dic with all data 
                             if cmds.objExists(net+".afterData"):
                                 if cmds.getAttr(net+".rawGuide"): 
@@ -97,10 +93,8 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                             self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if self.importedDataDic:
                                 wellImported = True
-                                progressAmount = 0
-                                maxProcess = len(self.importedDataDic.keys())
+                                self.utils.setProgress(max=len(self.importedDataDic.keys()))
                                 for net in self.importedDataDic.keys():
-                                    progressAmount += 1
                                     toInitializeGuide = True
                                     if cmds.objExists(net):
                                         if cmds.getAttr(net+".rawGuide"):
@@ -112,7 +106,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                         try:
                                             #self.netDic = json.loads(self.importedDataDic[net])
                                             self.netDic = self.importedDataDic[net]
-                                            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" - "+self.netDic['ModuleType']))
+                                            self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.netDic['ModuleType'])
                                             # create a module instance:
                                             self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
                                             self.setupInstanceChanges()

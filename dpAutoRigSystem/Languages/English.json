@@ -592,7 +592,7 @@
     "m091_createdArm"            : "Created Arm Guides.",
     "m092_createdLeg"            : "Created Leg Guides.",
     "m093_createdTweaks"         : "Created Tweaks Guides.",
-    "m094_doing"                 : "Doing",
+    "m094_doing"                 : "Doing: ",
     "m095_isolate"               : "Isolate",
     "m096_isolateDesc"           : "This script will create an Isolate setup.\nNeed 3 nodes selected\nor it'll use the Root_Ctrl.",
     "m097_dynamic"               : "Dynamic",

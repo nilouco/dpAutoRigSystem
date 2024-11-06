@@ -107,12 +107,9 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
             #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
             #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
             #            }
-            progressAmount = 0
-            maxProcess = len(constraintList)
+            self.utils.setProgress(max=len(constraintList))
             for const in constraintList:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # getting attributes if they exists
                 dic[const] = {"attributes" : {},
                               "output"     : {},
@@ -153,14 +150,12 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
         """ Import constraints from exported dictionary.
             Create missing constraints and set them values if they don't exists.
         """
-        progressAmount = 0
-        maxProcess = len(constDic.keys())
+        self.utils.setProgress(max=len(constDic.keys()))
         # define lists to check result
         wellImportedList = []
         for item in constDic.keys():
             existingNodesList = []
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             # create constraint node if it needs
             if not cmds.objExists(item):
                 constType = constDic[item]["type"]

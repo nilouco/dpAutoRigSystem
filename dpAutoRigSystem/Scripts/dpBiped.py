@@ -62,6 +62,7 @@ def Biped(dpUIinst):
         complete = dpUIinst.lang['i176_complete']
         cancel   = dpUIinst.lang['i132_cancel']
         userMessage = dpUIinst.lang['i177_chooseMessage']
+        bipedGuideName = dpUIinst.lang['m026_biped']+" "+dpUIinst.lang['i205_guide']
         
         
         # getting Simple or Complete module guides to create:
@@ -74,15 +75,10 @@ def Biped(dpUIinst):
                 maxProcess = 18
         
             # Starting progress window
-            progressAmount = 0
-            cmds.progressWindow(title='Biped Guides', progress=progressAmount, status=doingName+': 0%', isInterruptable=False)
+            dpUIinst.utils.setProgress(doingName, bipedGuideName, maxProcess, addOne=False)
 
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+spineName))
-            
-            
             # working with SPINE system:
+            dpUIinst.utils.setProgress(doingName+spineName)
             # create spine module instance:
             spineInstance = dpUIinst.initGuide('dpSpine', guideDir)
             # editing spine base guide informations:
@@ -91,13 +87,10 @@ def Biped(dpUIinst):
             cmds.setAttr(spineInstance.moduleGrp+".translateY", 11)
             cmds.setAttr(spineInstance.annotation+".translateY", -6)
             cmds.setAttr(spineInstance.radiusCtrl+".translateX", 2.5)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+headName))
             cmds.refresh()
             
             # working with HEAD system:
+            dpUIinst.utils.setProgress(doingName+headName)
             # create head module instance:
             headInstance = dpUIinst.initGuide('dpHead', guideDir)
             # editing head base guide informations:
@@ -105,16 +98,12 @@ def Biped(dpUIinst):
             headInstance.changeJointNumber(2)
             cmds.setAttr(headInstance.moduleGrp+".translateY", 17)
             cmds.setAttr(headInstance.annotation+".translateY", 3.5)
-            
             # parent head guide to spine guide:
             cmds.parent(headInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+eyeName))
             cmds.refresh()
             
             # working with Eye system:
+            dpUIinst.utils.setProgress(doingName+eyeName)
             # create eye module instance:
             eyeInstance = dpUIinst.initGuide('dpEye', guideDir)
             # editing eyeLookAt base guide informations:
@@ -128,16 +117,12 @@ def Biped(dpUIinst):
             cmds.setAttr(eyeInstance.radiusCtrl+".translateX", 0.5)
             cmds.setAttr(eyeInstance.cvEndJoint+".translateZ", 7)
             cmds.setAttr(eyeInstance.moduleGrp+".flip", 1)
-            
             # parent eye guide to spine guide:
             cmds.parent(eyeInstance.moduleGrp, headInstance.cvUpperHeadLoc, absolute=True)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+legName))
             cmds.refresh()
             
             # working with LEG system:
+            dpUIinst.utils.setProgress(doingName+legName)
             # create leg module instance:
             legLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
             # change name to leg:
@@ -149,7 +134,6 @@ def Biped(dpUIinst):
             # change limb style to biped:
             legLimbInstance.changeStyle(bipedStyleName)
             cmds.setAttr(legLimbInstance.annotation+".translateY", -4)
-            
             # editing leg base guide informations:
             legBaseGuide = legLimbInstance.moduleGrp
             cmds.setAttr(legBaseGuide+".type", 1)
@@ -157,34 +141,26 @@ def Biped(dpUIinst):
             cmds.setAttr(legBaseGuide+".translateY", 10)
             cmds.setAttr(legBaseGuide+".rotateX", 0)
             cmds.setAttr(legLimbInstance.radiusCtrl+".translateX", 1.5)
-            
             # edit location of leg ankle guide:
             cmds.setAttr(legLimbInstance.cvExtremLoc+".translateZ", 8.5)
-            
             # parent leg guide to spine base guide:
             cmds.parent(legBaseGuide, spineInstance.moduleGrp, absolute=True)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+footName))
             cmds.refresh()
             
+            # working with FOOT system:
+            dpUIinst.utils.setProgress(doingName+footName)
             # create foot module instance:
             footInstance = dpUIinst.initGuide('dpFoot', guideDir)
             footInstance.editUserName(footName)
             cmds.setAttr(footInstance.annotation+".translateY", -3)
             cmds.setAttr(footInstance.moduleGrp+".translateX", 1.5)
             cmds.setAttr(footInstance.cvFootLoc+".translateZ", 1.5)
-            
             # parent foot guide to leg ankle guide:
             cmds.parent(footInstance.moduleGrp, legLimbInstance.cvExtremLoc, absolute=True)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+armName))
             cmds.refresh()
             
             # working with ARM system:
+            dpUIinst.utils.setProgress(doingName+armName)
             # creating module instances:
             armLimbInstance = dpUIinst.initGuide('dpLimb', guideDir)
             # change name to arm:
@@ -204,12 +180,10 @@ def Biped(dpUIinst):
             cmds.setAttr(armLimbInstance.radiusCtrl+".translateX", 1.5)
             # parent arm guide to spine chest guide:
             cmds.parent(armLimbInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
-            
-            # Update progress window
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+fingerIndexName))
             cmds.refresh()
             
+            # working with FINGERS system:
+            dpUIinst.utils.setProgress(doingName+dpUIinst.lang['m007_finger'])
             # create finger instances:
             thumbFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
             thumbFingerInstance.editUserName(fingerThumbName)
@@ -221,7 +195,6 @@ def Biped(dpUIinst):
             ringFingerInstance.editUserName(fingerRingName)
             pinkyFingerInstance = dpUIinst.initGuide('dpFinger', guideDir)
             pinkyFingerInstance.editUserName(fingerPinkyName)
-            
             # edit finger guides:
             fingerInstanceList = [thumbFingerInstance, indexFingerInstance, middleFingerInstance, ringFingerInstance, pinkyFingerInstance]
             fingerTZList       = [0.72, 0.6, 0.2, -0.2, -0.6]
@@ -233,26 +206,21 @@ def Biped(dpUIinst):
                 cmds.setAttr(fingerInstance.annotation+".visibility", 0)
                 cmds.setAttr(fingerInstance.moduleGrp+".shapeSize", 0.3)
                 fingerInstance.displayAnnotation(0)
-                
                 if n == 0:
                     # correct not commun values for thumb guide:
                     cmds.setAttr(thumbFingerInstance.moduleGrp+".translateX", 10.1)
                     cmds.setAttr(thumbFingerInstance.moduleGrp+".rotateX", 60)
                     thumbFingerInstance.changeJointNumber(2)
                     cmds.setAttr(thumbFingerInstance.moduleGrp+".nJoints", 2)
-                
                 # parent finger guide to the arm wrist guide:
                 cmds.parent(fingerInstance.moduleGrp, armLimbInstance.cvExtremLoc, absolute=True)
+                cmds.refresh()
             
-            
+            #
             # complete part:
+            #
             if userDetail == complete:
             
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+earName))
-                cmds.refresh()
-                
                 # set guides attributes to complete system
                 headInstance.changeDeformer(1)
                 headInstance.changeFacial(1)
@@ -261,6 +229,7 @@ def Biped(dpUIinst):
                     instance.setCorrective(1)
 
                 # working with EAR system:
+                dpUIinst.utils.setProgress(doingName+earName)
                 # create FkLine module instance:
                 earInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing ear base guide informations:
@@ -278,13 +247,10 @@ def Biped(dpUIinst):
                 earInstance.changeMirror("X")
                 cmds.setAttr(earInstance.moduleGrp+".flip", 1)
                 cmds.setAttr(earInstance.moduleGrp+".deformedBy", 1)
-
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+upperTeethName))
                 cmds.refresh()
-                
+
                 # working with Teeth system:
+                dpUIinst.utils.setProgress(doingName+upperTeethName)
                 # create FkLine module instance:
                 upperTeethInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing upperTeeth base guide informations:
@@ -367,13 +333,10 @@ def Biped(dpUIinst):
                 lowerTeethSideInstance.displayAnnotation(0)
                 # parent lowerTeethSide guide to lowerTeeth guide:
                 cmds.parent(lowerTeethSideInstance.moduleGrp, lowerTeethInstance.cvJointLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+noseName))
                 cmds.refresh()
                 
                 # working with Nose systems:
+                dpUIinst.utils.setProgress(doingName+noseName)
                 # create FkLine module instance:
                 noseInstance = dpUIinst.initGuide('dpNose', guideDir)
                 # editing upperTeeth base guide informations:
@@ -384,13 +347,10 @@ def Biped(dpUIinst):
                 noseInstance.changeJointNumber(2)
                 # parent nose guide to head guide:
                 cmds.parent(noseInstance.moduleGrp, headInstance.cvUpperJawLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+tongueName))
                 cmds.refresh()
                 
                 # working with Tongue system:
+                dpUIinst.utils.setProgress(doingName+tongueName)
                 # create FkLine module instance:
                 tongueInstance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # editing tongue base guide informations:
@@ -409,12 +369,10 @@ def Biped(dpUIinst):
                 cmds.setAttr(tongueInstance.moduleGrp+".deformedBy", 3)
                 # parent tongue guide to head guide:
                 cmds.parent(tongueInstance.moduleGrp, headInstance.cvChinLoc, absolute=True)
-            
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_1'))
                 cmds.refresh()
                 
+                # working with Toes system:
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe1 module instance:
                 toe1Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -432,15 +390,11 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe1Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe1Instance.moduleGrp+".flip", 1)
                 toe1Instance.displayAnnotation(0)
-                
                 # parent toe1 guide to foot middle guide:
                 cmds.parent(toe1Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_2'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe2 module instance:
                 toe2Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -458,15 +412,11 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe2Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe2Instance.moduleGrp+".flip", 1)
                 toe2Instance.displayAnnotation(0)
-                
                 # parent toe2 guide to foot middle guide:
                 cmds.parent(toe2Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_3'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe3 module instance:
                 toe3Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -484,15 +434,11 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe3Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe3Instance.moduleGrp+".flip", 1)
                 toe3Instance.displayAnnotation(0)
-                
                 # parent toe3 guide to foot middle guide:
                 cmds.parent(toe3Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_4'))
                 cmds.refresh()
-                
+
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe4 module instance:
                 toe4Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -510,15 +456,11 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe4Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe4Instance.moduleGrp+".flip", 1)
                 toe4Instance.displayAnnotation(0)
-                
                 # parent toe4 guide to foot middle guide:
                 cmds.parent(toe4Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+toeName+'_5'))
                 cmds.refresh()
                 
+                dpUIinst.utils.setProgress(doingName+toeName)
                 # create toe5 module instance:
                 toe5Instance = dpUIinst.initGuide('dpFkLine', guideDir)
                 # change name to toe:
@@ -536,16 +478,12 @@ def Biped(dpUIinst):
                 cmds.setAttr(toe5Instance.radiusCtrl+".translateX", 0.2)
                 cmds.setAttr(toe5Instance.moduleGrp+".flip", 1)
                 toe5Instance.displayAnnotation(0)
-                
                 # parent toe5 guide to foot middle guide:
                 cmds.parent(toe5Instance.moduleGrp, footInstance.cvRFFLoc, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+breathName))
                 cmds.refresh()
                 
                 # working with Breath system:
+                dpUIinst.utils.setProgress(doingName+breathName)
                 # create FkLine module instance:
                 breathInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # editing breath base guide informations:
@@ -559,13 +497,10 @@ def Biped(dpUIinst):
                 breathInstance.displayAnnotation(0)
                 # parent breath guide to chest guide:
                 cmds.parent(breathInstance.moduleGrp, spineInstance.cvLocator, absolute=True)
-                
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(doingName+': ' + repr(progressAmount) + ' '+bellyName))
                 cmds.refresh()
-                
+
                 # working with Belly system:
+                dpUIinst.utils.setProgress(doingName+bellyName)
                 # create FkLine module instance:
                 bellyInstance = dpUIinst.initGuide('dpSingle', guideDir)
                 # editing belly base guide informations:
@@ -581,7 +516,7 @@ def Biped(dpUIinst):
                 cmds.parent(bellyInstance.moduleGrp, spineInstance.moduleGrp, absolute=True)
             
             # Close progress window
-            self.utils.setProgress(endIt=True)
+            dpUIinst.utils.setProgress(endIt=True)
             
             # select spineGuide_Base:
             cmds.select(spineInstance.moduleGrp)

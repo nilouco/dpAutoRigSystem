@@ -67,18 +67,14 @@ class FreezeTransform(dpBaseActionClass.ActionStartClass):
             allObjectList = cmds.ls(selection=False, type='transform', long=True)
         # analisys transformations
         if len(allObjectList) > 0:
-            progressAmount = 0
-            maxProcess = len(allObjectList)
+            self.utils.setProgress(max=len(allObjectList))
             self.animCurvesList = cmds.ls(type='animCurve')
             zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
             oneAttrList = ['scaleX', 'scaleY', 'scaleZ']
             camerasList = ['|persp', '|top', '|side', '|front', '|bottom', '|back', '|left']
             allValidObjs = list(filter(lambda obj: obj not in camerasList, allObjectList))
             for idx, obj in enumerate(allValidObjs):
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(obj):
                     # run for translates and rotates
                     frozenTR = checkFrozenObject(obj, zeroAttrList, 0)

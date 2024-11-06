@@ -43,13 +43,9 @@ class OverrideCleaner(dpBaseActionClass.ActionStartClass):
             nodeList = objList
         if nodeList:
             overridedList = []
-            progressAmount = 0
-            maxProcess = len(nodeList)
+            self.utils.setProgress(max=len(nodeList))
             for item in nodeList:
-                if self.verbose:
-                    # Update progress window
-                    progressAmount += 1
-                    cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(item+".overrideEnabled"):
                     if cmds.getAttr(item+".overrideEnabled") == 1:
                         overridedList.append(item)

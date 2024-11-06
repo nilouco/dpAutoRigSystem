@@ -98,12 +98,9 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         """
         if ctrlList:
             dic = {}
-            progressAmount = 0
-            maxProcess = len(ctrlList)
+            self.utils.setProgress(max=len(ctrlList))
             for ctrl in ctrlList:
-                # Update progress window
-                progressAmount += 1
-                cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)))
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
                 attrList = cmds.listAttr(ctrl, userDefined=True)
                 if attrList:
                     dic[ctrl] = {"attributes" : {},
@@ -135,14 +132,12 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         """ Import attributes from exported dictionary.
             Add missing attributes and set them values if they don't exists.
         """
-        progressAmount = 0
-        maxProcess = len(attrDic.keys())
+        self.utils.setProgress(max=len(attrDic.keys()))
         # define lists to check result
         wellImportedList = []
         for item in attrDic.keys():
             notFoundNodesList = []
-            progressAmount += 1
-            cmds.progressWindow(edit=True, maxValue=maxProcess, progress=progressAmount, status=(self.dpUIinst.lang[self.title]+': '+repr(progressAmount)+" "+item[item.rfind("|"):]))
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
             # check attributes
             if not cmds.objExists(item):
                 item = item[item.rfind("|")+1:] #short name (after last "|")
