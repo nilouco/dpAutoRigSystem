@@ -1448,6 +1448,7 @@ class ControlClass(object):
         if nodeToRunList:
             if resetMode:
                 self.resetPose.runAction(False, nodeToRunList)
+                self.utils.setProgress(endIt=True)
             else: #set default values
                 for item in nodeToRunList:
                     attrList = self.resetPose.getSetupAttrList(item, self.ignoreDefaultValuesAttrList)
