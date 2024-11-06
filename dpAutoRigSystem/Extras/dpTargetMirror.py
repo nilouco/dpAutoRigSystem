@@ -176,7 +176,7 @@ class TargetMirror(object):
             # get target list:
             targetList = cmds.textScrollList(self.targetScrollList, query=True, allItems=True)
             if targetList:
-                self.utils.setProgress('Target: 0%', self.dpUIinst.lang["m055_tgtMirror"], len(targetList), addOne=False)
+                self.utils.setProgress('Target: '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
                 cancelled = False
                 # get mirror information from UI
                 selectedMirror = cmds.radioCollection(self.mirrorAxisRC, query=True, select=True)

@@ -66,7 +66,7 @@ def Bike(dpUIinst):
                 maxProcess = 16
             
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, bikeGuideName, maxProcess, addOne=False)
+            dpUIinst.utils.setProgress(doingName, bikeGuideName, maxProcess, addOne=False, addNumber=False)
             dpUIinst.utils.setProgress(doingName+chassisName)
             
             # woking with CHASSIS system:

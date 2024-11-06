@@ -191,7 +191,7 @@ class Rivet(object):
         selectionIndexList = cmds.textScrollList(self.rivetControllersList, query=True, selectIndexedItem=True)
         if selectionList and selectionIndexList:
             trueIndexList = list(map(lambda n : n-1, selectionIndexList))
-            self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(trueIndexList), addOne=False)
+            self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(trueIndexList), addOne=False, addNumber=False)
             self.removeRivetFromList(trueIndexList, selectionList)
             self.checkRivetGrp()
             self.utils.setProgress(endIt=True)
@@ -374,7 +374,7 @@ class Rivet(object):
 
                 if removeExistingRivet == self.dpUIinst.lang['i071_yes']:
                     needToRemoveList, trueIndexList = self.riseRemoveAndIndexList(needToRemove, hasRivetList)
-                    self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(needToRemoveList), addOne=False)
+                    self.utils.setProgress(self.dpUIinst.lang['i315_removing'], self.dpUIinst.lang['i315_removing']+" "+self.dpUIinst.lang['m083_rivet'], len(needToRemoveList), addOne=False, addNumber=False)
                     self.removeRivetFromList(trueIndexList, needToRemoveList)
                     self.utils.setProgress(endIt=True)
                 elif removeExistingRivet == self.dpUIinst.lang['i072_no']:
@@ -383,7 +383,7 @@ class Rivet(object):
                     return
 
         # call run function to create Rivet setup using UI values
-        self.utils.setProgress(self.dpUIinst.lang['i318_working'], self.dpUIinst.lang['i317_creatingRivet'], len(itemList), addOne=False)
+        self.utils.setProgress(self.dpUIinst.lang['i318_working'], self.dpUIinst.lang['i317_creatingRivet'], len(itemList), addOne=False, addNumber=False)
         self.dpCreateRivet(geoToAttach, uvSet, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, RIVET_GRP, True)
         self.utils.setProgress(endIt=True)
         self.utils.closeUI('dpRivetWindow')

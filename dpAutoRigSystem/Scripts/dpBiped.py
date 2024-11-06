@@ -75,7 +75,7 @@ def Biped(dpUIinst):
                 maxProcess = 18
         
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, bipedGuideName, maxProcess, addOne=False)
+            dpUIinst.utils.setProgress(doingName, bipedGuideName, maxProcess, addOne=False, addNumber=False)
 
             # working with SPINE system:
             dpUIinst.utils.setProgress(doingName+spineName)

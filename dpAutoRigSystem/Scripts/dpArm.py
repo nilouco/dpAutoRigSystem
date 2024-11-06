@@ -33,7 +33,7 @@ def Arm(dpUIinst):
     
         # Starting progress window
         maxProcess = 6 # number of modules to create
-        dpUIinst.utils.setProgress(doingName, armGuideName, maxProcess, addOne=False)
+        dpUIinst.utils.setProgress(doingName, armGuideName, maxProcess, addOne=False, addNumber=False)
         dpUIinst.utils.setProgress(doingName+armName)
         
         # creating module instances:

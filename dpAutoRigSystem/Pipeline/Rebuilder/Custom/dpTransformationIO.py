@@ -54,7 +54,7 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                         self.utils.setProgress(max=len(transformList))
                         # define dictionary to export
                         transformDic = {}
-                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.title)
+                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
                         for item in transformList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title])
                             useThisTransform = True

@@ -74,4 +74,4 @@ class Logger(object):
         logText += '\n' + self.lang['i018_thanks']
         
         # creating a info window to show the log:
-        self.infoWin( 'i019_log', None, logText, 'center', 250, (150+(nRiggedModule*13)) )
+        self.infoWin( 'i019_log', None, logText, 'center', 250, min((350, 150+(nRiggedModule*13))) )

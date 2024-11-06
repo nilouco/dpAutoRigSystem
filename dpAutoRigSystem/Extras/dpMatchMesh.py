@@ -121,7 +121,7 @@ class MatchMesh(object):
                     toMeshFn.getPoints(toVerticeList)
                     
                     # progress window
-                    self.utils.setProgress(self.dpUIinst.lang['i035_transfData']+': 0%', 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
+                    self.utils.setProgress(self.dpUIinst.lang['i035_transfData']+': '+self.dpUIinst.lang['c110_start'], 'Match Mesh Data', fromVerticeList.length(), isInterruptable=True)
                     cancelled = False
                     
                     # transfer vetex position from FROM mesh to TO mesh selected

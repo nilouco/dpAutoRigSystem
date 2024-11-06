@@ -115,7 +115,7 @@ class Skinning(dpWeights.Weights):
         """ Serialize the copy skinning for one source or many items with the same name.
         """
         ranList = []
-        self.utils.setProgress('Skinning: ', self.dpUIinst.lang['i287_copy']+" Skinning", len(destinationList), addOne=False)
+        self.utils.setProgress('Skinning: ', self.dpUIinst.lang['i287_copy']+" Skinning", len(destinationList), addOne=False, addNumber=False)
         for sourceItem in sourceList:
             self.utils.setProgress("Skinning: ")
             if oneSource:
@@ -292,7 +292,7 @@ class Skinning(dpWeights.Weights):
     def getSkinWeightData(self, meshList, *args):
         """ Return the the skinCluster weights data of the given mesh list.
         """
-        self.utils.setProgress(self.ioStartName+': 0%', self.ioStartName, len(meshList), addOne=False)
+        self.utils.setProgress(self.ioStartName+': '+self.dpUIinst.lang['c110_start'], self.ioStartName, len(meshList), addOne=False, addNumber=False)
         skinWeightsDic = {}
         for mesh in meshList:
             self.utils.setProgress('SkinningIO: '+mesh)
@@ -356,10 +356,10 @@ class Skinning(dpWeights.Weights):
                 cmds.setAttr(skinClusterName+"."+attrName+"["+str(vertex)+"]", skinWeightDic[vertex])
 
 
-    def importSkinWeightsFromFile(self, meshList, path, filename, *args):
+    def importSkinWeightsFromFile(self, meshList, path, filename, verbose=True, *args):
         """ Import the skinCluster weights of the given mesh in the given path and filename.
         """
-        self.utils.setProgress(self.ioStartName+": 0%", self.ioStartName, len(meshList), addOne=False)
+        self.utils.setProgress(self.ioStartName+": "+self.dpUIinst.lang['c110_start'], self.ioStartName, len(meshList), addOne=False, addNumber=False)
         skinWeightDic = self.dpUIinst.pipeliner.getJsonContent(path+"/"+filename)
         if skinWeightDic:
             for mesh in meshList:
@@ -380,7 +380,8 @@ class Skinning(dpWeights.Weights):
                         if cmds.objExists(skinClusterName+".relativeSpaceMode"):
                             if "skinRelativeSpaceMode" in skinWeightDic[mesh][skinClusterName].keys():
                                 cmds.setAttr(skinClusterName+".relativeSpaceMode", skinWeightDic[mesh][skinClusterName]["skinRelativeSpaceMode"])
-        self.utils.setProgress(endIt=True)
+        if verbose:
+            self.utils.setProgress(endIt=True)
 
 
     def ioSkinWeightsByUI(self, export=True, *args):

@@ -1128,7 +1128,7 @@ class ControlClass(object):
                         path = pathList[0] 
             if path:
                 if ui:
-                    self.utils.setProgress(self.doingName+': 0%', self.dpUIinst.lang['i164_export'], len(nodeList), addOne=False)
+                    self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i164_export'], len(nodeList), addOne=False, addNumber=False)
                 # make sure we save the file as mayaAscii
                 if not path.endswith(".ma"):
                     path = path.replace(".*", ".ma")
@@ -1136,8 +1136,7 @@ class ControlClass(object):
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
                 for item in nodeList:
-                    if ui:
-                        self.utils.setProgress(self.doingName+': Shape')
+                    self.utils.setProgress(self.doingName+': Shape')
                     snapshotName = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
@@ -1220,7 +1219,7 @@ class ControlClass(object):
                     refNodeList = cmds.referenceQuery(refNode, nodes=True)
                     if refNodeList:
                         if ui:
-                            self.utils.setProgress(self.doingName+': 0%', self.dpUIinst.lang['i196_import'], len(refNodeList), addOne=False)
+                            self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i196_import'], len(refNodeList), addOne=False, addNumber=False)
                         for sourceRefNode in refNodeList:
                             if ui:
                                 self.utils.setProgress(self.doingName+': Shape')
@@ -1409,7 +1408,7 @@ class ControlClass(object):
                         allNodeList = cmds.ls(fromPrefix+"*", selection=False, type="transform")
                         allControlList = self.getControlList()
                         if allNodeList and allControlList:
-                            self.utils.setProgress(self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['m010_mirror'], len(allNodeList), addOne=False)
+                            self.utils.setProgress(self.dpUIinst.lang['m067_shape'], self.dpUIinst.lang['m010_mirror'], len(allNodeList), addOne=False, addNumber=False)
                             for node in allNodeList:
                                 if node in allControlList:
                                     self.utils.setProgress(self.dpUIinst.lang['m067_shape']+": "+node)

@@ -87,7 +87,7 @@ def Car(dpUIinst):
                 maxProcess = 37
             
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, carGuideName, maxProcess, addOne=False)
+            dpUIinst.utils.setProgress(doingName, carGuideName, maxProcess, addOne=False, addNumber=False)
             
             # woking with CHASSIS system:
             dpUIinst.utils.setProgress(doingName+chassisName)

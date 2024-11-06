@@ -1678,7 +1678,7 @@ class DP_AutoRig_UI(object):
             logText += "\nExported: "+publishLog["exportPath"]
             logText += "\nComments: "+publishLog["comments"]+"\n"
         if actionInstList:
-            self.utils.setProgress(self.lang[actionType]+': 0%', self.lang[actionType], len(actionInstList))
+            self.utils.setProgress(self.lang[actionType]+': '+self.lang['c110_start'], self.lang[actionType], len(actionInstList))
             for a, actionInst in enumerate(actionInstList):
                 if actionInst.active:
                     self.utils.setProgress(actionInst.guideModuleName)
@@ -2276,8 +2276,8 @@ class DP_AutoRig_UI(object):
             for obj in objList:
                 # load dpReorderAttribute:
                 dpRAttr = dpReorderAttr.ReorderAttr(self, False)
-                if verbose:
-                    self.utils.setProgress('Reordering: 0%', 'Reordering Attributes', len(attrList), addOne=False)
+                if verbose and not self.rebuilding:
+                    self.utils.setProgress('Reordering: '+self.lang['c110_start'], 'Reordering Attributes', len(attrList), addOne=False, addNumber=False)
                 delta = 0
                 for i, desAttr in enumerate(attrList):
                     if verbose:
@@ -2291,7 +2291,7 @@ class DP_AutoRig_UI(object):
                             dpRAttr.dpMoveAttr(1, [obj], [desAttr])
                     else:
                         delta = delta+1
-                if verbose:
+                if verbose and not self.rebuilding:
                     self.utils.setProgress(endIt=True)
                 dpRAttr.dpCloseReorderAttrUI()
 
@@ -2314,6 +2314,8 @@ class DP_AutoRig_UI(object):
             Most important function to automate the generating process.
         """
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
+        # Starting progress window
+        self.utils.setProgress(self.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.rebuilding:
@@ -2330,6 +2332,7 @@ class DP_AutoRig_UI(object):
         
         # verify if there are instances of modules (guides) to rig in the scene:
         if self.modulesToBeRiggedList:
+            self.utils.setProgress(max=len(self.modulesToBeRiggedList))
             
             # check guide versions to be sure we are building with the same dpAutoRigSystem version:
             for guideModule in self.modulesToBeRiggedList:
@@ -2349,9 +2352,6 @@ class DP_AutoRig_UI(object):
             
             # force unPin all Guides:
             self.unPinAllGuides()
-            
-            # Starting progress window
-            self.utils.setProgress('Rigging:', 'dpAutoRigSystem', len(self.modulesToBeRiggedList), addOne=False)
             
             # clear all duplicated names in order to run without find same names if they exists:
             if cmds.objExists(self.guideMirrorGrp):
@@ -2392,7 +2392,10 @@ class DP_AutoRig_UI(object):
                 guideModuleCustomName = cmds.getAttr(guideModule.moduleGrp+'.customName')
                 
                 # Update progress window
-                self.utils.setProgress('Rigging: '+str(guideModuleCustomName))
+                guideName = guideModuleCustomName
+                if not guideName:
+                    guideName = cmds.getAttr(guideModule.moduleGrp+'.moduleNamespace')
+                self.utils.setProgress('Rigging: '+str(guideName))
                 
                 # Rig it :)
                 guideModule.rigModule()
@@ -3103,9 +3106,6 @@ class DP_AutoRig_UI(object):
                     if ( typeCounter != cmds.getAttr(self.masterGrp+'.'+guideType+'Count') ):
                         cmds.setAttr(self.masterGrp+'.'+guideType+'Count', typeCounter)
         
-            # Close progress window
-            self.utils.setProgress(endIt=True)
-            
             #Actualise all controls (All_Grp.controlList) for this rig:
             dpUpdateRigInfo.UpdateRigInfo.updateRigInfoLists()
 
@@ -3225,6 +3225,8 @@ class DP_AutoRig_UI(object):
         if not self.rebuilding:
             # call log window:
             self.logger.logWin()
+            # close progress window
+            self.utils.setProgress(endIt=True)
         
     
     ###################### End: Rigging Modules Instances.

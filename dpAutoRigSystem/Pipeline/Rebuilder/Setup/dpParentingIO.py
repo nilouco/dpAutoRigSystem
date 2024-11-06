@@ -53,7 +53,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                     if transformList:
                         self.utils.setProgress(max=len(transformList))
                         # define list to export
-                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.title)
+                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
                         transformList = self.reorderList(transformList)
                         parentDic = {"Parent" : transformList}
                         try:
@@ -74,7 +74,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                             parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if parentDic:
                                 currentTransformList = cmds.ls(selection=False, long=True, type="transform")
-                                currentTransformList = self.utils.filterTransformList(currentTransformList, verbose=self.verbose, title=self.title)
+                                currentTransformList = self.utils.filterTransformList(currentTransformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
                                 currentTransformList = self.reorderList(currentTransformList)
                                 if not currentTransformList == parentDic["Parent"]:
                                     self.utils.setProgress(max=len(parentDic["Parent"]))

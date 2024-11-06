@@ -1172,7 +1172,7 @@ class Utils(object):
         toRemoveList = []
         for item in itemList:
             if verbose:
-                self.setProgress(self.dpUIinst.lang[title])
+                self.setProgress(title)
             itemType = cmds.objectType(item)
             if filterCamera:
                 for cameraName in cameraList:

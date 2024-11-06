@@ -53,7 +53,7 @@ def Leg(dpUIinst):
                 maxProcess = 7
                 
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False)
+            dpUIinst.utils.setProgress(doingName, legGuideName, maxProcess, addOne=False, addNumber=False)
 
             dpUIinst.utils.setProgress(doingName+legName)
             # create leg module instance:

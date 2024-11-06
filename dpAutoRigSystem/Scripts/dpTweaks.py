@@ -111,7 +111,7 @@ def Tweaks(dpUIinst):
                     indSkinValue = 0
             
                 # Starting progress window
-                dpUIinst.utils.setProgress(doingName, tweaksGuideName, maxProcess, addOne=False)
+                dpUIinst.utils.setProgress(doingName, tweaksGuideName, maxProcess, addOne=False, addNumber=False)
                 
                 dpUIinst.utils.setProgress(doingName+eyebrowMainName)
                 # creating Single instances:

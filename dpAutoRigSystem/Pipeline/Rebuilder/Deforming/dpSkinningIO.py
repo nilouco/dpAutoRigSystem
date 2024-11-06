@@ -99,7 +99,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                             if toImportList:
                                 try:
                                     # import skin weights
-                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1])
+                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1], False)
                                     self.wellDoneIO(', '.join(toImportList))
                                 except Exception as e:
                                     self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))

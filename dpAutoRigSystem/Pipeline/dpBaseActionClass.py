@@ -88,7 +88,7 @@ class ActionStartClass(object):
         if cmds.window('dpInfoWindow', query=True, exists=True):
             cmds.deleteUI('dpInfoWindow', window=True)
         if self.verbose:
-            self.utils.setProgress(self.dpUIinst.lang[self.title]+': 0%', self.dpUIinst.lang[self.actionType], addOne=False)
+            self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
 
 
     def resetButtonColors(self, *args):

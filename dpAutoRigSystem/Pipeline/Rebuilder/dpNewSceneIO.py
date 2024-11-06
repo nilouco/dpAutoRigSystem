@@ -26,7 +26,6 @@ class NewSceneIO(dpBaseActionClass.ActionStartClass):
         self.secondBTCustomLabel = self.dpUIinst.lang['i306_run']
         self.setActionType("r000_rebuilder")
 
-    
 
     def runAction(self, firstMode=True, objList=None, *args):
         """ Main method to process this validator instructions.

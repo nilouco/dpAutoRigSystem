@@ -76,7 +76,7 @@ def Quadruped(dpUIinst):
                 maxProcess = 22
                 
             # Starting progress window
-            dpUIinst.utils.setProgress(doingName, quadrupedGuideName, maxProcess, addOne=False)
+            dpUIinst.utils.setProgress(doingName, quadrupedGuideName, maxProcess, addOne=False, addNumber=False)
 
             # woking with SPINE system:
             dpUIinst.utils.setProgress(doingName+spineName)
