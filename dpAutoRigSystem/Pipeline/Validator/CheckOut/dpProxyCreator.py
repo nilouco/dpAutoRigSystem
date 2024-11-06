@@ -23,6 +23,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
         kwargs["ICON"] = ICON
         self.version = DP_PROXYCREATOR_VERSION
         dpBaseActionClass.ActionStartClass.__init__(self, *args, **kwargs)
+        self.repeatedNameList = []
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -59,18 +60,17 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                         if cmds.objExists("Render_Grp"):
                             renderGrp = "Render_Grp"
                     if renderGrp:
-                        meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, type="mesh")
+                        meshList = cmds.listRelatives(renderGrp, children=True, allDescendents=True, fullPath=True, type="mesh")
                 if meshList:
                     # find meshes to generate proxy
                     toProxyList = []
                     for mesh in meshList:
                         if len(cmds.ls(mesh)) == 1:
-                            meshTransform = cmds.listRelatives(mesh, parent=True, type="transform")
+                            meshTransform = cmds.listRelatives(mesh, parent=True, fullPath=True, type="transform")
                             if meshTransform:
                                 if not meshTransform[0] in toProxyList:
                                     if not cmds.objExists(meshTransform[0]+"."+NO_PROXY):
                                         if not cmds.objExists(meshTransform[0]+"."+PROXIED):
-                                            #if cmds.getAttr(meshTransform[0]+".visibility"):
                                             toProxyList.append(meshTransform[0])
                     if toProxyList:
                         self.utils.setProgress(max=len(toProxyList))
@@ -81,8 +81,9 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                         else: #fix
                             try:
                                 for sourceTransform in toProxyList:
-                                    self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+sourceTransform)
-                                    self.createProxy(sourceTransform, proxyGrp)
+                                    sourceShortName = self.utils.getShortName(sourceTransform)
+                                    self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+sourceShortName)
+                                    self.createProxy(sourceTransform, sourceShortName, proxyGrp)
                                 self.proxyIntegration(proxyGrp)
                                 self.resultOkList.append(True)
                                 self.messageList.append(self.dpUIinst.lang['v004_fixed']+": "+proxyGrp)
@@ -108,7 +109,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def createProxy(self, source, grp, *args):
+    def createProxy(self, source, shortName, grp, *args):
         """ Creates a proxy setup from the given source transform and put it into the given grp group.
         """
         try:
@@ -127,7 +128,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
             if weightedInfluenceList:
                 # get data and store it into a dic
                 indexJointDic = {}
-                sourceFaceList = cmds.ls(source+".f[*]", flatten=True)
+                sourceFaceList = cmds.ls(source+".f[*]", flatten=True, long=True)
                 for i, idx in enumerate(sourceFaceList):
                     percList = cmds.skinPercent(skinClusterNode, source+".f["+str(i)+"]", ignoreBelow=0.1, transform=None, query=True)
                     if percList:
@@ -155,7 +156,8 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                             for n in faceList:
                                 nodeFaceList.append(source+".f["+str(n)+"]")
                         # create proxy geometry
-                        dup = cmds.duplicate(source, name=source+"_"+jnt+"_Pxy")[0]
+                        dup = cmds.duplicate(source, name=shortName+"_"+str(self.repeatedNameList.count(shortName)).zfill(2)+"_"+jnt+"_Pxy")[0]
+                        self.repeatedNameList.append(shortName)
                         self.utils.removeUserDefinedAttr(dup)
                         self.utils.deleteOrigShape(dup)
                         if nodeFaceList:
@@ -180,7 +182,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                         cmds.setAttr(dup+".overrideDisplayType", 2) #reference
                         self.reconnectVisibility(source, dup)
             cmds.addAttr(source, longName=PROXIED, attributeType="bool", defaultValue=1)
-        sourceParent = cmds.listRelatives(source, parent=True, type="transform")
+        sourceParent = cmds.listRelatives(source, parent=True, fullPath=True, type="transform")
         if sourceParent:
             if sourceParent[0] == grp:
                 cmds.delete(source)

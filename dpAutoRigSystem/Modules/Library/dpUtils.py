@@ -1318,3 +1318,20 @@ class Utils(object):
                 cmds.progressWindow(title=header, progress=self.currentAmount, status=message, maxValue=max, isInterruptable=isInterruptable)
                 self.progress = True
         return self.progress
+
+
+    def getShortName(self, name, *args):
+        """ Returns the short name of the given node.
+            Example:
+            |All_Grp|Render_Grp|Body_Mesh -> BodyMesh
+            |pCube1 -> pCube1
+        """
+        shortName = None
+        if name:
+            shortName = name
+            if "|" in name:
+                if name.count("|") > 1:
+                    shortName = name[name.rfind("|"):]
+                else:
+                    shortName = name[1:]
+        return shortName
