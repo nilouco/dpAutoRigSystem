@@ -997,7 +997,7 @@ class ControlClass(object):
         refNodeList = cmds.referenceQuery(refNode, nodes=True)
         if refNodeList:
             for item in refNodeList:
-                self.utils.setProgress(max=len(refNodeList))
+                self.utils.setProgress(max=len(refNodeList), addOne=False, addNumber=False)
                 self.utils.setProgress(self.dpUIinst.lang['i215_setAttr'], addOne=True)
                 if cmds.objExists(item+".calibrationList"):
                     sourceRefNodeList.append(item)
@@ -1098,7 +1098,7 @@ class ControlClass(object):
         return nodeList
 
 
-    def exportShape(self, nodeList=None, path=None, IO=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, dir="dpControlShape", *args):
+    def exportShape(self, nodeList=None, path=None, IO=False, dpSnapshotGrp="dpSnapshot_Grp", keepSnapshot=False, overrideExisting=True, ui=True, verbose=False, dir="dpControlShape", *args):
         """ Export control shapes from a given list or all found dpControl transforms in the scene.
             It will save a Maya ASCII file with the control shapes snapshots.
             If there is no given path, it will ask user where to save the file.
@@ -1136,7 +1136,8 @@ class ControlClass(object):
                 if not cmds.objExists(dpSnapshotGrp):
                     cmds.group(name=dpSnapshotGrp, empty=True)
                 for item in nodeList:
-                    self.utils.setProgress(self.doingName+': Shape')
+                    if ui or verbose:
+                        self.utils.setProgress(self.doingName+': Shape')
                     snapshotName = item+SNAPSHOT_SUFFIX
                     if cmds.objExists(snapshotName):
                         if overrideExisting:
@@ -1182,7 +1183,7 @@ class ControlClass(object):
             self.utils.setProgress(endIt=True)
 
 
-    def importShape(self, nodeList=None, path=None, IO=False, ui=True, dir="dpControlShape", *args):
+    def importShape(self, nodeList=None, path=None, IO=False, ui=True, verbose=False, dir="dpControlShape", *args):
         """ Import control shapes from an external loaded Maya file.
             If not get an user defined parameter for a node list, it will import all shapes.
             If the IO parameter is True, it will use the default path as current location inside dpControlShapeIO directory.
@@ -1221,7 +1222,7 @@ class ControlClass(object):
                         if ui:
                             self.utils.setProgress(self.doingName+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang['i196_import'], len(refNodeList), addOne=False, addNumber=False)
                         for sourceRefNode in refNodeList:
-                            if ui:
+                            if ui or verbose:
                                 self.utils.setProgress(self.doingName+': Shape')
                             if cmds.objectType(sourceRefNode) == "transform":
                                 destinationNode = sourceRefNode[sourceRefNode.rfind(":")+1:-len(SNAPSHOT_SUFFIX)] #removed namespace before ":"" and the suffix _Snapshot_Crv (-13)

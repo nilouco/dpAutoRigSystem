@@ -101,7 +101,7 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
             attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
             keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
             keyTimeAttrList = ["keyTime", "keyValue"]
-            self.utils.setProgress(max=len(nodeList))
+            self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
             for item in nodeList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # getting attributes if they exists
@@ -159,7 +159,7 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
         """ Import set driven key nodes from exported dictionary.
             Create missing set driven key nodes and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(drivenKeyDic.keys()))
+        self.utils.setProgress(max=len(drivenKeyDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in drivenKeyDic.keys():

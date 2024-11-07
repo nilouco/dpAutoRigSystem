@@ -49,12 +49,12 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                 else:
                     ctrlList = self.dpUIinst.ctrls.getControlList()
                 if ctrlList:
-                    self.utils.setProgress(max=len(ctrlList))
+                    self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
                     if self.firstMode: #export
                         try:
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
                             ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".ma"
-                            self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName, ui=False)
+                            self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
                             self.wellDoneIO(', '.join(ctrlList))
                         except Exception as e:
                             self.notWorkedWellIO(', '.join(ctrlList)+": "+str(e))
@@ -64,7 +64,7 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                             try:
                                 exportedList.sort()
                                 ctrlsToImport = self.ioPath+"/"+exportedList[-1]
-                                self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport, ui=False)
+                                self.dpUIinst.ctrls.importShape(ctrlList, ctrlsToImport, ui=False, verbose=True)
                                 self.wellDoneIO(exportedList[-1])
                             except Exception as e:
                                 self.notWorkedWellIO(exportedList[-1]+": "+str(e))

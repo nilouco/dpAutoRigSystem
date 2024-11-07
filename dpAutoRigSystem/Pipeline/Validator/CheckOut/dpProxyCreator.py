@@ -73,7 +73,7 @@ class ProxyCreator(dpBaseActionClass.ActionStartClass):
                                         if not cmds.objExists(meshTransform[0]+"."+PROXIED):
                                             toProxyList.append(meshTransform[0])
                     if toProxyList:
-                        self.utils.setProgress(max=len(toProxyList))
+                        self.utils.setProgress(max=len(toProxyList), addOne=False, addNumber=False)
                         self.checkedObjList.append(proxyGrp)
                         self.foundIssueList.append(True)
                         if self.firstMode:

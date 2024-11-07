@@ -1308,7 +1308,7 @@ class Utils(object):
                 else:
                     self.currentAmount = amount
                 if message == "Rigging...":
-                    cmds.progressWindow(edit=True, maxValue=max)
+                    cmds.progressWindow(edit=True, maxValue=max, progress=0)
                 else:
                     if addNumber:
                         message = message+" # "+str(self.currentAmount)

@@ -107,7 +107,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
             #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
             #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
             #            }
-            self.utils.setProgress(max=len(constraintList))
+            self.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
             for const in constraintList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # getting attributes if they exists
@@ -150,7 +150,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
         """ Import constraints from exported dictionary.
             Create missing constraints and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(constDic.keys()))
+        self.utils.setProgress(max=len(constDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in constDic.keys():

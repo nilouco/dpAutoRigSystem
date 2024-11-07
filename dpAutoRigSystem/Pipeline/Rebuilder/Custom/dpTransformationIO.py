@@ -51,7 +51,7 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                     else:
                         transformList = cmds.ls(selection=False, long=True, type="transform")
                     if transformList:
-                        self.utils.setProgress(max=len(transformList))
+                        self.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
                         # define dictionary to export
                         transformDic = {}
                         transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
@@ -82,7 +82,7 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                             exportedList.sort()
                             transformDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if transformDic:
-                                self.utils.setProgress(max=len(transformDic.keys()))
+                                self.utils.setProgress(max=len(transformDic.keys()), addOne=False, addNumber=False)
                                 # define lists to check result
                                 wellImportedList = []
                                 for item in transformDic.keys():
@@ -92,20 +92,21 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                                     if not cmds.objExists(item):
                                         item = item[item.rfind("|")+1:] #short name (after last "|")
                                     if cmds.objExists(item):
-                                        for attr in transformDic[item].keys():
+                                        for attr in transformDic[item]["transform"].keys():
                                             if not cmds.listConnections(item+"."+attr, destination=False, source=True):
                                                 # unlock attribute
                                                 wasLocked = cmds.getAttr(item+"."+attr, lock=True)
                                                 cmds.setAttr(item+"."+attr, lock=False)
                                                 try:
                                                     # set transformation value
-                                                    cmds.setAttr(item+"."+attr, transformDic[item][attr])
+                                                    cmds.setAttr(item+"."+attr, transformDic[item]["transform"][attr])
                                                     # lock attribute again if it was locked
                                                     cmds.setAttr(item+"."+attr, lock=wasLocked)
                                                     if not item in wellImportedList:
                                                         wellImportedList.append(item)
                                                 except Exception as e:
                                                     self.notWorkedWellIO(item+" - "+str(e))
+                                        cmds.xform(item, worldSpace=False, matrix=transformDic[item]["matrix"])
                                     else:
                                         notFoundNodesList.append(item)
                                 if wellImportedList:
@@ -137,9 +138,16 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
         """ Returns a dictionary with the transformation attribute values of the given transform node.
         """
         dic = {}
+        needGetData = True
         for attr, default in zip(["tx", "ty",  "tz",  "rx",  "ry",  "rz",  "sx",  "sy",  "sz"], [0, 0, 0, 0, 0, 0, 1, 1, 1]):
             value = cmds.getAttr(item+"."+attr)
             if not value == default:
                 if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                    dic[attr] = cmds.getAttr(item+"."+attr)
+                    if needGetData:
+                        dic = { 
+                                "transform" : {},
+                                "matrix" : cmds.xform(item, query=True, worldSpace=False, matrix=True)
+                                }
+                        needGetData = False
+                    dic["transform"][attr] = cmds.getAttr(item+"."+attr)
         return dic

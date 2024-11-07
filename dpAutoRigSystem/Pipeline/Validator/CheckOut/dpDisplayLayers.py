@@ -180,7 +180,7 @@ class DisplayLayers(dpBaseActionClass.ActionStartClass):
             If it's not a list it will append the obj and run the main function.
         """
         if itemList:
-            self.utils.setProgress(max=len(itemList))
+            self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
             for i, item in enumerate(itemList):
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if self.firstMode:

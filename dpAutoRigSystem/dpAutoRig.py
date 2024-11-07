@@ -2332,7 +2332,7 @@ class DP_AutoRig_UI(object):
         
         # verify if there are instances of modules (guides) to rig in the scene:
         if self.modulesToBeRiggedList:
-            self.utils.setProgress(max=len(self.modulesToBeRiggedList))
+            self.utils.setProgress(max=len(self.modulesToBeRiggedList), addOne=False, addNumber=False)
             
             # check guide versions to be sure we are building with the same dpAutoRigSystem version:
             for guideModule in self.modulesToBeRiggedList:

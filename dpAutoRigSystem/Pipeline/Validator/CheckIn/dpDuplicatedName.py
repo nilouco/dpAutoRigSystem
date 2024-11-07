@@ -43,7 +43,7 @@ class DuplicatedName(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = cmds.ls(selection=False, long=False)
         if toCheckList:
-            self.utils.setProgress(max=len(toCheckList))
+            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             foundDuplicated = False
             for node in toCheckList:
                 if "|" in node:

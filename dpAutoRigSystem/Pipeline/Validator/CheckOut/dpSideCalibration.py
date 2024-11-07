@@ -44,7 +44,7 @@ class SideCalibration(dpBaseActionClass.ActionStartClass):
             toCheckList = self.dpUIinst.ctrls.getControlList()
         if toCheckList:
             pairDic = {}
-            self.utils.setProgress(max=len(toCheckList))
+            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             for item in toCheckList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # conditional to check here

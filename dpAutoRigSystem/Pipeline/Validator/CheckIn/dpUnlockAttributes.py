@@ -43,7 +43,7 @@ class UnlockAttributes(dpBaseActionClass.ActionStartClass):
             nodeList = objList
         if nodeList:
             lockedAttrDic = {}
-            self.utils.setProgress(max=len(nodeList))
+            self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
             for item in nodeList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 lockedAttrList = cmds.listAttr(item, locked=True)

@@ -98,7 +98,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         """
         if ctrlList:
             dic = {}
-            self.utils.setProgress(max=len(ctrlList))
+            self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
             for ctrl in ctrlList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(ctrl):
@@ -147,7 +147,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             Check if need to create an unitConversion node and set its conversionFactor value.
             Only redo the connection if it doesn't exists yet.
         """
-        self.utils.setProgress(max=len(connectDic.keys()))
+        self.utils.setProgress(max=len(connectDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in connectDic.keys():

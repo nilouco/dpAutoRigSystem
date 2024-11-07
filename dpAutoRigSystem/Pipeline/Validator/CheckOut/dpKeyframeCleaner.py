@@ -52,7 +52,7 @@ class KeyframeCleaner(dpBaseActionClass.ActionStartClass):
                     if connectionList and not connectionList[0] in animatedList:
                         animatedList.append(connectionList[0])
                 if animatedList:
-                    self.utils.setProgress(max=len(animatedList))
+                    self.utils.setProgress(max=len(animatedList), addOne=False, addNumber=False)
                     for item in animatedList:
                         self.utils.setProgress(self.dpUIinst.lang[self.title])
                         if item in toCheckList:

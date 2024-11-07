@@ -51,7 +51,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                     else:
                         transformList = cmds.ls(selection=False, long=True, type="transform")
                     if transformList:
-                        self.utils.setProgress(max=len(transformList))
+                        self.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
                         # define list to export
                         transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
                         transformList = self.reorderList(transformList)
@@ -77,7 +77,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                                 currentTransformList = self.utils.filterTransformList(currentTransformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
                                 currentTransformList = self.reorderList(currentTransformList)
                                 if not currentTransformList == parentDic["Parent"]:
-                                    self.utils.setProgress(max=len(parentDic["Parent"]))
+                                    self.utils.setProgress(max=len(parentDic["Parent"]), addOne=False, addNumber=False)
                                     # define lists to check result
                                     wellImportedList = []
                                     parentIssueList = []

@@ -51,7 +51,7 @@ class UnusedNodeCleaner(dpBaseActionClass.ActionStartClass):
                 usedMatList = list(set(self.getUsedMaterialList()) - set(defaultMatList))
                 # conditional to check here
                 if not len(allMatList) == len(usedMatList):
-                    self.utils.setProgress(max=len(allMatList))
+                    self.utils.setProgress(max=len(allMatList), addOne=False, addNumber=False)
                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                     issueMatList = sorted(list(set(allMatList) - set(usedMatList)))
                     self.checkedObjList.append(str(", ".join(issueMatList)))

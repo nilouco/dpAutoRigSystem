@@ -97,7 +97,7 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
         """
         if ctrlList:
             dic = {}
-            self.utils.setProgress(max=len(ctrlList))
+            self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
             for ctrl in ctrlList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
@@ -110,7 +110,7 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
     def importCalibrationData(self, calibrationDic, *args):
         """ Import the calibration setup from the given calibration data dictionary.
         """
-        self.utils.setProgress(max=len(calibrationDic.keys()))
+        self.utils.setProgress(max=len(calibrationDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in calibrationDic.keys():

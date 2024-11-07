@@ -43,7 +43,7 @@ class NgSkinToolsCleaner(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = cmds.ls(selection=False, type='ngst2SkinLayerData')
         if toCheckList:
-            self.utils.setProgress(max=len(toCheckList))
+            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             for item in toCheckList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 # conditional to check here

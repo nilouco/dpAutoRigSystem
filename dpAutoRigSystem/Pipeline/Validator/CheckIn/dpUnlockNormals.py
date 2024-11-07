@@ -43,7 +43,7 @@ class UnlockNormals(dpBaseActionClass.ActionStartClass):
         else:
             allMeshList = cmds.ls(selection=False, type='mesh')
         if allMeshList:
-            self.utils.setProgress(max=len(allMeshList))
+            self.utils.setProgress(max=len(allMeshList), addOne=False, addNumber=False)
             for mesh in allMeshList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(mesh):

@@ -42,7 +42,7 @@ class OutlinerCleaner(dpBaseActionClass.ActionStartClass):
         if not objList:
             objList = cmds.ls(selection=False, type="transform")
         if objList:
-            self.utils.setProgress(max=len(objList))
+            self.utils.setProgress(max=len(objList), addOne=False, addNumber=False)
             for i, item in enumerate(objList):
                 if cmds.objExists(item):
                     self.utils.setProgress(self.dpUIinst.lang[self.title])

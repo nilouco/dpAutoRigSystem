@@ -77,7 +77,7 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
                             self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if self.importedDataDic:
                                 wellImported = True
-                                self.utils.setProgress(max=len(self.importedDataDic.keys()))
+                                self.utils.setProgress(max=len(self.importedDataDic.keys()), addOne=False, addNumber=False)
                                 for net in self.importedDataDic.keys():
                                     try:
                                         netDic = self.importedDataDic[net]
@@ -119,7 +119,7 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
         """
         if netList:
             dic = {}
-            self.utils.setProgress(max=len(netList))
+            self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
             i = 0
             for n, net in enumerate(netList):
                 if self.verbose:

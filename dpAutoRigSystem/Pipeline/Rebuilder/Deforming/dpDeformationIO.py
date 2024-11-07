@@ -62,7 +62,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                 hasDef = True
                                 break
                         if hasDef:
-                            self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()))
+                            self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
                             # Declaring the data dictionary to export it
                             self.deformerDataDic = {}
                             # run for all deformer types to get info
@@ -121,7 +121,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                     else:
                                         notFoundMeshList.append(deformerNode)
                             if toImportList:
-                                self.utils.setProgress(max=len(toImportList))
+                                self.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
                                 for deformerNode in toImportList:
                                     self.utils.setProgress(self.dpUIinst.lang[self.title])
                                     try:

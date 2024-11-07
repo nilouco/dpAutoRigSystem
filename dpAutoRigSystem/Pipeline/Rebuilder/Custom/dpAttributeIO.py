@@ -98,7 +98,7 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         """
         if ctrlList:
             dic = {}
-            self.utils.setProgress(max=len(ctrlList))
+            self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
             for ctrl in ctrlList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 attrList = cmds.listAttr(ctrl, userDefined=True)
@@ -132,7 +132,7 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         """ Import attributes from exported dictionary.
             Add missing attributes and set them values if they don't exists.
         """
-        self.utils.setProgress(max=len(attrDic.keys()))
+        self.utils.setProgress(max=len(attrDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
         wellImportedList = []
         for item in attrDic.keys():

@@ -897,7 +897,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             cmds.setAttr(self.toParentExtremCtrl+".translateX", self.ctrlRadius)
                         else:
                             cmds.setAttr(self.toParentExtremCtrl+".translateX", -self.ctrlRadius)
-                        self.utils.zeroOut([self.toParentExtremCtrl])
+                        self.utils.zeroOut([self.toParentExtremCtrl], notTransformIO=False)
                         self.ctrls.setLockHide([self.toParentExtremCtrl], ['v'])
                 # zeroOut controls:
                 self.zeroFkCtrlList = self.utils.zeroOut(self.fkCtrlList)

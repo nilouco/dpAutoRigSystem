@@ -54,7 +54,7 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                         deformedList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if deformedList:
                         orderDic = {}
-                        self.utils.setProgress(max=len(deformedList))
+                        self.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
                         for item in deformedList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title])
                             orderDic[item] = self.defWeights.getOrderList(item)
@@ -77,7 +77,7 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                         self.exportedList.sort()
                         orderDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
                         if orderDic:
-                            self.utils.setProgress(max=len(orderDic.keys()))
+                            self.utils.setProgress(max=len(orderDic.keys()), addOne=False, addNumber=False)
                             wellImported = True
                             toImportList, notFoundMeshList, = [], []
                             for item in orderDic.keys():

@@ -64,7 +64,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                         shaderList = self.getShaderToExportList()
                     if shaderList:
                         shaderDic = {}
-                        self.utils.setProgress(max=len(shaderList))
+                        self.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
                         for shader in shaderList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shader)
                             fileNode = None

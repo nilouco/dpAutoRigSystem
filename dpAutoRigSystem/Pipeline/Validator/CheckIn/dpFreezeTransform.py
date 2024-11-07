@@ -67,7 +67,7 @@ class FreezeTransform(dpBaseActionClass.ActionStartClass):
             allObjectList = cmds.ls(selection=False, type='transform', long=True)
         # analisys transformations
         if len(allObjectList) > 0:
-            self.utils.setProgress(max=len(allObjectList))
+            self.utils.setProgress(max=len(allObjectList), addOne=False, addNumber=False)
             self.animCurvesList = cmds.ls(type='animCurve')
             zeroAttrList = ['translateX', 'translateY', 'translateZ', 'rotateX', 'rotateY', 'rotateZ']
             oneAttrList = ['scaleX', 'scaleY', 'scaleZ']

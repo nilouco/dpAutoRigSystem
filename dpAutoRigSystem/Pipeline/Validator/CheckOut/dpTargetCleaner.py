@@ -48,7 +48,7 @@ class TargetCleaner(dpBaseActionClass.ActionStartClass):
             if meshList:
                 toCheckList = list(set(cmds.listRelatives(meshList, type="transform", parent=True, fullPath=False)))
         if toCheckList:
-            self.utils.setProgress(max=len(toCheckList))
+            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             # get exception list to keep nodes in the scene
             deformersToKeepList = ["skinCluster", "blendShape", "wrap", "cluster", "ffd", "wire", "shrinkWrap", "sculpt", "morph"]
             exceptionList = self.keepGrp(["renderGrp", "proxyGrp"])

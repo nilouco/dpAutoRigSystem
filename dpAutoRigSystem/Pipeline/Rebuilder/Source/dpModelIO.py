@@ -54,7 +54,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                         else:
                             meshList = self.getModelToExportList()
                         if meshList:
-                            self.utils.setProgress(max=len(meshList))
+                            self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
                             try:
                                 nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
                                 # export alembic

@@ -43,7 +43,7 @@ class ControllerTag(dpBaseActionClass.ActionStartClass):
         else:
             toCheckList = self.dpUIinst.ctrls.getControlList()
         if toCheckList:
-            self.utils.setProgress(max=len(toCheckList))
+            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
             firstFixed = False
             for item in toCheckList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])

@@ -43,7 +43,7 @@ class OverrideCleaner(dpBaseActionClass.ActionStartClass):
             nodeList = objList
         if nodeList:
             overridedList = []
-            self.utils.setProgress(max=len(nodeList))
+            self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
             for item in nodeList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(item+".overrideEnabled"):

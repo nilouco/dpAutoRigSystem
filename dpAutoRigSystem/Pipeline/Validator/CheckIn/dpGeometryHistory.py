@@ -62,7 +62,7 @@ class GeometryHistory(dpBaseActionClass.ActionStartClass):
             # Get shortName to better reading in display log
             geoToCleanList = cmds.ls(geoToCleanFullPathList, long=False)
         if geoToCleanList:
-            self.utils.setProgress(max=len(geoToCleanList))
+            self.utils.setProgress(max=len(geoToCleanList), addOne=False, addNumber=False)
             for geo in geoToCleanList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if cmds.objExists(geo):

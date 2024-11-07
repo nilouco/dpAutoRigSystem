@@ -55,7 +55,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                         netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                     if netList:
                         toExportDataDic = {}
-                        self.utils.setProgress(max=len(netList))
+                        self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
                         for net in netList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title])
                             # mount a dic with all data 
@@ -93,7 +93,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                             self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
                             if self.importedDataDic:
                                 wellImported = True
-                                self.utils.setProgress(max=len(self.importedDataDic.keys()))
+                                self.utils.setProgress(max=len(self.importedDataDic.keys()), addOne=False, addNumber=False)
                                 for net in self.importedDataDic.keys():
                                     toInitializeGuide = True
                                     if cmds.objExists(net):
@@ -106,7 +106,7 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                                         try:
                                             #self.netDic = json.loads(self.importedDataDic[net])
                                             self.netDic = self.importedDataDic[net]
-                                            self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.netDic['ModuleType'])
+                                            self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.importedDataDic[net]['ModuleType'])
                                             # create a module instance:
                                             self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
                                             self.setupInstanceChanges()

@@ -60,7 +60,7 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                             bsList = cmds.ls(selection=False, type="blendShape")
                         if bsList:
                             bsDic = {}
-                            self.utils.setProgress(max=len(bsList))
+                            self.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
                             for bsNode in bsList:
                                 self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+bsNode)
                                 bsDic[bsNode] = {}
