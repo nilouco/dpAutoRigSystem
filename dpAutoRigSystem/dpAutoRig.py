@@ -2380,6 +2380,10 @@ class DP_AutoRig_UI(object):
                 bAddAttr = cmds.checkBox(self.allUIs["addAttrCB"], query=True, value=True)
             except:
                 pass
+            
+            # serialize all guides before build them
+            for guideModule in self.modulesToBeRiggedList:
+                guideModule.serializeGuide()
 
             if integrate == 1:
                 self.createBaseRigNode()

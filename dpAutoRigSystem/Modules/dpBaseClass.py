@@ -36,6 +36,7 @@ class StartClass(object):
         self.annotation = self.moduleGrp+"_Ant"
         self.number = number
         self.raw = True
+        self.serialized = False
         # utils
         self.utils = dpUIinst.utils
         # calling dpControls:
@@ -582,27 +583,29 @@ class StartClass(object):
     def serializeGuide(self, buildIt=True, *args):
         """ Work in the guide info to store it as a json dictionary in order to be able to rebuild it in the future.
         """
-        afterDataDic, guideDic = {}, {}
-        beforeList = self.getBeforeList()
-        if beforeList:
-            if buildIt:
-                self.raw = False
-                cmds.setAttr(self.guideNet+".rawGuide", 0)
-            afterDataDic["GuideNumber"] = cmds.getAttr(self.guideNet+".guideNumber")
-            afterDataDic["ModuleType"] = self.guideModuleName
-            afterDataDic["RawGuide"] = self.raw
-            afterDataDic["BeforeData"] = beforeList
-            for beforeAttr in beforeList:
-                nodeName = cmds.listConnections(self.guideNet+"."+beforeAttr, source=True, destination=False) or None
-                if nodeName:
-                    if cmds.objExists(nodeName[0]):
-                        guideDic[nodeName[0]] = self.getNodeData(nodeName[0])
-                        if buildIt:
-                            cmds.deleteAttr(self.guideNet+"."+beforeAttr)
-            afterDataDic["GuideData"] = guideDic
-            cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
-            if buildIt:
-                cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node
+        if not self.serialized:
+            afterDataDic, guideDic = {}, {}
+            beforeList = self.getBeforeList()
+            if beforeList:
+                if buildIt:
+                    self.raw = False
+                    cmds.setAttr(self.guideNet+".rawGuide", 0)
+                afterDataDic["GuideNumber"] = cmds.getAttr(self.guideNet+".guideNumber")
+                afterDataDic["ModuleType"] = self.guideModuleName
+                afterDataDic["RawGuide"] = self.raw
+                afterDataDic["BeforeData"] = beforeList
+                for beforeAttr in beforeList:
+                    nodeName = cmds.listConnections(self.guideNet+"."+beforeAttr, source=True, destination=False) or None
+                    if nodeName:
+                        if cmds.objExists(nodeName[0]):
+                            guideDic[nodeName[0]] = self.getNodeData(nodeName[0])
+                            if buildIt:
+                                cmds.deleteAttr(self.guideNet+"."+beforeAttr)
+                afterDataDic["GuideData"] = guideDic
+                cmds.setAttr(self.guideNet+".afterData", afterDataDic, type="string")
+                if buildIt:
+                    cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node
+                    self.serialized = True
 
 
     def renameUnitConversion(self, unitConversionList=None, *args):

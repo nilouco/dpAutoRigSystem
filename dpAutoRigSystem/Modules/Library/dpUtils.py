@@ -552,7 +552,7 @@ class Utils(object):
                         if not "dpHead" in str(guideModule):
                             modulesToBeRiggedList.append(guideModule)
                         else:
-                            # store Head guides to rigger later
+                            # store Head guides to rig it later
                             headModuleList.append(guideModule)
         if headModuleList:
             # hack to rig Head modules at the end in order to call FacialConnection properly for joint target Singles tweakers.
