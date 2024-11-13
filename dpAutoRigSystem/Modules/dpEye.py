@@ -409,7 +409,11 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.dpUIinst.lang['c052_fix']+self.dpUIinst.lang['c029_middle']+"TranslateZ",
             self.dpUIinst.lang['c107_reduce']+self.dpUIinst.lang['c029_middle']+"Open"
         ]
+        eyelidNotMirrorList = [self.dpUIinst.lang['c053_invert']+"X",
+                               self.dpUIinst.lang['c053_invert']+"Y",
+                               self.dpUIinst.lang['c053_invert']+self.dpUIinst.lang['c029_middle']]
         self.ctrls.setStringAttrFromList(eyelidCtrl, eyelidCalibrationList)
+        self.ctrls.setStringAttrFromList(eyelidCtrl, eyelidNotMirrorList, "notMirrorList") #useful to export calibrationIO and not mirror them
         return eyelidCtrl, eyelidCtrlZero
         
         

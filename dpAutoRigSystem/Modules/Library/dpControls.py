@@ -1038,6 +1038,9 @@ class ControlClass(object):
                 if attrList:
                     destinationNode = toPrefix+nodeName[len(fromPrefix):]
                     if cmds.objExists(destinationNode):
+                        notMirrorAttrList = self.getListFromStringAttr(nodeName, "notMirrorList")
+                        if notMirrorAttrList:
+                            attrList = list(set(attrList) - set(notMirrorAttrList))
                         self.transferAttr(nodeName, [destinationNode], attrList)
         else:
             print(self.dpUIinst.lang['i198_mirrorPrefix'])
