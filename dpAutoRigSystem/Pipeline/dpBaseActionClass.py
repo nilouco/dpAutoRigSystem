@@ -9,6 +9,7 @@ DEFAULT_COLOR = (0.5, 0.5, 0.5)
 CHECKED_COLOR = (0.7, 1.0, 0.7)
 WARNING_COLOR = (1.0, 1.0, 0.5)
 ISSUE_COLOR = (1.0, 0.7, 0.7)
+RUNNING_COLOR = (1.0, 1.0, 1.0)
 
 DP_ACTIONSTARTCLASS_VERSION = 2.3
 
@@ -87,6 +88,8 @@ class ActionStartClass(object):
         # close info log window if it exists
         if cmds.window('dpInfoWindow', query=True, exists=True):
             cmds.deleteUI('dpInfoWindow', window=True)
+        self.updateButtonColors(True) #running
+        cmds.refresh()
         if self.verbose:
             self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
 
@@ -100,20 +103,27 @@ class ActionStartClass(object):
                 cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
 
 
-    def updateButtonColors(self, *args):
+    def updateButtonColors(self, running=False, *args):
         """ Update button background colors if using UI.
         """
         if self.ui:
             if cmds.button(self.firstBT, exists=True):
-                if self.checkedObjList:
-                    if self.firstMode:
+                if running:
+                    if self.firstMode: #verify/export
+                        cmds.button(self.firstBT, edit=True, backgroundColor=RUNNING_COLOR)
+                        cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                    else: #fix/import
+                        cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
+                        cmds.button(self.secondBT, edit=True, backgroundColor=RUNNING_COLOR)
+                elif self.checkedObjList:
+                    if self.firstMode: #verify/export
                         if True in self.foundIssueList:
                             cmds.button(self.firstBT, edit=True, backgroundColor=ISSUE_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=WARNING_COLOR)
                         else:
                             cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                    else: #fix
+                    else: #fix/import
                         if False in self.resultOkList:
                             cmds.button(self.firstBT, edit=True, backgroundColor=WARNING_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=ISSUE_COLOR)
@@ -121,10 +131,10 @@ class ActionStartClass(object):
                             cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
                             cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
                 else:
-                    if self.firstMode:
+                    if self.firstMode: #verify/export
                         cmds.button(self.firstBT, edit=True, backgroundColor=CHECKED_COLOR)
                         cmds.button(self.secondBT, edit=True, backgroundColor=DEFAULT_COLOR)
-                    else: #fix
+                    else: #fix/import
                         cmds.button(self.firstBT, edit=True, backgroundColor=DEFAULT_COLOR)
                         cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
     
