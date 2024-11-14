@@ -94,14 +94,14 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                                                     longFatherNode = item[:item.rfind("|")]
                                                     shortFatherNode = longFatherNode[longFatherNode.rfind("|")+1:]
                                                     currentFatherList = cmds.listRelatives(shortItem, parent=True)
-                                                    if currentFatherList:
-                                                        if currentFatherList[0] == shortFatherNode:
-                                                            # already child of the father node
-                                                            wellImportedList.append(shortItem)
-                                                    elif cmds.objExists(longFatherNode):
+                                                    if cmds.objExists(longFatherNode):
                                                         # simple parent to existing old father node in the ancient hierarchy
                                                         cmds.parent(shortItem, longFatherNode)
                                                         wellImportedList.append(shortItem)
+                                                    elif currentFatherList:
+                                                        if currentFatherList[0] == shortFatherNode:
+                                                            # already child of the father node
+                                                            wellImportedList.append(shortItem)
                                                     elif cmds.objExists(shortFatherNode):
                                                         if len(cmds.ls(shortFatherNode)) == 1:
                                                             # found unique father node in another hierarchy to parent
