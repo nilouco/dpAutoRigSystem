@@ -50,8 +50,8 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                     nodeList = objList
                 else:
                     nodeList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
-                if nodeList:
-                    if self.firstMode: #export
+                if self.firstMode: #export
+                    if nodeList:
                         toExportDataDic = self.getDrivenKeyDataDic(nodeList)
                         try:
                             # export json file
@@ -61,22 +61,20 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                             self.wellDoneIO(jsonName)
                         except Exception as e:
                             self.notWorkedWellIO(jsonName+": "+str(e))
-                    else: #import
-                        try:
-                            exportedList = self.getExportedList()
-                            if exportedList:
-                                exportedList.sort()
-                                drivenKeyDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if drivenKeyDic:
-                                    self.importDrivenKeyData(drivenKeyDic)
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                else: #import
+                    try:
+                        exportedList = self.getExportedList()
+                        if exportedList:
+                            exportedList.sort()
+                            drivenKeyDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                            if drivenKeyDic:
+                                self.importDrivenKeyData(drivenKeyDic)
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
-                else:
-                    self.notWorkedWellIO("Ctrls_Grp")
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    except Exception as e:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:

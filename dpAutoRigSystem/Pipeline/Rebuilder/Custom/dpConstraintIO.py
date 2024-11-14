@@ -132,9 +132,10 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
                     elif cmds.objExists(const+".target[0].targetMesh"):
                         targetAttr = "targetMesh"
                     if targetAttr:
+                        dic[const]["target"][targetAttr] = {}
                         targetList = cmds.getAttr(const+".target", multiIndices=True)
                         for t in targetList:
-                            dic[const]["target"][targetAttr] = {t : [cmds.listConnections(const+".target["+str(t)+"]."+targetAttr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(t)+"].targetWeight")]}
+                            dic[const]["target"][targetAttr][t] = [cmds.listConnections(const+".target["+str(t)+"]."+targetAttr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(t)+"].targetWeight")]
                 # store connection info to disconnect when import if need to skip the constraint driving
                 for outAttr in outputAttrList:
                     dic[const]["output"][outAttr] = None
