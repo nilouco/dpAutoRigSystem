@@ -492,11 +492,13 @@ class StartClass(object):
         cmds.addAttr(self.guideNet, longName="guideNumber", dataType="string")
         cmds.addAttr(self.guideNet, longName="beforeData", dataType="string")
         cmds.addAttr(self.guideNet, longName="afterData", dataType="string")
+        cmds.addAttr(self.guideNet, longName="linkedNode", attributeType="message")
         cmds.setAttr(self.guideNet+".moduleType", self.guideModuleName, type="string")
         cmds.setAttr(self.guideNet+".guideNumber", guideNumber, type="string")
         cmds.addAttr(self.moduleGrp, longName="net", attributeType="message")
         cmds.lockNode(self.guideNet, lock=False)
         cmds.connectAttr(self.guideNet+".message", self.moduleGrp+".net", force=True)
+        cmds.connectAttr(self.moduleGrp+".message", self.guideNet+".linkedNode", force=True)
         self.addNodeToGuideNet([self.moduleGrp, self.radiusCtrl, self.annotation], ["moduleGrp", "radiusCtrl", "annotation"])
 
     
@@ -606,6 +608,12 @@ class StartClass(object):
                 if buildIt:
                     cmds.lockNode(self.guideNet, lock=True) #to avoid deleting this network node
                     self.serialized = True
+        else: #update linked node to avoid cleanup this network if it's broken
+            cmds.lockNode(self.guideNet, lock=False)
+            cmds.connectAttr(self.toStaticHookGrp+".message", self.guideNet+".linkedNode", force=True)
+            cmds.addAttr(self.toStaticHookGrp, longName="net", attributeType="message")
+            cmds.connectAttr(self.guideNet+".message", self.toStaticHookGrp+".net", force=True)
+            cmds.lockNode(self.guideNet, lock=True)
 
 
     def renameUnitConversion(self, unitConversionList=None, *args):

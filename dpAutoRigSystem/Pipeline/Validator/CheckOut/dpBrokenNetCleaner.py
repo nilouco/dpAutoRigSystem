@@ -8,7 +8,7 @@ TITLE = "v046_brokenNetCleaner"
 DESCRIPTION = "v047_brokenNetCleanerDesc"
 ICON = "/Icons/dp_brokenNetCleaner.png"
 
-DP_BROKENNETCLEANER_VERSION = 1.3
+DP_BROKENNETCLEANER_VERSION = 1.4
 
 
 class BrokenNetCleaner(dpBaseActionClass.ActionStartClass):
@@ -56,6 +56,9 @@ class BrokenNetCleaner(dpBaseActionClass.ActionStartClass):
                 elif cmds.objExists(item+".follicle"): #rivet
                     if not cmds.listConnections(item+".follicle", source=True, destination=False):
                         self.cleanUpNetwork(item)
+                elif cmds.objExists(item+".linkedNode"): #guide
+                    if not cmds.listConnections(item+".linkedNode", source=True, destination=False):
+                        self.cleanUpNetwork(item)
         else:
             self.notFoundNodes()
         # --- validator code --- end
@@ -75,6 +78,7 @@ class BrokenNetCleaner(dpBaseActionClass.ActionStartClass):
             self.resultOkList.append(False)
         else: #fix
             try:
+                cmds.lockNode(item, lock=False)
                 cmds.delete(item)
                 cmds.select(clear=True)
                 self.resultOkList.append(True)
