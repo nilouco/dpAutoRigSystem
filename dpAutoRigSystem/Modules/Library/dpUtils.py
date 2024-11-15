@@ -19,10 +19,11 @@ DP_UTILS_VERSION = 3.1
 
 
 class Utils(object):
-    def __init__(self, *args):
+    def __init__(self, dpUIinst, *args):
         """ Initialize the module class loading variables.
         """
         # define variables
+        self.dpUIinst = dpUIinst
         self.dpOrderList = "dpOrderList"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
         self.progress = False
@@ -264,6 +265,7 @@ class Utils(object):
                     cmds.delete(allChildrenList)
                 if offset:
                     offsetGrp = cmds.duplicate(zeroGrp, name=transform+'_Offset_Grp')[0]
+                    self.dpUIinst.customAttr.addAttr(0, [offsetGrp]) #dpID
                     cmds.parent(transform, offsetGrp, absolute=True)
                     cmds.parent(offsetGrp, zeroGrp, absolute=True)
                 else:
@@ -272,6 +274,7 @@ class Utils(object):
                     self.addCustomAttr([zeroGrp], self.ignoreTransformIOAttr)
                     if offset:
                         self.addCustomAttr([offsetGrp], self.ignoreTransformIOAttr)
+                self.dpUIinst.customAttr.addAttr(0, [zeroGrp]) #dpID
                 zeroList.append(zeroGrp)
         return zeroList
 
@@ -590,6 +593,7 @@ class Utils(object):
                     cmds.parent(jnt, dup)
                     if not displayBone:
                         cmds.setAttr(dup+".drawStyle", 2) #none
+                    self.dpUIinst.customAttr.addAttr(0, [dup]) #dpID
                     resultList.append(dup)
         return resultList
 
@@ -1028,20 +1032,20 @@ class Utils(object):
         return pathFile
 
 
-    def dpCreateValidatorPreset(self, dpUIinst):
+    def dpCreateValidatorPreset(self, *args):
         """ Creates a json file as a Validator Preset and returns it.
         """
         resultString = None
-        validatorsList = dpUIinst.checkInInstanceList + dpUIinst.checkOutInstanceList + dpUIinst.checkAddOnsInstanceList
+        validatorsList = self.dpUIinst.checkInInstanceList + self.dpUIinst.checkOutInstanceList + self.dpUIinst.checkAddOnsInstanceList
         if validatorsList:
             resultDialog = cmds.promptDialog(
-                                                title=dpUIinst.lang['i129_createPreset'],
-                                                message=dpUIinst.lang['i130_presetName'],
-                                                button=[dpUIinst.lang['i131_ok'], dpUIinst.lang['i132_cancel']],
-                                                defaultButton=dpUIinst.lang['i131_ok'],
-                                                cancelButton=dpUIinst.lang['i132_cancel'],
-                                                dismissString=dpUIinst.lang['i132_cancel'])
-            if resultDialog == dpUIinst.lang['i131_ok']:
+                                                title=self.dpUIinst.lang['i129_createPreset'],
+                                                message=self.dpUIinst.lang['i130_presetName'],
+                                                button=[self.dpUIinst.lang['i131_ok'], self.dpUIinst.lang['i132_cancel']],
+                                                defaultButton=self.dpUIinst.lang['i131_ok'],
+                                                cancelButton=self.dpUIinst.lang['i132_cancel'],
+                                                dismissString=self.dpUIinst.lang['i132_cancel'])
+            if resultDialog == self.dpUIinst.lang['i131_ok']:
                 resultName = cmds.promptDialog(query=True, text=True)
                 resultName = resultName[0].upper()+resultName[1:]
                 author = getpass.getuser()
@@ -1292,7 +1296,7 @@ class Utils(object):
 
             Example:
                 self.utils.setProgress(messageName, titleName, 20, addOne=False)
-                dpUIinst.utils.setProgress(doingName+': '+backWheelName)
+                self.dpUIinst.utils.setProgress(doingName+': '+backWheelName)
 
             Returns the progress: 
                 True if the progressWindow is running

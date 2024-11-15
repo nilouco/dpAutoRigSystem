@@ -301,10 +301,6 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            try:
-                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
-            except:
-                hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             # dynamic:
@@ -351,7 +347,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
@@ -722,36 +718,12 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # work with main fk controllers
                 if cmds.getAttr(self.base+".mainControls"):
                     self.addFkMainCtrls(side, self.fkCtrlList)
-                
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef, name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp, name=side+self.userGuideName+"_Scalable_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.ikStaticDataGrp, ikMainLocGrp, name=side+self.userGuideName+"_Static_Grp")
-                
+                self.hookSetup(side, [self.fkZeroGrpList[0], self.ikCtrlGrp, self.origFromList[0], self.worldRef], [self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikClusterGrp], [self.ikStaticDataGrp, ikMainLocGrp])
                 # dynamic
                 if self.addDynamic:
                     self.createDynamicChain(side+self.userGuideName)
                     cmds.xform(self.toCtrlHookGrp, pivots=cmds.xform(self.ikCtrlMain, worldSpace=True, rotatePivot=True, query=True))
-
-                # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
-                cmds.parent(loc, self.toStaticHookGrp, absolute=True)
-                cmds.setAttr(loc+".visibility", 0)
-                self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-                # add hook attributes to be read when rigging integrated modules:
-                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
-                # add module type counter value
-                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
-                self.hookSetup()
-                if hideJoints:
-                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(self.base, side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)

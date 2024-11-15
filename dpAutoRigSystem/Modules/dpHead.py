@@ -483,10 +483,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            try:
-                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
-            except:
-                hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             self.addFlip = self.getModuleAttr("flip")
@@ -535,7 +531,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
             for s, side in enumerate(sideList):
                 self.neckLocList, self.neckCtrlList, self.neckJointList = [], [], []
@@ -1054,25 +1050,9 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ctrls.setStringAttrFromList(self.lowerLipCtrl, lipCalibrationList)
                 
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(self.zeroNeckCtrlList[0], self.zeroCtrlList[2], self.zeroCtrlList[8], self.zeroCtrlList[9], name=side+self.userGuideName+"_Control_Grp")
+                self.hookSetup(side, [self.zeroNeckCtrlList[0], self.zeroCtrlList[2], self.zeroCtrlList[8], self.zeroCtrlList[9]], [self.neckJointList[0]], [self.worldRef])
                 if self.addCorrective:
                     cmds.parent(self.correctiveCtrlsGrp, self.toCtrlHookGrp)
-                self.toScalableHookGrp = cmds.group(self.neckJointList[0], name=side+self.userGuideName+"_Scalable_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, self.worldRef, name=side+self.userGuideName+"_Static_Grp")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
-                # add module type counter value
-                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
-                # add hook attributes to be read when rigging integrated modules:
-                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-                self.hookSetup()
-                if hideJoints:
-                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 
                 # head deformer
                 if cmds.getAttr(self.moduleGrp+".deformer"):

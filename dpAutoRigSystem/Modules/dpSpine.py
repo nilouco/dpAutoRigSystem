@@ -169,10 +169,6 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            try:
-                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
-            except:
-                hideJoints = 1
             self.currentStyle = cmds.getAttr(self.moduleGrp+".style")
             # start as no having mirror:
             sideList = [""]
@@ -209,7 +205,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # naming main controls:
             hipsName  = self.dpUIinst.lang['c100_bottom']
             chestName = self.dpUIinst.lang['c099_top']
@@ -399,11 +395,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.parentConstraint(self.hipsBCtrl, downCluster, maintainOffset=True, name=downCluster+"_PaC")
                 cmds.parentConstraint(self.chestBCtrl, upCluster, maintainOffset=True, name=upCluster+"_PaC")
                 # organize a group of clusters:
-                self.toScalableHookGrp = cmds.group(name=side+self.userGuideName+"_Scalable_Grp", empty=True)
-                self.aClusterGrp.append(self.toScalableHookGrp)
-                if hideJoints:
-                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
-                cmds.parent(downCluster, upCluster, self.toScalableHookGrp, relative=True)
+                spineClustersGrp = cmds.group(name=side+self.userGuideName+"_Clusters_Grp", empty=True)
+                cmds.parent(downCluster, upCluster, spineClustersGrp, relative=True)
                 # make ribbon joints groups scalable:
                 middleScaleYMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_MiddleScaleY_MD")
                 cmds.setAttr(middleScaleYMD+".operation", 2)
@@ -413,7 +406,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for r, rbnJntGrp in enumerate(rbnJointGrpList):
                     sizeGrpList.append(cmds.group(rbnJntGrp, name=rbnJntGrp.replace("_Grp", "_Size_Grp")))
                     scaleGrp = cmds.group(sizeGrpList[-1], name=rbnJntGrp.replace("_Grp", "_Scale_Grp"))
-                    cmds.scaleConstraint(self.toScalableHookGrp, scaleGrp, maintainOffset=True, name=scaleGrp+"_ScC")
+                    cmds.scaleConstraint(spineClustersGrp, scaleGrp, maintainOffset=True, name=scaleGrp+"_ScC")
                     if ((r > 0) and (r < (len(rbnJointGrpList) - 1))):
                         self.utils.addCustomAttr([scaleGrp], self.utils.ignoreTransformIOAttr)
                         self.ctrls.directConnect(scaleGrp, rbnJntGrp, ['sx', 'sy', 'sz'])
@@ -495,7 +488,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     nParentValue = (n) / float(self.nJoints-1)
                     cmds.setAttr(self.parentConst+"."+self.hipsBCtrl+"W0", 1-nParentValue)
                     cmds.setAttr(self.parentConst+"."+self.chestBCtrl+"W1", nParentValue)
-                    cmds.parent(middleCluster, self.toScalableHookGrp, relative=True)
+                    cmds.parent(middleCluster, spineClustersGrp, relative=True)
                     # add originedFrom attribute to this middle ctrl:
                     middleOrigGrp = cmds.group(empty=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_OrigFrom_Grp")
                     self.utils.originedFrom(objName=middleOrigGrp, attrString=middleLocGuide)
@@ -553,25 +546,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 currentVV = cmds.getAttr(rbnMD+'.outputX')
                 cmds.setAttr(rbnVVMD+'.input1X', currentVV)
                 # organize groups:
-                self.toStaticHookGrp = cmds.group(name=side+self.userGuideName+"_Static_Grp", empty=True)
-                self.toCtrlHookGrp = cmds.group(name=side+self.userGuideName+"_Control_Grp", empty=True)
-                cmds.parent(self.hipsACtrlZero, self.toCtrlHookGrp, relative=True)
-                cmds.parent(self.toScalableHookGrp, side+self.userGuideName+"_Rbn_RibbonJoint_Grp", self.toCtrlHookGrp, arcLen, self.toStaticHookGrp, relative=True)
-                cmds.parent(baseJnt, tipJnt, self.toStaticHookGrp)
-                if hideJoints:
-                    cmds.setAttr(side+self.userGuideName+"_Rbn_RibbonJoint_Grp.visibility", 0)
-                # add hook attributes to be read when rigging integrated modules:
-                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
-                # add module type counter value
-                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
-                self.hookSetup()
+                self.hookSetup(side, [self.hipsACtrlZero], [spineClustersGrp], [side+self.userGuideName+"_Rbn_RibbonJoint_Grp", arcLen, baseJnt, tipJnt])
+                self.aClusterGrp.append(self.toScalableHookGrp)
                 # lockHide scale of up and down controls:
                 self.ctrls.setLockHide([self.hipsACtrl, self.hipsBCtrl, self.chestACtrl, self.chestBCtrl, self.hipsFkCtrl, self.chestFkCtrl], ['sx', 'sy', 'sz'])
                 # delete duplicated group for side (mirror):

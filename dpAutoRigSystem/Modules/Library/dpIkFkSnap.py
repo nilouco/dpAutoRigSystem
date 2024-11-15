@@ -12,10 +12,9 @@
 # importing libraries:
 from maya import cmds
 from maya.api import OpenMaya
-from ...Extras import dpCustomAttr
 import math
 
-DP_IKFKSNAP_VERSION = 2.1
+DP_IKFKSNAP_VERSION = 2.2
 
 
 
@@ -38,8 +37,7 @@ class IkFkSnapClass(object):
         # store data
         self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
         self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
-        self.customAttr = dpCustomAttr.CustomAttr(dpUIinst, ui=False, verbose=False)
-        self.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
+        dpUIinst.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
         self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
         self.storeIkFkSnapData()
         if dpDev:

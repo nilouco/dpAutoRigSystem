@@ -724,10 +724,6 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            try:
-                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
-            except:
-                hideJoints = 1
             # articulation joint:
             self.addArticJoint = self.getArticulation()
             # corrective network:
@@ -768,7 +764,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
+            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
                 attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
@@ -1451,29 +1447,14 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", self.ikExtremCtrl+".disableIkFkRevOutputX", force=True)
 
                 # create a masterModuleGrp to be checked if this rig exists:
+                ctrlHookList = [self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef]
                 if self.limbTypeName == ARM:
                     # (James) not implementing the forearm control if we use ribbons (yet)
-                    if self.getHasBend() == True:
-                        # do not use forearm control
-                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef, name=side+self.userGuideName+"_Control_Grp")
-                    else:
+                    if not self.getHasBend():
                         # use forearm control
-                        self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, forearmZero, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef, name=side+self.userGuideName+"_Control_Grp")
-                else:
-                    self.toCtrlHookGrp = cmds.group(self.zeroFkCtrlGrp, self.zeroCornerGrp, self.ikExtremCtrlZero, self.cornerOrientGrp, distBetGrp, self.origFromList[0], self.origFromList[1], self.ikFkBlendGrpToRevFoot, self.worldRef, self.masterCtrlRef, self.rootCtrlRef, name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(name=side+self.userGuideName+"_Scalable_Grp", empty=True)
-                cmds.parent(self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1], self.toScalableHookGrp)
-                self.aScalableGrps.append(self.toScalableHookGrp)
-                cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp+"_PaC")
-                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, ikHandleGrp, ikHandleNotStretchGrp, ikHandleACGrp, name=side+self.userGuideName+"_Static_Grp")
-
-                # arrange poleVector locators hierarchy
-                cmds.parent(poleVectorLocatorsGrp, self.toStaticHookGrp)
-                cmds.parentConstraint(self.toCtrlHookGrp, poleVectorAimLoc, skipRotate=["x", "y", "z"], maintainOffset=True, name=poleVectorAimLoc+"_PaC")
+                        ctrlHookList.append(forearmZero)
+                self.hookSetup(side, ctrlHookList, [self.skinJointList[0], self.ikJointList[0], self.fkJointList[0], self.ikNSJointList[0], self.ikACJointList[1]], [ikHandleGrp, ikHandleNotStretchGrp, ikHandleACGrp, poleVectorLocatorsGrp])
                 
-                # clean-up before joint, it isn't used to autoClavicle:
-                cmds.delete(self.ikACJointList[0])
-
                 # Ribbon feature by James do Carmo, thanks!
                 loadedRibbon = False
                 # (James) add bend to limb
@@ -1599,7 +1580,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     else:
                         cmds.setAttr(acIkUpLoc+".translateZ", 1)
                     cmds.delete(cmds.pointConstraint(self.fkCtrlList[1], acLocGrp, maintainOffset=False))
-                    cmds.parent(acRefMainLoc, acLocGrp, self.toScalableHookGrp)
+                    cmds.parent([acRefMainLoc, acLocGrp], self.toScalableHookGrp)
                     cmds.delete(cmds.pointConstraint(self.ikACJointList[1], acRefMainLoc, maintainOffset=False))
                     cmds.parentConstraint(self.ikACJointList[1], acRefMainLoc, skipTranslate=["x", "y", "z"], maintainOffset=False, name=acRefMainLoc+"_PaC")
                     self.ctrls.directConnect(acRefMainLoc, acIkMainLoc, ['rx', 'ry', 'rz']) #shoulder rotate
@@ -1807,6 +1788,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if correctionNetInputValue > 0:
                     cmds.setAttr(self.cornerCorrectiveNet+".inputEnd", correctionNetInputValue+110)
 
+                # add hook attributes to be read when rigging integrated modules:
+                cmds.parentConstraint(self.toCtrlHookGrp, self.toScalableHookGrp, maintainOffset=True, name=self.toScalableHookGrp+"_PaC")
+                cmds.parentConstraint(self.toCtrlHookGrp, poleVectorAimLoc, skipRotate=["x", "y", "z"], maintainOffset=True, name=poleVectorAimLoc+"_PaC")
+                self.aScalableGrps.append(self.toScalableHookGrp)
+
                 # add main articulationJoint:
                 if self.addArticJoint:
                     if self.addCorrective:
@@ -1984,22 +1970,8 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.extremJntList.append(self.skinJointList[-2])
                 self.integrateOrigFromList.append(self.origFromList)
                 
-                # add hook attributes to be read when rigging integrated modules:
-                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                self.utils.addHook(objName=self.skinJointList[len(self.skinJointList) - 1],
-                              hookType='revFootExtremJointHook')
-                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
-                # add module type counter value
-                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
-                self.hookSetup()
-                if hideJoints:
-                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
+                # clean-up before joint, it isn't used to autoClavicle:
+                cmds.delete(self.ikACJointList[0])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.zeroFkCtrlGrp, self.masterCtrlRef, self.rootCtrlRef, self.shoulderRefGrp, self.ikStretchExtremLoc, self.ikExtremCtrlGrp, self.ikExtremCtrlOrientGrp, self.ikHandleToRFGrp, self.cornerGrp, self.cornerOrientGrp, ikHandleACGrp, self.clavicleCtrlGrp, acLocGrp], self.utils.ignoreTransformIOAttr)

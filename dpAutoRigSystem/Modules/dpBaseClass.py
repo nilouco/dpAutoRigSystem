@@ -10,7 +10,7 @@ class RigType(object):
     quadruped = "quadruped"
     default = "unknown" #Support old guide system
 
-DP_STARTCLASS_VERSION = 2.3
+DP_STARTCLASS_VERSION = 2.4
 
 
 class StartClass(object):
@@ -462,13 +462,40 @@ class StartClass(object):
             cmds.select(clear=True)
     
 
-    def hookSetup(self, *args):
-        """ Add message attributes to map hooked groups for the rigged module.
+    def hookSetup(self, side, ctrlList, scalableList, staticList=None, *args):
+        """ Generate the hook setup to find lists of controllers, scalable and static groups.
+            Add message attributes to map hooked groups for the rigged module.
         """
+        # create a masterModuleGrp to be checked if this rig exists:
+        self.toCtrlHookGrp     = cmds.group(ctrlList, name=side+self.userGuideName+"_Control_Grp")
+        self.toScalableHookGrp = cmds.group(scalableList, name=side+self.userGuideName+"_Scalable_Grp")
+        self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
+        if staticList:
+            cmds.parent(staticList, self.toStaticHookGrp)
+        # create a locator in order to avoid delete static group
+        loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
+        self.dpUIinst.customAttr.addAttr(0, [self.toCtrlHookGrp, self.toScalableHookGrp, self.toStaticHookGrp, loc]) #dpID
+        cmds.setAttr(loc+".visibility", 0)
+        cmds.parent(loc, self.toStaticHookGrp, absolute=True)
+        self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
+        # add hook attributes to be read when rigging integrated modules:
+        self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
+        self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
+        self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
+        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
+        cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
+        cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
+        cmds.setAttr(self.toStaticHookGrp+".dpAR_type", self.guideModuleName, type="string")
+        # add module type counter value
+        cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
+        cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', self.dpAR_count)
+        # message attributes
         cmds.addAttr(self.toStaticHookGrp, longName="controlHookGrp", attributeType="message")
         cmds.addAttr(self.toStaticHookGrp, longName="scalableHookGrp", attributeType="message")
         cmds.connectAttr(self.toCtrlHookGrp+".message", self.toStaticHookGrp+".controlHookGrp", force=True)
         cmds.connectAttr(self.toScalableHookGrp+".message", self.toStaticHookGrp+".scalableHookGrp", force=True)
+        cmds.setAttr(self.toScalableHookGrp+".visibility", self.getJointsVisibility())
+        cmds.setAttr(self.toStaticHookGrp+".visibility", self.getJointsVisibility())
 
     
     def integratingInfo(self, *args):
@@ -635,6 +662,12 @@ class StartClass(object):
 
     def getModuleAttr(self, moduleAttr, *args):
         return cmds.getAttr(self.moduleGrp+"."+moduleAttr)
+    
+    def getJointsVisibility(self, *args):
+        try:
+            return cmds.checkBox('displayJointsCB', query=True, value=True)
+        except:
+            return 1
 
     
     # Setters:

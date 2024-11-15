@@ -421,6 +421,7 @@ class ControlClass(object):
             cmds.setAttr(optCtrlTxt+".template", 1)
             cmds.setAttr(optCtrlTxt+".tx", -0.72*r)
             cmds.setAttr(optCtrlTxt+".ty", 1.1*r)
+            self.dpUIinst.customAttr.addAttr(0, [optCtrlTxt]) #dpID
         except:
             # it will pass if we don't able to find the font to create the text
             pass

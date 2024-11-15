@@ -172,7 +172,7 @@
     "i006_aboutDesc"            : "\nSobre dpAutoRig System:\n\nEsse script é um programa em Python para\nautomatizar o processo de Rigging.\n\nEle foi escrito para ajudar você a deselvolver\nvários tipos de Rigs por você mesmo.\nSua arquitetura é modular, multilingue e orientada à objeto\nque significa que você pode criar qualquer tipo de Rig em partes\ne combinar como quiser...\n\nSe você tiver qualquer sugestão ou comentario, por favor entre em contato.\nEu espero que goste   :)\n\nEle é GRATUITO!!!",
     "i007_authorDesc"           : "\nAutor: Danilo Pinheiro (nilouco)\n\nÉ uma pessoa simples que gosta do 3D\ne realmente quer o melhor para todos...\n\nInformações para contato:\ne-mail: nilouco@gmail.com\nportfolio: https://nilouco.blogspot.com\n\nPor favor, qualquer feedback será bem vindo   :)\n\nMuito Obrigado!",
     "i008_errorUI"              : "Não pode carregar a janela dpAutoRig UI..., por favor tente salvar a pasta dpAutoRigSystem em um diretorio do MAYA_PATH e verifique se você não mudou nenhum arquivo.",
-    "i009_hideJointsCB"         : "Esconder os joints após o Rig.",
+    "i009_displayJointsCB"      : "Mostrar os joints após o Rig.",
     "i010_integrateCB"          : "Integrar todos os modulos juntos.",
     "i011_editSelected"         : "Editar Selecionado",
     "i012_idiomsDesc"           : "\nInformações de idiomas:\n\nEsse script tem opções de multiplas linguagens.\nBasta você escolher no menu a linguagem desejada.\nPara criar uma linguagem nova,\nvocê pode se basear nos arquivos .json\nno diretorio Languages,\nfaça uma copia renomeando para sua lingua e\nrealise a tradução dos valores (da direita) do dicionário\n(mas não mude as chaves da esquerda).\n\nOu simplesmente use o dpTranslate no menu Create.",

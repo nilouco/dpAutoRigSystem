@@ -204,9 +204,9 @@ class DP_AutoRig_UI(object):
         self.dpData = DPDATA
         self.dpLog = DPLOG
         self.optionCtrl = None
-        self.utils = dpUtils.Utils()
+        self.utils = dpUtils.Utils(self)
         self.pipeliner = dpPipeliner.Pipeliner(self)
-        self.packager = dpPackager.Packager()
+        self.packager = dpPackager.Packager(self)
         
         try:
             # store all UI elements in a dictionary:
@@ -478,12 +478,12 @@ class DP_AutoRig_UI(object):
         self.allUIs["prefixTextField"] = cmds.textField('prefixTextField', text="", parent= self.allUIs["prefixLayout"], changeCommand=self.setPrefix)
         self.allUIs["prefixText"] = cmds.text('prefixText', align='left', label=self.lang['i003_prefix'], parent=self.allUIs["prefixLayout"])
         cmds.setParent(self.allUIs["rigOptionsLayout"])
-        self.allUIs["hideJointsCB"] = cmds.checkBox('hideJointsCB', label=self.lang['i009_hideJointsCB'], align='left', v=0, parent=self.allUIs["rigOptionsLayout"])
-        self.allUIs["hideGuideGrpCB"] = cmds.checkBox('hideGuideGrpCB', label=self.lang['i183_hideGuideGrp'], align='left', v=1, changeCommand=self.displayGuideGrp, parent=self.allUIs["rigOptionsLayout"])
-        self.allUIs["integrateCB"] = cmds.checkBox('integrateCB', label=self.lang['i010_integrateCB'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
-        self.allUIs["defaultRenderLayerCB"] = cmds.checkBox('defaultRenderLayerCB', label=self.lang['i004_defaultRL'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
-        self.allUIs["colorizeCtrlCB"] = cmds.checkBox('colorizeCtrlCB', label=self.lang['i065_colorizeCtrl'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
-        self.allUIs["addAttrCB"] = cmds.checkBox('addAttrCB', label=self.lang['i066_addAttr'], align='left', v=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["displayJointsCB"] = cmds.checkBox('displayJointsCB', label=self.lang['i009_displayJointsCB'], align='left', value=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["hideGuideGrpCB"] = cmds.checkBox('hideGuideGrpCB', label=self.lang['i183_hideGuideGrp'], align='left', value=1, changeCommand=self.displayGuideGrp, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["integrateCB"] = cmds.checkBox('integrateCB', label=self.lang['i010_integrateCB'], align='left', value=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["defaultRenderLayerCB"] = cmds.checkBox('defaultRenderLayerCB', label=self.lang['i004_defaultRL'], align='left', value=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["colorizeCtrlCB"] = cmds.checkBox('colorizeCtrlCB', label=self.lang['i065_colorizeCtrl'], align='left', value=1, parent=self.allUIs["rigOptionsLayout"])
+        self.allUIs["addAttrCB"] = cmds.checkBox('addAttrCB', label=self.lang['i066_addAttr'], align='left', value=1, parent=self.allUIs["rigOptionsLayout"])
         self.allUIs["degreeLayout"] = cmds.rowColumnLayout('degreeLayout', numberOfColumns=2, columnWidth=[(1, 100), (2, 250)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=self.allUIs["rigOptionsLayout"])
         # option Degree:
         self.degreeOptionMenu = cmds.optionMenu("degreeOptionMenu", label='', changeCommand=self.changeOptionDegree, parent=self.allUIs["degreeLayout"])
@@ -926,7 +926,7 @@ class DP_AutoRig_UI(object):
         if type == "controls":
             newPresetString = self.ctrls.dpCreateControlsPreset()
         elif type == "validator":
-            newPresetString = self.utils.dpCreateValidatorPreset(self)
+            newPresetString = self.utils.dpCreateValidatorPreset()
         if newPresetString:
             # create json file:
             resultDic = self.createJsonFile(newPresetString, presetDir, '_preset')
@@ -2043,6 +2043,7 @@ class DP_AutoRig_UI(object):
             cmds.addAttr(self.masterGrp, longName=sAttrName, attributeType="message")
         if not cmds.listConnections(self.masterGrp+"."+sAttrName, destination=False, source=True):
             cmds.connectAttr(sGrpName+".message", self.masterGrp+"."+sAttrName, force=True)
+        self.customAttr.addAttr(0, [sGrpName]) #dpID
         return sGrpName
 
 
@@ -2080,6 +2081,7 @@ class DP_AutoRig_UI(object):
                 cmds.rename(sAllGrp, sAllGrp+"_Old")
             #Create Master Grp
             self.masterGrp = cmds.createNode("transform", name=self.prefix+sAllGrp)
+            self.customAttr.addAttr(0, [self.masterGrp]) #dpID
             # adding All_Grp attributes
             cmds.addAttr(self.masterGrp, longName=MASTER_ATTR, attributeType="bool")
             cmds.addAttr(self.masterGrp, longName="dpAutoRigSystem", dataType="string")
@@ -2235,8 +2237,10 @@ class DP_AutoRig_UI(object):
         self.baseRootJntGrp = self.prefix+"BaseRoot_Joint_Grp"
         if not cmds.objExists(self.baseRootJnt):
             self.baseRootJnt = cmds.createNode("joint", name=self.prefix+"BaseRoot_Jnt")
+            self.customAttr.addAttr(0, [self.baseRootJnt]) #dpID
             if not cmds.objExists(self.baseRootJntGrp):
                 self.baseRootJntGrp = cmds.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
+                self.customAttr.addAttr(0, [self.baseRootJntGrp]) #dpID
             cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
             cmds.parent(self.baseRootJntGrp, self.scalableGrp)
             cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")

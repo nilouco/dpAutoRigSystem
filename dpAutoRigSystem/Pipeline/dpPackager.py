@@ -24,8 +24,8 @@ DP_PACKAGER_VERSION = 1.9
 
 class Packager(object):
 
-    def __init__(self) -> None:
-        self.utils = dpUtils.Utils()
+    def __init__(self, dpUIinst) -> None:
+        self.utils = dpUtils.Utils(dpUIinst)
         self.callback = None
     
     

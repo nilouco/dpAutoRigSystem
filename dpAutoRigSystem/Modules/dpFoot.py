@@ -130,10 +130,6 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            try:
-                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
-            except:
-                hideJoints = 1
             # create lists to be integrated:
             # start as no having mirror:
             sideList = [""]
@@ -170,7 +166,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type
-            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
+            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
             for s, side in enumerate(sideList):
                 # redeclaring variables:
@@ -469,12 +465,10 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 for rfCtrl in showHideCtrlList:
                     rfCtrlShape = cmds.listRelatives(rfCtrl, children=True, type='nurbsCurve')[0]
                     cmds.connectAttr(mdNode+".outputX", rfCtrlShape+".visibility", force=True)
-                
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp = cmds.group(self.footCtrlZeroList[0], name=side+self.userGuideName+"_Control_Grp")
-                self.revFootCtrlGrpFinalList.append(self.toCtrlHookGrp)
-                
-                self.toScalableHookGrp = cmds.createNode("transform", name=side+self.userGuideName+"_Scalable_Grp")
+                tempScalableHookGrp = cmds.createNode("transform", name=side+self.userGuideName+"_TEMP_Grp")
+                self.hookSetup(side, [self.footCtrlZeroList[0]], [tempScalableHookGrp])
+                cmds.delete(tempScalableHookGrp)
                 mWorldFoot = cmds.getAttr(self.footJnt+".worldMatrix")
                 cmds.xform(self.toScalableHookGrp, matrix=mWorldFoot, worldSpace=True)
                 cmds.parent(self.footJnt, self.toScalableHookGrp, absolute=True)
@@ -483,27 +477,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.footJnt+".jointOrientY", 0)
                 cmds.setAttr(self.footJnt+".jointOrientZ", 0)
                 self.aScalableGrp.append(self.toScalableHookGrp)
-                
-                self.toStaticHookGrp = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
-                # add module type counter value
-                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
-                # create a locator in order to avoid delete static group
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
-                cmds.parent(loc, self.toStaticHookGrp, absolute=True)
-                cmds.setAttr(loc+".visibility", 0)
-                self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-                # add hook attributes to be read when rigging integrated modules:
-                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-                self.hookSetup()
-                if hideJoints:
-                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
+                self.revFootCtrlGrpFinalList.append(self.toCtrlHookGrp)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp], self.utils.ignoreTransformIOAttr)

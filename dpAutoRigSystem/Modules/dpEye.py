@@ -475,10 +475,6 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            try:
-                hideJoints = cmds.checkBox('hideJointsCB', query=True, value=True)
-            except:
-                hideJoints = 1
             # start as no having mirror:
             sideList = [""]
             # analisys the mirror module:
@@ -521,7 +517,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # joint labelling:
                 jointLabelAdd = 0
             # store the number of this guide by module type:
-            dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
+            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # create lists to export:
             self.eyeScaleGrpList, self.irisCtrlList, self.pupilCtrlList = [], [], []
             self.hasIris = False
@@ -745,33 +741,11 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.pupilCtrl = self.createIrisPupilSetup(s, side, PUPIL, 'i081_pupil', s+jointLabelAdd)
                     self.pupilCtrlList.append(self.pupilCtrl)
                     self.hasPupil = True
-                    
                 # create a masterModuleGrp to be checked if this rig exists:
-                self.toCtrlHookGrp     = cmds.group(eyeZeroList[0], name=side+self.userGuideName+"_Control_Grp")
-                self.toScalableHookGrp = cmds.group(self.jxt, self.eyeScaleGrp, name=side+self.userGuideName+"_Scalable_Grp")
-                self.toStaticHookGrp   = cmds.group(self.toCtrlHookGrp, self.toScalableHookGrp, name=side+self.userGuideName+"_Static_Grp")
+                self.hookSetup(side, [eyeZeroList[0]], [self.jxt, self.eyeScaleGrp])
                 if s == 0:
                     cmds.parent(self.eyeGrp, self.toCtrlHookGrp)
                     cmds.parent(self.upLocGrp, self.toScalableHookGrp)
-                # create a locator in order to avoid delete static group:
-                loc = cmds.spaceLocator(name=side+self.userGuideName+"_DO_NOT_DELETE_PLEASE_Loc")[0]
-                cmds.parent(loc, self.toStaticHookGrp, absolute=True)
-                cmds.setAttr(loc+".visibility", 0)
-                self.ctrls.setLockHide([loc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
-                # add hook attributes to be read when rigging integrated modules:
-                self.utils.addHook(objName=self.toCtrlHookGrp, hookType='ctrlHook')
-                self.utils.addHook(objName=self.toScalableHookGrp, hookType='scalableHook')
-                self.utils.addHook(objName=self.toStaticHookGrp, hookType='staticHook')
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_name", dataType="string")
-                cmds.addAttr(self.toStaticHookGrp, longName="dpAR_type", dataType="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_name", self.userGuideName, type="string")
-                cmds.setAttr(self.toStaticHookGrp+".dpAR_type", CLASS_NAME, type="string")
-                # add module type counter value
-                cmds.addAttr(self.toStaticHookGrp, longName='dpAR_count', attributeType='long', keyable=False)
-                cmds.setAttr(self.toStaticHookGrp+'.dpAR_count', dpAR_count)
-                self.hookSetup()
-                if hideJoints:
-                    cmds.setAttr(self.toScalableHookGrp+".visibility", 0)
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.eyeGrp, self.upLocGrp, self.lUpGrpLoc, self.eyeScaleGrp], self.utils.ignoreTransformIOAttr)
