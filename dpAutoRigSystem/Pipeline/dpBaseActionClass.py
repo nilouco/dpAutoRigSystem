@@ -91,7 +91,8 @@ class ActionStartClass(object):
         self.updateButtonColors(True) #running
         cmds.refresh()
         if self.verbose:
-            self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
+            titleText = self.getTitle()
+            self.utils.setProgress(titleText+': '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
 
 
     def resetButtonColors(self, *args):
@@ -139,15 +140,25 @@ class ActionStartClass(object):
                         cmds.button(self.secondBT, edit=True, backgroundColor=CHECKED_COLOR)
     
 
+    def getTitle(self, *args):
+        """ Check if there's a key in the dictionary with the current title.
+            Returns its value or the current title text only.
+        """
+        titleText = self.title
+        if self.title in self.dpUIinst.lang.keys():
+            titleText = self.dpUIinst.lang[self.title]
+        return titleText
+
+
     def reportLog(self, *args):
         """ Prepare the log output text and data dictionary for this checked validator/rebuilder.
         """
         # texts
         nameText = self.dpUIinst.lang['m006_name']
-        titleText = self.dpUIinst.lang[self.title]
         modeText = self.dpUIinst.lang['v003_mode']
         foundIssueText = self.dpUIinst.lang['v006_foundIssue']
         everythingOkText = self.dpUIinst.lang['v007_allOk']
+        titleText = self.getTitle()
         # header
         logText = "\n"+nameText+": "+titleText+"\n"
         # mode

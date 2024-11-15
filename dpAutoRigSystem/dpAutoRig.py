@@ -1406,7 +1406,7 @@ class DP_AutoRig_UI(object):
                     self.checkAddOnsInstanceList.append(validatorInstance)
                     if validatorInstance.customName:
                         cmds.checkBox(validatorInstance.actionCB, edit=True, label=validatorInstance.customName)
-                        validatorInstance.title = validatorInstance.customName
+                        #validatorInstance.title = validatorInstance.customName
             elif guideDir == REBUILDER.replace("/", ".") or guideDir == SOURCE.replace("/", ".") or guideDir == SETUP.replace("/", ".") or guideDir == DEFORMING.replace("/", ".") or guideDir == CUSTOM.replace("/", "."):
                 rebuilderInstance = self.initExtraModule(guideModule, guideDir)
                 rebuilderInstance.actionCB = cmds.checkBox(label=title, value=True, changeCommand=rebuilderInstance.changeActive)
