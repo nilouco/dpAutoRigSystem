@@ -710,7 +710,7 @@ class LayoutClass(object):
                 cmds.connectAttr(self.moduleGrp+'.worldMatrix', decomposeMatrix+'.inputMatrix', force=True)
                 
                 # connect original guide base decomposeMatrix node output transformations to the mirror guide base node:
-                axisList = ['X', 'Y', 'Z']
+                axisList = ["X", "Y", "Z"]
                 for axis in axisList:
                     cmds.connectAttr(decomposeMatrix+'.outputTranslate'+axis, self.previewMirrorGuide+'.translate'+axis, force=True)
                     cmds.connectAttr(decomposeMatrix+'.outputRotate'+axis, self.previewMirrorGuide+'.rotate'+axis, force=True)

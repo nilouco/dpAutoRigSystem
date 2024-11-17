@@ -170,42 +170,6 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
             self.currentStyle = cmds.getAttr(self.moduleGrp+".style")
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_']
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        for axis in self.mirrorAxis:
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale' + axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else:  # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # naming main controls:
             hipsName  = self.dpUIinst.lang['c100_bottom']
             chestName = self.dpUIinst.lang['c099_top']
@@ -215,7 +179,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 hipsName  = self.dpUIinst.lang['c027_hips']
                 chestName = self.dpUIinst.lang['c028_chest']
             # run for all sides
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 attrNameLower = self.utils.getAttrNameLower(side, self.userGuideName)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.radiusGuide = side+self.userGuideName+"_Guide_Base_RadiusCtrl"
@@ -346,8 +310,8 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 tipJnt = cmds.joint(name=side+self.userGuideName+"_"+str(self.nJoints+1).zfill(2)+"_"+self.dpUIinst.lang['c120_tip']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(tipJnt, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(baseJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c106_base'])
-                self.utils.setJointLabel(tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c120_tip'])
+                self.utils.setJointLabel(baseJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c106_base'])
+                self.utils.setJointLabel(tipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c120_tip'])
                 # Base and end controllers:
                 cmds.parentConstraint(self.baseCtrl, baseJnt, maintainOffset=False, name=baseJnt+"_PaC")
                 cmds.scaleConstraint(self.baseCtrl, baseJnt, maintainOffset=True, name=baseJnt+"_ScC")
@@ -355,7 +319,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.scaleConstraint(self.tipCtrl, tipJnt, maintainOffset=True, name=tipJnt+"_ScC")
 
                 # create a simple spine ribbon:
-                returnedRibbonList = self.ctrls.createSimpleRibbon(name=side+self.userGuideName, totalJoints=(self.nJoints-1), jointLabelNumber=(s+jointLabelAdd), jointLabelName=self.userGuideName)
+                returnedRibbonList = self.ctrls.createSimpleRibbon(name=side+self.userGuideName, totalJoints=(self.nJoints-1), jointLabelNumber=(s+self.jointLabelAdd), jointLabelName=self.userGuideName)
                 rbnNurbsPlane = returnedRibbonList[0]
                 rbnNurbsPlaneShape = returnedRibbonList[1]
                 rbnJointGrpList = returnedRibbonList[2]

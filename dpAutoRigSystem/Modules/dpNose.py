@@ -217,51 +217,8 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.aCtrls, self.aLCtrls, self.aRCtrls = [], [], []
             # check if need to add nostril:
             self.addNostril = self.getModuleAttr("nostril")
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [ self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_' ]
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        if not self.addFlip:
-                            for axis in self.mirrorAxis:
-                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                                flipedValue = gotValue*(-2)
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
-                        else:
-                            for axis in self.mirrorAxis:
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else: # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []
@@ -279,7 +236,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
                     self.noseCtrl = self.ctrls.cvControl("id_075_NoseTop", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_cvTopLoc1")
@@ -318,7 +275,7 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if n == 1:
                         if self.addArticJoint:
                             artJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            self.utils.setJointLabel(artJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                             cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
                             cmds.setAttr(artJntList[0]+".segmentScaleCompensate", 0)
                     cmds.select(self.jnt)
@@ -374,9 +331,9 @@ class Nose(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if cmds.objExists(dpARJoint):
                         cmds.addAttr(dpARJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(self.middleJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle'])
-                self.utils.setJointLabel(self.tipJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip'])
-                self.utils.setJointLabel(self.bottomJnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom'])
+                self.utils.setJointLabel(self.middleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+1)+self.dpUIinst.lang['c029_middle'])
+                self.utils.setJointLabel(self.tipJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c120_tip'])
+                self.utils.setJointLabel(self.bottomJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_"%(n+2)+self.dpUIinst.lang['c100_bottom'])
                 self.utils.setJointLabel(self.lSideJnt, 1, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
                 self.utils.setJointLabel(self.rSideJnt, 2, 18, self.userGuideName+"_%02d_"%(n+3)+self.dpUIinst.lang['c121_side'])
                 if self.addNostril:

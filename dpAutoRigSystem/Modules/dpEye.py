@@ -475,49 +475,6 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [ self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_' ]
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
-                            for axis in self.mirrorAxis:
-                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                                flipedValue = gotValue*(-2)
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
-                        else:
-                            for axis in self.mirrorAxis:
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else: # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type:
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # create lists to export:
             self.eyeScaleGrpList, self.irisCtrlList, self.pupilCtrlList = [], [], []
             self.hasIris = False
@@ -525,14 +482,14 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # create the main control:
             self.eyeCtrl = self.ctrls.cvControl("id_010_EyeLookAtMain", self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Ctrl", r=(2.25*self.ctrlRadius), d=self.curveDegree, guideSource=self.guideName+"_JointEnd")
             cmds.addAttr(self.eyeCtrl, longName=self.dpUIinst.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
-            cmds.delete(cmds.parentConstraint(sideList[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
+            cmds.delete(cmds.parentConstraint(self.sideList[0]+self.userGuideName+"_Guide_JointEnd", self.eyeCtrl, maintainOffset=False))
             if self.mirrorAxis != 'off':
                 cmds.setAttr(self.eyeCtrl+".translate"+self.mirrorAxis, 0)
             self.eyeGrp = cmds.group(self.eyeCtrl, name=self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Grp")
             self.utils.zeroOut([self.eyeCtrl])
             self.upLocGrp = cmds.group(name=self.userGuideName+"_UpLoc_Grp", empty=True)
             # run for all sides:
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 cmds.select(clear=True)
                 self.base = side+self.userGuideName+'_Guide_Base'
                 # declare guide:
@@ -546,7 +503,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.subJnt = cmds.joint(name=side+self.userGuideName+"_1_Sub_Jxt", scaleCompensate=False)
                 self.jnt = cmds.joint(name=side+self.userGuideName+"_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_1")
+                self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_1")
                 if s == 1:
                     lEyeFkCtrlData = self.utils.getTransformData(self.fkEyeCtrl)
                 self.fkEyeCtrl = self.ctrls.cvControl("id_014_EyeFk", side+self.userGuideName+"_Fk_Ctrl", r=self.ctrlRadius, d=self.curveDegree, headDef=self.headDefValue, guideSource=self.guideName+"_JointLoc1")
@@ -616,7 +573,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.select(clear=True)
                 self.eyeScaleJnt = cmds.joint(name=side+self.userGuideName+"Scale_1_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.eyeScaleJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                self.utils.setJointLabel(self.eyeScaleJnt, s+jointLabelAdd, 18, self.userGuideName+"Scale_1")
+                self.utils.setJointLabel(self.eyeScaleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"Scale_1")
                 # jointScale position:
                 cmds.delete(cmds.parentConstraint(self.guide, self.eyeScaleJnt, maintainOffset=False))
                 # create endScale joint:
@@ -639,11 +596,11 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # specular joint:
                     self.eyeSpecJnt = cmds.joint(name=side+self.userGuideName+"Specular_1_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.eyeSpecJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.utils.setJointLabel(self.eyeSpecJnt, s+jointLabelAdd, 18, self.userGuideName+"Specular_1")
+                    self.utils.setJointLabel(self.eyeSpecJnt, s+self.jointLabelAdd, 18, self.userGuideName+"Specular_1")
                     # specular joint scale:
                     self.eyeSpecScaleJnt = cmds.joint(name=side+self.userGuideName+"Specular_2_Jnt", scaleCompensate=False)
                     cmds.addAttr(self.eyeSpecScaleJnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.utils.setJointLabel(self.eyeSpecScaleJnt, s+jointLabelAdd, 18, self.userGuideName+"Specular_2")
+                    self.utils.setJointLabel(self.eyeSpecScaleJnt, s+self.jointLabelAdd, 18, self.userGuideName+"Specular_2")
                     cmds.setAttr(self.eyeSpecScaleJnt+".translateZ", self.ctrlRadius)
                     # create endSpecular joint:
                     self.endSpecJoint = cmds.joint(name=side+self.userGuideName+"Specular_JEnd", radius=0.5)
@@ -699,10 +656,10 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.eyelidJxt = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang['c042_eyelid']+"_Jxt", scaleCompensate=False)
                     cmds.delete(cmds.parentConstraint(self.cvLidPivotLoc, self.eyelidJxt, mo=False))
                     cmds.parent(self.eyelidJxt, self.eyeScaleJnt)
-                    self.upperEyelidBaseJxt, self.upperEyelidJnt = self.createEyelidJoints(side, 'c044_upper', "", self.cvUpperEyelidLoc, s+jointLabelAdd)
-                    self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt = self.createEyelidJoints(side, 'c044_upper', self.dpUIinst.lang['c029_middle'], self.cvUpperEyelidLoc, s+jointLabelAdd)
-                    self.lowerEyelidBaseJxt, self.lowerEyelidJnt = self.createEyelidJoints(side, 'c045_lower', "", self.cvLowerEyelidLoc, s+jointLabelAdd)
-                    self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt = self.createEyelidJoints(side, 'c045_lower', self.dpUIinst.lang['c029_middle'], self.cvLowerEyelidLoc, s+jointLabelAdd)
+                    self.upperEyelidBaseJxt, self.upperEyelidJnt = self.createEyelidJoints(side, 'c044_upper', "", self.cvUpperEyelidLoc, s+self.jointLabelAdd)
+                    self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt = self.createEyelidJoints(side, 'c044_upper', self.dpUIinst.lang['c029_middle'], self.cvUpperEyelidLoc, s+self.jointLabelAdd)
+                    self.lowerEyelidBaseJxt, self.lowerEyelidJnt = self.createEyelidJoints(side, 'c045_lower', "", self.cvLowerEyelidLoc, s+self.jointLabelAdd)
+                    self.lowerEyelidMiddleBaseJxt, self.lowerEyelidMiddleJnt = self.createEyelidJoints(side, 'c045_lower', self.dpUIinst.lang['c029_middle'], self.cvLowerEyelidLoc, s+self.jointLabelAdd)
                     
                     # creating eyelids controls and setup:
                     self.upperEyelidCtrl, self.upperEyelidCtrlZero = self.createEyelidSetup(side, 'c044_upper', self.upperEyelidJnt, self.upperEyelidBaseJxt, self.upperEyelidMiddleBaseJxt, self.upperEyelidMiddleJnt, 30, (0, 0, 0), self.cvUpperEyelidLoc)
@@ -732,13 +689,13 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     
                 # create iris setup:
                 if self.getModuleAttr(IRIS):
-                    self.irisCtrl = self.createIrisPupilSetup(s, side, IRIS, 'i080_iris', s+jointLabelAdd)
+                    self.irisCtrl = self.createIrisPupilSetup(s, side, IRIS, 'i080_iris', s+self.jointLabelAdd)
                     self.irisCtrlList.append(self.irisCtrl)
                     self.hasIris = True
                     
                 # create pupil setup:
                 if self.getModuleAttr(PUPIL):
-                    self.pupilCtrl = self.createIrisPupilSetup(s, side, PUPIL, 'i081_pupil', s+jointLabelAdd)
+                    self.pupilCtrl = self.createIrisPupilSetup(s, side, PUPIL, 'i081_pupil', s+self.jointLabelAdd)
                     self.pupilCtrlList.append(self.pupilCtrl)
                     self.hasPupil = True
                 # create a masterModuleGrp to be checked if this rig exists:

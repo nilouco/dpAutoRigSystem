@@ -514,7 +514,7 @@ class Rivet(object):
         """ Creates a setup to invert attribute transformations in order to avoid doubleTransformation.
             Return inverted groups.
         """
-        axisList = ['X', 'Y', 'Z']
+        axisList = ["X", "Y", "Z"]
         invTGrp = None
         invRGrp = None
         if cmds.objExists(nodeName):

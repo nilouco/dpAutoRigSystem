@@ -142,51 +142,8 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         if cmds.objExists(self.moduleGrp):
             # articulation joint:
             self.addArticJoint = self.getArticulation()
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [ self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_' ]
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
-                            for axis in self.mirrorAxis:
-                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                                flipedValue = gotValue*(-2)
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
-                        else:
-                            for axis in self.mirrorAxis:
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else: # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                #for Maya2012: self.userGuideName+'_'+self.moduleGrp+"_Grp"
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.ctrlZeroGrp = side+self.userGuideName+"_00_Ctrl_Zero_0_Grp"
                 self.skinJointList = []
@@ -203,7 +160,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
                     # joint labelling:
-                    self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     self.skinJointList.append(self.jnt)
                     # create a control:
                     self.jntCtrl = self.ctrls.cvControl("id_007_FkLine", side+self.userGuideName+"_%02d_Ctrl"%(n), r=self.ctrlRadius, d=self.curveDegree, headDef=cmds.getAttr(self.base+".deformedBy"), guideSource=self.guideName+"_JointLoc"+str(n+1))
@@ -246,7 +203,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if n > 0:
                         if self.addArticJoint:
                             artJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt) #could call to create corrective joints. See parameters to implement it, please.
-                            self.utils.setJointLabel(artJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                            self.utils.setJointLabel(artJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                     cmds.select(self.jnt)
                     # end chain:
                     if n == self.nJoints-1:

@@ -167,44 +167,8 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.addCorrective = self.getModuleAttr("corrective")
             # declaring lists to send information for integration:
             self.scalableGrpList, self.ikCtrlZeroList = [], []
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_']
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        for axis in self.mirrorAxis:
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else:  # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 self.skinJointList = []
                 self.base = side+self.userGuideName+'_Guide_Base'
                 if self.addArticJoint:
@@ -225,7 +189,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.jnt = cmds.joint(name=side+self.userGuideName+"_%02d_Jnt"%(n), scaleCompensate=False)
                     self.skinJointList.append(self.jnt)
                     cmds.addAttr(self.jnt, longName='dpAR_joint', attributeType='float', keyable=False)
-                    self.utils.setJointLabel(self.jnt, s+jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
+                    self.utils.setJointLabel(self.jnt, s+self.jointLabelAdd, 18, self.userGuideName+"_%02d"%(n))
                     # create a control:
                     if n == 1:
                         self.fingerCtrl = self.ctrls.cvControl("id_015_FingerMain", ctrlName=side+self.userGuideName+"_%02d_Ctrl"%(n), r=(self.ctrlRadius * 2.0), d=self.curveDegree, rot=(0, 0, -90), guideSource=self.guideName+"_JointLoc"+str(n))
@@ -330,14 +294,14 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 correctiveNetList = [None]
                                 correctiveNetList.append(self.setupCorrectiveNet(side+self.userGuideName+"_01_Ctrl", self.skinJointList[n-1], self.skinJointList[n], side+self.userGuideName+"_"+str(n)+"_PitchDown", 1, 1, -90))
                                 articJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt, 1, [(0.3*self.ctrlRadius, 0, 0)])
-                                self.setupJcrControls(articJntList, s, jointLabelAdd, self.userGuideName+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
+                                self.setupJcrControls(articJntList, s, self.jointLabelAdd, self.userGuideName+"_"+str(n), correctiveNetList, phalangeCalibratePresetList, invertList)
                                 if s == 1:
                                     cmds.setAttr(articJntList[0]+".scaleX", -1)
                                     cmds.setAttr(articJntList[0]+".scaleY", -1)
                                     cmds.setAttr(articJntList[0]+".scaleZ", -1)
                             else:
                                 articJntList = self.utils.articulationJoint(self.fatherJnt, self.jnt)
-                                self.utils.setJointLabel(articJntList[0], s+jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
+                                self.utils.setJointLabel(articJntList[0], s+self.jointLabelAdd, 18, self.userGuideName+"_%02d_Jar"%(n))
                                 cmds.connectAttr(self.scaleCompensateCond+".outColorR", articJntList[0]+".segmentScaleCompensate", force=True)
                     cmds.select(self.jnt)
                     

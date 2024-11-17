@@ -128,50 +128,8 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         if cmds.objExists(self.moduleGrp):
             # declare lists to store names and attributes:
             self.mainCtrlList, self.wheelCtrlList, self.steeringGrpList, self.ctrlHookGrpList = [], [], [], []
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [ self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_' ]
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
-                            for axis in self.mirrorAxis:
-                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                                flipedValue = gotValue*(-2)
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
-                        else:
-                            for axis in self.mirrorAxis:
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else: # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type") + 1
             # run for all sides
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 # declare guides:
                 self.base = side+self.userGuideName+'_Guide_Base'
                 self.cvCenterLoc = side+self.userGuideName+"_Guide_CenterLoc"
@@ -186,7 +144,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.centerJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.centerJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(self.centerJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel'])
+                self.utils.setJointLabel(self.centerJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel'])
                 # create end joint:
                 self.endJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_JEnd", radius=0.5)
                 # main joint:
@@ -194,7 +152,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.mainJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Jnt", scaleCompensate=False)
                 cmds.addAttr(self.mainJoint, longName='dpAR_joint', attributeType='float', keyable=False)
                 # joint labelling:
-                self.utils.setJointLabel(self.mainJoint, s+jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c058_main'])
+                self.utils.setJointLabel(self.mainJoint, s+self.jointLabelAdd, 18, self.userGuideName+"_"+self.dpUIinst.lang['c058_main'])
                 # create end joint:
                 self.mainEndJoint = cmds.joint(name=side+self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_JEnd", radius=0.5)
                 

@@ -3,7 +3,6 @@ from maya import cmds
 from maya import mel
 from .Library import dpControls
 from ..Extras import dpCorrectionManager
-import json
 
 class RigType(object):
     biped = "biped"
@@ -26,7 +25,7 @@ class StartClass(object):
         self.userGuideName = userGuideName
         self.rigType = rigType
         # defining namespace:
-        self.guideNamespace = self.guideModuleName + "__" + self.userGuideName
+        self.guideNamespace = self.guideModuleName+"__"+self.userGuideName
         # defining guideNamespace:
         cmds.namespace(setNamespace=":")
         self.namespaceExists = cmds.namespace(exists=self.guideNamespace)
@@ -37,6 +36,8 @@ class StartClass(object):
         self.number = number
         self.raw = True
         self.serialized = False
+        self.sideList = [""]
+        self.axisList = ["X", "Y", "Z"]
         # utils
         self.utils = dpUIinst.utils
         # calling dpControls:
@@ -55,7 +56,6 @@ class StartClass(object):
         self.guideNet = self.utils.getNodeByMessage("net", self.moduleGrp)
         if self.guideNet:
             self.raw = cmds.getAttr(self.guideNet+".rawGuide")
-
     
     
     def createModuleLayout(self, *args):
@@ -311,7 +311,7 @@ class StartClass(object):
                     else:
                         s = sDefault
                     # add joint label, create controller, zeroOut
-                    self.utils.setJointLabel(jcr, s+jointLabelAdd, 18, labelName+"_"+str(m))
+                    self.utils.setJointLabel(jcr, s+self.jointLabelAdd, 18, labelName+"_"+str(m))
                     jcrCtrl, jcrGrp = self.ctrls.createCorrectiveJointCtrl(jcrList[i], correctiveNetList[i], radius=self.ctrlRadius*0.2)
                     cmds.parent(jcrGrp, self.correctiveCtrlsGrp)
                     # preset calibration
@@ -367,7 +367,6 @@ class StartClass(object):
     def addFkMainCtrls(self, side, ctrlList, *args):
         """ Implement the fk main controllers.
         """
-        axisList = ['X', 'Y', 'Z']
         # getting and calculating values
         totalToAddMain = 1
         self.nMain = cmds.getAttr(self.base+".nMain")
@@ -393,7 +392,7 @@ class StartClass(object):
                     cmds.parent(currentCtrl, mainCtrl)
                     # intensity utilities
                     rIntensityMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_R_Main_MD")
-                    for axis in axisList:
+                    for axis in self.axisList:
                         cmds.connectAttr(mainCtrl+".rotate"+axis, rIntensityMD+".input1"+axis, force=True)
                         cmds.connectAttr(mainCtrl+"."+self.dpUIinst.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
                 else:
@@ -402,11 +401,56 @@ class StartClass(object):
                     cmds.parent(offsetGrp, currentCtrlZero)
                     cmds.makeIdentity(offsetGrp, apply=False, translate=True, rotate=True, scale=True)
                     cmds.parent(currentCtrl, offsetGrp)
-                    for axis in axisList:
+                    for axis in self.axisList:
                         cmds.connectAttr(rIntensityMD+".output"+axis, offsetGrp+".rotate"+axis, force=True)
                 # display sub controllers shapes
                 self.ctrls.setSubControlDisplay(mainCtrl, currentCtrl, 0)
     
+
+    def getMirrorSideList(self, *args):
+        """
+        """
+        # analisys the mirror module:
+        self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
+        if self.mirrorAxis != 'off':
+            # get rigs names:
+            self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
+            # get first and last letters to use as side initials (prefix):
+            self.sideList = [self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames)-1]+'_']
+            for s, side in enumerate(self.sideList):
+                duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
+                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
+                for item in allGuideList:
+                    cmds.rename(item, side+self.userGuideName+"_"+item)
+                self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
+                cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
+                # re-rename grp:
+                cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
+                # do a group mirror with negative scaling:
+                if s == 1:
+                    if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                        for axis in self.mirrorAxis:
+                            gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
+                            flipedValue = gotValue*(-2)
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
+                    else:
+                        for axis in self.mirrorAxis:
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+            # joint labelling:
+            self.jointLabelAdd = 1
+        else: # if not mirror:
+            duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
+            allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
+            for item in allGuideList:
+                cmds.rename(item, self.userGuideName+"_"+item)
+            self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
+            # re-rename grp:
+            cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
+            # joint labelling:
+            self.jointLabelAdd = 0
+        # store the number of this guide by module type
+        self.dpAR_count = self.utils.findModuleLastNumber(self.guideModuleName, "dpAR_type")+1
+
 
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
@@ -460,6 +504,7 @@ class StartClass(object):
                     prefix = prefix + "_"
                 self.userGuideName = prefix + self.userGuideName
             cmds.select(clear=True)
+            self.getMirrorSideList()
     
 
     def hookSetup(self, side, ctrlList, scalableList, staticList=None, *args):

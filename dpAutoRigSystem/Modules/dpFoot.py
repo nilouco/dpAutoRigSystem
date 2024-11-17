@@ -130,45 +130,8 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.rigModule(self)
         # verify if the guide exists:
         if cmds.objExists(self.moduleGrp):
-            # create lists to be integrated:
-            # start as no having mirror:
-            sideList = [""]
-            # analisys the mirror module:
-            self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
-            if self.mirrorAxis != 'off':
-                # get rigs names:
-                self.mirrorNames = cmds.getAttr(self.moduleGrp+".mirrorName")
-                # get first and last letters to use as side initials (prefix):
-                sideList = [self.mirrorNames[0]+'_', self.mirrorNames[len(self.mirrorNames) - 1]+'_']
-                for s, side in enumerate(sideList):
-                    duplicated = cmds.duplicate(self.moduleGrp, name=side+self.userGuideName+'_Guide_Base')[0]
-                    allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                    for item in allGuideList:
-                        cmds.rename(item, side+self.userGuideName+"_"+item)
-                    self.mirrorGrp = cmds.group(name="Guide_Base_Grp", empty=True)
-                    cmds.parent(side+self.userGuideName+'_Guide_Base', self.mirrorGrp, absolute=True)
-                    # re-rename grp:
-                    cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
-                    # do a group mirror with negative scaling:
-                    if s == 1:
-                        for axis in self.mirrorAxis:
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
-                # joint labelling:
-                jointLabelAdd = 1
-            else:  # if not mirror:
-                duplicated = cmds.duplicate(self.moduleGrp, name=self.userGuideName+'_Guide_Base')[0]
-                allGuideList = cmds.listRelatives(duplicated, allDescendents=True)
-                for item in allGuideList:
-                    cmds.rename(item, self.userGuideName+"_"+item)
-                self.mirrorGrp = cmds.group(self.userGuideName+'_Guide_Base', name="Guide_Base_Grp", relative=True)
-                # re-rename grp:
-                cmds.rename(self.mirrorGrp, self.userGuideName+'_'+self.mirrorGrp)
-                # joint labelling:
-                jointLabelAdd = 0
-            # store the number of this guide by module type
-            self.dpAR_count = self.utils.findModuleLastNumber(CLASS_NAME, "dpAR_type")+1
             # run for all sides
-            for s, side in enumerate(sideList):
+            for s, side in enumerate(self.sideList):
                 # redeclaring variables:
                 self.base = side+self.userGuideName+"_Guide_Base"
                 self.cvFootLoc = side+self.userGuideName+"_Guide_Foot"
@@ -202,12 +165,12 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # creating joints:
                 cmds.select(clear=True)
                 self.footJnt = cmds.joint(name=side+self.userGuideName+"_"+ankleRFAttr.capitalize()+"_Jnt")
-                self.utils.setJointLabel(self.footJnt, s+jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
+                self.utils.setJointLabel(self.footJnt, s+self.jointLabelAdd, 18, self.userGuideName+ "_"+ankleRFAttr.capitalize())
                 self.middleFootJxt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jxt")
                 self.endJnt = cmds.joint(name=side+self.userGuideName+"_JEnd", radius=0.5)
                 cmds.select(clear=True)
                 self.middleFootJnt = cmds.joint(name=side+self.userGuideName+"_"+middleRFAttr.capitalize()+"_Jnt")
-                self.utils.setJointLabel(self.middleFootJnt, s+jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
+                self.utils.setJointLabel(self.middleFootJnt, s+self.jointLabelAdd, 18, self.userGuideName+"_"+middleRFAttr.capitalize())
                 self.endBJnt = cmds.joint(name=side+self.userGuideName+"B_JEnd", radius=0.5)
                 cmds.parent(self.middleFootJnt, self.middleFootJxt)
                 cmds.addAttr(self.footJnt, longName='dpAR_joint', attributeType='float', keyable=False)
