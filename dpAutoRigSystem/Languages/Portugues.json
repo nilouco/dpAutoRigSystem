@@ -5,7 +5,7 @@
     "_date"          : "2011-08-03",
     "_language"      : "Português",
     "_translator"    : "Danilo Pinheiro",
-    "_updated"       : "2024-11-15",
+    "_updated"       : "2024-11-18",
     
     "a000_presentation" : "Esta é a primeira frase a traduzir.\nPor favor, use o campo de texto abaixo para escrever seu texto traduzido.\nVocê pode usar os botões para:\n\nVoltar e revisar sua tradução.\nMesmo para usar o mesmo texto no seu idioma.\nPróximo para aplicar o texto traduzido e seguir em frente.\n\nUse Enter (Return) para uma nova linha.\nAlguns textos não aceitam caracteres especiais.\nOutros têm pontuação ou nada.\n\nVamos começar! Obrigado.",
     
@@ -526,7 +526,7 @@
     "m025_footDesc"              : "Descrição do Modulo Pé:\n\nEsse modulo cria um rig de pé\ncom sistema reverso (reverse foot).\nEle funciona bem quando integrado com um modulo membro do tipo perna.",
     "m026_biped"                 : "Bípede",
     "m027_bipedDesc"             : "Descrição do Script Bípede:\n\nEsse modulo cria uma guia básica de bípede,\ncom todos os modulos já parenteados usando espelhamentos corretos\ne uma boa convenção de nomes...\n\nVoce precisa somente colocar as guias nos lugares corretos\ne pressionar o botao RIG all (botão verde).",
-    "m028_arm"                   : "Braco",
+    "m028_arm"                   : "Braço",
     "m029_armDesc"               : "Descrição do Script Braço:\n\nEsse modulo cria uma guia básica de braço,\ncom dedos parenteados ao modulo membro do tipo braço.",
     "m030_leg"                   : "Perna",
     "m031_legDesc"               : "Descrição do Script Perna:\n\nEsse modulo cria uma guia básica de perna,\ncom o pé parenteado ao modulo membro do tipo perna.",
@@ -651,7 +651,7 @@
     "m150_avoidDoubleTransf"     : "Adicionar um setup inverso para evitar a dupla transformação",
     "m151_invert"                : "Inverter",
     "m152_originalModel"         : "Modelo Original",
-    "m153_suspension"            : "Suspensao",
+    "m153_suspension"            : "Suspensão",
     "m154_suspensionDesc"        : "Descrição do módulo Suspensão:\n\nCria um setup de Suspensão usando\n2 joints e aim constraints.",
     "m155_quadrupedExtra"        : "Quadrúpede Controle Extra",
     "m156_wheel"                 : "Roda",

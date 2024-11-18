@@ -408,7 +408,8 @@ class StartClass(object):
     
 
     def getMirrorSideList(self, *args):
-        """
+        """ Processes the mirror information for the current guide.
+        Defines self.sideList to be used by the module.
         """
         # analisys the mirror module:
         self.mirrorAxis = cmds.getAttr(self.moduleGrp+".mirrorAxis")
@@ -428,14 +429,15 @@ class StartClass(object):
                 cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
                 # do a group mirror with negative scaling:
                 if s == 1:
-                    if cmds.getAttr(self.moduleGrp+".flip") == 0:
-                        for axis in self.mirrorAxis:
-                            gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                            flipedValue = gotValue*(-2)
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
-                    else:
-                        for axis in self.mirrorAxis:
-                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+                    if cmds.objExists(self.moduleGrp+".flip"):
+                        if cmds.getAttr(self.moduleGrp+".flip") == 0:
+                            for axis in self.mirrorAxis:
+                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
+                                flipedValue = gotValue*(-2)
+                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
+                        else:
+                            for axis in self.mirrorAxis:
+                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
             # joint labelling:
             self.jointLabelAdd = 1
         else: # if not mirror:
