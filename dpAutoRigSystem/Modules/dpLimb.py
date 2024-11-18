@@ -1940,6 +1940,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
+            self.generatRelativesID()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()

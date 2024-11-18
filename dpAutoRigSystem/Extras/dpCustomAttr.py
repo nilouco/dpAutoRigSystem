@@ -124,13 +124,21 @@ class CustomAttr(object):
         cmds.showWindow(self.addWindowName)
 
 
-    def addAttr(self, attrIndex, itemList=None, attrName=None, *args):
+    def addAttr(self, attrIndex, itemList=None, attrName=None, shapes=True, *args):
         """ Create attributes in the selected transform if they don't exists yet.
         """
         attr = None
         if not itemList:
             itemList = cmds.ls(selection=True)
         if itemList:
+            if shapes:
+                shapeList = []
+                for item in itemList:
+                    childrenShapeList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
+                    if childrenShapeList:
+                        shapeList.extend(childrenShapeList)
+                if shapeList:
+                    itemList.extend(shapeList)
             for item in itemList:
                 if attrIndex == "custom":
                     if attrName:

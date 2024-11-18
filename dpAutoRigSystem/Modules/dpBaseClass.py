@@ -429,15 +429,18 @@ class StartClass(object):
                 cmds.rename(self.mirrorGrp, side+self.userGuideName+'_'+self.mirrorGrp)
                 # do a group mirror with negative scaling:
                 if s == 1:
+                    withoutFlip = False
                     if cmds.objExists(self.moduleGrp+".flip"):
                         if cmds.getAttr(self.moduleGrp+".flip") == 0:
-                            for axis in self.mirrorAxis:
-                                gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
-                                flipedValue = gotValue*(-2)
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
-                        else:
-                            for axis in self.mirrorAxis:
-                                cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
+                            withoutFlip = True
+                    if withoutFlip:
+                        for axis in self.mirrorAxis:
+                            gotValue = cmds.getAttr(side+self.userGuideName+"_Guide_Base.translate"+axis)
+                            flipedValue = gotValue*(-2)
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.translate'+axis, flipedValue)
+                    else:
+                        for axis in self.mirrorAxis:
+                            cmds.setAttr(side+self.userGuideName+'_'+self.mirrorGrp+'.scale'+axis, -1)
             # joint labelling:
             self.jointLabelAdd = 1
         else: # if not mirror:
@@ -559,6 +562,7 @@ class StartClass(object):
         else:
             guideNumber = self.utils.findLastNumber()
         self.guideNet = cmds.createNode("network", name="dpGuide_"+guideNumber+"_Net")
+        self.dpUIinst.customAttr.addAttr(0, [self.guideNet]) #dpID
         for baseAttr in ["dpNetwork", "dpGuideNet", "rawGuide"]:
             cmds.addAttr(self.guideNet, longName=baseAttr, attributeType="bool")
             cmds.setAttr(self.guideNet+"."+baseAttr, 1)
@@ -689,6 +693,19 @@ class StartClass(object):
             cmds.connectAttr(self.guideNet+".message", self.toStaticHookGrp+".net", force=True)
             cmds.lockNode(self.guideNet, lock=True)
 
+
+    def generatRelativesID(self, item=None, *args):
+        """ Add dpID to all relative children nodes for the given item if it doesn't exists yet.
+        """
+        if not item:
+            item = self.toStaticHookGrp
+        if cmds.objExists(item):
+            nodeList = [item]
+            childrenList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
+            if childrenList:
+                nodeList.extend(childrenList)
+            self.dpUIinst.customAttr.addAttr(0, nodeList) #dpID
+    
 
     def renameUnitConversion(self, unitConversionList=None, *args):
         """ Rename just the new unitConverson created after the beginning of the module building.

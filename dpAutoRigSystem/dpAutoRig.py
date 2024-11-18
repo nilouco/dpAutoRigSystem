@@ -275,7 +275,6 @@ class DP_AutoRig_UI(object):
                 print("Error: Cannot load json validator preset files!\n")
                 return
             
-            
             # create the main layout:
             self.allUIs["mainLayout"] = cmds.formLayout('mainLayout')
             # here we will populate with layout from mainUI based in the choose language.
@@ -450,7 +449,7 @@ class DP_AutoRig_UI(object):
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
         #colMiddleLeftA - scrollLayout - guidesLayout:
-        self.allUIs["colMiddleLeftA"] = cmds.scrollLayout("colMiddleLeftA", width=150, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["colMiddleLeftA"] = cmds.scrollLayout("colMiddleLeftA", width=160, parent=self.allUIs["riggingTabLayout"])
         self.allUIs["guidesLayoutA"] = cmds.columnLayout("guidesLayoutA", adjustableColumn=True, width=140, rowSpacing=3, parent=self.allUIs["colMiddleLeftA"])
         # here will be populated by guides of modules and scripts...
         self.allUIs["i030_standard"] = cmds.text(self.lang['i030_standard'], font="obliqueLabelFont", align='left', parent=self.allUIs["guidesLayoutA"])
@@ -461,8 +460,8 @@ class DP_AutoRig_UI(object):
         cmds.setParent(self.allUIs["riggingTabLayout"])
         
         #colMiddleRightA - scrollLayout - modulesLayout:
-        self.allUIs["colMiddleRightA"] = cmds.scrollLayout("colMiddleRightA", width=150, parent=self.allUIs["riggingTabLayout"])
-        self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=200, parent=self.allUIs["colMiddleRightA"])
+        self.allUIs["colMiddleRightA"] = cmds.scrollLayout("colMiddleRightA", width=120, parent=self.allUIs["riggingTabLayout"])
+        self.allUIs["modulesLayoutA"] = cmds.columnLayout("modulesLayoutA", adjustableColumn=True, width=120, parent=self.allUIs["colMiddleRightA"])
         # here will be populated by created instances of modules...
         # after footerA we will call the function to populate here, because it edits the footerAText
         cmds.setParent(self.allUIs["riggingTabLayout"])
@@ -2196,6 +2195,7 @@ class DP_AutoRig_UI(object):
             cmds.setAttr(self.optionCtrlGrp+".translateX", fMasterRadius)
             # use Option_Ctrl rigScale and rigScaleMultiplier attribute to Master_Ctrl
             self.rigScaleMD = cmds.createNode("multiplyDivide", name=self.prefix+'RigScale_MD')
+            self.customAttr.addAttr(0, [self.rigScaleMD]) #dpID
             cmds.addAttr(self.rigScaleMD, longName="dpRigScale", attributeType="bool", defaultValue=True)
             cmds.addAttr(self.optionCtrl, longName="dpRigScaleNode", attributeType="message")
             cmds.addAttr(self.optionCtrl, longName="rigScaleOutput", attributeType="float", defaultValue=1)
@@ -2243,8 +2243,9 @@ class DP_AutoRig_UI(object):
                 self.customAttr.addAttr(0, [self.baseRootJntGrp]) #dpID
             cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
             cmds.parent(self.baseRootJntGrp, self.scalableGrp)
-            cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
-            cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
+            pac = cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")[0]
+            scc = cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")[0]
+            self.customAttr.addAttr(0, [pac, scc]) #dpID
             cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
             self.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
     
