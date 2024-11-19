@@ -233,32 +233,27 @@ class JointDisplay(object):
     
     
     def keepSelectedObj(self, *args):
-        """ Mantain ative selected joints"""
+        """Mantain ative selected joints"""
 
-        selectedUIJoints = self.selectionUiList
-        selectedUIBoard = self.selectedBoard
-        allboards = self.allBoardList
-        selectedItens = []
+        # selectedUIJoints = self.selectionUiList
+        # selectedUIBoard = self.selectedBoard
+        # allboards = self.allBoardList
+        selectedItems = []
 
-        for board in allboards:
+        for board in self.allBoardList:
             #Existe algum objeto da lista selectedUIJoints?
-            if selectedUIJoints:
-                selectedItens.append(cmds.textScrollList(board, query=True, selectItem=True))
-                for iten in selectedItens:
-                    cmds.textScrollList(board, edit=True, selectItem=iten)
-                selectedItens = []
+            if self.selectionUiList:
+                selectedItems.append(cmds.textScrollList(board, query=True, selectItem=True))
+                for item in selectedItems:
+                    cmds.textScrollList(board, edit=True, selectItem=item)
+                # selectedItems = []
 
             # Se existe, seleciona ele.
             # Se algum objeto contem no em algum board. Seleciona o objeto no respectivo board.
             
 
-
-
                 
                 
-
-
-        """!!!!!!!!!!!!!  STOOPED: Parei tentando encontrar """
         
         # selectedList = cmds.textScrollList(obj, query=True, selectItem=True)
         # toSelectList = []
