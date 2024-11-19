@@ -330,6 +330,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSuffixList[t], radius=0.5)
                     self.wipList.append(jEndJnt)
                     self.chainDic[suffix] = self.wipList
+                    self.toAddIDList.extend(self.wipList)
                 # getting jointLists:
                 self.skinJointList = self.chainDic[self.jSuffixList[0]]
                 self.ikJointList = self.chainDic[self.jSuffixList[1]]
@@ -371,7 +372,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.base)
                     else:
                         self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_"))
-                    cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC")
+                    self.toAddIDList.extend(cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC"))
                     
                     if n > 0:
                         cmds.parent(self.fkZeroGrpList[n], self.fkCtrlList[n - 1])
@@ -688,11 +689,12 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generatRelativesID()
+            self.generateRelativesID()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toAddIDList) #dpID
     
     
     def integratingInfo(self, *args):

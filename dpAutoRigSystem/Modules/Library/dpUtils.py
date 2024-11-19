@@ -1262,6 +1262,7 @@ class Utils(object):
         if not itemList:
             itemList = cmds.ls(selection=False, type="unitConversion")
         if itemList:
+            self.dpUIinst.customAttr.addAttr(0, itemList) #dpID
             for item in itemList:
                 if not item.endswith("_UC"):
                     newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])

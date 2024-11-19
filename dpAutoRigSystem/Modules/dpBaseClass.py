@@ -459,10 +459,10 @@ class StartClass(object):
 
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
-            Delete the moduleLayout, guide and namespaces for this module.
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
+            self.toAddIDList = []
             self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
             try:
                 # clear selected module layout:
@@ -694,16 +694,26 @@ class StartClass(object):
             cmds.lockNode(self.guideNet, lock=True)
 
 
-    def generatRelativesID(self, item=None, *args):
-        """ Add dpID to all relative children nodes for the given item if it doesn't exists yet.
+    def generateRelativesID(self, item=None, *args):
+        """ Add dpID to all relative children nodes for the given item if this attribute doesn't exists yet.
+            Run into toStaticHookGrp if item isn't given.
         """
         if not item:
             item = self.toStaticHookGrp
         if cmds.objExists(item):
             nodeList = [item]
-            childrenList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
+            shapeList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
+            if shapeList:
+                nodeList.extend(shapeList)
+            childrenList = cmds.listRelatives(item, allDescendents=True, children=True)
             if childrenList:
                 nodeList.extend(childrenList)
+#            nodeTypeList = ["transform", "parentConstraint", "orientConstraint", "scaleConstraint"]
+#            for nodeType in nodeTypeList:
+#                childrenTypeList = cmds.listRelatives(item, allDescendents=True, children=True, type=nodeType)
+#                if childrenTypeList:
+#                    nodeList.extend(childrenTypeList)
+            nodeList = list(set(nodeList)) # just remove duplicated items
             self.dpUIinst.customAttr.addAttr(0, nodeList) #dpID
     
 

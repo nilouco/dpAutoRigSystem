@@ -2557,6 +2557,7 @@ class DP_AutoRig_UI(object):
                 
                 # integrating modules together:
                 if self.integratedTaskDic:
+                    self.toIDList = []
                     # working with specific cases:
                     for moduleDic in self.integratedTaskDic:
                         moduleType = moduleDic[:moduleDic.find("__")]
@@ -2617,7 +2618,7 @@ class DP_AutoRig_UI(object):
                                     cmds.cycleCheck(evaluation=True)
                                     cmds.parent(revFootCtrlGrp, ikFkBlendGrpToRevFoot, absolute=True)
                                     cmds.parent(ikHandleGrp, toLimbIkHandleGrp, absolute=True)
-                                    cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")[0]
+                                    self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
                                     if limbTypeName == LEG:
                                         cmds.connectAttr(extremJnt+".scaleX", footJnt+".scaleX", force=True)
                                         cmds.connectAttr(extremJnt+".scaleY", footJnt+".scaleY", force=True)
@@ -2652,12 +2653,13 @@ class DP_AutoRig_UI(object):
                                                                 cmds.connectAttr(footJnt+".message", actionLocList[0]+".inputNode", force=True)
                                                                 actionLocGrp = cmds.listRelatives(actionLocList[0], parent=True, type="transform")[0]
                                                                 cmds.delete(actionLocGrp+"_PaC")
-                                                                cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC")
+                                                                self.toIDList.extend(cmds.parentConstraint(footJnt, actionLocGrp, maintainOffset=True, name=actionLocGrp+"_PaC"))
                                             else:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC")[0]
                                             cmds.setAttr(oc+".interpType", 2) #shortest
+                                            self.toIDList.append(oc)
                                     scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                    cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
+                                    self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
                                     # hide this control shape
                                     cmds.setAttr(revFootCtrlShape+".visibility", 0)
                                     # add attributes and connect from ikCtrl to revFootCtrl:
@@ -2729,14 +2731,14 @@ class DP_AutoRig_UI(object):
 
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
-                                cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
 
                                 # remove dpControl attribute
                                 self.customAttr.removeAttr("dpControl", [worldRef])
                             
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
-                                cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC")
-                                cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC")
+                                self.toIDList.extend(cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))
+                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC"))
                             
                             # parenting correctly the ikCtrlZero to spineModule:
                             fatherModule   = self.hookDic[moduleDic]['fatherModule']
@@ -2752,7 +2754,7 @@ class DP_AutoRig_UI(object):
 
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 scalableGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
-                                cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
+                                self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
 
                                 if fatherModule == SPINE:
                                     # getting limb data:
@@ -2774,10 +2776,10 @@ class DP_AutoRig_UI(object):
                                         cmds.parent(ikPoleVectorCtrlZero, self.ctrlsVisGrp, absolute=True)
                                     else:
                                         # do task actions in order to integrate the limb and spine (ikCtrl):
-                                        cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC")
+                                        self.toIDList.extend(cmds.parentConstraint(tipCtrl, ikHandleGrp, mo=1, name=ikHandleGrp+"_PaC"))
                                         # poleVector autoOrient for arm
                                         cmds.delete(rootCtrlRefList[s]+"_PaC")
-                                        cmds.parentConstraint(tipCtrl, rootCtrlRefList[s], maintainOffset=True, name=rootCtrlRefList[s]+"_PaC")
+                                        self.toIDList.extend(cmds.parentConstraint(tipCtrl, rootCtrlRefList[s], maintainOffset=True, name=rootCtrlRefList[s]+"_PaC"))
 
                                     # verify if is quadruped
                                     if limbStyle == self.lang['m037_quadruped'] or limbStyle == self.lang['m043_quadSpring']:
@@ -2788,6 +2790,7 @@ class DP_AutoRig_UI(object):
                                             # if quadruped, create a parent contraint from tipCtrl to front leg:
                                             quadChestParentConst = cmds.parentConstraint(self.rootCtrl, tipCtrl, quadFrontLeg, maintainOffset=True, name=quadFrontLeg+"_PaC")[0]
                                             revNode = cmds.createNode('reverse', name=quadFrontLeg+"_Rev")
+                                            self.toIDList.extend([quadChestParentConst, revNode])
                                             cmds.addAttr(ikCtrl, longName="followChestA", attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                                             cmds.connectAttr(ikCtrl+".followChestA", quadChestParentConst+"."+tipCtrl+"W1", force=True)
                                             cmds.connectAttr(ikCtrl+".followChestA", revNode+".inputX", force=True)
@@ -2799,7 +2802,7 @@ class DP_AutoRig_UI(object):
                             if fixIkSpringSolverGrp:
                                 cmds.parent(fixIkSpringSolverGrp, self.scalableGrp, absolute=True)
                                 for nFix in fixIkSpringSolverGrp:
-                                    cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScC")
+                                    self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, nFix, name=nFix+"_ScC"))
                             
                         # integrate the volumeVariation and ikFkBlend attributes from Spine module to optionCtrl:
                         if moduleType == SPINE:
@@ -2819,7 +2822,7 @@ class DP_AutoRig_UI(object):
                                 ikFkBlendAttr = self.integratedTaskDic[moduleDic]['IkFkBlendAttrList'][s]
                                 clusterGrp = self.integratedTaskDic[moduleDic]["scalableGrp"][s]
                                 shapeVisAttrList = self.integratedTaskDic[moduleDic]["shapeVisAttrList"]
-                                cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC")
+                                self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, clusterGrp, name=clusterGrp+"_ScC"))
                                 cmds.addAttr(self.optionCtrl, longName=vvAttr, attributeType="float", defaultValue=1, keyable=True)
                                 cmds.connectAttr(self.optionCtrl+'.'+vvAttr, hipsA+'.'+vvAttr)
                                 cmds.setAttr(hipsA+'.'+vvAttr, keyable=False)
@@ -2854,7 +2857,7 @@ class DP_AutoRig_UI(object):
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 # connect the masterCtrl to head group using a orientConstraint:
                                 worldRef = self.integratedTaskDic[moduleDic]['worldRefList'][s]
-                                cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
                                 if bColorize:
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['ctrlList'][s], "yellow")
                                     self.ctrls.colorShape(self.integratedTaskDic[moduleDic]['InnerCtrls'][s], "cyan")
@@ -2876,6 +2879,7 @@ class DP_AutoRig_UI(object):
                                 upperCtrl  = self.integratedTaskDic[fatherGuide]['upperCtrlList'][0]
                                 headParentConst = cmds.parentConstraint(self.rootCtrl, upperCtrl, eyeGrp, maintainOffset=True, name=eyeGrp+"_PaC")[0]
                                 eyeRevNode = cmds.createNode('reverse', name=eyeGrp+"_Rev")
+                                self.toIDList.extend([headParentConst, eyeRevNode])
                                 cmds.connectAttr(eyeCtrl+'.'+self.lang['c032_follow'], eyeRevNode+".inputX", force=True)
                                 cmds.connectAttr(eyeRevNode+".outputX", headParentConst+"."+self.rootCtrl+"W0", force=True)
                                 cmds.connectAttr(eyeCtrl+'.'+self.lang['c032_follow'], headParentConst+"."+upperCtrl+"W1", force=True)
@@ -2891,7 +2895,7 @@ class DP_AutoRig_UI(object):
                                     self.itemMirrorNameList = self.itemGuideMirrorNameList
                                 for s, sideName in enumerate(self.itemMirrorNameList):
                                     eyeScaleGrp = self.integratedTaskDic[moduleDic]['eyeScaleGrp'][s]
-                                    cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC")
+                                    self.toIDList.extend(cmds.parentConstraint(upperCtrl, eyeScaleGrp, maintainOffset=True, name=eyeScaleGrp+"_PaC"))
                             # changing iris and pupil color override:
                             if bColorize:
                                 self.itemMirrorNameList = [""]
@@ -2919,7 +2923,7 @@ class DP_AutoRig_UI(object):
                             for s, sideName in enumerate(self.itemMirrorNameList):
                                 ikCtrlZero = self.integratedTaskDic[moduleDic]['ikCtrlZeroList'][s]
                                 scalableGrp = self.integratedTaskDic[moduleDic]['scalableGrpList'][s]
-                                cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC")
+                                self.toIDList.extend(cmds.scaleConstraint(self.masterCtrl, scalableGrp, name=scalableGrp+"_ScC"))
                                 # correct ikCtrl parent to root ctrl:
                                 cmds.parent(ikCtrlZero, self.ctrlsVisGrp, relative=True)
                                 # get father guide data:
@@ -2932,7 +2936,7 @@ class DP_AutoRig_UI(object):
                                     if limbTypeName == ARM:
                                         origFromList = self.integratedTaskDic[fatherGuide]['integrateOrigFromList'][s]
                                         origFrom = origFromList[-1]
-                                        cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True, name=scalableGrp+"_PaC")
+                                        self.toIDList.extend(cmds.parentConstraint(origFrom, scalableGrp, maintainOffset=True, name=scalableGrp+"_PaC"))
                 
                         # integrate the Single module with another Single as a father:
                         if moduleType == SINGLE:
@@ -2963,8 +2967,8 @@ class DP_AutoRig_UI(object):
                                     except:
                                         mainJis = self.integratedTaskDic[fatherGuide]['mainJisList'][0]
                                     # father's mainJis drives child's staticGrp:
-                                    cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_PaC")
-                                    cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_ScC")
+                                    self.toIDList.extend(cmds.parentConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_PaC"))
+                                    self.toIDList.extend(cmds.scaleConstraint(mainJis, staticGrp, maintainOffset=True, name=staticGrp+"_ScC"))
                                     
                         # integrate the Wheel module with another Option_Ctrl:
                         if moduleType == WHEEL:
@@ -3034,15 +3038,15 @@ class DP_AutoRig_UI(object):
                                                     if cmds.objExists(fatherBRiggedNode):
                                                         if len(self.fatherBMirrorNameList) != 1: #means fatherB has mirror
                                                             if s == fB:
-                                                                cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
-                                                                cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
+                                                                self.toIDList.extend(cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
+                                                                self.toIDList.extend(cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
                                                         else:
-                                                            cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
-                                                            cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
+                                                            self.toIDList.extend(cmds.parentConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
+                                                            self.toIDList.extend(cmds.scaleConstraint(fatherBRiggedNode, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
                                     else: # probably we will parent to a control curve already generated and rigged before
                                         if cmds.objExists(loadedFatherB):
-                                            cmds.parentConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC")
-                                            cmds.scaleConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC")
+                                            self.toIDList.extend(cmds.parentConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_PaC"))
+                                            self.toIDList.extend(cmds.scaleConstraint(loadedFatherB, suspensionBCtrlGrp, maintainOffset=True, name=suspensionBCtrlGrp+"_ScC"))
                                 # get father module:
                                 fatherModule = self.hookDic[moduleDic]['fatherModule']
                                 if fatherModule == WHEEL:
@@ -3051,8 +3055,8 @@ class DP_AutoRig_UI(object):
                                     # parent suspension control group to wheel Main_Ctrl
                                     suspensionHookCtrlGrp = self.integratedTaskDic[moduleDic]['ctrlHookGrpList'][s]
                                     wheelMainCtrl = self.integratedTaskDic[fatherGuide]['mainCtrlList'][s]
-                                    cmds.parentConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_PaC")
-                                    cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScC")
+                                    self.toIDList.extend(cmds.parentConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_PaC"))
+                                    self.toIDList.extend(cmds.scaleConstraint(wheelMainCtrl, suspensionHookCtrlGrp, maintainOffset=True, name=suspensionHookCtrlGrp+"_ScC"))
 
                         # integrate the nose control colors:
                         if moduleType == NOSE:
@@ -3075,6 +3079,7 @@ class DP_AutoRig_UI(object):
                                 cmds.connectAttr(mainCtrl+".spaceSwitch", pac+"."+upperCtrl+"W1", force=True)
                                 cmds.connectAttr(mainCtrl+".spaceSwitch", revNode+".inputX", force=True)
                                 cmds.connectAttr(revNode+".outputX", pac+"."+upperJawCtrl+"W0", force=True)
+                                self.toIDList.extend([pac, revNode])
                         
                         # worldRef of chain controlled by optionCtrl:
                         if moduleType == CHAIN:
@@ -3096,9 +3101,14 @@ class DP_AutoRig_UI(object):
                                 cmds.connectAttr(self.masterCtrl+".scaleX", worldRef+".scaleX", force=True)
                                 cmds.delete(worldRefShapeList[w])
                                 worldRef = cmds.rename(worldRef, worldRef.replace("_Ctrl", "_Grp"))
-                                cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC")
+                                self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, worldRef, maintainOffset=True, name=worldRef+"_PaC"))
                                 # remove dpControl attribute
                                 self.customAttr.removeAttr("dpControl", [worldRef])
+
+                # dpID
+                if self.toIDList:
+                    self.toIDList = list(set(self.toIDList))
+                    self.customAttr.addAttr(0, self.toIDList)
 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

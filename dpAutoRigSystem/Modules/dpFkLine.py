@@ -220,7 +220,7 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generatRelativesID()
+            self.generateRelativesID()
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
