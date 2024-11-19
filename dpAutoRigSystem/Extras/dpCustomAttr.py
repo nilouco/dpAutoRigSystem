@@ -124,7 +124,21 @@ class CustomAttr(object):
         cmds.showWindow(self.addWindowName)
 
 
-    def addAttr(self, attrIndex, itemList=None, attrName=None, shapes=True, *args):
+    def getDescendentsList(self, itemList, shapes=True, *args):
+        """ Returns the children nodes or shapes from given item list.
+        """
+        resultList = []
+        for item in itemList:
+            if cmds.objExists(item):
+                childrenList = cmds.listRelatives(item, allDescendents=True, children=True)
+                if shapes:
+                    childrenList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
+                if childrenList:
+                    resultList.extend(childrenList)
+        return resultList
+
+
+    def addAttr(self, attrIndex, itemList=None, attrName=None, shapes=True, descendents=False, *args):
         """ Create attributes in the selected transform if they don't exists yet.
         """
         attr = None
@@ -132,40 +146,38 @@ class CustomAttr(object):
             itemList = cmds.ls(selection=True)
         if itemList:
             if shapes:
-                shapeList = []
-                for item in itemList:
-                    childrenShapeList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
-                    if childrenShapeList:
-                        shapeList.extend(childrenShapeList)
-                if shapeList:
-                    itemList.extend(shapeList)
+                itemList.extend(self.getDescendentsList(itemList))
+            if descendents:
+                itemList.extend(self.getDescendentsList(itemList, False))
+            itemList = list(set(itemList)) # just remove duplicated items
             for item in itemList:
-                if attrIndex == "custom":
-                    if attrName:
-                        attr = attrName
-                    elif self.ui:
-                        attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
-                        if attr:
-                            if not attr == ATTR_START:
-                                if not attr.startswith(ATTR_START):
-                                    attr = ATTR_START+attr[0].capitalize()+attr[1:]
+                if cmds.objExists(item):
+                    if attrIndex == "custom":
+                        if attrName:
+                            attr = attrName
+                        elif self.ui:
+                            attr = cmds.textFieldButtonGrp(self.addCustomAttrTFG, query=True, text=True)
+                            if attr:
+                                if not attr == ATTR_START:
+                                    if not attr.startswith(ATTR_START):
+                                        attr = ATTR_START+attr[0].capitalize()+attr[1:]
+                                    else:
+                                        point = len(ATTR_START)
+                                        attr = attr[:point]+attr[point].capitalize()+attr[point+1:]
                                 else:
-                                    point = len(ATTR_START)
-                                    attr = attr[:point]+attr[point].capitalize()+attr[point+1:]
-                            else:
-                                attr = None
-                            cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
-                elif attrIndex == 0: #dpID
-                    if not cmds.objExists(item+"."+ATTR_DPID):
-                        id = self.utils.generateID(item)
-                        cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
-                        cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
-                else:
-                    attr = ATTR_LIST[attrIndex]
-                if attr:
-                    if not cmds.objExists(item+"."+attr):
-                        cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
-                        cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
+                                    attr = None
+                                cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
+                    elif attrIndex == 0: #dpID
+                        if not cmds.objExists(item+"."+ATTR_DPID):
+                            id = self.utils.generateID(item)
+                            cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
+                            cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
+                    else:
+                        attr = ATTR_LIST[attrIndex]
+                    if attr:
+                        if not cmds.objExists(item+"."+attr):
+                            cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
+                            cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
 
 
     def removeAttrUI(self, *args):

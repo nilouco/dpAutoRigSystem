@@ -291,6 +291,9 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         eyelidFixMiddleTZMD = cmds.createNode('multiplyDivide', name=baseName+"_Fix_MiddleTZ_MD")
         eyelidFixMiddleScaleClp = cmds.createNode('clamp', name=baseName+"_Fix_Middle_Clp")
         eyelidFollowRev = cmds.createNode('reverse', name=baseName+"_Follow_Rev")
+        self.toIDList.extend([eyelidIntensityMD, eyelidInvertMD, eyelidInvertXCnd, eyelidInvertYCnd, eyelidInvertYMiddleCnd, eyelidInvertFixMiddleCnd, eyelidPresetMD, eyelidMiddleMD, eyelidMiddleCnd, eyelidFixMD,
+                              eyelidFixPMA, eyelidFixModulusXCnd, eyelidFixModulusYMiddleCnd, eyelidFixModulusYCnd, eyelidFixNegativeMD, eyelidReduceOpenMiddleMD, eyelidInvertOpenMiddleMD, eyelidFixInvertOpenMiddleMD,
+                              eyelidFixMiddleMD, eyelidFixMiddleTZMD, eyelidFixMiddleScaleClp, eyelidFollowRev])
         # seting up the node attributes:
         cmds.setAttr(eyelidInvertXCnd+".colorIfTrueR", 1)
         cmds.setAttr(eyelidInvertXCnd+".colorIfFalseR", -1)
@@ -617,6 +620,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(self.eyeSpecCtrl, longName=self.dpUIinst.lang['c032_follow'], attributeType='float', keyable=True, minValue=0, maxValue=1, defaultValue=1)
                     followSPC = cmds.parentConstraint(self.fkEyeSubCtrl, self.baseEyeCtrl, eyeSpecZeroGrp, maintainOffset=True, name=eyeSpecZeroGrp+"_PaC")[0]
                     eyeSpecFollowRev = cmds.createNode('reverse', name=side+self.userGuideName+"_Spec_Follow_Rev")
+                    self.toIDList.append(eyeSpecFollowRev)
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.dpUIinst.lang['c032_follow'], followSPC+"."+self.fkEyeSubCtrl+"W0", force=True)
                     cmds.connectAttr(self.eyeSpecCtrl+"."+self.dpUIinst.lang['c032_follow'], eyeSpecFollowRev+".inputX", force=True)
                     cmds.connectAttr(eyeSpecFollowRev+".outputX", followSPC+"."+self.baseEyeCtrl+"W1", force=True)
@@ -709,11 +713,12 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generateRelativesID()
+            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
         
         
     def integratingInfo(self, *args):

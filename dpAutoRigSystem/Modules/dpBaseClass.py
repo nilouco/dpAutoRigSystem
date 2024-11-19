@@ -692,24 +692,6 @@ class StartClass(object):
             cmds.addAttr(self.toStaticHookGrp, longName="net", attributeType="message")
             cmds.connectAttr(self.guideNet+".message", self.toStaticHookGrp+".net", force=True)
             cmds.lockNode(self.guideNet, lock=True)
-
-
-    def generateRelativesID(self, item=None, *args):
-        """ Add dpID to all relative children nodes for the given item if this attribute doesn't exists yet.
-            Run into toStaticHookGrp if item isn't given.
-        """
-        if not item:
-            item = self.toStaticHookGrp
-        if cmds.objExists(item):
-            nodeList = [item]
-            shapeList = cmds.listRelatives(item, allDescendents=True, children=True, shapes=True)
-            if shapeList:
-                nodeList.extend(shapeList)
-            childrenList = cmds.listRelatives(item, allDescendents=True, children=True)
-            if childrenList:
-                nodeList.extend(childrenList)
-            nodeList = list(set(nodeList)) # just remove duplicated items
-            self.dpUIinst.customAttr.addAttr(0, nodeList) #dpID
     
 
     def renameUnitConversion(self, unitConversionList=None, *args):

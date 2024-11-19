@@ -212,12 +212,14 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         if not cmds.objExists(self.fingerCtrl+'.ikFkBlend'):
                             cmds.addAttr(self.fingerCtrl, longName="ikFkBlend", attributeType='float', keyable=True, minValue=0.0, maxValue=1.0, defaultValue=1.0)
                             self.ikFkRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_ikFk_Rev")
+                            self.toIDList.append(self.ikFkRevNode)
                             cmds.connectAttr(self.fingerCtrl+".ikFkBlend", self.ikFkRevNode+".inputX", force=True)
                         if not cmds.objExists(self.fingerCtrl+'.scaleCompensate'):
                             cmds.addAttr(self.fingerCtrl, longName="scaleCompensate", attributeType='short', minValue=0, defaultValue=1, maxValue=1, keyable=False)
                             cmds.setAttr(self.fingerCtrl+".scaleCompensate", channelBox=True)
                             scaleCompensateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_%02d_ScaleCompensate_MD"%(n))
                             self.scaleCompensateCond = cmds.createNode("condition", name=side+self.userGuideName+"_%02d_ScaleCompensate_Cnd"%(n))
+                            self.toIDList.extend([scaleCompensateMD, self.scaleCompensateCond])
                             cmds.connectAttr(self.fingerCtrl+".scaleCompensate", scaleCompensateMD+".input1X", force=True)
                             cmds.connectAttr(self.ikFkRevNode+".outputX", scaleCompensateMD+".input2X", force=True)
                             cmds.connectAttr(scaleCompensateMD+".outputX", self.scaleCompensateCond+".firstTerm", force=True)
@@ -435,6 +437,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.stretchCond+".secondTerm", 1)
                 cmds.setAttr(self.stretchCond+".operation", 2)
                 cmds.connectAttr(stretchScaleMD+".outputX", self.stretchCond+".colorIfTrueR", force=True)
+                self.toIDList.extend([stretchNormMD, ikStretchZUniformScaleMD, stretchScaleMD, self.stretchCond])
 
                 # ik fk blend connnections
                 for i, ikJoint in enumerate(ikJointList):
@@ -448,6 +451,7 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         cmds.connectAttr(self.fingerCtrl+".ikFkBlend", ikFkParentConst+"."+fkJoint+"W1", force=True)
                         cmds.connectAttr(self.ikFkRevNode+".outputX", ikFkParentConst+"."+ikJoint+"W0", force=True)
                         scaleBC = cmds.createNode("blendColors", name=skinJoint+"_BC")
+                        self.toIDList.append(scaleBC)
                         cmds.connectAttr(fkJoint+".scaleX", scaleBC+".color1R", force=True)
                         cmds.connectAttr(fkJoint+".scaleY", scaleBC+".color1G", force=True)
                         cmds.connectAttr(fkJoint+".scaleZ", scaleBC+".color1B", force=True)
@@ -491,11 +495,12 @@ class Finger(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generateRelativesID()
+            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
 
 
     def integratingInfo(self, *args):

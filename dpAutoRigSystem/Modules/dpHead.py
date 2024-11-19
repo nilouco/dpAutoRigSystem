@@ -211,11 +211,11 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         cmds.setAttr(self.deformerCube+".translateY", 4.0)
         cmds.setAttr(self.deformerCube+".translateZ", 0.5)
         cmds.parent(self.deformerCube, self.cvDeformerCenterLoc)
-        defRadiusMD = cmds.createNode("multiplyDivide", name=self.guideName+"_DeformerCube_MD")
+        self.defRadiusMD = cmds.createNode("multiplyDivide", name=self.guideName+"_DeformerCube_MD")
         for axis, attr in zip(["X", "Y", "Z"], ["width", "height", "depth"]):
-            cmds.setAttr(defRadiusMD+".input2"+axis, 2)
-            cmds.connectAttr(self.cvDeformerRadiusLoc+".translate"+axis, defRadiusMD+".input1"+axis)
-            cmds.connectAttr(defRadiusMD+".output"+axis, defPolyCube+"."+attr)
+            cmds.setAttr(self.defRadiusMD+".input2"+axis, 2)
+            cmds.connectAttr(self.cvDeformerRadiusLoc+".translate"+axis, self.defRadiusMD+".input1"+axis)
+            cmds.connectAttr(self.defRadiusMD+".output"+axis, defPolyCube+"."+attr)
         cmds.setAttr(self.deformerCube+".template", 1)
         self.utils.addCustomAttr([self.deformerCube], self.dpUIinst.skin.ignoreSkinningAttr)
         # include nodes into net
@@ -370,6 +370,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         jawStartMD = cmds.createNode('multiplyDivide', name=jawStartMDName)
         jawIntPMA = cmds.createNode('plusMinusAverage', name=jawIntPMAName)
         jawIntCnd = cmds.createNode('condition', name=jawIntCndName)
+        self.toIDList.extend([jawCalibrateMD, jawUnitFixMD, jawIntMD, jawStartMD, jawIntPMA, jawIntCnd])
         
         # set attributes to move jaw group when open or close:
         cmds.setAttr(jawIntPMA+".operation", 2) #substract
@@ -400,6 +401,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             invetRotMDName = attrBaseName+self.dpUIinst.lang[openCloseID]+self.dpUIinst.lang[intAttrID].capitalize()+"_"+axis+"_InvertRot_MD"
             invetRotPMA = cmds.createNode('plusMinusAverage', name=invetRotPMAName)
             invetRotMD = cmds.createNode('multiplyDivide', name=invetRotMDName)
+            self.toIDList.extend([invetRotPMA, invetRotMD])
             cmds.setAttr(invetRotPMA+".operation", 2) #substract
             cmds.setAttr(invetRotMD+".input2X", -1)
             cmds.setAttr(jawIntCnd+".colorIfFalseG", 0)
@@ -415,6 +417,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.addAttr(self.jawCtrl, longName=calibOutputAttrName, attributeType='float', defaultValue=1)
                 cmds.addAttr(self.jawCtrl, longName=outputAttrName, attributeType='float', defaultValue=1)
             jawOutputRmV = cmds.createNode('remapValue', name=jawOutputRmVName)
+            self.toIDList.append(jawOutputRmV)
             cmds.connectAttr(self.jawCtrl+".rotateX", jawOutputRmV+".inputValue", force=True)
             cmds.connectAttr(self.jawCtrl+"."+calibOutputAttrName, jawOutputRmV+".inputMax", force=True)
             cmds.connectAttr(jawOutputRmV+".outValue", self.jawCtrl+"."+outputAttrName, force=True)
@@ -801,6 +804,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.addAttr(self.neckCtrlList[n], longName=self.dpUIinst.lang['c047_autoRotate'], attributeType='float', minValue=0, maxValue=1, defaultValue=self.autoRotateCalc(n), keyable=True)
                     neckARMDName = self.dpUIinst.lang['c047_autoRotate'][0].capitalize()+self.dpUIinst.lang['c047_autoRotate'][1:]
                     neckARMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_MD")
+                    self.toIDList.append(neckARMD)
                     cmds.connectAttr(self.headCtrl+".rotateX", neckARMD+".input1X", force=True)
                     cmds.connectAttr(self.headCtrl+".rotateY", neckARMD+".input1Y", force=True)
                     cmds.connectAttr(self.headCtrl+".rotateZ", neckARMD+".input1Z", force=True)
@@ -883,7 +887,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.rCornerLipCtrl+'.'+self.dpUIinst.lang['c032_follow'], self.rLipRevNode+".inputX", force=True)
                 cmds.connectAttr(self.rLipRevNode+'.outputX', rLipParentConst+"."+self.upperJawCtrl+"W1", force=True)
                 cmds.scaleConstraint(self.upperJawCtrl, self.rLipGrp, maintainOffset=True, name=self.rLipGrp+"_ScC")[0]
-                
+                self.toIDList.extend([self.headRevNode, jawFollowRev, upperLipRev, self.lLipRevNode, self.rLipRevNode])
+
                 # articulation joint:
                 if self.addArticJoint:
                     # neckBase
@@ -1011,6 +1016,8 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     # collect nodes to be deformedBy this Head module:
                     deformedByList = headDefCtrlList + self.getDeformedByList(s) + facialCtrlList
                     self.dpHeadDeformer.dpHeadDeformer(side+self.userGuideName+"_"+self.dpUIinst.lang['c024_head'], [self.deformerCube], self.headSubCtrl, deformedByList)
+                elif cmds.objExists(self.guideName+"_DeformerCube_MD"):
+                    cmds.delete(self.guideName+"_DeformerCube_MD")
 
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
@@ -1029,11 +1036,12 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generateRelativesID()
+            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def dpCreateFacialCtrl(self, side, sideName, ctrlName, cvCtrl, attrList, rotVector=(0, 0, 0), lockX=False, lockY=False, lockZ=False, limitX=True, limitY=True, limitZ=True, directConnection=False, color='yellow', headDefInfluence=False, jawDefInfluence=False, addTranslateY=False, limitMinY=False, invertZ=False, *args):
@@ -1076,6 +1084,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             cmds.connectAttr(fCtrl+".scaleFactor", fCtrlGrp+".scaleY", force=True)
             if invertZ: # grimace hack to invert front and back values from Z axis
                 invZMD = cmds.createNode("multiplyDivide", name=ctrlName+"_InvZ_MD")
+                self.toIDList.append(invZMD)
                 cmds.setAttr(invZMD+".input2Z", -1)
                 cmds.connectAttr(fCtrl+".scaleFactor", invZMD+".input1Z", force=True)
                 cmds.connectAttr(invZMD+".outputZ", fCtrlGrp+".scaleZ", force=True)
@@ -1098,6 +1107,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                             calibrateMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Calibrate_MD")
                             clp = cmds.createNode("clamp", name=ctrlName+"_"+attr+"_Clp")
                             invMD = cmds.createNode("multiplyDivide", name=ctrlName+"_"+attr+"_Invert_MD")
+                            self.toIDList.extend([calibrateMD, clp, invMD])
                             if a == 0 or a == 2 or a == 4: #negative
                                 cmds.setAttr(clp+".minR", -1000)
                                 cmds.setAttr(invMD+".input2X", -1)
@@ -1119,6 +1129,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                     calibrationList.append(self.calibrateName+"TZ")
                             if addTranslateY: #useful for Sneer and Grimace
                                 integrateTYPMA = cmds.createNode("plusMinusAverage", name=ctrlName+"_"+attr+"_TY_PMA")
+                                self.toIDList.append(integrateTYPMA)
                                 cmds.connectAttr(calibrateMD+".outputX", integrateTYPMA+".input1D[0]", force=True)
                                 if not "Front" in attr:
                                     cmds.connectAttr(fCtrl+".translateY", integrateTYPMA+".input1D[1]", force=True)
@@ -1163,6 +1174,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         """
         hyperboleTLimitMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_MD")
         hyperboleInvMD = cmds.createNode("multiplyDivide", name=ctrlName+"_LimitT"+axis+"_Inv_MD")
+        self.toIDList.extend([hyperboleTLimitMD, hyperboleInvMD])
         cmds.setAttr(hyperboleTLimitMD+".input1X", 1)
         cmds.setAttr(hyperboleTLimitMD+".operation", 2)
         cmds.setAttr(hyperboleInvMD+".input2X", -1)

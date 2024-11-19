@@ -1088,6 +1088,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 if self.getAlignWorld():
                     originalRotateMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_"+extremName+"_OriginalRotate_MD")
                     alignWorldRev = cmds.createNode("reverse", name=side+self.userGuideName+"_"+extremName+"_AlighWorld_Rev")
+                    self.toIDList.extend([originalRotateMD, alignWorldRev])
                     cmds.addAttr(self.ikExtremCtrl, longName="alignWorld", attributeType="float", defaultValue=0, minValue=0, maxValue=1, keyable=True)
                     cmds.connectAttr(self.ikExtremCtrl+".alignWorld", alignWorldRev+".inputX", force=True)
                     if s == 0:
@@ -1132,6 +1133,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.connectAttr(self.ikExtremCtrl+'.twist', ikHandleACList[0]+".twist", force=True)
                 else:
                     twistMultDiv = cmds.createNode('multiplyDivide', name=self.ikExtremCtrl+"_MD")
+                    self.toIDList.append(twistMultDiv)
                     cmds.setAttr(twistMultDiv+'.input2X', -1)
                     cmds.connectAttr(self.ikExtremCtrl+'.twist', twistMultDiv+'.input1X', force=True)
                     cmds.connectAttr(twistMultDiv+'.outputX', ikHandleMainList[0]+".twist", force=True)
@@ -1256,6 +1258,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.delete(cmds.parentConstraint(self.quadExtraCtrl, quadExtraRotNull, maintainOffset=False))
                     cmds.parent(quadExtraRotNull, self.ikHandleToRFGrp)
                     autoOrientRev = cmds.createNode("reverse", name=self.quadExtraCtrl+"_AutoOrient_Rev")
+                    self.toIDList.append(autoOrientRev)
                     autoOrientConst = cmds.parentConstraint(self.ikHandleToRFGrp, quadExtraRotNull, quadExtraCtrlZero, skipTranslate=["x", "y", "z"], maintainOffset=True, name=quadExtraCtrlZero+"_PaC")[0]
                     cmds.setAttr(autoOrientConst+".interpType", 0) #noflip
                     cmds.connectAttr(self.quadExtraCtrl+".autoOrient", autoOrientRev+".inputX", force=True)
@@ -1320,6 +1323,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.ctrls.setLockHide([forearmCtrl], ['tx', 'ty', 'tz', 'rx', 'ry', 'sx', 'sy', 'sz', 'v', 'ro'])
                     # make rotate connections:
                     forearmMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+self.dpUIinst.lang[ 'c030_forearm']+"_MD")
+                    self.toIDList.append(forearmMD)
                     cmds.connectAttr(forearmCtrl+'.'+self.dpUIinst.lang['c033_autoOrient'], forearmMD+'.input1X')
                     cmds.connectAttr(self.skinJointList[3]+'.rotateZ', forearmMD+'.input2X')
                     cmds.connectAttr(forearmMD+'.outputX', forearmGrp+'.rotateZ')
@@ -1348,7 +1352,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.lang['c040_uniformScale'], fkScaleMD+".input1X", force=True)
                 cmds.connectAttr(self.fkCtrlList[-1]+"."+self.dpUIinst.lang['c040_uniformScale']+self.dpUIinst.lang['c105_multiplier'].capitalize(), fkScaleMD+".input2X", force=True)
                 # integrate uniformScale and scaleMultiplier attributes
-                uniBlend = cmds.rename(cmds.shadingNode("blendColors", asUtility=True), side+self.userGuideName+"_"+self.dpUIinst.lang['c040_uniformScale'][0].capitalize()+self.dpUIinst.lang['c040_uniformScale'][1:]+"_BC")
+                uniBlend = cmds.createNode("blendColors", name=side+self.userGuideName+"_"+self.dpUIinst.lang['c040_uniformScale'][0].capitalize()+self.dpUIinst.lang['c040_uniformScale'][1:]+"_BC")
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleX", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleY", force=True)
                 cmds.connectAttr(uniBlend+".outputR", origGrp+".scaleZ", force=True)
@@ -1570,6 +1574,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     acInvBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_AC_Inv_BC")
                     acInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_Inv_MD")
                     acMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_AC_MD")
+                    self.toIDList.extend([acIkMM, acIkDM, acIkQtE, acFkMM, acFkDM, acFkQtE, acBC, acInvBC, acInvMD, acMD])
                     cmds.setAttr(acFkQtE+".inputRotateOrder", 1) #yzx
                     # add attributes to control inverse value setup to blend ikFk:
                     ikFkRotAttrList = ["ikRotateX", "ikRotateY", "ikRotateZ", "fkRotateX", "fkRotateY", "fkRotateZ"]
@@ -1821,6 +1826,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         orientConnection = cmds.listConnections(extremJax+".rotateZ", destination=False, source=True, plugs=True)[0]
                         cmds.disconnectAttr(orientConnection, extremJax+".rotateZ")
                         jaxRotZMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_"+extremName+"_RotZ_Fix_MD")
+                        self.toIDList.append(jaxRotZMD)
                         cmds.setAttr(jaxRotZMD+".input2Z", 2)
                         cmds.connectAttr(orientConnection, jaxRotZMD+".input1Z", force=True)
                         cmds.connectAttr(jaxRotZMD+".outputZ", extremJax+".rotateZ", force=True)
@@ -1893,6 +1899,7 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     rfSoftIkCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_SoftIk_Cnd")
                     rfStretchableCnd = cmds.createNode("condition", name=side+self.userGuideName+"_RF_Stretchable_Cnd")
                     rfDistInvMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_RF_DistInv_MD")
+                    self.toIDList.extend([rfSoftIkCnd, rfStretchableCnd, rfDistInvMD])
                     cmds.setAttr(rfDistInvMD+".input2X", -1)
                     cmds.setAttr(rfStretchableCnd+".colorIfFalseR", 0)
                     cmds.connectAttr(rfDistBetList[1]+".distance", rfSoftIkCnd+".colorIfFalseR", force=True)
@@ -1937,10 +1944,12 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.zeroFkCtrlGrp, self.masterCtrlRef, self.rootCtrlRef, self.shoulderRefGrp, self.ikStretchExtremLoc, self.ikExtremCtrlGrp, self.ikExtremCtrlOrientGrp, self.ikHandleToRFGrp, self.cornerGrp, self.cornerOrientGrp, ikHandleACGrp, self.clavicleCtrlGrp, acLocGrp], self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr(self.ikHandleToRFGrpList, self.utils.ignoreTransformIOAttr)
+                self.toIDList.extend([self.fkIsolateRevNode, upLocOrientConst, ikScaleMD, fkScaleMD])
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generateRelativesID()
+            self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()

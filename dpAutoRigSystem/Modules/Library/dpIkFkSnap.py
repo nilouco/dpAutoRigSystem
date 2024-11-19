@@ -21,6 +21,7 @@ DP_IKFKSNAP_VERSION = 2.2
 class IkFkSnapClass(object):
     def __init__(self, dpUIinst, netName, worldRef, fkCtrlList, ikCtrlList, ikJointList, revFootAttrList, uniformScaleAttr, dpDev=False, *args):
         # defining variables:
+        self.dpUIinst = dpUIinst
         self.netName = netName
         self.worldRef = worldRef
         self.ikFkBlendAttr = cmds.getAttr(self.worldRef+".ikFkBlendAttrName")
@@ -37,7 +38,7 @@ class IkFkSnapClass(object):
         # store data
         self.ikFkState = round(cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr), 0)
         self.ikFkSnapNet = cmds.createNode("network", name=self.netName+"_IkFkSnap_Net")
-        dpUIinst.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
+        self.dpUIinst.customAttr.addAttr(0, [self.ikFkSnapNet]) #dpID
         self.dpID = cmds.getAttr(self.ikFkSnapNet+".dpID")
         self.storeIkFkSnapData()
         if dpDev:
@@ -504,6 +505,7 @@ for net in cmds.ls(type="network"):
                 IkFkSnap(net)
 '''
         sn = cmds.scriptNode(name=self.netName+'_IkFkSnap_SN', sourceType='python', scriptType=2, beforeScript=ikFkSnapCode)
+        self.dpUIinst.customAttr.addAttr(0, [sn]) #dpID
         cmds.addAttr(self.ikFkSnapNet, longName="ikFkSnapScriptNode", attributeType="message")
         cmds.addAttr(sn, longName="ikFkSnapNet", attributeType="message")
         cmds.connectAttr(sn+".message", self.ikFkSnapNet+".ikFkSnapScriptNode", force=True)

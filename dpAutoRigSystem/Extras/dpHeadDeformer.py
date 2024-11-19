@@ -70,6 +70,8 @@ class HeadDeformer(object):
         if dialogName == None:
             return
         # defining variables
+        self.toIDList = []
+        self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
         self.headCtrl = ctrl
         deformerName = self.addDeformerInName(dialogName, True)
         clusterName = self.addDeformerInName(dialogName, False)
@@ -255,6 +257,7 @@ class HeadDeformer(object):
                 # create and connect cluster
                 namePos = bottomCtrlName.replace(self.dpUIinst.lang["c100_bottom"], pos)
                 subClusterList = cmds.cluster(latticeSubPoints, relative=True, name=namePos+"_Cls")
+                self.toIDList.extend(subClusterList)
                 cmds.parent(self.utils.zeroOut([subClusterList[1]])[0], clusterGrp)
                 # create control and match zeroOutGrp
                 subCtrl = self.ctrls.cvControl("id_098_HeadDeformerSub", namePos+"_Ctrl", 0.55*bBoxSize, d=0, rot=(90, 0, 0))
@@ -386,8 +389,15 @@ class HeadDeformer(object):
                                 ]
             self.ctrls.setStringAttrFromList(arrowCtrl, hdCalibrationList)
             
+            # rename unitConversion nodes
+            self.utils.unitConversionTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
+            # add ignoreTranformIO attribute
             self.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, mainCtrlGrp, arrowCtrlGrp], self.utils.ignoreTransformIOAttr)
-
+            # add dpID attributes
+            self.toIDList.extend([mainCtrlGrp, dataGrp, calibrateMD, calibrateReduceMD, intensityMD, twistMD, remapV])
+            for deformerList in [latticeDefList, twistDefList, squashDefList, sideBendDefList, frontBendDefList, centerClusterList, topClusterList]:
+                self.toIDList.extend(deformerList)
+            self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
             # finish selection the arrow control
             cmds.select(arrowCtrl)
             if self.wellDone:

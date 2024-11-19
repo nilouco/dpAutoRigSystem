@@ -441,6 +441,7 @@ class Utils(object):
             dist = cmds.getAttr(distBet+".distance")
             if keep:
                 self.addCustomAttr([nullA, nullB, nullC], self.ignoreTransformIOAttr)
+                self.dpUIinst.customAttr.addAttr(0, [distBet]) #dpID
                 return [dist, distBet, nullA, nullB, nullC, pointConst]
             else:
                 cmds.delete(distBet, nullA, nullB, nullC, pointConst)

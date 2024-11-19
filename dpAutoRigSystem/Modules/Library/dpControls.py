@@ -1247,6 +1247,7 @@ class ControlClass(object):
             Connect setup nodes and add calibration attributes to it.
             Returns the corrective controller and its highest zero out group.
         """
+        toIDList = []
         calibrateAttrList = ["T", "R", "S"]
         calibrateAxisList = ["X", "Y", "Z"]
         toCalibrationList = []
@@ -1265,6 +1266,7 @@ class ControlClass(object):
             for axis in calibrateAxisList:
                 remapV = cmds.createNode("remapValue", name=jcrName.replace("_Jcr", "_"+attr+axis+"_RmV"))
                 intensityMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Intensity_MD"))
+                toIDList.extend([remapV, intensityMD])
                 cmds.connectAttr(correctiveNet+".outputStart", remapV+".inputMin", force=True)
                 cmds.connectAttr(correctiveNet+".outputEnd", remapV+".inputMax", force=True)
                 cmds.connectAttr(correctiveNet+".outputValue", remapV+".inputValue", force=True)
@@ -1273,6 +1275,7 @@ class ControlClass(object):
                 # add calibrate attributes:
                 if attr == "S":
                     scaleClp = cmds.createNode("clamp", name=jcrName.replace("_Jcr", "_"+attr+axis+"_ScaleIntensity_Clp"))
+                    toIDList.append(scaleClp)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=1)
                     cmds.setAttr(remapV+".outputMin", 1)
                     cmds.setAttr(scaleClp+".minR", 1)
@@ -1282,6 +1285,7 @@ class ControlClass(object):
                 else:
                     invertMD = cmds.createNode("multiplyDivide", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_MD"))
                     invertCnd = cmds.createNode("condition", name=jcrName.replace("_Jcr", "_"+attr+axis+"_Invert_Cnd"))
+                    toIDList.extend([invertMD, invertCnd])
                     cmds.setAttr(invertCnd+".secondTerm", 1)
                     cmds.setAttr(invertCnd+".colorIfTrueR", -1)
                     cmds.addAttr(jcrCtrl, longName="calibrate"+attr+axis, attributeType="float", defaultValue=0)
@@ -1292,6 +1296,7 @@ class ControlClass(object):
                     cmds.connectAttr(invertMD+".outputX", jcrGrp0+"."+attr.lower()+axis.lower(), force=True)
                 cmds.connectAttr(jcrCtrl+".calibrate"+attr+axis, remapV+".outputMax", force=True)
                 toCalibrationList.append("calibrate"+attr+axis)
+        self.dpUIinst.customAttr.addAttr(0, toIDList) #dpID
         self.setStringAttrFromList(jcrCtrl, toCalibrationList)
         return jcrCtrl, jcrGrp1
 

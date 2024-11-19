@@ -190,6 +190,7 @@ class DP_AutoRig_UI(object):
         self.loadedCheckOut = False
         self.loadedAddOns = False
         self.loadedRebuilder = False
+        self.toIDList = []
         self.controlInstanceList = []
         self.checkInInstanceList = []
         self.checkOutInstanceList = []
@@ -2735,6 +2736,7 @@ class DP_AutoRig_UI(object):
 
                                 # remove dpControl attribute
                                 self.customAttr.removeAttr("dpControl", [worldRef])
+                                self.toIDList.append(worldRef)
                             
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 self.toIDList.extend(cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))

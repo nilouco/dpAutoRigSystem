@@ -404,6 +404,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     cmds.setAttr(footPlantInvMD+".input2X", -1)
                     cmds.connectAttr(footPlantCnd+".outColorR", footPlantInvMD+".input1X", force=True)
                     cmds.connectAttr(footPlantInvMD+".outputX", self.footCtrlZeroList[1]+".rotateX", force=True)
+                    self.toIDList.append(footPlantInvMD)
                 
                 # create follow attribute to footBall control to space switch to middle control space:
                 cmds.addAttr(self.RFFCtrl, longName="follow", attributeType ="double", min=0, max=1, defaultValue=0, keyable=True)
@@ -444,14 +445,16 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.RFAGrp, self.RFBGrp, self.RFCGrp, self.RFDGrp, self.RFEGrp], self.utils.ignoreTransformIOAttr)
+                self.toIDList.extend([sideClamp, sideMD, footHeelClp, footPMA, footSR, footPlantClp, footPlantCnd, anglePlantPMA, anglePlantMD, anglePlantRmV, anglePlantCnd, footBallRevNode, mdNode])
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.generateRelativesID()
+            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
 
 
     def integratingInfo(self, *args):
