@@ -183,6 +183,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             aimRev = cmds.createNode("reverse", name=ikCtrlZero+"_Aim_Rev")
             cmds.connectAttr(ikCtrl+"."+self.dpUIinst.lang['c033_autoOrient'], aimRev+".inputX", force=True)
             cmds.connectAttr(aimRev+".outputX", aimConst+"."+fakeLoc+"W1", force=True)
+            self.toIDList.append(aimRev)
 
 
     def clearRenameJointChain(self, jntList, fromName, toName, clear=True, *args):
@@ -243,6 +244,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # setup new blend joints
         self.utils.createJointBlend(self.skinJointList[:-1], dynJntList[:-1], newSkinJntList[:-1], "Dyn_ikFkBlend", dynNameLower, self.worldRef, False)
         dynStretchBC = cmds.createNode("blendColors", name=dynName+"_DynStretch_BC")
+        self.toIDList.append(dynStretchBC)
         cmds.connectAttr(dynJntList[0]+".scaleX", dynStretchBC+".color1R", force=True)
         cmds.connectAttr(dynJntList[0]+".scaleY", dynStretchBC+".color1G", force=True)
         cmds.connectAttr(dynJntList[0]+".scaleZ", dynStretchBC+".color1B", force=True)
@@ -330,7 +332,6 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     jEndJnt = cmds.joint(name=side+self.userGuideName+self.jEndSuffixList[t], radius=0.5)
                     self.wipList.append(jEndJnt)
                     self.chainDic[suffix] = self.wipList
-                    self.toAddIDList.extend(self.wipList)
                 # getting jointLists:
                 self.skinJointList = self.chainDic[self.jSuffixList[0]]
                 self.ikJointList = self.chainDic[self.jSuffixList[1]]
@@ -372,7 +373,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_")+";"+self.base)
                     else:
                         self.utils.originedFrom(objName=origGrp, attrString=self.guide[self.guide.find("__") + 1:].replace(":", "_"))
-                    self.toAddIDList.extend(cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC"))
+                    self.toIDList.extend(cmds.parentConstraint(self.skinJointList[n], origGrp, maintainOffset=False, name=origGrp+"_PaC"))
                     
                     if n > 0:
                         cmds.parent(self.fkZeroGrpList[n], self.fkCtrlList[n - 1])
@@ -452,11 +453,10 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.ikSplineCurve = self.ikSplineList[2]
                 # ik clusters:
                 self.ikClusterList = []
-                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[0:1]", name=side+self.userGuideName+"_Ik_0_Cls")[1]) #[Deform, Handle]
-                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[2]", name=side+self.userGuideName+"_Ik_1_Cls")[1]) #[Deform, Handle]
-                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[3]", name=side+self.userGuideName+"_Ik_2_Cls")[1]) #[Deform, Handle]
-                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[4]", name=side+self.userGuideName+"_Ik_3_Cls")[1]) #[Deform, Handle]
-                self.ikClusterList.append(cmds.cluster(self.ikSplineCurve+".cv[5:6]", name=side+self.userGuideName+"_Ik_4_Cls")[1]) #[Deform, Handle]
+                for p, i in zip(["0:1", "2", "3", "4", "5:6"], range(0,5)):
+                    clusterList = cmds.cluster(self.ikSplineCurve+".cv["+p+"]", name=side+self.userGuideName+"_Ik_"+str(i)+"_Cls") #[Deform, Handle]
+                    self.toIDList.append(clusterList[0]) #Deformer
+                    self.ikClusterList.append(clusterList[1]) #Handle
                 # ik cluster positions:
                 firstIkJointPos = cmds.xform(self.ikJointList[0], query=True, worldSpace=True, rotatePivot=True)
                 cmds.xform(self.ikClusterList[0], worldSpace=True, rotatePivot=firstIkJointPos)
@@ -686,6 +686,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(self.base, side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr(self.origFromList, self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr([self.ikClusterGrp, self.ikCtrlGrp, ikMainLocGrp, self.ikStaticDataGrp], self.utils.ignoreTransformIOAttr)
+                self.toIDList.extend([curveInfoNode, ikNormalizeMD, globalStretchBC, stretchableBC, stretchBC, ikStretchRevNode, vvBC, vvCond, vvMD, vvScaleCompensateMD, vvClp, fkLastScaleCompensateMD, ikLastScaleCompensateMD, lastScaleBC])
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
@@ -694,7 +695,7 @@ class Chain(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toAddIDList) #dpID
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def integratingInfo(self, *args):

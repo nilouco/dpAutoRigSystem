@@ -462,7 +462,7 @@ class StartClass(object):
         """
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
-            self.toAddIDList = []
+            self.toIDList = []
             self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
             try:
                 # clear selected module layout:
@@ -708,11 +708,6 @@ class StartClass(object):
             childrenList = cmds.listRelatives(item, allDescendents=True, children=True)
             if childrenList:
                 nodeList.extend(childrenList)
-#            nodeTypeList = ["transform", "parentConstraint", "orientConstraint", "scaleConstraint"]
-#            for nodeType in nodeTypeList:
-#                childrenTypeList = cmds.listRelatives(item, allDescendents=True, children=True, type=nodeType)
-#                if childrenTypeList:
-#                    nodeList.extend(childrenTypeList)
             nodeList = list(set(nodeList)) # just remove duplicated items
             self.dpUIinst.customAttr.addAttr(0, nodeList) #dpID
     

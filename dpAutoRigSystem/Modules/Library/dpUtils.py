@@ -777,6 +777,7 @@ class Utils(object):
         else:
             twistBoneMD = cmds.createNode("multiplyDivide", name=twistBoneName+"_MD")
             cmds.connectAttr(twistBoneQtE+".outputRotate.outputRotate"+axis, twistBoneMD+".input2"+axis, force=True)
+        self.dpUIinst.customAttr.addAttr(0, [twistBoneMM, twistBoneDM, twistBoneQtE, twistBoneMD]) #dpID
         return twistBoneMD
         
 
@@ -1110,6 +1111,7 @@ class Utils(object):
             cmds.setAttr(parentConst+".interpType", 2) #shortest
             if n == 0:
                 revNode = cmds.createNode('reverse', name=jointListC[n]+"_"+attrName+"_Rev")
+                self.dpUIinst.customAttr.addAttr(0, [revNode]) #dpID
                 cmds.addAttr(worldRef, longName=attrCompName, attributeType='float', minValue=0, maxValue=1, defaultValue=0, keyable=True)
                 cmds.addAttr(worldRef, longName=attrCompName+"RevOutputX", attributeType="float", keyable=False)
                 if storeName:
