@@ -390,7 +390,7 @@ class HeadDeformer(object):
             self.ctrls.setStringAttrFromList(arrowCtrl, hdCalibrationList)
             
             # rename unitConversion nodes
-            self.utils.unitConversionTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
+            self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
             # add ignoreTranformIO attribute
             self.utils.addCustomAttr([latticeDefList[1], latticeDefList[2], offsetGrp, mainCtrlGrp, arrowCtrlGrp], self.utils.ignoreTransformIOAttr)
             # add dpID attributes

@@ -2242,8 +2242,8 @@ class DP_AutoRig_UI(object):
                 self.baseRootJntGrp = cmds.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
             cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
             cmds.parent(self.baseRootJntGrp, self.scalableGrp)
-            pac = cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")[0]
-            scc = cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")[0]
+            cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")
+            cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")
             self.customAttr.addAttr(0, [self.baseRootJntGrp], descendents=True) #dpID
             cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
             self.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
@@ -2643,7 +2643,7 @@ class DP_AutoRig_UI(object):
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
                                                 if jaxRotZMDList:
                                                     cmds.connectAttr(oc+".constraintRotateZ", jaxRotZMDList[s]+".input1Z", force=True)
-                                                    self.utils.unitConversionTreatment(cmds.listConnections(jaxRotZMDList[s]+".input1Z", source=True, destination=False))
+                                                    self.utils.nodeRenamingTreatment(cmds.listConnections(jaxRotZMDList[s]+".input1Z", source=True, destination=False))
                                                 for netNode in ankleCorrectiveList:
                                                     if netNode:
                                                         if cmds.objExists(netNode):

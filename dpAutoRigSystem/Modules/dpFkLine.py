@@ -225,4 +225,5 @@ class FkLine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     

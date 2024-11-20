@@ -42,11 +42,11 @@ class Isolate(object):
         """ Get grandfather node from selected item
             Return grandfather node found
         """
-        fatherItem = cmds.listRelatives(self.selItem, allParents=True, type="transform")[0]
-        if fatherItem:
-            grandFatherItem = cmds.listRelatives(fatherItem, allParents=True, type="transform")[0]
-            if grandFatherItem:
-                return grandFatherItem
+        fatherList = cmds.listRelatives(self.selItem, allParents=True, type="transform")
+        if fatherList:
+            grandFatherList = cmds.listRelatives(fatherList[0], allParents=True, type="transform")
+            if grandFatherList:
+                return grandFatherList[0]
         
         
     def dpMain(self, *args):
@@ -73,11 +73,13 @@ class Isolate(object):
         # get father zero out transform node
         zeroGrp = cmds.listRelatives(nodeList[2], allParents=True, type="transform")[0]
         # create parent constraint
-        pConst = cmds.parentConstraint(nodeList[0], nodeList[1], zeroGrp, maintainOffset=True, skipTranslate=["x", "y", "z"])[0]
+        pConst = cmds.parentConstraint(nodeList[0], nodeList[1], zeroGrp, maintainOffset=True, skipTranslate=["x", "y", "z"], name=zeroGrp+"_PaC")[0]
+        cmds.setAttr(pConst+".interpType", 0) #noFlip
         # add isolate attribute to selected control
         cmds.addAttr(nodeList[2], longName=attrName, defaultValue=1.0, minValue=0, maxValue=1, keyable=True) 
         # create reverse node
         reverseNode = cmds.createNode('reverse', name=nodeList[2]+"_"+attrName.capitalize()+"_Rev")
+        self.dpUIinst.customAttr.addAttr(0, [pConst, reverseNode]) #dpID
         # do isolate connections
         cmds.connectAttr(nodeList[2]+"."+attrName, pConst+"."+nodeList[0]+"W0", force=True)
         cmds.connectAttr(nodeList[2]+"."+attrName, reverseNode+".inputX", force=True)

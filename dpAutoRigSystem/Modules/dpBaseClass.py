@@ -392,6 +392,7 @@ class StartClass(object):
                     cmds.parent(currentCtrl, mainCtrl)
                     # intensity utilities
                     rIntensityMD = cmds.createNode("multiplyDivide", name=side+self.userGuideName+"_R_Main_MD")
+                    self.toIDList.append(rIntensityMD)
                     for axis in self.axisList:
                         cmds.connectAttr(mainCtrl+".rotate"+axis, rIntensityMD+".input1"+axis, force=True)
                         cmds.connectAttr(mainCtrl+"."+self.dpUIinst.lang['c049_intensity'], rIntensityMD+".input2"+axis, force=True)
@@ -703,7 +704,7 @@ class StartClass(object):
             if self.oldUnitConversionList:
                 unitConversionList = list(set(unitConversionList)-set(self.oldUnitConversionList))
             if unitConversionList:
-                self.utils.unitConversionTreatment(unitConversionList)
+                self.utils.nodeRenamingTreatment(unitConversionList)
 
 
     # Getters:

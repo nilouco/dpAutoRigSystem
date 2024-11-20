@@ -7,7 +7,7 @@ TITLE = "m059_limbSpaceSwitch"
 DESCRIPTION = "m060_limbSpaceSwitchDesc"
 ICON = "/Icons/dp_limbSpaceSwitch.png"
 
-DP_LIMBSPACESWITCH_VERSION = 2.3
+DP_LIMBSPACESWITCH_VERSION = 2.4
 
 
 class LimbSpaceSwitch(object):
@@ -18,6 +18,8 @@ class LimbSpaceSwitch(object):
         # find nodes
         for item in cmds.ls(selection=False, type="transform"):
             if cmds.objExists(item+".masterGrp"): #All_Grp
+                self.drivenKeyTypeList = ["animCurveUA", "animCurveUL", "animCurveUT", "animCurveUU"]
+                self.toIDList = []
                 self.rootCtrl = cmds.listConnections(item+".ctrlsVisibilityGrp", source=True, destination=False)[0] #Ctrls_Visibility_Grp
                 self.globalCtrl = cmds.listConnections(item+".globalCtrl", source=True, destination=False)[0]
 
@@ -75,6 +77,7 @@ class LimbSpaceSwitch(object):
     def dpDoAddHandFollow(self, *args):
         """ Set attributes and call setDrivenKey method.
         """
+        oldDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
         sideList = [self.dpUIinst.lang['p002_left'], self.dpUIinst.lang['p003_right']]
         limbList = [
                     self.dpUIinst.lang['c037_arm']+"_"+self.dpUIinst.lang['c004_arm_extrem'],
@@ -99,7 +102,8 @@ class LimbSpaceSwitch(object):
                         cmds.setAttr(ikCtrl+"."+self.followAttr, edit=True, keyable=True)
                         
                         self.pac = cmds.parentConstraint(self.globalCtrl, self.rootCtrl, self.spineHipsACtrl, self.spineHipsBCtrl, self.spineChestACtrl, self.spineChestBCtrl, self.headSubCtrl, ikCtrl+"_Orient_Grp", maintainOffset=True, name=ikCtrl+"_Orient_Grp_PaC")[0]
-                        
+                        self.toIDList.append(self.pac)
+
                         cmds.setAttr(ikCtrl+"."+self.followAttr, 0)
                         cmds.setAttr(self.pac+"."+self.globalCtrl+"W0", 1)
                         cmds.setAttr(self.pac+"."+self.rootCtrl+"W1", 0)
@@ -141,3 +145,10 @@ class LimbSpaceSwitch(object):
                         self.dpSetHandFollowSDK(ikCtrl)
 
                         cmds.setAttr(ikCtrl+"."+self.followAttr, followValue)
+
+        currentDrivenKeyList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
+        newDrivenKeyList = currentDrivenKeyList
+        if oldDrivenKeyList:
+            newDrivenKeyList = list(set(currentDrivenKeyList) - set(oldDrivenKeyList))
+        self.toIDList.extend(newDrivenKeyList)
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID

@@ -168,14 +168,15 @@ class CustomAttr(object):
                                     attr = None
                                 cmds.textFieldButtonGrp(self.addCustomAttrTFG, edit=True, text="")
                     elif attrIndex == 0: #dpID
-                        if not cmds.objExists(item+"."+ATTR_DPID):
+                        #if not cmds.objExists(item+"."+ATTR_DPID):
+                        if not ATTR_DPID in (cmds.listAttr(item, userDefined=True) or []):
                             id = self.utils.generateID(item)
                             cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
                             cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
                     else:
                         attr = ATTR_LIST[attrIndex]
                     if attr:
-                        if not cmds.objExists(item+"."+attr):
+                        if not attr in (cmds.listAttr(item, userDefined=True) or []):
                             cmds.addAttr(item, longName=attr, attributeType="bool", defaultValue=1, keyable=False)
                             cmds.setAttr(item+"."+attr, edit=True, channelBox=False)
 
@@ -208,7 +209,7 @@ class CustomAttr(object):
         itemList = self.getItemList(itemList)
         if itemList:
             for item in itemList:
-                if cmds.objExists(item+"."+attr):
+                if attr in cmds.listAttr(item):
                     cmds.setAttr(item+"."+attr, edit=True, lock=False)
                     cmds.deleteAttr(item+"."+attr)
                     if self.ui:

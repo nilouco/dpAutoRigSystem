@@ -13,7 +13,7 @@ ICON = "/Icons/dp_zipper.png"
 ZIPPER_ATTR = "dpZipper"
 ZIPPER_ID = "dpZipperID"
 
-DP_ZIPPER_VERSION = 2.18
+DP_ZIPPER_VERSION = 2.19
 
 
 class Zipper(object):
@@ -117,7 +117,9 @@ class Zipper(object):
             # delete old curve:
             self.dpDeleteOldCurve(zipperId)
             # create curve:
-            baseCurve = cmds.polyToCurve(name=curveName, form=2, degree=3, conformToSmoothMeshPreview=0)[0]
+            baseCurveList = cmds.polyToCurve(name=curveName, form=2, degree=3, conformToSmoothMeshPreview=0)
+            self.dpUIinst.customAttr.addAttr(0, baseCurveList, descendents=True) #dpID
+            baseCurve = baseCurveList[0]
             # rename polyEdgeToCurve node:
             cmds.rename(cmds.listConnections(baseCurve+".create")[0], pecName)
             # add attributes:
@@ -202,7 +204,7 @@ class Zipper(object):
         maxPos = cmds.xform(curveName+".cv["+str(curveLength-1)+"]", query=True, worldSpace=True, translation=True)[self.curveAxis]
         if minPos > maxPos:
             cmds.reverseCurve(curveName, constructionHistory=True, replaceOriginal=True)
-            cmds.rename(cmds.listConnections(curveName+".create")[0], self.utils.extractSuffix(curveName)+"_"+self.curveDirection+"_RevC")
+            self.toIDList.append(cmds.rename(cmds.listConnections(curveName+".create")[0], self.utils.extractSuffix(curveName)+"_"+self.curveDirection+"_RevC"))
     
     
     def dpGenerateMiddleCurve(self, origCurve, *args):
@@ -210,6 +212,7 @@ class Zipper(object):
         """
         self.middleCurve = cmds.duplicate(origCurve, name=self.zipperName+"_"+self.dpUIinst.lang['c029_middle']+"_Crv")[0]
         averageCurveNode = cmds.createNode('avgCurves', name=self.zipperName+"_"+self.dpUIinst.lang['c029_middle']+"_AvgC")
+        self.toIDList.append(averageCurveNode)
         cmds.setAttr(averageCurveNode+".automaticWeight", 0)
         cmds.connectAttr(self.firstCurve+".worldSpace", averageCurveNode+".inputCurve1", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace", averageCurveNode+".inputCurve2", force=True)
@@ -247,6 +250,7 @@ class Zipper(object):
         cmds.addAttr(self.zipperCtrl, longName=rigScaleAttr, attributeType='float', defaultValue=1)
         
         ctrlGrp = cmds.group(self.zipperCtrl, name=self.zipperName+"_Control_Grp")
+        self.toIDList.append(ctrlGrp)
         
         # check if there's a dpAR Option_Ctrl:
         if self.goodToDPAR:
@@ -374,6 +378,8 @@ class Zipper(object):
                 if c == 0:
                     cmds.connectAttr(zipperClp+".outputR", self.firstBS+".inputTarget[0].inputTargetGroup[0].targetWeights["+str(i)+"]")
                     cmds.connectAttr(zipperClp+".outputR", self.secondBS+".inputTarget[0].inputTargetGroup[0].targetWeights["+str(i)+"]")
+                self.toIDList.extend([crescentSR, decrescentSR, zipperPMA, autoSR, zipperClp])
+        self.toIDList.extend([self.firstBS, self.secondBS, firstMoP, secondMoP, autoOnOffMD, autoMaxCalibrateMD, rigScaleMD, rigScaleAutoMD, hyperboleScaleMD, autoMainSR])
     
     
     def dpCreateDeformMesh(self, *args):
@@ -388,6 +394,7 @@ class Zipper(object):
         # rename geometries:
         self.origModel = cmds.rename(self.origModel, self.utils.extractSuffix(self.origModel)+"_Orig_Geo")
         self.deformMesh = cmds.rename(self.deformMesh, self.utils.extractSuffix(oldMeshName)+"_Def_Mesh")
+        self.toIDList.extend([self.origModel, self.deformMesh])
         cmds.setAttr(self.origModel+".visibility", 0)
         # parent if need:
         modelGrp = self.utils.getNodeByMessage("modelsGrp")
@@ -412,6 +419,7 @@ class Zipper(object):
         """
         firstWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=self.utils.extractSuffix(self.deformMesh)+"_First_Wire")[0]
         secondWireDef = cmds.wire(self.deformMesh, groupWithBase=False, crossingEffect=0, localInfluence=1, dropoffDistance=(0, 1), name=self.utils.extractSuffix(self.deformMesh)+"_Second_Wire")[0]
+        self.toIDList.extend([firstWireDef, secondWireDef])
         cmds.connectAttr(self.firstCurve+".worldSpace[0]", firstWireDef+".baseWire[0]", force=True)
         cmds.connectAttr(self.secondCurve+".worldSpace[0]", secondWireDef+".baseWire[1]", force=True)
         cmds.connectAttr(self.firstBlendCurve+".worldSpace[0]", firstWireDef+".deformedWire[0]", force=True)
@@ -424,6 +432,7 @@ class Zipper(object):
         zipperCurvesGrp = cmds.group(self.firstCurve, self.secondCurve, self.middleCurve, self.firstBlendCurve, self.secondBlendCurve, name=self.zipperName+"_Curves_Grp")
         zipperDistanceGrp = cmds.group(self.firstLoc, self.secondLoc, self.distDimTransform, name=self.zipperName+"_Distance_Grp")
         zipperDataGrp = cmds.group(zipperCurvesGrp, zipperDistanceGrp, name=self.zipperName+"_Data_Grp")
+        self.toIDList.append(zipperDataGrp)
         if self.goodToDPAR:
             staticGrp = self.utils.getNodeByMessage("staticGrp")
             if staticGrp:
@@ -439,6 +448,8 @@ class Zipper(object):
             self.dpGetGoodToDPAR()
             if self.firstCurve and self.secondCurve:
                 if self.origModel:
+                    self.toIDList = []
+                    self.oldAddDoubleLinearList = cmds.ls(selection=False, type="addDoubleLinear")
                     self.dpGetCurveDirection()
                     self.dpSetCurveDirection(self.firstCurve)
                     self.dpSetCurveDirection(self.secondCurve)
@@ -448,6 +459,8 @@ class Zipper(object):
                     self.dpCreateWireDeform()
                     self.dpZipperDataGrp()
                     self.dpZipperCloseUI()
+                    self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="addDoubleLinear"))-set(self.oldAddDoubleLinearList)), "addDoubleLinear", "_ADL")
+                    self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
                     cmds.select(self.zipperCtrl)
                     print(self.dpUIinst.lang['m174_createdZipper'])
                 else:

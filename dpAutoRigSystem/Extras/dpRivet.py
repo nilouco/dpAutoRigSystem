@@ -35,7 +35,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.3
+DP_RIVET_VERSION = 2.4
 
 
 class Rivet(object):
@@ -523,6 +523,7 @@ class Rivet(object):
                 invTGrp = cmds.group(nodeName, name=nodeName+"_InvT_Grp")
                 cmds.xform(invTGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]))
                 tMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvT_MD", skipSelect=True)
+                self.toIDList.append(tMD)
                 cmds.setAttr(tMD+'.input2X', -1)
                 cmds.setAttr(tMD+'.input2Y', -1)
                 cmds.setAttr(tMD+'.input2Z', -1)
@@ -533,6 +534,7 @@ class Rivet(object):
                 invRGrp = cmds.group(nodeName, name=nodeName+"_InvR_Grp")
                 cmds.xform(invRGrp, worldSpace=True, rotatePivot=(nodePivot[0], nodePivot[1], nodePivot[2]), rotateOrder="zyx")
                 rMD = cmds.createNode('multiplyDivide', name=nodeName+"_InvR_MD", skipSelect=True)
+                self.toIDList.append(rMD)
                 cmds.setAttr(rMD+'.input2X', -1)
                 cmds.setAttr(rMD+'.input2Y', -1)
                 cmds.setAttr(rMD+'.input2Z', -1)
@@ -547,6 +549,7 @@ class Rivet(object):
             Returns the network node. 
         """
         # declaring variables
+        self.toIDList = []
         self.originedGeo = geoToAttach
         self.shapeToAttachList = None
         self.shapeToAttach = None
@@ -554,7 +557,8 @@ class Rivet(object):
         attrList = ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz']
         self.rivetList, togetherList = [], []
         isComponent = None
-        
+        self.oldUnitConversionList = cmds.ls(selection=False, type="unitConversion")
+
         # integrate to dpAutoRigSystem:
         self.masterGrp = None
         self.masterCtrl = None
@@ -578,6 +582,7 @@ class Rivet(object):
         if not cmds.objExists(rivetGrpName):
             createdRivetGrp = True
             self.rivetGrp = cmds.group(name=rivetGrpName, empty=True)
+            self.toIDList.append(self.rivetGrp)
             for attr in attrList:
                 cmds.setAttr(self.rivetGrp+"."+attr, lock=True, keyable=False, channelBox=False)
             cmds.addAttr(self.rivetGrp, longName="dpRivetGrp", attributeType='bool')
@@ -692,21 +697,18 @@ class Rivet(object):
                             cmds.polyUVSet(dupShape, copy=True, uvSet=uvSetName, newUVSet=uvSetList[0])
                         except:
                             uvSetName = uvSetList[0]
-                        
                 # closest point on mesh node:
                 self.cpNode = cmds.createNode("closestPointOnMesh", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
                 cmds.connectAttr(dupShape+".outMesh", self.cpNode+".inMesh", force=True)
-                
                 # move tempNode to cpNode position:
                 cmds.connectAttr(self.tempNode+".translate", self.cpNode+".inPosition", force=True)
-            
             else: #nurbsSurface
                 uRange = cmds.getAttr(dupShape+".minMaxRangeU")[0]
                 vRange = cmds.getAttr(dupShape+".minMaxRangeV")[0]
-                
                 # closest point on mesh node:
                 self.cpNode = cmds.createNode("closestPointOnSurface", name=geoToAttach+"_dpRivet_TEMP_CP", skipSelect=True)
                 cmds.connectAttr(dupShape+".local", self.cpNode+".inputSurface", force=True)
+            self.toIDList.append(self.cpNode)
                 
             # working with follicles and attaches
             for r, rivet in enumerate(self.rivetList):
@@ -714,6 +716,7 @@ class Rivet(object):
                 rivetPos = cmds.xform(rivet, query=True, worldSpace=True, rotatePivot=True)
                 if addFatherGrp:
                     rivet = cmds.group(rivet, name=rivet+"_"+RIVET_GRP)
+                    self.toIDList.append(rivet)
                     cmds.xform(rivet, worldSpace=True, rotatePivot=(rivetPos[0], rivetPos[1], rivetPos[2]))
                 
                 # move temp tranform to rivet location:
@@ -759,6 +762,7 @@ class Rivet(object):
             
                 # serialize network node
                 self.net = cmds.createNode("network", name=rivet+"_Net")
+                self.toIDList.append(self.net)
                 # add
                 cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
                 cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool")
@@ -816,7 +820,9 @@ class Rivet(object):
             cmds.delete(dupGeo, self.cpNode, self.tempNode)
         else:
             mel.eval("error \"Load one geometry to attach Rivets on it, please.\";")
-
+        
+        self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
         cmds.select(clear=True)
         return self.net
     
@@ -1023,7 +1029,8 @@ class Rivet(object):
             toRivetName = toRivetName[toRivetName.rfind("|")+1:]
         morphNode = cmds.rename(morphList, toRivetName+"_Mrp")
         componentMatchNode = cmds.listConnections(morphNode+".componentLookupList[0].componentLookup")[0]
-        cmds.rename(componentMatchNode, toRivetName+"_CpM")
+        componentMatchNode = cmds.rename(componentMatchNode, toRivetName+"_CpM")
+        self.toIDList.extend([morphGeo, morphNode, componentMatchNode])
         # Parent in modelsGrp
         self.parentToTransform([morphGeo], self.utils.getNodeByMessage("modelsGrp"))
         return morphGeo, morphNode
@@ -1048,6 +1055,7 @@ class Rivet(object):
         self.dpUIinst.ctrls.setLockHide([baseShape], ["translateX", "translateY", "translateZ", "rotateX", "rotateY", "rotateZ", "scaleX", "scaleY", "scaleZ"], True, False, True)
         # Remove from displayLayers
         cmds.editDisplayLayerMembers("defaultLayer", baseShape, noRecurse=False)
+        self.toIDList.extend([wrapGeo, wrapNode, baseShape])
         # Parent in modelsGrp
         self.parentToTransform([wrapGeo, baseShape], self.utils.getNodeByMessage("modelsGrp"))
         return wrapGeo, wrapNode

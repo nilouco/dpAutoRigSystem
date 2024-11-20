@@ -178,6 +178,7 @@ class TargetMirror(object):
             if targetList:
                 self.utils.setProgress('Target: '+self.dpUIinst.lang['c110_start'], self.dpUIinst.lang["m055_tgtMirror"], len(targetList), addOne=False, addNumber=False)
                 cancelled = False
+                self.toIDList = []
                 # get mirror information from UI
                 selectedMirror = cmds.radioCollection(self.mirrorAxisRC, query=True, select=True)
                 axis = cmds.radioButton(selectedMirror, query=True, annotation=True)
@@ -210,6 +211,7 @@ class TargetMirror(object):
                             cmds.setAttr(bsMirrorGrp+".scale"+axis, -1)
                             # create a new copy of the original model in order to be the mirrored target
                             newTarget = cmds.duplicate(origNode, name=newTargetName)[0]
+                            self.toIDList.append(newTarget)
                             # create a wrap deformer from bsMirrorGrp to newTarget
                             cmds.select([newTarget, bsMirrorGrp])
                             mel.eval("CreateWrap;")
@@ -231,4 +233,5 @@ class TargetMirror(object):
                             if clearUndo:
                                 mel.eval("flushUndo;")
                 self.utils.setProgress(endIt=True)
+                self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
             cmds.select(clear=True)

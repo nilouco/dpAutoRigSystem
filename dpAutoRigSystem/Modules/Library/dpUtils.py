@@ -1258,20 +1258,24 @@ class Utils(object):
         return resultDic
 
 
-    def unitConversionTreatment(self, itemList=None, *args):
+    def nodeRenamingTreatment(self, itemList=None, nodeType="unitConversion", suffix="_UC", *args):
         """ Rename unitConversion nodes to something like this:
             [IN]capitals+#+attr+_+[OUT]capitals+#+attr+"_UC"
+            or the given nodeType and suffix.
         """
         if not itemList:
-            itemList = cmds.ls(selection=False, type="unitConversion")
+            itemList = cmds.ls(selection=False, type=nodeType)
         if itemList:
             self.dpUIinst.customAttr.addAttr(0, itemList) #dpID
             for item in itemList:
-                if not item.endswith("_UC"):
-                    newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
+                if not item.endswith(suffix):
+                    if "input" in cmds.listAttr(item):
+                        newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
+                    elif "input1" in cmds.listAttr(item):
+                        newName = self.getCapitalsName(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
                     newName += "_"
                     newName += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])
-                    newName += "_UC"
+                    newName += suffix
                     cmds.rename(item, newName)
 
 

@@ -815,6 +815,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     if self.rigType == dpBaseClass.RigType.quadruped:
                         cmds.connectAttr(neckARMD+".outputZ", self.neckOrientGrp+".rotateY", force=True)
                         quadrupedRotYZFixMD = cmds.createNode('multiplyDivide', name=self.neckCtrlList[n]+"_"+neckARMDName+"_YZ_Fix_MD")
+                        self.toIDList.append(quadrupedRotYZFixMD)
                         cmds.connectAttr(neckARMD+".outputY", quadrupedRotYZFixMD+".input1X", force=True)
                         cmds.setAttr(quadrupedRotYZFixMD+".input2X", -1)
                         cmds.connectAttr(quadrupedRotYZFixMD+".outputX", self.neckOrientGrp+".rotateZ", force=True)
