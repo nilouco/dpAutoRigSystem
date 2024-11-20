@@ -333,8 +333,11 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 upLocPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(self.nJoints), query=True, worldSpace=True, translation=True)
                 cmds.move(downLocPos[0], downLocPos[1], downLocPos[2], rbnNurbsPlane)
                 # create up and down clusters:
-                downCluster = cmds.cluster(rbnNurbsPlane+".cv[0:3][0:1]", name=side+self.userGuideName+'_Down_Cls')[1]
-                upCluster = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(self.nJoints)+":"+str(self.nJoints+1)+"]", name=side+self.userGuideName+'_Up_Cls')[1]
+                downClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3][0:1]", name=side+self.userGuideName+'_Down_Cls')
+                upClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(self.nJoints)+":"+str(self.nJoints+1)+"]", name=side+self.userGuideName+'_Up_Cls')
+                downCluster = downClusterList[1]
+                upCluster = upClusterList[1]
+                self.toIDList.extend([downClusterList[0], upClusterList[0]])
                 # get positions of joints from ribbon nurbs plane:
                 startRbnJointPos = cmds.xform(side+self.userGuideName+"_01_Jnt", query=True, worldSpace=True, translation=True)
                 endRbnJointPos = cmds.xform(side+self.userGuideName+"_%02d_Jnt"%(self.nJoints), query=True, worldSpace=True, translation=True)
@@ -440,7 +443,9 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.middleCtrlGrp = cmds.rename(self.middleCtrlGrp, self.middleCtrlGrp.replace("Zero", "Grp"))
                     self.middleCtrlZero = self.utils.zeroOut([self.middleCtrlGrp])[0]
                     self.middleFkCtrlZero = self.utils.zeroOut([self.middleFkCtrl])[0]
-                    middleCluster = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(n+1)+"]", name=side+self.userGuideName+'_Middle_Cls')[1]
+                    middleClusterList = cmds.cluster(rbnNurbsPlane+".cv[0:3]["+str(n+1)+"]", name=side+self.userGuideName+'_Middle_Cls')
+                    middleCluster = middleClusterList[1]
+                    self.toIDList.append(middleClusterList[0])
                     middleLocPos = cmds.xform(side+self.userGuideName+"_Guide_JointLoc"+str(n), query=True, worldSpace=True, translation=True)
                     tempDel = cmds.parentConstraint(middleLocGuide, middleCluster, maintainOffset=False)
                     cmds.delete(tempDel)
@@ -467,6 +472,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     jointFather = cmds.listRelatives(self.aRbnJointList[n], allParents=True)[0]
                     intRevNode = cmds.createNode("reverse", name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_Rev")
                     middleIntBC = cmds.createNode("blendColors", name=side+self.userGuideName+"_"+self.dpUIinst.lang['c029_middle']+str(n)+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_BC")
+                    self.toIDList.extend([intRevNode, middleIntBC])
                     middleIntPC = cmds.parentConstraint(self.middleCtrl, jointFather, self.aRbnJointList[n], maintainOffset=True, name=self.aRbnJointList[n]+"_"+self.dpUIinst.lang['c049_intensity'].capitalize()+"_PaC")[0]
                     cmds.connectAttr(self.middleFkCtrl+"."+self.dpUIinst.lang['c049_intensity'], middleIntBC+".color1R", force=True)
                     cmds.connectAttr(self.middleCtrl+"."+self.dpUIinst.lang['c049_intensity'], middleIntBC+".color2R", force=True)
@@ -483,6 +489,7 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                     self.middleCtrlGrpPC = cmds.parentConstraint(self.middleCtrlZero, self.middleFkCtrl, self.middleCtrlGrp, maintainOffset=True, name=self.middleCtrlGrp+"_IkFkBlend_PaC")[0]
                     if n == 1:
                         self.revNode = cmds.createNode('reverse', name=side+self.userGuideName+"_IkFkBlend_Rev")
+                        self.toIDList.append(self.revNode)
                         cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.revNode+".inputX", force=True)
                     # connecting ikFkBlend using the reverse node:
                     cmds.connectAttr(self.hipsACtrl+'.'+attrNameLower+'Fk_ikFkBlend', self.middleCtrlGrpPC+"."+self.middleFkCtrl+"W1", force=True)
@@ -517,14 +524,16 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([middleOrigGrp], self.utils.ignoreTransformIOAttr)
+                self.toIDList.extend([middleScaleYMD, arcLen, rbnMD, rbnBlendColors, rbnCond, rbnVVMD])
+                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
 
 
     def connectSizeAxis(self, fromNode, toNode, *args):

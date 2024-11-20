@@ -2238,15 +2238,13 @@ class DP_AutoRig_UI(object):
         self.baseRootJntGrp = self.prefix+"BaseRoot_Joint_Grp"
         if not cmds.objExists(self.baseRootJnt):
             self.baseRootJnt = cmds.createNode("joint", name=self.prefix+"BaseRoot_Jnt")
-            self.customAttr.addAttr(0, [self.baseRootJnt]) #dpID
             if not cmds.objExists(self.baseRootJntGrp):
                 self.baseRootJntGrp = cmds.createNode("transform", name=self.prefix+"BaseRoot_Joint_Grp")
-                self.customAttr.addAttr(0, [self.baseRootJntGrp]) #dpID
             cmds.parent(self.baseRootJnt, self.baseRootJntGrp)
             cmds.parent(self.baseRootJntGrp, self.scalableGrp)
             pac = cmds.parentConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_PaC")[0]
             scc = cmds.scaleConstraint(self.rootCtrl, self.baseRootJntGrp, maintainOffset=True, name=self.baseRootJntGrp+"_ScC")[0]
-            self.customAttr.addAttr(0, [pac, scc]) #dpID
+            self.customAttr.addAttr(0, [self.baseRootJntGrp], descendents=True) #dpID
             cmds.setAttr(self.baseRootJntGrp+".visibility", 0)
             self.ctrls.setLockHide([self.baseRootJnt, self.baseRootJntGrp], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
     
@@ -2640,7 +2638,7 @@ class DP_AutoRig_UI(object):
                                             cmds.makeIdentity(footJnt, apply=True, translate=True, rotate=True, jointOrient=True, scale=False)
                                             cmds.parent(footJnt, footJntFather)
                                             cmds.parent(footJntChildrenList, footJnt)
-                                            cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC")
+                                            self.toIDList.extend(cmds.parentConstraint(extremJnt, footJnt, maintainOffset=True, name=footJnt+"_PaC"))
                                             if addCorrective:
                                                 oc = cmds.orientConstraint(footJnt, ankleArticList[2], ankleArticList[0], maintainOffset=True, name=ankleArticList[0]+"_OrC", skip="z")[0]
                                                 if jaxRotZMDList:
@@ -2737,7 +2735,7 @@ class DP_AutoRig_UI(object):
                                 # remove dpControl attribute
                                 self.customAttr.removeAttr("dpControl", [worldRef])
                                 self.toIDList.append(worldRef)
-                            
+
                                 # fix poleVector follow feature integrating with Master_Ctrl and Root_Ctrl:
                                 self.toIDList.extend(cmds.parentConstraint(self.masterCtrl, masterCtrlRefList[w], maintainOffset=True, name=masterCtrlRefList[w]+"_PaC"))
                                 self.toIDList.extend(cmds.parentConstraint(self.rootCtrl, rootCtrlRefList[w], maintainOffset=True, name=rootCtrlRefList[w]+"_PaC"))
@@ -3110,7 +3108,7 @@ class DP_AutoRig_UI(object):
                 # dpID
                 if self.toIDList:
                     self.toIDList = list(set(self.toIDList))
-                    self.customAttr.addAttr(0, self.toIDList)
+                    self.customAttr.addAttr(0, self.toIDList, descendents=True)
 
                 # atualise the number of rigged guides by type
                 for guideType in self.guideModuleList:

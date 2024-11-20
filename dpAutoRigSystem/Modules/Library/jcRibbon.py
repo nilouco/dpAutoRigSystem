@@ -323,6 +323,7 @@ class RibbonClass(object):
             cmds.delete(grp)
 
         self.utils.addCustomAttr([scaleGrp, ], self.utils.ignoreTransformIOAttr)
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
 
         # extraCtrlList:
         extraCtrlList = upLimb['extraCtrlList']
@@ -637,10 +638,10 @@ class RibbonClass(object):
         curveInfoNode = cmds.arclen(ribbon+".v[0.5]", constructionHistory=True)
         curveInfoNode = cmds.rename(curveInfoNode, ribbon+"_CurveInfo")
         curveFromSurfaceIso = cmds.listConnections(curveInfoNode+".inputCurve", source=True, destination=False)
-        cmds.rename(curveFromSurfaceIso, ribbon+"_CurveFromSurfaceIso")
+        cmds.rename(curveFromSurfaceIso, ribbon+"_CurveFromSurface_Iso")
         rbScaleMD = cmds.createNode("multiplyDivide", name=ribbon+"_ScaleCompensate_MD")
         rbNormalizeMD = cmds.createNode("multiplyDivide", name=ribbon+"_Normalize_MD")
-        self.toIDList.extend([rbScaleMD, rbNormalizeMD])
+        self.toIDList.extend([curveInfoNode, rbScaleMD, rbNormalizeMD, ribbon+"_CurveFromSurface_Iso"])
         cmds.setAttr(rbNormalizeMD+".operation", 2)
         cmds.connectAttr(curveInfoNode+".arcLength", rbNormalizeMD+".input2X", force=True)
         cmds.connectAttr(rbScaleMD+".outputX", rbNormalizeMD+".input1X", force=True)
@@ -765,6 +766,7 @@ class RibbonClass(object):
         skinClusterNode = cmds.skinCluster(drv_Jnt[0:3], ribbonShape, tsb=True, mi=2, dr=1, n=name+"_SC")[0]
         bindPose = cmds.listConnections(skinClusterNode+".bindPose", destination=False, source=True)
         cmds.rename(bindPose, name+"_BP")
+        self.toIDList.extend([skinClusterNode, name+"_BP"])
         
         #skin presets for the ribbon (that's amazing!)
         if not horizontal:

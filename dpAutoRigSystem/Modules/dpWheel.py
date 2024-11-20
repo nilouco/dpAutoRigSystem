@@ -308,7 +308,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         ";\nif (frame == "+self.wheelCtrl+"."+self.dpUIinst.lang['c068_startFrame']+") { "+wheelAutoGrp+".rotateZ = 0; };"+\
                         "\nif ("+self.wheelCtrl+"."+self.dpUIinst.lang['c093_tryKeepUndo']+" == 1) { undoInfo -stateWithoutFlush 1; };};"
                 # expression:
-                cmds.expression(name=side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Exp", object=self.frontLoc, string=expString)
+                expNode = cmds.expression(name=side+self.userGuideName+"_"+self.dpUIinst.lang['m156_wheel']+"_Exp", object=self.frontLoc, string=expString)
                 self.ctrls.setLockHide([self.frontLoc, self.wheelAutoGrpLoc], ['tx', 'ty', 'tz', 'rx', 'ry', 'rz', 'sx', 'sy', 'sz', 'v'])
                 
                 # deformers:
@@ -320,7 +320,9 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.setAttr(self.geoHolder+".visibility", 0, lock=True)
                 
                 # skinning:
-                cmds.skinCluster(self.centerJoint, self.geoHolder, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c046_holder']+"_SC")
+                scNode = cmds.skinCluster(self.centerJoint, self.geoHolder, toSelectedBones=True, dropoffRate=4.0, maximumInfluences=3, skinMethod=0, normalizeWeights=1, removeUnusedInfluence=False, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c046_holder']+"_SC")[0]
+                scBindPose = cmds.listConnections(scNode+".bindPose", destination=False, source=True)
+                cmds.rename(scBindPose, side+self.userGuideName+"_"+self.dpUIinst.lang['c046_holder']+"_BP")
                 if self.loadedGeo:
                     if cmds.objExists(self.loadedGeo):
                         baseName = self.utils.extractSuffix(self.loadedGeo)
@@ -347,7 +349,7 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # clusters:
                 upperClusterList = cmds.cluster(latticeList[1]+".pt[0:5][4:5][0:5]", relative=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c044_upper']+"_Cls") #[deform, handle]
                 middleClusterList = cmds.cluster(latticeList[1]+".pt[0:5][2:3][0:5]", relative=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['m033_middle']+"_Cls") #[deform, handle]
-                lowerClusterList = cmds.cluster(latticeList[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+"_Cls") #[deform, handle]
+                lowerClusterList = cmds.cluster(latticeList[1]+".pt[0:5][0:1][0:5]", relative=True, name=side+self.userGuideName+"_"+self.dpUIinst.lang['c045_lower']+"_Cls") #[deform, handle]                
                 clusterGrpList = self.utils.zeroOut([upperClusterList[1], middleClusterList[1], lowerClusterList[1]])
                 clustersGrp = cmds.group(clusterGrpList, name=side+self.userGuideName+"_Clusters_Grp")
                 
@@ -395,14 +397,19 @@ class Wheel(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.toSteeringGrp, clustersGrp, defCtrlGrp, defGrp, latticeList[1], latticeList[2], self.geoHolder], self.utils.ignoreTransformIOAttr)
+                
+                self.toIDList.extend([receptSteeringMD, inverseSteeringMD, steeringInvCnd, expNode, self.geoHolder, scNode, side+self.userGuideName+"_"+self.dpUIinst.lang['c046_holder']+"_BP"])
+                for idList in [latticeList, upperClusterList, middleClusterList, lowerClusterList]:
+                    self.toIDList.extend(idList)
+                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def integratingInfo(self, *args):

@@ -210,7 +210,7 @@ class ControlClass(object):
             Returns the ribbon nurbs plane, the joints groups and joints created.
         """
         # create a ribbonNurbsPlane:
-        ribbonNurbsPlane = cmds.nurbsPlane(name=name+"RibbonNurbsPlane", constructionHistory=False, object=True, polygon=0, axis=(0, 1, 0), width=1, lengthRatio=8, patchesV=totalJoints)[0]
+        ribbonNurbsPlane = cmds.nurbsPlane(name=name+"Ribbon_NP", constructionHistory=False, object=True, polygon=0, axis=(0, 1, 0), width=1, lengthRatio=8, patchesV=totalJoints)[0]
         # get the ribbonNurbsPlane shape:
         ribbonNurbsPlaneShape = cmds.listRelatives(ribbonNurbsPlane, shapes=True, children=True)[0]
         # make this ribbonNurbsPlane as template, invisible and not renderable:
@@ -225,20 +225,21 @@ class ControlClass(object):
         jointList, jointGrpList = [], []
         for j in range(totalJoints+1):
             # create pointOnSurfaceInfo:
-            infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+"_POSI"+str(j+1))
+            infoNode = cmds.createNode('pointOnSurfaceInfo', name=name+str(j+1)+"_POSI")
+            self.dpUIinst.customAttr.addAttr(0, [infoNode]) #dpID
             # setting parameters worldSpace, U and V:
-            cmds.connectAttr(ribbonNurbsPlaneShape + ".worldSpace[0]", infoNode + ".inputSurface")
-            cmds.setAttr(infoNode + ".parameterV", ((1/float(totalJoints))*j) )
-            cmds.setAttr(infoNode + ".parameterU", 0.5)
+            cmds.connectAttr(ribbonNurbsPlaneShape+".worldSpace[0]", infoNode+".inputSurface")
+            cmds.setAttr(infoNode+".parameterV", ((1/float(totalJoints))*j) )
+            cmds.setAttr(infoNode+".parameterU", 0.5)
             # create and parent groups to calculate:
             posGrp = cmds.group(n=name+"Pos"+str(j+1)+"_Grp", empty=True)
             upGrp  = cmds.group(n=name+"Up"+str(j+1)+"_Grp", empty=True)
             aimGrp = cmds.group(n=name+"Aim"+str(j+1)+"_Grp", empty=True)
             cmds.parent(upGrp, aimGrp, posGrp, relative=True)
             # connect groups translations:
-            cmds.connectAttr(infoNode + ".position", posGrp + ".translate", force=True)
-            cmds.connectAttr(infoNode + ".tangentU", upGrp + ".translate", force=True)
-            cmds.connectAttr(infoNode + ".tangentV", aimGrp + ".translate", force=True)
+            cmds.connectAttr(infoNode+".position", posGrp+".translate", force=True)
+            cmds.connectAttr(infoNode+".tangentU", upGrp+".translate", force=True)
+            cmds.connectAttr(infoNode+".tangentV", aimGrp+".translate", force=True)
             # create joint:
             cmds.select(clear=True)
             joint = cmds.joint(name=name+"_%02d_Jnt"%(j+1))

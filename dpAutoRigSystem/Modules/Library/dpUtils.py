@@ -429,7 +429,7 @@ class Utils(object):
             cmds.delete(cmds.pointConstraint(b, nullC, maintainOffset=False))
             pointConst = cmds.pointConstraint(b, nullC, nullB, maintainOffset=False, name=nullB+"_PaC")[0]
             # create distanceBetween node:
-            distBet = cmds.shadingNode("distanceBetween", n=name, asUtility=True)
+            distBet = cmds.createNode("distanceBetween", n=name)
             # connect aPos to the distance between point1:
             cmds.connectAttr(nullA+".tx", distBet+".point1X")
             cmds.connectAttr(nullA+".ty", distBet+".point1Y")

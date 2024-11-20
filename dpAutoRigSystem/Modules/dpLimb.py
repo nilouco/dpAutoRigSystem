@@ -1379,11 +1379,11 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                         self.quadFrontLegList.append(self.ikExtremCtrlOrientGrp)
 
                 # work with not stretch ik setup:
-                ikStretchableMD = cmds.shadingNode('multiplyDivide', asUtility=True, name=side+self.userGuideName+"_IkStretchable_MD")
+                ikStretchableMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_IkStretchable_MD")
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchableMD+".input1X", force=True)
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchableMD+".input2X", force=True)
 
-                ikStretchCtrlCnd = cmds.shadingNode('condition', asUtility=True, name=side+self.userGuideName+"_IkStretchCtrl_Cnd")
+                ikStretchCtrlCnd = cmds.createNode('condition', name=side+self.userGuideName+"_IkStretchCtrl_Cnd")
                 cmds.setAttr(ikStretchCtrlCnd+".secondTerm", 1)
                 cmds.setAttr(ikStretchCtrlCnd+".operation", 3)
                 cmds.connectAttr(ikStretchableMD+".outputX", ikStretchCtrlCnd+".colorIfFalseR", force=True)
@@ -1391,18 +1391,18 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchCtrlCnd+".firstTerm", force=True)
                 cmds.connectAttr(ikStretchCtrlCnd+".outColorR", parentConstToRFOffset+"."+self.ikExtremSubCtrl+"W0", force=True)
 
-                ikStretchDifPMA = cmds.shadingNode('plusMinusAverage', asUtility=True, name=side+self.userGuideName+"_Stretch_Dif_PMA")
+                ikStretchDifPMA = cmds.createNode('plusMinusAverage', name=side+self.userGuideName+"_Stretch_Dif_PMA")
                 cmds.setAttr(ikStretchDifPMA+".operation", 2)
                 cmds.connectAttr(self.worldRef+"."+attrNameLower+"Fk_ikFkBlendRevOutputX", ikStretchDifPMA+".input1D[0]", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchDifPMA+".input1D[1]", force=True)
 
-                ikStretchCnd = cmds.shadingNode('condition', asUtility=True, name=side+self.userGuideName+"_IkStretch_Cnd")
+                ikStretchCnd = cmds.createNode('condition', name=side+self.userGuideName+"_IkStretch_Cnd")
                 cmds.setAttr(ikStretchCnd+".operation", 3)
                 cmds.setAttr(ikStretchCnd+".secondTerm", 1)
                 cmds.connectAttr(ikStretchDifPMA+".output1D", ikStretchCnd+".colorIfFalseR", force=True)
                 cmds.connectAttr(self.ikExtremCtrl+".stretchable", ikStretchCnd+".firstTerm", force=True)
 
-                ikStretchClp = cmds.shadingNode('clamp', asUtility=True, name=side+self.userGuideName+"_IkStretch_Clp")
+                ikStretchClp = cmds.createNode('clamp', name=side+self.userGuideName+"_IkStretch_Clp")
                 cmds.setAttr(ikStretchClp+".maxR", 1)
                 cmds.connectAttr(ikStretchCnd+".outColorR", ikStretchClp+".inputR", force=True)
                 cmds.connectAttr(ikStretchClp+".outputR", parentConstToRFOffset+"."+self.ikNSJointList[-2]+"W2", force=True)
@@ -1944,16 +1944,16 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.zeroFkCtrlGrp, self.masterCtrlRef, self.rootCtrlRef, self.shoulderRefGrp, self.ikStretchExtremLoc, self.ikExtremCtrlGrp, self.ikExtremCtrlOrientGrp, self.ikHandleToRFGrp, self.cornerGrp, self.cornerOrientGrp, ikHandleACGrp, self.clavicleCtrlGrp, acLocGrp], self.utils.ignoreTransformIOAttr)
                 self.utils.addCustomAttr(self.ikHandleToRFGrpList, self.utils.ignoreTransformIOAttr)
-                self.toIDList.extend([self.fkIsolateRevNode, upLocOrientConst, ikScaleMD, fkScaleMD])
+                self.toIDList.extend([self.fkIsolateRevNode, upLocOrientConst, upLocOrientRev, ikScaleMD, fkScaleMD, uniBlend, ikStretchableMD, ikStretchCtrlCnd, ikStretchDifPMA, ikStretchCnd, ikStretchClp])
+                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
-            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
 
 
     def integratingInfo(self, *args):

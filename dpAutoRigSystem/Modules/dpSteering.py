@@ -111,6 +111,7 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.steeringUnitMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Unit_MD")
                 self.steeringInvertMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_Rotate_MD")
                 self.steeringMD = cmds.createNode('multiplyDivide', name=side+self.userGuideName+"_MD")
+                self.toIDList.extend([self.steeringUnitMD, self.steeringInvertMD, self.steeringMD])
                 cmds.setAttr(self.steeringInvertMD+".input2X", 0.1)
                 cmds.setAttr(self.steeringUnitMD+".input2X", -1)
                 cmds.transformLimits(self.steeringCtrl, enableRotationZ=(1, 1))
@@ -140,14 +141,15 @@ class Steering(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.hookSetup(side, [zeroOutCtrlGrpList[1]], [side+self.userGuideName+"_1_Jnt"])
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
+                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def integratingInfo(self, *args):

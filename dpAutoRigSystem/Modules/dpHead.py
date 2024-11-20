@@ -1025,6 +1025,7 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 self.utils.addCustomAttr([self.lLipGrp, self.rLipGrp, self.headOrientGrp, self.worldRef], self.utils.ignoreTransformIOAttr)
                 if self.correctiveCtrlGrpList:
                     self.utils.addCustomAttr(self.correctiveCtrlGrpList, self.utils.ignoreTransformIOAttr)
+                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
                 
             # connect to facial controllers to blendShapes or facial joints
             if cmds.getAttr(self.moduleGrp+".facial"):
@@ -1036,7 +1037,6 @@ class Head(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()

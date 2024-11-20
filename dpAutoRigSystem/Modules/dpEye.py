@@ -491,6 +491,7 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
             self.eyeGrp = cmds.group(self.eyeCtrl, name=self.userGuideName+"_"+self.dpUIinst.lang['c058_main']+"_Grp")
             self.utils.zeroOut([self.eyeCtrl])
             self.upLocGrp = cmds.group(name=self.userGuideName+"_UpLoc_Grp", empty=True)
+            self.toIDList.append(self.upLocGrp)
             # run for all sides:
             for s, side in enumerate(self.sideList):
                 cmds.select(clear=True)
@@ -710,15 +711,15 @@ class Eye(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                 # delete duplicated group for side (mirror):
                 cmds.delete(side+self.userGuideName+'_'+self.mirrorGrp)
                 self.utils.addCustomAttr([self.eyeGrp, self.upLocGrp, self.lUpGrpLoc, self.eyeScaleGrp], self.utils.ignoreTransformIOAttr)
+                self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             # finalize this rig:
             self.serializeGuide()
             self.integratingInfo()
-            self.dpUIinst.customAttr.addAttr(0, [self.toStaticHookGrp], descendents=True) #dpID
             cmds.select(clear=True)
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
-        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
         
         
     def integratingInfo(self, *args):
