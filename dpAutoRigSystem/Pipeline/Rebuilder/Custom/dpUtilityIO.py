@@ -50,8 +50,8 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                     utilityList = objList
                 else:
                     utilityList = cmds.ls(selection=False, type=self.utilityTypeList)
-                if utilityList:
-                    if self.firstMode: #export
+                if self.firstMode: #export
+                    if utilityList:
                         toExportDataDic = self.getUtilityDataDic(utilityList)
                         if toExportDataDic:
                             try:
@@ -62,26 +62,20 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                                 self.wellDoneIO(jsonName)
                             except Exception as e:
                                 self.notWorkedWellIO(jsonName+": "+str(e))
-                    else: #import
-                        try:
-                            exportedList = self.getExportedList()
-                            if exportedList:
-                                exportedList.sort()
-                                utilityDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if utilityDic:
-                                    self.importUtilityData(utilityDic)
-
-                                    # TODO: self.importUtilityConnections(utilityDic)
-
-
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                else: #import
+                    try:
+                        exportedList = self.getExportedList()
+                        if exportedList:
+                            exportedList.sort()
+                            utilityDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+                            if utilityDic:
+                                self.importUtilityData(utilityDic)
                             else:
                                 self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
-                else:
-                    self.notWorkedWellIO("Ctrls_Grp")
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    except Exception as e:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
@@ -128,34 +122,37 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
                 if not self.dpID in cmds.listAttr(item):
                     # getting attributes values
-                    itemType = cmds.objectType(item)
+                    nodeType = cmds.objectType(item)
                     dic[item] = {"attributes" : {},
-                                 "type"       : itemType,
+                                 "type"       : nodeType,
                                  "name"       : item
                                 }
-                    for attr in self.typeAttrDic[itemType]:
+                    for attr in self.typeAttrDic[nodeType]:
                         if attr in cmds.listAttr(item):
                             dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                     # compound attributes
-                    if itemType in self.typeMultiAttrDic.keys():
-                        for multiAttr in self.typeMultiAttrDic[itemType].keys():
+                    if nodeType in self.typeMultiAttrDic.keys():
+                        for multiAttr in self.typeMultiAttrDic[nodeType].keys():
                             indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
                             if indexList:
                                 dot = ""
                                 attrList = [""]
-                                if self.typeMultiAttrDic[itemType][multiAttr]:
+                                if self.typeMultiAttrDic[nodeType][multiAttr]:
                                     dot = "."
-                                    attrList = self.typeMultiAttrDic[itemType][multiAttr]
+                                    attrList = self.typeMultiAttrDic[nodeType][multiAttr]
                                 for i in indexList:
                                     for attr in attrList:
                                         attrName = multiAttr+"["+str(i)+"]"+dot+attr
-                                        dic[item]["attributes"][attrName] = cmds.getAttr(item+"."+attrName)
+                                        attrValue = cmds.getAttr(item+"."+attrName)
+                                        dic[item]["attributes"][attrName] = attrValue
+                                        if isinstance(attrValue, list):
+                                            dic[item]["attributes"][attrName] = attrValue[0]
             return dic
 
 
     def importUtilityData(self, utilityDic, *args):
-        """ Import constraints from exported dictionary.
-            Create missing constraints and set them values if they don't exists.
+        """ Import utility nodes from exported dictionary.
+            Create missing utility nodes and set them values if they don't exists.
         """
         self.utils.setProgress(max=len(utilityDic.keys()), addOne=False, addNumber=False)
         # define lists to check result
@@ -163,60 +160,18 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
         for item in utilityDic.keys():
             existingNodesList = []
             self.utils.setProgress(self.dpUIinst.lang[self.title])
-            # create constraint node if it needs
+            # create utility node if it needs
             if not cmds.objExists(item):
-                constType = utilityDic[item]["type"]
-                targetList, valueList = [], []
-                if utilityDic[item]["target"]:
-                    targetAttr = list(utilityDic[item]["target"].keys())[0]
-                    keyList = list(utilityDic[item]["target"][targetAttr].keys())
-                    keyList.sort()
-                    for k in keyList:
-                        targetList.append(utilityDic[item]["target"][targetAttr][k][0])
-                        valueList.append(utilityDic[item]["target"][targetAttr][k][1])
-                toNodeList = utilityDic[item]["constraintParentInverseMatrix"]
-                # create the missing constraint
-                if targetList and toNodeList:
-                    if constType == "parentConstraint":
-                        item = cmds.parentConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "pointConstraint":
-                        item = cmds.pointConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "orientConstraint":
-                        item = cmds.orientConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "scaleConstraint":
-                        item = cmds.scaleConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "aimConstraint":
-                        item = cmds.aimConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "pointOnPolyConstraint":
-                        item = cmds.pointOnPolyConstraint(targetList, toNodeList[0], maintainOffset=True, name=item)[0]
-                    elif constType == "geometryConstraint":
-                        item = cmds.geometryConstraint(targetList, toNodeList[0], name=item)[0]
-                    elif constType == "normalConstraint":
-                        item = cmds.normalConstraint(targetList, toNodeList[0], name=item)[0]
-                    elif constType == "poleVectorConstraint":
-                        item = cmds.poleVectorConstraint(targetList, toNodeList[0], name=item)[0]
-                    elif constType == "tangentConstraint":
-                        item = cmds.tangentConstraint(targetList, toNodeList[0], name=item)[0]
-                    # set attribute values
-                    if utilityDic[item]["attributes"]:
-                        for attr in utilityDic[item]["attributes"].keys():
+                cmds.createNode(utilityDic[item]["type"], name=utilityDic[item]["name"])
+                # set attribute values
+                if utilityDic[item]["attributes"]:
+                    for attr in utilityDic[item]["attributes"].keys():
+                        #if isinstance(attr, list): 
+                        if str(utilityDic[item]["attributes"][attr]).count(",") > 1: #support vector attributes like color_Color
+                            cmds.setAttr(item+"."+attr, utilityDic[item]["attributes"][attr][0], utilityDic[item]["attributes"][attr][1], utilityDic[item]["attributes"][attr][2], type="double3")
+                        else:
                             cmds.setAttr(item+"."+attr, utilityDic[item]["attributes"][attr])
-                    # set weight values
-                    for v, value in enumerate(valueList):
-                        cmds.setAttr(item+"."+targetList[v]+"W"+str(v), value)
-                    if utilityDic[item]["worldUpMatrix"]:
-                        cmds.connectAttr(utilityDic[item]["worldUpMatrix"][0]+".worldMatrix", item+".worldUpMatrix", force=True)
-                    # disconnect to keep the same exported skip option
-                    for outAttr in utilityDic[item]["output"].keys():
-                        if cmds.objExists(item+"."+outAttr):
-                            if not utilityDic[item]["output"][outAttr]:
-                                connectedList = cmds.listConnections(item+"."+outAttr, source=False, destination=True, plugs=True)
-                                if connectedList:
-                                    cmds.disconnectAttr(item+"."+outAttr, connectedList[0])
-                    wellImportedList.append(item)
-                else:
-                    cmds.createNode(constType, name=item) #broken node
-                    self.notWorkedWellIO(self.dpUIinst.lang['i329_broken']+" node - "+item)
+                wellImportedList.append(item)
             else:
                 existingNodesList.append(item)
         if wellImportedList:
