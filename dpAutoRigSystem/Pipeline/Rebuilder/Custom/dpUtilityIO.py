@@ -71,7 +71,7 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                                 if utilityDic:
                                     self.importUtilityData(utilityDic)
 
-                                    # TODO: self.importUtilityConnectins(utilityDic)
+                                    # TODO: self.importUtilityConnections(utilityDic)
 
 
                                 else:
@@ -103,32 +103,25 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
         """
         if utilityList:
             dic = {}
-            attrList = ["interpType", "constraintOffsetPolarity", "aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
-            outputAttrList = ["constraintTranslateX", "constraintTranslateY",  "constraintTranslateZ",  "constraintRotateX",  "constraintRotateY",  "constraintRotateZ",  "constraintScaleX",  "constraintScaleY",  "constraintScaleZ"]
-            
-            
-            typeAttrDic = {
+
+            self.typeAttrDic = {
                             "multiplyDivide"   : ["operation", "input1X", "input1Y", "input1Z", "input2X", "input2Y", "input2Z"],
                             "reverse"          : ["inputX", "inputY", "inputZ"],
-                            "plusMinusAverage" : ["operation", "input1D", "input2D", "input3D"], #TODO: etc... multiIndices attributes
+                            "plusMinusAverage" : ["operation"],
                             "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
                             "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
                             "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
                             "remapValue"       : ["inputValue", "inputMin", "inputMax", "outputMin", "outputMax"]
                         }
-            #TODO: remapValue attributes:
-                                            #value
-                                            #value.value_Position
-                                            #value.value_FloatValue
-                                            #value.value_Interp
-                                            #color
-                                            #color.color_Position
-                                            #color.color_Color
-                                            #color.color_ColorR
-                                            #color.color_ColorG
-                                            #color.color_ColorB
-                                            #color.color_Interp
-
+            self.typeMultiAttrDic = {
+                                "plusMinusAverage" : {"input1D" : [],
+                                                      "input2D" : ["input2Dx", "input2Dy"],
+                                                      "input3D" : ["input3Dx", "input3Dy", "input3Dz"]
+                                                      },
+                                "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
+                                                      "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
+                                                      }
+                            }
 
             self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
             for item in utilityList:
@@ -140,25 +133,23 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                                  "type"       : itemType,
                                  "name"       : item
                                 }
-                    for attr in typeAttrDic[itemType]:
+                    for attr in self.typeAttrDic[itemType]:
                         if attr in cmds.listAttr(item):
                             dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
-                    
-                    # dic[item]["target"] = {}
-                    # if cmds.objExists(item+".target"):
-                    #     targetAttr = None
-                    #     if cmds.objExists(item+".target[0].targetParentMatrix"):
-                    #         targetAttr = "targetParentMatrix"
-                    #     elif cmds.objExists(item+".target[0].targetGeometry"):
-                    #         targetAttr = "targetGeometry"
-                    #     elif cmds.objExists(item+".target[0].targetMesh"):
-                    #         targetAttr = "targetMesh"
-                    #     if targetAttr:
-                    #         dic[item]["target"][targetAttr] = {}
-                    #         targetList = cmds.getAttr(item+".target", multiIndices=True)
-                    #         for t in targetList:
-                    #             dic[item]["target"][targetAttr][t] = [cmds.listConnections(item+".target["+str(t)+"]."+targetAttr, source=True, destination=False)[0], cmds.getAttr(item+".target["+str(t)+"].targetWeight")]
-
+                    # compound attributes
+                    if itemType in self.typeMultiAttrDic.keys():
+                        for multiAttr in self.typeMultiAttrDic[itemType].keys():
+                            indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
+                            if indexList:
+                                dot = ""
+                                attrList = [""]
+                                if self.typeMultiAttrDic[itemType][multiAttr]:
+                                    dot = "."
+                                    attrList = self.typeMultiAttrDic[itemType][multiAttr]
+                                for i in indexList:
+                                    for attr in attrList:
+                                        attrName = multiAttr+"["+str(i)+"]"+dot+attr
+                                        dic[item]["attributes"][attrName] = cmds.getAttr(item+"."+attrName)
             return dic
 
 
