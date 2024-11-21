@@ -53,6 +53,9 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                 if ctrlList:
                     if self.firstMode: #export
                         toExportDataDic = self.getConnectionDataDic(ctrlList)
+
+                        # TODO: toExportDataDic.update(self.getConnectionsData(customList)) #utilityNodes without dpID
+
                         try:
                             # export json file
                             self.pipeliner.makeDirIfNotExists(self.ioPath)

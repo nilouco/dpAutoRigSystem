@@ -215,7 +215,7 @@ class Publisher(object):
         """
         if self.pipeliner.pipeData['publishPath']:
             # Starting progress window
-            self.utils.setProgress(self.dpUIinst.lang['i333_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
+            self.utils.setProgress(self.dpUIinst.lang['i335_starting']+"...", self.publisherName, 5, addOne=False, addNumber=False)
 
             # check if there'a a file name to publish this scene
             publishFileName = self.pipeliner.getPipeFileName(self.pipeliner.pipeData['publishPath'])
@@ -249,7 +249,7 @@ class Publisher(object):
                     self.abortPublishing(validatorsResult)
 
                 else:
-                    self.utils.setProgress(self.dpUIinst.lang['i333_storingData']+"...", addNumber=False)
+                    self.utils.setProgress(self.dpUIinst.lang['i336_storingData']+"...", addNumber=False)
                     
                     self.pipeliner.pipeData.update(publishLog)
 

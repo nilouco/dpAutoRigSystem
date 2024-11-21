@@ -188,6 +188,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
                                 cmds.delete(cmds.parentConstraint(self.singleCtrl, sdkLocGrp, maintainOffset=False))
                                 cmds.parent(sdkLocGrp, self.singleCtrl, relative=True)
                                 sdkLocMD = cmds.createNode("multiplyDivide", name=sdkLoc+"_MD")
+                                self.toIDList.append(sdkLocMD)
                                 cmds.addAttr(sdkLoc, longName="intensityX", attributeType="float", defaultValue=-1, keyable=False)
                                 cmds.addAttr(sdkLoc, longName="intensityY", attributeType="float", defaultValue=-1, keyable=False)
                                 cmds.addAttr(sdkLoc, longName="intensityZ", attributeType="float", defaultValue=-1, keyable=False)
@@ -246,6 +247,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         # delete UI (moduleLayout), GUIDE and moduleInstance namespace:
         self.deleteModule()
         self.renameUnitConversion()
+        self.dpUIinst.customAttr.addAttr(0, self.toIDList) #dpID
     
     
     def integratingInfo(self, *args):

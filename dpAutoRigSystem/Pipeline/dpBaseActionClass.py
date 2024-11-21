@@ -39,6 +39,7 @@ class ActionStartClass(object):
         self.secondBTLabel = None
         self.firstBTCustomLabel = None
         self.secondBTCustomLabel = None
+        self.dpID = "dpID"
         # returned lists
         self.checkedObjList = []
         self.foundIssueList = []
@@ -276,6 +277,7 @@ class ActionStartClass(object):
         cmds.refresh()
         cmds.viewFit(allObjects=True, animate=True)
         mel.eval("flushUndo;")
+        cmds.select(clear=True)
 
 
     def changeNodeState(self, itemList, findDeformers=True, state=None, dic=None, *args):

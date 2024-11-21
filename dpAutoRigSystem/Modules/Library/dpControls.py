@@ -669,6 +669,7 @@ class ControlClass(object):
                         # update cvControls attributes:
                         self.transferAttr(sourceItem, destinationList, ["className", "size", "degree", "cvRotX", "cvRotY", "cvRotZ"])
                         cmds.delete(sourceItem)
+                    self.dpUIinst.customAttr.addAttr(0, destinationList, descendents=True) #dpID
 
 
     def setSourceColorOverride(self, sourceItem, destinationList, *args):
