@@ -39,7 +39,7 @@ class ActionStartClass(object):
         self.secondBTLabel = None
         self.firstBTCustomLabel = None
         self.secondBTCustomLabel = None
-        self.dpID = "dpID"
+        self.dpID = self.dpUIinst.dpID
         # returned lists
         self.checkedObjList = []
         self.foundIssueList = []

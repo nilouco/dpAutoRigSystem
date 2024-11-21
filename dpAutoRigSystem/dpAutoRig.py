@@ -170,6 +170,7 @@ LOCATION_URL = "https://ipinfo.io/json"
 MASTER_ATTR = "masterGrp"
 DPDATA = "dpData"
 DPLOG = "dpLog"
+DPID = "dpID"
 
 
 class DP_AutoRig_UI(object):
@@ -190,6 +191,7 @@ class DP_AutoRig_UI(object):
         self.loadedCheckOut = False
         self.loadedAddOns = False
         self.loadedRebuilder = False
+        self.dpID = DPID
         self.toIDList = []
         self.controlInstanceList = []
         self.checkInInstanceList = []

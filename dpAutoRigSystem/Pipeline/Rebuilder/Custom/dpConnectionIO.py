@@ -53,9 +53,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                 if ctrlList:
                     if self.firstMode: #export
                         toExportDataDic = self.getConnectionDataDic(ctrlList)
-
-                        # TODO: toExportDataDic.update(self.getConnectionsData(customList)) #utilityNodes without dpID
-
+                        toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.utils.utilityTypeList))) #utilityNodes without dpID
                         try:
                             # export json file
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
@@ -117,10 +115,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                     if connectedAttrList:
                         dic[ctrl] = {}
                         for attr in connectedAttrList:
-                            dic[ctrl][attr] = {
-                                                "in"  : self.getConnectionInfoList(ctrl+"."+attr, sourceConnection=True, destinationConnection=False),
-                                                "out" : self.getConnectionInfoList(ctrl+"."+attr, sourceConnection=False, destinationConnection=True)
-                                                }
+                            dic[ctrl][attr] = self.getConnectionIODic(ctrl, attr)
             return dic
 
 
@@ -145,6 +140,32 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         return resultList
 
 
+    def getUtilitiesDataDic(self, itemList, *args):
+        """ Return the connection data from given utility nodes list.
+        """
+        if itemList:
+            dic = {}
+            for item in itemList:
+                if cmds.objExists(item):
+                    attrList = cmds.listAttr(item)
+                    if not self.dpID in attrList:
+                        nodeType = cmds.objectType(item)
+                        for attr in self.utils.typeAttrDic[nodeType]:
+                            if attr in attrList:
+                                if cmds.listConnections(item+"."+attr):
+                                    dic[item] = {attr : self.getConnectionIODic(item, attr)}
+            return dic
+        
+
+    def getConnectionIODic(self, item, attr, *args):
+        """ Return the connection from and to the given item and its attribute.
+        """
+        return {
+                "in"  : self.getConnectionInfoList(item+"."+attr, sourceConnection=True, destinationConnection=False),
+                "out" : self.getConnectionInfoList(item+"."+attr, sourceConnection=False, destinationConnection=True)
+                }
+
+
     def importConnectionData(self, connectDic, *args):
         """ Import connection data.
             Check if need to create an unitConversion node and set its conversionFactor value.
@@ -158,7 +179,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             self.utils.setProgress(self.dpUIinst.lang[self.title])
             # check connections
             for attr in connectDic[item].keys():
-                if cmds.objExists(item+"."+attr):
+                if attr in cmds.listAttr(item):
                     for i, io in enumerate(["in", "out"]): #input and output
                         if connectDic[item][attr][io]: #there's connection
                             for ioInfo in connectDic[item][attr][io]:

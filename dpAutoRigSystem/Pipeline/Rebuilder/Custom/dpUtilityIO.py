@@ -23,7 +23,6 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
         self.setActionType("r000_rebuilder")
         self.ioDir = "s_utilityIO"
         self.startName = "dpUtility"
-        self.utilityTypeList = ["multiplyDivide", "reverse", "plusMinusAverage", "condition", "clamp", "blendColors", "remapValue"]
     
 
     def runAction(self, firstMode=True, objList=None, *args):
@@ -49,7 +48,7 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                 if objList:
                     utilityList = objList
                 else:
-                    utilityList = cmds.ls(selection=False, type=self.utilityTypeList)
+                    utilityList = cmds.ls(selection=False, type=self.utils.utilityTypeList)
                 if self.firstMode: #export
                     if utilityList:
                         toExportDataDic = self.getUtilityDataDic(utilityList)
@@ -97,26 +96,6 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
         """
         if utilityList:
             dic = {}
-
-            self.typeAttrDic = {
-                            "multiplyDivide"   : ["operation", "input1X", "input1Y", "input1Z", "input2X", "input2Y", "input2Z"],
-                            "reverse"          : ["inputX", "inputY", "inputZ"],
-                            "plusMinusAverage" : ["operation"],
-                            "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
-                            "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
-                            "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
-                            "remapValue"       : ["inputValue", "inputMin", "inputMax", "outputMin", "outputMax"]
-                        }
-            self.typeMultiAttrDic = {
-                                "plusMinusAverage" : {"input1D" : [],
-                                                      "input2D" : ["input2Dx", "input2Dy"],
-                                                      "input3D" : ["input3Dx", "input3Dy", "input3Dz"]
-                                                      },
-                                "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
-                                                      "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
-                                                      }
-                            }
-
             self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
             for item in utilityList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
@@ -127,19 +106,19 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                                  "type"       : nodeType,
                                  "name"       : item
                                 }
-                    for attr in self.typeAttrDic[nodeType]:
+                    for attr in self.utils.typeAttrDic[nodeType]:
                         if attr in cmds.listAttr(item):
                             dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                     # compound attributes
-                    if nodeType in self.typeMultiAttrDic.keys():
-                        for multiAttr in self.typeMultiAttrDic[nodeType].keys():
+                    if nodeType in self.utils.typeMultiAttrDic.keys():
+                        for multiAttr in self.utils.typeMultiAttrDic[nodeType].keys():
                             indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
                             if indexList:
                                 dot = ""
                                 attrList = [""]
-                                if self.typeMultiAttrDic[nodeType][multiAttr]:
+                                if self.utils.typeMultiAttrDic[nodeType][multiAttr]:
                                     dot = "."
-                                    attrList = self.typeMultiAttrDic[nodeType][multiAttr]
+                                    attrList = self.utils.typeMultiAttrDic[nodeType][multiAttr]
                                 for i in indexList:
                                     for attr in attrList:
                                         attrName = multiAttr+"["+str(i)+"]"+dot+attr

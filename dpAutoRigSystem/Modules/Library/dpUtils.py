@@ -27,6 +27,32 @@ class Utils(object):
         self.dpOrderList = "dpOrderList"
         self.ignoreTransformIOAttr = "dpNotTransformIO"
         self.progress = False
+        self.defineDics()
+
+
+    def defineDics(self, *args):
+        """ Just define dictionary member variables.
+        """
+#        self.baseNodeList = ['time1', 'sequenceManager1', 'hardwareRenderingGlobals', 'renderPartition', 'renderGlobalsList1', 'defaultLightList1', 'defaultShaderList1', 'postProcessList1', 'defaultRenderUtilityList1', 'defaultRenderingList1', 'lightList1', 'defaultTextureList1', 'lambert1', 'standardSurface1', 'particleCloud1', 'initialShadingGroup', 'initialParticleSE', 'initialMaterialInfo', 'shaderGlow1', 'dof1', 'defaultRenderGlobals', 'defaultRenderQuality', 'defaultResolution', 'defaultLightSet', 'defaultObjectSet', 'defaultViewColorManager', 'defaultColorMgtGlobals', 'hardwareRenderGlobals', 'characterPartition', 'defaultHardwareRenderGlobals', 'ikSystem', 'hyperGraphInfo', 'hyperGraphLayout', 'globalCacheControl', 'strokeGlobals', 'dynController1', 'lightLinker1', 'persp', 'perspShape', 'top', 'topShape', 'front', 'frontShape', 'side', 'sideShape', 'shapeEditorManager', 'poseInterpolatorManager', 'layerManager', 'defaultLayer', 'renderLayerManager', 'defaultRenderLayer', 'ikSCsolver', 'ikRPsolver', 'ikSplineSolver', 'hikSolver', 'MayaNodeEditorSavedTabsInfo']
+        self.utilityTypeList = ["multiplyDivide", "reverse", "plusMinusAverage", "condition", "clamp", "blendColors", "remapValue"]
+        self.typeAttrDic = {
+                            "multiplyDivide"   : ["operation", "input1X", "input1Y", "input1Z", "input2X", "input2Y", "input2Z"],
+                            "reverse"          : ["inputX", "inputY", "inputZ"],
+                            "plusMinusAverage" : ["operation"],
+                            "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
+                            "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
+                            "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
+                            "remapValue"       : ["inputValue", "inputMin", "inputMax", "outputMin", "outputMax"]
+                        }
+        self.typeMultiAttrDic = {
+                            "plusMinusAverage" : {"input1D" : [],
+                                                    "input2D" : ["input2Dx", "input2Dy"],
+                                                    "input3D" : ["input3Dx", "input3Dy", "input3Dz"]
+                                                    },
+                            "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
+                                                    "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
+                                                    }
+                        }
         
 
     # UTILS functions:
