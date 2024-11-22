@@ -903,6 +903,8 @@
     "v090_overrideCleaner"        : "Override nettoyer",
     "v091_overrideCleanerDesc"    : "Ce validateur vérifiera s'il y a des overrides\net va les remover.",
     "v092_unlockAttributes"       : "Unlock attributs",
-    "v093_unlockAttributesDesc"   : "Ce validateur vérifiera et va faire l'unlock des attributs."
+    "v093_unlockAttributesDesc"   : "Ce validateur vérifiera et va faire l'unlock des attributs.",
+    "v094_envelopeChecker"        : "Vérificateur d'enveloppe",
+    "v095_envelopeCheckerDesc"    : "Ce validateur vérifie les attributs d'enveloppe inférieurs à un."
 
 }

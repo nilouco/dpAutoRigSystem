@@ -9,6 +9,7 @@ dpTargetCleaner
 dpUnknownNodesCleaner
 dpUnusedNodeCleaner
 dpUnusedSkinCleaner
+dpEnvelopeOn
 dpWIPCleaner
 dpExitEditMode
 dpHideCorrectives

@@ -903,6 +903,8 @@
     "v090_overrideCleaner"        : "Override limpador",
     "v091_overrideCleanerDesc"    : "Este validador verificará se existem overrides\ne removerá-los.",
     "v092_unlockAttributes"       : "Unlock atributos",
-    "v093_unlockAttributesDesc"   : "Esse validador verificará e vai dar unlock nos atributos."
+    "v093_unlockAttributesDesc"   : "Esse validador verificará e vai dar unlock nos atributos.",
+    "v094_envelopeChecker"        : "Verificador de envelopes",
+    "v095_envelopeCheckerDesc"    : "Este validador verifica atributos de envelope menores que um."
     
 }
