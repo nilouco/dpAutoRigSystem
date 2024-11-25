@@ -53,6 +53,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                 if ctrlList:
                     if self.firstMode: #export
                         toExportDataDic = self.getConnectionDataDic(ctrlList)
+                        #toExportDataDic.update(self.getConnectionDataDic(cmds.ls(selection=False, type="transform")))
                         toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.utils.utilityTypeList))) #utilityNodes without dpID
                         try:
                             # export json file
@@ -93,29 +94,29 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         return self.dataLogDic
 
 
-    def getConnectionDataDic(self, ctrlList, *args):
-        """ Processes the given controller list to collect the info about their connections to rebuild.
+    def getConnectionDataDic(self, itemList, *args):
+        """ Processes the given list to collect the info about their connections to rebuild.
             Returns a dictionary to export.
         """
-        if ctrlList:
+        if itemList:
             dic = {}
-            self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
-            for ctrl in ctrlList:
+            self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+            for item in itemList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(ctrl):
+                if cmds.objExists(item):
                     attrList = self.defaultAttrList
-                    userDefList = cmds.listAttr(ctrl, userDefined=True)
+                    userDefList = cmds.listAttr(item, userDefined=True)
                     if userDefList:
                         attrList.extend(userDefList)
                     connectedAttrList = []
                     for attr in attrList:
-                        if cmds.objExists(ctrl+"."+attr):
-                            if cmds.listConnections(ctrl+"."+attr):
+                        if cmds.objExists(item+"."+attr):
+                            if cmds.listConnections(item+"."+attr):
                                 connectedAttrList.append(attr)
                     if connectedAttrList:
-                        dic[ctrl] = {}
+                        dic[item] = {}
                         for attr in connectedAttrList:
-                            dic[ctrl][attr] = self.getConnectionIODic(ctrl, attr)
+                            dic[item][attr] = self.getConnectionIODic(item, attr)
             return dic
 
 
@@ -148,12 +149,18 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             for item in itemList:
                 if cmds.objExists(item):
                     attrList = cmds.listAttr(item)
-                    if not self.dpID in attrList:
+                    if not self.dpID in attrList or not self.utils.validateID(item):
                         nodeType = cmds.objectType(item)
-                        for attr in self.utils.typeAttrDic[nodeType]:
-                            if attr in attrList:
-                                if cmds.listConnections(item+"."+attr):
-                                    dic[item] = {attr : self.getConnectionIODic(item, attr)}
+                        connectedAttrList = []
+                        for inOutList in [self.utils.typeAttrDic[nodeType], self.utils.typeOutAttrDic[nodeType]]:
+                            for attr in inOutList:
+                                if attr in attrList:
+                                    if cmds.listConnections(item+"."+attr):
+                                        connectedAttrList.append(attr)
+                        if connectedAttrList:
+                            dic[item] = {}
+                            for attr in connectedAttrList:
+                                dic[item][attr] = self.getConnectionIODic(item, attr)
             return dic
         
 

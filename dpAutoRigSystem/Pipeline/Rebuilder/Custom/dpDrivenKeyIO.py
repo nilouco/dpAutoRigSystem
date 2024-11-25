@@ -103,7 +103,7 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
             self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
             for item in nodeList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not self.dpID in cmds.listAttr(item):
+                if not self.dpID in cmds.listAttr(item) or not self.utils.validateID(item):
                     # getting attributes if they exists
                     dic[item] = { "attributes"     : {},
                                 "keys"             : {},

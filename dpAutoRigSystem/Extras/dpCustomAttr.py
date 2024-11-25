@@ -173,6 +173,8 @@ class CustomAttr(object):
                             id = self.utils.generateID(item)
                             cmds.addAttr(item, longName=ATTR_DPID, dataType="string")
                             cmds.setAttr(item+"."+ATTR_DPID, id, type="string", lock=True)
+                        elif not self.utils.validateID(item):
+                            self.updateID([item])
                     else:
                         attr = ATTR_LIST[attrIndex]
                     if attr:
@@ -218,7 +220,7 @@ class CustomAttr(object):
 
 
     def getCustomAttrList(self, itemList=None, *args):
-        """ Return all boolean attributes starting "dp".
+        """ Return all boolean attributes starting with "dp".
         """
         customAttrList = []
         itemList = self.getItemList(itemList)

@@ -2693,6 +2693,7 @@ class DP_AutoRig_UI(object):
                                                             cmds.connectAttr(worldRef+"."+wrAttr, ikCtrl+'.'+attr, force=True)
                                     revFootCtrlOld = cmds.rename(revFootCtrl, revFootCtrl+"_Old")
                                     self.customAttr.removeAttr("dpControl", [revFootCtrlOld])
+                                    self.customAttr.updateID([revFootCtrlOld])
                         
                         # worldRef of extremGuide from limbModule controlled by optionCtrl:
                         if moduleType == LIMB:

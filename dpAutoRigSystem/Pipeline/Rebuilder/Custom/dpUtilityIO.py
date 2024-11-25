@@ -99,7 +99,7 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
             self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
             for item in utilityList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not self.dpID in cmds.listAttr(item):
+                if not self.dpID in cmds.listAttr(item) or not self.utils.validateID(item):
                     # getting attributes values
                     nodeType = cmds.objectType(item)
                     dic[item] = {"attributes" : {},

@@ -324,6 +324,30 @@ class ActionStartClass(object):
                     if lockNodeStatus:
                         cmds.lockNode(node, lock=1)
         return resultDic
+    
+
+    def getBrokenIDDataDic(self, toCheckList=None, *args):
+        """ Return a dictionary with the broken ID nodes as keys and them father nodes as values.
+        """
+        dic = {"BrokenID" : {}}
+        if not toCheckList:
+            toCheckList = cmds.ls(selection=False, long=True, type="transform", noIntermediate=True)
+        if toCheckList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title], self.dpUIinst.lang[self.actionType], addOne=False, addNumber=False)
+            self.utils.setProgress(max=len(toCheckList), addOne=False, addNumber=False)
+            filteredList = self.utils.filterTransformList(toCheckList, filterConstraint=False, filterFollicle=False, filterJoint=False, filterLocator=False, filterHandle=False, filterLinearDeform=False, filterEffector=False, title=self.dpUIinst.lang[self.title]+" "+self.dpUIinst.lang['i329_broken'])
+            if filteredList:
+                for item in filteredList:
+                    shortName = item[item.rfind("|")+1:]
+                    if not self.utils.validateID(shortName):
+                        itemType = cmds.objectType(item)
+                        if not itemType in dic["BrokenID"].keys():
+                            dic["BrokenID"][itemType] = {}
+                        dic["BrokenID"][itemType][shortName] = None
+                        fatherList = cmds.listRelatives(item, parent=True, fullPath=True)
+                        if fatherList:
+                            dic["BrokenID"][itemType][shortName] = fatherList[0]
+        return dic
 
 
     def endProgress(self, *args):

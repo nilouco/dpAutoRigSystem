@@ -86,7 +86,7 @@ class CorrectionManager(object):
         cmds.separator(style='none', height=10, width=100, parent=correctionManagerLayout)
         # edit selected net layout:
         self.editSelectedNetLayout = cmds.frameLayout('editSelectedNetLayout', label=self.dpUIinst.lang['i011_editSelected'], collapsable=True, collapse=False, parent=correctionManagerLayout)
-        
+
 
     def renameLinkedNodes(self, oldName, name, *args):
         """ List all connected nodes by message into the network and rename them using given parameters.
@@ -102,10 +102,12 @@ class CorrectionManager(object):
                 if connectedNodeList:
                     childrenList = cmds.listRelatives(connectedNodeList[0], children=True, allDescendents=True)
                     cmds.rename(connectedNodeList[0], connectedNodeList[0].replace(oldName, name))
+                    self.dpUIinst.customAttr.updateID([connectedNodeList[0].replace(oldName, name)])
                     if childrenList:
                         for children in childrenList:
                             try:
                                 cmds.rename(children, children.replace(oldName, name))
+                                self.dpUIinst.customAttr.updateID([children.replace(oldName, name)])
                             except:
                                 pass
 
