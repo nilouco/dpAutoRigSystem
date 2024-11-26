@@ -40,34 +40,40 @@ class Utils(object):
                             'defaultColorMgtGlobals', 'hardwareRenderGlobals', 'characterPartition', 'defaultHardwareRenderGlobals', 'ikSystem', 'hyperGraphInfo', 'hyperGraphLayout', 'globalCacheControl', 
                             'strokeGlobals', 'dynController1', 'lightLinker1', 'persp', 'perspShape', 'top', 'topShape', 'front', 'frontShape', 'side', 'sideShape', 'shapeEditorManager', 'poseInterpolatorManager', 
                             'layerManager', 'defaultLayer', 'renderLayerManager', 'defaultRenderLayer', 'ikSCsolver', 'ikRPsolver', 'ikSplineSolver', 'hikSolver', 'MayaNodeEditorSavedTabsInfo']
-        self.utilityTypeList = ["multiplyDivide", "reverse", "plusMinusAverage", "condition", "clamp", "blendColors", "remapValue"]
+        self.utilityTypeList = ["blendColors", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse"]
         self.typeAttrDic = {
-                            "multiplyDivide"   : ["operation", "input1X", "input1Y", "input1Z", "input2X", "input2Y", "input2Z"],
-                            "reverse"          : ["inputX", "inputY", "inputZ"],
-                            "plusMinusAverage" : ["operation"],
-                            "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
-                            "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
                             "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
-                            "remapValue"       : ["inputValue", "inputMin", "inputMax", "outputMin", "outputMax"]
+                            "choice"           : ["selector"],
+                            "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
+                            "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
+                            "multiplyDivide"   : ["operation", "input1X", "input1Y", "input1Z", "input2X", "input2Y", "input2Z"],
+                            "plusMinusAverage" : ["operation"],
+                            "remapValue"       : ["inputValue", "inputMin", "inputMax", "outputMin", "outputMax"],
+                            "reverse"          : ["inputX", "inputY", "inputZ"]
                         }
         self.typeOutAttrDic = {
-                            "multiplyDivide"   : ["outputX", "outputY", "outputZ"],
-                            "reverse"          : ["outputX", "outputY", "outputZ"],
-                            "plusMinusAverage" : ["output1D", "output2Dx", "output2Dy", "output3Dx", "output3Dy", "output3Dz"],
-                            "condition"        : ["outputColorR", "outputColorG", "outputColorB"],
-                            "clamp"            : ["outputR", "outputG", "outputB"],
                             "blendColors"      : ["outputR", "outputG", "outputB"],
-                            "remapValue"       : ["outColorR", "outColorG", "outColorB", "outValue"]
+                            "choice"           : ["output"],
+                            "clamp"            : ["outputR", "outputG", "outputB"],
+                            "condition"        : ["outColorR", "outColorG", "outColorB"],
+                            "multiplyDivide"   : ["outputX", "outputY", "outputZ"],
+                            "plusMinusAverage" : ["output1D", "output2Dx", "output2Dy", "output3Dx", "output3Dy", "output3Dz"],
+                            "remapValue"       : ["outColorR", "outColorG", "outColorB", "outValue"],
+                            "reverse"          : ["outputX", "outputY", "outputZ"]
                         }
         self.typeMultiAttrDic = {
+                            "choice"           : {"input" : []},
+                            "chooser"          : {"inLevel"      : [],
+                                                  "displayLevel" : []},
                             "plusMinusAverage" : {"input1D" : [],
-                                                    "input2D" : ["input2Dx", "input2Dy"],
-                                                    "input3D" : ["input3Dx", "input3Dy", "input3Dz"]
+                                                  "input2D" : ["input2Dx", "input2Dy"],
+                                                  "input3D" : ["input3Dx", "input3Dy", "input3Dz"]
                                                     },
                             "remapValue"       : {"value" : ["value_Position", "value_FloatValue", "value_Interp"],
-                                                    "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
+                                                  "color" : ["color_Position", "color_Color", "color_ColorR", "color_ColorG", "color_ColorB", "color_Position"]
                                                     }
                         }
+        self.typeOutMultiAttrDic = {"chooser" : {"output" : []}}
         
 
     # UTILS functions:
