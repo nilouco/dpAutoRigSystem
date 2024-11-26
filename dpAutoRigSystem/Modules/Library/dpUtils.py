@@ -40,9 +40,10 @@ class Utils(object):
                             'defaultColorMgtGlobals', 'hardwareRenderGlobals', 'characterPartition', 'defaultHardwareRenderGlobals', 'ikSystem', 'hyperGraphInfo', 'hyperGraphLayout', 'globalCacheControl', 
                             'strokeGlobals', 'dynController1', 'lightLinker1', 'persp', 'perspShape', 'top', 'topShape', 'front', 'frontShape', 'side', 'sideShape', 'shapeEditorManager', 'poseInterpolatorManager', 
                             'layerManager', 'defaultLayer', 'renderLayerManager', 'defaultRenderLayer', 'ikSCsolver', 'ikRPsolver', 'ikSplineSolver', 'hikSolver', 'MayaNodeEditorSavedTabsInfo']
-        self.utilityTypeList = ["blendColors", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse"]
+        self.utilityTypeList = ["blendColors", "blendWeighted", "choice", "chooser", "clamp", "condition", "multiplyDivide", "plusMinusAverage", "remapValue", "reverse"]
         self.typeAttrDic = {
                             "blendColors"      : ["blender", "color1R", "color1G", "color1B", "color2R", "color2G", "color2B"],
+                            "blendWeighted"    : ["current"],
                             "choice"           : ["selector"],
                             "clamp"            : ["minR", "minG", "minB", "maxR", "maxG", "maxB", "inputR", "inputG", "inputB"],
                             "condition"        : ["operation", "firstTerm", "secondTerm", "colorIfTrueR", "colorIfTrueG", "colorIfTrueB", "colorIfFalseR", "colorIfFalseG", "colorIfFalseB"],
@@ -53,6 +54,7 @@ class Utils(object):
                         }
         self.typeOutAttrDic = {
                             "blendColors"      : ["outputR", "outputG", "outputB"],
+                            "blendWeighted"    : ["output"],
                             "choice"           : ["output"],
                             "clamp"            : ["outputR", "outputG", "outputB"],
                             "condition"        : ["outColorR", "outColorG", "outColorB"],
@@ -62,6 +64,8 @@ class Utils(object):
                             "reverse"          : ["outputX", "outputY", "outputZ"]
                         }
         self.typeMultiAttrDic = {
+                            "blendWeighted"    : {"input"   : [],
+                                                   "weight" : []},
                             "choice"           : {"input" : []},
                             "chooser"          : {"inLevel"      : [],
                                                   "displayLevel" : []},
