@@ -25,6 +25,12 @@ class EnvelopeChecker(dpBaseActionClass.ActionStartClass):
 
     def nodeHasEnvelope(self, node):
         return cmds.attributeQuery('envelope', node=node, exists=True)
+    
+    def envelopeIsValid(self, node):
+        notConnected =  not cmds.listConnections(node+".envelope", source=True, destination=False)
+        nodeStateNormal = cmds.getAttr(node+".nodeState") == 0
+        notUserDefined = not "envelope" in (cmds.listAttr(node, userDefined=True) or [])
+        return notConnected and nodeStateNormal and notUserDefined
 
 
     def verifyEnvelope(self, node):
@@ -53,8 +59,9 @@ class EnvelopeChecker(dpBaseActionClass.ActionStartClass):
             allNodesList = objList
         else:
             allNodesList = cmds.ls()
-        allEnvelopedNodes = filter(self.nodeHasEnvelope, allNodesList)
-        self.checkedObjList.extend(list(allEnvelopedNodes))
+        allEnvelopedNodes = list(filter(self.nodeHasEnvelope, allNodesList))
+        allValidEnvelopeNodes = list(filter(self.envelopeIsValid, allEnvelopedNodes))
+        self.checkedObjList.extend(allValidEnvelopeNodes)
         if self.checkedObjList:
             self.utils.setProgress(max=len(self.checkedObjList), addOne=False, addNumber=False)
 
@@ -63,11 +70,8 @@ class EnvelopeChecker(dpBaseActionClass.ActionStartClass):
 
             if not self.firstMode:
                 for idx, issue in enumerate(self.checkedObjList):
-                    #self.utils.setProgress(self.dpUIinst.lang[self.title])
-                    notConnected =  not cmds.listConnections(self.checkedObjList[idx]+".envelope", source=True, destination=False)
-                    nodeStateNormal = cmds.getAttr(self.checkedObjList[idx]+".nodeState") == 0
-                    notUserDefined = "envelope" in cmds.listAttr(self.checkedObjList[idx], userDefined=False)
-                    if issue and notConnected and nodeStateNormal and notUserDefined:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    if issue:
                         try:
                             cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
                         except Exception as e:
