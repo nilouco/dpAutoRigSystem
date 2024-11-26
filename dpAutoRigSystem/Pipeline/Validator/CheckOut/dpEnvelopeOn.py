@@ -45,9 +45,9 @@ class EnvelopeChecker(dpBaseActionClass.ActionStartClass):
 
         # ---
         # --- validator code --- beginning
-        all_nodes_list = cmds.ls()
-        all_enveloped_nodes = filter(self.nodeHasEnvelope, all_nodes_list)
-        self.checkedObjList.extend(list(all_enveloped_nodes))
+        allNodesList = cmds.ls()
+        allEnvelopedNodes = filter(self.nodeHasEnvelope, allNodesList)
+        self.checkedObjList.extend(list(allEnvelopedNodes))
         self.utils.setProgress(max=len(self.checkedObjList), addOne=False, addNumber=False)
 
         for node in self.checkedObjList:
@@ -56,7 +56,9 @@ class EnvelopeChecker(dpBaseActionClass.ActionStartClass):
         if not self.firstMode:
             for idx, issue in enumerate(self.checkedObjList):
                 self.utils.setProgress()
-                if issue:
+                notConnected =  not cmds.listConnections(self.checkedObjList[idx]+".envelope", source=True, destination=False)
+                nodeStateNormal = cmds.getAttr(self.checkedObjList[idx]+".nodeState") == 0
+                if issue and notConnected and nodeStateNormal:
                     try:
                         cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
                     except Exception as e:
