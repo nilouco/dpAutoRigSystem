@@ -74,10 +74,13 @@ class EnvelopeChecker(dpBaseActionClass.ActionStartClass):
                     if issue:
                         try:
                             cmds.setAttr(f"{self.checkedObjList[idx]}.envelope", 1)
+                            self.foundIssueList[idx] = False
                         except Exception as e:
                             mel.eval('print \"dpAR: '+e+'\\n\";')
+        else:
+            self.foundIssueList.append(False)
 
-        self.resultOkList.append(True in self.foundIssueList)
+        self.resultOkList.append(not True in self.foundIssueList)
 
         # --- validator code --- end
         # ---
