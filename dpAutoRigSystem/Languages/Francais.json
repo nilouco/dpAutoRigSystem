@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-11-20",
+    "_updated"       : "2024-11-26",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -499,6 +499,7 @@
     "i335_starting"             : "Commence",
     "i336_storingData"          : "Gardant des donnés",
     "i337_sUtilityIOAnn"        : "Le dossier ou on va importer et exporter les donnés des utility nodes.",
+    "i338_sRenameIOAnn"         : "Le dossier ou on va importer et exporter les donnés des nodes renomés.",
 
     "m001_fkLine"                : "Ligne Fk",
     "m002_fkLineDesc"            : "Description du module Ligne Fk:\n\nCe module crées une chaine de joints\navec le nombre de joints désiré.\n\nLorsque rigged, les contrôles seront FK (forward kinematics).\n\nCeci est utile pour créer des queues, des oreilles, des poils\nou des contrôles simples pour les objets.",
@@ -801,6 +802,8 @@
     "r053_drivenKeyIODesc"      : "Cet action va travailler des nodes de set driven keys\nl'export et l'import de ces infos pour les réconstruire.",
     "r054_utilityIO"            : "Utilitaire IO",
     "r055_utilityIODesc"        : "Cet action va travailler des nodes des utilitaires\nl'export et l'import de ces infos pour les réconstruire.",
+    "r056_renameIO"             : "Renomer IO",
+    "r057_renameIODesc"         : "Cet action va travailler des nodes renomés\nl'export et l'import de ces infos pour les réconstruire.",
     
     "t000_translator"      : "Traducteur",
     "t001_greeting"        : "Merci pour votre aide dans ce projet.\n\nAvant de commencer la traduction de phrases,\nnous devons collecter des informations\nafin de compléter le fichier...",

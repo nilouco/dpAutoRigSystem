@@ -177,8 +177,7 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
             dic = {}
             for item in itemList:
                 if cmds.objExists(item):
-                    attrList = cmds.listAttr(item)
-                    if not self.dpID in attrList or not self.utils.validateID(item):
+                    if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
                         for attrDic, multi in zip([self.utils.typeAttrDic, self.utils.typeOutAttrDic, self.utils.typeMultiAttrDic, self.utils.typeOutMultiAttrDic], [False, False, True, True]):
                             gotDic = self.getAttrConnections(item, attrDic, multi)
                             if gotDic:

@@ -1126,27 +1126,33 @@ class Utils(object):
         return word+"."+now
 
 
-    def decomposeID(self, node, *args):
+    def getDecomposedIDList(self, id, *args):
+        """ Returns a list with prefix, name and date from decomposed given dpID.
+        """
+        word, now = id.split(".")
+        info = bytes.fromhex(word).decode('utf-8')
+        prefix = info[0:2]
+        name = info[2:]
+        date = time.strftime("%a %b %d %H:%M:%S %Y", time.localtime(int(now)/10000000000000))
+        return [prefix, name, date]
+
+
+    def decomposeID(self, item, *args):
         """ Return a list with the name and date decomposed from dpID attribute of the given node.
         """
-        if self.dpID in cmds.listAttr(node):
-            id = cmds.getAttr(node+"."+self.dpID)
-            word, now = id.split(".")
-            info = bytes.fromhex(word).decode('utf-8')
-            prefix = info[0:2]
-            name = info[2:]
-            date = time.strftime("%a %b %d %H:%M:%S %Y", time.localtime(int(now)/10000000000000))
-            return [prefix, name, date]
+        if cmds.attributeQuery(self.dpID, node=item, exists=True):
+            id = cmds.getAttr(item+"."+self.dpID)
+            return self.getDecomposedIDList(id)
         return [None, None, None]
     
 
-    def validateID(self, node, *args):
+    def validateID(self, item, *args):
         """ Return True if the decomposed name in the dpID is equal to the given node name.
         """
-        if self.dpID in cmds.listAttr(node):
-            decomposedIDList = self.decomposeID(node)
+        if cmds.attributeQuery(self.dpID, node=item, exists=True):
+            decomposedIDList = self.decomposeID(item)
             if "dp" == decomposedIDList[0]:
-                if node == decomposedIDList[1]:
+                if item == decomposedIDList[1]:
                     return True
 
 
@@ -1347,9 +1353,9 @@ class Utils(object):
             self.dpUIinst.customAttr.addAttr(0, itemList) #dpID
             for item in itemList:
                 if not item.endswith(suffix):
-                    if "input" in cmds.listAttr(item):
+                    if cmds.attributeQuery("input", node=item, exists=True):
                         newName = self.getCapitalsName(cmds.listConnections(item+".input", plugs=True, source=True, destination=False)[0])
-                    elif "input1" in cmds.listAttr(item):
+                    elif cmds.attributeQuery("input1", node=item, exists=True):
                         newName = self.getCapitalsName(cmds.listConnections(item+".input1", plugs=True, source=True, destination=False)[0])
                     newName += "_"
                     newName += self.getCapitalsName(cmds.listConnections(item+".output", plugs=True, source=False, destination=True)[0])

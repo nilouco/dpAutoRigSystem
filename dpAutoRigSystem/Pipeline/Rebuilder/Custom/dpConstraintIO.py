@@ -109,7 +109,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
             self.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
             for const in constraintList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not self.dpID in cmds.listAttr(const):
+                if not cmds.attributeQuery(self.dpID, node=const, exists=True):
                     # getting attributes if they exists
                     dic[const] = {"attributes" : {},
                                 "output"     : {},
