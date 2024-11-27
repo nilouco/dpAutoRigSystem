@@ -1,3 +1,4 @@
+dpRenameIO
 dpTransformationIO
 dpControlShapeIO
 dpAttributeIO

@@ -99,7 +99,7 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
             self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
             for item in utilityList:
                 self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not self.dpID in cmds.listAttr(item) or not self.utils.validateID(item):
+                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
                     # getting attributes values
                     nodeType = cmds.objectType(item)
                     dic[item] = {"attributes" : {},
@@ -107,7 +107,7 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                                  "name"       : item
                                 }
                     for attr in self.utils.typeAttrDic[nodeType]:
-                        if attr in cmds.listAttr(item):
+                        if cmds.attributeQuery(attr, node=item, exists=True):
                             dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
                     # compound attributes
                     if nodeType in self.utils.typeMultiAttrDic.keys():
