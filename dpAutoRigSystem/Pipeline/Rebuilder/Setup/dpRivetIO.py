@@ -54,21 +54,10 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
                     else:
                         netList = self.utils.getNetworkNodeByAttr("dpRivetNet")
                     if netList:
-                        toExportDataDic = self.getRivetDataDic(netList)
-                        if toExportDataDic:
-                            try:
-                                # export json file
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(jsonName+": "+str(e))
-                        else:
-                            self.notWorkedWellIO("v014_notFoundNodes")
-                        cmds.select(clear=True)
+                        self.exportDicToJsonFile(self.getRivetDataDic(netList))
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
+                        cmds.select(clear=True)
                 else: #import
                     exportedList = self.getExportedList()
                     if exportedList:

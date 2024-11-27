@@ -51,28 +51,7 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                     else:
                         transformList = cmds.ls(selection=False, long=True, type="transform")
                     if transformList:
-                        self.utils.setProgress(max=len(transformList), addOne=False, addNumber=False)
-                        # define dictionary to export
-                        transformDic = {}
-                        transformList = self.utils.filterTransformList(transformList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
-                        for item in transformList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
-                            useThisTransform = True
-                            if cmds.objExists(item+".dpNotTransformIO"):
-                                if cmds.getAttr(item+".dpNotTransformIO") == 1:
-                                    useThisTransform = False
-                            if useThisTransform:
-                                dataDic = self.getTransformation(item)
-                                if dataDic:
-                                    transformDic[item] = dataDic
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            self.pipeliner.saveJsonFile(transformDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(self.getTransformDataDic(transformList))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else: #import
@@ -132,6 +111,26 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
+
+
+    def getTransformDataDic(self, itemList, *args):
+        """ Return the transform data info to export.
+        """
+        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        # define dictionary to export
+        transformDic = {}
+        itemList = self.utils.filterTransformList(itemList, verbose=self.verbose, title=self.dpUIinst.lang[self.title])
+        for item in itemList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            useThisTransform = True
+            if cmds.objExists(item+".dpNotTransformIO"):
+                if cmds.getAttr(item+".dpNotTransformIO") == 1:
+                    useThisTransform = False
+            if useThisTransform:
+                dataDic = self.getTransformation(item)
+                if dataDic:
+                    transformDic[item] = dataDic
+        return transformDic
 
 
     def getTransformation(self, item, *args):

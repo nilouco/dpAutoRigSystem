@@ -51,16 +51,7 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
                     utilityList = cmds.ls(selection=False, type=self.utils.utilityTypeList)
                 if self.firstMode: #export
                     if utilityList:
-                        toExportDataDic = self.getUtilityDataDic(utilityList)
-                        if toExportDataDic:
-                            try:
-                                # export json file
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(self.getUtilityDataDic(utilityList))
                 else: #import
                     try:
                         exportedList = self.getExportedList()

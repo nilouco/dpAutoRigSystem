@@ -353,3 +353,16 @@ class ActionStartClass(object):
     def endProgress(self, *args):
         if self.verbose:
             self.utils.setProgress(endIt=True)
+
+
+    def exportDicToJsonFile(self, dic, *args):
+        """ Export given dictionary to json file using ioPath and startName as prefix of the current file name.
+        """
+        try:
+            # export json file
+            self.pipeliner.makeDirIfNotExists(self.ioPath)
+            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
+            self.pipeliner.saveJsonFile(dic, jsonName)
+            self.wellDoneIO(jsonName)
+        except Exception as e:
+            self.notWorkedWellIO(jsonName+": "+str(e))

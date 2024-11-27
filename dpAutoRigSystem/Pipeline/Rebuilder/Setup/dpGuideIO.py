@@ -54,33 +54,10 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     else:
                         netList = self.utils.getNetworkNodeByAttr("dpGuideNet")
                     if netList:
-                        toExportDataDic = {}
-                        self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
-                        for net in netList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
-                            # mount a dic with all data 
-                            if cmds.objExists(net+".afterData"):
-                                if cmds.getAttr(net+".rawGuide"): 
-                                    # get data from not rendered guide (rawGuide status on)
-                                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
-                                    for moduleInstance in self.dpUIinst.moduleInstancesList:
-                                        if str(moduleInstance) == moduleInstanceInfoString:
-                                            moduleInstance.serializeGuide(False) #serialize it without build it
-                                toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
-                        if toExportDataDic:
-                            try:
-                                # export json file
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(jsonName+": "+str(e))
-                        else:
-                            self.notWorkedWellIO("v014_notFoundNodes")
-                        cmds.select(clear=True)
+                        self.exportDicToJsonFile(self.getGuideDataDic(netList))
                     else:
                         self.notWorkedWellIO("v014_notFoundNodes")
+                        cmds.select(clear=True)
                 else: #import
                     # apply viewport xray
                     modelPanelList = cmds.getPanel(type="modelPanel")
@@ -146,6 +123,25 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
+
+
+    def getGuideDataDic(self, netList, *args):
+        """ Return a dictionary of the guide data to export it.
+        """
+        toExportDataDic = {}
+        self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
+        for net in netList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            # mount a dic with all data 
+            if cmds.objExists(net+".afterData"):
+                if cmds.getAttr(net+".rawGuide"): 
+                    # get data from not rendered guide (rawGuide status on)
+                    moduleInstanceInfoString = cmds.getAttr(cmds.listConnections(net+".moduleGrp")[0]+".moduleInstanceInfo")
+                    for moduleInstance in self.dpUIinst.moduleInstancesList:
+                        if str(moduleInstance) == moduleInstanceInfoString:
+                            moduleInstance.serializeGuide(False) #serialize it without build it
+                toExportDataDic[net] = ast.literal_eval(cmds.getAttr(net+".afterData"))
+        return toExportDataDic
 
 
     def setupInstanceChanges(self, *args):

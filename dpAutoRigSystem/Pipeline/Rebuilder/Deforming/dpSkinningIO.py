@@ -53,15 +53,7 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                     else:
                         meshList = self.dpUIinst.skin.getDeformedModelList(deformerTypeList=["skinCluster"], ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if meshList:
-                        try:
-                            # export skinning data
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            skinWeightDic = self.dpUIinst.skin.getSkinWeightData(meshList)
-                            self.pipeliner.saveJsonFile(skinWeightDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                        self.exportDicToJsonFile(self.dpUIinst.skin.getSkinWeightData(meshList))
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import

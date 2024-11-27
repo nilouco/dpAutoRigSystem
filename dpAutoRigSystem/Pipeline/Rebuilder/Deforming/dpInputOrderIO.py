@@ -53,22 +53,7 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                     else:
                         deformedList = self.defWeights.getDeformedModelList(deformerTypeList=self.defWeights.getAllDeformerTypeList(), ignoreAttr=self.dpUIinst.skin.ignoreSkinningAttr)
                     if deformedList:
-                        orderDic = {}
-                        self.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
-                        for item in deformedList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title])
-                            orderDic[item] = self.defWeights.getOrderList(item)
-                        if orderDic:
-                            try:
-                                # export order list data
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(orderDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(', '.join(deformedList)+": "+str(e))
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" - deformed meshes")
+                        self.exportDicToJsonFile(self.getOrderDataDic(deformedList))
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
                 else: #import
@@ -121,3 +106,14 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
+
+
+    def getOrderDataDic(self, deformedList, *args):
+        """ Return the deformer order data dictionary to export.
+        """
+        orderDic = {}
+        self.utils.setProgress(max=len(deformedList), addOne=False, addNumber=False)
+        for item in deformedList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            orderDic[item] = self.defWeights.getOrderList(item)
+        return orderDic

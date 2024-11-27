@@ -48,18 +48,10 @@ class RenameIO(dpBaseActionClass.ActionStartClass):
                 if objList:
                     itemList = objList
                 else:
-                    itemList = [n for n in cmds.ls(selection=False) if cmds.attributeQuery(self.dpID, node=n, exists=True)]
+                    itemList = [n for n in cmds.ls(selection=False, noIntermediate=True) if cmds.attributeQuery(self.dpID, node=n, exists=True)]
                 if itemList:
                     if self.firstMode: #export
-                        toExportDataDic = self.getNodeIDDataDic(itemList)
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(self.getNodeIDDataDic(itemList))
                     else: #import
                         try:
                             exportedList = self.getExportedList()

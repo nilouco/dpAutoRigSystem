@@ -52,16 +52,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
                     constraintList = cmds.ls(selection=False, type=self.constraintTypeList)
                 if self.firstMode: #export
                     if constraintList:
-                        toExportDataDic = self.getConstraintDataDic(constraintList)
-                        if toExportDataDic:
-                            try:
-                                # export json file
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(self.getConstraintDataDic(constraintList))
                 else: #import
                     try:
                         exportedList = self.getExportedList()

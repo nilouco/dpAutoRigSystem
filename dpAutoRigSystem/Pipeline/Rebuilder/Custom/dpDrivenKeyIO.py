@@ -52,16 +52,7 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
                     nodeList = cmds.ls(selection=False, type=self.drivenKeyTypeList)
                 if self.firstMode: #export
                     if nodeList:
-                        toExportDataDic = self.getDrivenKeyDataDic(nodeList)
-                        if toExportDataDic:
-                            try:
-                                # export json file
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(toExportDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(self.getDrivenKeyDataDic(nodeList))
                 else: #import
                     try:
                         exportedList = self.getExportedList()

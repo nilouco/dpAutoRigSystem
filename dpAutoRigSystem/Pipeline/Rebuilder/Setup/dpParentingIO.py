@@ -55,14 +55,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                         # define data to export
                         parentDic = self.getParentingDataDic(transformList)
                         parentDic.update(self.getBrokenIDDataDic())
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            self.pipeliner.saveJsonFile(parentDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(parentDic)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else: #import
@@ -119,14 +112,15 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
         if parentDic["BrokenID"]:
             self.utils.setProgress(max=len(parentDic["BrokenID"]), addOne=False, addNumber=False)
             for nodeType in parentDic["BrokenID"].keys():
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                for item in parentDic["BrokenID"][nodeType].keys():
-                    if not cmds.objExists(item):
-                        cmds.createNode(nodeType, name=item)
-                        if parentDic["BrokenID"][nodeType][item]:
-                            if cmds.objExists(parentDic["BrokenID"][nodeType][item]):
-                                cmds.parent(item, parentDic["BrokenID"][nodeType][item])
-                        cmds.select(clear=True)
+                if nodeType == "transform":
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    for item in parentDic["BrokenID"][nodeType].keys():
+                        if not cmds.objExists(item):
+                            cmds.createNode(nodeType, name=item)
+                            if parentDic["BrokenID"][nodeType][item]:
+                                if cmds.objExists(parentDic["BrokenID"][nodeType][item]):
+                                    cmds.parent(item, parentDic["BrokenID"][nodeType][item])
+                            cmds.select(clear=True)
             return True
 
 

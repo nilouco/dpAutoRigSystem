@@ -63,56 +63,7 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                     else:
                         shaderList = self.getShaderToExportList()
                     if shaderList:
-                        shaderDic = {}
-                        self.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
-                        for shader in shaderList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shader)
-                            fileNode = None
-                            texture = None
-                            color = None
-                            cmds.hyperShade(objects=shader)
-                            assignedList = cmds.ls(selection=True)
-                            if assignedList:
-                                colorAttr = "color"
-                                transparencyAttr = "transparency"
-                                if not cmds.objExists(shader+"."+colorAttr): #support standardShader
-                                    colorAttr = "baseColor"
-                                    transparencyAttr = "opacity"
-                                if cmds.objExists(shader+"."+colorAttr):
-                                    shaderConnectionList = cmds.listConnections(shader+"."+colorAttr, destination=False, source=True)
-                                    if shaderConnectionList:
-                                        fileNode = shaderConnectionList[0]
-                                        texture = cmds.getAttr(fileNode+".fileTextureName")
-                                    else:
-                                        color = cmds.getAttr(shader+"."+colorAttr)[0]
-                                transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
-                                # data dictionary to export
-                                shaderDic[shader] = {"assigned"        : assignedList,
-                                                    "color"            : color,
-                                                    "colorAttr"        : colorAttr,
-                                                    "fileNode"         : fileNode,
-                                                    "material"         : cmds.objectType(shader),
-                                                    "texture"          : texture,
-                                                    "transparency"     : transparency,
-                                                    "transparencyAttr" : transparencyAttr
-                                                    }
-                                # custom shader attributes
-                                for attr in self.customAttrList:
-                                    if cmds.objExists(shader+"."+attr):
-                                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
-                                # custom vector color attributes
-                                for attr in self.vectorColorList:
-                                    if cmds.objExists(shader+"."+attr):
-                                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
-                            cmds.select(clear=True)
-                        try:
-                            # export json file
-                            self.pipeliner.makeDirIfNotExists(self.ioPath)
-                            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                            self.pipeliner.saveJsonFile(shaderDic, jsonName)
-                            self.wellDoneIO(jsonName)
-                        except Exception as e:
-                            self.notWorkedWellIO(jsonName+": "+str(e))
+                        self.exportDicToJsonFile(self.getShaderDataDic(shaderList))
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import
@@ -178,6 +129,54 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
         self.refreshView()
         return self.dataLogDic
 
+
+    def getShaderDataDic(self, shaderList, *args):
+        """ Return shader data dictionary to export.
+        """
+        shaderDic = {}
+        self.utils.setProgress(max=len(shaderList), addOne=False, addNumber=False)
+        for shader in shaderList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+shader)
+            fileNode = None
+            texture = None
+            color = None
+            cmds.hyperShade(objects=shader)
+            assignedList = cmds.ls(selection=True)
+            if assignedList:
+                colorAttr = "color"
+                transparencyAttr = "transparency"
+                if not cmds.objExists(shader+"."+colorAttr): #support standardShader
+                    colorAttr = "baseColor"
+                    transparencyAttr = "opacity"
+                if cmds.objExists(shader+"."+colorAttr):
+                    shaderConnectionList = cmds.listConnections(shader+"."+colorAttr, destination=False, source=True)
+                    if shaderConnectionList:
+                        fileNode = shaderConnectionList[0]
+                        texture = cmds.getAttr(fileNode+".fileTextureName")
+                    else:
+                        color = cmds.getAttr(shader+"."+colorAttr)[0]
+                transparency = cmds.getAttr(shader+"."+transparencyAttr)[0]
+                # data dictionary to export
+                shaderDic[shader] = {"assigned"        : assignedList,
+                                    "color"            : color,
+                                    "colorAttr"        : colorAttr,
+                                    "fileNode"         : fileNode,
+                                    "material"         : cmds.objectType(shader),
+                                    "texture"          : texture,
+                                    "transparency"     : transparency,
+                                    "transparencyAttr" : transparencyAttr
+                                    }
+                # custom shader attributes
+                for attr in self.customAttrList:
+                    if cmds.objExists(shader+"."+attr):
+                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)
+                # custom vector color attributes
+                for attr in self.vectorColorList:
+                    if cmds.objExists(shader+"."+attr):
+                        shaderDic[shader][attr] = cmds.getAttr(shader+"."+attr)[0]
+            cmds.select(clear=True)
+        return shaderDic
+    
 
     def getShaderToExportList(self, *args):
         """ Returns a list of shaders to export as json dictionary.

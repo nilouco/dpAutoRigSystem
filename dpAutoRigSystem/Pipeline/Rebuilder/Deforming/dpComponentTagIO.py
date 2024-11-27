@@ -65,14 +65,7 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                                                 "influencer" : self.defWeights.getComponentTagInfluencer(),
                                                 "falloff"    : self.defWeights.getComponentTagFalloff()
                                             }
-                            try:
-                                # export data
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(self.tagDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(', '.join(nodeList)+": "+str(e))
+                            self.exportDicToJsonFile(self.tagDataDic)
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" componentTag")
                     else:

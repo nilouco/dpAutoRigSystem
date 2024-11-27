@@ -62,44 +62,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                                 hasDef = True
                                 break
                         if hasDef:
-                            self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
-                            # Declaring the data dictionary to export it
-                            self.deformerDataDic = {}
-                            # run for all deformer types to get info
-                            for deformerType in self.defWeights.typeAttrDic.keys():
-                                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                                deformerList = cmds.ls(selection=False, type=deformerType)
-                                if deformerList:
-                                    for deformerNode in deformerList:
-                                        if deformerNode in inputDeformerList:
-                                            # get the attributes and values for this deformer node
-                                            self.deformerDataDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
-                                            # Get shape indexes for the deformer so we can query the deformer weights
-                                            shapeList, indexList, shapeToIndexDic = self.defWeights.getShapeToIndexData(deformerNode)
-                                            # update dictionary
-                                            self.deformerDataDic[deformerNode]["shapeList"] = shapeList
-                                            self.deformerDataDic[deformerNode]["indexList"] = indexList
-                                            self.deformerDataDic[deformerNode]["shapeToIndexDic"] = shapeToIndexDic
-                                            self.deformerDataDic[deformerNode]["weights"] = {}
-                                            for shape in shapeList:
-                                                # Get weights
-                                                index = shapeToIndexDic[shape]
-                                                weights = self.defWeights.getDeformerWeights(deformerNode, index)
-                                                if self.deformerDataDic[deformerNode]["relatedNode"]: 
-                                                    if not deformerType == "ffd":
-                                                        # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
-                                                        weights = self.defWeights.getDeformerWeights(self.deformerDataDic[deformerNode]["relatedNode"], index)
-                                                self.deformerDataDic[deformerNode]["weights"][index] = weights
-                                            # componentTag
-                                            self.deformerDataDic[deformerNode]["componentTag"] = self.defWeights.checkUseComponentTag(deformerNode)
-                            try:
-                                # export deformer data
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-                                self.pipeliner.saveJsonFile(self.deformerDataDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                            self.exportDicToJsonFile(self.getDeformerDataDic(inputDeformerList))
                         else:
                             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" deformers")
                     else:
@@ -161,6 +124,42 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
+
+
+    def getDeformerDataDic(self, inputDeformerList, *args):
+        """ Return the deformer data dictionary to export.
+        """
+        self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
+        # Declaring the data dictionary to export it
+        self.deformerDataDic = {}
+        # run for all deformer types to get info
+        for deformerType in self.defWeights.typeAttrDic.keys():
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            deformerList = cmds.ls(selection=False, type=deformerType)
+            if deformerList:
+                for deformerNode in deformerList:
+                    if deformerNode in inputDeformerList:
+                        # get the attributes and values for this deformer node
+                        self.deformerDataDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
+                        # Get shape indexes for the deformer so we can query the deformer weights
+                        shapeList, indexList, shapeToIndexDic = self.defWeights.getShapeToIndexData(deformerNode)
+                        # update dictionary
+                        self.deformerDataDic[deformerNode]["shapeList"] = shapeList
+                        self.deformerDataDic[deformerNode]["indexList"] = indexList
+                        self.deformerDataDic[deformerNode]["shapeToIndexDic"] = shapeToIndexDic
+                        self.deformerDataDic[deformerNode]["weights"] = {}
+                        for shape in shapeList:
+                            # Get weights
+                            index = shapeToIndexDic[shape]
+                            weights = self.defWeights.getDeformerWeights(deformerNode, index)
+                            if self.deformerDataDic[deformerNode]["relatedNode"]: 
+                                if not deformerType == "ffd":
+                                    # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
+                                    weights = self.defWeights.getDeformerWeights(self.deformerDataDic[deformerNode]["relatedNode"], index)
+                            self.deformerDataDic[deformerNode]["weights"][index] = weights
+                        # componentTag
+                        self.deformerDataDic[deformerNode]["componentTag"] = self.defWeights.checkUseComponentTag(deformerNode)
+        return self.deformerDataDic
 
 
     def importDeformation(self, deformerNode, wellImported, *args):
