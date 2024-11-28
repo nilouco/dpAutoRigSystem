@@ -87,14 +87,13 @@ class RenameIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given item list to collect and mount the dpID attribute dictionary.
             Returns the dictionary to export.
         """
-        if itemList:
-            dic = {}
-            self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-            for item in itemList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(item):
-                    dic[item] = cmds.getAttr(item+"."+self.dpID)
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        for item in itemList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if cmds.objExists(item):
+                dic[item] = cmds.getAttr(item+"."+self.dpID)
+        return dic
 
 
     def importNodeIDData(self, nodeIDDic, *args):

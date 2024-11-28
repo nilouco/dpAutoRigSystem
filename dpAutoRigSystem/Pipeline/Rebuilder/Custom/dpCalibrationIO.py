@@ -87,17 +87,16 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given controller list to collect and mount the calibration data.
             Returns the dictionary to export.
         """
-        if ctrlList:
-            dic = {}
-            self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
-            for ctrl in ctrlList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
-                if calibrationList:
-                    dic[ctrl] = {}
-                    for attr in calibrationList:
-                        dic[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+        for ctrl in ctrlList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            calibrationList = self.dpUIinst.ctrls.getListFromStringAttr(ctrl)
+            if calibrationList:
+                dic[ctrl] = {}
+                for attr in calibrationList:
+                    dic[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
+        return dic
 
     def importCalibrationData(self, calibrationDic, *args):
         """ Import the calibration setup from the given calibration data dictionary.

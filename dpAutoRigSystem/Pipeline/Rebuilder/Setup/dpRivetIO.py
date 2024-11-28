@@ -106,23 +106,22 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given rivet network list and mount the right info pack to rebuild the module.
             Returns the dictionary to export.
         """
-        if netList:
-            dic = {}
-            self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
-            i = 0
-            for n, net in enumerate(netList):
-                if self.verbose:
-                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                # mount a dic
-                if cmds.objExists(net+".rivetData"):
-                    data = json.loads(cmds.getAttr(net+".rivetData"))
-                    addIt = True
-                    if n > 0:
-                        for x in range(0, i):
-                            if data["itemNode"] in dic[x]["itemList"]:
-                                addIt = False
-                                break
-                    if addIt:
-                        dic[i] = data
-                        i += 1
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(netList), addOne=False, addNumber=False)
+        i = 0
+        for n, net in enumerate(netList):
+            if self.verbose:
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
+            # mount a dic
+            if cmds.objExists(net+".rivetData"):
+                data = json.loads(cmds.getAttr(net+".rivetData"))
+                addIt = True
+                if n > 0:
+                    for x in range(0, i):
+                        if data["itemNode"] in dic[x]["itemList"]:
+                            addIt = False
+                            break
+                if addIt:
+                    dic[i] = data
+                    i += 1
+        return dic

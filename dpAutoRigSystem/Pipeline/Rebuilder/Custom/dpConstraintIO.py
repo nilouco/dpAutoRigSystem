@@ -86,56 +86,55 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given constraint list to collect and mount the info data.
             Returns the dictionary to export.
         """
-        if constraintList:
-            dic = {}
-            attrList = ["interpType", "constraintOffsetPolarity", "aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
-            outputAttrList = ["constraintTranslateX", "constraintTranslateY",  "constraintTranslateZ",  "constraintRotateX",  "constraintRotateY",  "constraintRotateZ",  "constraintScaleX",  "constraintScaleY",  "constraintScaleZ"]
-            #typeAttrDic = {
-            #                "parentConstraint" : ["interpType"],
-            #                "orientConstraint" : ["interpType"],
-            #                "pointConstraint"  : ["constraintOffsetPolarity"],
-            #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
-            #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
-            #            }
-            self.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
-            for const in constraintList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not cmds.attributeQuery(self.dpID, node=const, exists=True):
-                    # getting attributes if they exists
-                    dic[const] = {"attributes" : {},
-                                "output"     : {},
-                                "type"       : cmds.objectType(const)
-                                }
-                    for attr in attrList:
-                        if cmds.objExists(const+"."+attr):
-                            dic[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
-                    dic[const]["worldUpMatrix"] = []
-                    if cmds.objExists(const+".worldUpMatrix"):
-                        dic[const]["worldUpMatrix"] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
-                    dic[const]["constraintParentInverseMatrix"] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
-                    dic[const]["target"] = {}
-                    if cmds.objExists(const+".target"):
-                        targetAttr = None
-                        if cmds.objExists(const+".target[0].targetParentMatrix"):
-                            targetAttr = "targetParentMatrix"
-                        elif cmds.objExists(const+".target[0].targetGeometry"):
-                            targetAttr = "targetGeometry"
-                        elif cmds.objExists(const+".target[0].targetMesh"):
-                            targetAttr = "targetMesh"
-                        if targetAttr:
-                            dic[const]["target"][targetAttr] = {}
-                            targetList = cmds.getAttr(const+".target", multiIndices=True)
-                            for t in targetList:
-                                dic[const]["target"][targetAttr][t] = [cmds.listConnections(const+".target["+str(t)+"]."+targetAttr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(t)+"].targetWeight")]
-                    # store connection info to disconnect when import if need to skip the constraint driving
-                    for outAttr in outputAttrList:
-                        dic[const]["output"][outAttr] = None
-                        if cmds.objExists(const+"."+outAttr):
-                            if cmds.listConnections(const+"."+outAttr, source=False, destination=True):
-                                dic[const]["output"][outAttr] = True
-                            else:
-                                dic[const]["output"][outAttr] = False
-            return dic
+        dic = {}
+        attrList = ["interpType", "constraintOffsetPolarity", "aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
+        outputAttrList = ["constraintTranslateX", "constraintTranslateY",  "constraintTranslateZ",  "constraintRotateX",  "constraintRotateY",  "constraintRotateZ",  "constraintScaleX",  "constraintScaleY",  "constraintScaleZ"]
+        #typeAttrDic = {
+        #                "parentConstraint" : ["interpType"],
+        #                "orientConstraint" : ["interpType"],
+        #                "pointConstraint"  : ["constraintOffsetPolarity"],
+        #                "normalConstraint" : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"],
+        #                "aimConstraint"    : ["aimVectorX", "aimVectorY", "aimVectorZ", "upVectorX", "upVectorY", "upVectorZ", "worldUpType", "worldUpVectorX", "worldUpVectorY", "worldUpVectorZ"]
+        #            }
+        self.utils.setProgress(max=len(constraintList), addOne=False, addNumber=False)
+        for const in constraintList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if not cmds.attributeQuery(self.dpID, node=const, exists=True):
+                # getting attributes if they exists
+                dic[const] = {"attributes" : {},
+                            "output"     : {},
+                            "type"       : cmds.objectType(const)
+                            }
+                for attr in attrList:
+                    if cmds.objExists(const+"."+attr):
+                        dic[const]["attributes"][attr] = cmds.getAttr(const+"."+attr)
+                dic[const]["worldUpMatrix"] = []
+                if cmds.objExists(const+".worldUpMatrix"):
+                    dic[const]["worldUpMatrix"] = cmds.listConnections(const+".worldUpMatrix", source=True, destination=False)
+                dic[const]["constraintParentInverseMatrix"] = cmds.listConnections(const+".constraintParentInverseMatrix", source=True, destination=False)
+                dic[const]["target"] = {}
+                if cmds.objExists(const+".target"):
+                    targetAttr = None
+                    if cmds.objExists(const+".target[0].targetParentMatrix"):
+                        targetAttr = "targetParentMatrix"
+                    elif cmds.objExists(const+".target[0].targetGeometry"):
+                        targetAttr = "targetGeometry"
+                    elif cmds.objExists(const+".target[0].targetMesh"):
+                        targetAttr = "targetMesh"
+                    if targetAttr:
+                        dic[const]["target"][targetAttr] = {}
+                        targetList = cmds.getAttr(const+".target", multiIndices=True)
+                        for t in targetList:
+                            dic[const]["target"][targetAttr][t] = [cmds.listConnections(const+".target["+str(t)+"]."+targetAttr, source=True, destination=False)[0], cmds.getAttr(const+".target["+str(t)+"].targetWeight")]
+                # store connection info to disconnect when import if need to skip the constraint driving
+                for outAttr in outputAttrList:
+                    dic[const]["output"][outAttr] = None
+                    if cmds.objExists(const+"."+outAttr):
+                        if cmds.listConnections(const+"."+outAttr, source=False, destination=True):
+                            dic[const]["output"][outAttr] = True
+                        else:
+                            dic[const]["output"][outAttr] = False
+        return dic
 
 
     def importConstraintData(self, constDic, *args):

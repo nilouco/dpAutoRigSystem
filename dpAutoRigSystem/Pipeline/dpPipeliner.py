@@ -883,7 +883,7 @@ class Pipeliner(object):
             "guideIO",
             "controlShapeIO",
             "skinningIO",
-            "parentIO"
+            "parentingIO"
             ]
         self.existList = []
         for item in defaultList:

@@ -55,26 +55,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                             meshList = self.getModelToExportList()
                         if meshList:
                             self.utils.setProgress(max=len(meshList), addOne=False, addNumber=False)
-                            try:
-                                nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
-                                # export alembic
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                ioItems = ' -root '.join(meshList)
-                                meshList.extend(cmds.listRelatives(meshList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
-                                attrStr = ""
-                                for mesh in meshList:
-                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                                    userDefAttrList = cmds.listAttr(mesh, userDefined=True)
-                                    if userDefAttrList:
-                                        for userDefAttr in userDefAttrList:
-                                            attrStr += " -attr "+userDefAttr
-                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".abc"
-                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+attrStr+" -file "+abcName)
-                                if nodeStateDic:
-                                    self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
-                                self.wellDoneIO(', '.join(meshList))
-                            except Exception as e:
-                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                            self.exportAlembicFile(meshList)
                         else:
                             self.notWorkedWellIO("Render_Grp")
                     else: #import

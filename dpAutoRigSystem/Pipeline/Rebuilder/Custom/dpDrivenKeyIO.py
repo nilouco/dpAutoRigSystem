@@ -86,64 +86,63 @@ class DrivenKeyIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given set driven key node list to collect and mount the info data.
             Returns the dictionary to export.
         """
-        if nodeList:
-            dic = {}
-            attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
-            keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
-            keyTimeAttrList = ["keyTime", "keyValue"]
-            self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
-            for item in nodeList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
-                    # getting attributes if they exists
-                    dic[item] = { "attributes"     : {},
-                                "keys"             : {},
-                                "keyTimeValue"     : {},
-                                "keyTanInType"     : {},
-                                "keyTanOutType"    : {},
-                                "keyTanInX"        : {},
-                                "keyTanInY"        : {},
-                                "keyTanOutX"       : {},
-                                "keyTanOutY"       : {},
-                                "keyTanLocked"     : {},
-                                "keyWeightLocked"  : {},
-                                "inAngle"          : {},
-                                "inWeight"         : {},
-                                "outAngle"         : {},
-                                "outWeight"        : {},
-                                "input"            : cmds.listConnections(item+".input", source=True, destination=False, plugs=True),
-                                "output"           : cmds.listConnections(item+".output", source=False, destination=True, plugs=True),
-                                "curveColor"       : cmds.getAttr(item+".curveColor")[0],
-                                "weightedTangents" : cmds.getAttr(item+".weightedTangents"),
-                                "type"             : cmds.objectType(item),
-                                "size"             : cmds.getAttr(item+".keyTimeValue", multiIndices=True, size=True),
-                                "name"             : item
-                                }
-                    for attr in attrList:
-                        if cmds.objExists(item+"."+attr):
-                            dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
-                    # storage the keys
-                    if cmds.getAttr(item+".keyTimeValue", multiIndices=True):
-                        for i, index in enumerate(cmds.getAttr(item+".keyTimeValue", multiIndices=True)):
-                            dic[item]["keyTimeValue"][index] = {}
-                            dic[item]["keys"][index] = {}
-                            for ktAttr in keyTimeAttrList:
-                                dic[item]["keyTimeValue"][index][ktAttr] = cmds.getAttr(item+".keyTimeValue["+str(i)+"]."+ktAttr)
-                            for kAttr in keyAttrList:
-                                dic[item]["keys"][index][kAttr] = cmds.getAttr(item+"."+kAttr+"["+str(i)+"]")
-                            dic[item]["keyTanInType"][index]    = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
-                            dic[item]["keyTanOutType"][index]   = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
-                            dic[item]["keyTanInX"][index]       = cmds.keyTangent(item, query=True, index=(i, i), ix=True)[0]
-                            dic[item]["keyTanInY"][index]       = cmds.keyTangent(item, query=True, index=(i, i), iy=True)[0]
-                            dic[item]["keyTanOutX"][index]      = cmds.keyTangent(item, query=True, index=(i, i), ox=True)[0]
-                            dic[item]["keyTanOutY"][index]      = cmds.keyTangent(item, query=True, index=(i, i), oy=True)[0]
-                            dic[item]["keyTanLocked"][index]    = cmds.keyTangent(item, query=True, index=(i, i), lock=True)[0]
-                            dic[item]["keyWeightLocked"][index] = cmds.keyTangent(item, query=True, index=(i, i), weightLock=True)[0]
-                            dic[item]["inAngle"][index]         = cmds.keyTangent(item, query=True, index=(i, i), inAngle=True)[0]
-                            dic[item]["inWeight"][index]        = cmds.keyTangent(item, query=True, index=(i, i), inWeight=True)[0]
-                            dic[item]["outAngle"][index]        = cmds.keyTangent(item, query=True, index=(i, i), outAngle=True)[0]
-                            dic[item]["outWeight"][index]       = cmds.keyTangent(item, query=True, index=(i, i), outWeight=True)[0]
-            return dic
+        dic = {}
+        attrList = ["preInfinity", "postInfinity", "useCurveColor", "stipplePattern", "outStippleThreshold", "stippleReverse"]
+        keyAttrList = ["keyBreakdown", "keyTickDrawSpecial"]
+        keyTimeAttrList = ["keyTime", "keyValue"]
+        self.utils.setProgress(max=len(nodeList), addOne=False, addNumber=False)
+        for item in nodeList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
+                # getting attributes if they exists
+                dic[item] = { "attributes"     : {},
+                            "keys"             : {},
+                            "keyTimeValue"     : {},
+                            "keyTanInType"     : {},
+                            "keyTanOutType"    : {},
+                            "keyTanInX"        : {},
+                            "keyTanInY"        : {},
+                            "keyTanOutX"       : {},
+                            "keyTanOutY"       : {},
+                            "keyTanLocked"     : {},
+                            "keyWeightLocked"  : {},
+                            "inAngle"          : {},
+                            "inWeight"         : {},
+                            "outAngle"         : {},
+                            "outWeight"        : {},
+                            "input"            : cmds.listConnections(item+".input", source=True, destination=False, plugs=True),
+                            "output"           : cmds.listConnections(item+".output", source=False, destination=True, plugs=True),
+                            "curveColor"       : cmds.getAttr(item+".curveColor")[0],
+                            "weightedTangents" : cmds.getAttr(item+".weightedTangents"),
+                            "type"             : cmds.objectType(item),
+                            "size"             : cmds.getAttr(item+".keyTimeValue", multiIndices=True, size=True),
+                            "name"             : item
+                            }
+                for attr in attrList:
+                    if cmds.objExists(item+"."+attr):
+                        dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
+                # storage the keys
+                if cmds.getAttr(item+".keyTimeValue", multiIndices=True):
+                    for i, index in enumerate(cmds.getAttr(item+".keyTimeValue", multiIndices=True)):
+                        dic[item]["keyTimeValue"][index] = {}
+                        dic[item]["keys"][index] = {}
+                        for ktAttr in keyTimeAttrList:
+                            dic[item]["keyTimeValue"][index][ktAttr] = cmds.getAttr(item+".keyTimeValue["+str(i)+"]."+ktAttr)
+                        for kAttr in keyAttrList:
+                            dic[item]["keys"][index][kAttr] = cmds.getAttr(item+"."+kAttr+"["+str(i)+"]")
+                        dic[item]["keyTanInType"][index]    = cmds.keyTangent(item, query=True, index=(i, i), inTangentType=True)[0]
+                        dic[item]["keyTanOutType"][index]   = cmds.keyTangent(item, query=True, index=(i, i), outTangentType=True)[0]
+                        dic[item]["keyTanInX"][index]       = cmds.keyTangent(item, query=True, index=(i, i), ix=True)[0]
+                        dic[item]["keyTanInY"][index]       = cmds.keyTangent(item, query=True, index=(i, i), iy=True)[0]
+                        dic[item]["keyTanOutX"][index]      = cmds.keyTangent(item, query=True, index=(i, i), ox=True)[0]
+                        dic[item]["keyTanOutY"][index]      = cmds.keyTangent(item, query=True, index=(i, i), oy=True)[0]
+                        dic[item]["keyTanLocked"][index]    = cmds.keyTangent(item, query=True, index=(i, i), lock=True)[0]
+                        dic[item]["keyWeightLocked"][index] = cmds.keyTangent(item, query=True, index=(i, i), weightLock=True)[0]
+                        dic[item]["inAngle"][index]         = cmds.keyTangent(item, query=True, index=(i, i), inAngle=True)[0]
+                        dic[item]["inWeight"][index]        = cmds.keyTangent(item, query=True, index=(i, i), inWeight=True)[0]
+                        dic[item]["outAngle"][index]        = cmds.keyTangent(item, query=True, index=(i, i), outAngle=True)[0]
+                        dic[item]["outWeight"][index]       = cmds.keyTangent(item, query=True, index=(i, i), outWeight=True)[0]
+        return dic
 
 
     def importDrivenKeyData(self, drivenKeyDic, *args):

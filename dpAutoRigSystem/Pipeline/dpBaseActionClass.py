@@ -358,11 +358,44 @@ class ActionStartClass(object):
     def exportDicToJsonFile(self, dic, *args):
         """ Export given dictionary to json file using ioPath and startName as prefix of the current file name.
         """
+        if dic:
+            try:
+                # export json file
+                self.pipeliner.makeDirIfNotExists(self.ioPath)
+                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
+                self.pipeliner.saveJsonFile(dic, jsonName)
+                self.wellDoneIO(jsonName)
+            except Exception as e:
+                self.notWorkedWellIO(jsonName+": "+str(e))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+
+
+    def exportAlembicFile(self, meshList, path=None, name=None, attr=True, *args):
+        """ Export given mesh list to alembic file.
+        """
         try:
-            # export json file
-            self.pipeliner.makeDirIfNotExists(self.ioPath)
-            jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".json"
-            self.pipeliner.saveJsonFile(dic, jsonName)
-            self.wellDoneIO(jsonName)
+            if not path:
+                path = self.ioPath
+            if not name:
+                name = self.startName
+            nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
+            # export alembic
+            self.pipeliner.makeDirIfNotExists(path)
+            ioItems = ' -root '.join(meshList)
+            attrStr = ""
+            if attr:
+                meshList.extend(cmds.listRelatives(meshList, type="mesh", children=True, allDescendents=True, noIntermediate=True))
+                for mesh in meshList:
+                    self.utils.setProgress(self.dpUIinst.lang[self.title])
+                    userDefAttrList = cmds.listAttr(mesh, userDefined=True)
+                    if userDefAttrList:
+                        for userDefAttr in userDefAttrList:
+                            attrStr += " -attr "+userDefAttr
+            abcName = path+"/"+name+"_"+self.pipeliner.pipeData['currentFileName']+".abc"
+            cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+attrStr+" -file "+abcName)
+            if nodeStateDic:
+                self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
+            self.wellDoneIO(', '.join(meshList))
         except Exception as e:
-            self.notWorkedWellIO(jsonName+": "+str(e))
+            self.notWorkedWellIO(', '.join(meshList)+": "+str(e))

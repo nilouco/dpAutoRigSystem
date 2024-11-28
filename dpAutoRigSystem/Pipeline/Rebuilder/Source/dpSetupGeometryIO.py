@@ -55,18 +55,7 @@ class SetupGeometryIO(dpBaseActionClass.ActionStartClass):
                             meshList = self.getGeometryToExportList()
                         if meshList:
                             self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
-                            try:
-                                nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
-                                # export alembic
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                ioItems = ' -root '.join(meshList)
-                                abcName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".abc"
-                                cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                                if nodeStateDic:
-                                    self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
-                                self.wellDoneIO(', '.join(meshList))
-                            except Exception as e:
-                                self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+                            self.exportAlembicFile(meshList, attr=False)
                         else:
                             self.notWorkedWellIO("Geometries")
                     else: #import

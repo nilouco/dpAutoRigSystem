@@ -90,26 +90,25 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given list to collect the info about their connections to rebuild.
             Returns a dictionary to export.
         """
-        if itemList:
-            dic = {}
-            self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
-            for item in itemList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if cmds.objExists(item):
-                    attrList = self.defaultAttrList
-                    userDefList = cmds.listAttr(item, userDefined=True)
-                    if userDefList:
-                        attrList.extend(userDefList)
-                    connectedAttrList = []
-                    for attr in attrList:
-                        if cmds.objExists(item+"."+attr):
-                            if cmds.listConnections(item+"."+attr):
-                                connectedAttrList.append(attr)
-                    if connectedAttrList:
-                        dic[item] = {}
-                        for attr in connectedAttrList:
-                            dic[item][attr] = self.getConnectionIODic(item, attr)
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        for item in itemList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if cmds.objExists(item):
+                attrList = self.defaultAttrList
+                userDefList = cmds.listAttr(item, userDefined=True)
+                if userDefList:
+                    attrList.extend(userDefList)
+                connectedAttrList = []
+                for attr in attrList:
+                    if cmds.objExists(item+"."+attr):
+                        if cmds.listConnections(item+"."+attr):
+                            connectedAttrList.append(attr)
+                if connectedAttrList:
+                    dic[item] = {}
+                    for attr in connectedAttrList:
+                        dic[item][attr] = self.getConnectionIODic(item, attr)
+        return dic
 
 
     def getConnectionInfoList(self, item, sourceConnection, destinationConnection, *args):
@@ -165,19 +164,20 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
     def getUtilitiesDataDic(self, itemList, *args):
         """ Return the connection data from given utility nodes list.
         """
-        if itemList:
-            dic = {}
-            for item in itemList:
-                if cmds.objExists(item):
-                    if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
-                        for attrDic, multi in zip([self.utils.typeAttrDic, self.utils.typeOutAttrDic, self.utils.typeMultiAttrDic, self.utils.typeOutMultiAttrDic], [False, False, True, True]):
-                            gotDic = self.getAttrConnections(item, attrDic, multi)
-                            if gotDic:
-                                if not item in dic.keys():
-                                    dic[item] = gotDic
-                                else:
-                                    dic[item].update(gotDic)
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(itemList), addOne=False, addNumber=False)
+        for item in itemList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if cmds.objExists(item):
+                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
+                    for attrDic, multi in zip([self.utils.typeAttrDic, self.utils.typeOutAttrDic, self.utils.typeMultiAttrDic, self.utils.typeOutMultiAttrDic], [False, False, True, True]):
+                        gotDic = self.getAttrConnections(item, attrDic, multi)
+                        if gotDic:
+                            if not item in dic.keys():
+                                dic[item] = gotDic
+                            else:
+                                dic[item].update(gotDic)
+        return dic
         
 
     def getConnectionIODic(self, item, attr, *args):

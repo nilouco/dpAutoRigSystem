@@ -88,36 +88,35 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given controller list to collect and mount the attributes data.
             Returns the dictionary to export.
         """
-        if ctrlList:
-            dic = {}
-            self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
-            for ctrl in ctrlList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                attrList = cmds.listAttr(ctrl, userDefined=True)
-                if attrList:
-                    dic[ctrl] = {"attributes" : {},
-                                 "order" : attrList}
-                    for attr in attrList:
-                        if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
-                            attrType = cmds.getAttr(ctrl+"."+attr, type=True)
-                            dic[ctrl]["attributes"][attr] = {
-                                                "type" : attrType,
-                                                "value" : cmds.getAttr(ctrl+"."+attr),
-                                                "locked" : cmds.getAttr(ctrl+"."+attr, lock=True),
-                                                "keyable" : cmds.getAttr(ctrl+"."+attr, keyable=True),
-                                                "channelBox" : cmds.getAttr(ctrl+"."+attr, channelBox=True)
-                                                }
-                            if attrType in self.defaultValueTypeList:
-                                if attrType == "enum":
-                                    dic[ctrl]["attributes"][attr]["enumName"] = cmds.attributeQuery(attr, node=ctrl, listEnum=True)[0]
-                                dic[ctrl]["attributes"][attr]["default"] = cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True)
-                                dic[ctrl]["attributes"][attr]["maxExists"] = cmds.attributeQuery(attr, node=ctrl, maxExists=True) or False
-                                if dic[ctrl]["attributes"][attr]["maxExists"]:
-                                    dic[ctrl]["attributes"][attr]["maximum"] = cmds.attributeQuery(attr, node=ctrl, maximum=True)[0]
-                                dic[ctrl]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=ctrl, minExists=True) or False
-                                if dic[ctrl]["attributes"][attr]["minExists"]:
-                                    dic[ctrl]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)[0]
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(ctrlList), addOne=False, addNumber=False)
+        for ctrl in ctrlList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            attrList = cmds.listAttr(ctrl, userDefined=True)
+            if attrList:
+                dic[ctrl] = {"attributes" : {},
+                                "order" : attrList}
+                for attr in attrList:
+                    if not cmds.getAttr(ctrl+"."+attr, type=True) == "message":
+                        attrType = cmds.getAttr(ctrl+"."+attr, type=True)
+                        dic[ctrl]["attributes"][attr] = {
+                                            "type" : attrType,
+                                            "value" : cmds.getAttr(ctrl+"."+attr),
+                                            "locked" : cmds.getAttr(ctrl+"."+attr, lock=True),
+                                            "keyable" : cmds.getAttr(ctrl+"."+attr, keyable=True),
+                                            "channelBox" : cmds.getAttr(ctrl+"."+attr, channelBox=True)
+                                            }
+                        if attrType in self.defaultValueTypeList:
+                            if attrType == "enum":
+                                dic[ctrl]["attributes"][attr]["enumName"] = cmds.attributeQuery(attr, node=ctrl, listEnum=True)[0]
+                            dic[ctrl]["attributes"][attr]["default"] = cmds.addAttr(ctrl+"."+attr, query=True, defaultValue=True)
+                            dic[ctrl]["attributes"][attr]["maxExists"] = cmds.attributeQuery(attr, node=ctrl, maxExists=True) or False
+                            if dic[ctrl]["attributes"][attr]["maxExists"]:
+                                dic[ctrl]["attributes"][attr]["maximum"] = cmds.attributeQuery(attr, node=ctrl, maximum=True)[0]
+                            dic[ctrl]["attributes"][attr]["minExists"] = cmds.attributeQuery(attr, node=ctrl, minExists=True) or False
+                            if dic[ctrl]["attributes"][attr]["minExists"]:
+                                dic[ctrl]["attributes"][attr]["minimum"] = cmds.attributeQuery(attr, node=ctrl, minimum=True)[0]
+        return dic
 
 
     def importAttributeData(self, attrDic, *args):

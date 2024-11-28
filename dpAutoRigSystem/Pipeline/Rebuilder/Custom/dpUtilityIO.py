@@ -85,39 +85,38 @@ class UtilityIO(dpBaseActionClass.ActionStartClass):
         """ Processes the given utility list to collect and mount the info data.
             Returns the dictionary to export.
         """
-        if utilityList:
-            dic = {}
-            self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
-            for item in utilityList:
-                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
-                    # getting attributes values
-                    nodeType = cmds.objectType(item)
-                    dic[item] = {"attributes" : {},
-                                 "type"       : nodeType,
-                                 "name"       : item
-                                }
-                    for attr in self.utils.typeAttrDic[nodeType]:
-                        if cmds.attributeQuery(attr, node=item, exists=True):
-                            dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
-                    # compound attributes
-                    if nodeType in self.utils.typeMultiAttrDic.keys():
-                        for multiAttr in self.utils.typeMultiAttrDic[nodeType].keys():
-                            indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
-                            if indexList:
-                                dot = ""
-                                attrList = [""]
-                                if self.utils.typeMultiAttrDic[nodeType][multiAttr]:
-                                    dot = "."
-                                    attrList = self.utils.typeMultiAttrDic[nodeType][multiAttr]
-                                for i in indexList:
-                                    for attr in attrList:
-                                        attrName = multiAttr+"["+str(i)+"]"+dot+attr
-                                        attrValue = cmds.getAttr(item+"."+attrName)
-                                        dic[item]["attributes"][attrName] = attrValue
-                                        if isinstance(attrValue, list):
-                                            dic[item]["attributes"][attrName] = attrValue[0]
-            return dic
+        dic = {}
+        self.utils.setProgress(max=len(utilityList), addOne=False, addNumber=False)
+        for item in utilityList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if not cmds.attributeQuery(self.dpID, node=item, exists=True) or not self.utils.validateID(item):
+                # getting attributes values
+                nodeType = cmds.objectType(item)
+                dic[item] = {"attributes" : {},
+                                "type"       : nodeType,
+                                "name"       : item
+                            }
+                for attr in self.utils.typeAttrDic[nodeType]:
+                    if cmds.attributeQuery(attr, node=item, exists=True):
+                        dic[item]["attributes"][attr] = cmds.getAttr(item+"."+attr)
+                # compound attributes
+                if nodeType in self.utils.typeMultiAttrDic.keys():
+                    for multiAttr in self.utils.typeMultiAttrDic[nodeType].keys():
+                        indexList = cmds.getAttr(item+"."+multiAttr, multiIndices=True)
+                        if indexList:
+                            dot = ""
+                            attrList = [""]
+                            if self.utils.typeMultiAttrDic[nodeType][multiAttr]:
+                                dot = "."
+                                attrList = self.utils.typeMultiAttrDic[nodeType][multiAttr]
+                            for i in indexList:
+                                for attr in attrList:
+                                    attrName = multiAttr+"["+str(i)+"]"+dot+attr
+                                    attrValue = cmds.getAttr(item+"."+attrName)
+                                    dic[item]["attributes"][attrName] = attrValue
+                                    if isinstance(attrValue, list):
+                                        dic[item]["attributes"][attrName] = attrValue[0]
+        return dic
 
 
     def importUtilityData(self, utilityDic, *args):

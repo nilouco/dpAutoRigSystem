@@ -59,99 +59,14 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
                         else:
                             bsList = cmds.ls(selection=False, type="blendShape")
                         if bsList:
-                            bsDic = {}
-                            self.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
+                            bsDic = self.getBSDataDic(bsList)
                             for bsNode in bsList:
-                                self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+bsNode)
-                                bsDic[bsNode] = {}
-                                bsDic[bsNode]["targets"] = {}
-                                # get blendShape node info
-                                bsDic[bsNode]['geometry'] = cmds.blendShape(bsNode, query=True, geometry=True)
-                                bsDic[bsNode]['envelope'] = cmds.getAttr(bsNode+".envelope")
-                                bsDic[bsNode]['supportNegativeWeights'] = cmds.getAttr(bsNode+".supportNegativeWeights")
-                                targetList = cmds.listAttr("{}.weight".format(bsNode), multi=True)
-                                if targetList:
-                                    # prepare index to deleted targets
-                                    indexList = cmds.getAttr("{}.weight".format(bsNode), multiIndices=True)
-                                    bsDic[bsNode]["indexTargetDic"] = dict(zip(indexList, targetList))
-                                    deletedIndexList = []
-                                    i = 0 #workaround to avoid deleted target index when importing data
-                                    for t, target in enumerate(targetList):
-                                        weightDic = {}
-                                        combination = False
-                                        combinationMethod = None
-                                        combinationList = []
-                                        unitConversionFactor = None
-                                        unitConversionInputPlug = None
-                                        plug = cmds.listConnections(bsNode+"."+target, destination=False, source=True, plugs=True)
-                                        if plug:
-                                            plugNode = plug[0][:plug[0].find(".")]
-                                            if cmds.objectType(plugNode) == "combinationShape":
-                                                combination = True
-                                                combinationMethod = cmds.getAttr(plugNode+".combinationMethod")
-                                                inputWeightList = cmds.listAttr(plugNode+".inputWeight", multi=True)
-                                                if inputWeightList:
-                                                    for inputWeight in inputWeightList:
-                                                        combinationList.append(cmds.listConnections(plugNode+"."+inputWeight, destination=False, source=True, plugs=True)[0])
-                                            elif cmds.objectType(plugNode) == "unitConversion":
-                                                unitConversionFactor = cmds.getAttr(plugNode+".conversionFactor")
-                                                unitConversionInputPlug = cmds.listConnections(plugNode+".input", destination=False, source=True, plugs=True)[0]
-                                        # getting vertex weights if not equal to 1
-                                        for s, shapeNode in enumerate(bsDic[bsNode]["geometry"]):
-                                            # write deleted target to compose a clear target list to avoid Maya's garbage issue
-                                            while not i == indexList[t]:
-                                                bsDic[bsNode]["targets"][i] = {"deleted" : True}
-                                                deletedIndexList.append(i)
-                                                i += 1
-                                            # continue writing relevant or just info data
-                                            vertices = cmds.polyEvaluate(shapeNode, vertex=True)
-                                            rawWeightList = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bsNode, s, t, vertices-1))
-                                            if not len(rawWeightList) == rawWeightList.count(1.0):
-                                                for w, weight in enumerate(rawWeightList):
-                                                    if not weight == 1.0:
-                                                        weightDic[w] = weight
-                                        # data dictionary to export
-                                        bsDic[bsNode]["targets"][i] = { "name"           : target,
-                                                                        "deleted"        : False,
-                                                                        "regenerate"     : cmds.objExists(target),
-                                                                        "value"          : cmds.getAttr(bsNode+"."+target),
-                                                                        "plug"           : plug,
-                                                                        "comb"           : combination,
-                                                                        "combMethod"     : combinationMethod,
-                                                                        "combList"       : combinationList,
-                                                                        "unitConvFactor" : unitConversionFactor,
-                                                                        "unitConvInput"  : unitConversionInputPlug,
-                                                                        "weightDic"      : weightDic
-                                                                        }
-                                        bsDic[bsNode]["deletedIndexList"] = deletedIndexList
-                                        i += 1
-                                try:
-                                    self.pipeliner.makeDirIfNotExists(self.targetPath)
-                                    self.pipeliner.makeDirIfNotExists(self.originalPath)
-                                    # export blendShape targets as compiled maya file
-                                    cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
-                                    # export original mesh transform as alembic file
-                                    transformList = []
-                                    for geoShape in bsDic[bsNode]["geometry"]:
-                                        transformList.append(cmds.listRelatives(geoShape, parent=True, type="transform")[0])
-                                    nodeStateDic = self.changeNodeState(transformList, state=1) #has no effect
-                                    ioItems = " -root ".join(transformList)
-                                    abcName = self.originalPath+"/"+self.originalName+"_"+bsNode+".abc"
-                                    cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+" -file "+abcName)
-                                    if nodeStateDic:
-                                        self.changeNodeState(bsDic[bsNode]["geometry"], findDeformers=False, dic=nodeStateDic) #back deformer as before
-                                except Exception as e:
-                                    self.notWorkedWellIO(str(e))
-                            try:
-                                # export json file
-                                self.pipeliner.makeDirIfNotExists(self.ioPath)
-                                jsonName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData["currentFileName"]+".json"
-                                self.pipeliner.saveJsonFile(bsDic, jsonName)
-                                self.wellDoneIO(jsonName)
-                            except Exception as e:
-                                self.notWorkedWellIO(jsonName+": "+str(e))
+                                self.exportTargetFile(bsNode)
+                                transformList = [cmds.listRelatives(geoShape, parent=True, type="transform")[0] for geoShape in bsDic[bsNode]["geometry"]]
+                                self.exportAlembicFile(transformList, self.originalPath, self.originalName, False)
+                            self.exportDicToJsonFile(bsDic)
                         else:
-                            self.notWorkedWellIO("BlendShape_Grp")
+                            self.notWorkedWellIO("BlendShapes_Grp")
                     else: #import
                         try:
                             exportedList = self.getExportedList()
@@ -241,3 +156,85 @@ class BlendShapeIO(dpBaseActionClass.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
+
+    def getBSDataDic(self, bsList, *args):
+        """ Return the blendShape data dictionary to export info.
+        """
+        bsDic = {}
+        self.utils.setProgress(max=len(bsList), addOne=False, addNumber=False)
+        for bsNode in bsList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title]+": "+bsNode)
+            bsDic[bsNode] = {}
+            bsDic[bsNode]["targets"] = {}
+            # get blendShape node info
+            bsDic[bsNode]['geometry'] = cmds.blendShape(bsNode, query=True, geometry=True)
+            bsDic[bsNode]['envelope'] = cmds.getAttr(bsNode+".envelope")
+            bsDic[bsNode]['supportNegativeWeights'] = cmds.getAttr(bsNode+".supportNegativeWeights")
+            targetList = cmds.listAttr("{}.weight".format(bsNode), multi=True)
+            if targetList:
+                # prepare index to deleted targets
+                indexList = cmds.getAttr("{}.weight".format(bsNode), multiIndices=True)
+                bsDic[bsNode]["indexTargetDic"] = dict(zip(indexList, targetList))
+                deletedIndexList = []
+                i = 0 #workaround to avoid deleted target index when importing data
+                for t, target in enumerate(targetList):
+                    weightDic = {}
+                    combination = False
+                    combinationMethod = None
+                    combinationList = []
+                    unitConversionFactor = None
+                    unitConversionInputPlug = None
+                    plug = cmds.listConnections(bsNode+"."+target, destination=False, source=True, plugs=True)
+                    if plug:
+                        plugNode = plug[0][:plug[0].find(".")]
+                        if cmds.objectType(plugNode) == "combinationShape":
+                            combination = True
+                            combinationMethod = cmds.getAttr(plugNode+".combinationMethod")
+                            inputWeightList = cmds.listAttr(plugNode+".inputWeight", multi=True)
+                            if inputWeightList:
+                                for inputWeight in inputWeightList:
+                                    combinationList.append(cmds.listConnections(plugNode+"."+inputWeight, destination=False, source=True, plugs=True)[0])
+                        elif cmds.objectType(plugNode) == "unitConversion":
+                            unitConversionFactor = cmds.getAttr(plugNode+".conversionFactor")
+                            unitConversionInputPlug = cmds.listConnections(plugNode+".input", destination=False, source=True, plugs=True)[0]
+                    # getting vertex weights if not equal to 1
+                    for s, shapeNode in enumerate(bsDic[bsNode]["geometry"]):
+                        # write deleted target to compose a clear target list to avoid Maya's garbage issue
+                        while not i == indexList[t]:
+                            bsDic[bsNode]["targets"][i] = {"deleted" : True}
+                            deletedIndexList.append(i)
+                            i += 1
+                        # continue writing relevant or just info data
+                        vertices = cmds.polyEvaluate(shapeNode, vertex=True)
+                        rawWeightList = cmds.getAttr("{}.inputTarget[{}].inputTargetGroup[{}].targetWeights[0:{}]".format(bsNode, s, t, vertices-1))
+                        if not len(rawWeightList) == rawWeightList.count(1.0):
+                            for w, weight in enumerate(rawWeightList):
+                                if not weight == 1.0:
+                                    weightDic[w] = weight
+                    # data dictionary to export
+                    bsDic[bsNode]["targets"][i] = { "name"           : target,
+                                                    "deleted"        : False,
+                                                    "regenerate"     : cmds.objExists(target),
+                                                    "value"          : cmds.getAttr(bsNode+"."+target),
+                                                    "plug"           : plug,
+                                                    "comb"           : combination,
+                                                    "combMethod"     : combinationMethod,
+                                                    "combList"       : combinationList,
+                                                    "unitConvFactor" : unitConversionFactor,
+                                                    "unitConvInput"  : unitConversionInputPlug,
+                                                    "weightDic"      : weightDic
+                                                    }
+                    bsDic[bsNode]["deletedIndexList"] = deletedIndexList
+                    i += 1
+        return bsDic
+
+
+    def exportTargetFile(self, bsNode, *args):
+        """ Export the given blendShape target.
+        """
+        try:
+            self.pipeliner.makeDirIfNotExists(self.targetPath)
+            # export blendShape targets as compiled maya file
+            cmds.blendShape(bsNode, edit=True, export=self.targetPath+"/"+self.targetName+"_"+bsNode+"."+self.extention)
+        except Exception as e:
+            self.notWorkedWellIO(str(e))
