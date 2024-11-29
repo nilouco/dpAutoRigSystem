@@ -56,19 +56,11 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
                         toExportDataDic.update(self.getUtilitiesDataDic(cmds.ls(selection=False, type=self.utils.utilityTypeList))) #utilityNodes without dpID
                         self.exportDicToJsonFile(toExportDataDic)
                     else: #import
-                        try:
-                            exportedList = self.getExportedList()
-                            if exportedList:
-                                exportedList.sort()
-                                connectDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if connectDic:
-                                    self.importConnectionData(connectDic)
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                        connectDic = self.importLatestJsonFile(self.getExportedList())
+                        if connectDic:
+                            self.importConnectionData(connectDic)
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
@@ -256,4 +248,4 @@ class ConnectionIO(dpBaseActionClass.ActionStartClass):
         if notFoundNodesList:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
         elif wellImportedList:
-            self.wellDoneIO(', '.join(wellImportedList))
+            self.wellDoneIO(self.latestDataFile)

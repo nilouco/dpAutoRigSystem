@@ -57,53 +57,9 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import
-                    self.exportedList = self.getExportedList()
-                    if self.exportedList:
-                        self.exportedList.sort()
-                        skinWeightDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                        if skinWeightDic:
-                            wellImported = True
-                            toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
-                            
-                            # reference old wip rig version to compare meshes changes
-                            #refNodeList = self.referOldWipFile()
-                            refNodeList = None
-
-                            for mesh in skinWeightDic.keys():
-                                if cmds.objExists(mesh):
-                                    if refNodeList:
-                                        for refNodeName in refNodeList:
-                                            if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
-                                                if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
-                                                    changedShapeMeshList.append(mesh)
-                                                    wellImported = False
-                                                elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
-                                                    changedTopoMeshList.append(mesh)
-                                                    wellImported = False
-                                                else:
-                                                    toImportList.append(mesh)
-                                    else:
-                                        toImportList.append(mesh)
-                                else:
-                                    notFoundMeshList.append(mesh)
-                            if refNodeList:
-                                cmds.file(self.refPathName, removeReference=True)
-                            if toImportList:
-                                try:
-                                    # import skin weights
-                                    self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.exportedList[-1], False)
-                                    self.wellDoneIO(', '.join(toImportList))
-                                except Exception as e:
-                                    self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
-                            if not wellImported:
-                                if changedShapeMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
-                                elif changedTopoMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
-                                elif notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                    skinWeightDic = self.importLatestJsonFile(self.getExportedList())
+                    if skinWeightDic:
+                        self.importSkinning(skinWeightDic)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
@@ -141,3 +97,50 @@ class SkinningIO(dpBaseActionClass.ActionStartClass):
                 if refNodeList:
                     refNodeList = cmds.ls(refNodeList, type="transform")
         return refNodeList
+
+
+    def importSkinning(self, skinWeightDic, *args):
+        """ Import the skinning from exported skin weight dictionary.
+        """
+        wellImported = True
+        toImportList, notFoundMeshList, changedTopoMeshList, changedShapeMeshList = [], [], [], []
+        
+        # reference old wip rig version to compare meshes changes
+        #refNodeList = self.referOldWipFile()
+        refNodeList = None
+
+        for mesh in skinWeightDic.keys():
+            if cmds.objExists(mesh):
+                if refNodeList:
+                    for refNodeName in refNodeList:
+                        if refNodeName[refNodeName.rfind(":")+1:] == self.dpUIinst.skin.getIOFileName(mesh):
+                            if cmds.polyCompare(mesh, refNodeName, vertices=True) > 0 or cmds.polyCompare(mesh, refNodeName, edges=True) > 0: #check if shape changes
+                                changedShapeMeshList.append(mesh)
+                                wellImported = False
+                            elif not len(cmds.ls(mesh+".vtx[*]", flatten=True)) == len(cmds.ls(refNodeName+".vtx[*]", flatten=True)): #check if poly count changes
+                                changedTopoMeshList.append(mesh)
+                                wellImported = False
+                            else:
+                                toImportList.append(mesh)
+                else:
+                    toImportList.append(mesh)
+            else:
+                notFoundMeshList.append(mesh)
+        if refNodeList:
+            cmds.file(self.refPathName, removeReference=True)
+        if toImportList:
+            try:
+                # import skin weights
+                self.dpUIinst.skin.importSkinWeightsFromFile(toImportList, self.ioPath, self.latestDataFile, False)
+                self.wellDoneIO(self.latestDataFile)
+            except Exception as e:
+                self.notWorkedWellIO(self.latestDataFile+": "+str(e))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(skinWeightDic.keys())))
+        if not wellImported:
+            if changedShapeMeshList:
+                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+            elif changedTopoMeshList:
+                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" topology "+str(', '.join(changedTopoMeshList)))
+            elif notFoundMeshList:
+                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

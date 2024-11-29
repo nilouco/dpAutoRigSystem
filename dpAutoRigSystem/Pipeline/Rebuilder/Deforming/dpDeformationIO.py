@@ -68,46 +68,9 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh")
                 else: #import
-                    self.exportedList = self.getExportedList()
-                    if self.exportedList:
-                        self.exportedList.sort()
-                        self.deformerDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                        if self.deformerDataDic:
-                            wellImported = True
-                            toImportList, notFoundMeshList, changedShapeMeshList = [], [], []
-                            for deformerNode in self.deformerDataDic.keys():
-                                # check mesh existing
-                                for shapeNode in self.deformerDataDic[deformerNode]["shapeList"]:
-                                    if cmds.objExists(shapeNode):
-                                        if not deformerNode in toImportList:
-                                            toImportList.append(deformerNode)
-                                    else:
-                                        notFoundMeshList.append(deformerNode)
-                            if toImportList:
-                                self.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
-                                for deformerNode in toImportList:
-                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                                    try:
-                                        wellImported = self.importDeformation(deformerNode, wellImported)
-                                    except Exception as e:
-                                        self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+str(e))
-                                if notFoundMeshList: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
-                                    for deformerNode in notFoundMeshList:
-                                        for shapeNode in self.deformerDataDic[deformerNode]["shapeList"]:
-                                            if cmds.objExists(shapeNode):
-                                                try:
-                                                    wellImported = self.importDeformation(deformerNode, wellImported)
-                                                except Exception as e:
-                                                    self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+str(e))
-                                if wellImported:
-                                    self.wellDoneIO(', '.join(toImportList))
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(self.deformerDataDic.keys())))
-                            if not wellImported:
-                                if changedShapeMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
-                                elif notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                    deformerDic = self.importLatestJsonFile(self.getExportedList())
+                    if deformerDic:
+                        self.importDeformationData(deformerDic)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
@@ -131,7 +94,7 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
         """
         self.utils.setProgress(max=len(self.defWeights.typeAttrDic.keys()), addOne=False, addNumber=False)
         # Declaring the data dictionary to export it
-        self.deformerDataDic = {}
+        deformerDic = {}
         # run for all deformer types to get info
         for deformerType in self.defWeights.typeAttrDic.keys():
             self.utils.setProgress(self.dpUIinst.lang[self.title])
@@ -140,99 +103,139 @@ class DeformationIO(dpBaseActionClass.ActionStartClass):
                 for deformerNode in deformerList:
                     if deformerNode in inputDeformerList:
                         # get the attributes and values for this deformer node
-                        self.deformerDataDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
+                        deformerDic[deformerNode] = self.defWeights.getDeformerInfo(deformerNode)
                         # Get shape indexes for the deformer so we can query the deformer weights
                         shapeList, indexList, shapeToIndexDic = self.defWeights.getShapeToIndexData(deformerNode)
                         # update dictionary
-                        self.deformerDataDic[deformerNode]["shapeList"] = shapeList
-                        self.deformerDataDic[deformerNode]["indexList"] = indexList
-                        self.deformerDataDic[deformerNode]["shapeToIndexDic"] = shapeToIndexDic
-                        self.deformerDataDic[deformerNode]["weights"] = {}
+                        deformerDic[deformerNode]["shapeList"] = shapeList
+                        deformerDic[deformerNode]["indexList"] = indexList
+                        deformerDic[deformerNode]["shapeToIndexDic"] = shapeToIndexDic
+                        deformerDic[deformerNode]["weights"] = {}
                         for shape in shapeList:
                             # Get weights
                             index = shapeToIndexDic[shape]
                             weights = self.defWeights.getDeformerWeights(deformerNode, index)
-                            if self.deformerDataDic[deformerNode]["relatedNode"]: 
+                            if deformerDic[deformerNode]["relatedNode"]: 
                                 if not deformerType == "ffd":
                                     # nonLinear because other don't have weights (wrap, shrinkWrap and wire)
-                                    weights = self.defWeights.getDeformerWeights(self.deformerDataDic[deformerNode]["relatedNode"], index)
-                            self.deformerDataDic[deformerNode]["weights"][index] = weights
+                                    weights = self.defWeights.getDeformerWeights(deformerDic[deformerNode]["relatedNode"], index)
+                            deformerDic[deformerNode]["weights"][index] = weights
                         # componentTag
-                        self.deformerDataDic[deformerNode]["componentTag"] = self.defWeights.checkUseComponentTag(deformerNode)
-        return self.deformerDataDic
+                        deformerDic[deformerNode]["componentTag"] = self.defWeights.checkUseComponentTag(deformerNode)
+        return deformerDic
 
 
-    def importDeformation(self, deformerNode, wellImported, *args):
+    def importDeformation(self, deformerNode, deformerDic, wellImported, *args):
         """ Import deformer data creating a new deformer node, set values and weights.
         """
         newDefNode = None
         # verify if the deformer node exists to don't recreate it and import data
         if cmds.objExists(deformerNode):
             newDefNode = deformerNode
-            self.defWeights.assignDeformer(deformerNode, self.deformerDataDic[deformerNode]["shapeList"])
+            self.defWeights.assignDeformer(deformerNode, deformerDic[deformerNode]["shapeList"])
         else:
             # create a new deformer if it doesn't exists
-            if self.deformerDataDic[deformerNode]["type"] == "cluster":
-                newDefNode = cmds.cluster(self.deformerDataDic[deformerNode]["shapeList"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"])[0] #[cluster, handle]
-            elif self.deformerDataDic[deformerNode]["type"] == "deltaMush":
-                newDefNode = cmds.deltaMush(self.deformerDataDic[deformerNode]["shapeList"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"])[0] #[deltaMush]
-            elif self.deformerDataDic[deformerNode]["type"] == "tension":
-                newDefNode = cmds.tension(self.deformerDataDic[deformerNode]["shapeList"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"])[0] #[tension]
-            elif self.deformerDataDic[deformerNode]["type"] == "ffd":
-                latticeList = cmds.lattice(self.deformerDataDic[deformerNode]["shapeList"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"]) #[set, ffd, base] 
+            if deformerDic[deformerNode]["type"] == "cluster":
+                newDefNode = cmds.cluster(deformerDic[deformerNode]["shapeList"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0] #[cluster, handle]
+            elif deformerDic[deformerNode]["type"] == "deltaMush":
+                newDefNode = cmds.deltaMush(deformerDic[deformerNode]["shapeList"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0] #[deltaMush]
+            elif deformerDic[deformerNode]["type"] == "tension":
+                newDefNode = cmds.tension(deformerDic[deformerNode]["shapeList"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0] #[tension]
+            elif deformerDic[deformerNode]["type"] == "ffd":
+                latticeList = cmds.lattice(deformerDic[deformerNode]["shapeList"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"]) #[set, ffd, base] 
                 newDefNode = latticeList[0]
-                self.defWeights.setLatticePoints(latticeList[1], self.deformerDataDic[deformerNode]["relatedData"]["pointList"])
-                cmds.rename(latticeList[1], self.deformerDataDic[deformerNode]["relatedNode"])
-                cmds.rename(latticeList[2], self.deformerDataDic[deformerNode]["relatedData"]["baseLatticeMatrix"])
-            elif self.deformerDataDic[deformerNode]["type"] == "sculpt":
-                sculptList = cmds.sculpt(self.deformerDataDic[deformerNode]["shapeList"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"]) #[sculpt, sculptor, orig]
+                self.defWeights.setLatticePoints(latticeList[1], deformerDic[deformerNode]["relatedData"]["pointList"])
+                cmds.rename(latticeList[1], deformerDic[deformerNode]["relatedNode"])
+                cmds.rename(latticeList[2], deformerDic[deformerNode]["relatedData"]["baseLatticeMatrix"])
+            elif deformerDic[deformerNode]["type"] == "sculpt":
+                sculptList = cmds.sculpt(deformerDic[deformerNode]["shapeList"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"]) #[sculpt, sculptor, orig]
                 newDefNode = sculptList[0]
-                cmds.rename(sculptList[1], self.deformerDataDic[deformerNode]["relatedData"]["sculptor"])
-                cmds.rename(sculptList[2], self.deformerDataDic[deformerNode]["relatedData"]["originLocator"])
-            elif self.deformerDataDic[deformerNode]["type"] == "wrap":
-                if cmds.objExists(self.deformerDataDic[deformerNode]["relatedNode"]):
-                    cmds.select(self.deformerDataDic[deformerNode]["shapeList"], self.deformerDataDic[deformerNode]["relatedNode"])
+                cmds.rename(sculptList[1], deformerDic[deformerNode]["relatedData"]["sculptor"])
+                cmds.rename(sculptList[2], deformerDic[deformerNode]["relatedData"]["originLocator"])
+            elif deformerDic[deformerNode]["type"] == "wrap":
+                if cmds.objExists(deformerDic[deformerNode]["relatedNode"]):
+                    cmds.select(deformerDic[deformerNode]["shapeList"], deformerDic[deformerNode]["relatedNode"])
                     mel.eval("CreateWrap;")
-                    hist = cmds.listHistory(self.deformerDataDic[deformerNode]["shapeList"])
+                    hist = cmds.listHistory(deformerDic[deformerNode]["shapeList"])
                     wrapList = cmds.ls(hist, type="wrap")[0]
-                    newDefNode = cmds.rename(wrapList, self.deformerDataDic[deformerNode]["name"])
-            elif self.deformerDataDic[deformerNode]["type"] == "shrinkWrap":
-                newDefNode = cmds.deformer(self.deformerDataDic[deformerNode]["shapeList"], type=self.deformerDataDic[deformerNode]["type"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"])[0] #shrinkWrap
+                    newDefNode = cmds.rename(wrapList, deformerDic[deformerNode]["name"])
+            elif deformerDic[deformerNode]["type"] == "shrinkWrap":
+                newDefNode = cmds.deformer(deformerDic[deformerNode]["shapeList"], type=deformerDic[deformerNode]["type"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0] #shrinkWrap
                 for cAttr in ["continuity", "smoothUVs", "keepBorder", "boundaryRule", "keepHardEdge", "propagateEdgeHardness", "keepMapBorders"]:
-                    cmds.connectAttr(self.deformerDataDic[deformerNode]["relatedNode"]+"."+cAttr, newDefNode+"."+cAttr, force=True)
-                cmds.connectAttr(self.deformerDataDic[deformerNode]["relatedNode"]+".worldMesh", newDefNode+".targetGeom", force=True)
-            elif self.deformerDataDic[deformerNode]["type"] == "wire":
-                if not cmds.objExists(self.deformerDataDic[deformerNode]["relatedNode"]):
+                    cmds.connectAttr(deformerDic[deformerNode]["relatedNode"]+"."+cAttr, newDefNode+"."+cAttr, force=True)
+                cmds.connectAttr(deformerDic[deformerNode]["relatedNode"]+".worldMesh", newDefNode+".targetGeom", force=True)
+            elif deformerDic[deformerNode]["type"] == "wire":
+                if not cmds.objExists(deformerDic[deformerNode]["relatedNode"]):
                     isPeriodic = False
-                    if self.deformerDataDic[deformerNode]["relatedData"]["form"] == 2:
+                    if deformerDic[deformerNode]["relatedData"]["form"] == 2:
                         isPeriodic = True
-                    cmds.curve(name=self.deformerDataDic[deformerNode]["relatedNode"], periodic=isPeriodic, point=self.deformerDataDic[deformerNode]["relatedData"]["point"], degree=self.deformerDataDic[deformerNode]["relatedData"]["degree"], knot=self.deformerDataDic[deformerNode]["relatedData"]["knot"])
-                newDefNode = cmds.wire(self.deformerDataDic[deformerNode]["shapeList"], wire=self.deformerDataDic[deformerNode]["relatedNode"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"])[0] #wire
-            elif self.deformerDataDic[deformerNode]["nonLinear"]:
-                nonLinearList = cmds.nonLinear(self.deformerDataDic[deformerNode]["shapeList"], type=self.deformerDataDic[deformerNode]["nonLinear"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"]) #[def, handle] bend, flare, sine, squash, twist, wave
+                    cmds.curve(name=deformerDic[deformerNode]["relatedNode"], periodic=isPeriodic, point=deformerDic[deformerNode]["relatedData"]["point"], degree=deformerDic[deformerNode]["relatedData"]["degree"], knot=deformerDic[deformerNode]["relatedData"]["knot"])
+                newDefNode = cmds.wire(deformerDic[deformerNode]["shapeList"], wire=deformerDic[deformerNode]["relatedNode"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0] #wire
+            elif deformerDic[deformerNode]["nonLinear"]:
+                nonLinearList = cmds.nonLinear(deformerDic[deformerNode]["shapeList"], type=deformerDic[deformerNode]["nonLinear"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"]) #[def, handle] bend, flare, sine, squash, twist, wave
                 newDefNode = nonLinearList[0]
-                cmds.rename(nonLinearList[1], self.deformerDataDic[deformerNode]["relatedData"])
+                cmds.rename(nonLinearList[1], deformerDic[deformerNode]["relatedData"])
             else: #solidify, proximityWrap, morph, textureDeformer, jiggle
-                newDefNode = cmds.deformer(self.deformerDataDic[deformerNode]["shapeList"], type=self.deformerDataDic[deformerNode]["type"], name=self.deformerDataDic[deformerNode]["name"], useComponentTags=self.deformerDataDic[deformerNode]["componentTag"])[0]
-            if self.deformerDataDic[deformerNode]["type"] == "morph":
-                if cmds.objExists(self.deformerDataDic[deformerNode]["relatedNode"]):
-                    cmds.connectAttr(self.deformerDataDic[deformerNode]["relatedNode"]+".worldMesh[0]", newDefNode+".morphTarget[0]", force=True)
+                newDefNode = cmds.deformer(deformerDic[deformerNode]["shapeList"], type=deformerDic[deformerNode]["type"], name=deformerDic[deformerNode]["name"], useComponentTags=deformerDic[deformerNode]["componentTag"])[0]
+            if deformerDic[deformerNode]["type"] == "morph":
+                if cmds.objExists(deformerDic[deformerNode]["relatedNode"]):
+                    cmds.connectAttr(deformerDic[deformerNode]["relatedNode"]+".worldMesh[0]", newDefNode+".morphTarget[0]", force=True)
                 else:
                     wellImported = False
-                    self.notWorkedWellIO(self.exportedList[-1]+": "+deformerNode+" - "+self.deformerDataDic[deformerNode]["relatedNode"])
+                    self.notWorkedWellIO(self.latestDataFile+": "+deformerNode+" - "+deformerDic[deformerNode]["relatedNode"])
         # import attribute values
         if newDefNode:
-            for attr in self.deformerDataDic[deformerNode]["attributes"].keys():
+            for attr in deformerDic[deformerNode]["attributes"].keys():
                 try:
-                    cmds.setAttr(newDefNode+"."+attr, self.deformerDataDic[deformerNode]["attributes"][attr])
+                    cmds.setAttr(newDefNode+"."+attr, deformerDic[deformerNode]["attributes"][attr])
                 except:
                     pass #just to avoid try set connected attributes like envelope or curvature.
         # import deformer weights, except for skinCluster, blendShape, sculpt, wrap
-        weightsDic = self.deformerDataDic[deformerNode]["weights"]
+        weightsDic = deformerDic[deformerNode]["weights"]
         if weightsDic:
-            for index in self.deformerDataDic[deformerNode]["indexList"]:
-                currentIndex = self.defWeights.getCurrentDeformedIndex(deformerNode, self.deformerDataDic[deformerNode]["shapeToIndexDic"], index)
+            for index in deformerDic[deformerNode]["indexList"]:
+                currentIndex = self.defWeights.getCurrentDeformedIndex(deformerNode, deformerDic[deformerNode]["shapeToIndexDic"], index)
                 if weightsDic[str(index)]:
                     # cluster, deltaMush, tension, ffd, shrinkWrap, wire, nonLinear, solidify, proximityWrap, textureDeformer, jiggle
-                    self.defWeights.setDeformerWeights(self.deformerDataDic[deformerNode]["name"], weightsDic[str(index)], currentIndex)
+                    self.defWeights.setDeformerWeights(deformerDic[deformerNode]["name"], weightsDic[str(index)], currentIndex)
         return wellImported
+
+
+    def importDeformationData(self, deformerDic, *args):
+        """ Import the deformation from exported file using the given dictionary.
+        """
+        wellImported = True
+        toImportList, notFoundMeshList, changedShapeMeshList = [], [], []
+        for deformerNode in deformerDic.keys():
+            # check mesh existing
+            for shapeNode in deformerDic[deformerNode]["shapeList"]:
+                if cmds.objExists(shapeNode):
+                    if not deformerNode in toImportList:
+                        toImportList.append(deformerNode)
+                else:
+                    notFoundMeshList.append(deformerNode)
+        if toImportList:
+            self.utils.setProgress(max=len(toImportList), addOne=False, addNumber=False)
+            for deformerNode in toImportList:
+                self.utils.setProgress(self.dpUIinst.lang[self.title])
+                try:
+                    wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
+                except Exception as e:
+                    self.notWorkedWellIO(self.latestDataFile+": "+deformerNode+" - "+str(e))
+            if notFoundMeshList: #call again the same instruction to try create a deformer in a deformer, like a cluster in a lattice.
+                for deformerNode in notFoundMeshList:
+                    for shapeNode in deformerDic[deformerNode]["shapeList"]:
+                        if cmds.objExists(shapeNode):
+                            try:
+                                wellImported = self.importDeformation(deformerNode, deformerDic, wellImported)
+                            except Exception as e:
+                                self.notWorkedWellIO(self.latestDataFile+": "+deformerNode+" - "+str(e))
+            if wellImported:
+                self.wellDoneIO(self.latestDataFile)
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(deformerDic.keys())))
+        if not wellImported:
+            if changedShapeMeshList:
+                self.notWorkedWellIO(self.dpUIinst.lang['r018_changedMesh']+" shape "+str(', '.join(changedShapeMeshList)))
+            elif notFoundMeshList:
+                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

@@ -53,19 +53,11 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                     if self.firstMode: #export
                         self.exportDicToJsonFile(self.getCalibrationDataDic(ctrlList))
                     else: #import
-                        try:
-                            exportedList = self.getExportedList()
-                            if exportedList:
-                                exportedList.sort()
-                                calibrationDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if calibrationDic:
-                                    self.importCalibrationData(calibrationDic)
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                        calibrationDic = self.importLatestJsonFile(self.getExportedList())
+                        if calibrationDic:
+                            self.importCalibrationData(calibrationDic)
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
@@ -98,6 +90,7 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
                     dic[ctrl][attr] = cmds.getAttr(ctrl+"."+attr)
         return dic
 
+
     def importCalibrationData(self, calibrationDic, *args):
         """ Import the calibration setup from the given calibration data dictionary.
         """
@@ -128,6 +121,6 @@ class CalibrationIO(dpBaseActionClass.ActionStartClass):
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
-            self.wellDoneIO(', '.join(wellImportedList))
+            self.wellDoneIO(self.latestDataFile)
         else:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

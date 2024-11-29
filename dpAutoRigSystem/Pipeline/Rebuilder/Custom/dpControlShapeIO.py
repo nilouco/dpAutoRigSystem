@@ -55,7 +55,7 @@ class ControlShapeIO(dpBaseActionClass.ActionStartClass):
                             self.pipeliner.makeDirIfNotExists(self.ioPath)
                             ctrlFileName = self.ioPath+"/"+self.startName+"_"+self.pipeliner.pipeData['currentFileName']+".ma"
                             self.dpUIinst.ctrls.exportShape(ctrlList, ctrlFileName, ui=False, verbose=True)
-                            self.wellDoneIO(', '.join(ctrlList))
+                            self.wellDoneIO(ctrlFileName)
                         except Exception as e:
                             self.notWorkedWellIO(', '.join(ctrlList)+": "+str(e))
                     else: #import

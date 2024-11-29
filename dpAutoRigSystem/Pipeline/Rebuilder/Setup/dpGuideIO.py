@@ -56,57 +56,29 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     if netList:
                         self.exportDicToJsonFile(self.getGuideDataDic(netList))
                     else:
-                        self.notWorkedWellIO("v014_notFoundNodes")
+                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
                         cmds.select(clear=True)
                 else: #import
                     # apply viewport xray
                     modelPanelList = cmds.getPanel(type="modelPanel")
                     for mp in modelPanelList:
                         cmds.modelEditor(mp, edit=True, xray=True)
-                    exportedList = self.getExportedList()
-                    if exportedList:
-                        exportedList.sort()
+                    guideDic = self.importLatestJsonFile(self.getExportedList())
+                    if guideDic:
                         try:
-                            self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if self.importedDataDic:
-                                wellImported = True
-                                self.utils.setProgress(max=len(self.importedDataDic.keys()), addOne=False, addNumber=False)
-                                for net in self.importedDataDic.keys():
-                                    toInitializeGuide = True
-                                    if cmds.objExists(net):
-                                        if cmds.getAttr(net+".rawGuide"):
-                                            toInitializeGuide = False
-                                        else:
-                                            cmds.lockNode(net, lock=False)
-                                            cmds.delete(net)
-                                    if toInitializeGuide:
-                                        try:
-                                            #self.netDic = json.loads(self.importedDataDic[net])
-                                            self.netDic = self.importedDataDic[net]
-                                            self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+self.importedDataDic[net]['ModuleType'])
-                                            # create a module instance:
-                                            self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
-                                            self.setupInstanceChanges()
-                                            self.setupGuideTransformations()
-                                        except Exception as e:
-                                            wellImported = False
-                                            self.notWorkedWellIO(net+": "+str(e))
-                                            break
-                                try:
-                                    # Parenting guides
-                                    self.setupGuideBaseParenting(self.dpUIinst.lang['m197_notPossibleParent'])
-                                except Exception as e:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
-                                    wellImported = False
-                                if wellImported:
-                                    self.wellDoneIO(exportedList[-1])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                            cmds.select(clear=True)
-                        except:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                            wellImported = self.importGuide(guideDic)
+                            self.setupGuideBaseParenting(guideDic)
+                        except Exception as e:
+                            if not wellImported: #guide initialization issue
+                                self.notWorkedWellIO(self.dpUIinst.lang['m195_couldNotBeSet']+": "+str(e))
+                            else: #parenting issue
+                                self.notWorkedWellIO(self.dpUIinst.lang['m197_notPossibleParent']+": "+str(e))
+                            wellImported = False
+                        if wellImported:
+                            self.wellDoneIO(self.latestDataFile)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    cmds.select(clear=True)
                     # remove viewport xray
                     for mp in modelPanelList:
                         cmds.modelEditor(mp, edit=True, xray=False)
@@ -202,14 +174,43 @@ class GuideIO(dpBaseActionClass.ActionStartClass):
                     cmds.refresh()
 
 
-    def setupGuideBaseParenting(self, *args):
+    def setupGuideBaseParenting(self, guideDic, *args):
         """ Rebuild the Guide_Base parenting.
         """
-        for net in self.importedDataDic.keys():
-            netDic = self.importedDataDic[net]
+        for net in guideDic.keys():
+            netDic = guideDic[net]
             for item in list(netDic["GuideData"]):
                 if cmds.objExists(item+".guideBase") and cmds.getAttr(item+".guideBase") == 1: #moduleGrp
                     fatherNodeData = netDic["GuideData"][item]['FatherNode']
                     if fatherNodeData:
                         if cmds.objExists(fatherNodeData):
                             cmds.parent(item, fatherNodeData)
+
+
+    def importGuide(self, guideDic, *args):
+        """ Import guide info and initialize guide setting it attribute values.
+        """
+        wellImported = True
+        self.utils.setProgress(max=len(guideDic.keys()), addOne=False, addNumber=False)
+        for net in guideDic.keys():
+            toInitializeGuide = True
+            if cmds.objExists(net):
+                if cmds.getAttr(net+".rawGuide"):
+                    toInitializeGuide = False
+                else:
+                    cmds.lockNode(net, lock=False)
+                    cmds.delete(net)
+            if toInitializeGuide:
+                try:
+                    #self.netDic = json.loads(guideDic[net])
+                    self.netDic = guideDic[net]
+                    self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+guideDic[net]['ModuleType'])
+                    # create a module instance:
+                    self.instance = self.dpUIinst.initGuide("dp"+self.netDic['ModuleType'], MODULES, number=self.netDic["GuideNumber"])
+                    self.setupInstanceChanges()
+                    self.setupGuideTransformations()
+                except Exception as e:
+                    wellImported = False
+                    self.notWorkedWellIO(net+": "+str(e))
+                    break
+        return wellImported

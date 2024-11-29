@@ -57,40 +57,9 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" - meshes")
                 else: #import
-                    self.exportedList = self.getExportedList()
-                    if self.exportedList:
-                        self.exportedList.sort()
-                        orderDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                        if orderDic:
-                            self.utils.setProgress(max=len(orderDic.keys()), addOne=False, addNumber=False)
-                            wellImported = True
-                            toImportList, notFoundMeshList, = [], []
-                            for item in orderDic.keys():
-                                self.utils.setProgress(self.dpUIinst.lang[self.title])
-                                if cmds.objExists(item):
-                                    toImportList.append(item)
-                                else:
-                                    notFoundMeshList.append(item)
-                            if toImportList:
-                                warningStatus = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
-                                cmds.scriptEditorInfo(edit=True, suppressWarnings=True)
-                                for item in toImportList:
-                                    try:
-                                        # reorder deformers
-                                        deformerList = orderDic[item]
-                                        if deformerList:
-                                            if len(deformerList) > 1:
-                                                self.defWeights.setOrderList(item, deformerList)
-                                    except Exception as e:
-                                        wellImported = False
-                                        self.notWorkedWellIO(self.exportedList[-1]+": "+str(e))
-                                cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
-                                if wellImported:
-                                    self.wellDoneIO(', '.join(toImportList))
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(orderDic.keys())))
-                        if not wellImported:
-                            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))
+                    orderDic = self.importLatestJsonFile(self.getExportedList())
+                    if orderDic:
+                        self.importInputOrder(orderDic)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
@@ -117,3 +86,35 @@ class InputOrderIO(dpBaseActionClass.ActionStartClass):
             self.utils.setProgress(self.dpUIinst.lang[self.title])
             orderDic[item] = self.defWeights.getOrderList(item)
         return orderDic
+    
+
+    def importInputOrder(self, orderDic, *args):
+        """ Import the input order data from given dictionary.
+        """
+        self.utils.setProgress(max=len(orderDic.keys()), addOne=False, addNumber=False)
+        wellImported = True
+        toImportList, notFoundMeshList, = [], []
+        for item in orderDic.keys():
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            if cmds.objExists(item):
+                toImportList.append(item)
+            else:
+                notFoundMeshList.append(item)
+        if toImportList:
+            warningStatus = cmds.scriptEditorInfo(query=True, suppressWarnings=True)
+            cmds.scriptEditorInfo(edit=True, suppressWarnings=True)
+            for item in toImportList:
+                try:
+                    # reorder deformers
+                    deformerList = orderDic[item]
+                    if deformerList:
+                        if len(deformerList) > 1:
+                            self.defWeights.setOrderList(item, deformerList)
+                except Exception as e:
+                    wellImported = False
+                    self.notWorkedWellIO(self.latestDataFile)
+            cmds.scriptEditorInfo(edit=True, suppressWarnings=warningStatus)
+            if wellImported:
+                self.wellDoneIO(self.latestDataFile)
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" "+str(', '.join(notFoundMeshList)))

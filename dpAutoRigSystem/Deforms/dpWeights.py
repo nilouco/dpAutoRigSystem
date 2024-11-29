@@ -278,11 +278,12 @@ class Weights(object):
         return falloffDic
     
 
-    def importComponentTag(self, taggedNode, tagName, injestNode, componentList, wellImported, *args):
+    def importComponentTag(self, taggedNode, tagName, injestNode, componentList, *args):
         """
             Import componentList to the tagged node using the injestNode as injestLocation parameter.
             Need to eval a MEL command because seems the Python command isn't implemented properly in Maya2022.
         """
+        wellImported = True
         index = 0
         indexList = cmds.getAttr(taggedNode+".componentTags", multiIndices=True)
         if indexList:
@@ -297,9 +298,10 @@ class Weights(object):
         return wellImported
 
 
-    def importComponentTagInfo(self, taggedDic, nodeList, wellImported, *args):
+    def importComponentTagInfo(self, taggedDic, nodeList, *args):
         """ Import component tag tagged "nodes" as "tag" info.
         """
+        wellImported = True
         toImportList, self.notWorkWellInfoList = [], []
         currentTaggedDic = self.getComponentTagInfo(nodeList)
         for taggedNode in taggedDic.keys():
@@ -328,9 +330,10 @@ class Weights(object):
         return wellImported
 
 
-    def importComponentTagInfluencer(self, infDic, wellImported, *args):
+    def importComponentTagInfluencer(self, infDic, *args):
         """ Import component tag influencer info from deformer nodes.
         """
+        wellImported = True
         self.notWorkWellInfoList = []
         for infNode in infDic.keys():
             # check deformer node existing
@@ -345,12 +348,13 @@ class Weights(object):
         return wellImported
 
 
-    def importComponentTagFalloff(self, falloffDic, wellImported, *args):
+    def importComponentTagFalloff(self, falloffDic, *args):
         """ Import the component tag falloff info.
             Create them if they don't exists.
             Connect node attributes.
             Set all specific node attributes for each falloff type.
         """
+        wellImported = True
         self.notWorkWellInfoList = []
         for falloffNode in falloffDic.keys():
             # check falloff node existing

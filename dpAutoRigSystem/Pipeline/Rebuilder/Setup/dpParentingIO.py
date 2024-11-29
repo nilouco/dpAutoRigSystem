@@ -59,21 +59,16 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else: #import
-                    try:
-                        self.exportedList = self.getExportedList()
-                        if self.exportedList:
-                            self.exportedList.sort()
-                            parentDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                            if parentDic:
-                                if self.importBrokenIDData(parentDic):
-                                    self.importParentingData(parentDic) #double run to first put broken nodes in place
-                                self.importParentingData(parentDic)
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except Exception as e:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                    parentDic = self.importLatestJsonFile(self.getExportedList())
+                    if parentDic:
+                        try:
+                            if self.importBrokenIDData(parentDic):
+                                self.importParentingData(parentDic) #double run to first put broken nodes in place
+                            self.importParentingData(parentDic)
+                        except Exception as e:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
@@ -109,7 +104,7 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
         """ If there are broken nodes, we try to recreate them if needed.
             Return True if there are broken nodes.
         """
-        if parentDic["BrokenID"]:
+        if "BrokenID" in parentDic.keys():
             self.utils.setProgress(max=len(parentDic["BrokenID"]), addOne=False, addNumber=False)
             for nodeType in parentDic["BrokenID"].keys():
                 if nodeType == "transform":
@@ -167,10 +162,10 @@ class ParentingIO(dpBaseActionClass.ActionStartClass):
                         notFoundNodesList.append(shortItem)
             if parentIssueList:
                 if wellImportedList:
-                    self.wellDoneIO(self.exportedList[-1]+": "+', '.join(parentIssueList))
+                    self.wellDoneIO(self.latestDataFile)
                 else:
                     self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
             else:
-                self.wellDoneIO(self.exportedList[-1])
+                self.wellDoneIO(self.latestDataFile)
         else:
-            self.wellDoneIO(self.exportedList[-1])
+            self.wellDoneIO(self.latestDataFile)

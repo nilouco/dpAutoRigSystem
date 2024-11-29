@@ -319,7 +319,7 @@ class Skinning(dpWeights.Weights):
                         "skinDropoffWeights"        : self.getSkinListWeights(mesh, skinClusterNode, "dropoff")
                     }
                     if cmds.objExists(skinClusterNode+".relativeSpaceMode"):
-                        skinWeightsDic["skinRelativeSpaceMode"] = cmds.getAttr(skinClusterNode+".relativeSpaceMode")
+                        skinWeightsDic[mesh][skinClusterNode]["skinRelativeSpaceMode"] = cmds.getAttr(skinClusterNode+".relativeSpaceMode")
         return skinWeightsDic
 
 

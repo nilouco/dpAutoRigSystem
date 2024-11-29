@@ -59,20 +59,7 @@ class ModelIO(dpBaseActionClass.ActionStartClass):
                         else:
                             self.notWorkedWellIO("Render_Grp")
                     else: #import
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
-                            try:
-                                # import alembic
-                                exportedList.sort()
-                                abcToImport = self.ioPath+"/"+exportedList[-1]
-                                #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
-                                mel.eval("AbcImport -mode import \""+abcToImport+"\";")
-                                self.wellDoneIO(exportedList[-1])
-                            except Exception as e:
-                                self.notWorkedWellIO(exportedList[-1]+": "+str(e))
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                        self.importLatestAlembicFile(self.getExportedList())
                 else:
                     self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
             else:

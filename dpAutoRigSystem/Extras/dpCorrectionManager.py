@@ -353,7 +353,7 @@ class CorrectionManager(object):
             cmds.connectAttr(toAttach+".message", loc+".inputNode", force=True)
             grp = self.utils.zeroOut([loc])[0]
             if toRivet:
-                rivetNode = self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, False, useOffset=False)
+                rivetNode = self.dpRivetInst.dpCreateRivet(toAttach, "AnyUVSet", [grp], True, False, False, False, False, False, False, useOffset=False)[-1]
                 cmds.addAttr(self.net, longName=toAttach+"_Rivet", attributeType="message")
                 cmds.connectAttr(rivetNode+".message", self.net+"."+toAttach+"_Rivet", force=True)
             else:

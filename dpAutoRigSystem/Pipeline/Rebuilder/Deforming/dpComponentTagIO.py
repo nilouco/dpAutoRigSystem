@@ -71,29 +71,9 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+" mesh, lattice")
                 else: #import
-                    self.exportedList = self.getExportedList()
-                    if self.exportedList:
-                        self.exportedList.sort()
-                        self.tagDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+self.exportedList[-1])
-                        if self.tagDataDic:
-                            wellImported = True
-                            # import tagged (tag info into the received deformed mesh)
-                            if self.tagDataDic["tagged"]:
-                                wellImported = self.defWeights.importComponentTagInfo(self.tagDataDic["tagged"], nodeList, wellImported)
-                                if not wellImported:
-                                    self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(self.defWeights.notWorkWellInfoList))
-                            # import influencers (tag info into the deformer node)
-                            if self.tagDataDic["influencer"]:
-                                wellImported = self.defWeights.importComponentTagInfluencer(self.tagDataDic["influencer"], wellImported)
-                                if not wellImported:
-                                    self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(self.defWeights.notWorkWellInfoList))
-                            # import falloffs
-                            if self.tagDataDic["falloff"]:
-                                wellImported = self.defWeights.importComponentTagFalloff(self.tagDataDic["falloff"], wellImported)
-                                if not wellImported:
-                                    self.notWorkedWellIO(self.exportedList[-1]+": "+", ".join(self.defWeights.notWorkWellInfoList))
-                            if wellImported:
-                                self.wellDoneIO(", ".join(list(self.tagDataDic["tagged"].keys())))
+                    tagDataDic = self.importLatestJsonFile(self.getExportedList())
+                    if tagDataDic:
+                        self.importTag(tagDataDic, nodeList)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
@@ -110,3 +90,26 @@ class ComponentTagIO(dpBaseActionClass.ActionStartClass):
         self.endProgress()
         self.refreshView()
         return self.dataLogDic
+
+
+    def importTag(self, tagDataDic, nodeList, *args):
+        """ Import componentTag data.
+        """
+        fail = False
+        # import tagged (tag info into the received deformed mesh)
+        if tagDataDic["tagged"]:
+            if not self.defWeights.importComponentTagInfo(tagDataDic["tagged"], nodeList):
+                self.notWorkedWellIO(self.latestDataFile+": tagged - "+", ".join(self.defWeights.notWorkWellInfoList))
+                fail = True
+        # import influencers (tag info into the deformer node)
+        if tagDataDic["influencer"]:
+            if not self.defWeights.importComponentTagInfluencer(tagDataDic["influencer"]):
+                self.notWorkedWellIO(self.latestDataFile+": influencer - "+", ".join(self.defWeights.notWorkWellInfoList))
+                fail = True
+        # import falloffs
+        if tagDataDic["falloff"]:
+            if not self.defWeights.importComponentTagFalloff(tagDataDic["falloff"]):
+                self.notWorkedWellIO(self.latestDataFile+": falloff - "+", ".join(self.defWeights.notWorkWellInfoList))
+                fail = True
+        if not fail:
+            self.wellDoneIO(self.latestDataFile)

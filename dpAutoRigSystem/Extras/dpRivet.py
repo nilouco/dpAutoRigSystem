@@ -54,6 +54,7 @@ class Rivet(object):
         self.mayaMinimalVersion = 2022.3
         self.mayaVersionRequired = self.checkMayaVersion()
         self.ui = ui
+        self.netList = []
         # call main function
         if ui:
             self.dpRivetUI()
@@ -546,7 +547,7 @@ class Rivet(object):
     
     def dpCreateRivet(self, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName=RIVET_GRP, askComponent=False, useOffset=True, reuseFaceToRivet=False, *args):
         """ Create the Rivet setup.
-            Returns the network node. 
+            Returns the created network node list. 
         """
         # declaring variables
         self.toIDList = []
@@ -763,6 +764,7 @@ class Rivet(object):
                 # serialize network node
                 self.net = cmds.createNode("network", name=rivet+"_Net")
                 self.toIDList.append(self.net)
+                self.netList.append(self.net)
                 # add
                 cmds.addAttr(self.net, longName="dpNetwork", attributeType="bool")
                 cmds.addAttr(self.net, longName="dpRivetNet", attributeType="bool")
@@ -824,7 +826,7 @@ class Rivet(object):
         self.utils.nodeRenamingTreatment(list(set(cmds.ls(selection=False, type="unitConversion"))-set(self.oldUnitConversionList)))
         self.dpUIinst.customAttr.addAttr(0, self.toIDList, descendents=True) #dpID
         cmds.select(clear=True)
-        return self.net
+        return self.netList
     
 
     def getRivetData(self, itemNode, geoToAttach, uvSetName, itemList, attachTranslate, attachRotate, addFatherGrp, addInvert, invT, invR, faceToRivet, rivetGrpName, askComponent, useOffset, *args):

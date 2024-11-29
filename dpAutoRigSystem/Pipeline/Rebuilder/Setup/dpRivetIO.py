@@ -56,37 +56,15 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
                     if netList:
                         self.exportDicToJsonFile(self.getRivetDataDic(netList))
                     else:
-                        self.notWorkedWellIO("v014_notFoundNodes")
+                        self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
                         cmds.select(clear=True)
                 else: #import
-                    exportedList = self.getExportedList()
-                    if exportedList:
-                        exportedList.sort()
-                        try:
-                            self.importedDataDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if self.importedDataDic:
-                                wellImported = True
-                                self.utils.setProgress(max=len(self.importedDataDic.keys()), addOne=False, addNumber=False)
-                                for net in self.importedDataDic.keys():
-                                    try:
-                                        netDic = self.importedDataDic[net]
-                                        self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+netDic['geoToAttach'])
-                                        # recreate rivet:
-                                        self.dpRivet.deformerToUse = netDic['deformerToUse']
-                                        self.dpRivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['itemList'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
-                                    except Exception as e:
-                                        wellImported = False
-                                        self.notWorkedWellIO(net+": "+str(e))
-                                        break
-                                if wellImported:
-                                    self.wellDoneIO(exportedList[-1])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                            cmds.select(clear=True)
-                        except:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    rivetDic = self.importLatestJsonFile(self.getExportedList())
+                    if rivetDic:
+                        self.importRivet(rivetDic)
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+                    cmds.select(clear=True)
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
@@ -125,3 +103,26 @@ class RivetIO(dpBaseActionClass.ActionStartClass):
                     dic[i] = data
                     i += 1
         return dic
+
+
+    def importRivet(self, rivetDic, *args):
+        """ Import rivet data creating new instances with exported attribute values.
+        """
+        wellImported = True
+        self.utils.setProgress(max=len(rivetDic.keys()), addOne=False, addNumber=False)
+        for net in rivetDic.keys():
+            try:
+                netDic = rivetDic[net]
+                self.utils.setProgress(self.dpUIinst.lang[self.title]+': '+netDic['geoToAttach'])
+                # recreate rivet:
+                self.dpRivet.deformerToUse = netDic['deformerToUse']
+                rivetList = self.dpRivet.dpCreateRivet(netDic['geoToAttach'], netDic['uvSetName'], netDic['itemList'], netDic['attachTranslate'], netDic['attachRotate'], netDic['addFatherGrp'], netDic['addInvert'], netDic['invT'], netDic['invR'], netDic['faceToRivet'], netDic['rivetGrpName'], netDic['askComponent'], netDic['useOffset'], netDic['reuseFaceToRivet'])
+                if not rivetList:
+                    wellImported = False
+                    self.notWorkedWellIO(net+": "+self.dpUIinst.lang['r032_notImportedData'])
+            except Exception as e:
+                wellImported = False
+                self.notWorkedWellIO(net+": "+str(e))
+                break
+        if wellImported:
+            self.wellDoneIO(self.latestDataFile)

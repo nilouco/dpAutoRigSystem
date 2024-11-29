@@ -55,49 +55,11 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes'])
                 else: #import
-                    try:
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            exportedList.sort()
-                            transformDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if transformDic:
-                                self.utils.setProgress(max=len(transformDic.keys()), addOne=False, addNumber=False)
-                                # define lists to check result
-                                wellImportedList = []
-                                for item in transformDic.keys():
-                                    self.utils.setProgress(self.dpUIinst.lang[self.title])
-                                    notFoundNodesList = []
-                                    # check transformations
-                                    if not cmds.objExists(item):
-                                        item = item[item.rfind("|")+1:] #short name (after last "|")
-                                    if cmds.objExists(item):
-                                        for attr in transformDic[item]["transform"].keys():
-                                            if not cmds.listConnections(item+"."+attr, destination=False, source=True):
-                                                # unlock attribute
-                                                wasLocked = cmds.getAttr(item+"."+attr, lock=True)
-                                                cmds.setAttr(item+"."+attr, lock=False)
-                                                try:
-                                                    # set transformation value
-                                                    cmds.setAttr(item+"."+attr, transformDic[item]["transform"][attr])
-                                                    # lock attribute again if it was locked
-                                                    cmds.setAttr(item+"."+attr, lock=wasLocked)
-                                                    if not item in wellImportedList:
-                                                        wellImportedList.append(item)
-                                                except Exception as e:
-                                                    self.notWorkedWellIO(item+" - "+str(e))
-                                        cmds.xform(item, worldSpace=False, matrix=transformDic[item]["matrix"])
-                                    else:
-                                        notFoundNodesList.append(item)
-                                if wellImportedList:
-                                    self.wellDoneIO(', '.join(wellImportedList))
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except Exception as e:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                    transformDic = self.importLatestJsonFile(self.getExportedList())
+                    if transformDic:
+                        self.importTransformation(transformDic)
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
@@ -150,3 +112,39 @@ class TransformationIO(dpBaseActionClass.ActionStartClass):
                         needGetData = False
                     dic["transform"][attr] = cmds.getAttr(item+"."+attr)
         return dic
+
+
+    def importTransformation(self, transformDic, *args):
+        """ Import transfomation data from given dictionary.
+        """
+        self.utils.setProgress(max=len(transformDic.keys()), addOne=False, addNumber=False)
+        # define lists to check result
+        wellImportedList = []
+        for item in transformDic.keys():
+            self.utils.setProgress(self.dpUIinst.lang[self.title])
+            notFoundNodesList = []
+            # check transform
+            #if not cmds.objExists(item):
+            #    item = item[item.rfind("|")+1:] #short name (after last "|")
+            if cmds.objExists(item):
+                for attr in transformDic[item]["transform"].keys():
+                    if not cmds.listConnections(item+"."+attr, destination=False, source=True):
+                        # unlock attribute
+                        wasLocked = cmds.getAttr(item+"."+attr, lock=True)
+                        cmds.setAttr(item+"."+attr, lock=False)
+                        try:
+                            # set transformation value
+                            cmds.setAttr(item+"."+attr, transformDic[item]["transform"][attr])
+                            # lock attribute again if it was locked
+                            cmds.setAttr(item+"."+attr, lock=wasLocked)
+                            if not item in wellImportedList:
+                                wellImportedList.append(item)
+                        except Exception as e:
+                            self.notWorkedWellIO(item+" - "+str(e))
+                cmds.xform(item, worldSpace=False, matrix=transformDic[item]["matrix"])
+            else:
+                notFoundNodesList.append(item)
+        if wellImportedList:
+            self.wellDoneIO(self.latestDataFile)
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

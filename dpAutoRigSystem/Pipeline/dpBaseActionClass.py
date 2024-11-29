@@ -371,14 +371,16 @@ class ActionStartClass(object):
             self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
 
 
-    def exportAlembicFile(self, meshList, path=None, name=None, attr=True, *args):
+    def exportAlembicFile(self, meshList, path=None, startName=None, fileName=None, attr=True, *args):
         """ Export given mesh list to alembic file.
         """
         try:
             if not path:
                 path = self.ioPath
-            if not name:
-                name = self.startName
+            if not startName:
+                startName = self.startName
+            if not fileName:
+                fileName = self.pipeliner.pipeData['currentFileName']
             nodeStateDic = self.changeNodeState(meshList, state=1) #has no effect
             # export alembic
             self.pipeliner.makeDirIfNotExists(path)
@@ -392,10 +394,44 @@ class ActionStartClass(object):
                     if userDefAttrList:
                         for userDefAttr in userDefAttrList:
                             attrStr += " -attr "+userDefAttr
-            abcName = path+"/"+name+"_"+self.pipeliner.pipeData['currentFileName']+".abc"
+            abcName = path+"/"+startName+"_"+fileName+".abc"
             cmds.AbcExport(jobArg="-frameRange 0 0 -uvWrite -writeVisibility -writeUVSets -worldSpace -dataFormat ogawa -root "+ioItems+attrStr+" -file "+abcName)
             if nodeStateDic:
                 self.changeNodeState(meshList, findDeformers=False, dic=nodeStateDic) #back deformer as before
-            self.wellDoneIO(', '.join(meshList))
+            self.wellDoneIO(abcName)
         except Exception as e:
             self.notWorkedWellIO(', '.join(meshList)+": "+str(e))
+
+
+    def importLatestAlembicFile(self, exportedList, *args):
+        """ Import the latest alembic file from given exported list.
+        """
+        self.latestDataFile = None
+        if exportedList:
+            self.utils.setProgress(self.dpUIinst.lang[self.title], addOne=False, addNumber=False)
+            try:
+                # import alembic
+                exportedList.sort()
+                self.latestDataFile = exportedList[-1]
+                abcToImport = self.ioPath+"/"+self.latestDataFile
+                #cmds.AbcImport(jobArg="-mode import \""+abcToImport+"\"")
+                mel.eval("AbcImport -mode import \""+abcToImport+"\";")
+                self.wellDoneIO(self.latestDataFile)
+            except Exception as e:
+                self.notWorkedWellIO(self.latestDataFile+": "+str(e))
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
+
+
+    def importLatestJsonFile(self, exportedList, path=None, *args):
+        """ Return the latest exported json file from given list.
+        """
+        self.latestDataFile = None
+        if exportedList:
+            if not path:
+                path = self.ioPath
+            exportedList.sort()
+            self.latestDataFile = exportedList[-1]
+            return self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
+        else:
+            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])

@@ -54,19 +54,11 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
                     if constraintList:
                         self.exportDicToJsonFile(self.getConstraintDataDic(constraintList))
                 else: #import
-                    try:
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            exportedList.sort()
-                            constDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if constDic:
-                                self.importConstraintData(constDic)
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except Exception as e:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                    constDic = self.importLatestJsonFile(self.getExportedList())
+                    if constDic:
+                        self.importConstraintData(constDic)
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
@@ -204,7 +196,7 @@ class ConstraintIO(dpBaseActionClass.ActionStartClass):
             else:
                 existingNodesList.append(item)
         if wellImportedList:
-            self.wellDoneIO(', '.join(wellImportedList))
+            self.wellDoneIO(self.latestDataFile)
         else:
             if existingNodesList:
                 self.wellDoneIO(self.dpUIinst.lang['r032_notImportedData'])

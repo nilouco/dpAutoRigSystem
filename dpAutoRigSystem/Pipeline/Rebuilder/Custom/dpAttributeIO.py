@@ -54,19 +54,11 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
                     if self.firstMode: #export
                         self.exportDicToJsonFile(self.getAttributeDataDic(ctrlList))
                     else: #import
-                        try:
-                            exportedList = self.getExportedList()
-                            if exportedList:
-                                exportedList.sort()
-                                attrDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if attrDic:
-                                    self.importAttributeData(attrDic)
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                        attrDic = self.importLatestJsonFile(self.getExportedList())
+                        if attrDic:
+                            self.importAttributeData(attrDic)
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
@@ -169,6 +161,6 @@ class AttributeIO(dpBaseActionClass.ActionStartClass):
             else:
                 notFoundNodesList.append(item)
         if wellImportedList:
-            self.wellDoneIO(', '.join(wellImportedList))
+            self.wellDoneIO(self.latestDataFile)
         else:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))

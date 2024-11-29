@@ -67,54 +67,14 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                     else:
                         self.notWorkedWellIO("Render_Grp")
                 else: #import
-                    try:
-                        exportedList = self.getExportedList()
-                        if exportedList:
-                            exportedList.sort()
-                            shaderDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                            if shaderDic:
-                                mayaVersion = cmds.about(version=True)
-                                notFoundMeshList = []
-                                # rebuild shaders
-                                for item in shaderDic.keys():
-                                    if not cmds.objExists(item):
-                                        shader = cmds.shadingNode(shaderDic[item]['material'], asShader=True, name=item)
-                                        if shaderDic[item]['fileNode']:
-                                            fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=shaderDic[item]['fileNode'])
-                                            cmds.connectAttr(fileNode+".outColor", shader+"."+shaderDic[item]['colorAttr'], force=True)
-                                            cmds.setAttr(fileNode+".fileTextureName", shaderDic[item]['texture'], type="string")
-                                        else:
-                                            colorList = shaderDic[item]['color']
-                                            cmds.setAttr(shader+"."+shaderDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
-                                        transparencyList = shaderDic[item]['transparency']
-                                        cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
-                                        for attr in self.customAttrList:
-                                            if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
-                                                cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
-                                        for attr in self.vectorColorList:
-                                            if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
-                                                cmds.setAttr(shader+"."+attr, shaderDic[item][attr][0], shaderDic[item][attr][1], shaderDic[item][attr][2], type="double3")
-                                    # apply shader to meshes
-                                    for mesh in shaderDic[item]['assigned']:
-                                        if cmds.objExists(mesh):
-                                            if mayaVersion >= "2024":
-                                                cmds.hyperShade(assign=item, geometries=mesh)
-                                            else:
-                                                cmds.select(mesh)
-                                                cmds.hyperShade(assign=item)
-                                        else:
-                                            notFoundMeshList.append(mesh)
-                                cmds.select(clear=True)
-                                if notFoundMeshList:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
-                                else:
-                                    self.wellDoneIO(exportedList[-1])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        else:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                    except Exception as e:
-                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                    shaderDic = self.importLatestJsonFile(self.getExportedList())
+                    if shaderDic:
+                        try:
+                            self.importShader(shaderDic)
+                        except Exception as e:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r032_notImportedData']+": "+str(e))
+                    else:
+                        self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
             else:
                 self.notWorkedWellIO(self.dpUIinst.lang['r010_notFoundPath'])
         else:
@@ -195,3 +155,44 @@ class ShaderIO(dpBaseActionClass.ActionStartClass):
                 if ignoreMaterial in shaderList:
                     shaderList.remove(ignoreMaterial)
         return shaderList
+
+
+    def importShader(self, shaderDic, *args):
+        """ Import the shaders from given shader dictionary.
+        """
+        mayaVersion = cmds.about(version=True)
+        notFoundMeshList = []
+        # rebuild shaders
+        for item in shaderDic.keys():
+            if not cmds.objExists(item):
+                shader = cmds.shadingNode(shaderDic[item]['material'], asShader=True, name=item)
+                if shaderDic[item]['fileNode']:
+                    fileNode = cmds.shadingNode("file", asTexture=True, isColorManaged=True, name=shaderDic[item]['fileNode'])
+                    cmds.connectAttr(fileNode+".outColor", shader+"."+shaderDic[item]['colorAttr'], force=True)
+                    cmds.setAttr(fileNode+".fileTextureName", shaderDic[item]['texture'], type="string")
+                else:
+                    colorList = shaderDic[item]['color']
+                    cmds.setAttr(shader+"."+shaderDic[item]['colorAttr'], colorList[0], colorList[1], colorList[2], type="double3")
+                transparencyList = shaderDic[item]['transparency']
+                cmds.setAttr(shader+"."+shaderDic[item]['transparencyAttr'], transparencyList[0], transparencyList[1], transparencyList[2], type="double3")
+                for attr in self.customAttrList:
+                    if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
+                        cmds.setAttr(shader+"."+attr, shaderDic[item][attr])
+                for attr in self.vectorColorList:
+                    if cmds.objExists(shader+"."+attr) and shaderDic[item][attr]:
+                        cmds.setAttr(shader+"."+attr, shaderDic[item][attr][0], shaderDic[item][attr][1], shaderDic[item][attr][2], type="double3")
+            # apply shader to meshes
+            for mesh in shaderDic[item]['assigned']:
+                if cmds.objExists(mesh):
+                    if mayaVersion >= "2024":
+                        cmds.hyperShade(assign=item, geometries=mesh)
+                    else:
+                        cmds.select(mesh)
+                        cmds.hyperShade(assign=item)
+                else:
+                    notFoundMeshList.append(mesh)
+        cmds.select(clear=True)
+        if notFoundMeshList:
+            self.notWorkedWellIO(self.dpUIinst.lang['r011_notFoundMesh']+", ".join(notFoundMeshList))
+        else:
+            self.wellDoneIO(self.latestDataFile)

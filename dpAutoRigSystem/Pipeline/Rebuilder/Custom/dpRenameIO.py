@@ -53,19 +53,11 @@ class RenameIO(dpBaseActionClass.ActionStartClass):
                     if self.firstMode: #export
                         self.exportDicToJsonFile(self.getNodeIDDataDic(itemList))
                     else: #import
-                        try:
-                            exportedList = self.getExportedList()
-                            if exportedList:
-                                exportedList.sort()
-                                nodeIDDic = self.pipeliner.getJsonContent(self.ioPath+"/"+exportedList[-1])
-                                if nodeIDDic:
-                                    self.importNodeIDData(nodeIDDic)
-                                else:
-                                    self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                            else:
-                                self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
-                        except Exception as e:
-                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData']+": "+str(e))
+                        nodeIDDic = self.importLatestJsonFile(self.getExportedList())
+                        if nodeIDDic:
+                            self.importNodeIDData(nodeIDDic)
+                        else:
+                            self.notWorkedWellIO(self.dpUIinst.lang['r007_notExportedData'])
                 else:
                     self.notWorkedWellIO("Ctrls_Grp")
             else:
@@ -116,6 +108,6 @@ class RenameIO(dpBaseActionClass.ActionStartClass):
                     else:
                         notFoundNodesList.append(item)
         if wellImportedList:
-            self.wellDoneIO(', '.join(wellImportedList))
+            self.wellDoneIO(self.latestDataFile)
         elif notFoundNodesList:
             self.notWorkedWellIO(self.dpUIinst.lang['v014_notFoundNodes']+": "+', '.join(notFoundNodesList))
