@@ -512,6 +512,25 @@ class UpdateGuides(object):
         self.dpUIinst.jobReloadUI()
 
 
+    def patchFootRfF(self, *args):
+        """ Patching RfF new Foot pivot.
+        """
+        reverseFootE = "Guide_RfE"
+        reverseFootF = "Guide_RfF"
+        reverseFootFList = cmds.ls("*:"+reverseFootF)
+        if reverseFootFList:
+            for f in reverseFootFList:
+                e = f.replace(reverseFootF, reverseFootE)
+                for attr in ["tx", "ty", "tz"]:
+                    cmds.setAttr(f+".translate."+attr, cmds.getAttr(e+"."+attr))
+                toeList = cmds.listRelatives(e, children=True, type="transform")
+                if toeList:
+                    cmds.matchTransform(e, f, position=True, rotation=True)
+                    cmds.parent(toeList, f)
+                for attr in ["tx", "ty", "tz"]:
+                    cmds.setAttr(e+".translate."+attr, 0)
+
+
     def doUpdate(self, *args):
         """ Main method to update the guides in the scene.
         """
@@ -539,6 +558,7 @@ class UpdateGuides(object):
         self.setProgressBar(6, self.dpUIinst.lang['m201_parentGuides'])
         # After all new guides parented and set, reparent old ones that will be used.
         self.parentRetainGuides()
+        self.patchFootRfF()
         cmds.select(clear=True)
         if self.ui:
             self.setProgressBar(7, self.dpUIinst.lang['m204_finish'])
@@ -548,3 +568,4 @@ class UpdateGuides(object):
             self.summaryUI()
         else:
             self.doDelete()
+

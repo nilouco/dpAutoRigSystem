@@ -15,7 +15,7 @@ from maya.api import OpenMaya
 from ...Extras import dpCustomAttr
 import math
 
-DP_IKFKSNAP_VERSION = 2.1
+DP_IKFKSNAP_VERSION = 2.3
 
 
 
@@ -109,12 +109,12 @@ class IkFkSnapClass(object):
     ###
 
     def jobChangedIkFk(self, *args):
-        """ Just call snap function to set as well.
+        """ Just call snap function to set as well or update the ikFkState.
         """
         self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
-            currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
             if self.ikFkState == 0: #ik
                 if currentValue >= 0.001:
                     self.changeIkFkAttr(0, False)
@@ -126,6 +126,11 @@ class IkFkSnapClass(object):
                     self.snapFkToIk()
                     self.changeIkFkAttr(0, True)
             self.resetShear(list(set([self.ikExtremCtrl] + self.fkCtrlList)))
+        else:
+            if currentValue <= 0.5: #ik
+                cmds.setAttr(self.ikFkSnapNet+".ikFkState", 0)
+            else: #fk
+                cmds.setAttr(self.ikFkSnapNet+".ikFkState", 1)
 
 
     def changeIkFkAttr(self, ikFkValue, setState, *args):
@@ -329,12 +334,12 @@ class IkFkSnap(object):
         self.extremOffsetMatrix = cmds.getAttr(self.ikFkSnapNet+".extremOffset")
 
     def jobChangedIkFk(self, *args):
-        """ Just call snap function to set as well.
+        """ Just call snap function to set as well or update the ikFkState.
         """
         self.worldRef = cmds.listConnections(self.ikFkSnapNet+".worldRef")[0]
+        currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
         if cmds.getAttr(self.worldRef+".ikFkSnap"):
             self.ikFkState = cmds.getAttr(self.ikFkSnapNet+".ikFkState")
-            currentValue = cmds.getAttr(self.worldRef+"."+self.ikFkBlendAttr)
             if self.ikFkState == 0: #ik
                 if currentValue >= 0.001:
                     self.changeIkFkAttr(0, False)
@@ -346,6 +351,11 @@ class IkFkSnap(object):
                     self.snapFkToIk()
                     self.changeIkFkAttr(0, True)
             self.resetShear(list(set([self.ikExtremCtrl] + self.fkCtrlList)))
+        else:
+            if currentValue <= 0.5: #ik
+                cmds.setAttr(self.ikFkSnapNet+".ikFkState", 0)
+            else: #fk
+                cmds.setAttr(self.ikFkSnapNet+".ikFkState", 1)
 
     def changeIkFkAttr(self, ikFkValue, setState, *args):
         """ 0 = ik
