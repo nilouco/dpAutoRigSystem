@@ -501,6 +501,7 @@
     "i337_sUtilityIOAnn"        : "The folder to export and import utility nodes data.",
     "i338_sRenameIOAnn"         : "The folder to export and import renamed node data info.",
     "i339_any"                  : "any",
+    "i340_reveal"               : "Reveal",
 
     "m001_fkLine"                : "Fk Line",
     "m002_fkLineDesc"            : "Fk Line Module Description:\n\nThis module creates a joint chain\nwith the number of joints desired.\n\nWhen rigged, the controls will be FK (forward kinematics).\n\nThis is useful to create tails, ears, hairs\nor simple controls to objects.",

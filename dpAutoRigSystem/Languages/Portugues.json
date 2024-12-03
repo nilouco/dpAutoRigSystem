@@ -501,6 +501,7 @@
     "i337_sUtilityIOAnn"        : "O diretório onde será exportado ou importado os dados de utility nodes.",
     "i338_sRenameIOAnn"         : "O diretório onde será exportado ou importado os dados de nodes renomeados.",
     "i339_any"                  : "any",
+    "i340_reveal"               : "Revelar",
 
     "m001_fkLine"                : "Linha Fk",
     "m002_fkLineDesc"            : "Descrição do Modulo Linha Fk:\n\nEsse modulo cria uma cadeia de joints\ncom o numero de joints desejado.\n\nQuando rigado, os controles serão FK (forward kinematics).\n\nEle é util para criar rabos, orelhas, cabelos\nou simples controles de objetos.",

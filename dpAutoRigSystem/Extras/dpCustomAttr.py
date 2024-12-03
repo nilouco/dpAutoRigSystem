@@ -71,10 +71,11 @@ class CustomAttr(object):
         self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
-        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=3, columnWidth=[(1, 80), (2, 80), (3, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5)], parent=mainLayout)
+        buttonLayout = cmds.rowColumnLayout("buttonLayout", numberOfColumns=4, columnWidth=[(1, 80), (2, 80), (3, 100), (4, 100)], columnOffset=[(1, "both", 5), (2, "both", 5), (3, "both", 5), (4, "both", 5)], parent=mainLayout)
         cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
         cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
         cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.updateID, parent=buttonLayout)
+        cmds.button("revealIDButton", label=self.dpUIinst.lang['i340_reveal']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.revealID, parent=buttonLayout)
         cmds.separator(style='none', height=15, parent=mainLayout)
         # settings - frameLayout:
         settingsFL = cmds.frameLayout('settingsFL', label=self.dpUIinst.lang['i215_setAttr'], collapsable=True, collapse=True, parent=mainLayout)
@@ -342,3 +343,29 @@ class CustomAttr(object):
         """
         self.removeAttr(ATTR_DPID, itemList)
         self.addAttr(0, itemList)
+
+
+    def revealID(self, itemList=None, *args):
+        """ If UI, it opens a window to reveal the decomposed ID.
+            Returns a dictionary with the IDs data.
+        """
+        idDic = {}
+        if not itemList:
+            if self.ui:
+                #itemList = cmds.spreadSheetEditor(self.mainSSE, query=True, selectionConnection=True)
+                #itemList = cmds.spreadSheetEditor(self.mainSSE, query=True, exists=True)
+                #itemList = cmds.selectionConnection(self.itemSC, query=True, activeList=True)
+                #itemList = cmds.selectionConnection(self.itemSC, query=True)
+                #itemList = cmds.itemFilter(self.itemF, query=True, byType=True)
+                #itemList = cmds.itemFilter(self.itemF, query=True)
+                #itemList = cmds.selectionConnection(activeList=True)
+                itemList = self.itemF
+
+                print("itemSC", self.itemSC)
+                print("itemF", self.itemF)
+                print("itemList =", itemList)
+
+
+
+
+        return idDic
