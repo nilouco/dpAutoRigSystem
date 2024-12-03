@@ -128,7 +128,7 @@ class IkFkSnapClass(object):
         else:
             if currentValue <= 0.5: #ik
                 cmds.setAttr(self.ikFkSnapNet+".ikFkState", 0)
-            else:
+            else: #fk
                 cmds.setAttr(self.ikFkSnapNet+".ikFkState", 1)
 
 
@@ -353,7 +353,7 @@ class IkFkSnap(object):
         else:
             if currentValue <= 0.5: #ik
                 cmds.setAttr(self.ikFkSnapNet+".ikFkState", 0)
-            else:
+            else: #fk
                 cmds.setAttr(self.ikFkSnapNet+".ikFkState", 1)
 
     def changeIkFkAttr(self, ikFkValue, setState, *args):
