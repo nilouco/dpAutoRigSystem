@@ -12,7 +12,6 @@ ATTR_START = "dp"
 ATTR_DPID = "dpID"
 ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt", "dpHeadDeformerInfluence", "dpJawDeformerInfluence", "dpNotTransformIO"]
 DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
-DEFAULTDONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
 DEFAULTTYPE_LIST = ['transform', 'network']
 
 DP_CUSTOMATTR_VERSION = 1.6
@@ -20,6 +19,7 @@ DP_CUSTOMATTR_VERSION = 1.6
 
 class CustomAttr(object):
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
+        self.title = TITLE
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.ui = ui
@@ -27,7 +27,7 @@ class CustomAttr(object):
         self.mainWindowName = "dpCustomAttributesWindow"
         self.addWindowName = "dpAddCustomAttributesWindow"
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
-        self.doNotDisplayList = DEFAULTDONOTDISPLAY_LIST.copy()
+        self.doNotDisplayList = []
         self.ignoreList = DEFAULTIGNORE_LIST.copy()
         self.typeList = DEFAULTTYPE_LIST.copy()
         # call main UI function
@@ -37,6 +37,7 @@ class CustomAttr(object):
             self.utils.closeUI(self.removeWindowName)
             self.getItemFilter()
             self.mainUI()
+            self.updateNameDisplay()
 
 
     def getItemFilter(self, *args):
@@ -46,6 +47,8 @@ class CustomAttr(object):
         self.itemF = cmds.itemFilter(byType=self.typeList)
         for ignoreIt in self.ignoreList:
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
+        for suffix in self.doNotDisplayList:
+            self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName="*"+suffix)))
 
 
     def mainUI(self, *args):
@@ -78,22 +81,22 @@ class CustomAttr(object):
         settingsCL = cmds.columnLayout('settingsCL', adjustableColumn=True, columnOffset=('left', 5), parent=settingsFL)
         # type
         cmds.text('typeTxt', align='left', label=self.dpUIinst.lang['i138_type'], height=30, font='boldLabelFont', parent=settingsCL)
-
         self.typeAllCB = cmds.checkBox('typeAllCB', label=self.dpUIinst.lang['i339_any'].capitalize(), align='left', value=0, changeCommand=partial(self.updateType, "any"), parent=settingsCL)
         self.typeTransformCB = cmds.checkBox('transform', label="transform", align='left', value=1, changeCommand=partial(self.updateType, "transform"), parent=settingsCL)
         self.typeNetworkCB = cmds.checkBox('network', label="network", align='left', value=1, changeCommand=partial(self.updateType, "network"), parent=settingsCL)
         cmds.separator(style='in', height=15, parent=settingsCL)
-        
         # display
         cmds.text('displayTxt', align='left', label=self.dpUIinst.lang['m217_suffix']+" "+self.dpUIinst.lang['c126_display'], height=30, font='boldLabelFont', parent=settingsCL)
         diplayRCL = cmds.rowColumnLayout('displayRCL', numberOfColumns=6, columnWidth=[(1, 70), (2, 70), (3, 70), (4, 70), (5, 70), (6, 70)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10), (5, 'left', 10), (6, 'left', 10)], parent=settingsCL)
+        self.displayGrpCB = cmds.checkBox('displayGrpCB', label="Grp", annotation="Group", align='left', value=1, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayCtrlCB = cmds.checkBox('displayCtrlCB', label="Ctrl", annotation="Controller", align='left', value=1, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJntCB = cmds.checkBox('displayJntCB', label="Jnt", annotation="Skinned joint", align='left', value=1, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayPaCCB = cmds.checkBox('displayPaCCB', label="PaC", annotation="Parent constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayPoCCB = cmds.checkBox('displayPoCCB', label="PoC", annotation="Point constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayOrCCB = cmds.checkBox('displayOrCCB', label="OrC", annotation="Orient constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayScCCB = cmds.checkBox('displayScCCB', label="ScC", annotation="Scale constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayAiCCB = cmds.checkBox('displayAiCCB', label="AiC", annotation="Aim constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayPVCCB = cmds.checkBox('displayPVCCB', label="PVC", annotation="Pole Vector Constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
-        self.displayJntCB = cmds.checkBox('displayJntCB', label="Jnt", annotation="Skinned joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayJxtCB = cmds.checkBox('displayJxtCB', label="Jxt", annotation="Extra joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayJarCB = cmds.checkBox('displayJarCB', label="Jar", annotation="Ariticulation joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayJadCB = cmds.checkBox('displayJadCB', label="Jad", annotation="Additional joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
@@ -103,12 +106,12 @@ class CustomAttr(object):
         self.displayJztCB = cmds.checkBox('displayJztCB', label="Jzt", annotation="Zero out joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayJEndCB = cmds.checkBox('displayJEndCB', label="JEnd", annotation="End joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayEffCB = cmds.checkBox('displayEffCB', label="Eff", annotation="Effector", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
-        self.displayIKHCB = cmds.checkBox('displayIKHCB', label="IKH", annotation="Ik Handle", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayIKHCB = cmds.checkBox('displayIKHCB', label="IkH", annotation="Ik Handle", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         self.displayHandleCB = cmds.checkBox('displayHandleCB', label="Handle", annotation="Deformer Handle", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
         cmds.separator(style='none', height=15, parent=mainLayout)
         # storing checkBoxes lists
         self.typeCBList = [self.typeTransformCB, self.typeNetworkCB]
-        self.displayCBList = [self.displayPaCCB, self.displayPoCCB, self.displayOrCCB, self.displayScCCB, self.displayAiCCB, self.displayPVCCB, self.displayJntCB, self.displayJxtCB, self.displayJarCB, self.displayJadCB, self.displayJcrCB, self.displayJisCB, self.displayJaxCB, self.displayJztCB, self.displayEffCB, self.displayIKHCB, self.displayHandleCB]
+        self.displayCBList = [self.displayGrpCB, self.displayCtrlCB, self.displayJntCB, self.displayPaCCB, self.displayPoCCB, self.displayOrCCB, self.displayScCCB, self.displayAiCCB, self.displayPVCCB, self.displayJxtCB, self.displayJarCB, self.displayJadCB, self.displayJcrCB, self.displayJisCB, self.displayJaxCB, self.displayJztCB, self.displayJEndCB, self.displayEffCB, self.displayIKHCB, self.displayHandleCB]
         # call window
         cmds.showWindow(self.mainWindowName)
 
@@ -118,14 +121,17 @@ class CustomAttr(object):
         cmds.spreadSheetEditor(self.mainSSE, edit=True, mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False)
 
 
-
-
     def updateNameDisplay(self, *args):
         """ Update item filter name display argument.
         """
-        print("argsName....", args)
-
-
+        self.doNotDisplayList = []
+        for cb in self.displayCBList:
+            suffix = cmds.checkBox(cb, query=True, label=True)
+            if not cmds.checkBox(cb, query=True, value=True):
+                self.doNotDisplayList.append(suffix)
+            elif suffix in self.doNotDisplayList:
+                self.doNotDisplayList.remove(suffix)
+        self.updateUI()
 
 
     def updateType(self, typeName, value, *args):
@@ -133,9 +139,11 @@ class CustomAttr(object):
         """
         if typeName == "any":
             if value:
-                self.typeList = []
-                for cbItem in self.typeCBList:
-                    cmds.checkBox(cbItem, edit=True, value=1, enable=0)
+                confirm = cmds.confirmDialog(title=self.dpUIinst.lang[self.title], icon="question", message=self.dpUIinst.lang['m098_confirmSelectAny'], button=[self.dpUIinst.lang['i071_yes'], self.dpUIinst.lang['i072_no']], defaultButton=self.dpUIinst.lang['i072_no'], cancelButton=self.dpUIinst.lang['i072_no'], dismissString=self.dpUIinst.lang['i072_no'])
+                if confirm == self.dpUIinst.lang['i071_yes']:
+                    self.typeList = []
+                    for cbItem in self.typeCBList:
+                        cmds.checkBox(cbItem, edit=True, value=1, enable=0)
             else:
                 self.typeList = DEFAULTTYPE_LIST.copy()
                 for cbItem in self.typeCBList:

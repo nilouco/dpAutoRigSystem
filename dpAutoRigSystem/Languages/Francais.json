@@ -5,7 +5,7 @@
     "_date"          : "2011-08-04",
     "_language"      : "Français",
     "_translator"    : "Marina Rüegger",
-    "_updated"       : "2024-12-02",
+    "_updated"       : "2024-12-03",
 
     "a000_presentation" : "Ceci est la première phrase à traduire.\nVeuillez utiliser le champ de texte ci-dessous pour rédiger votre texte traduit.\n\nVous pouvez utiliser des boutons pour:\nRetourner et réviser votre traduction.\nMême pour utiliser le même texte dans votre langue.\nSuivant pour appliquer votre texte traduit et avancer.\n\nUtilisez Enter (Return) pour avoir une nouvelle ligne.\nCertains textes n'acceptent pas des caractères spéciaux.\nD'autres ont la ponctuation ou rien.\n\nCommençons! Je vous remercie.",
     
@@ -599,7 +599,7 @@
     "m095_isolate"               : "Isolé",
     "m096_isolateDesc"           : "Celuici va creer un setup de Isolation.\nIl faut avoir 3 nodes selectionnés\nou il va utiliser le Root_Ctrl.",
     "m097_dynamic"               : "Dynamique",
-    "m098_000000000000"          : "",
+    "m098_confirmSelectAny"      : "Il existe de nombreux types de nœuds dans la scène.\nIl faudra peut-être un certain temps pour les sélectionner tous.\nVoulez-vous continuer?",
     "m099_cvControlDesc"         : "Il va créer une curve\npour être utilisé comme controleur.",
     "m100_square"                : "Carré",
     "m101_smile"                 : "Sourire",
