@@ -32,11 +32,10 @@ class Limb(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
         self.softIk = dpSoftIk.SoftIkClass(self.dpUIinst)
         self.correctionManager = dpCorrectionManager.CorrectionManager(self.dpUIinst, False)
-
-        #Declare variable
+        # declare variable
         self.integratedActionsDic = {}
         self.bendGrps = None
-        #Returned data from the dictionnary
+        # returned data from the dictionary
         self.ikExtremCtrlList = []
         self.ikExtremCtrlZeroList = []
         self.ikPoleVectorCtrlZeroList = []

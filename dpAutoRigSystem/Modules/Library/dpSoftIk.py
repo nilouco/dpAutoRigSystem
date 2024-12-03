@@ -27,7 +27,6 @@
 
 # importing libraries:
 from maya import cmds
-from . import dpControls
 
 DP_SOFTIK_VERSION = 2.1
 
@@ -36,7 +35,7 @@ class SoftIkClass(object):
     def __init__(self, dpUIinst, *args):
         # defining variables:
         self.dpUIinst = dpUIinst
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ctrls = dpUIinst.ctrls
 
 
     def createSoftIk(self, userName, ctrlName, ikhName, ikJointList, skinJointList, distBetween, worldRef, stretch=True, axis="Z", *args):

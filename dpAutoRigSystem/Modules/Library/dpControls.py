@@ -31,7 +31,6 @@ DP_CONTROLS_VERSION = 2.7
 
 
 class ControlClass(object):
-
     def __init__(self, dpUIinst, moduleGrp=None, *args):
         """ Initialize the module class defining variables to use creating preset controls.
         """

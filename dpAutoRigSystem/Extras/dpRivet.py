@@ -22,7 +22,6 @@ from maya import cmds
 from maya import mel
 import json
 from functools import partial
-from ..Modules.Library import dpControls
 
 # global variables to this module:
 CLASS_NAME = "Rivet"
@@ -35,7 +34,7 @@ RIVET_GRP = "Rivet_Grp"
 MORPH = "Morph"
 WRAP = "Wrap"
 
-DP_RIVET_VERSION = 2.4
+DP_RIVET_VERSION = 2.5
 
 
 class Rivet(object):
@@ -43,7 +42,7 @@ class Rivet(object):
         # declaring variables
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ctrls = dpUIinst.ctrls
         self.geoToAttach = None
         self.itemType = None
         self.meshNode = None

@@ -1,6 +1,5 @@
 # importing libraries:
 from maya import cmds
-from maya import mel
 from ... import dpBaseActionClass
 
 # global variables to this module:

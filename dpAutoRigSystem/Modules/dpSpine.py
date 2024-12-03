@@ -20,14 +20,12 @@ class Spine(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
-
-        # Declare variable
+        # declare variable
         self.integratedActionsDic = {}
         self.cvJointLoc = None
         self.shapeSizeCH = None
         self.currentNJoints = 3
-
-        # List of returned data:
+        # list of returned data:
         self.aHipsAList = []
         self.tipList = []
         self.aVolVariationAttrList = []

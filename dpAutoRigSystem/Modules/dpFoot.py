@@ -20,7 +20,7 @@ class Foot(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
-
+        # declare variables
         self.footCtrlList = []
         self.revFootCtrlGrpFinalList = []
         self.revFootCtrlShapeList = []

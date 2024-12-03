@@ -28,7 +28,7 @@ class RibbonClass(object):
         self.ctrlRadius = limbInstance.ctrlRadius
         self.curveDegree = limbInstance.curveDegree
         self.utils = dpUIinst.utils
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ctrls = dpUIinst.ctrls
         self.limbManualVVAttr = self.dpUIinst.lang['m019_limb'].lower()+"Manual_"+self.dpUIinst.lang['c031_volumeVariation']
         self.limbVVAttr       = self.dpUIinst.lang['m019_limb'].lower()+"_"+self.dpUIinst.lang['c031_volumeVariation']
         self.limbMinVVAttr    = self.dpUIinst.lang['m019_limb'].lower()+"Min_"+self.dpUIinst.lang['c031_volumeVariation']

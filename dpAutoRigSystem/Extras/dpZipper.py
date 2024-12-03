@@ -2,7 +2,6 @@
 from maya import cmds
 from maya import mel
 from functools import partial
-from ..Modules.Library import dpControls
 
 # global variables to this module:    
 CLASS_NAME = "Zipper"
@@ -21,7 +20,7 @@ class Zipper(object):
         # redeclaring variables
         self.dpUIinst = dpUIinst
         self.utils = dpUIinst.utils
-        self.ctrls = dpControls.ControlClass(self.dpUIinst)
+        self.ctrls = dpUIinst.ctrls
         self.zipperName = self.dpUIinst.lang['m061_zipper']
         self.firstName = self.dpUIinst.lang['c114_first']
         self.secondName = self.dpUIinst.lang['c115_second']

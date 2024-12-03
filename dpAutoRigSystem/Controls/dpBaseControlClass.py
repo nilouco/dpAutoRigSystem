@@ -1,7 +1,6 @@
 # importing libraries:
 from maya import cmds
 from maya import mel
-from ..Modules.Library import dpControls
 
 DP_CONTROLSTARTCLASS_VERSION = 2.3
 

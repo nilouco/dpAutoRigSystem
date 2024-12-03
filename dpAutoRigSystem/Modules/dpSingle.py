@@ -20,7 +20,7 @@ class Single(dpBaseClass.StartClass, dpLayoutClass.LayoutClass):
         kwargs["DESCRIPTION"] = DESCRIPTION
         kwargs["ICON"] = ICON
         dpBaseClass.StartClass.__init__(self, *args, **kwargs)
-        #Returned data from the dictionnary
+        # returned data from the dictionary
         self.mainJisList = []
         self.aStaticGrpList = []
         self.aCtrlGrpList = []

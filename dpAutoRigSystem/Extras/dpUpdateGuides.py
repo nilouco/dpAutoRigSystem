@@ -11,7 +11,6 @@ DP_UPDATEGUIDES_VERSION = 1.7
 
 
 class UpdateGuides(object):
-
     def __init__(self, dpUIinst, ui=True, *args, **kwargs):
         # defining variables
         self.dpUIinst = dpUIinst

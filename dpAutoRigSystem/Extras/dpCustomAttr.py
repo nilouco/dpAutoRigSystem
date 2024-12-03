@@ -27,9 +27,9 @@ class CustomAttr(object):
         self.mainWindowName = "dpCustomAttributesWindow"
         self.addWindowName = "dpAddCustomAttributesWindow"
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
-        self.doNotDisplayList = DEFAULTDONOTDISPLAY_LIST
-        self.ignoreList = DEFAULTIGNORE_LIST
-        self.typeList = DEFAULTTYPE_LIST
+        self.doNotDisplayList = DEFAULTDONOTDISPLAY_LIST.copy()
+        self.ignoreList = DEFAULTIGNORE_LIST.copy()
+        self.typeList = DEFAULTTYPE_LIST.copy()
         # call main UI function
         if self.ui:
             self.utils.closeUI(self.mainWindowName)
@@ -129,7 +129,7 @@ class CustomAttr(object):
 
 
     def updateType(self, typeName, value, *args):
-        """
+        """ Change node type to display in the UI.
         """
         if typeName == "any":
             if value:
@@ -137,7 +137,7 @@ class CustomAttr(object):
                 for cbItem in self.typeCBList:
                     cmds.checkBox(cbItem, edit=True, value=1, enable=0)
             else:
-                self.typeList = DEFAULTTYPE_LIST
+                self.typeList = DEFAULTTYPE_LIST.copy()
                 for cbItem in self.typeCBList:
                     cmds.checkBox(cbItem, edit=True, value=1, enable=1)
         else:
@@ -151,9 +151,11 @@ class CustomAttr(object):
     def selectNodes(self, *args):
         """ Select the desired type nodes in the scene.
         """
-        #if self.typeList:
         toSelectList = []
-        nodeList = cmds.ls(selection=False, type=self.typeList)
+        if self.typeList:
+            nodeList = cmds.ls(type=self.typeList)
+        else:
+            nodeList = cmds.ls(defaultNodes=False)
         if nodeList:
             for item in nodeList:
                 if not item in toSelectList:
@@ -167,8 +169,6 @@ class CustomAttr(object):
                 toSelectList.sort()
             cmds.select(toSelectList)
             self.updateUI()
-        #else:
-        #    cmds.select(cmds.ls(selection=False))
 
 
     def filterByName(self, filterName=None, *args):
