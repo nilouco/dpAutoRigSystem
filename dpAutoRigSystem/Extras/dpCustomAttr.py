@@ -11,10 +11,11 @@ ICON = "/Icons/dp_customAttr.png"
 ATTR_START = "dp"
 ATTR_DPID = "dpID"
 ATTR_LIST = [ATTR_DPID, "dpControl", "dpDoNotProxyIt", "dpDoNotSkinIt", "dpIgnoreIt", "dpKeepIt", "dpHeadDeformerInfluence", "dpJawDeformerInfluence", "dpNotTransformIO"]
-IGNORE_LIST = ['persp', 'top', 'front', 'side']
-DONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
+DEFAULTIGNORE_LIST = ['persp', 'top', 'front', 'side']
+DEFAULTDONOTDISPLAY_LIST = ['PaC', 'PoC', 'OrC', 'ScC', 'AiC', 'Jxt', 'Jar', 'Jad', 'Jcr', 'Jis', 'Jax', 'Jzt', 'JEnd', 'Eff', 'IKH', 'Handle', 'PVC']
+DEFAULTTYPE_LIST = ['transform', 'network']
 
-DP_CUSTOMATTR_VERSION = 1.5
+DP_CUSTOMATTR_VERSION = 1.6
 
 
 class CustomAttr(object):
@@ -26,6 +27,9 @@ class CustomAttr(object):
         self.mainWindowName = "dpCustomAttributesWindow"
         self.addWindowName = "dpAddCustomAttributesWindow"
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
+        self.doNotDisplayList = DEFAULTDONOTDISPLAY_LIST
+        self.ignoreList = DEFAULTIGNORE_LIST
+        self.typeList = DEFAULTTYPE_LIST
         # call main UI function
         if self.ui:
             self.utils.closeUI(self.mainWindowName)
@@ -36,10 +40,11 @@ class CustomAttr(object):
 
 
     def getItemFilter(self, *args):
-        """ Create a selection filter by transform type excluding the ignoreIt list.
+        """ Create a selection filter by node type excluding the ignoreIt list.
         """
-        self.itemF = cmds.itemFilter(byType="transform")
-        for ignoreIt in IGNORE_LIST:
+        self.itemSC = cmds.selectionConnection(activeList=True)
+        self.itemF = cmds.itemFilter(byType=self.typeList)
+        for ignoreIt in self.ignoreList:
             self.itemF = cmds.itemFilter(difference=(self.itemF, cmds.itemFilter(byName=ignoreIt)))
 
 
@@ -48,19 +53,18 @@ class CustomAttr(object):
         """
         # window
         customAttributes_winWidth  = 380
-        customAttributes_winHeight = 300
+        customAttributes_winHeight = 350
         cmds.window(self.mainWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(customAttributes_winWidth, customAttributes_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
         # create UI layout and elements:
         customAttributesLayout = cmds.columnLayout('customAttributesLayout', adjustableColumn=True, columnOffset=("both", 10))
         mainLayout = cmds.columnLayout('mainLayout', adjustableColumn=True, columnOffset=("both", 10), parent=customAttributesLayout)
-        cmds.text("headerTxt", label=self.dpUIinst.lang['i267_customHeader']+' "'+ATTR_START+'"', align="left", height=30, font='boldLabelFont', parent=mainLayout)
+        cmds.text("headerTxt", label=self.dpUIinst.lang['i267_customAttrHeader']+' "'+ATTR_START+'"', align="left", height=30, font='boldLabelFont', parent=mainLayout)
         # filter
         filterLayout = cmds.columnLayout("filterLayout", adjustableColumn=True, parent=mainLayout)
-        self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand=self.selectAllTransforms, changeCommand=self.filterByName, adjustableColumn=2, parent=filterLayout)
+        self.itemFilterTFG = cmds.textFieldButtonGrp("itemFilterTFG", label=self.dpUIinst.lang['i268_filterByName'], text="", buttonLabel=self.dpUIinst.lang['m004_select']+" "+self.dpUIinst.lang['i211_all'], buttonCommand=self.selectNodes, changeCommand=self.filterByName, adjustableColumn=2, parent=filterLayout)
         cmds.separator(style='none', height=5, parent=filterLayout)
         # items and attributes layout
         tablePaneLayout = cmds.paneLayout("tablePaneLayout", parent=mainLayout)
-        self.itemSC = cmds.selectionConnection(activeList=True)
         self.mainSSE = cmds.spreadSheetEditor(mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False, parent=tablePaneLayout)
         # bottom layout for buttons
         cmds.separator(style='none', height=10, parent=mainLayout)
@@ -68,24 +72,103 @@ class CustomAttr(object):
         cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
         cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
         cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.updateID, parent=buttonLayout)
+        cmds.separator(style='none', height=15, parent=mainLayout)
+        # settings - frameLayout:
+        settingsFL = cmds.frameLayout('settingsFL', label=self.dpUIinst.lang['i215_setAttr'], collapsable=True, collapse=True, parent=mainLayout)
+        settingsCL = cmds.columnLayout('settingsCL', adjustableColumn=True, columnOffset=('left', 5), parent=settingsFL)
+        # type
+        cmds.text('typeTxt', align='left', label=self.dpUIinst.lang['i138_type'], height=30, font='boldLabelFont', parent=settingsCL)
+
+        self.typeAllCB = cmds.checkBox('typeAllCB', label=self.dpUIinst.lang['i339_any'].capitalize(), align='left', value=0, changeCommand=partial(self.updateType, "any"), parent=settingsCL)
+        self.typeTransformCB = cmds.checkBox('transform', label="transform", align='left', value=1, changeCommand=partial(self.updateType, "transform"), parent=settingsCL)
+        self.typeNetworkCB = cmds.checkBox('network', label="network", align='left', value=1, changeCommand=partial(self.updateType, "network"), parent=settingsCL)
+        cmds.separator(style='in', height=15, parent=settingsCL)
+        
+        # display
+        cmds.text('displayTxt', align='left', label=self.dpUIinst.lang['m217_suffix']+" "+self.dpUIinst.lang['c126_display'], height=30, font='boldLabelFont', parent=settingsCL)
+        diplayRCL = cmds.rowColumnLayout('displayRCL', numberOfColumns=6, columnWidth=[(1, 70), (2, 70), (3, 70), (4, 70), (5, 70), (6, 70)], columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left'), (6, 'left')], columnAttach=[(1, 'left', 10), (2, 'left', 10), (3, 'left', 10), (4, 'left', 10), (5, 'left', 10), (6, 'left', 10)], parent=settingsCL)
+        self.displayPaCCB = cmds.checkBox('displayPaCCB', label="PaC", annotation="Parent constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayPoCCB = cmds.checkBox('displayPoCCB', label="PoC", annotation="Point constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayOrCCB = cmds.checkBox('displayOrCCB', label="OrC", annotation="Orient constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayScCCB = cmds.checkBox('displayScCCB', label="ScC", annotation="Scale constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayAiCCB = cmds.checkBox('displayAiCCB', label="AiC", annotation="Aim constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayPVCCB = cmds.checkBox('displayPVCCB', label="PVC", annotation="Pole Vector Constraint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJntCB = cmds.checkBox('displayJntCB', label="Jnt", annotation="Skinned joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJxtCB = cmds.checkBox('displayJxtCB', label="Jxt", annotation="Extra joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJarCB = cmds.checkBox('displayJarCB', label="Jar", annotation="Ariticulation joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJadCB = cmds.checkBox('displayJadCB', label="Jad", annotation="Additional joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJcrCB = cmds.checkBox('displayJcrCB', label="Jcr", annotation="Corrective joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJisCB = cmds.checkBox('displayJisCB', label="Jis", annotation="Indirect skinning joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJaxCB = cmds.checkBox('displayJaxCB', label="Jax", annotation="Extra articulation joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJztCB = cmds.checkBox('displayJztCB', label="Jzt", annotation="Zero out joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayJEndCB = cmds.checkBox('displayJEndCB', label="JEnd", annotation="End joint", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayEffCB = cmds.checkBox('displayEffCB', label="Eff", annotation="Effector", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayIKHCB = cmds.checkBox('displayIKHCB', label="IKH", annotation="Ik Handle", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        self.displayHandleCB = cmds.checkBox('displayHandleCB', label="Handle", annotation="Deformer Handle", align='left', value=0, changeCommand=self.updateNameDisplay, parent=diplayRCL)
+        cmds.separator(style='none', height=15, parent=mainLayout)
+        # storing checkBoxes lists
+        self.typeCBList = [self.typeTransformCB, self.typeNetworkCB]
+        self.displayCBList = [self.displayPaCCB, self.displayPoCCB, self.displayOrCCB, self.displayScCCB, self.displayAiCCB, self.displayPVCCB, self.displayJntCB, self.displayJxtCB, self.displayJarCB, self.displayJadCB, self.displayJcrCB, self.displayJisCB, self.displayJaxCB, self.displayJztCB, self.displayEffCB, self.displayIKHCB, self.displayHandleCB]
         # call window
         cmds.showWindow(self.mainWindowName)
 
 
-    def selectAllTransforms(self, *args):
-        """ Just select all transform nodes in the scene.
+    def updateUI(self, *args):
+        self.getItemFilter()
+        cmds.spreadSheetEditor(self.mainSSE, edit=True, mainListConnection=self.itemSC, filter=self.itemF, attrRegExp=ATTR_START, niceNames=False, keyableOnly=False)
+
+
+
+
+    def updateNameDisplay(self, *args):
+        """ Update item filter name display argument.
         """
-        cleanTransformList = []
-        allTransformList = cmds.ls(selection=False, type="transform")
-        for item in allTransformList:
-            if not item in cleanTransformList:
-                addThisItem = True
-                for suffix in DONOTDISPLAY_LIST:
-                    if suffix in item:
-                        addThisItem = False
-                if addThisItem:
-                    cleanTransformList.append(item)
-        cmds.select(cleanTransformList)
+        print("argsName....", args)
+
+
+
+
+    def updateType(self, typeName, value, *args):
+        """
+        """
+        if typeName == "any":
+            if value:
+                self.typeList = []
+                for cbItem in self.typeCBList:
+                    cmds.checkBox(cbItem, edit=True, value=1, enable=0)
+            else:
+                self.typeList = DEFAULTTYPE_LIST
+                for cbItem in self.typeCBList:
+                    cmds.checkBox(cbItem, edit=True, value=1, enable=1)
+        else:
+            if value and not typeName in self.typeList:
+                self.typeList.append(typeName)
+            elif typeName in self.typeList:
+                self.typeList.remove(typeName)
+        self.updateUI()
+
+
+    def selectNodes(self, *args):
+        """ Select the desired type nodes in the scene.
+        """
+        #if self.typeList:
+        toSelectList = []
+        nodeList = cmds.ls(selection=False, type=self.typeList)
+        if nodeList:
+            for item in nodeList:
+                if not item in toSelectList:
+                    addThisItem = True
+                    for suffix in self.doNotDisplayList:
+                        if item.endswith(suffix):
+                            addThisItem = False
+                    if addThisItem:
+                        toSelectList.append(item)
+            if toSelectList:
+                toSelectList.sort()
+            cmds.select(toSelectList)
+            self.updateUI()
+        #else:
+        #    cmds.select(cmds.ls(selection=False))
 
 
     def filterByName(self, filterName=None, *args):
@@ -97,7 +180,7 @@ class CustomAttr(object):
             currentItemList = cmds.selectionConnection(self.itemSC, query=True, object=True)
             if currentItemList:
                 filteredItemList = self.utils.filterName(filterName, currentItemList, " ")
-                filteredItemList = list(set(filteredItemList) - set(IGNORE_LIST))
+                filteredItemList = list(set(filteredItemList) - set(self.ignoreList))
                 filteredItemList.sort()
                 cmds.selectionConnection(self.itemSC, edit=True, clear=True)
                 for item in filteredItemList:
@@ -139,7 +222,7 @@ class CustomAttr(object):
 
 
     def addAttr(self, attrIndex, itemList=None, attrName=None, shapes=True, descendents=False, *args):
-        """ Create attributes in the selected transform if they don't exists yet.
+        """ Create attributes in the selected node if they don't exists yet.
         """
         attr = None
         if not itemList:
@@ -239,10 +322,10 @@ class CustomAttr(object):
 
 
     def getItemList(self, itemList=None, *args):
-        """ Check if the itemList is a valid item or select all transform to return it.
+        """ Check if the itemList is a valid item or select all type to return it.
         """
         if not itemList:
-            return cmds.ls(selection=True, type="transform")
+            return cmds.ls(selection=True, type=self.typeList)
         return itemList
 
 
