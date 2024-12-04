@@ -160,6 +160,7 @@ MODULE_INSTANCE_INFO_ATTR = "moduleInstanceInfo"
 TEMP_GRP = "dpAR_Temp_Grp"
 GUIDEMIRROR_GRP = "dpAR_GuideMirror_Grp"
 INFO_ICON = "dp_info.png"
+PLUSINFOWIN_NAME = "dpPlusInfoWindow"
 DPAR_SITE = "https://nilouco.blogspot.com"
 DPAR_RAWURL = "https://raw.githubusercontent.com/nilouco/dpAutoRigSystem/master/dpAutoRigSystem/dpAutoRig.py"
 DPAR_GITHUB = "https://github.com/nilouco/dpAutoRigSystem"
@@ -202,6 +203,7 @@ class DP_AutoRig_UI(object):
         self.degreeOption = 0
         self.tempGrp = TEMP_GRP
         self.guideMirrorGrp = GUIDEMIRROR_GRP
+        self.plusInfoWinName = PLUSINFOWIN_NAME
         self.userDefAutoCheckUpdate = 1
         self.userDefAgreeTerms = 1
         self.dpData = DPDATA
@@ -2322,6 +2324,8 @@ class DP_AutoRig_UI(object):
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
         # Starting progress window
         self.utils.setProgress(self.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
+        if cmds.window(self.plusInfoWinName, query=True, exists=True):
+            self.utils.closeUI(self.plusInfoWinName)
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.rebuilding:

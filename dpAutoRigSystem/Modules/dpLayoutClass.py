@@ -2,7 +2,7 @@
 from maya import cmds
 from functools import partial
 
-DP_LAYOUTCLASS_VERSION = 2.4
+DP_LAYOUTCLASS_VERSION = 2.5
 
 
 class LayoutClass(object):
@@ -33,19 +33,16 @@ class LayoutClass(object):
         self.bsType = "bsType"
         self.jointsType = "jointsType"
         self.facialUserType = self.bsType
+        # plus icon
+        path = self.utils.findPath("dpAutoRig.py")
+        self.iconPlus = path.replace("Modules", "/Icons/dp_plusInfo.png")
 
         # BASIC MODULE LAYOUT:
-        self.basicColumn = cmds.rowLayout(numberOfColumns=5, width=190, columnWidth5=(30, 20, 80, 20, 35), adjustableColumn=3, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left'), (4, 'left'), (5, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 2), (3, 'both', 2), (4, 'both', 2), (5, 'both', 2)], parent=self.topColumn)
+        self.basicColumn = cmds.rowLayout(numberOfColumns=3, width=190, columnWidth3=(30, 120, 20), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left'), (3, 'left')], columnAttach=[(1, 'both', 2), (2, 'both', 4), (3, 'both', 0)], parent=self.topColumn)
         # create basic module UI:
         self.selectButton = cmds.button(label=" ", annotation=self.dpUIinst.lang['m004_select'], command=partial(self.reCreateEditSelectedModuleLayout, True), backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
-        self.annotationCheckBox = cmds.checkBox(label=" ", annotation=self.dpUIinst.lang['m014_annotation'], onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), value=0, parent=self.basicColumn)
         self.userName = cmds.textField('userName', annotation=self.dpUIinst.lang['i101_customName'], text=cmds.getAttr(self.moduleGrp+".customName"), changeCommand=self.editUserName, parent=self.basicColumn)
-        self.colorButton = cmds.button(label=" ", annotation=self.dpUIinst.lang['m013_color'], command=self.colorizeModuleUI, backgroundColor=(0.5, 0.5, 0.5), parent=self.basicColumn)
-        shapeSizeValue = cmds.getAttr(self.moduleGrp+'.shapeSize')
-        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.dpUIinst.lang['m067_shape']+" "+self.dpUIinst.lang['i115_size'], minValue=0.001, value=shapeSizeValue, precision=2, step=0.01, changeCommand=self.changeShapeSize, parent=self.basicColumn)
-        # edit values reading from guide:
-        displayAnnotationValue = cmds.getAttr(self.moduleGrp+'.displayAnnotation')
-        cmds.checkBox(self.annotationCheckBox, edit=True, value=displayAnnotationValue)
+        cmds.iconTextButton(image=self.iconPlus, height=30, width=17, style='iconOnly', command=partial(self.plusInfoWin, self.title, self.description, None, 'center', 305, 250), parent=self.basicColumn)
         
         # declaring the index color list to override and background color of buttons:
         # Manually add the "none" color
@@ -436,7 +433,8 @@ class LayoutClass(object):
                         cmds.optionMenu(self.deformedByMenu, edit=True, value='3 - Head and Jaw Deformers')
                     else:
                         cmds.optionMenu(self.deformedByMenu, edit=True, value='0 - None')
-
+                if cmds.window(self.dpUIinst.plusInfoWinName, query=True, exists=True):
+                    self.plusInfoWin()
             except:
                 pass
     
@@ -544,6 +542,12 @@ class LayoutClass(object):
         cmds.setAttr(self.moduleGrp+".shapeSize", cmds.floatField(self.shapeSizeFF, query=True, value=True))
     
     
+    def changeRadiusSize(self, *args):
+        """ Set the attribute value for the viewport radius size.
+        """
+        cmds.setAttr(self.radiusCtrl+".translateX", cmds.floatField(self.radiusSizeFF, query=True, value=True))
+        
+
     def changeMirror(self, item, *args):
         """ This function receives the mirror menu item and set it as a string in the guide base (moduleGrp).
             Also, call the builder of the preview mirror (for the viewport).
@@ -749,3 +753,35 @@ class LayoutClass(object):
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             cmds.setAttr(self.moduleGrp+".deformedBy", int(item[0]))
+
+
+    def plusInfoWin(self, *args):
+        """ Open plus info attributes to each module
+        """
+        self.dpUIinst.utils.closeUI(self.dpUIinst.plusInfoWinName)
+        guideName = self.guideNamespace.split("__")[-1]
+        customName = cmds.getAttr(self.moduleGrp+".customName")
+        if not customName:
+            customName = ""
+        # declaring variables:
+        plus_winWidth  = 200
+        plus_winHeight = 100
+        # creating Plus Info Window:
+        dpPlusInfo = cmds.window(self.dpUIinst.plusInfoWinName, title='dpAutoRig - '+self.dpUIinst.lang[self.title], iconName='dpPlus', widthHeight=(plus_winWidth, plus_winHeight), menuBar=False, sizeable=True, minimizeButton=False, maximizeButton=False)
+        # creating text layout:
+        plusRCL = cmds.rowColumnLayout('plusRCL', numberOfColumns=1, adjustableColumn=1, rowSpacing=[(1, 10)], columnOffset=[(1, 'both', 20)], parent=dpPlusInfo)
+        cmds.separator(style='none', height=1, parent=plusRCL)
+        headerRCL = cmds.rowColumnLayout('headerRCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 55), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=plusRCL)
+        cmds.text(label=guideName, align='left', parent=headerRCL)
+        cmds.text(label=customName, align='left', font='boldLabelFont', parent=headerRCL)
+        self.annotationCheckBox = cmds.checkBox(label=self.dpUIinst.lang['m014_annotation'], annotation=self.dpUIinst.lang['m014_annotation'], value=cmds.getAttr(self.moduleGrp+'.displayAnnotation'), onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), parent=plusRCL)
+        doubleRCL = cmds.rowColumnLayout('doubleRCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 55), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=plusRCL)
+        cmds.text(label=self.dpUIinst.lang['c067_radius'].capitalize(), align='left', parent=doubleRCL)
+        self.radiusSizeFF = cmds.floatField('radiusSizeFF', annotation=self.dpUIinst.lang['c067_radius']+" "+self.dpUIinst.lang['i115_size'], minValue=0.001, precision=2, step=0.01, changeCommand=self.changeRadiusSize, dragCommand=self.changeRadiusSize, value=cmds.getAttr(self.moduleGrp+'.shapeSize'), parent=doubleRCL)
+        cmds.text(label=self.dpUIinst.lang['m067_shape']+" "+self.dpUIinst.lang['i115_size'], align='left', parent=doubleRCL)
+        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.dpUIinst.lang['m067_shape']+" "+self.dpUIinst.lang['i115_size'], minValue=0.001, precision=2, step=0.01, changeCommand=self.changeShapeSize, dragCommand=self.changeShapeSize, value=cmds.getAttr(self.radiusCtrl+".translateX"), parent=doubleRCL)
+        currentGuideColorList = self.colorList[(cmds.getAttr(self.moduleGrp+".guideColor"))]
+        self.colorButton = cmds.button(label=self.dpUIinst.lang['m013_color'], annotation=self.dpUIinst.lang['m013_color'], width=plus_winWidth, command=self.colorizeModuleUI, backgroundColor=currentGuideColorList, parent=plusRCL)
+        cmds.separator(style='none', height=1, parent=plusRCL)
+        # call Info Window:
+        cmds.showWindow(dpPlusInfo)

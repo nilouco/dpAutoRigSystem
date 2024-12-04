@@ -461,6 +461,7 @@ class StartClass(object):
     def rigModule(self, *args):
         """ The fun part of the module, just read the values from editModuleLayout and create the rig for this guide.
         """
+        self.dpUIinst.utils.closeUI(self.dpUIinst.plusInfoWinName)
         # verify integrity of the guideModule:
         if self.verifyGuideModuleIntegrity():
             self.toIDList = []
