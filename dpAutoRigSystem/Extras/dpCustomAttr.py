@@ -27,6 +27,7 @@ class CustomAttr(object):
         self.mainWindowName = "dpCustomAttributesWindow"
         self.addWindowName = "dpAddCustomAttributesWindow"
         self.removeWindowName = "dpRemoveCustomAttributesWindow"
+        self.idWindowName = "dpIDCustomAttributesWindow"
         self.doNotDisplayList = []
         self.ignoreList = DEFAULTIGNORE_LIST.copy()
         self.typeList = DEFAULTTYPE_LIST.copy()
@@ -35,6 +36,7 @@ class CustomAttr(object):
             self.utils.closeUI(self.mainWindowName)
             self.utils.closeUI(self.addWindowName)
             self.utils.closeUI(self.removeWindowName)
+            self.utils.closeUI(self.idWindowName)
             self.getItemFilter()
             self.mainUI()
             self.updateNameDisplay()
@@ -75,7 +77,7 @@ class CustomAttr(object):
         cmds.button("addButton", label=self.dpUIinst.lang['i063_skinAddBtn'], backgroundColor=(0.6, 0.6, 0.6), width=70, command=self.addAttrUI, parent=buttonLayout)
         cmds.button("removeButton", label=self.dpUIinst.lang['i064_skinRemBtn'], backgroundColor=(0.4, 0.4, 0.4), width=70, command=self.removeAttrUI, parent=buttonLayout)
         cmds.button("updateIDButton", label=self.dpUIinst.lang['i089_update']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.updateID, parent=buttonLayout)
-        cmds.button("revealIDButton", label=self.dpUIinst.lang['i340_reveal']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=self.revealID, parent=buttonLayout)
+        cmds.button("revealIDButton", label=self.dpUIinst.lang['i340_reveal']+" "+ATTR_DPID, backgroundColor=(0.5, 0.5, 0.5), width=100, command=partial(self.revealID, None, True), parent=buttonLayout)
         cmds.separator(style='none', height=15, parent=mainLayout)
         # settings - frameLayout:
         settingsFL = cmds.frameLayout('settingsFL', label=self.dpUIinst.lang['i215_setAttr'], collapsable=True, collapse=True, parent=mainLayout)
@@ -345,23 +347,13 @@ class CustomAttr(object):
         self.addAttr(0, itemList)
 
 
-    def revealID(self, itemList=None, *args):
+    def revealID(self, itemList=None, win=False, *args):
         """ If UI, it opens a window to reveal the decomposed ID.
             Returns a dictionary with the IDs data.
         """
         idDic = {}
         if not itemList:
-            selList = cmds.ls(selection=True)
-            if selList:
-                itemList = []
-                for node in selList:
-                    if not node in self.ignoreList:
-                        for suffix in self.doNotDisplayList:
-                            if not node.endswith(suffix):
-                                itemList.append(node)
-            
-            itemList = [node for node in selList for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignoreList]
-            
+            itemList = [node for node in cmds.ls(selection=True) for suffix in self.doNotDisplayList if not node.endswith(suffix) and not node in self.ignoreList]
         if itemList:
             for item in itemList:
                 decomposedIDList = self.dpUIinst.utils.decomposeID(item)
@@ -370,10 +362,56 @@ class CustomAttr(object):
                                 "name" : decomposedIDList[1],
                                 "date" : decomposedIDList[2]
                                }
-            if self.ui:
+            if win:
                 if idDic:
-                    
-                    print("open window here...")
-
-        print(idDic)
+                    self.idUI(idDic)
         return idDic
+
+
+    def idUI(self, idDic, *args):
+        """ Create a window with exposed dpID attributes.
+        """
+        if idDic:
+            self.utils.closeUI(self.idWindowName)
+            id_winWidth  = 780
+            id_winHeight = 350
+            cmds.window(self.idWindowName, title=self.dpUIinst.lang['m212_customAttr']+" "+str(DP_CUSTOMATTR_VERSION), widthHeight=(id_winWidth, id_winHeight), menuBar=False, sizeable=True, minimizeButton=True, maximizeButton=False)
+            self.idAttrLayout = cmds.columnLayout('self.idAttrLayout', adjustableColumn=True, columnOffset=("both", 10))
+            cmds.text("headerIdTxt", label=ATTR_DPID+" "+self.dpUIinst.lang['m212_customAttr'], align="left", height=30, font='boldLabelFont', parent=self.idAttrLayout)
+            cmds.separator(style='none', height=10, parent=self.idAttrLayout)
+            refreshLayout = cmds.rowLayout("refreshLayout", numberOfColumns=2, width=400, columnWidth2=(200, 200), adjustableColumn=2, columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10)], parent=self.idAttrLayout)
+            cmds.button(self.dpUIinst.lang['m181_refresh'], width=80, command=self.populateIDUI, backgroundColor=(0.5, 0.5, 0.5), parent=refreshLayout)
+            cmds.separator(style='in', height=30, parent=self.idAttrLayout)
+            self.idScrollLayout = cmds.scrollLayout("self.idScrollLayout", width=300, parent=self.idAttrLayout)
+            self.populateIDUI(idDic)
+            cmds.separator(style='none', height=30, parent=self.idScrollLayout)
+            cmds.showWindow(self.idWindowName)
+
+
+    def populateIDUI(self, idDic, *args):
+        """ Fill UI with nodes of decomposed dpID info.
+        """
+        if not idDic:
+            idDic = self.revealID()
+        if idDic:
+            cmds.deleteUI(self.idScrollLayout)
+            self.idScrollLayout = cmds.scrollLayout("self.idScrollLayout", width=300, parent=self.idAttrLayout)
+            for n, node in enumerate(list(idDic.keys())):
+                # layout
+                cmds.rowColumnLayout(numberOfColumns=3, adjustableColumn=3, columnWidth=[(1, 200), (2, 80), (3, 500)], columnAlign=[(1, 'center'), (2, 'right'), (3, 'left')], columnAttach=[(1, 'both', 10), (2, 'both', 10), (3, 'both', 10)], parent=self.idScrollLayout)
+                # button
+                if node == idDic[node]["name"]:
+                    cmds.button(label=node, command=partial(self.dpUIinst.ctrls.selectControl, node, False))
+                else: #supposed renamed node
+                    cmds.button(label=node, command=partial(self.dpUIinst.ctrls.selectControl, node, False), backgroundColor=(0.8, 0.5, 0.5))
+                # data
+                cmds.text(label=ATTR_DPID)
+                cmds.text(label=idDic[node][ATTR_DPID])
+                cmds.text(label="")
+                cmds.text(label=self.dpUIinst.lang['m006_name'])
+                cmds.text(idDic[node]["name"])
+                cmds.text(label="")
+                cmds.text(label=self.dpUIinst.lang['i341_date'])
+                cmds.text(label=idDic[node]["date"])
+                cmds.separator(style='none', height=5, parent=self.idScrollLayout)
+            cmds.separator(style='none', height=10, parent=self.idScrollLayout)
