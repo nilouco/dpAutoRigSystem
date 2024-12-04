@@ -317,8 +317,8 @@ class DP_AutoRig_UI(object):
     def deleteExistWindow(self, *args):
         """ Check if there are the dpAutoRigWindow and dpAutoRigSystem_Control to deleteUI.
         """
-        if cmds.window('dpAutoRigWindow', query=True, exists=True):
-            cmds.deleteUI('dpAutoRigWindow', window=True)
+        self.utils.closeUI(self.plusInfoWinName)
+        self.utils.closeUI('dpAutoRigWindow')
         if cmds.dockControl('dpAutoRigSystem', query=True, exists=True):
             cmds.deleteUI('dpAutoRigSystem', control=True)
     
@@ -621,7 +621,7 @@ class DP_AutoRig_UI(object):
         cmds.radioButtonGrp(self.allUIs["controlActionRBG"], edit=True, select=1) #new control
         self.allUIs["degreeRBG"] = cmds.radioButtonGrp("degreeRBG", label=self.lang['i103_degree'], labelArray2=[self.lang['i104_linear'], self.lang['i105_cubic']], vertical=True, numberOfRadioButtons=2, parent=self.allUIs["controlOptionsLayout"])
         cmds.radioButtonGrp(self.allUIs["degreeRBG"], edit=True, select=1) #linear
-        self.allUIs["controlSizeFSG"] = cmds.floatSliderGrp("controlSizeFSG", label=self.lang['i115_size'], field=True, minValue=0.01, maxValue=10.0, fieldMinValue=0, fieldMaxValue=1000.0, precision=2, value=1.0, parent=self.allUIs["controlOptionsLayout"])
+        self.allUIs["controlSizeFSG"] = cmds.floatSliderGrp("controlSizeFSG", label=self.lang['i115_size'], field=True, minValue=0.01, maxValue=10.0, fieldMinValue=0, fieldMaxValue=100.0, precision=2, value=1.0, parent=self.allUIs["controlOptionsLayout"])
         self.allUIs["directionOMG"] = cmds.optionMenuGrp("directionOMG", label=self.lang['i106_direction'], parent=self.allUIs["controlOptionsLayout"])
         cmds.menuItem(label='-X')
         cmds.menuItem(label='+X')
@@ -2324,8 +2324,7 @@ class DP_AutoRig_UI(object):
         print('\ndpAutoRigSystem Log: ' + self.lang['i178_startRigging'] + '...\n')
         # Starting progress window
         self.utils.setProgress(self.lang['i178_startRigging'], 'dpAutoRigSystem', addOne=False, addNumber=False)
-        if cmds.window(self.plusInfoWinName, query=True, exists=True):
-            self.utils.closeUI(self.plusInfoWinName)
+        self.utils.closeUI(self.plusInfoWinName)
         # force refresh in order to avoid calculus error if creating Rig at the same time of guides:
         cmds.refresh()
         if self.rebuilding:

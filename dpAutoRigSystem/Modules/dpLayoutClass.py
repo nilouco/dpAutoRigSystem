@@ -539,13 +539,13 @@ class LayoutClass(object):
     def changeShapeSize(self, *args):
         """ Set the attribute value for shapeSize.
         """
-        cmds.setAttr(self.moduleGrp+".shapeSize", cmds.floatField(self.shapeSizeFF, query=True, value=True))
+        cmds.setAttr(self.moduleGrp+".shapeSize", cmds.floatSliderGrp(self.shapeSizeFSG, query=True, value=True))
     
     
     def changeRadiusSize(self, *args):
         """ Set the attribute value for the viewport radius size.
         """
-        cmds.setAttr(self.radiusCtrl+".translateX", cmds.floatField(self.radiusSizeFF, query=True, value=True))
+        cmds.setAttr(self.radiusCtrl+".translateX", cmds.floatSliderGrp(self.radiusSizeFSG, query=True, value=True))
         
 
     def changeMirror(self, item, *args):
@@ -775,11 +775,8 @@ class LayoutClass(object):
         cmds.text(label=guideName, align='left', parent=headerRCL)
         cmds.text(label=customName, align='left', font='boldLabelFont', parent=headerRCL)
         self.annotationCheckBox = cmds.checkBox(label=self.dpUIinst.lang['m014_annotation'], annotation=self.dpUIinst.lang['m014_annotation'], value=cmds.getAttr(self.moduleGrp+'.displayAnnotation'), onCommand=partial(self.displayAnnotation, 1), offCommand=partial(self.displayAnnotation, 0), parent=plusRCL)
-        doubleRCL = cmds.rowColumnLayout('doubleRCL', numberOfColumns=2, adjustableColumn=2, columnWidth=[(1, 55), (2, 150)], columnAlign=[(1, 'left'), (2, 'left')], columnAttach=[(1, 'left', 0), (2, 'left', 10)], parent=plusRCL)
-        cmds.text(label=self.dpUIinst.lang['c067_radius'].capitalize(), align='left', parent=doubleRCL)
-        self.radiusSizeFF = cmds.floatField('radiusSizeFF', annotation=self.dpUIinst.lang['c067_radius']+" "+self.dpUIinst.lang['i115_size'], minValue=0.001, precision=2, step=0.01, changeCommand=self.changeRadiusSize, dragCommand=self.changeRadiusSize, value=cmds.getAttr(self.moduleGrp+'.shapeSize'), parent=doubleRCL)
-        cmds.text(label=self.dpUIinst.lang['m067_shape']+" "+self.dpUIinst.lang['i115_size'], align='left', parent=doubleRCL)
-        self.shapeSizeFF = cmds.floatField('shapeSizeFF', annotation=self.dpUIinst.lang['m067_shape']+" "+self.dpUIinst.lang['i115_size'], minValue=0.001, precision=2, step=0.01, changeCommand=self.changeShapeSize, dragCommand=self.changeShapeSize, value=cmds.getAttr(self.radiusCtrl+".translateX"), parent=doubleRCL)
+        self.radiusSizeFSG = cmds.floatSliderGrp("radiusSizeFSG", label=self.dpUIinst.lang['c067_radius'].capitalize(), field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(self.radiusCtrl+".translateX"), changeCommand=self.changeRadiusSize, dragCommand=self.changeRadiusSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusRCL)
+        self.shapeSizeFSG = cmds.floatSliderGrp("shapeSizeFSG", label=self.dpUIinst.lang['m067_shape']+" "+self.dpUIinst.lang['i115_size'], field=True, minValue=0.001, maxValue=10.0, fieldMinValue=0.001, fieldMaxValue=100.0, precision=2, value=cmds.getAttr(self.moduleGrp+'.shapeSize'), changeCommand=self.changeShapeSize, dragCommand=self.changeShapeSize, columnWidth=[(1, 55), (2, 60), (3, 30)], parent=plusRCL)
         currentGuideColorList = self.colorList[(cmds.getAttr(self.moduleGrp+".guideColor"))]
         self.colorButton = cmds.button(label=self.dpUIinst.lang['m013_color'], annotation=self.dpUIinst.lang['m013_color'], width=plus_winWidth, command=self.colorizeModuleUI, backgroundColor=currentGuideColorList, parent=plusRCL)
         cmds.separator(style='none', height=1, parent=plusRCL)
